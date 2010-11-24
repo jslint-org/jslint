@@ -5784,3 +5784,8 @@ loop:   for (;;) {
     return itself;
 
 }());
+
+// Hook into commonJS module systems
+if (typeof module !== 'undefined' && "exports" in module) {
+    module.exports = JSLINT;
+}

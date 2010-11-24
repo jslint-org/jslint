@@ -1,0 +1,7 @@
+{
+  "name" : "JSLint-commonJS",
+  "description" : "JSLint with commonJS exportability and package.json",
+  "version" : "0.0.1",
+  "author" : "Douglas Crockford <douglas@crockford.com>",
+  "main": "./fulljslint"
+}
