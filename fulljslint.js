@@ -5784,3 +5784,8 @@ loop:   for (;;) {
     return itself;
 
 }());
+
+// export JSLINT if in commonjs env
+if (typeof exports !== 'undefined') {
+    exports.JSLINT = JSLINT;
+}
