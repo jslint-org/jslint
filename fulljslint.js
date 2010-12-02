@@ -5408,6 +5408,12 @@ loop:   for (;;) {
                 for (i = 0; i < a.length; i += 1) {
                     predefined[a[i]] = true;
                 }
+            } else if (a instanceof Object) {
+                for (i in a) {
+                    if (a.hasOwnProperty(i)) {
+                        predefined[i] = (a[i] === true);
+                    }
+                }
             }
             if (o.adsafe) {
                 o.safe = true;
