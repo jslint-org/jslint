@@ -5419,7 +5419,7 @@ loop:   for (;;) {
                     }
                 } else if (typeof a === 'object') {
                     k = Object.keys(a);
-                    for (i = 0; i < a.length; i += 1) {
+                    for (i = 0; i < k.length; i += 1) {
                         predefined[k[i]] = !!a[k];
                     }
                 }
