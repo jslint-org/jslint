@@ -162,7 +162,7 @@ SOFTWARE.
     "(params)", "(scope)", "(statement)", "(token)", "(verb)", ")", "*",
     "+", "-", "/", ";", "<", "</", "<=", "==", "===", ">",
     ">=", ADSAFE, ActiveXObject, Array, Boolean, COM, CScript, Canvas,
-    CustomAnimation, Date, Debug, E, Enumerator, Error, EvalError,
+    CustomAnimation, Date, Debug, E, Enumerator, Error, EvalError, expression,
     FadeAnimation, Flash, FormField, Frame, Function, HotKey, Image, JSON,
     LN10, LN2, LOG10E, LOG2E, MAX_VALUE, MIN_VALUE, Math, MenuItem,
     MoveAnimation, NEGATIVE_INFINITY, Number, Object, Option, PI,
@@ -254,8 +254,8 @@ SOFTWARE.
     select, serialize, setInterval, setTimeout, shift,
     showWidgetPreferences, sienna, silver, skyblue, slateblue, slategray,
     sleep, slice, small, snow, sort, source, span, spawn, speak, speech,
-    split, springgreen, src, stack, status, steelblue, strict, strong,
-    style, styleproperty, sub, substr, sup, supplant, suppressUpdates,
+    split, springgreen, src, stack, statement, status, steelblue, strict,
+    strong, style, styleproperty, sub, substr, sup, supplant, suppressUpdates,
     switch, sync, system, table, "table-layout", tan, tbody, td, teal,
     tellWidget, test, "text-align", "text-decoration", "text-indent",
     "text-shadow", "text-transform", textarea, tfoot, th, thead, third,
@@ -2098,7 +2098,7 @@ loop:   for (;;) {
                 }
                 if (t.value === 'indent' && o === '/*jslint') {
                     b = +v.value;
-                    if (typeof b !== 'number' || !isFinite(b) || b <= 0 ||
+                    if (typeof b !== 'number' || !isFinite(b) || b < 0 ||
                             Math.floor(b) !== b) {
                         error("Expected a small integer and instead saw '{a}'.",
                             v, v.value);
@@ -2115,7 +2115,7 @@ loop:   for (;;) {
                     obj.maxerr = b;
                 } else if (t.value === 'maxlen' && o === '/*jslint') {
                     b = +v.value;
-                    if (typeof b !== 'number' || !isFinite(b) || b <= 0 ||
+                    if (typeof b !== 'number' || !isFinite(b) || b < 0 ||
                             Math.floor(b) !== b) {
                         error("Expected a small integer and instead saw '{a}'.",
                             v, v.value);
