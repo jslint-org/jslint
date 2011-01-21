@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-01-20
+// 2011-01-21
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -2326,7 +2326,7 @@ loop:   for (;;) {
                 };
             } else {
                 was = indent;
-                open = mode === 'var' ||
+                open = (mode === 'var' && option.indent === 4) ||
                     (nexttoken.line !== token.line && mode !== 'statement');
                 indent = {
                     array: mode === 'array' || mode === 'control',
@@ -2338,7 +2338,7 @@ loop:   for (;;) {
                     statement: mode === 'statement' || mode === 'var',
                     was: was
                 };
-                if (mode === 'var') {
+                if (mode === 'var' && open) {
                     var_mode = indent;
                 }
             }
@@ -6096,7 +6096,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-01-20';
+    itself.edition = '2011-01-21';
 
     return itself;
 
