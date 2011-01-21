@@ -162,111 +162,110 @@ SOFTWARE.
     "(params)", "(scope)", "(statement)", "(token)", "(verb)", ")", "*",
     "+", "-", "/", ";", "<", "</", "<=", "==", "===", ">",
     ">=", ADSAFE, ActiveXObject, Array, Boolean, COM, CScript, Canvas,
-    CustomAnimation, Date, Debug, E, Enumerator, Error, EvalError, expression,
-    FadeAnimation, Flash, FormField, Frame, Function, HotKey, Image, JSON,
-    LN10, LN2, LOG10E, LOG2E, MAX_VALUE, MIN_VALUE, Math, MenuItem,
-    MoveAnimation, NEGATIVE_INFINITY, Number, Object, Option, PI,
-    POSITIVE_INFINITY, Point, RangeError, Rectangle, ReferenceError, RegExp,
-    ResizeAnimation, RotateAnimation, SQRT1_2, SQRT2, ScrollBar, String,
-    Style, SyntaxError, System, Text, TextArea, Timer, TypeError, URIError,
-    URL, VBArray, WScript, Web, Window, XMLDOM, XMLHttpRequest, "\\", a,
-    abbr, acronym, activeborder, activecaption, addEventListener, address,
-    adsafe, alert, aliceblue, all, animator, antiquewhite, appleScript,
-    applet, apply, approved, appworkspace, aqua, aquamarine, area,
-    arguments, arity, array, article, aside, assign, at, audio,
-    autocomplete, azure, b, background, "background-attachment",
-    "background-color", "background-image", "background-position",
-    "background-repeat", base, bdo, beep, beige, big, bisque, bitwise,
-    black, blanchedalmond, block, blockquote, blue, blueviolet, blur, body,
-    border, "border-bottom", "border-bottom-color", "border-bottom-style",
-    "border-bottom-width", "border-collapse", "border-color", "border-left",
-    "border-left-color", "border-left-style", "border-left-width",
-    "border-right", "border-right-color", "border-right-style",
-    "border-right-width", "border-spacing", "border-style", "border-top",
-    "border-top-color", "border-top-style", "border-top-width",
-    "border-width", bottom, br, braille, brown, browser, burlywood, button,
-    buttonface, buttonhighlight, buttonshadow, buttontext, bytesToUIString,
-    c, cadetblue, call, callee, caller, canvas, cap, caption,
-    "caption-side", captiontext, case, center, charAt, charCodeAt,
-    character, chartreuse, chocolate, chooseColor, chooseFile, chooseFolder,
-    cite, clear, clearInterval, clearTimeout, clip, close, closeWidget,
-    closed, closure, cm, code, col, colgroup, color, command, comments,
-    concat, confirm, console, constructor, content, convertPathToHFS,
-    convertPathToPlatform, coral, cornflowerblue, cornsilk,
-    "counter-increment", "counter-reset", create, crimson, css, cursor,
-    cyan, d, darkblue, darkcyan, darkgoldenrod, darkgray, darkgreen,
-    darkkhaki, darkmagenta, darkolivegreen, darkorange, darkorchid, darkred,
-    darksalmon, darkseagreen, darkslateblue, darkslategray, darkturquoise,
-    darkviolet, data, datalist, dd, debug, decodeURI, decodeURIComponent,
-    deeppink, deepskyblue, default, defaultStatus, defineClass, del,
-    deserialize, details, devel, dfn, dialog, dimgray, dir, direction,
-    display, disrupt, div, dl, do, document, dodgerblue, dt, edge, edition,
-    else, em, embed, embossed, empty, "empty-cells", encodeURI,
-    encodeURIComponent, entityify, errors, es5, escape, eval, event,
-    evidence, evil, ex, exception, exec, fieldset, figure, filesystem,
-    firebrick, first, float, floor, floralwhite, focus, focusWidget, font,
-    "font-family", "font-size", "font-size-adjust", "font-stretch",
-    "font-style", "font-variant", "font-weight", footer, for, forestgreen,
-    forin, form, fragment, frame, frames, frameset, from, fromCharCode,
-    fuchsia, fud, funct, function, functions, g, gainsboro, gc,
-    getComputedStyle, ghostwhite, global, globals, gold, goldenrod, gray,
-    graytext, green, greenyellow, h1, h2, h3, h4, h5, h6, handheld,
-    hasOwnProperty, head, header, height, help, hgroup, highlight,
-    highlighttext, history, honeydew, hotpink, hr, "hta:application", html,
-    i, iTunes, id, identifier, iframe, img, immed, implieds, in,
-    inactiveborder, inactivecaption, inactivecaptiontext, include, indent,
-    indexOf, indianred, indigo, infobackground, infotext, init, input, ins,
-    isAlpha, isApplicationRunning, isArray, isDigit, isFinite, isNaN, ivory,
-    join, jslint, json, kbd, keygen, keys, khaki, konfabulatorVersion,
-    label, lang, last, lavender, lavenderblush, lawngreen, lbp, led, left,
-    legend, lemonchiffon, length, "letter-spacing", li, lib, lightblue,
-    lightcoral, lightcyan, lightgoldenrodyellow, lightgreen, lightpink,
-    lightsalmon, lightseagreen, lightskyblue, lightslategray,
-    lightsteelblue, lightyellow, lime, limegreen, line, "line-height",
-    linen, link, "list-style", "list-style-image", "list-style-position",
-    "list-style-type", load, loadClass, location, log, m, magenta, map,
-    margin, "margin-bottom", "margin-left", "margin-right", "margin-top",
-    mark, "marker-offset", maroon, match, "max-height", "max-width", maxerr,
-    maxlen, md5, mediumaquamarine, mediumblue, mediumorchid, mediumpurple,
-    mediumseagreen, mediumslateblue, mediumspringgreen, mediumturquoise,
-    mediumvioletred, member, menu, menutext, message, meta, meter,
-    midnightblue, "min-height", "min-width", mintcream, mistyrose, mm,
-    moccasin, moveBy, moveTo, name, nav, navajowhite, navigator, navy,
-    newcap, next, noframes, nomen, noscript, nud, object, ol, oldlace,
-    olive, olivedrab, on, onbeforeunload, onblur, onerror, onevar, onfocus,
-    onload, onresize, onunload, opacity, open, openURL, opener, opera,
-    optgroup, option, orange, orangered, orchid, outer, outline,
-    "outline-color", "outline-style", "outline-width", output, overflow,
-    "overflow-x", "overflow-y", p, padding, "padding-bottom",
-    "padding-left", "padding-right", "padding-top", "page-break-after",
-    "page-break-before", palegoldenrod, palegreen, paleturquoise,
-    palevioletred, papayawhip, param, parent, parseFloat, parseInt,
-    passfail, pc, peachpuff, peru, pink, play, plum, plusplus, pop,
-    popupMenu, position, postcomments, powderblue, pre, predef,
-    preferenceGroups, preferences, prev, print, progress, projection,
-    prompt, prototype, pt, purple, push, px, q, quit, quote, quotes, random,
-    range, raw, readFile, readUrl, reason, red, regexp, reloadWidget,
-    removeEventListener, replace, report, reserved, resizeBy, resizeTo,
-    resolvePath, resumeUpdates, rhino, right, rosybrown, royalblue, rp, rt,
-    ruby, runCommand, runCommandInBg, saddlebrown, safe, salmon, samp,
-    sandybrown, saveAs, savePreferences, screen, script, scroll, scrollBy,
-    scrollTo, scrollbar, seagreen, seal, search, seashell, second, section,
-    select, serialize, setInterval, setTimeout, shift,
-    showWidgetPreferences, sienna, silver, skyblue, slateblue, slategray,
-    sleep, slice, small, snow, sort, source, span, spawn, speak, speech,
-    split, springgreen, src, stack, statement, status, steelblue, strict,
-    strong, style, styleproperty, sub, substr, sup, supplant, suppressUpdates,
-    switch, sync, system, table, "table-layout", tan, tbody, td, teal,
-    tellWidget, test, "text-align", "text-decoration", "text-indent",
-    "text-shadow", "text-transform", textarea, tfoot, th, thead, third,
-    thistle, threeddarkshadow, threedface, threedhighlight,
-    threedlightshadow, threedshadow, thru, time, title, toLowerCase,
-    toString, toUpperCase, toint32, token, tomato, top, tr, tree, tt, tty,
-    turquoise, tv, type, u, ul, undef, unescape, "unicode-bidi", unused,
-    unwatch, updateNow, urls, value, valueOf, var, version,
-    "vertical-align", video, violet, visibility, was, watch, wheat, while,
-    white, "white-space", whitesmoke, widget, width, window, windowframe,
-    windows, windowtext, "word-spacing", "word-wrap", wrap, yahooCheckLogin,
+    CustomAnimation, Date, Debug, E, Enumerator, Error, EvalError, 
+    FadeAnimation, Flash, FormField, Frame, Function, HotKey, Image, JSON, 
+    LN10, LN2, LOG10E, LOG2E, MAX_VALUE, MIN_VALUE, Math, MenuItem, 
+    MoveAnimation, NEGATIVE_INFINITY, Number, Object, Option, PI, 
+    POSITIVE_INFINITY, Point, RangeError, Rectangle, ReferenceError, RegExp, 
+    ResizeAnimation, RotateAnimation, SQRT1_2, SQRT2, ScrollBar, String, 
+    Style, SyntaxError, System, Text, TextArea, Timer, TypeError, URIError, 
+    URL, VBArray, WScript, Web, Window, XMLDOM, XMLHttpRequest, "\\", a, 
+    abbr, acronym, activeborder, activecaption, addEventListener, address, 
+    adsafe, alert, aliceblue, all, animator, antiquewhite, appleScript, 
+    applet, apply, approved, appworkspace, aqua, aquamarine, area, 
+    arguments, arity, article, aside, assign, at, audio, autocomplete, 
+    azure, b, background, "background-attachment", "background-color", 
+    "background-image", "background-position", "background-repeat", base, 
+    bdo, beep, beige, big, bisque, bitwise, black, blanchedalmond, block, 
+    blockquote, blue, blueviolet, blur, body, border, "border-bottom", 
+    "border-bottom-color", "border-bottom-style", "border-bottom-width", 
+    "border-collapse", "border-color", "border-left", "border-left-color", 
+    "border-left-style", "border-left-width", "border-right", 
+    "border-right-color", "border-right-style", "border-right-width", 
+    "border-spacing", "border-style", "border-top", "border-top-color", 
+    "border-top-style", "border-top-width", "border-width", bottom, br, 
+    braille, brown, browser, burlywood, button, buttonface, buttonhighlight, 
+    buttonshadow, buttontext, bytesToUIString, c, cadetblue, call, callee, 
+    caller, canvas, cap, caption, "caption-side", captiontext, case, center, 
+    charAt, charCodeAt, character, chartreuse, chocolate, chooseColor, 
+    chooseFile, chooseFolder, cite, clear, clearInterval, clearTimeout, 
+    clip, close, closeWidget, closed, closure, cm, code, col, colgroup, 
+    color, command, comments, concat, confirm, console, constructor, 
+    content, convertPathToHFS, convertPathToPlatform, coral, cornflowerblue, 
+    cornsilk, "counter-increment", "counter-reset", create, crimson, css, 
+    cursor, cyan, d, darkblue, darkcyan, darkgoldenrod, darkgray, darkgreen, 
+    darkkhaki, darkmagenta, darkolivegreen, darkorange, darkorchid, darkred, 
+    darksalmon, darkseagreen, darkslateblue, darkslategray, darkturquoise, 
+    darkviolet, data, datalist, dd, debug, decodeURI, decodeURIComponent, 
+    deeppink, deepskyblue, default, defaultStatus, defineClass, del, 
+    deserialize, details, devel, dfn, dialog, dimgray, dir, direction, 
+    display, disrupt, div, dl, do, document, dodgerblue, dt, edge, edition, 
+    else, em, embed, embossed, empty, "empty-cells", encodeURI, 
+    encodeURIComponent, entityify, errors, es5, escape, eval, event, 
+    evidence, evil, ex, exception, exec, expression, fieldset, figure, 
+    filesystem, firebrick, first, float, floor, floralwhite, focus, 
+    focusWidget, font, "font-family", "font-size", "font-size-adjust", 
+    "font-stretch", "font-style", "font-variant", "font-weight", footer, 
+    for, forestgreen, forin, form, fragment, frame, frames, frameset, from, 
+    fromCharCode, fuchsia, fud, funct, function, functions, g, gainsboro, 
+    gc, getComputedStyle, ghostwhite, global, globals, gold, goldenrod, 
+    gray, graytext, green, greenyellow, h1, h2, h3, h4, h5, h6, handheld, 
+    hasOwnProperty, head, header, height, help, hgroup, highlight, 
+    highlighttext, history, honeydew, hotpink, hr, "hta:application", html, 
+    i, iTunes, id, identifier, iframe, img, immed, implieds, in, 
+    inactiveborder, inactivecaption, inactivecaptiontext, include, indent, 
+    indexOf, indianred, indigo, infobackground, infotext, init, input, ins, 
+    isAlpha, isApplicationRunning, isArray, isDigit, isFinite, isNaN, ivory, 
+    join, jslint, json, kbd, keygen, keys, khaki, konfabulatorVersion, 
+    label, lang, last, lavender, lavenderblush, lawngreen, lbp, led, left, 
+    legend, lemonchiffon, length, "letter-spacing", li, lib, lightblue, 
+    lightcoral, lightcyan, lightgoldenrodyellow, lightgreen, lightpink, 
+    lightsalmon, lightseagreen, lightskyblue, lightslategray, 
+    lightsteelblue, lightyellow, lime, limegreen, line, "line-height", 
+    linen, link, "list-style", "list-style-image", "list-style-position", 
+    "list-style-type", load, loadClass, location, log, m, magenta, map, 
+    margin, "margin-bottom", "margin-left", "margin-right", "margin-top", 
+    mark, "marker-offset", maroon, match, "max-height", "max-width", maxerr, 
+    maxlen, md5, mediumaquamarine, mediumblue, mediumorchid, mediumpurple, 
+    mediumseagreen, mediumslateblue, mediumspringgreen, mediumturquoise, 
+    mediumvioletred, member, menu, menutext, message, meta, meter, 
+    midnightblue, "min-height", "min-width", mintcream, mistyrose, mm, 
+    moccasin, mode, moveBy, moveTo, name, nav, navajowhite, navigator, navy, 
+    newcap, next, noframes, nomen, noscript, nud, object, ol, oldlace, 
+    olive, olivedrab, on, onbeforeunload, onblur, onerror, onevar, onfocus, 
+    onload, onresize, onunload, opacity, open, openURL, opener, opera, 
+    optgroup, option, orange, orangered, orchid, outer, outline, 
+    "outline-color", "outline-style", "outline-width", output, overflow, 
+    "overflow-x", "overflow-y", p, padding, "padding-bottom", 
+    "padding-left", "padding-right", "padding-top", "page-break-after", 
+    "page-break-before", palegoldenrod, palegreen, paleturquoise, 
+    palevioletred, papayawhip, param, parent, parseFloat, parseInt, 
+    passfail, pc, peachpuff, peru, pink, play, plum, plusplus, pop, 
+    popupMenu, position, postcomments, powderblue, pre, predef, 
+    preferenceGroups, preferences, prev, print, progress, projection, 
+    prompt, prototype, pt, purple, push, px, q, quit, quote, quotes, random, 
+    range, raw, readFile, readUrl, reason, red, regexp, reloadWidget, 
+    removeEventListener, replace, report, reserved, resizeBy, resizeTo, 
+    resolvePath, resumeUpdates, rhino, right, rosybrown, royalblue, rp, rt, 
+    ruby, runCommand, runCommandInBg, saddlebrown, safe, salmon, samp, 
+    sandybrown, saveAs, savePreferences, screen, script, scroll, scrollBy, 
+    scrollTo, scrollbar, seagreen, seal, search, seashell, second, section, 
+    select, serialize, setInterval, setTimeout, shift, 
+    showWidgetPreferences, sienna, silver, skyblue, slateblue, slategray, 
+    sleep, slice, small, snow, sort, source, span, spawn, speak, speech, 
+    split, springgreen, src, stack, statement, status, steelblue, strict, 
+    strong, style, styleproperty, sub, substr, sup, supplant, 
+    suppressUpdates, switch, sync, system, table, "table-layout", tan, 
+    tbody, td, teal, tellWidget, test, "text-align", "text-decoration", 
+    "text-indent", "text-shadow", "text-transform", textarea, tfoot, th, 
+    thead, third, thistle, threeddarkshadow, threedface, threedhighlight, 
+    threedlightshadow, threedshadow, thru, time, title, toLowerCase, 
+    toString, toUpperCase, toint32, token, tomato, top, tr, tree, tt, tty, 
+    turquoise, tv, type, u, ul, undef, unescape, "unicode-bidi", unused, 
+    unwatch, updateNow, urls, value, valueOf, var, version, 
+    "vertical-align", video, violet, visibility, was, watch, wheat, while, 
+    white, "white-space", whitesmoke, widget, width, window, windowframe, 
+    windows, windowtext, "word-spacing", "word-wrap", wrap, yahooCheckLogin, 
     yahooLogin, yahooLogout, yellow, yellowgreen, "z-index", "}"
 */
 
@@ -2230,14 +2229,15 @@ loop:   for (;;) {
                         expected_at(1);
                     } else if (nexttoken.edge === 'case') {
                         expected_at(indent.at - option.indent);
-                    } else if (!indent.array || nexttoken.line !== token.line) {
+                    } else if (indent.mode !== 'array' || nexttoken.line !== token.line) {
                         expected_at(indent.at);
                     }
 
 // If the token is not an edge, but is the first token on the line.
 
                 } else if (nexttoken.line !== token.line &&
-                        nexttoken.from < indent.at + option.indent) {
+                        nexttoken.from < indent.at + 
+                        (indent.mode === 'expression' ? 0 : option.indent)) {
                     expected_at(indent.at + option.indent);
                 }
             } else if (nexttoken.line !== token.line) {
@@ -2245,9 +2245,11 @@ loop:   for (;;) {
                     expected_at(indent.at);
                 } else {
                     indent.wrap = true;
-                    if (nexttoken.from <
-                            indent.at + (indent.expression ? 0 : option.indent)) {
-                        expected_at(indent.at + indent.expression);
+                    if (indent.mode === 'statement' || indent.mode === 'var') {
+                        expected_at(indent.at + option.indent);
+                    } else if (nexttoken.from < indent.at + 
+                            (indent.mode === 'expression' ? 0 : option.indent)) {
+                        expected_at(indent.at + option.indent);
                     }
                 }
             }
@@ -2326,16 +2328,15 @@ loop:   for (;;) {
                 };
             } else {
                 was = indent;
-                open = (mode === 'var' && option.indent === 4) ||
+                open = mode === 'var' ||
                     (nexttoken.line !== token.line && mode !== 'statement');
                 indent = {
-                    array: mode === 'array' || mode === 'control',
                     at: (open || mode === 'control' ?
                         was.at + option.indent : was.at) +
                         (was.wrap ? option.indent : 0),
                     expression: mode === 'expression',
+                    mode: mode,
                     open: open,
-                    statement: mode === 'statement' || mode === 'var',
                     was: was
                 };
                 if (mode === 'var' && open) {
@@ -3468,6 +3469,7 @@ loop:   for (;;) {
         step_in('expression');
         discard();
         no_space();
+        edge();
         if (nexttoken.id === 'function') {
             nexttoken.immed = true;
         }
@@ -3816,8 +3818,6 @@ loop:   for (;;) {
         this.first = [];
         step_in('var');
         for (;;) {
-            spaces();
-            edge();
             name = nexttoken;
             id = identifier();
             if (funct['(global)'] && predefined[id] === false) {
@@ -3854,6 +3854,8 @@ loop:   for (;;) {
                 indent.open = false;
                 indent.at -= option.indent;
             }
+            spaces();
+            edge();
         }
         var_mode = false;
         step_out();
