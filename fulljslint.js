@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-01-19
+// 2011-01-20
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -2206,8 +2206,9 @@ loop:   for (;;) {
 // intention.
 
             if (var_mode && nexttoken.line !== token.line) {
-                if (nexttoken.from ===
-                        indent.at - (nexttoken.edge ? option.indent : 0)) {
+                if ((var_mode !== indent || !nexttoken.edge) &&
+                        nexttoken.from === indent.at -
+                        (nexttoken.edge ? option.indent : 0)) {
                     var dent = indent;
                     for (;;) {
                         dent.at -= option.indent;
@@ -2244,7 +2245,10 @@ loop:   for (;;) {
                     expected_at(indent.at);
                 } else {
                     indent.wrap = true;
-                    expected_at(indent.at + option.indent);
+                    if (nexttoken.from <
+                            indent.at + (indent.expression ? 0 : option.indent)) {
+                        expected_at(indent.at + indent.expression);
+                    }
                 }
             }
         }
@@ -2329,7 +2333,9 @@ loop:   for (;;) {
                     at: (open || mode === 'control' ?
                         was.at + option.indent : was.at) +
                         (was.wrap ? option.indent : 0),
+                    expression: mode === 'expression',
                     open: open,
+                    statement: mode === 'statement' || mode === 'var',
                     was: was
                 };
                 if (mode === 'var') {
@@ -3382,7 +3388,11 @@ loop:   for (;;) {
     });
 
     infix('(', 160, function (left, that) {
-        no_space_only(prevtoken, token);
+        if (indent && indent.statement) {
+            no_space_only(prevtoken, token);
+        } else {
+            no_space(prevtoken, token);
+        }
         if (!left.immed && left.id === 'function') {
             warning("Wrap an immediate function invocation in parentheses " +
                 "to assist the reader in understanding that the expression " +
@@ -3455,10 +3465,7 @@ loop:   for (;;) {
     }, true);
 
     prefix('(', function () {
-        var b = token.line !== nexttoken.line;
-        if (b) {
-            step_in();
-        }
+        step_in('expression');
         discard();
         no_space();
         if (nexttoken.id === 'function') {
@@ -3466,11 +3473,7 @@ loop:   for (;;) {
         }
         var v = expression(0);
         no_space();
-        if (b) {
-            step_out(')', this);
-        } else {
-            advance(')', this);
-        }
+        step_out(')', this);
         discard();
         if (v.id === 'function') {
             if (nexttoken.id === '(') {
@@ -6093,7 +6096,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-01-19';
+    itself.edition = '2011-01-20';
 
     return itself;
 
