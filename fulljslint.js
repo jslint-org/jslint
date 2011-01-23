@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-01-21
+// 2011-01-22
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -2319,7 +2319,7 @@ loop:   for (;;) {
 
     function step_in(mode) {
         var open, was;
-        if (option.indent) {
+        if (option.white && option.indent) {
             if (typeof mode === 'number') {
                 indent = {
                     at: mode,
@@ -2414,7 +2414,9 @@ loop:   for (;;) {
     }
 
     function comma() {
-        no_space_only();
+        if (option.white) {
+            no_space_only();
+        }
         advance(',');
         discard();
         spaces();
@@ -2422,7 +2424,9 @@ loop:   for (;;) {
 
 
     function semicolon() {
-        no_space_only();
+        if (option.white) {
+            no_space_only();
+        }
         advance(';');
         discard();
         if (semicolon_coda[nexttoken.id] !== true) {
@@ -6098,7 +6102,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-01-21';
+    itself.edition = '2011-01-22';
 
     return itself;
 
