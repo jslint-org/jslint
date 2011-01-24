@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-01-22
+// 2011-01-23
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -158,7 +158,7 @@ SOFTWARE.
 
 /*members "\b", "\t", "\n", "\f", "\r", "!=", "!==", "\"", "%", "'",
     "(begin)", "(breakage)", "(context)", "(end)", "(error)", "(global)",
-    "(identifier)", "(last)", "(line)", "(loopage)", "(name)", "(onevar)",
+    "(identifier)", "(line)", "(loopage)", "(name)", "(onevar)",
     "(params)", "(scope)", "(statement)", "(token)", "(verb)", ")", "*",
     "+", "-", "/", ";", "<", "</", "<=", "==", "===", ">",
     ">=", ADSAFE, ActiveXObject, Array, Boolean, COM, CScript, Canvas,
@@ -618,7 +618,6 @@ var JSLINT = (function () {
         ],
 
         functions,      // All of the functions
-
         global,         // The global scope
         htmltag = {
             a:        {},
@@ -1034,7 +1033,19 @@ var JSLINT = (function () {
         };
     }
 
-// Non standard methods
+// Substandard methods
+
+    if (typeof Array.prototype.map !== 'function') {
+        Array.prototype.map = function (func) {
+            var i, result = [];
+            for (i = 0; i < this.length; i += 1) {
+                try {
+                    result[i] = func(this[i], this);
+                } catch (ignore) {
+                }
+            }
+        };
+    }
 
     if (typeof String.prototype.entityify !== 'function') {
         String.prototype.entityify = function () {
@@ -3702,7 +3713,6 @@ loop:   for (;;) {
         func.block = block(false);
 
         scope = s;
-        funct['(last)'] = token.line;
         funct = funct['(context)'];
         return func;
     }
@@ -5954,7 +5964,6 @@ loop:   for (;;) {
             fu.name = f['(name)'];
             fu.param = f['(params)'];
             fu.line = f['(line)'];
-            fu.last = f['(last)'];
             data.functions.push(fu);
         }
 
@@ -5992,6 +6001,9 @@ loop:   for (;;) {
                 }
                 o.push('</div>');
             }
+        }
+        function get_value(object) {
+            return object.value;
         }
 
         if (data.errors || data.implieds || data.unused) {
@@ -6058,9 +6070,9 @@ loop:   for (;;) {
             for (i = 0; i < data.functions.length; i += 1) {
                 f = data.functions[i];
 
-                o.push('<br><div class=function><i>' + f.line + '-' +
-                    f.last + '</i> ' + (f.name || '') + '(' +
-                    (f.param ? f.param.join(', ') : '') + ')</div>');
+                o.push('<br><div class=function><i>' + f.line + '</i> ' + 
+                    (f.name || '') + '(' +
+                    (f.param ? f.param.map(get_value).join(', ') : '') + ')</div>');
                 detail('<big><b>Unused</b></big>', f.unused);
                 detail('Closure', f.closure);
                 detail('Variable', f['var']);
@@ -6102,7 +6114,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-01-22';
+    itself.edition = '2011-01-23';
 
     return itself;
 
