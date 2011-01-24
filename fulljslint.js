@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-01-23
+// 2011-01-24
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -2324,7 +2324,7 @@ loop:   for (;;) {
 // Indentation intention
 
     function edge(mode) {
-        nexttoken.edge = indent.open && (mode || true);
+        nexttoken.edge = !indent || (indent.open && (mode || true));
     }
 
 
@@ -2337,6 +2337,12 @@ loop:   for (;;) {
                     open: true,
                     was: was
                 };
+            } else if (!indent) {
+                indent = {
+                    at: 1,
+                    mode: 'statement',
+                    open: true
+                };
             } else {
                 was = indent;
                 open = mode === 'var' ||
@@ -2345,7 +2351,6 @@ loop:   for (;;) {
                     at: (open || mode === 'control' ?
                         was.at + option.indent : was.at) +
                         (was.wrap ? option.indent : 0),
-                    expression: mode === 'expression',
                     mode: mode,
                     open: open,
                     was: was
@@ -6114,7 +6119,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-01-23';
+    itself.edition = '2011-01-24';
 
     return itself;
 
