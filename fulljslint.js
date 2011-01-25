@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-01-24
+// 2011-01-25
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -239,7 +239,7 @@ SOFTWARE.
     "overflow-x", "overflow-y", p, padding, "padding-bottom", 
     "padding-left", "padding-right", "padding-top", "page-break-after", 
     "page-break-before", palegoldenrod, palegreen, paleturquoise, 
-    palevioletred, papayawhip, param, parent, parseFloat, parseInt, 
+    palevioletred, papayawhip, param, paren, parent, parseFloat, parseInt, 
     passfail, pc, peachpuff, peru, pink, play, plum, plusplus, pop, 
     popupMenu, position, postcomments, powderblue, pre, predef, 
     preferenceGroups, preferences, prev, print, progress, projection, 
@@ -1034,18 +1034,6 @@ var JSLINT = (function () {
     }
 
 // Substandard methods
-
-    if (typeof Array.prototype.map !== 'function') {
-        Array.prototype.map = function (func) {
-            var i, result = [];
-            for (i = 0; i < this.length; i += 1) {
-                try {
-                    result[i] = func(this[i], this);
-                } catch (ignore) {
-                }
-            }
-        };
-    }
 
     if (typeof String.prototype.entityify !== 'function') {
         String.prototype.entityify = function () {
@@ -3240,10 +3228,17 @@ loop:   for (;;) {
         that.third = expression(10);
         return that;
     });
-
+    
     infix('||', 40, function (left, that) {
-        that.first = expected_relation(left);
-        that.second = expected_relation(expression(50));
+        function paren_check(that) {
+            if (that.id === '&&' && !that.paren) {
+                warning("The '&&' subexpression should be wrapped in parens.", that);
+            }
+            return that;
+        }        
+    
+        that.first = paren_check(expected_relation(left));        
+        that.second = paren_check(expected_relation(expression(40)));
         return that;
     });
     infix('&&', 50, function (left, that) {
@@ -3494,6 +3489,7 @@ loop:   for (;;) {
             nexttoken.immed = true;
         }
         var v = expression(0);
+        v.paren = true;
         no_space();
         step_out(')', this);
         discard();
@@ -5990,7 +5986,7 @@ loop:   for (;;) {
     itself.report = function (option) {
         var data = itself.data();
 
-        var a = [], c, e, err, f, i, k, l, m = '', n, o = [], s;
+        var a = [], c, e, err, f, i, j, k, l, m = '', n, names, o = [], s;
 
         function detail(h, array) {
             var b, i, singularity;
@@ -6006,9 +6002,6 @@ loop:   for (;;) {
                 }
                 o.push('</div>');
             }
-        }
-        function get_value(object) {
-            return object.value;
         }
 
         if (data.errors || data.implieds || data.unused) {
@@ -6074,10 +6067,14 @@ loop:   for (;;) {
 
             for (i = 0; i < data.functions.length; i += 1) {
                 f = data.functions[i];
-
+                names = [];
+                if (f.param) {
+                    for (j = 0; j < f.param.length; j += 1) {
+                        names[j] = f.param[j].value;
+                    }
+                }
                 o.push('<br><div class=function><i>' + f.line + '</i> ' + 
-                    (f.name || '') + '(' +
-                    (f.param ? f.param.map(get_value).join(', ') : '') + ')</div>');
+                    (f.name || '') + '(' + names.join(', ') + ')</div>');
                 detail('<big><b>Unused</b></big>', f.unused);
                 detail('Closure', f.closure);
                 detail('Variable', f['var']);
@@ -6119,7 +6116,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-01-24';
+    itself.edition = '2011-01-25';
 
     return itself;
 
