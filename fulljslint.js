@@ -2551,19 +2551,19 @@ loop:   for (;;) {
     function one_space(left, right) {
         left = left || token;
         right = right || nexttoken;
-        if (right.id !== '(end)' && (left.line !== right.line ||
-                (option.white && left.thru + 1 !== right.from))) {
-            warning(bundle.expected_space_a_b, right, left.value, right.value);
+        if (right.id !== '(end)' && option.white &&
+                (token.line !== right.line ||
+                token.thru + 1 !== right.from)) {
+            warning(bundle.expected_space_a_b, right, token.value, right.value);
         }
     }
 
     function one_space_only(left, right) {
         left = left || token;
         right = right || nexttoken;
-        if (right.id !== '(end)' && option.white &&
-                (token.line !== right.line ||
-                token.thru + 1 !== right.from)) {
-            warning(bundle.expected_space_a_b, right, token.value, right.value);
+        if (right.id !== '(end)' && (left.line !== right.line ||
+                (option.white && left.thru + 1 !== right.from))) {
+            warning(bundle.expected_space_a_b, right, left.value, right.value);
         }
     }
 
@@ -4189,7 +4189,7 @@ loop:   for (;;) {
         no_space();
         step_out(')', t);
         discard();
-        one_space_only();
+        one_space();
         advance('{');
         step_in();
         this.second = [];
@@ -4278,7 +4278,7 @@ loop:   for (;;) {
         advance('while');
         discard();
         var t = nexttoken;
-        one_space_only();
+        one_space();
         advance('(');
         step_in();
         discard();
