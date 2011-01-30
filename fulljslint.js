@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-01-26
+// 2011-01-27
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -4185,7 +4185,10 @@ loop:   for (;;) {
         no_space();
         step_in();
         this.arity = 'statement';
-        this.first = expression(20);
+        this.first = expected_relation(expression(0));
+        if (this.first.id === 'NaN') {
+            warning(bundle.unexpected_a, this.first);
+        }
         no_space();
         step_out(')', t);
         discard();
@@ -4201,7 +4204,11 @@ loop:   for (;;) {
             advance('case');
             for (;;) {
                 one_space();
-                t.first.push(expression(0));
+                s = expression(0);
+                t.first.push(s);
+                if (s.id === 'NaN') {
+                    warning(bundle.unexpected_a, s);
+                }
                 no_space_only();
                 advance(':');
                 discard();
@@ -6208,7 +6215,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-01-26';
+    itself.edition = '2011-01-27';
 
     return itself;
 
