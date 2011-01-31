@@ -265,12 +265,7 @@ effect as this comment:</p>
     ...
 }</pre>
 <p>It is difficult to write correct programs while using idioms that are
-  hard to distinguish from obvious errors. If you really intend an assignment,
-  wrap it in another set of parens:</p>
-<pre>if ((a = b)) {
-    ...
-}</pre>
-
+  hard to distinguish from obvious errors.</p>
 <h2 id=equal>== and !=</h2>
 <p>The <code>==</code> and <code>!=</code> operators do type coercion before
   comparing. This is bad because it causes <code>' \t\r\n' == 0</code> to
