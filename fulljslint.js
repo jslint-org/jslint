@@ -376,6 +376,7 @@ var JSLINT = (function () {
             nomen      : true, // if names should be checked
             on         : true, // if HTML event handlers should be allowed
             onevar     : true, // if only one var statement per function should be allowed
+            forvar     : true, // if no var statement in for statement should be allowed
             passfail   : true, // if the scan should stop on first error
             plusplus   : true, // if increment/decrement should not be allowed
             regexp     : true, // if the . should not be allowed in regexp literals
@@ -4328,7 +4329,7 @@ loop:   for (;;) {
     });
 
     stmt('for', function () {
-        var f = option.forin, i, s, t = nexttoken, v;
+        var f = option.forin, i, s, t = nexttoken, v, w;
         this.arity = 'statement';
         funct['(breakage)'] += 1;
         funct['(loopage)'] += 1;
@@ -4338,7 +4339,10 @@ loop:   for (;;) {
         spaces(this, t);
         no_space();
         if (nexttoken.id === 'var') {
-            error(bundle.move_var);
+            if (option.forvar) {
+                warning(bundle.move_var);
+            }
+            w = expression(0, true);
         }
         edge();
         if (peek(0).id === 'in') {
@@ -4365,6 +4369,15 @@ loop:   for (;;) {
                     s[0].value !== 'if')) {
                 warning(bundle.for_if, this);
             }
+        } else if(nexttoken.id === 'in' && w) {
+            i = nexttoken;
+            advance();
+            i.first = w;
+            i.second = expression(20);
+            step_out(')', t);
+            discard();
+            this.first = i;
+            s = block(true);
         } else {
             if (nexttoken.id !== ';') {
                 edge();
@@ -4376,6 +4389,8 @@ loop:   for (;;) {
                     }
                     comma();
                 }
+            } else {
+              this.first = w;
             }
             semicolon();
             if (nexttoken.id !== ';') {
