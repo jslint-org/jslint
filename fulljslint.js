@@ -162,15 +162,15 @@ SOFTWARE.
     "(params)", "(scope)", "(statement)", "(token)", "(verb)", ")", "*",
     "+", "-", "/", ";", "<", "</", "<=", "==", "===", ">",
     ">=", ADSAFE, 
-    ActiveXObject, Array, Boolean, COM, CScript, Canvas, CustomAnimation, 
-    Date, Debug, E, Enumerator, Error, EvalError, FadeAnimation, Flash, 
-    FormField, Frame, Function, HotKey, Image, JSON, LN10, LN2, LOG10E, 
-    LOG2E, MAX_VALUE, MIN_VALUE, Math, MenuItem, MoveAnimation, 
-    NEGATIVE_INFINITY, Number, Object, Option, PI, POSITIVE_INFINITY, Point, 
-    RangeError, Rectangle, ReferenceError, RegExp, ResizeAnimation, 
-    RotateAnimation, SQRT1_2, SQRT2, ScrollBar, String, Style, SyntaxError, 
-    System, Text, TextArea, Timer, TypeError, URIError, URL, VBArray, 
-    WScript, Web, Window, XMLDOM, XMLHttpRequest, "\\", a, a_function, 
+    ActiveXObject, Array, Boolean, COM, CScript, Canvas, continue, 
+    CustomAnimation, Date, Debug, E, Enumerator, Error, EvalError, 
+    FadeAnimation, Flash,  FormField, Frame, Function, HotKey, Image, JSON, 
+    LN10, LN2, LOG10E, LOG2E, MAX_VALUE, MIN_VALUE, Math, MenuItem, 
+    MoveAnimation,  NEGATIVE_INFINITY, Number, Object, Option, PI, 
+    POSITIVE_INFINITY, Point, RangeError, Rectangle, ReferenceError, RegExp, 
+    ResizeAnimation, RotateAnimation, SQRT1_2, SQRT2, ScrollBar, String, Style, 
+    SyntaxError, System, Text, TextArea, Timer, TypeError, URIError, URL, 
+    VBArray, WScript, Web, Window, XMLDOM, XMLHttpRequest, "\\", a, a_function, 
     a_label, a_not_allowed, a_not_defined, a_scope, abbr, acronym, 
     activeborder, activecaption, addEventListener, address, adsafe, 
     adsafe_a, adsafe_autocomplete, adsafe_bad_id, adsafe_div, 
@@ -365,6 +365,7 @@ var JSLINT = (function () {
             bitwise    : true, // if bitwise operators should not be allowed
             browser    : true, // if the standard browser globals should be predefined
             cap        : true, // if upper case HTML should be allowed
+            'continue' : true, // if the continuation statement should be tolerated
             css        : true, // if CSS workarounds should be tolerated
             debug      : true, // if debugger statements should be allowed
             devel      : true, // if logging should be allowed (console, alert, etc.)
@@ -616,10 +617,10 @@ var JSLINT = (function () {
             wrap_regexp: "Wrap the /regexp/ literal in parens to disambiguate the slash operator.",
             write_is_wrong: "document.write can be a form of eval."
         },
-        cssAttributeData,
-        cssAny,
+        css_attribute_data,
+        css_any,
 
-        cssColorData = {
+        css_colorData = {
             "aliceblue"             : true,
             "antiquewhite"          : true,
             "aqua"                  : true,
@@ -790,10 +791,10 @@ var JSLINT = (function () {
             "windowtext"            : true
         },
 
-        cssBorderStyle,
-        cssBreak,
+        css_border_style,
+        css_break,
 
-        cssLengthData = {
+        css_lengthData = {
             '%': true,
             'cm': true,
             'em': true,
@@ -805,8 +806,8 @@ var JSLINT = (function () {
             'px': true
         },
 
-        cssMedia,
-        cssOverflow,
+        css_media,
+        css_overflow,
 
         devel = {
             alert           : false,
@@ -837,7 +838,7 @@ var JSLINT = (function () {
 
         functions,      // All of the functions
         global,         // The global scope
-        htmltag = {
+        html_tag = {
             a:        {},
             abbr:     {},
             acronym:  {},
@@ -1385,7 +1386,7 @@ var JSLINT = (function () {
         return w;
     }
 
-    function warningAt(m, l, ch, a, b, c, d) {
+    function warning_at(m, l, ch, a, b, c, d) {
         return warning(m, {
             line: l,
             from: ch
@@ -1397,11 +1398,18 @@ var JSLINT = (function () {
         quit(bundle.stopping, w.line, w.character);
     }
 
-    function errorAt(m, l, ch, a, b, c, d) {
+    function error_at(m, l, ch, a, b, c, d) {
         return error(m, {
             line: l,
             from: ch
         }, a, b, c, d);
+    }
+
+    function expected_at(at) {
+        if (nexttoken.from !== at) {
+            warning(bundle.expected_a_at_b_c, nexttoken, nexttoken.value, at, 
+                nexttoken.from);
+        }
     }
 
 
@@ -1427,7 +1435,7 @@ var JSLINT = (function () {
             }
         }
 
-        function nextLine() {
+        function next_line() {
             var at;
             if (line >= lines.length) {
                 return false;
@@ -1437,15 +1445,15 @@ var JSLINT = (function () {
             line += 1;
             at = s.search(/ \t/);
             if (at >= 0) {
-                warningAt(bundle.mixed, line, at + 1);
+                warning_at(bundle.mixed, line, at + 1);
             }
             s = s.replace(/\t/g, tab);
             at = s.search(cx);
             if (at >= 0) {
-                warningAt(bundle.unsafe, line, at);
+                warning_at(bundle.unsafe, line, at);
             }
             if (option.maxlen && option.maxlen < s.length) {
-                warningAt(bundle.too_long, line, s.length);
+                warning_at(bundle.too_long, line, s.length);
             }
             return true;
         }
@@ -1465,17 +1473,17 @@ var JSLINT = (function () {
             t = Object.create(t);
             if (type === '(string)' || type === '(range)') {
                 if (jx.test(value)) {
-                    warningAt(bundle.url, line, from);
+                    warning_at(bundle.url, line, from);
                 }
             }
             if (type === '(identifier)') {
                 t.identifier = true;
                 if (value === '__iterator__' || value === '__proto__') {
-                    errorAt(bundle.reserved_a, line, from, value);
+                    error_at(bundle.reserved_a, line, from, value);
                 } else if (option.nomen &&
                         (value.charAt(0) === '_' ||
                         value.charAt(value.length - 1) === '_')) {
-                    warningAt(bundle.dangling_a, line, from, value);
+                    warning_at(bundle.dangling_a, line, from, value);
                 }
             }
             if (value !== undefined) {
@@ -1514,7 +1522,7 @@ var JSLINT = (function () {
                     lines = source;
                 }
                 line = 0;
-                nextLine();
+                next_line();
                 from = 1;
             },
 
@@ -1522,7 +1530,7 @@ var JSLINT = (function () {
                 var c, value = '';
                 from = character;
                 if (s.charAt(0) !== begin) {
-                    errorAt(bundle.expected_a_b, line, character, begin, s.charAt(0));
+                    error_at(bundle.expected_a_b, line, character, begin, s.charAt(0));
                 }
                 for (;;) {
                     s = s.slice(1);
@@ -1530,7 +1538,7 @@ var JSLINT = (function () {
                     c = s.charAt(0);
                     switch (c) {
                     case '':
-                        errorAt(bundle.missing_a, line, character, c);
+                        error_at(bundle.missing_a, line, character, c);
                         break;
                     case end:
                         s = s.slice(1);
@@ -1538,7 +1546,7 @@ var JSLINT = (function () {
                         return it('(range)', value);
                     case xquote:
                     case '\\':
-                        warningAt(bundle.unexpected_a, line, character, c);
+                        warning_at(bundle.unexpected_a, line, character, c);
                         break;
                     }
                     value += c;
@@ -1567,7 +1575,7 @@ var JSLINT = (function () {
                     var c, j, r = '';
 
                     if (jsonmode && x !== '"') {
-                        warningAt(bundle.expected_a, line, character, '"');
+                        warning_at(bundle.expected_a, line, character, '"');
                     }
 
                     if (xquote === x || (xmode === 'scriptstring' && !xquote)) {
@@ -1579,7 +1587,7 @@ var JSLINT = (function () {
                         j += n;
                         if (i >= 32 && i <= 126 &&
                                 i !== 34 && i !== 92 && i !== 39) {
-                            warningAt(bundle.unexpected_a, line, character, '\\');
+                            warning_at(bundle.unexpected_a, line, character, '\\');
                         }
                         character += n;
                         c = String.fromCharCode(i);
@@ -1588,8 +1596,8 @@ var JSLINT = (function () {
                     for (;;) {
                         while (j >= s.length) {
                             j = 0;
-                            if (xmode !== 'html' || !nextLine()) {
-                                errorAt(bundle.unclosed, line, from);
+                            if (xmode !== 'html' || !next_line()) {
+                                error_at(bundle.unclosed, line, from);
                             }
                         }
                         c = s.charAt(j);
@@ -1602,30 +1610,30 @@ var JSLINT = (function () {
                             if (c === '\n' || c === '\r') {
                                 break;
                             }
-                            warningAt(bundle.control_a,
+                            warning_at(bundle.control_a,
                                 line, character + j, s.slice(0, j));
                         } else if (c === xquote) {
-                            warningAt(bundle.bad_html, line, character + j);
+                            warning_at(bundle.bad_html, line, character + j);
                         } else if (c === '<') {
                             if (option.safe && xmode === 'html') {
-                                warningAt(bundle.adsafe_a, line, character + j, c);
+                                warning_at(bundle.adsafe_a, line, character + j, c);
                             } else if (s.charAt(j + 1) === '/' && (xmode || option.safe)) {
-                                warningAt(bundle.expected_a_b, line, character, 
+                                warning_at(bundle.expected_a_b, line, character, 
                                     '<\\/', '</');
                             } else if (s.charAt(j + 1) === '!' && (xmode || option.safe)) {
-                                warningAt(bundle.unexpected_a, line, character, '<!');
+                                warning_at(bundle.unexpected_a, line, character, '<!');
                             }
                         } else if (c === '\\') {
                             if (xmode === 'html') {
                                 if (option.safe) {
-                                    warningAt(bundle.adsafe_a, line, character + j, c);
+                                    warning_at(bundle.adsafe_a, line, character + j, c);
                                 }
                             } else if (xmode === 'styleproperty') {
                                 j += 1;
                                 character += 1;
                                 c = s.charAt(j);
                                 if (c !== x) {
-                                    warningAt(bundle.unexpected_a, line, character, '\\');
+                                    warning_at(bundle.unexpected_a, line, character, '\\');
                                 }
                             } else {
                                 j += 1;
@@ -1633,7 +1641,7 @@ var JSLINT = (function () {
                                 c = s.charAt(j);
                                 switch (c) {
                                 case xquote:
-                                    warningAt(bundle.bad_html, line, character + j);
+                                    warning_at(bundle.bad_html, line, character + j);
                                     break;
                                 case '\\':
                                 case '"':
@@ -1641,7 +1649,7 @@ var JSLINT = (function () {
                                     break;
                                 case '\'':
                                     if (jsonmode) {
-                                        warningAt(bundle.unexpected_a, line, character, '\\\'');
+                                        warning_at(bundle.unexpected_a, line, character, '\\\'');
                                     }
                                     break;
                                 case 'b':
@@ -1664,18 +1672,18 @@ var JSLINT = (function () {
                                     break;
                                 case 'v':
                                     if (jsonmode) {
-                                        warningAt(bundle.unexpected_a, line, character, '\\v');
+                                        warning_at(bundle.unexpected_a, line, character, '\\v');
                                     }
                                     c = '\v';
                                     break;
                                 case 'x':
                                     if (jsonmode) {
-                                        warningAt(bundle.unexpected_a, line, character, '\\x');
+                                        warning_at(bundle.unexpected_a, line, character, '\\x');
                                     }
                                     esc(2);
                                     break;
                                 default:
-                                    warningAt(bundle.unexpected_a, line, character, '\\');
+                                    warning_at(bundle.unexpected_a, line, character, '\\');
                                 }
                             }
                         }
@@ -1687,7 +1695,7 @@ var JSLINT = (function () {
 
                 for (;;) {
                     while (!s) {
-                        if (!nextLine()) {
+                        if (!next_line()) {
                             return it('(end)');
                         }
                     }
@@ -1700,7 +1708,7 @@ var JSLINT = (function () {
                             s = s.slice(i);
                             break;
                         } else {
-                            if (!nextLine()) {
+                            if (!next_line()) {
                                 return it('(end)', '');
                             }
                         }
@@ -1716,7 +1724,7 @@ var JSLINT = (function () {
                             if (xmode === 'html') {
                                 return it('(error)', s.charAt(0));
                             } else {
-                                errorAt(bundle.unexpected_a,
+                                error_at(bundle.unexpected_a,
                                     line, character, s.substr(0, 1));
                             }
                         }
@@ -1732,27 +1740,27 @@ var JSLINT = (function () {
 
                         if (c.isDigit()) {
                             if (xmode !== 'style' && !isFinite(Number(t))) {
-                                warningAt(bundle.bad_number, line, character, t);
+                                warning_at(bundle.bad_number, line, character, t);
                             }
                             if (xmode !== 'style' &&
                                     xmode !== 'styleproperty' &&
                                     s.substr(0, 1).isAlpha()) {
-                                warningAt(bundle.expected_space_a_b,
+                                warning_at(bundle.expected_space_a_b,
                                     line, character, c, s.charAt(0));
                             }
                             if (c === '0') {
                                 d = t.substr(1, 1);
                                 if (d.isDigit()) {
                                     if (token.id !== '.' && xmode !== 'styleproperty') {
-                                        warningAt(bundle.unexpected_a,
+                                        warning_at(bundle.unexpected_a,
                                             line, character, t);
                                     }
                                 } else if (jsonmode && (d === 'x' || d === 'X')) {
-                                    warningAt(bundle.unexpected_a, line, character, '0x');
+                                    warning_at(bundle.unexpected_a, line, character, '0x');
                                 }
                             }
                             if (t.substr(t.length - 1) === '.') {
-                                warningAt(bundle.trailing_decimal_a, line,
+                                warning_at(bundle.trailing_decimal_a, line,
                                     character, t);
                             }
                             return it('(number)', t);
@@ -1769,11 +1777,11 @@ var JSLINT = (function () {
 
                         case '//':
                             if (src || (xmode && xmode !== 'script')) {
-                                warningAt(bundle.unexpected_comment, line, character);
+                                warning_at(bundle.unexpected_comment, line, character);
                             } else if (xmode === 'script' && /<\s*\//i.test(s)) {
-                                warningAt(bundle.unexpected_a, line, character, '<\/');
+                                warning_at(bundle.unexpected_a, line, character, '<\/');
                             } else if ((option.safe || xmode === 'script') && ax.test(s)) {
-                                warningAt(bundle.dangerous_comment, line, character);
+                                warning_at(bundle.dangerous_comment, line, character);
                             }
                             collect_comment(s);
                             s = '';
@@ -1783,10 +1791,10 @@ var JSLINT = (function () {
 
                         case '/*':
                             if (src || (xmode && xmode !== 'script' && xmode !== 'style' && xmode !== 'styleproperty')) {
-                                warningAt(bundle.unexpected_comment, line, character);
+                                warning_at(bundle.unexpected_comment, line, character);
                             }
                             if (option.safe && ax.test(s)) {
-                                warningAt(bundle.dangerous_comment, line, character);
+                                warning_at(bundle.dangerous_comment, line, character);
                             }
                             for (;;) {
                                 i = s.search(lx);
@@ -1794,17 +1802,17 @@ var JSLINT = (function () {
                                     break;
                                 }
                                 collect_comment(s);
-                                if (!nextLine()) {
-                                    errorAt(bundle.unclosed_comment, line, character);
+                                if (!next_line()) {
+                                    error_at(bundle.unclosed_comment, line, character);
                                 } else {
                                     if (option.safe && ax.test(s)) {
-                                        warningAt(bundle.dangerous_comment, line, character);
+                                        warning_at(bundle.dangerous_comment, line, character);
                                     }
                                 }
                             }
                             character += i + 2;
                             if (s.substr(i, 1) === '/') {
-                                errorAt(bundle.nested_comment, line, character);
+                                error_at(bundle.nested_comment, line, character);
                             }
                             collect_comment(s.substr(0, i));
                             s = s.substr(i + 2);
@@ -1830,7 +1838,7 @@ var JSLINT = (function () {
     //      /
                         case '/':
                             if (token.id === '/=') {
-                                errorAt(
+                                error_at(
                                     bundle.slash_equal,
                                     line,
                                     from
@@ -1846,11 +1854,11 @@ var JSLINT = (function () {
                                     l += 1;
                                     switch (c) {
                                     case '':
-                                        errorAt(bundle.unclosed_regexp, line, from);
+                                        error_at(bundle.unclosed_regexp, line, from);
                                         return;
                                     case '/':
                                         if (depth > 0) {
-                                            warningAt(bundle.unescaped_a,
+                                            warning_at(bundle.unescaped_a,
                                                 line, from + l, '/');
                                         }
                                         c = s.substr(0, l - 1);
@@ -1867,17 +1875,17 @@ var JSLINT = (function () {
                                         s = s.substr(l);
                                         q = s.charAt(0);
                                         if (q === '/' || q === '*') {
-                                            errorAt(bundle.confusing_regexp,
+                                            error_at(bundle.confusing_regexp,
                                                 line, from);
                                         }
                                         return it('(regexp)', c);
                                     case '\\':
                                         c = s.charAt(l);
                                         if (c < ' ') {
-                                            warningAt(bundle.control_a,
+                                            warning_at(bundle.control_a,
                                                 line, from + l, String(c));
                                         } else if (c === '<') {
-                                            warningAt(
+                                            warning_at(
                                                 bundle.unexpected_a, 
                                                 line,
                                                 from + l,
@@ -1898,7 +1906,7 @@ var JSLINT = (function () {
                                                 l += 1;
                                                 break;
                                             default:
-                                                warningAt(
+                                                warning_at(
                                                     bundle.expected_a_b,
                                                     line,
                                                     from + l,
@@ -1915,7 +1923,7 @@ var JSLINT = (function () {
                                         break;
                                     case ')':
                                         if (depth === 0) {
-                                            warningAt(bundle.unescaped_a,
+                                            warning_at(bundle.unescaped_a,
                                                 line, from + l, ')');
                                         } else {
                                             depth -= 1;
@@ -1928,7 +1936,7 @@ var JSLINT = (function () {
                                             q += 1;
                                         }
                                         if (q > 1) {
-                                            warningAt(bundle.use_braces,
+                                            warning_at(bundle.use_braces,
                                                 line, from + l, q);
                                         }
                                         break;
@@ -1937,16 +1945,16 @@ var JSLINT = (function () {
                                         if (c === '^') {
                                             l += 1;
                                             if (option.regexp) {
-                                                warningAt(bundle.insecure_a,
+                                                warning_at(bundle.insecure_a,
                                                     line, from + l, c);
                                             } else if (s.charAt(l) === ']') {
-                                                errorAt(bundle.unescaped_a,
+                                                error_at(bundle.unescaped_a,
                                                     line, from + l, '^');
                                             }
                                         }
                                         q = false;
                                         if (c === ']') {
-                                            warningAt(bundle.empty_class, line,
+                                            warning_at(bundle.empty_class, line,
                                                 from + l - 1);
                                             q = true;
                                         }
@@ -1956,7 +1964,7 @@ klass:                                  do {
                                             switch (c) {
                                             case '[':
                                             case '^':
-                                                warningAt(bundle.unescaped_a,
+                                                warning_at(bundle.unescaped_a,
                                                     line, from + l, c);
                                                 q = true;
                                                 break;
@@ -1964,28 +1972,28 @@ klass:                                  do {
                                                 if (q) {
                                                     q = false;
                                                 } else {
-                                                    warningAt(bundle.unescaped_a,
+                                                    warning_at(bundle.unescaped_a,
                                                         line, from + l, '-');
                                                     q = true;
                                                 }
                                                 break;
                                             case ']':
                                                 if (!q) {
-                                                    warningAt(bundle.unescaped_a,
+                                                    warning_at(bundle.unescaped_a,
                                                         line, from + l - 1, '-');
                                                 }
                                                 break klass;
                                             case '\\':
                                                 c = s.charAt(l);
                                                 if (c < ' ') {
-                                                    warningAt(
+                                                    warning_at(
                                                         bundle.control_a,
                                                         line,
                                                         from + l,
                                                         String(c)
                                                     );
                                                 } else if (c === '<') {
-                                                    warningAt(
+                                                    warning_at(
                                                         bundle.unexpected_a,
                                                         line,
                                                         from + l,
@@ -1996,7 +2004,7 @@ klass:                                  do {
                                                 q = true;
                                                 break;
                                             case '/':
-                                                warningAt(bundle.unescaped_a,
+                                                warning_at(bundle.unescaped_a,
                                                     line, from + l - 1, '/');
                                                 q = true;
                                                 break;
@@ -2004,7 +2012,7 @@ klass:                                  do {
                                                 if (xmode === 'script') {
                                                     c = s.charAt(l);
                                                     if (c === '!' || c === '/') {
-                                                        warningAt(
+                                                        warning_at(
                                                             bundle.html_confusion_a,
                                                             line,
                                                             from + l,
@@ -2021,7 +2029,7 @@ klass:                                  do {
                                         break;
                                     case '.':
                                         if (option.regexp) {
-                                            warningAt(bundle.insecure_a, line,
+                                            warning_at(bundle.insecure_a, line,
                                                 from + l, c);
                                         }
                                         break;
@@ -2031,14 +2039,14 @@ klass:                                  do {
                                     case '}':
                                     case '+':
                                     case '*':
-                                        warningAt(bundle.unescaped_a, line,
+                                        warning_at(bundle.unescaped_a, line,
                                             from + l, c);
                                         break;
                                     case '<':
                                         if (xmode === 'script') {
                                             c = s.charAt(l);
                                             if (c === '!' || c === '/') {
-                                                warningAt(
+                                                warning_at(
                                                     bundle.html_confusion_a,
                                                     line,
                                                     from + l,
@@ -2062,7 +2070,7 @@ klass:                                  do {
                                             l += 1;
                                             c = s.charAt(l);
                                             if (c < '0' || c > '9') {
-                                                warningAt(
+                                                warning_at(
                                                     bundle.expected_number_a,
                                                     line,
                                                     from + l,
@@ -2098,7 +2106,7 @@ klass:                                  do {
                                                 }
                                             }
                                             if (s.charAt(l) !== '}') {
-                                                warningAt(
+                                                warning_at(
                                                     bundle.expected_a_b,
                                                     line,
                                                     from + l,
@@ -2112,7 +2120,7 @@ klass:                                  do {
                                                 l += 1;
                                             }
                                             if (low > high) {
-                                                warningAt(
+                                                warning_at(
                                                     bundle.not_greater,
                                                     line,
                                                     from + l,
@@ -2143,21 +2151,21 @@ klass:                                  do {
                                 }
                                 i = s.indexOf('<!');
                                 if (i >= 0) {
-                                    errorAt(bundle.nested_comment,
+                                    error_at(bundle.nested_comment,
                                         line, character + i);
                                 }
-                                if (!nextLine()) {
-                                    errorAt(bundle.unclosed_comment, l, c);
+                                if (!next_line()) {
+                                    error_at(bundle.unclosed_comment, l, c);
                                 }
                             }
                             l = s.indexOf('<!');
                             if (l >= 0 && l < i) {
-                                errorAt(bundle.nested_comment,
+                                error_at(bundle.nested_comment,
                                     line, character + l);
                             }
                             character += i;
                             if (s.charAt(i + 2) !== '>') {
-                                errorAt(bundle.expected_a, line, character, '-->');
+                                error_at(bundle.expected_a, line, character, '-->');
                             }
                             character += 3;
                             s = s.slice(i + 3);
@@ -2176,7 +2184,7 @@ klass:                                  do {
                                     t += c;
                                 }
                                 if (t.length !== 4 && t.length !== 7) {
-                                    warningAt(bundle.bad_color_a, line,
+                                    warning_at(bundle.bad_color_a, line,
                                         from + l, t);
                                 }
                                 return it('(color)', t);
@@ -2196,7 +2204,7 @@ klass:                                  do {
                                     if (!((c >= '0' && c <= '9') ||
                                             (c >= 'a' && c <= 'z') ||
                                             c === '#')) {
-                                        errorAt(bundle.bad_entity, line, from + l,
+                                        error_at(bundle.bad_entity, line, from + l,
                                             character);
                                     }
                                 }
@@ -2211,7 +2219,7 @@ klass:                                  do {
     }());
 
 
-    function addlabel(t, type) {
+    function add_label(t, type) {
 
         if (option.safe && funct['(global)'] &&
                 typeof predefined[t] !== 'boolean') {
@@ -2241,7 +2249,7 @@ klass:                                  do {
     }
 
 
-    function doOption() {
+    function do_option() {
         var b, obj, filter, o = nexttoken.value, t, v;
         switch (o) {
         case '*/':
@@ -2383,13 +2391,7 @@ loop:   for (;;) {
         return t;
     }
 
-    function expected_at(at) {
-        if (nexttoken.from !== at) {
-            warning(bundle.expected_a_at_b_c, nexttoken, nexttoken.value, at, 
-                nexttoken.from);
-        }
-    }
-
+    
     function advance(id, t) {
 
 // Produce the next token, also looking for programming errors.
@@ -2489,7 +2491,7 @@ loop:   for (;;) {
             if (nexttoken.type !== 'special') {
                 break;
             }
-            doOption();
+            do_option();
         }
     }
 
@@ -2742,7 +2744,7 @@ loop:   for (;;) {
         return x;
     }
 
-    function disruptstmt(s, f) {
+    function disrupt_stmt(s, f) {
         var x = stmt(s, f);
         x.disrupt = true;
     }
@@ -2938,7 +2940,7 @@ loop:   for (;;) {
     }
 
 
-    function optionalidentifier() {
+    function optional_identifier() {
         if (nexttoken.identifier) {
             advance();
             if (option.safe && banned[token.value]) {
@@ -2952,7 +2954,7 @@ loop:   for (;;) {
 
 
     function identifier() {
-        var i = optionalidentifier();
+        var i = optional_identifier();
         if (i) {
             return i;
         }
@@ -2986,7 +2988,7 @@ loop:   for (;;) {
             advance();
             advance(':');
             scope = Object.create(s);
-            addlabel(t.value, 'label');
+            add_label(t.value, 'label');
             if (labelled[nexttoken.id] !== true) {
                 warning(bundle.label_a_b, nexttoken, t.value, nexttoken.value);
             }
@@ -3166,7 +3168,7 @@ loop:   for (;;) {
     }
 
 
-    function countMember(m) {
+    function tally_member(m) {
         if (membersOnly && typeof membersOnly[m] !== 'boolean') {
             warning(bundle.unexpected_member_a, token, m);
         }
@@ -3219,7 +3221,7 @@ loop:   for (;;) {
             } else if (typeof s === 'boolean') {
                 f = funct;
                 funct = functions[0];
-                addlabel(v, 'var');
+                add_label(v, 'var');
                 s = funct;
                 funct = f;
             }
@@ -3667,7 +3669,7 @@ loop:   for (;;) {
         no_space();
         var m = identifier();
         if (typeof m === 'string') {
-            countMember(m);
+            tally_member(m);
         }
         that.first = left;
         that.second = token;
@@ -3722,7 +3724,7 @@ loop:   for (;;) {
                 that = token;
                 m = identifier();
                 if (typeof m === 'string') {
-                    countMember(m);
+                    tally_member(m);
                 }
             }
         }
@@ -3745,7 +3747,7 @@ loop:   for (;;) {
                     (e.value.charAt(0) === '_' || e.value.charAt(0) === '-')) {
                 warning(bundle.adsafe_subscript_a, e);
             }
-            countMember(e.value);
+            tally_member(e.value);
             if (!option.sub && ix.test(e.value)) {
                 s = syntax[e.value];
                 if (!s || !s.reserved) {
@@ -3795,7 +3797,7 @@ loop:   for (;;) {
 
 
     function property_name() {
-        var id = optionalidentifier(true);
+        var id = optional_identifier(true);
         if (!id) {
             if (nexttoken.id === '(string)') {
                 id = nexttoken.value;
@@ -3833,7 +3835,7 @@ loop:   for (;;) {
             edge();
             i = identifier();
             p.push(token);
-            addlabel(i, 'parameter');
+            add_label(i, 'parameter');
             if (nexttoken.id === ',') {
                 comma();
             } else {
@@ -3846,7 +3848,7 @@ loop:   for (;;) {
     }
 
 
-    function doFunction(func, name) {
+    function do_function(func, name) {
         var s = scope;
         scope = Object.create(s);
         funct = {
@@ -3861,7 +3863,7 @@ loop:   for (;;) {
         token.funct = funct;
         functions.push(funct);
         if (name) {
-            addlabel(name, 'function');
+            add_label(name, 'function');
         }
         func.name = name || '';
         func.first = funct['(params)'] = functionparams();
@@ -3896,7 +3898,7 @@ loop:   for (;;) {
                 if (!i) {
                     error(bundle.missing_property);
                 }
-                doFunction(get, '');
+                do_function(get, '');
                 if (funct['(loopage)']) {
                     warning(bundle.function_loop, t);
                 }
@@ -3914,7 +3916,7 @@ loop:   for (;;) {
                 if (i !== j) {
                     error(bundle.expected_a_b, token, i, j);
                 }
-                doFunction(set, '');
+                do_function(set, '');
                 p = set.first;
                 if (!p || p.length !== 1 || p[0] !== 'value') {
                     warning(bundle.parameter_set_a, t, i);
@@ -3936,7 +3938,7 @@ loop:   for (;;) {
                 warning(bundle.duplicate_a, nexttoken, i);
             }
             seen[i] = true;
-            countMember(i);
+            tally_member(i);
             if (nexttoken.id !== ',') {
                 break;
             }
@@ -3992,7 +3994,7 @@ loop:   for (;;) {
             if (funct['(global)'] && predefined[id] === false) {
                 warning(bundle.redefinition_a, token, id);
             }
-            addlabel(id, 'unused');
+            add_label(id, 'unused');
 
             if (nexttoken.id === '=') {
                 assign = nexttoken;
@@ -4037,10 +4039,10 @@ loop:   for (;;) {
         }
         var i = identifier();
         if (i) {
-            addlabel(i, 'unction');
+            add_label(i, 'unction');
             no_space_only();
         }
-        doFunction(this, i, true);
+        do_function(this, i, true);
         if (nexttoken.id === '(' && nexttoken.line === token.line) {
             error(bundle.function_statement);
         }
@@ -4050,11 +4052,11 @@ loop:   for (;;) {
 
     prefix('function', function () {
         one_space();
-        var i = optionalidentifier();
+        var i = optional_identifier();
         if (i) {
             no_space_only();
         }
-        doFunction(this, i);
+        do_function(this, i);
         if (funct['(loopage)']) {
             warning(bundle.function_loop);
         }
@@ -4082,6 +4084,7 @@ loop:   for (;;) {
         case '(string)':
         case '(number)':
             warning(bundle.weird_relation, this);
+            break;
         }
         no_space();
         step_out(')', t);
@@ -4133,7 +4136,7 @@ loop:   for (;;) {
             if (nexttoken.type !== '(identifier)') {
                 warning(bundle.expected_identifier_a, nexttoken);
             } else {
-                addlabel(e, 'exception');
+                add_label(e, 'exception');
             }
             advance();
             no_space();
@@ -4215,6 +4218,7 @@ loop:   for (;;) {
         case '(string)':
         case '(number)':
             warning(bundle.weird_relation, this.first);
+            break;
         }
         no_space();
         step_out(')', t);
@@ -4413,7 +4417,7 @@ loop:   for (;;) {
     });
 
 
-    disruptstmt('break', function () {
+    disrupt_stmt('break', function () {
         var v = nexttoken.value;
         this.arity = 'statement';
         if (funct['(breakage)'] === 0) {
@@ -4433,7 +4437,10 @@ loop:   for (;;) {
     });
 
 
-    disruptstmt('continue', function () {
+    disrupt_stmt('continue', function () {
+        if (!option['continue']) {
+            warning(bundle.unexpected_a, this);
+        }
         var v = nexttoken.value;
         this.arity = 'statement';
         if (funct['(breakage)'] === 0) {
@@ -4453,7 +4460,7 @@ loop:   for (;;) {
     });
 
 
-    disruptstmt('return', function () {
+    disrupt_stmt('return', function () {
         this.arity = 'statement';
         if (nexttoken.id !== ';' && nexttoken.line === token.line) {
             one_space_only();
@@ -4466,7 +4473,7 @@ loop:   for (;;) {
     });
 
 
-    disruptstmt('throw', function () {
+    disrupt_stmt('throw', function () {
         this.arity = 'statement';
         one_space_only();
         this.first = expression(20);
@@ -4500,9 +4507,9 @@ loop:   for (;;) {
 
 // Parse JSON
 
-    function jsonValue() {
+    function json_value() {
 
-        function jsonObject() {
+        function json_object() {
             var o = {}, t = nexttoken;
             advance('{');
             if (nexttoken.id !== '}') {
@@ -4523,7 +4530,7 @@ loop:   for (;;) {
                     }
                     advance();
                     advance(':');
-                    jsonValue();
+                    json_value();
                     if (nexttoken.id !== ',') {
                         break;
                     }
@@ -4537,7 +4544,7 @@ loop:   for (;;) {
             advance('}', t);
         }
 
-        function jsonArray() {
+        function json_array() {
             var t = nexttoken;
             advance('[');
             if (nexttoken.id !== ']') {
@@ -4546,7 +4553,7 @@ loop:   for (;;) {
                         warning(bundle.unexpected_a, nexttoken);
                         comma();
                     }
-                    jsonValue();
+                    json_value();
                     if (nexttoken.id !== ',') {
                         break;
                     }
@@ -4562,10 +4569,10 @@ loop:   for (;;) {
 
         switch (nexttoken.id) {
         case '{':
-            jsonObject();
+            json_object();
             break;
         case '[':
-            jsonArray();
+            json_array();
             break;
         case 'true':
         case 'false':
@@ -4587,7 +4594,7 @@ loop:   for (;;) {
 
 // CSS parsing.
 
-    function cssName() {
+    function css_name() {
         if (nexttoken.identifier) {
             advance();
             return true;
@@ -4595,7 +4602,7 @@ loop:   for (;;) {
     }
 
 
-    function cssNumber() {
+    function css_number() {
         if (nexttoken.id === '-') {
             advance('-');
             no_space_only();
@@ -4607,14 +4614,14 @@ loop:   for (;;) {
     }
 
 
-    function cssString() {
+    function css_string() {
         if (nexttoken.type === '(string)') {
             advance();
             return true;
         }
     }
 
-    function cssColor() {
+    function css_color() {
         var i, number, t, value;
         if (nexttoken.identifier) {
             value = nexttoken.value;
@@ -4658,7 +4665,7 @@ loop:   for (;;) {
                 }
                 advance(')', t);
                 return true;
-            } else if (cssColorData[nexttoken.value] === true) {
+            } else if (css_colorData[nexttoken.value] === true) {
                 advance();
                 return true;
             }
@@ -4670,7 +4677,7 @@ loop:   for (;;) {
     }
 
 
-    function cssLength() {
+    function css_length() {
         if (nexttoken.id === '-') {
             advance('-');
             no_space_only();
@@ -4678,7 +4685,7 @@ loop:   for (;;) {
         if (nexttoken.type === '(number)') {
             advance();
             if (nexttoken.type !== '(string)' &&
-                    cssLengthData[nexttoken.value] === true) {
+                    css_lengthData[nexttoken.value] === true) {
                 no_space_only();
                 advance();
             } else if (+token.value !== 0) {
@@ -4690,7 +4697,7 @@ loop:   for (;;) {
     }
 
 
-    function cssLineHeight() {
+    function css_line_height() {
         if (nexttoken.id === '-') {
             advance('-');
             no_space_only();
@@ -4698,7 +4705,7 @@ loop:   for (;;) {
         if (nexttoken.type === '(number)') {
             advance();
             if (nexttoken.type !== '(string)' &&
-                    cssLengthData[nexttoken.value] === true) {
+                    css_lengthData[nexttoken.value] === true) {
                 no_space_only();
                 advance();
             }
@@ -4708,7 +4715,7 @@ loop:   for (;;) {
     }
 
 
-    function cssWidth() {
+    function css_width() {
         if (nexttoken.identifier) {
             switch (nexttoken.value) {
             case 'thin':
@@ -4718,23 +4725,23 @@ loop:   for (;;) {
                 return true;
             }
         } else {
-            return cssLength();
+            return css_length();
         }
     }
 
 
-    function cssMargin() {
+    function css_margin() {
         if (nexttoken.identifier) {
             if (nexttoken.value === 'auto') {
                 advance();
                 return true;
             }
         } else {
-            return cssLength();
+            return css_length();
         }
     }
 
-    function cssAttr() {
+    function css_attr() {
         if (nexttoken.identifier && nexttoken.value === 'attr') {
             advance();
             advance('(');
@@ -4749,9 +4756,9 @@ loop:   for (;;) {
     }
 
 
-    function cssCommaList() {
+    function css_comma_list() {
         while (nexttoken.id !== ';') {
-            if (!cssName() && !cssString()) {
+            if (!css_name() && !css_string()) {
                 warning(bundle.expected_name_a);
             }
             if (nexttoken.id !== ',') {
@@ -4762,7 +4769,7 @@ loop:   for (;;) {
     }
 
 
-    function cssCounter() {
+    function css_counter() {
         if (nexttoken.identifier && nexttoken.value === 'counter') {
             advance();
             advance('(');
@@ -4805,13 +4812,13 @@ loop:   for (;;) {
     }
 
 
-    function cssShape() {
+    function css_shape() {
         var i;
         if (nexttoken.identifier && nexttoken.value === 'rect') {
             advance();
             advance('(');
             for (i = 0; i < 4; i += 1) {
-                if (!cssLength()) {
+                if (!css_length()) {
                     warning(bundle.expected_number_a);
                     break;
                 }
@@ -4823,7 +4830,7 @@ loop:   for (;;) {
     }
 
 
-    function cssUrl() {
+    function css_url() {
         var c, url;
         if (nexttoken.identifier && nexttoken.value === 'url') {
             nexttoken = lex.range('(', ')');
@@ -4853,12 +4860,12 @@ loop:   for (;;) {
     }
 
 
-    cssAny = [cssUrl, function () {
+    css_any = [css_url, function () {
         for (;;) {
             if (nexttoken.identifier) {
                 switch (nexttoken.value.toLowerCase()) {
                 case 'url':
-                    cssUrl();
+                    css_url();
                     break;
                 case 'expression':
                     warning(bundle.unexpected_a);
@@ -4878,16 +4885,16 @@ loop:   for (;;) {
     }];
 
 
-    cssBorderStyle = [
+    css_border_style = [
         'none', 'dashed', 'dotted', 'double', 'groove',
         'hidden', 'inset', 'outset', 'ridge', 'solid'
     ];
 
-    cssBreak = [
+    css_break = [
         'auto', 'always', 'avoid', 'left', 'right'
     ];
 
-    cssMedia = {
+    css_media = {
         'all': true,
         'braille': true,
         'embossed': true,
@@ -4900,20 +4907,20 @@ loop:   for (;;) {
         'tv': true
     };
 
-    cssOverflow = [
+    css_overflow = [
         'auto', 'hidden', 'scroll', 'visible'
     ];
 
-    cssAttributeData = {
+    css_attribute_data = {
         background: [
             true, 'background-attachment', 'background-color',
             'background-image', 'background-position', 'background-repeat'
         ],
         'background-attachment': ['scroll', 'fixed'],
-        'background-color': ['transparent', cssColor],
-        'background-image': ['none', cssUrl],
+        'background-color': ['transparent', css_color],
+        'background-image': ['none', css_url],
         'background-position': [
-            2, [cssLength, 'top', 'bottom', 'left', 'right', 'center']
+            2, [css_length, 'top', 'bottom', 'left', 'right', 'center']
         ],
         'background-repeat': [
             'repeat', 'repeat-x', 'repeat-y', 'no-repeat'
@@ -4923,50 +4930,50 @@ loop:   for (;;) {
             true, 'border-bottom-color', 'border-bottom-style',
             'border-bottom-width'
         ],
-        'border-bottom-color': cssColor,
-        'border-bottom-style': cssBorderStyle,
-        'border-bottom-width': cssWidth,
+        'border-bottom-color': css_color,
+        'border-bottom-style': css_border_style,
+        'border-bottom-width': css_width,
         'border-collapse': ['collapse', 'separate'],
-        'border-color': ['transparent', 4, cssColor],
+        'border-color': ['transparent', 4, css_color],
         'border-left': [
             true, 'border-left-color', 'border-left-style', 'border-left-width'
         ],
-        'border-left-color': cssColor,
-        'border-left-style': cssBorderStyle,
-        'border-left-width': cssWidth,
+        'border-left-color': css_color,
+        'border-left-style': css_border_style,
+        'border-left-width': css_width,
         'border-right': [
             true, 'border-right-color', 'border-right-style',
             'border-right-width'
         ],
-        'border-right-color': cssColor,
-        'border-right-style': cssBorderStyle,
-        'border-right-width': cssWidth,
-        'border-spacing': [2, cssLength],
-        'border-style': [4, cssBorderStyle],
+        'border-right-color': css_color,
+        'border-right-style': css_border_style,
+        'border-right-width': css_width,
+        'border-spacing': [2, css_length],
+        'border-style': [4, css_border_style],
         'border-top': [
             true, 'border-top-color', 'border-top-style', 'border-top-width'
         ],
-        'border-top-color': cssColor,
-        'border-top-style': cssBorderStyle,
-        'border-top-width': cssWidth,
-        'border-width': [4, cssWidth],
-        bottom: [cssLength, 'auto'],
+        'border-top-color': css_color,
+        'border-top-style': css_border_style,
+        'border-top-width': css_width,
+        'border-width': [4, css_width],
+        bottom: [css_length, 'auto'],
         'caption-side' : ['bottom', 'left', 'right', 'top'],
         clear: ['both', 'left', 'none', 'right'],
-        clip: [cssShape, 'auto'],
-        color: cssColor,
+        clip: [css_shape, 'auto'],
+        color: css_color,
         content: [
             'open-quote', 'close-quote', 'no-open-quote', 'no-close-quote',
-            cssString, cssUrl, cssCounter, cssAttr
+            css_string, css_url, css_counter, css_attr
         ],
         'counter-increment': [
-            cssName, 'none'
+            css_name, 'none'
         ],
         'counter-reset': [
-            cssName, 'none'
+            css_name, 'none'
         ],
         cursor: [
-            cssUrl, 'auto', 'crosshair', 'default', 'e-resize', 'help', 'move',
+            css_url, 'auto', 'crosshair', 'default', 'e-resize', 'help', 'move',
             'n-resize', 'ne-resize', 'nw-resize', 'pointer', 's-resize',
             'se-resize', 'sw-resize', 'w-resize', 'text', 'wait'
         ],
@@ -4985,12 +4992,12 @@ loop:   for (;;) {
             'status-bar', true, 'font-size', 'font-style', 'font-weight',
             'font-family'
         ],
-        'font-family': cssCommaList,
+        'font-family': css_comma_list,
         'font-size': [
             'xx-small', 'x-small', 'small', 'medium', 'large', 'x-large',
-            'xx-large', 'larger', 'smaller', cssLength
+            'xx-large', 'larger', 'smaller', css_length
         ],
-        'font-size-adjust': ['none', cssNumber],
+        'font-size-adjust': ['none', css_number],
         'font-stretch': [
             'normal', 'wider', 'narrower', 'ultra-condensed',
             'extra-condensed', 'condensed', 'semi-condensed',
@@ -5003,16 +5010,16 @@ loop:   for (;;) {
             'normal', 'small-caps'
         ],
         'font-weight': [
-            'normal', 'bold', 'bolder', 'lighter', cssNumber
+            'normal', 'bold', 'bolder', 'lighter', css_number
         ],
-        height: [cssLength, 'auto'],
-        left: [cssLength, 'auto'],
-        'letter-spacing': ['normal', cssLength],
-        'line-height': ['normal', cssLineHeight],
+        height: [css_length, 'auto'],
+        left: [css_length, 'auto'],
+        'letter-spacing': ['normal', css_length],
+        'line-height': ['normal', css_line_height],
         'list-style': [
             true, 'list-style-image', 'list-style-position', 'list-style-type'
         ],
-        'list-style-image': ['none', cssUrl],
+        'list-style-image': ['none', css_url],
         'list-style-position': ['inside', 'outside'],
         'list-style-type': [
             'circle', 'disc', 'square', 'decimal', 'decimal-leading-zero',
@@ -5020,62 +5027,62 @@ loop:   for (;;) {
             'lower-latin', 'upper-alpha', 'upper-latin', 'hebrew', 'katakana',
             'hiragana-iroha', 'katakana-oroha', 'none'
         ],
-        margin: [4, cssMargin],
-        'margin-bottom': cssMargin,
-        'margin-left': cssMargin,
-        'margin-right': cssMargin,
-        'margin-top': cssMargin,
-        'marker-offset': [cssLength, 'auto'],
-        'max-height': [cssLength, 'none'],
-        'max-width': [cssLength, 'none'],
-        'min-height': cssLength,
-        'min-width': cssLength,
-        opacity: cssNumber,
+        margin: [4, css_margin],
+        'margin-bottom': css_margin,
+        'margin-left': css_margin,
+        'margin-right': css_margin,
+        'margin-top': css_margin,
+        'marker-offset': [css_length, 'auto'],
+        'max-height': [css_length, 'none'],
+        'max-width': [css_length, 'none'],
+        'min-height': css_length,
+        'min-width': css_length,
+        opacity: css_number,
         outline: [true, 'outline-color', 'outline-style', 'outline-width'],
-        'outline-color': ['invert', cssColor],
+        'outline-color': ['invert', css_color],
         'outline-style': [
             'dashed', 'dotted', 'double', 'groove', 'inset', 'none',
             'outset', 'ridge', 'solid'
         ],
-        'outline-width': cssWidth,
-        overflow: cssOverflow,
-        'overflow-x': cssOverflow,
-        'overflow-y': cssOverflow,
-        padding: [4, cssLength],
-        'padding-bottom': cssLength,
-        'padding-left': cssLength,
-        'padding-right': cssLength,
-        'padding-top': cssLength,
-        'page-break-after': cssBreak,
-        'page-break-before': cssBreak,
+        'outline-width': css_width,
+        overflow: css_overflow,
+        'overflow-x': css_overflow,
+        'overflow-y': css_overflow,
+        padding: [4, css_length],
+        'padding-bottom': css_length,
+        'padding-left': css_length,
+        'padding-right': css_length,
+        'padding-top': css_length,
+        'page-break-after': css_break,
+        'page-break-before': css_break,
         position: ['absolute', 'fixed', 'relative', 'static'],
-        quotes: [8, cssString],
-        right: [cssLength, 'auto'],
+        quotes: [8, css_string],
+        right: [css_length, 'auto'],
         'table-layout': ['auto', 'fixed'],
         'text-align': ['center', 'justify', 'left', 'right'],
         'text-decoration': [
             'none', 'underline', 'overline', 'line-through', 'blink'
         ],
-        'text-indent': cssLength,
-        'text-shadow': ['none', 4, [cssColor, cssLength]],
+        'text-indent': css_length,
+        'text-shadow': ['none', 4, [css_color, css_length]],
         'text-transform': ['capitalize', 'uppercase', 'lowercase', 'none'],
-        top: [cssLength, 'auto'],
+        top: [css_length, 'auto'],
         'unicode-bidi': ['normal', 'embed', 'bidi-override'],
         'vertical-align': [
             'baseline', 'bottom', 'sub', 'super', 'top', 'text-top', 'middle',
-            'text-bottom', cssLength
+            'text-bottom', css_length
         ],
         visibility: ['visible', 'hidden', 'collapse'],
         'white-space': [
             'normal', 'nowrap', 'pre', 'pre-line', 'pre-wrap', 'inherit'
         ],
-        width: [cssLength, 'auto'],
-        'word-spacing': ['normal', cssLength],
+        width: [css_length, 'auto'],
+        'word-spacing': ['normal', css_length],
         'word-wrap': ['break-word', 'normal'],
-        'z-index': ['auto', cssNumber]
+        'z-index': ['auto', css_number]
     };
 
-    function styleAttribute() {
+    function style_attribute() {
         var v;
         while (nexttoken.id === '*' || nexttoken.id === '#' ||
                 nexttoken.value === '_') {
@@ -5093,15 +5100,15 @@ loop:   for (;;) {
                 warning(bundle.expected_nonstandard_style_attribute);
             }
             advance();
-            return cssAny;
+            return css_any;
         } else {
             if (!nexttoken.identifier) {
                 warning(bundle.expected_style_attribute);
             } else {
-                if (is_own(cssAttributeData, nexttoken.value)) {
-                    v = cssAttributeData[nexttoken.value];
+                if (is_own(css_attribute_data, nexttoken.value)) {
+                    v = css_attribute_data[nexttoken.value];
                 } else {
-                    v = cssAny;
+                    v = css_any;
                     if (!option.css) {
                         warning(bundle.unrecognized_style_attribute_a);
                     }
@@ -5113,7 +5120,7 @@ loop:   for (;;) {
     }
 
 
-    function styleValue(v) {
+    function style_value(v) {
         var i = 0,
             n,
             once,
@@ -5148,7 +5155,7 @@ loop:   for (;;) {
             }
             match = false;
             while (n > 0) {
-                if (styleValue(vi)) {
+                if (style_value(vi)) {
                     match = true;
                     n -= 1;
                 } else {
@@ -5165,7 +5172,7 @@ loop:   for (;;) {
             round = false;
             for (i = start; i < v.length; i += 1) {
                 if (!once[i]) {
-                    if (styleValue(cssAttributeData[v[i]])) {
+                    if (style_value(css_attribute_data[v[i]])) {
                         match = true;
                         round = true;
                         once[i] = true;
@@ -5179,7 +5186,7 @@ loop:   for (;;) {
         }
     }
 
-    function styleChild() {
+    function style_child() {
         if (nexttoken.id === '(number)') {
             advance();
             if (nexttoken.value === 'n' && nexttoken.identifier) {
@@ -5214,12 +5221,12 @@ loop:   for (;;) {
                 warning(bundle.unexpected_a);
                 semicolon();
             }
-            v = styleAttribute();
+            v = style_attribute();
             advance(':');
             if (nexttoken.identifier && nexttoken.value === 'inherit') {
                 advance();
             } else {
-                if (!styleValue(v)) {
+                if (!style_value(v)) {
                     warning(bundle.unexpected_a);
                     advance();
                 }
@@ -5242,9 +5249,9 @@ loop:   for (;;) {
         }
     }
 
-    function styleSelector() {
+    function style_selector() {
         if (nexttoken.identifier) {
-            if (!is_own(htmltag, option.cap ?
+            if (!is_own(html_tag, option.cap ?
                     nexttoken.value.toLowerCase() : nexttoken.value)) {
                 warning(bundle.expected_tagname_a);
             }
@@ -5254,7 +5261,7 @@ loop:   for (;;) {
             case '>':
             case '+':
                 advance();
-                styleSelector();
+                style_selector();
                 break;
             case ':':
                 advance(':');
@@ -5295,7 +5302,7 @@ loop:   for (;;) {
                 case 'nth-of-type':
                     advance();
                     advance('(');
-                    styleChild();
+                    style_child();
                     advance(')');
                     break;
                 case 'not':
@@ -5304,7 +5311,7 @@ loop:   for (;;) {
                     if (nexttoken.id === ':' && peek(0).value === 'not') {
                         warning(bundle.not);
                     }
-                    styleSelector();
+                    style_selector();
                     advance(')');
                     break;
                 default:
@@ -5353,12 +5360,12 @@ loop:   for (;;) {
         }
     }
 
-    function stylePattern() {
+    function style_pattern() {
         if (nexttoken.id === '{') {
             warning(bundle.expected_style_pattern);
         }
         for (;;) {
-            styleSelector();
+            style_selector();
             if (nexttoken.id === '</' || nexttoken.id === '{' ||
                     nexttoken.id === '(end)') {
                 return '';
@@ -5369,9 +5376,9 @@ loop:   for (;;) {
         }
     }
 
-    function stylelist() {
+    function style_list() {
         while (nexttoken.id !== '</' && nexttoken.id !== '(end)') {
-            stylePattern();
+            style_pattern();
             xmode = 'styleproperty';
             if (nexttoken.id === ';') {
                 semicolon();
@@ -5393,7 +5400,7 @@ loop:   for (;;) {
                 switch (nexttoken.value) {
                 case 'import':
                     advance();
-                    if (!cssUrl()) {
+                    if (!css_url()) {
                         warning(bundle.expected_a_b,
                             nexttoken, 'url', nexttoken.value);
                         advance();
@@ -5403,7 +5410,7 @@ loop:   for (;;) {
                 case 'media':
                     advance();
                     for (;;) {
-                        if (!nexttoken.identifier || cssMedia[nexttoken.value] === true) {
+                        if (!nexttoken.identifier || css_media[nexttoken.value] === true) {
                             error(bundle.expected_media_a);
                         }
                         advance();
@@ -5413,7 +5420,7 @@ loop:   for (;;) {
                         comma();
                     }
                     advance('{');
-                    stylelist();
+                    style_list();
                     advance('}');
                     break;
                 default:
@@ -5423,13 +5430,13 @@ loop:   for (;;) {
                 warning(bundle.expected_at_a);
             }
         }
-        stylelist();
+        style_list();
     }
 
 
 // Parse HTML
 
-    function doBegin(n) {
+    function do_begin(n) {
         if (n !== 'html' && !option.fragment) {
             if (n === 'div' && option.adsafe) {
                 error(bundle.adsafe_fragment);
@@ -5453,7 +5460,7 @@ loop:   for (;;) {
         assume();
     }
 
-    function doAttribute(n, a, v) {
+    function do_attribute(n, a, v) {
         var u, x;
         if (a === 'id') {
             u = typeof v === 'string' ? v.toUpperCase() : '';
@@ -5513,8 +5520,8 @@ loop:   for (;;) {
         }
     }
 
-    function doTag(n, a) {
-        var i, t = htmltag[n], x;
+    function do_tag(n, a) {
+        var i, t = html_tag[n], x;
         src = false;
         if (!t) {
             error(
@@ -5661,9 +5668,9 @@ loop:   for (;;) {
                 advance();
                 if (!stack) {
                     stack = [];
-                    doBegin(n);
+                    do_begin(n);
                 }
-                v = htmltag[n];
+                v = html_tag[n];
                 if (typeof v !== 'object') {
                     error(bundle.unrecognized_tag_a, t, n);
                 }
@@ -5756,9 +5763,9 @@ loop:   for (;;) {
                         }
                     }
                     attributes[a] = v;
-                    doAttribute(n, a, v);
+                    do_attribute(n, a, v);
                 }
-                doTag(n, attributes);
+                do_tag(n, attributes);
                 if (!e) {
                     stack.push(t);
                 }
@@ -5952,7 +5959,7 @@ loop:   for (;;) {
                 case '{':
                 case '[':
                     jsonmode = true;
-                    jsonValue();
+                    json_value();
                     break;
                 case '@':
                 case '*':

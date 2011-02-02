@@ -107,6 +107,31 @@ body {
     text-align: left;
 }
 
+#JSLINT_INPUT{
+    border: 2px solid black;
+    color: black;
+    font-family: monospace;
+    height: 3in;
+    overflow: auto;
+    padding: 0.5em;
+    width: 100%;
+}
+
+#JSLINT_JSLINTSTRING {
+    background-color: peachpuff;
+    border: 2px solid black;
+    font-family: monospace;
+    margin: 1em;
+    padding: 1em;
+}
+
+#JSLINT_OPTIONS {
+    background-color: linen;
+}
+
+#JSLINT_TREE {
+    text-align: left;
+}
 </style></head>
 <body>
 <table border="0">
@@ -130,14 +155,7 @@ Code Quality Tool</big></p>
 
 <div id="JSLINT_">
 
-<p style="background-color: transparent;"><textarea id="JSLINT_INPUT" style="
-    border: 2px solid black;
-    color: black;
-    font-family: monospace;
-    height: 3in;
-    overflow: auto;
-    padding: 0.5em;
-    width: 100%;"></textarea>
+<p style="background-color: transparent;"><textarea id="JSLINT_INPUT"></textarea>
 </p>
 <p>
     <input type="button" name="jslint" value="JSLint">
@@ -156,7 +174,7 @@ Code Quality Tool</big></p>
       WARNING: JSLint will hurt your feelings.
       </div>
 </div>
-<pre id="JSLINT_TREE" style="text-align: left;"></pre>
+<pre id="JSLINT_TREE"></pre>
 <br clear="all">
 <p>
     <input type="button" name="jslint" value="JSLint">
@@ -212,6 +230,8 @@ Code Quality Tool</big></p>
   <br>
     <input type="checkbox" id="JSLINT_SUB" title="sub"><label for="JSLINT_SUB" title="sub">Tolerate inefficient subscripting</label>
   <br>
+    <input type="checkbox" id="JSLINT_CONTINUE" title="continue"><label for="JSLINT_CONTINUE" title="sub">Tolerate <tt>continue</tt></label>
+  <br>
     <input type="checkbox" id="JSLINT_CSS" title="css"><label for="JSLINT_CSS" title="css">Tolerate CSS workarounds</label>
   <br>
     <input type="checkbox" id="JSLINT_CAP" title="cap"><label for="JSLINT_CAP" title="cap">Tolerate&nbsp;<tt>HTML</tt>&nbsp;case</label>
@@ -234,12 +254,7 @@ Code Quality Tool</big></p>
     <label for="JSLINT_PREDEF">Predefined&nbsp;<small>(&nbsp;<code>,</code>&nbsp;separated)</small></label>&nbsp;<input id="JSLINT_PREDEF" type="text" size="72" autocomplete=off title=predef>
   </div>
 <br clear=all>
-<p id=JSLINT_JSLINTSTRING style="
-    background-color: peachpuff;
-    border: 2px solid black;
-    font-family: monospace;
-    margin: 1em;
-    padding: 1em;"></p>
+<p id=JSLINT_JSLINTSTRING></p>
 </fieldset>
 <p> Copyright 2002&nbsp;<a href="http://www.JSLint.com/lint.html">Douglas
   Crockford.</a>&nbsp;<a target="_blank" href="http://www.crockford.com/">All
