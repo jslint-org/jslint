@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-02-02
+// 2011-02-03
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -4072,6 +4072,17 @@ loop:   for (;;) {
         edge();
         this.arity = 'statement';
         this.first = expected_relation(expression(0));
+        switch (this.first.id) {
+        case 'true':
+        case 'false':
+        case 'null':
+        case 'undefined':
+        case 'NaN':
+        case 'Infinity':
+        case '(string)':
+        case '(number)':
+            warning(bundle.weird_relation, this);
+        }
         no_space();
         step_out(')', t);
         discard();
@@ -4194,8 +4205,16 @@ loop:   for (;;) {
         step_in();
         this.arity = 'statement';
         this.first = expected_relation(expression(0));
-        if (this.first.id === 'NaN') {
-            warning(bundle.unexpected_a, this.first);
+        switch (this.first.id) {
+        case 'true':
+        case 'false':
+        case 'null':
+        case 'undefined':
+        case 'NaN':
+        case 'Infinity':
+        case '(string)':
+        case '(number)':
+            warning(bundle.weird_relation, this.first);
         }
         no_space();
         step_out(')', t);
@@ -4343,7 +4362,7 @@ loop:   for (;;) {
             this.first = i;
             s = block(true);
             if (!f && (s.length > 1 || typeof s[0] !== 'object' ||
-                    s[0].value !== 'if' || s[0].first.id === 'true')) {
+                    s[0].value !== 'if')) {
                 warning(bundle.for_if, this);
             }
         } else {
@@ -6223,7 +6242,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-02-02';
+    itself.edition = '2011-02-03';
 
     return itself;
 
