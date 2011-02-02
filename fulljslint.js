@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-01-28
+// 2011-02-02
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -303,9 +303,9 @@ SOFTWARE.
     unrecognized_tag_a, unsafe, unused, unwatch, updateNow, url, urls, 
     use_array, use_braces, use_object, used_before_a, value, valueOf, var, 
     var_a_not, version, "vertical-align", video, violet, visibility, was, 
-    watch, weird_new, weird_program, wheat, while, white, "white-space", 
-    whitesmoke, widget, width, window, windowframe, windows, windowtext, 
-    "word-spacing", "word-wrap", wrap, wrap_immediate, wrap_regexp, 
+    watch, weird_new, weird_program, weird_relation, wheat, while, white, 
+    "white-space", whitesmoke, widget, width, window, windowframe, windows, 
+    windowtext, "word-spacing", "word-wrap", wrap, wrap_immediate, wrap_regexp, 
     write_is_wrong, yahooCheckLogin, yahooLogin, yahooLogout, yellow, 
     yellowgreen, "z-index", "}"
 */
@@ -609,6 +609,7 @@ var JSLINT = (function () {
             var_a_not: "Variable {a} was not declared correctly.",
             weird_new: "Weird construction. Delete 'new'.",
             weird_program: "Weird program.",
+            weird_relation: "Weird relation.",
             wrap_immediate: "Wrap an immediate function invocation in parentheses " +
                 "to assist the reader in understanding that the expression " +
                 "is the result of a function, and not the function itself.",
@@ -2841,6 +2842,10 @@ loop:   for (;;) {
                 warning(bundle.expected_a_b, that, eqeq, that.id);
             } else if (left.id === 'NaN' || right.id === 'NaN') {
                 warning(bundle.isNaN, that);
+            } else if ((left.identifier &&  right.identifier && left.value === right.value) ||
+                    ((left.id === '(string)' || left.id === '(number)') && 
+                    (right.id === '(string)' || right.id === '(number)'))) {
+                warning(bundle.weird_relation, that);
             }
             if (left.id === '!') {
                 warning(bundle.confusing_a, left);
@@ -6218,7 +6223,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-01-28';
+    itself.edition = '2011-02-02';
 
     return itself;
 
