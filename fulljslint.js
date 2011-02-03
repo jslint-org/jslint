@@ -3867,6 +3867,7 @@ loop:   for (;;) {
         }
         func.name = name || '';
         func.first = funct['(params)'] = functionparams();
+        one_space();
         func.block = block(false);
 
         scope = s;
