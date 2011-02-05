@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-02-03
+// 2011-02-04
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -1406,7 +1406,7 @@ var JSLINT = (function () {
     }
 
     function expected_at(at) {
-        if (nexttoken.from !== at) {
+        if (option.white && nexttoken.from !== at) {
             warning(bundle.expected_a_at_b_c, nexttoken, nexttoken.value, at, 
                 nexttoken.from);
         }
@@ -2390,7 +2390,7 @@ loop:   for (;;) {
         return t;
     }
 
-    
+
     function advance(id, t) {
 
 // Produce the next token, also looking for programming errors.
@@ -2503,7 +2503,7 @@ loop:   for (;;) {
 
     function step_in(mode) {
         var open, was;
-        if (option.white && option.indent) {
+        if (option.indent) {
             if (typeof mode === 'number') {
                 indent = {
                     at: mode,
@@ -3399,7 +3399,7 @@ loop:   for (;;) {
         that.third = expression(10);
         return that;
     });
-    
+
     infix('||', 40, function (left, that) {
         function paren_check(that) {
             if (that.id === '&&' && !that.paren) {
@@ -3407,7 +3407,7 @@ loop:   for (;;) {
             }
             return that;
         }        
-    
+
         that.first = paren_check(expected_relation(left));        
         that.second = paren_check(expected_relation(expression(40)));
         return that;
@@ -6249,7 +6249,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-02-03';
+    itself.edition = '2011-02-04';
 
     return itself;
 
