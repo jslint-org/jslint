@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-02-05
+// 2011-02-06
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -295,19 +295,18 @@ SOFTWARE.
     threedlightshadow, threedshadow, thru, time, title, toLowerCase, 
     toString, toUpperCase, toint32, token, tomato, too_long, too_many, top, 
     tr, trailing_decimal_a, tree, tt, tty, turquoise, tv, type, u, ul, 
-    unclosed, unclosed_comment, unclosed_regexp, undef, 
-    unescape, unescaped_a, unexpected_a, unexpected_char_a_b, 
-    unexpected_comment, unexpected_member_a, unexpected_space_a_b, 
-    "unicode-bidi", unnecessary_escapement, unnecessary_initialize, 
-    unnecessary_use, unreachable_a_b, unrecognized_style_attribute_a, 
-    unrecognized_tag_a, unsafe, unused, unwatch, updateNow, url, urls, 
-    use_array, use_braces, use_object, used_before_a, value, valueOf, var, 
-    var_a_not, version, "vertical-align", video, violet, visibility, was, 
-    watch, weird_new, weird_program, weird_relation, wheat, while, white, 
-    "white-space", whitesmoke, widget, width, window, windowframe, windows, 
-    windowtext, "word-spacing", "word-wrap", wrap, wrap_immediate, wrap_regexp, 
-    write_is_wrong, yahooCheckLogin, yahooLogin, yahooLogout, yellow, 
-    yellowgreen, "z-index", "}"
+    unclosed, unclosed_comment, unclosed_regexp, undef, unescape, unescaped_a, 
+    unexpected_a, unexpected_char_a_b, unexpected_comment, unexpected_member_a, 
+    unexpected_space_a_b, "unicode-bidi", unnecessary_escapement, 
+    unnecessary_initialize, unnecessary_use, unreachable_a_b, 
+    unrecognized_style_attribute_a, unrecognized_tag_a, unsafe, unused, unwatch, 
+    updateNow, url, urls, use_array, use_braces, use_object, used_before_a, 
+    value, valueOf, var, var_a_not, version, "vertical-align", video, violet, 
+    visibility, was, watch, weird_assignment, weird_new, weird_program, 
+    weird_relation, wheat, while, white, "white-space", whitesmoke, widget, 
+    width, window, windowframe, windows, windowtext, "word-spacing", 
+    "word-wrap", wrap, wrap_immediate, wrap_regexp, write_is_wrong, 
+    yahooCheckLogin, yahooLogin, yahooLogout, yellow, yellowgreen, "z-index", "}"
 */
 
 // We build the application inside a function so that we produce only a single
@@ -607,6 +606,7 @@ var JSLINT = (function () {
             use_object: "Use the object literal notation {}.",
             used_before_a: "'{a}' was used before it was defined.",
             var_a_not: "Variable {a} was not declared correctly.",
+            weird_assignment: "Weird_assignment.",
             weird_new: "Weird construction. Delete 'new'.",
             weird_program: "Weird program.",
             weird_relation: "Weird relation.",
@@ -2243,12 +2243,9 @@ klass:                                  do {
 // that are attached to the token to tokens that are in the tree.
 
         if (token.comments) {
-            if (nexttoken.comments) {
-                nexttoken.comments = nexttoken.comments.concat(token.comments);
-            } else {
-                nexttoken.comments = token.comments;
-            }
-            token.comments = null;
+            nexttoken.comments = nexttoken.comments ? 
+                nexttoken.comments.concat(token.comments) : 
+                token.comments;
         }
         if (token.postcomments) {
             var prev = prevtoken;
@@ -2361,7 +2358,7 @@ klass:                                  do {
             }
             break;
         }
-        if (token.id === '(string)' || token.identifier) {
+        if (token.arity === 'string' || token.identifier) {
             anonname = token.value;
         }
 
@@ -2421,7 +2418,7 @@ loop:   for (;;) {
                 }
                 advance();
             }
-            if (nexttoken.id !== '(string)' && !nexttoken.identifier && 
+            if (nexttoken.arity !== 'string' && !nexttoken.identifier && 
                     o !== '/*members') {
                 error(bundle.unexpected_a, nexttoken);
             }
@@ -2626,6 +2623,48 @@ loop:   for (;;) {
             return false;
         }
     }
+    
+    
+    function are_similar(a, b) {
+        if (Array.isArray(a)) {
+            if (Array.isArray(b) && a.length === b.length) {
+                var i;
+                for (i = 0; i < a.length; i += 1) {
+                    if (!are_similar(a[i], b[i])) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return true;
+        } 
+        if (Array.isArray(b)) {
+            return false;
+        } 
+        if (a.arity === b.arity && a.value === b.value) {
+            switch (a.arity) {
+            case 'prefix':
+            case 'suffix':
+                return are_similar(a.first, b.first);
+            case 'infix':
+                return are_similar(a.first, b.first) && 
+                    are_similar(a.second, b.second);
+            case 'ternary':
+                return are_similar(a.first, b.first) && 
+                    are_similar(a.second, b.second) && 
+                    are_similar(a.third, b.third);
+            default:
+                return true;
+            }
+        } else {
+            if (a.id === '.' && b.id === '[' && b.arity === 'infix') {
+                return a.second.value === b.second.value && b.second.arity === 'string';
+            } else if (a.id === '[' && a.arity === 'infix' && b.id === '.') {
+                return a.second.value === b.second.value && a.second.arity === 'string';
+            }
+        }
+        return false;
+    }
 
 
 // This is the heart of JSLINT, the Pratt parser. In addition to parsing, it
@@ -2666,7 +2705,7 @@ loop:   for (;;) {
             if (token.nud) {
                 left = token.nud();
             } else {
-                if (nexttoken.id === '(number)' && token.id === '.') {
+                if (nexttoken.arity === 'number' && token.id === '.') {
                     warning(bundle.leading_decimal_a, token,
                         nexttoken.value);
                     advance();
@@ -2830,9 +2869,10 @@ loop:   for (;;) {
                 warning(bundle.expected_a_b, that, eqeq, that.id);
             } else if (left.id === 'NaN' || right.id === 'NaN') {
                 warning(bundle.isNaN, that);
-            } else if ((left.identifier &&  right.identifier && left.value === right.value) ||
-                    ((left.id === '(string)' || left.id === '(number)') && 
-                    (right.id === '(string)' || right.id === '(number)'))) {
+            } 
+            if (are_similar(left, right) ||
+                    ((left.arity === 'string' || left.arity === 'number') && 
+                    (right.arity === 'string' || right.arity === 'number'))) {
                 warning(bundle.weird_relation, that);
             }
             if (left.id === '!') {
@@ -2872,21 +2912,27 @@ loop:   for (;;) {
                 } while (l);
             }
             if (left) {
+                if (left === syntax['function']) {
+                    warning(bundle.identifier_function, token);
+                }
                 if (left.id === '.' || left.id === '[') {
                     if (!left.first || left.first.value === 'arguments') {
                         warning(bundle.bad_assignment, that);
                     }
                     that.second = expression(19);
+                    if (that.id === '=' && are_similar(that.first, that.second)) {
+                        warning(bundle.weird_assignment, that);
+                    }
                     return that;
                 } else if (left.identifier && !left.reserved) {
                     if (funct[left.value] === 'exception') {
                         warning(bundle.assign_exception, left);
                     }
                     that.second = expression(19);
+                    if (that.id === '=' && are_similar(that.first, that.second)) {
+                        warning(bundle.weird_assignment, that);
+                    }
                     return that;
-                }
-                if (left === syntax['function']) {
-                    warning(bundle.identifier_function, token);
                 }
             }
             error(bundle.bad_assignment, that);
@@ -3381,6 +3427,7 @@ loop:   for (;;) {
         advance(':');
         spaces();
         that.third = expression(10);
+        that.arity = 'ternary';
         return that;
     });
 
@@ -3419,7 +3466,7 @@ loop:   for (;;) {
     infix('instanceof', 120);
     infix('+', 130, function (left, that) {
         var right = expression(130);
-        if (left && right && left.id === '(string)' && right.id === '(string)') {
+        if (left && right && left.arity === 'string' && right.arity === 'string') {
             left.value += right.value;
             left.thru = right.thru;
             if (jx.test(left.value)) {
@@ -3569,8 +3616,7 @@ loop:   for (;;) {
             if (left.identifier) {
                 if (left.value.match(/^[A-Z]([A-Z0-9_$]*[a-z][A-Za-z0-9_$]*)?$/)) {
                     if (left.value !== 'Number' && left.value !== 'String' &&
-                            left.value !== 'Boolean' &&
-                            left.value !== 'Date') {
+                            left.value !== 'Boolean' && left.value !== 'Date') {
                         if (left.value === 'Math' || left.value === 'JSON') {
                             warning(bundle.not_a_function, left);
                         } else if (option.newcap) {
@@ -3607,7 +3653,7 @@ loop:   for (;;) {
                 if (left.value === 'eval' || left.value === 'Function' ||
                         left.value === 'execScript') {
                     warning(bundle.evil, left);
-                } else if (p[0] && p[0].id === '(string)' &&
+                } else if (p[0] && p[0].arity === 'string' &&
                         (left.value === 'setTimeout' ||
                         left.value === 'setInterval')) {
                     warning(bundle.implied_evil, left);
@@ -3670,7 +3716,7 @@ loop:   for (;;) {
                     if (xmode !== 'script') {
                         warning(bundle.adsafe, that);
                     } else if (adsafe_went || nexttoken.id !== '(' ||
-                            peek(0).id !== '(string)' ||
+                            peek(0).arity !== 'string' ||
                             peek(0).value !== adsafe_id ||
                             peek(1).id !== ',') {
                         error(bundle.adsafe_a, that, 'go');
@@ -3720,7 +3766,7 @@ loop:   for (;;) {
         step_in();
         edge();
         var e = expression(0), s;
-        if (e.id === '(string)') {
+        if (e.arity === 'string') {
             if (option.safe && banned[e.value] === true) {
                 warning(bundle.adsafe_a, e);
             } else if (!option.evil &&
@@ -3737,7 +3783,7 @@ loop:   for (;;) {
                     warning(bundle.subscript, e);
                 }
             }
-        } else if (e.id !== '(number)' || e.value < 0) {
+        } else if (e.arity !== 'number' || e.value < 0) {
             if (option.safe) {
                 warning(bundle.adsafe_subscript_a, e);
             }
@@ -3782,7 +3828,7 @@ loop:   for (;;) {
     function property_name() {
         var id = optional_identifier(true);
         if (!id) {
-            if (nexttoken.id === '(string)') {
+            if (nexttoken.arity === 'string') {
                 id = nexttoken.value;
                 if (option.safe) {
                     if (banned[id]) {
@@ -3793,7 +3839,7 @@ loop:   for (;;) {
                     }
                 }
                 advance();
-            } else if (nexttoken.id === '(number)') {
+            } else if (nexttoken.arity === 'number') {
                 id = nexttoken.value.toString();
                 advance();
             }
@@ -4508,7 +4554,7 @@ loop:   for (;;) {
                         warning(bundle.unexpected_a, nexttoken);
                         comma();
                     }
-                    if (nexttoken.id !== '(string)') {
+                    if (nexttoken.arity !== 'string') {
                         warning(bundle.expected_string_a);
                     }
                     if (o[nexttoken.value] === true) {
@@ -4597,7 +4643,7 @@ loop:   for (;;) {
             advance('-');
             no_space_only();
         }
-        if (nexttoken.id === '(number)') {
+        if (nexttoken.arity === 'number') {
             advance('(number)');
             return true;
         }
@@ -4605,7 +4651,7 @@ loop:   for (;;) {
 
 
     function css_string() {
-        if (nexttoken.id === '(string)') {
+        if (nexttoken.arity === 'string') {
             advance();
             return true;
         }
@@ -4624,7 +4670,7 @@ loop:   for (;;) {
                         comma();
                     }
                     number = nexttoken.value;
-                    if (nexttoken.id !== '(number)' || number < 0) {
+                    if (nexttoken.arity !== 'number' || number < 0) {
                         warning(bundle.expected_positive_a, nexttoken);
                         advance();
                     } else {
@@ -4644,7 +4690,7 @@ loop:   for (;;) {
                 if (value === 'rgba') {
                     comma();
                     number = +nexttoken.value;
-                    if (nexttoken.id !== '(number)' || number < 0 || number > 1) {
+                    if (nexttoken.arity !== 'number' || number < 0 || number > 1) {
                         warning(bundle.expected_fraction_a, nexttoken);
                     }
                     advance();
@@ -4672,9 +4718,9 @@ loop:   for (;;) {
             advance('-');
             no_space_only();
         }
-        if (nexttoken.id === '(number)') {
+        if (nexttoken.arity === 'number') {
             advance();
-            if (nexttoken.id !== '(string)' &&
+            if (nexttoken.arity !== 'string' &&
                     css_lengthData[nexttoken.value] === true) {
                 no_space_only();
                 advance();
@@ -4692,9 +4738,9 @@ loop:   for (;;) {
             advance('-');
             no_space_only();
         }
-        if (nexttoken.id === '(number)') {
+        if (nexttoken.arity === 'number') {
             advance();
-            if (nexttoken.id !== '(string)' &&
+            if (nexttoken.arity !== 'string' &&
                     css_lengthData[nexttoken.value] === true) {
                 no_space_only();
                 advance();
@@ -4766,7 +4812,7 @@ loop:   for (;;) {
             advance();
             if (nexttoken.id === ',') {
                 comma();
-                if (nexttoken.id !== '(string)') {
+                if (nexttoken.arity !== 'string') {
                     warning(bundle.expected_string_a);
                 }
                 advance();
@@ -4783,14 +4829,14 @@ loop:   for (;;) {
             advance();
             if (nexttoken.id === ',') {
                 comma();
-                if (nexttoken.id !== '(string)') {
+                if (nexttoken.arity !== 'string') {
                     warning(bundle.expected_string_a);
                 }
                 advance();
             }
             if (nexttoken.id === ',') {
                 comma();
-                if (nexttoken.id !== '(string)') {
+                if (nexttoken.arity !== 'string') {
                     warning(bundle.expected_string_a);
                 }
                 advance();
@@ -5177,7 +5223,7 @@ loop:   for (;;) {
     }
 
     function style_child() {
-        if (nexttoken.id === '(number)') {
+        if (nexttoken.arity === 'number') {
             advance();
             if (nexttoken.value === 'n' && nexttoken.identifier) {
                 no_space_only();
@@ -5337,7 +5383,7 @@ loop:   for (;;) {
                         nexttoken.id === '*=' ||
                         nexttoken.id === '^=') {
                     advance();
-                    if (nexttoken.id !== '(string)') {
+                    if (nexttoken.arity !== 'string') {
                         warning(bundle.expected_string_a);
                     }
                     advance();
@@ -5566,6 +5612,7 @@ loop:   for (;;) {
                     error(bundle.adsafe_script, token);
                 }
                 step_in(nexttoken.from);
+                edge();
                 use_strict();
                 statements('script');
                 indent = null;
@@ -5742,8 +5789,8 @@ loop:   for (;;) {
                             if (!nexttoken.identifier &&
                                     nexttoken.id !== '"' &&
                                     nexttoken.id !== '\'' &&
-                                    nexttoken.id !== '(string)' &&
-                                    nexttoken.id !== '(number)' &&
+                                    nexttoken.arity !== 'string' &&
+                                    nexttoken.arity !== 'number' &&
                                     nexttoken.id !== '(color)') {
                                 warning(bundle.expected_attribute_value_a, token, a);
                             }
@@ -5966,7 +6013,7 @@ loop:   for (;;) {
                         error(bundle.css);
                     }
                     advance();
-                    if (nexttoken.id !== '(string)' &&
+                    if (nexttoken.arity !== 'string' &&
                             nexttoken.value !== 'UTF-8') {
                         error(bundle.css);
                     }
@@ -6002,7 +6049,7 @@ loop:   for (;;) {
             indent = null;
             advance('(end)');
         } catch (e) {
-            if (e) {
+            if (e) {        // `~
                 JSLINT.errors.push({
                     reason    : e.message,
                     line      : e.line || nexttoken.line,
@@ -6241,7 +6288,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-02-05';
+    itself.edition = '2011-02-06';
 
     return itself;
 
