@@ -3584,7 +3584,7 @@ loop:   for (;;) {
         return that;
     });
     infix('/', 140, function (left, that) {
-        if ((left.arity === 'number' && (left.value === 0 || left.value === 1)) || left.arity === 'string') {
+        if ((left.arity === 'number' && left.value === 0) || left.arity === 'string') {
             warning(bundle.unexpected_a, left);
         }
         var right = expression(140);
