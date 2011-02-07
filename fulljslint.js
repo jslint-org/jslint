@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-02-06
+// 2011-02-07
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -1741,9 +1741,6 @@ var JSLINT = (function () {
     //      number
 
                         if (c.isDigit()) {
-                            if (xmode !== 'style' && !isFinite(Number(t))) {
-                                warning_at(bundle.bad_number, line, character, t);
-                            }
                             if (xmode !== 'style' &&
                                     xmode !== 'styleproperty' &&
                                     s.substr(0, 1).isAlpha()) {
@@ -1764,6 +1761,13 @@ var JSLINT = (function () {
                             if (t.substr(t.length - 1) === '.') {
                                 warning_at(bundle.trailing_decimal_a, line,
                                     character, t);
+                            }
+                            if (xmode !== 'style') {
+                                d = +t;
+                                if (!isFinite(d)) {
+                                    warning_at(bundle.bad_number, line, character, t);
+                                }
+                                t = d;
                             }
                             return it('(number)', t);
                         }
@@ -2854,12 +2858,38 @@ loop:   for (;;) {
         return x;
     }
 
-    function expected_relation(node) {
+    function expected_relation(node, message) {
         if (node.assign) {
-            warning(bundle.conditional_assignment, node);
+            warning(message || bundle.conditional_assignment, node);
         }
         return node;
     }
+    
+    function expected_condition(node, message) {
+        switch (node.id) {
+        case '[':
+        case '-':
+            if (node.arity !== 'infix') {
+                warning(message || bundle.weird_relation, node);
+            }
+            break;
+        case 'false':
+        case 'Infinity':
+        case 'NaN':
+        case 'null':
+        case 'true':
+        case 'undefined':
+        case 'void':
+        case '(number)':
+        case '(regexp)':
+        case '(string)':
+        case '{':
+            warning(message || bundle.weird_relation, node);
+            break;
+        }
+        return node;
+    }
+
 
 
     function relation(s, eqeq) {
@@ -3397,7 +3427,7 @@ loop:   for (;;) {
     reservevar('NaN');
     reservevar('null');
     reservevar('this', function (x) {
-        if (strict_mode && ((funct['(statement)'] && //// correct this test.
+        if (strict_mode && ((funct['(statement)'] && 
                 funct['(name)'].charAt(0) > 'Z') || funct['(global)'])) {
             warning(bundle.strict, x);
         } else if (option.safe) {
@@ -3448,6 +3478,14 @@ loop:   for (;;) {
         that.second = expected_relation(expression(50));
         return that;
     });
+    prefix('void', function () {
+        this.first = expression(0);
+        if (this.first.arity !== 'number' || this.first.value) {
+            warning(bundle.unexpected_a, this);
+            return this;
+        }
+        return this;
+    });
     bitwise('|', 70);
     bitwise('^', 80);
     bitwise('&', 90);
@@ -3465,11 +3503,18 @@ loop:   for (;;) {
     infix('in', 120);
     infix('instanceof', 120);
     infix('+', 130, function (left, that) {
+        if (!left.value && (left.arity === 'number' || left.arity === 'string')) {
+            warning(bundle.unexpected_a, left);
+        }
         var right = expression(130);
-        if (left && right && left.arity === 'string' && right.arity === 'string') {
+        if (!right.value && (right.arity === 'number' || right.arity === 'string')) {
+            warning(bundle.unexpected_a, right);
+        }
+        if (left.arity === right.arity && 
+                (left.arity === 'string' && left.arity === 'number')) {
             left.value += right.value;
             left.thru = right.thru;
-            if (jx.test(left.value)) {
+            if (left.arity === 'string' && jx.test(left.value)) {
                 warning(bundle.url, left);
             }
             return left;
@@ -3491,7 +3536,23 @@ loop:   for (;;) {
         this.second = expression(130);
         return this;
     });
-    infix('-', 130);
+    infix('-', 130, function (left, that) {
+        if ((left.arity === 'number' && left.value === 0) || left.arity === 'string') {
+            warning(bundle.unexpected_a, left);
+        }
+        var right = expression(130);
+        if ((right.arity === 'number' && right.value === 0) || right.arity === 'string') {
+            warning(bundle.unexpected_a, left);
+        }
+        if (left.arity === right.arity && left.arity === 'number') {
+            left.value -= right.value;
+            left.thru = right.thru;
+            return left;
+        }
+        that.first = left;
+        that.second = right;
+        return that;
+    });
     prefix('-');
     prefix('---', function () {
         warning(bundle.confusing_a, token);
@@ -3505,9 +3566,57 @@ loop:   for (;;) {
         this.second = expression(130);
         return this;
     });
-    infix('*', 140);
-    infix('/', 140);
-    infix('%', 140);
+    infix('*', 140, function (left, that) {
+        if ((left.arity === 'number' && (left.value === 0 || left.value === 1)) || left.arity === 'string') {
+            warning(bundle.unexpected_a, left);
+        }
+        var right = expression(140);
+        if ((right.arity === 'number' && (right.value === 0 || right.value === 1)) || right.arity === 'string') {
+            warning(bundle.unexpected_a, right);
+        }
+        if (left.arity === right.arity && left.arity === 'number') {
+            left.value *= right.value;
+            left.thru = right.thru;
+            return left;
+        }
+        that.first = left;
+        that.second = right;
+        return that;
+    });
+    infix('/', 140, function (left, that) {
+        if ((left.arity === 'number' && (left.value === 0 || left.value === 1)) || left.arity === 'string') {
+            warning(bundle.unexpected_a, left);
+        }
+        var right = expression(140);
+        if ((right.arity === 'number' && (right.value === 0 || right.value === 1)) || right.arity === 'string') {
+            warning(bundle.unexpected_a, right);
+        }
+        if (left.arity === right.arity && left.arity === 'number') {
+            left.value /= right.value;
+            left.thru = right.thru;
+            return left;
+        }
+        that.first = left;
+        that.second = right;
+        return that;
+    });
+    infix('%', 140, function (left, that) {
+        if ((left.arity === 'number' && (left.value === 0 || left.value === 1)) || left.arity === 'string') {
+            warning(bundle.unexpected_a, left);
+        }
+        var right = expression(140);
+        if ((right.arity === 'number' && (right.value === 0 || right.value === 1)) || right.arity === 'string') {
+            warning(bundle.unexpected_a, right);
+        }
+        if (left.arity === right.arity && left.arity === 'number') {
+            left.value %= right.value;
+            left.thru = right.thru;
+            return left;
+        }
+        that.first = left;
+        that.second = right;
+        return that;
+    });
 
     suffix('++');
     prefix('++');
@@ -3545,7 +3654,8 @@ loop:   for (;;) {
     prefix('typeof');
     prefix('new', function () {
         one_space();
-        var c = expression(160), i;
+        var c = expression(160), i, p;
+        this.first = c;
         if (c.id !== 'function') {
             if (c.identifier) {
                 switch (c.value) {
@@ -3553,17 +3663,33 @@ loop:   for (;;) {
                     warning(bundle.use_object, token);
                     break;
                 case 'Array':
-                    if (nexttoken.id !== '(') {
-                        warning(bundle.use_array, token);
-                    } else {
+                    if (nexttoken.id === '(') {
+                        p = nexttoken;
+                        p.first = this;
                         advance('(');
-                        if (nexttoken.id === ')') {
+                        if (nexttoken.id !== ')') {
+                            p.second = expression(0);
+                            if (p.second.arity !== 'number' || !p.second.value) {
+                                expected_condition(p.second,  bundle.use_array);
+                                i = false;
+                            } else {
+                                i = true;
+                            }
+                            while (nexttoken.id !== ')' && nexttoken.id !== '(end)') {
+                                if (i) {
+                                    warning(bundle.use_array, p);
+                                    i = false;
+                                }
+                                advance();
+                            }
+                        } else {
                             warning(bundle.use_array, token);
                         }
-                        advance(')');
+                        advance(')', p);
+                        return p;                            
                     }
-                    this.first = c;
-                    return this;
+                    warning(bundle.use_array, token);
+                    break;
                 case 'Number':
                 case 'String':
                 case 'Boolean':
@@ -3598,7 +3724,6 @@ loop:   for (;;) {
         if (nexttoken.id !== '(') {
             warning(bundle.missing_a, nexttoken, '()');
         }
-        this.first = c;
         return this;
     });
 
@@ -3619,7 +3744,9 @@ loop:   for (;;) {
                             left.value !== 'Boolean' && left.value !== 'Date') {
                         if (left.value === 'Math' || left.value === 'JSON') {
                             warning(bundle.not_a_function, left);
-                        } else if (option.newcap) {
+                        } else if (left.value === 'Object') {
+                            warning(bundle.use_object, token);
+                        } else if (left.value === 'Array' || option.newcap) {
                             warning(bundle.missing_a, left, 'new');
                         }
                     }
@@ -4109,19 +4236,7 @@ loop:   for (;;) {
         no_space();
         edge();
         this.arity = 'statement';
-        this.first = expected_relation(expression(0));
-        switch (this.first.id) {
-        case 'true':
-        case 'false':
-        case 'null':
-        case 'undefined':
-        case 'NaN':
-        case 'Infinity':
-        case '(string)':
-        case '(number)':
-            warning(bundle.weird_relation, this);
-            break;
-        }
+        this.first = expected_condition(expected_relation(expression(0)));
         no_space();
         step_out(')', t);
         discard();
@@ -4210,6 +4325,9 @@ loop:   for (;;) {
         edge();
         this.arity = 'statement';
         this.first = expected_relation(expression(0));
+        if (this.first.id !== 'true') {
+            expected_condition(this.first, bundle.unexpected_a);
+        }
         no_space();
         step_out(')', t);
         discard();
@@ -4243,19 +4361,7 @@ loop:   for (;;) {
         no_space();
         step_in();
         this.arity = 'statement';
-        this.first = expected_relation(expression(0));
-        switch (this.first.id) {
-        case 'true':
-        case 'false':
-        case 'null':
-        case 'undefined':
-        case 'NaN':
-        case 'Infinity':
-        case '(string)':
-        case '(number)':
-            warning(bundle.weird_relation, this.first);
-            break;
-        }
+        this.first = expected_condition(expected_relation(expression(0)));
         no_space();
         step_out(')', t);
         discard();
@@ -4358,7 +4464,7 @@ loop:   for (;;) {
         discard();
         no_space();
         edge();
-        this.first = expected_relation(expression(0));
+        this.first = expected_condition(expected_relation(expression(0)), bundle.unexpected_a);
         no_space();
         step_out(')', t);
         discard();
@@ -4421,6 +4527,9 @@ loop:   for (;;) {
             if (nexttoken.id !== ';') {
                 edge();
                 this.second = expected_relation(expression(0));
+                if (this.second.id !== 'true') {
+                    expected_condition(this.second, bundle.unexpected_a);
+                }
             }
             semicolon(token);
             if (nexttoken.id === ';') {
@@ -4516,7 +4625,6 @@ loop:   for (;;) {
         return this;
     });
 
-    reserve('void');
 
 //  Superfluous reserved words
 
@@ -5988,7 +6096,9 @@ loop:   for (;;) {
 
         try {
             advance();
-            if (nexttoken.value.charAt(0) === '<') {
+            if (nexttoken.arity === 'number') {
+                error(bundle.unexpected_a);
+            } else if (nexttoken.value.charAt(0) === '<') {
                 html();
                 if (option.adsafe && !adsafe_went) {
                     warning(bundle.adsafe_go, this);
@@ -6288,7 +6398,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-02-06';
+    itself.edition = '2011-02-07';
 
     return itself;
 
