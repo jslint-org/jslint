@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-02-07
+// 2011-02-08
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -160,17 +160,16 @@ SOFTWARE.
     "(begin)", "(breakage)", "(context)", "(end)", "(error)", "(global)",
     "(identifier)", "(line)", "(loopage)", "(name)", "(onevar)",
     "(params)", "(scope)", "(statement)", "(token)", "(verb)", ")", "*",
-    "+", "-", "/", ";", "<", "</", "<=", "==", "===", ">",
-    ">=", ADSAFE, 
-    ActiveXObject, Array, Boolean, COM, CScript, Canvas, continue, 
-    CustomAnimation, Date, Debug, E, Enumerator, Error, EvalError, 
-    FadeAnimation, Flash,  FormField, Frame, Function, HotKey, Image, JSON, 
-    LN10, LN2, LOG10E, LOG2E, MAX_VALUE, MIN_VALUE, Math, MenuItem, 
-    MoveAnimation,  NEGATIVE_INFINITY, Number, Object, Option, PI, 
-    POSITIVE_INFINITY, Point, RangeError, Rectangle, ReferenceError, RegExp, 
-    ResizeAnimation, RotateAnimation, SQRT1_2, SQRT2, ScrollBar, String, Style, 
-    SyntaxError, System, Text, TextArea, Timer, TypeError, URIError, URL, 
-    VBArray, WScript, Web, Window, XMLDOM, XMLHttpRequest, "\\", a, a_function, 
+    "+", "-", "/", ";", "<", "</", "<=", "==", "===", ">", ">=", ADSAFE, 
+    ActiveXObject, Array, Boolean, COM, CScript, Canvas, CustomAnimation, 
+    Date, Debug, E, Enumerator, Error, EvalError, FadeAnimation, Flash, 
+    FormField, Frame, Function, HotKey, Image, JSON, LN10, LN2, LOG10E, 
+    LOG2E, MAX_VALUE, MIN_VALUE, Math, MenuItem, MoveAnimation, 
+    NEGATIVE_INFINITY, Number, Object, Option, PI, POSITIVE_INFINITY, Point, 
+    RangeError, Rectangle, ReferenceError, RegExp, ResizeAnimation, 
+    RotateAnimation, SQRT1_2, SQRT2, ScrollBar, String, Style, SyntaxError, 
+    System, Text, TextArea, Timer, TypeError, URIError, URL, VBArray, 
+    WScript, Web, Window, XMLDOM, XMLHttpRequest, "\\", a, a_function, 
     a_label, a_not_allowed, a_not_defined, a_scope, abbr, acronym, 
     activeborder, activecaption, addEventListener, address, adsafe, 
     adsafe_a, adsafe_autocomplete, adsafe_bad_id, adsafe_div, 
@@ -203,7 +202,7 @@ SOFTWARE.
     closed, closure, cm, code, col, colgroup, color, combine_var, command, 
     comments, concat, conditional_assignment, confirm, confusing_a, 
     confusing_regexp, console, constructor, constructor_name_a, content, 
-    control_a, convertPathToHFS, convertPathToPlatform, coral, 
+    continue, control_a, convertPathToHFS, convertPathToPlatform, coral, 
     cornflowerblue, cornsilk, "counter-increment", "counter-reset", create, 
     crimson, css, cursor, cyan, d, dangerous_comment, dangling_a, darkblue, 
     darkcyan, darkgoldenrod, darkgray, darkgreen, darkkhaki, darkmagenta, 
@@ -295,18 +294,20 @@ SOFTWARE.
     threedlightshadow, threedshadow, thru, time, title, toLowerCase, 
     toString, toUpperCase, toint32, token, tomato, too_long, too_many, top, 
     tr, trailing_decimal_a, tree, tt, tty, turquoise, tv, type, u, ul, 
-    unclosed, unclosed_comment, unclosed_regexp, undef, unescape, unescaped_a, 
-    unexpected_a, unexpected_char_a_b, unexpected_comment, unexpected_member_a, 
-    unexpected_space_a_b, "unicode-bidi", unnecessary_escapement, 
-    unnecessary_initialize, unnecessary_use, unreachable_a_b, 
-    unrecognized_style_attribute_a, unrecognized_tag_a, unsafe, unused, unwatch, 
-    updateNow, url, urls, use_array, use_braces, use_object, used_before_a, 
-    value, valueOf, var, var_a_not, version, "vertical-align", video, violet, 
-    visibility, was, watch, weird_assignment, weird_new, weird_program, 
-    weird_relation, wheat, while, white, "white-space", whitesmoke, widget, 
-    width, window, windowframe, windows, windowtext, "word-spacing", 
-    "word-wrap", wrap, wrap_immediate, wrap_regexp, write_is_wrong, 
-    yahooCheckLogin, yahooLogin, yahooLogout, yellow, yellowgreen, "z-index", "}"
+    unclosed, unclosed_comment, unclosed_regexp, undef, unescape, 
+    unescaped_a, unexpected_a, unexpected_char_a_b, unexpected_comment, 
+    unexpected_member_a, unexpected_space_a_b, "unicode-bidi", 
+    unnecessary_escapement, unnecessary_initialize, unnecessary_use, 
+    unreachable_a_b, unrecognized_style_attribute_a, unrecognized_tag_a, 
+    unsafe, unused, unwatch, updateNow, url, urls, use_array, use_braces, 
+    use_object, used_before_a, value, valueOf, var, var_a_not, version, 
+    "vertical-align", video, violet, visibility, was, watch, 
+    weird_assignment, weird_condition, weird_new, weird_program, 
+    weird_relation, weird_ternary, wheat, while, white, "white-space", 
+    whitesmoke, widget, width, window, windowframe, windows, windowtext, 
+    "word-spacing", "word-wrap", wrap, wrap_immediate, wrap_regexp, 
+    write_is_wrong, yahooCheckLogin, yahooLogin, yahooLogout, yellow, 
+    yellowgreen, "z-index", "}"
 */
 
 // We build the application inside a function so that we produce only a single
@@ -610,6 +611,7 @@ var JSLINT = (function () {
             weird_new: "Weird construction. Delete 'new'.",
             weird_program: "Weird program.",
             weird_relation: "Weird relation.",
+            weird_ternary: "Weird ternary.",
             wrap_immediate: "Wrap an immediate function invocation in parentheses " +
                 "to assist the reader in understanding that the expression " +
                 "is the result of a function, and not the function itself.",
@@ -2870,10 +2872,11 @@ loop:   for (;;) {
         case '[':
         case '-':
             if (node.arity !== 'infix') {
-                warning(message || bundle.weird_relation, node);
+                warning(message || bundle.weird_condition, node);
             }
             break;
         case 'false':
+        case 'function':
         case 'Infinity':
         case 'NaN':
         case 'null':
@@ -2884,35 +2887,52 @@ loop:   for (;;) {
         case '(regexp)':
         case '(string)':
         case '{':
-            warning(message || bundle.weird_relation, node);
+            warning(message || bundle.weird_condition, node);
             break;
         }
         return node;
     }
 
+    function check_relation(node) {
+        switch (node.arity) {
+        case 'prefix':
+            switch (node.id) {
+            case '{':
+            case '[':
+                warning(bundle.unexpected_a, node);
+                break;
+            case '!':
+                warning(bundle.confusing_a, node);
+                break;
+            }
+            break;
+        case 'function':
+        case 'regexp':
+            warning(bundle.unexpected_a, node);
+            break;
+        default:
+            if (node.id  === 'NaN') {
+                warning(bundle.isNaN, node);
+            } 
+        }
+        return node;
+    }
 
 
     function relation(s, eqeq) {
         var x = infix(s, 100, function (left, that) {
-            var right = expression(100);
+            check_relation(left);
             if (eqeq) {
                 warning(bundle.expected_a_b, that, eqeq, that.id);
-            } else if (left.id === 'NaN' || right.id === 'NaN') {
-                warning(bundle.isNaN, that);
             } 
+            var right = expression(100);
             if (are_similar(left, right) ||
                     ((left.arity === 'string' || left.arity === 'number') && 
                     (right.arity === 'string' || right.arity === 'number'))) {
                 warning(bundle.weird_relation, that);
             }
-            if (left.id === '!') {
-                warning(bundle.confusing_a, left);
-            }
-            if (right.id === '!') {
-                warning(bundle.confusing_a, right);
-            }
             that.first = left;
-            that.second = right;
+            that.second = check_relation(right);
             return that;
         });
         return x;
@@ -3451,13 +3471,16 @@ loop:   for (;;) {
     assignop('>>=', true);
     assignop('>>>=', true);
     infix('?', 30, function (left, that) {
-        that.first = expected_relation(left);
+        that.first = expected_condition(expected_relation(left));
         that.second = expression(0);
         spaces();
         advance(':');
         spaces();
         that.third = expression(10);
         that.arity = 'ternary';
+        if (are_similar(that.second, that.third)) {
+            warning(bundle.weird_ternary, that);
+        }
         return that;
     });
 
@@ -3471,11 +3494,17 @@ loop:   for (;;) {
 
         that.first = paren_check(expected_relation(left));        
         that.second = paren_check(expected_relation(expression(40)));
+        if (are_similar(that.first, that.second)) {
+            warning(bundle.weird_condition, that);
+        }
         return that;
     });
     infix('&&', 50, function (left, that) {
         that.first = expected_relation(left);
         that.second = expected_relation(expression(50));
+        if (are_similar(that.first, that.second)) {
+            warning(bundle.weird_condition, that);
+        }
         return that;
     });
     prefix('void', function () {
@@ -3924,6 +3953,7 @@ loop:   for (;;) {
     }, true);
 
     prefix('[', function () {
+        this.arity = 'prefix';
         this.first = [];
         step_in('array');
         while (nexttoken.id !== '(end)') {
@@ -6398,7 +6428,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-02-07';
+    itself.edition = '2011-02-08';
 
     return itself;
 
