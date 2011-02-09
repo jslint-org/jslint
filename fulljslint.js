@@ -1468,21 +1468,22 @@ var JSLINT = (function () {
 // Produce a token object.  The token inherits from a syntax symbol.
 
         function it(type, value, quote) {
-            var i, t;
-            if (type === '(punctuator)' ||
-                    (type === '(identifier)' && is_own(syntax, value))) {
-                t = syntax[value] || syntax['(error)'];
-            } else {
-                t = syntax[type];
-            }
-            t = Object.create(t);
+            var id, the_token;
             if (type === '(string)' || type === '(range)') {
                 if (jx.test(value)) {
                     warn_at(bundle.url, line, from);
                 }
             }
+            the_token = Object.create(syntax[
+                (
+                    type === '(punctuator)' ||
+                        (type === '(identifier)' && is_own(syntax, value)) ?
+                    value :
+                    type
+                )
+            ] || syntax['(error)']);
             if (type === '(identifier)') {
-                t.identifier = true;
+                the_token.identifier = true;
                 if (value === '__iterator__' || value === '__proto__') {
                     fail_at(bundle.reserved_a, line, from, value);
                 } else if (option.nomen &&
@@ -1492,26 +1493,27 @@ var JSLINT = (function () {
                 }
             }
             if (value !== undefined) {
-                t.value = value;
+                the_token.value = value;
             }
             if (quote !== undefined) {
-                t.quote = quote;
+                the_token.quote = quote;
             }
             if (comments) {
-                t.comments = comments;
+                the_token.comments = comments;
                 comments = null;
             }
-            t.line = line;
-            t.thru = character;
-            t.from = from;
-            t.prev = older_token;
-            i = t.id;
-            prereg = i &&
-                (('(,=:[!&|?{};'.indexOf(i.charAt(i.length - 1)) >= 0) ||
-                i === 'return');
-            older_token.next = t;
-            older_token = t;
-            return t;
+            the_token.line = line;
+            the_token.from = from;
+            the_token.thru = character;
+            the_token.prev = older_token;
+            id = the_token.id;
+            prereg = id && (
+                ('(,=:[!&|?{};'.indexOf(id.charAt(id.length - 1)) >= 0) ||
+                id === 'return'
+            );
+            older_token.next = the_token;
+            older_token = the_token;
+            return the_token;
         }
 
 // Public lex methods
@@ -3073,73 +3075,80 @@ loop:   for (;;) {
 // Usually a statement starts a line. Exceptions include the var statement in the
 // initialization part of a for statement, and an if after an else.
 
-        var r, s = scope, t = nexttoken;
+        var label, old_scope = scope, the_statement;
 
 // We don't like the empty statement.
 
-        if (t.id === ';') {
-            warn(bundle.unexpected_a, t);
+        if (nexttoken.id === ';') {
+            warn(bundle.unexpected_a);
             semicolon();
             return;
         }
 
 // Is this a labelled statement?
 
-        if (t.identifier && !t.reserved && peek().id === ':') {
+        if (nexttoken.identifier && !nexttoken.reserved && peek().id === ':') {
             edge('label');
+            label = nexttoken;
             advance();
             advance(':');
-            scope = Object.create(s);
-            add_label(t.value, 'label');
+            scope = Object.create(old_scope);
+            add_label(label.value, 'label');
             if (labelled[nexttoken.id] !== true) {
-                warn(bundle.label_a_b, nexttoken, t.value, nexttoken.value);
+                warn(bundle.label_a_b, nexttoken, label.value, nexttoken.value);
             }
-            if (jx.test(t.value + ':')) {
-                warn(bundle.url, t);
+            if (jx.test(label.value + ':')) {
+                warn(bundle.url, label);
             }
-            nexttoken.label = t;
-            t = nexttoken;
+            nexttoken.label = label;
         }
 
 // Parse the statement.
 
-        if (!no_indent) {
-            edge();
-        }
+        edge();
         step_in('statement');
-        r = expression(0, true);
-        if (r) {
+        the_statement = expression(0, true);
+        if (the_statement) {
 
 // Look for the final semicolon.
 
-            if (r.arity === 'statement') {
-                if (r.id !== 'switch' && (!r.block || r.id === 'do')) {
-                    semicolon();
-                } else {
+            if (the_statement.arity === 'statement') {
+                if (the_statement.id === 'switch' ||
+                        (the_statement.block && the_statement.id !== 'do')) {
                     spaces();
+                } else {
+                    semicolon();
                 }
             } else {
-                if (r.id === '(' && r.first.id === 'new') {
-                    warn(bundle.bad_new);
-                } else if (!r.assign && r.id !== 'delete' && r.id !== '++' &&
-                        r.id !== '--' && r.id !== '(') {
+
+// If this is an expression statement, determine if it is acceptble.
+// We do not like
+//      new Blah();
+// statments. If it is to be used at all, new should only be used to make
+// objects, not side effects. The expression statements we do like do
+// assignment or invocation or delete.
+
+                if (the_statement.id === '(') {
+                    if (the_statement.first.id === 'new') {
+                        warn(bundle.bad_new);
+                    }
+                } else if (!the_statement.assign &&
+                        the_statement.id !== 'delete' &&
+                        the_statement.id !== '++' &&
+                        the_statement.id !== '--') {
                     warn(bundle.assignment_function_expression, token);
                 }
-                if (nexttoken.id !== ';') {
-                    warn(bundle.expected_a_b, nexttoken, ';', nexttoken.value);
-                } else {
-                    semicolon();
-                }
+                semicolon();
             }
         }
         step_out();
-        scope = s;
-        return r;
+        scope = old_scope;
+        return the_statement;
     }
 
 
     function statements(begin) {
-        var a = [], d, f, p, s;
+        var adsafe_function, adsafe_params, array = [], disruptor, the_statement;
         if (option.adsafe) {
             switch (begin) {
             case 'script':
@@ -3181,19 +3190,19 @@ loop:   for (;;) {
                     advance('(');
                     advance('(string)');
                     comma();
-                    f = expression(0);
-                    if (f.id !== 'function') {
-                        fail(bundle.adsafe_lib_second, f);
+                    adsafe_function = expression(0);
+                    if (adsafe_function.id !== 'function') {
+                        fail(bundle.adsafe_lib_second, adsafe_function);
                     }
-                    p = f.funct['(params)'];
-                    p = p && p.join(', ');
-                    if (p && p !== 'lib') {
+                    adsafe_params = adsafe_function.funct['(params)'];
+                    adsafe_params = adsafe_params && adsafe_params.join(', ');
+                    if (adsafe_params && adsafe_params !== 'lib') {
                         fail(bundle.expected_a_b,
-                            f, '(lib)', '(' + p + ')');
+                            adsafe_function, '(lib)', '(' + adsafe_params + ')');
                     }
                     advance(')');
                     semicolon();
-                    return a;
+                    return array;
                 } else {
                     fail(bundle.adsafe_lib);
                 }
@@ -3209,68 +3218,65 @@ loop:   for (;;) {
                 warn(bundle.unexpected_a, nexttoken);
                 semicolon();
             } else {
-                if (d) {
+                if (disruptor) {
                     warn(bundle.unreachable_a_b, nexttoken, nexttoken.value,
-                        d.value);
-                    d = null;
+                        disruptor.value);
+                    disruptor = null;
                 }
-                s = statement();
-                if (s) {
-                    a.push(s);
-                    if (s.disrupt) {
-                        d = s;
-                        a.disrupt = true;
+                the_statement = statement();
+                if (the_statement) {
+                    array.push(the_statement);
+                    if (the_statement.disrupt) {
+                        disruptor = the_statement;
+                        array.disrupt = true;
                     }
                 }
             }
         }
-        return a;
+        return array;
     }
 
 
     function block(ordinary) {
 
-// A block is a sequence of statements wrapped in braces.
+// array block is array sequence of statements wrapped in braces.
 // ordinary is false for function bodies and try blocks.
 // ordinary is true for if statements, while, etc.
 
-        var a,
-            b = inblock,
-            m = strict_mode,
-            s = scope,
-            t;
+        var array,
+            curly = nexttoken,
+            old_inblock = inblock,
+            old_scope = scope,
+            old_strict_mode = strict_mode;
+
         inblock = ordinary;
         scope = Object.create(scope);
         spaces();
-        t = nexttoken;
         if (nexttoken.id === '{') {
             advance('{');
             step_in();
-            if (!ordinary && !use_strict() && !m && option.strict &&
-                    funct['(context)']['(global)']) {
+            if (!ordinary && !use_strict() && !old_strict_mode &&
+                    option.strict && funct['(context)']['(global)']) {
                 warn(bundle.missing_use_strict);
             }
-            a = statements();
-            strict_mode = m;
-            step_out('}', t);
+            array = statements();
+            strict_mode = old_strict_mode;
+            step_out('}', curly);
             discard();
         } else if (!ordinary) {
-            fail(bundle.expected_a_b,
-                nexttoken, '{', nexttoken.value);
+            fail(bundle.expected_a_b, nexttoken, '{', nexttoken.value);
         } else {
             warn(bundle.expected_a_b, nexttoken, '{', nexttoken.value);
-            a = [statement()];
-            if (a[0].disrupt) {
-                a.disrupt = true;
-            }
+            array = [statement()];
+            array.disrupt = array[0].disrupt;
         }
         funct['(verb)'] = null;
-        scope = s;
-        inblock = b;
-        if (ordinary && a.length === 0) {
+        scope = old_scope;
+        inblock = old_inblock;
+        if (ordinary && array.length === 0) {
             warn(bundle.empty_block);
         }
-        return a;
+        return array;
     }
 
 
@@ -3512,7 +3518,7 @@ loop:   for (;;) {
             return that;
         }
 
-        that.first = paren_check(expected_relation(left));
+        that.first = paren_check(expected_condition(expected_relation(left)));
         that.second = paren_check(expected_relation(expression(40)));
         if (are_similar(that.first, that.second)) {
             warn(bundle.weird_condition, that);
@@ -3520,7 +3526,7 @@ loop:   for (;;) {
         return that;
     });
     infix('&&', 50, function (left, that) {
-        that.first = expected_relation(left);
+        that.first = expected_condition(expected_relation(left));
         that.second = expected_relation(expression(50));
         if (are_similar(that.first, that.second)) {
             warn(bundle.weird_condition, that);
