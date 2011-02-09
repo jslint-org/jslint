@@ -2458,9 +2458,17 @@ loop:   for (;;) {
                     }
                     obj.maxlen = b;
                 } else if (nexttoken.id === 'true') {
-                    obj[n.value] = true;
+                    if (n.value === 'white' && o === '/*jslint') {
+                        w = obj.white = true;
+                    } else {
+                        obj[n.value] = true;
+                    }
                 } else if (nexttoken.id === 'false') {
-                    obj[n.value] = false;
+                    if (n.value === 'white' && o === '/*jslint') {
+                        w = obj.white = false;
+                    } else {
+                        obj[n.value] = false;
+                    }
                 } else {
                     error(bundle.unexpected_a);
                 }
