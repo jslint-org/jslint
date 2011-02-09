@@ -297,7 +297,7 @@ SOFTWARE.
     unclosed, unclosed_comment, unclosed_regexp, undef, unescape,
     unescaped_a, unexpected_a, unexpected_char_a_b, unexpected_comment,
     unexpected_member_a, unexpected_space_a_b, "unicode-bidi",
-    unnecessary_escapement, unnecessary_initialize, unnecessary_use,
+    unnecessary_initialize, unnecessary_use,
     unreachable_a_b, unrecognized_style_attribute_a, unrecognized_tag_a,
     unsafe, unused, unwatch, updateNow, url, urls, use_array, use_braces,
     use_object, used_before_a, value, valueOf, var, var_a_not, version,
@@ -594,7 +594,6 @@ var JSLINT = (function () {
             unexpected_comment: "Unexpected comment.",
             unexpected_member_a: "Unexpected /*member {a}.",
             unexpected_space_a_b: "Unexpected space between '{a}' and '{b}'.",
-            unnecessary_escapement: "Unnecessary escapement.",
             unnecessary_initialize: "It is not necessary to initialize '{a}' to 'undefined'.",
             unnecessary_use: "Unnecessary \"use strict\".",
             unreachable_a_b: "Unreachable '{a}' after '{b}'.",
@@ -989,7 +988,11 @@ var JSLINT = (function () {
         predefined,     // Global variables defined by option
         prereg,
         prevtoken,
-
+        regexp_flag = {
+            g: true,
+            i: true,
+            m: true
+        },
         rhino = {
             defineClass : false,
             deserialize : false,
@@ -1474,14 +1477,12 @@ var JSLINT = (function () {
                     warn_at(bundle.url, line, from);
                 }
             }
-            the_token = Object.create(syntax[
-                (
-                    type === '(punctuator)' ||
-                        (type === '(identifier)' && is_own(syntax, value)) ?
-                    value :
-                    type
-                )
-            ] || syntax['(error)']);
+            the_token = Object.create(syntax[(
+                type === '(punctuator)' ||
+                    (type === '(identifier)' && is_own(syntax, value)) ?
+                value :
+                type
+            )] || syntax['(error)']);
             if (type === '(identifier)') {
                 the_token.identifier = true;
                 if (value === '__iterator__' || value === '__proto__') {
@@ -1563,7 +1564,7 @@ var JSLINT = (function () {
 // token -- this is called by advance to get the next token.
 
             token: function () {
-                var b, c, captures, d, depth, high, i, l, low, q, t;
+                var b, c, captures, d, depth, flag, high, i, l, low, q, t;
 
                 function match(x) {
                     var r = x.exec(s), r1;
@@ -1858,14 +1859,14 @@ var JSLINT = (function () {
                                                 line, from + l, '/');
                                         }
                                         c = s.substr(0, l - 1);
-                                        q = {
-                                            g: true,
-                                            i: true,
-                                            m: true
-                                        };
-                                        while (q[s.charAt(l)] === true) {
-                                            q[s.charAt(l)] = false;
+                                        flag = Object.create(regexp_flag);
+                                        while (flag[s.charAt(l)] === true) {
+                                            flag[s.charAt(l)] = false;
                                             l += 1;
+                                        }
+                                        if (s.charAt(l).isAlpha()) {
+                                            fail_at(bundle.unexpected_a,
+                                                line, from, s.charAt(l));
                                         }
                                         character += l;
                                         s = s.substr(l);
@@ -6047,44 +6048,44 @@ loop:   for (;;) {
 
 // The actual JSLINT function itself.
 
-    var itself = function (s, o) {
-        var a, i, k;
+    var itself = function (the_source, the_option) {
+        var i, keys, predef;
         JSLINT.errors = [];
         JSLINT.tree = '';
         predefined = Object.create(standard);
-        if (o) {
-            a = o.predef;
-            if (a) {
-                if (Array.isArray(a)) {
-                    for (i = 0; i < a.length; i += 1) {
-                        predefined[a[i]] = true;
+        if (the_option) {
+            predef = the_option.predef;
+            if (predef) {
+                if (Array.isArray(predef)) {
+                    for (i = 0; i < predef.length; i += 1) {
+                        predefined[predef[i]] = true;
                     }
-                } else if (typeof a === 'object') {
-                    k = Object.keys(a);
-                    for (i = 0; i < k.length; i += 1) {
-                        predefined[k[i]] = !!a[k];
+                } else if (typeof predef === 'object') {
+                    keys = Object.keys(predef);
+                    for (i = 0; i < keys.length; i += 1) {
+                        predefined[keys[i]] = !!predef[keys];
                     }
                 }
             }
-            if (o.adsafe) {
-                o.safe = true;
+            if (the_option.adsafe) {
+                the_option.safe = true;
             }
-            if (o.safe) {
-                o.browser     =
-                    o.css     =
-                    o.debug   =
-                    o.devel   =
-                    o.evil    =
-                    o.forin   =
-                    o.on      =
-                    o.rhino   =
-                    o.windows =
-                    o.sub     =
-                    o.widget  = false;
+            if (the_option.safe) {
+                the_option.browser     =
+                    the_option.css     =
+                    the_option.debug   =
+                    the_option.devel   =
+                    the_option.evil    =
+                    the_option.forin   =
+                    the_option.on      =
+                    the_option.rhino   =
+                    the_option.windows =
+                    the_option.sub     =
+                    the_option.widget  = false;
 
-                o.nomen       =
-                    o.safe    =
-                    o.undef   = true;
+                the_option.nomen       =
+                    the_option.safe    =
+                    the_option.undef   = true;
 
                 predefined.Date         =
                     predefined['eval']  =
@@ -6094,7 +6095,7 @@ loop:   for (;;) {
                 predefined.ADSAFE  =
                     predefined.lib = false;
             }
-            option = o;
+            option = the_option;
         } else {
             option = {};
         }
@@ -6145,7 +6146,7 @@ loop:   for (;;) {
         var_mode = false;
         warnings = 0;
         xmode = false;
-        lex.init(s);
+        lex.init(the_source);
 
         prevtoken = token = nexttoken = syntax['(begin)'];
         assume();
@@ -6194,8 +6195,8 @@ loop:   for (;;) {
                             nexttoken, '<div>', nexttoken.value);
                     }
 
-// If the first token is a semicolon, ignore it. This is sometimes used when
-// files are intended to be appended to files that may be sloppy. A sloppy
+// If the first token is predef semicolon, ignore it. This is sometimes used when
+// files are intended to be appended to files that may be sloppy. predef sloppy
 // file may be depending on semicolon insertion on its last line.
 
                     step_in(1);
@@ -6324,133 +6325,134 @@ loop:   for (;;) {
     itself.report = function (option) {
         var data = itself.data();
 
-        var a = [], c, e, err, f, i, j, k, l, m = '', n, names, o = [], s;
+        var err, evidence, i, j, key, keys, length, mem = '', name, names,
+            output = [], snippets, the_function, warning;
 
         function detail(h, array) {
-            var b, i, singularity;
+            var comma_needed, i, singularity;
             if (array) {
-                o.push('<div><i>' + h + '</i> ');
+                output.push('<div><i>' + h + '</i> ');
                 array = array.sort();
                 for (i = 0; i < array.length; i += 1) {
                     if (array[i] !== singularity) {
                         singularity = array[i];
-                        o.push((b ? ', ' : '') + singularity);
-                        b = true;
+                        output.push((comma_needed ? ', ' : '') + singularity);
+                        comma_needed = true;
                     }
                 }
-                o.push('</div>');
+                output.push('</div>');
             }
         }
 
         if (data.errors || data.implieds || data.unused) {
             err = true;
-            o.push('<div id=errors><i>Error:</i>');
+            output.push('<div id=errors><i>Error:</i>');
             if (data.errors) {
                 for (i = 0; i < data.errors.length; i += 1) {
-                    c = data.errors[i];
-                    if (c) {
-                        e = c.evidence || '';
-                        o.push('<p>Problem' + (isFinite(c.line) ? ' at line ' +
-                            c.line + ' character ' + c.character : '') +
-                            ': ' + c.reason.entityify() +
+                    warning = data.errors[i];
+                    if (warning) {
+                        evidence = warning.evidence || '';
+                        output.push('<p>Problem' + (isFinite(warning.line) ? ' at line ' +
+                            warning.line + ' character ' + warning.character : '') +
+                            ': ' + warning.reason.entityify() +
                             '</p><p class=evidence>' +
-                            (e && (e.length > 80 ? e.slice(0, 77) + '...' :
-                            e).entityify()) + '</p>');
+                            (evidence && (evidence.length > 80 ? evidence.slice(0, 77) + '...' :
+                            evidence).entityify()) + '</p>');
                     }
                 }
             }
 
             if (data.implieds) {
-                s = [];
+                snippets = [];
                 for (i = 0; i < data.implieds.length; i += 1) {
-                    s[i] = '<code>' + data.implieds[i].name + '</code>&nbsp;<i>' +
+                    snippets[i] = '<code>' + data.implieds[i].name + '</code>&nbsp;<i>' +
                         data.implieds[i].line + '</i>';
                 }
-                o.push('<p><i>Implied global:</i> ' + s.join(', ') + '</p>');
+                output.push('<p><i>Implied global:</i> ' + snippets.join(', ') + '</p>');
             }
 
             if (data.unused) {
-                s = [];
+                snippets = [];
                 for (i = 0; i < data.unused.length; i += 1) {
-                    s[i] = '<code><u>' + data.unused[i].name + '</u></code>&nbsp;<i>' +
+                    snippets[i] = '<code><u>' + data.unused[i].name + '</u></code>&nbsp;<i>' +
                         data.unused[i].line + ' </i> <small>' +
                         data.unused[i]['function'] + '</small>';
                 }
-                o.push('<p><i>Unused variable:</i> ' + s.join(', ') + '</p>');
+                output.push('<p><i>Unused variable:</i> ' + snippets.join(', ') + '</p>');
             }
             if (data.json) {
-                o.push('<p>JSON: bad.</p>');
+                output.push('<p>JSON: bad.</p>');
             }
-            o.push('</div>');
+            output.push('</div>');
         }
 
         if (!option) {
 
-            o.push('<br><div id=functions>');
+            output.push('<br><div id=functions>');
 
             if (data.urls) {
                 detail("URLs<br>", data.urls, '<br>');
             }
 
             if (xmode === 'style') {
-                o.push('<p>CSS.</p>');
+                output.push('<p>CSS.</p>');
             } else if (data.json && !err) {
-                o.push('<p>JSON: good.</p>');
+                output.push('<p>JSON: good.</p>');
             } else if (data.globals) {
-                o.push('<div><i>Global</i> ' +
+                output.push('<div><i>Global</i> ' +
                     data.globals.sort().join(', ') + '</div>');
             } else {
-                o.push('<div><i>No new global variables introduced.</i></div>');
+                output.push('<div><i>No new global variables introduced.</i></div>');
             }
 
             for (i = 0; i < data.functions.length; i += 1) {
-                f = data.functions[i];
+                the_function = data.functions[i];
                 names = [];
-                if (f.param) {
-                    for (j = 0; j < f.param.length; j += 1) {
-                        names[j] = f.param[j].value;
+                if (the_function.param) {
+                    for (j = 0; j < the_function.param.length; j += 1) {
+                        names[j] = the_function.param[j].value;
                     }
                 }
-                o.push('<br><div class=function><i>' + f.line + '</i> ' +
-                    (f.name || '') + '(' + names.join(', ') + ')</div>');
-                detail('<big><b>Unused</b></big>', f.unused);
-                detail('Closure', f.closure);
-                detail('Variable', f['var']);
-                detail('Exception', f.exception);
-                detail('Outer', f.outer);
-                detail('Global', f.global);
-                detail('Label', f.label);
+                output.push('<br><div class=function><i>' + the_function.line + '</i> ' +
+                    (the_function.name || '') + '(' + names.join(', ') + ')</div>');
+                detail('<big><b>Unused</b></big>', the_function.unused);
+                detail('Closure', the_function.closure);
+                detail('Variable', the_function['var']);
+                detail('Exception', the_function.exception);
+                detail('Outer', the_function.outer);
+                detail('Global', the_function.global);
+                detail('Label', the_function.label);
             }
 
             if (data.member) {
-                a = Object.keys(data.member);
-                if (a.length) {
-                    a = a.sort();
-                    m = '<br><pre id=members>/*members ';
-                    l = 10;
-                    for (i = 0; i < a.length; i += 1) {
-                        k = a[i];
-                        n = k.name();
-                        if (l + n.length > 72) {
-                            o.push(m + '<br>');
-                            m = '    ';
-                            l = 1;
+                keys = Object.keys(data.member);
+                if (keys.length) {
+                    keys = keys.sort();
+                    mem = '<br><pre id=members>/*members ';
+                    length = 10;
+                    for (i = 0; i < keys.length; i += 1) {
+                        key = keys[i];
+                        name = key.name();
+                        if (length + name.length > 72) {
+                            output.push(mem + '<br>');
+                            mem = '    ';
+                            length = 1;
                         }
-                        l += n.length + 2;
-                        if (data.member[k] === 1) {
-                            n = '<i>' + n + '</i>';
+                        length += name.length + 2;
+                        if (data.member[key] === 1) {
+                            name = '<i>' + name + '</i>';
                         }
-                        if (i < a.length - 1) {
-                            n += ', ';
+                        if (i < keys.length - 1) {
+                            name += ', ';
                         }
-                        m += n;
+                        mem += name;
                     }
-                    o.push(m + '<br>*/</pre>');
+                    output.push(mem + '<br>*/</pre>');
                 }
-                o.push('</div>');
+                output.push('</div>');
             }
         }
-        return o.join('');
+        return output.join('');
     };
     itself.jslint = itself;
 
