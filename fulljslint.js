@@ -160,153 +160,153 @@ SOFTWARE.
     "(begin)", "(breakage)", "(context)", "(end)", "(error)", "(global)",
     "(identifier)", "(line)", "(loopage)", "(name)", "(onevar)",
     "(params)", "(scope)", "(statement)", "(token)", "(verb)", ")", "*",
-    "+", "-", "/", ";", "<", "</", "<=", "==", "===", ">", ">=", ADSAFE, 
-    ActiveXObject, Array, Boolean, COM, CScript, Canvas, CustomAnimation, 
-    Date, Debug, E, Enumerator, Error, EvalError, FadeAnimation, Flash, 
-    FormField, Frame, Function, HotKey, Image, JSON, LN10, LN2, LOG10E, 
-    LOG2E, MAX_VALUE, MIN_VALUE, Math, MenuItem, MoveAnimation, 
-    NEGATIVE_INFINITY, Number, Object, Option, PI, POSITIVE_INFINITY, Point, 
-    RangeError, Rectangle, ReferenceError, RegExp, ResizeAnimation, 
-    RotateAnimation, SQRT1_2, SQRT2, ScrollBar, String, Style, SyntaxError, 
-    System, Text, TextArea, Timer, TypeError, URIError, URL, VBArray, 
-    WScript, Web, Window, XMLDOM, XMLHttpRequest, "\\", a, a_function, 
-    a_label, a_not_allowed, a_not_defined, a_scope, abbr, acronym, 
-    activeborder, activecaption, addEventListener, address, adsafe, 
-    adsafe_a, adsafe_autocomplete, adsafe_bad_id, adsafe_div, 
-    adsafe_fragment, adsafe_go, adsafe_html, adsafe_id, adsafe_id_go, 
-    adsafe_lib, adsafe_lib_second, adsafe_missing_id, adsafe_name_a, 
-    adsafe_placement, adsafe_prefix_a, adsafe_script, adsafe_source, 
-    adsafe_subscript_a, adsafe_tag, alert, aliceblue, all, already_defined, 
-    and, animator, antiquewhite, appleScript, applet, apply, approved, 
-    appworkspace, aqua, aquamarine, area, arguments, arity, article, aside, 
-    assign, assign_exception, assignment_function_expression, at, 
-    attribute_case_a, audio, autocomplete, avoid_a, azure, b, background, 
-    "background-attachment", "background-color", "background-image", 
-    "background-position", "background-repeat", bad_assignment, bad_color_a, 
-    bad_constructor, bad_entity, bad_html, bad_id_a, bad_in_a, 
-    bad_invocation, bad_name_a, bad_new, bad_number, bad_operand, bad_type, 
-    bad_url, bad_wrap, base, bdo, beep, beige, big, bisque, bitwise, black, 
-    blanchedalmond, block, blockquote, blue, blueviolet, blur, body, border, 
-    "border-bottom", "border-bottom-color", "border-bottom-style", 
-    "border-bottom-width", "border-collapse", "border-color", "border-left", 
-    "border-left-color", "border-left-style", "border-left-width", 
-    "border-right", "border-right-color", "border-right-style", 
-    "border-right-width", "border-spacing", "border-style", "border-top", 
-    "border-top-color", "border-top-style", "border-top-width", 
-    "border-width", bottom, br, braille, brown, browser, burlywood, button, 
-    buttonface, buttonhighlight, buttonshadow, buttontext, bytesToUIString, 
-    c, cadetblue, call, callee, caller, canvas, cap, caption, 
-    "caption-side", captiontext, case, center, charAt, charCodeAt, 
-    character, chartreuse, chocolate, chooseColor, chooseFile, chooseFolder, 
-    cite, clear, clearInterval, clearTimeout, clip, close, closeWidget, 
-    closed, closure, cm, code, col, colgroup, color, combine_var, command, 
-    comments, concat, conditional_assignment, confirm, confusing_a, 
-    confusing_regexp, console, constructor, constructor_name_a, content, 
-    continue, control_a, convertPathToHFS, convertPathToPlatform, coral, 
-    cornflowerblue, cornsilk, "counter-increment", "counter-reset", create, 
-    crimson, css, cursor, cyan, d, dangerous_comment, dangling_a, darkblue, 
-    darkcyan, darkgoldenrod, darkgray, darkgreen, darkkhaki, darkmagenta, 
-    darkolivegreen, darkorange, darkorchid, darkred, darksalmon, 
-    darkseagreen, darkslateblue, darkslategray, darkturquoise, darkviolet, 
-    data, datalist, dd, debug, decodeURI, decodeURIComponent, deeppink, 
-    deepskyblue, default, defaultStatus, defineClass, del, deleted, 
-    deserialize, details, devel, dfn, dialog, dimgray, dir, direction, 
-    display, disrupt, div, dl, do, document, dodgerblue, dt, duplicate_a, 
-    edge, edition, else, em, embed, embossed, empty, "empty-cells", 
-    empty_block, empty_case, empty_class, encodeURI, encodeURIComponent, 
-    entityify, errors, es5, escape, eval, event, evidence, evil, ex, 
-    exception, exec, expected_a, expected_a_at_b_c, expected_a_b, 
-    expected_a_b_from_c_d, expected_at_a, expected_attribute_a, 
-    expected_attribute_value_a, expected_class_a, expected_fraction_a, 
-    expected_id_a, expected_identifier_a, expected_identifier_a_reserved, 
-    expected_lang_a, expected_linear_a, expected_media_a, expected_name_a, 
-    expected_nonstandard_style_attribute, expected_number_a, 
-    expected_operator_a, expected_percent_a, expected_positive_a, 
-    expected_pseudo_a, expected_selector_a, expected_small_a, 
-    expected_space_a_b, expected_string_a, expected_style_attribute, 
-    expected_style_pattern, expected_tagname_a, fieldset, figure, 
-    filesystem, firebrick, first, float, floor, floralwhite, focus, 
-    focusWidget, font, "font-family", "font-size", "font-size-adjust", 
-    "font-stretch", "font-style", "font-variant", "font-weight", footer, 
-    for, for_if, forestgreen, forin, form, fragment, frame, frames, 
-    frameset, from, fromCharCode, fuchsia, fud, funct, function, 
-    function_block, function_eval, function_loop, function_statement, 
-    function_strict, functions, g, gainsboro, gc, getComputedStyle, get_set, 
-    ghostwhite, global, globals, gold, goldenrod, gray, graytext, green, 
-    greenyellow, h1, h2, h3, h4, h5, h6, handheld, hasOwnProperty, head, 
-    header, height, help, hgroup, highlight, highlighttext, history, 
-    honeydew, hotpink, hr, "hta:application", html, html_confusion_a, 
-    html_handlers, i, iTunes, id, identifier, identifier_function, iframe, 
-    img, immed, implied_evil, implieds, in, inactiveborder, inactivecaption, 
-    inactivecaptiontext, include, indent, indexOf, indianred, indigo, 
-    infobackground, infotext, init, input, ins, insecure_a, isAlpha, 
-    isApplicationRunning, isArray, isDigit, isFinite, isNaN, ivory, join, 
-    jslint, json, kbd, keygen, keys, khaki, konfabulatorVersion, label, 
-    label_a_b, lang, lavender, lavenderblush, lawngreen, lbp, 
-    leading_decimal_a, led, left, legend, lemonchiffon, length, 
-    "letter-spacing", li, lib, lightblue, lightcoral, lightcyan, 
-    lightgoldenrodyellow, lightgreen, lightpink, lightsalmon, lightseagreen, 
-    lightskyblue, lightslategray, lightsteelblue, lightyellow, lime, 
-    limegreen, line, "line-height", linen, link, "list-style", 
-    "list-style-image", "list-style-position", "list-style-type", load, 
-    loadClass, location, log, m, magenta, map, margin, "margin-bottom", 
-    "margin-left", "margin-right", "margin-top", mark, "marker-offset", 
-    maroon, match, "max-height", "max-width", maxerr, maxlen, md5, 
-    mediumaquamarine, mediumblue, mediumorchid, mediumpurple, 
-    mediumseagreen, mediumslateblue, mediumspringgreen, mediumturquoise, 
-    mediumvioletred, member, menu, menutext, message, meta, meter, 
-    midnightblue, "min-height", "min-width", mintcream, missing_a, 
-    missing_a_after_b, missing_option, missing_property, missing_space_a_b, 
-    missing_url, missing_use_strict, mistyrose, mixed, mm, moccasin, mode, 
-    moveBy, moveTo, move_invocation, move_var, name, name_function, nav, 
-    navajowhite, navigator, navy, nested_comment, newcap, next, noframes, 
-    nomen, noscript, not, not_a_constructor, not_a_function, not_a_label, 
-    not_a_scope, not_greater, nud, object, ol, oldlace, olive, olivedrab, 
-    on, onbeforeunload, onblur, onerror, onevar, onfocus, onload, onresize, 
-    onunload, opacity, open, openURL, opener, opera, optgroup, option, 
-    orange, orangered, orchid, outer, outline, "outline-color", 
-    "outline-style", "outline-width", output, overflow, "overflow-x", 
-    "overflow-y", p, padding, "padding-bottom", "padding-left", 
-    "padding-right", "padding-top", "page-break-after", "page-break-before", 
-    palegoldenrod, palegreen, paleturquoise, palevioletred, papayawhip, 
-    param, parameter_a_get_b, parameter_set_a, paren, parent, parseFloat, 
-    parseInt, passfail, pc, peachpuff, peru, pink, play, plum, plusplus, 
-    pop, popupMenu, position, postcomments, powderblue, pre, predef, 
-    preferenceGroups, preferences, prev, print, progress, projection, 
-    prompt, prototype, pt, purple, push, px, q, quit, quote, quotes, radix, 
-    random, range, raw, readFile, readUrl, read_only, reason, red, 
-    redefinition_a, regexp, reloadWidget, removeEventListener, replace, 
-    report, reserved, reserved_a, resizeBy, resizeTo, resolvePath, 
-    resumeUpdates, rhino, right, rosybrown, royalblue, rp, rt, ruby, 
-    runCommand, runCommandInBg, saddlebrown, safe, salmon, samp, sandybrown, 
-    saveAs, savePreferences, scanned_a_b, screen, script, scroll, scrollBy, 
-    scrollTo, scrollbar, seagreen, seal, search, seashell, second, section, 
-    select, serialize, setInterval, setTimeout, shift, 
-    showWidgetPreferences, sienna, silver, skyblue, slash_equal, slateblue, 
-    slategray, sleep, slice, small, snow, sort, source, span, spawn, speak, 
-    speech, split, springgreen, src, stack, statement, statement_block, 
-    status, steelblue, stopping, strange_loop, strict, strong, style, 
-    styleproperty, sub, subscript, substr, sup, supplant, suppressUpdates, 
-    switch, sync, system, table, "table-layout", tag_a_in_b, tan, tbody, td, 
-    teal, tellWidget, test, "text-align", "text-decoration", "text-indent", 
-    "text-shadow", "text-transform", textarea, tfoot, th, thead, third, 
-    thistle, threeddarkshadow, threedface, threedhighlight, 
-    threedlightshadow, threedshadow, thru, time, title, toLowerCase, 
-    toString, toUpperCase, toint32, token, tomato, too_long, too_many, top, 
-    tr, trailing_decimal_a, tree, tt, tty, turquoise, tv, type, u, ul, 
-    unclosed, unclosed_comment, unclosed_regexp, undef, unescape, 
-    unescaped_a, unexpected_a, unexpected_char_a_b, unexpected_comment, 
-    unexpected_member_a, unexpected_space_a_b, "unicode-bidi", 
-    unnecessary_escapement, unnecessary_initialize, unnecessary_use, 
-    unreachable_a_b, unrecognized_style_attribute_a, unrecognized_tag_a, 
-    unsafe, unused, unwatch, updateNow, url, urls, use_array, use_braces, 
-    use_object, used_before_a, value, valueOf, var, var_a_not, version, 
-    "vertical-align", video, violet, visibility, was, watch, 
-    weird_assignment, weird_condition, weird_new, weird_program, 
-    weird_relation, weird_ternary, wheat, while, white, "white-space", 
-    whitesmoke, widget, width, window, windowframe, windows, windowtext, 
-    "word-spacing", "word-wrap", wrap, wrap_immediate, wrap_regexp, 
-    write_is_wrong, yahooCheckLogin, yahooLogin, yahooLogout, yellow, 
+    "+", "-", "/", ";", "<", "</", "<=", "==", "===", ">", ">=", ADSAFE,
+    ActiveXObject, Array, Boolean, COM, CScript, Canvas, CustomAnimation,
+    Date, Debug, E, Enumerator, Error, EvalError, FadeAnimation, Flash,
+    FormField, Frame, Function, HotKey, Image, JSON, LN10, LN2, LOG10E,
+    LOG2E, MAX_VALUE, MIN_VALUE, Math, MenuItem, MoveAnimation,
+    NEGATIVE_INFINITY, Number, Object, Option, PI, POSITIVE_INFINITY, Point,
+    RangeError, Rectangle, ReferenceError, RegExp, ResizeAnimation,
+    RotateAnimation, SQRT1_2, SQRT2, ScrollBar, String, Style, SyntaxError,
+    System, Text, TextArea, Timer, TypeError, URIError, URL, VBArray,
+    WScript, Web, Window, XMLDOM, XMLHttpRequest, "\\", a, a_function,
+    a_label, a_not_allowed, a_not_defined, a_scope, abbr, acronym,
+    activeborder, activecaption, addEventListener, address, adsafe,
+    adsafe_a, adsafe_autocomplete, adsafe_bad_id, adsafe_div,
+    adsafe_fragment, adsafe_go, adsafe_html, adsafe_id, adsafe_id_go,
+    adsafe_lib, adsafe_lib_second, adsafe_missing_id, adsafe_name_a,
+    adsafe_placement, adsafe_prefix_a, adsafe_script, adsafe_source,
+    adsafe_subscript_a, adsafe_tag, alert, aliceblue, all, already_defined,
+    and, animator, antiquewhite, appleScript, applet, apply, approved,
+    appworkspace, aqua, aquamarine, area, arguments, arity, article, aside,
+    assign, assign_exception, assignment_function_expression, at,
+    attribute_case_a, audio, autocomplete, avoid_a, azure, b, background,
+    "background-attachment", "background-color", "background-image",
+    "background-position", "background-repeat", bad_assignment, bad_color_a,
+    bad_constructor, bad_entity, bad_html, bad_id_a, bad_in_a,
+    bad_invocation, bad_name_a, bad_new, bad_number, bad_operand, bad_type,
+    bad_url, bad_wrap, base, bdo, beep, beige, big, bisque, bitwise, black,
+    blanchedalmond, block, blockquote, blue, blueviolet, blur, body, border,
+    "border-bottom", "border-bottom-color", "border-bottom-style",
+    "border-bottom-width", "border-collapse", "border-color", "border-left",
+    "border-left-color", "border-left-style", "border-left-width",
+    "border-right", "border-right-color", "border-right-style",
+    "border-right-width", "border-spacing", "border-style", "border-top",
+    "border-top-color", "border-top-style", "border-top-width",
+    "border-width", bottom, br, braille, brown, browser, burlywood, button,
+    buttonface, buttonhighlight, buttonshadow, buttontext, bytesToUIString,
+    c, cadetblue, call, callee, caller, canvas, cap, caption,
+    "caption-side", captiontext, case, center, charAt, charCodeAt,
+    character, chartreuse, chocolate, chooseColor, chooseFile, chooseFolder,
+    cite, clear, clearInterval, clearTimeout, clip, close, closeWidget,
+    closed, closure, cm, code, col, colgroup, color, combine_var, command,
+    comments, concat, conditional_assignment, confirm, confusing_a,
+    confusing_regexp, console, constructor, constructor_name_a, content,
+    continue, control_a, convertPathToHFS, convertPathToPlatform, coral,
+    cornflowerblue, cornsilk, "counter-increment", "counter-reset", create,
+    crimson, css, cursor, cyan, d, dangerous_comment, dangling_a, darkblue,
+    darkcyan, darkgoldenrod, darkgray, darkgreen, darkkhaki, darkmagenta,
+    darkolivegreen, darkorange, darkorchid, darkred, darksalmon,
+    darkseagreen, darkslateblue, darkslategray, darkturquoise, darkviolet,
+    data, datalist, dd, debug, decodeURI, decodeURIComponent, deeppink,
+    deepskyblue, default, defaultStatus, defineClass, del, deleted,
+    deserialize, details, devel, dfn, dialog, dimgray, dir, direction,
+    display, disrupt, div, dl, do, document, dodgerblue, dt, duplicate_a,
+    edge, edition, else, em, embed, embossed, empty, "empty-cells",
+    empty_block, empty_case, empty_class, encodeURI, encodeURIComponent,
+    entityify, errors, es5, escape, eval, event, evidence, evil, ex,
+    exception, exec, expected_a, expected_a_at_b_c, expected_a_b,
+    expected_a_b_from_c_d, expected_at_a, expected_attribute_a,
+    expected_attribute_value_a, expected_class_a, expected_fraction_a,
+    expected_id_a, expected_identifier_a, expected_identifier_a_reserved,
+    expected_lang_a, expected_linear_a, expected_media_a, expected_name_a,
+    expected_nonstandard_style_attribute, expected_number_a,
+    expected_operator_a, expected_percent_a, expected_positive_a,
+    expected_pseudo_a, expected_selector_a, expected_small_a,
+    expected_space_a_b, expected_string_a, expected_style_attribute,
+    expected_style_pattern, expected_tagname_a, fieldset, figure,
+    filesystem, firebrick, first, float, floor, floralwhite, focus,
+    focusWidget, font, "font-family", "font-size", "font-size-adjust",
+    "font-stretch", "font-style", "font-variant", "font-weight", footer,
+    for, for_if, forestgreen, forin, form, fragment, frame, frames,
+    frameset, from, fromCharCode, fuchsia, fud, funct, function,
+    function_block, function_eval, function_loop, function_statement,
+    function_strict, functions, g, gainsboro, gc, getComputedStyle, get_set,
+    ghostwhite, global, globals, gold, goldenrod, gray, graytext, green,
+    greenyellow, h1, h2, h3, h4, h5, h6, handheld, hasOwnProperty, head,
+    header, height, help, hgroup, highlight, highlighttext, history,
+    honeydew, hotpink, hr, "hta:application", html, html_confusion_a,
+    html_handlers, i, iTunes, id, identifier, identifier_function, iframe,
+    img, immed, implied_evil, implieds, in, inactiveborder, inactivecaption,
+    inactivecaptiontext, include, indent, indexOf, indianred, indigo,
+    infobackground, infotext, init, input, ins, insecure_a, isAlpha,
+    isApplicationRunning, isArray, isDigit, isFinite, isNaN, ivory, join,
+    jslint, json, kbd, keygen, keys, khaki, konfabulatorVersion, label,
+    label_a_b, lang, lavender, lavenderblush, lawngreen, lbp,
+    leading_decimal_a, led, left, legend, lemonchiffon, length,
+    "letter-spacing", li, lib, lightblue, lightcoral, lightcyan,
+    lightgoldenrodyellow, lightgreen, lightpink, lightsalmon, lightseagreen,
+    lightskyblue, lightslategray, lightsteelblue, lightyellow, lime,
+    limegreen, line, "line-height", linen, link, "list-style",
+    "list-style-image", "list-style-position", "list-style-type", load,
+    loadClass, location, log, m, magenta, map, margin, "margin-bottom",
+    "margin-left", "margin-right", "margin-top", mark, "marker-offset",
+    maroon, match, "max-height", "max-width", maxerr, maxlen, md5,
+    mediumaquamarine, mediumblue, mediumorchid, mediumpurple,
+    mediumseagreen, mediumslateblue, mediumspringgreen, mediumturquoise,
+    mediumvioletred, member, menu, menutext, message, meta, meter,
+    midnightblue, "min-height", "min-width", mintcream, missing_a,
+    missing_a_after_b, missing_option, missing_property, missing_space_a_b,
+    missing_url, missing_use_strict, mistyrose, mixed, mm, moccasin, mode,
+    moveBy, moveTo, move_invocation, move_var, name, name_function, nav,
+    navajowhite, navigator, navy, nested_comment, newcap, next, noframes,
+    nomen, noscript, not, not_a_constructor, not_a_function, not_a_label,
+    not_a_scope, not_greater, nud, object, ol, oldlace, olive, olivedrab,
+    on, onbeforeunload, onblur, onerror, onevar, onfocus, onload, onresize,
+    onunload, opacity, open, openURL, opener, opera, optgroup, option,
+    orange, orangered, orchid, outer, outline, "outline-color",
+    "outline-style", "outline-width", output, overflow, "overflow-x",
+    "overflow-y", p, padding, "padding-bottom", "padding-left",
+    "padding-right", "padding-top", "page-break-after", "page-break-before",
+    palegoldenrod, palegreen, paleturquoise, palevioletred, papayawhip,
+    param, parameter_a_get_b, parameter_set_a, paren, parent, parseFloat,
+    parseInt, passfail, pc, peachpuff, peru, pink, play, plum, plusplus,
+    pop, popupMenu, position, postcomments, powderblue, pre, predef,
+    preferenceGroups, preferences, prev, print, progress, projection,
+    prompt, prototype, pt, purple, push, px, q, quit, quote, quotes, radix,
+    random, range, raw, readFile, readUrl, read_only, reason, red,
+    redefinition_a, regexp, reloadWidget, removeEventListener, replace,
+    report, reserved, reserved_a, resizeBy, resizeTo, resolvePath,
+    resumeUpdates, rhino, right, rosybrown, royalblue, rp, rt, ruby,
+    runCommand, runCommandInBg, saddlebrown, safe, salmon, samp, sandybrown,
+    saveAs, savePreferences, scanned_a_b, screen, script, scroll, scrollBy,
+    scrollTo, scrollbar, seagreen, seal, search, seashell, second, section,
+    select, serialize, setInterval, setTimeout, shift,
+    showWidgetPreferences, sienna, silver, skyblue, slash_equal, slateblue,
+    slategray, sleep, slice, small, snow, sort, source, span, spawn, speak,
+    speech, split, springgreen, src, stack, statement, statement_block,
+    status, steelblue, stopping, strange_loop, strict, strong, style,
+    styleproperty, sub, subscript, substr, sup, supplant, suppressUpdates,
+    switch, sync, system, table, "table-layout", tag_a_in_b, tan, tbody, td,
+    teal, tellWidget, test, "text-align", "text-decoration", "text-indent",
+    "text-shadow", "text-transform", textarea, tfoot, th, thead, third,
+    thistle, threeddarkshadow, threedface, threedhighlight,
+    threedlightshadow, threedshadow, thru, time, title, toLowerCase,
+    toString, toUpperCase, toint32, token, tomato, too_long, too_many, top,
+    tr, trailing_decimal_a, tree, tt, tty, turquoise, tv, type, u, ul,
+    unclosed, unclosed_comment, unclosed_regexp, undef, unescape,
+    unescaped_a, unexpected_a, unexpected_char_a_b, unexpected_comment,
+    unexpected_member_a, unexpected_space_a_b, "unicode-bidi",
+    unnecessary_escapement, unnecessary_initialize, unnecessary_use,
+    unreachable_a_b, unrecognized_style_attribute_a, unrecognized_tag_a,
+    unsafe, unused, unwatch, updateNow, url, urls, use_array, use_braces,
+    use_object, used_before_a, value, valueOf, var, var_a_not, version,
+    "vertical-align", video, violet, visibility, was, watch,
+    weird_assignment, weird_condition, weird_new, weird_program,
+    weird_relation, weird_ternary, wheat, while, white, "white-space",
+    whitesmoke, widget, width, window, windowframe, windows, windowtext,
+    "word-spacing", "word-wrap", wrap, wrap_immediate, wrap_regexp,
+    write_is_wrong, yahooCheckLogin, yahooLogin, yahooLogout, yellow,
     yellowgreen, "z-index", "}"
 */
 
@@ -1341,7 +1341,7 @@ var JSLINT = (function () {
             }
         }
     }
-    
+
     function return_this() {
         return this;
     }
@@ -1355,7 +1355,7 @@ var JSLINT = (function () {
             line: l,
             character: ch,
             message: bundle.scanned_a_b.supplant({
-                a: m, 
+                a: m,
                 b: Math.floor((l / lines.length) * 100)
             })
         };
@@ -1413,7 +1413,7 @@ var JSLINT = (function () {
 
     function expected_at(at) {
         if (option.white && nexttoken.from !== at) {
-            warning(bundle.expected_a_at_b_c, nexttoken, nexttoken.value, at, 
+            warning(bundle.expected_a_at_b_c, nexttoken, nexttoken.value, at,
                 nexttoken.from);
         }
     }
@@ -1622,7 +1622,7 @@ var JSLINT = (function () {
                             if (option.safe && xmode === 'html') {
                                 warning_at(bundle.adsafe_a, line, character + j, c);
                             } else if (s.charAt(j + 1) === '/' && (xmode || option.safe)) {
-                                warning_at(bundle.expected_a_b, line, character, 
+                                warning_at(bundle.expected_a_b, line, character,
                                     '<\\/', '</');
                             } else if (s.charAt(j + 1) === '!' && (xmode || option.safe)) {
                                 warning_at(bundle.unexpected_a, line, character, '<!');
@@ -1879,7 +1879,7 @@ var JSLINT = (function () {
                                                 line, from + l, String(c));
                                         } else if (c === '<') {
                                             warning_at(
-                                                bundle.unexpected_a, 
+                                                bundle.unexpected_a,
                                                 line,
                                                 from + l,
                                                 '\\'
@@ -2183,7 +2183,7 @@ klass:                                  do {
                                 return it('(color)', t);
                             }
                             return it('(punctuator)', t);
-                            
+
                         default:
                             if (xmode === 'outer' && c === '&') {
                                 character += 1;
@@ -2249,8 +2249,8 @@ klass:                                  do {
 // that are attached to the token to tokens that are in the tree.
 
         if (token.comments) {
-            nexttoken.comments = nexttoken.comments ? 
-                nexttoken.comments.concat(token.comments) : 
+            nexttoken.comments = nexttoken.comments ?
+                nexttoken.comments.concat(token.comments) :
                 token.comments;
         }
         if (token.postcomments) {
@@ -2328,7 +2328,7 @@ klass:                                  do {
 // If the token is not an edge, but is the first token on the line.
 
                 } else if (nexttoken.line !== token.line &&
-                        nexttoken.from < indent.at + 
+                        nexttoken.from < indent.at +
                         (indent.mode === 'expression' ? 0 : option.indent)) {
                     expected_at(indent.at + option.indent);
                 }
@@ -2339,7 +2339,7 @@ klass:                                  do {
                     indent.wrap = true;
                     if (indent.mode === 'statement' || indent.mode === 'var') {
                         expected_at(indent.at + option.indent);
-                    } else if (nexttoken.from < indent.at + 
+                    } else if (nexttoken.from < indent.at +
                             (indent.mode === 'expression' ? 0 : option.indent)) {
                         expected_at(indent.at + option.indent);
                     }
@@ -2383,33 +2383,40 @@ klass:                                  do {
     }
 
     function do_option() {
-        var b, co = comments_off, obj, filter, n, o = this.id, w = option.white;
+        var command = this.id,
+            filter,
+            name,
+            object,
+            old_comments_off = comments_off,
+            old_option_white = option.white,
+            value;
         comments_off = true;
         option.white = false;
-        if (lookahead.length > 0 || this.postcomments || nexttoken.comments) {
+        if (inblock || !funct['(global)'] || lookahead.length > 0 || this.postcomments ||
+                nexttoken.comments) {
             warning(bundle.unexpected_a, this);
         }
-        switch (o) {
+        switch (command) {
         case '/*members':
         case '/*member':
-            o = '/*members';
+            command = '/*members';
             if (!members_only) {
                 members_only = {};
             }
-            obj = members_only;
+            object = members_only;
             break;
         case '/*jslint':
             if (option.safe) {
                 warning(bundle.adsafe_a, this);
             }
             filter = bool_options;
-            obj = option;
+            object = option;
             break;
         case '/*global':
             if (option.safe) {
                 warning(bundle.adsafe_a, this);
             }
-            obj = predefined;
+            object = predefined;
             break;
         default:
             error("What?");
@@ -2424,60 +2431,69 @@ loop:   for (;;) {
                 }
                 advance();
             }
-            if (nexttoken.arity !== 'string' && !nexttoken.identifier && 
-                    o !== '/*members') {
+            if (nexttoken.arity !== 'string' && !nexttoken.identifier) {
                 error(bundle.unexpected_a, nexttoken);
             }
-            n = nexttoken;
+            name = nexttoken;
             advance();
             if (nexttoken.id === ':') {
                 advance(':');
-                if (obj === members_only) {
-                    error(bundle.expected_a_b, n, '*/', ':');
+                if (object === members_only) {
+                    error(bundle.expected_a_b, name, '*/', ':');
                 }
-                if (n.value === 'indent' && o === '/*jslint') {
-                    b = +nexttoken.value;
-                    if (typeof b !== 'number' || !isFinite(b) || b < 0 ||
-                            Math.floor(b) !== b) {
+                if (name.value === 'indent' && command === '/*jslint') {
+                    value = +nexttoken.value;
+                    if (typeof value !== 'number' || !isFinite(value) || value < 0 ||
+                            Math.floor(value) !== value) {
                         error(bundle.expected_small_a);
                     }
-                    obj.white = true;
-                    obj.indent = b;
-                } else if (n.value === 'maxerr' && o === '/*jslint') {
-                    b = +nexttoken.value;
-                    if (typeof b !== 'number' || !isFinite(b) || b <= 0 ||
-                            Math.floor(b) !== b) {
+                    if (value > 0) {
+                        old_option_white = true;
+                    }
+                    object.indent = value;
+                } else if (name.value === 'maxerr' && command === '/*jslint') {
+                    value = +nexttoken.value;
+                    if (typeof value !== 'number' || !isFinite(value) || value <= 0 ||
+                            Math.floor(value) !== value) {
                         error(bundle.expected_small_a, nexttoken);
                     }
-                    obj.maxerr = b;
-                } else if (n.value === 'maxlen' && o === '/*jslint') {
-                    b = +nexttoken.value;
-                    if (typeof b !== 'number' || !isFinite(b) || b < 0 ||
-                            Math.floor(b) !== b) {
+                    object.maxerr = value;
+                } else if (name.value === 'maxlen' && command === '/*jslint') {
+                    value = +nexttoken.value;
+                    if (typeof value !== 'number' || !isFinite(value) || value < 0 ||
+                            Math.floor(value) !== value) {
                         error(bundle.expected_small_a);
                     }
-                    obj.maxlen = b;
+                    object.maxlen = value;
                 } else if (nexttoken.id === 'true') {
-                    obj[n.value] = true;
+                    if (name.value === 'white' && command === '/*jslint') {
+                        old_option_white = object.white = true;
+                    } else {
+                        object[name.value] = true;
+                    }
                 } else if (nexttoken.id === 'false') {
-                    obj[n.value] = false;
+                    if (name.value === 'white' && command === '/*jslint') {
+                        old_option_white = object.white = false;
+                    } else {
+                        object[name.value] = false;
+                    }
                 } else {
                     error(bundle.unexpected_a);
                 }
                 advance();
             } else {
-                if (o === '/*jslint') {
+                if (command === '/*jslint') {
                     error(bundle.missing_option, nexttoken);
                 }
-                obj[n.value] = false;
+                object[name.value] = false;
             }
         }
         if (filter) {
             assume();
         }
-        comments_off = co;
+        comments_off = old_comments_off;
         advance('*/');
-        option.white = w;
+        option.white = old_option_white;
     }
 
 
@@ -2629,8 +2645,8 @@ loop:   for (;;) {
             return false;
         }
     }
-    
-    
+
+
     function are_similar(a, b) {
         if (Array.isArray(a)) {
             if (Array.isArray(b) && a.length === b.length) {
@@ -2643,21 +2659,21 @@ loop:   for (;;) {
                 return true;
             }
             return true;
-        } 
+        }
         if (Array.isArray(b)) {
             return false;
-        } 
+        }
         if (a.arity === b.arity && a.value === b.value) {
             switch (a.arity) {
             case 'prefix':
             case 'suffix':
                 return are_similar(a.first, b.first);
             case 'infix':
-                return are_similar(a.first, b.first) && 
+                return are_similar(a.first, b.first) &&
                     are_similar(a.second, b.second);
             case 'ternary':
-                return are_similar(a.first, b.first) && 
-                    are_similar(a.second, b.second) && 
+                return are_similar(a.first, b.first) &&
+                    are_similar(a.second, b.second) &&
                     are_similar(a.third, b.third);
             default:
                 return true;
@@ -2866,7 +2882,7 @@ loop:   for (;;) {
         }
         return node;
     }
-    
+
     function expected_condition(node, message) {
         switch (node.id) {
         case '[':
@@ -2913,7 +2929,7 @@ loop:   for (;;) {
         default:
             if (node.id  === 'NaN') {
                 warning(bundle.isNaN, node);
-            } 
+            }
         }
         return node;
     }
@@ -2924,10 +2940,10 @@ loop:   for (;;) {
             check_relation(left);
             if (eqeq) {
                 warning(bundle.expected_a_b, that, eqeq, that.id);
-            } 
+            }
             var right = expression(100);
             if (are_similar(left, right) ||
-                    ((left.arity === 'string' || left.arity === 'number') && 
+                    ((left.arity === 'string' || left.arity === 'number') &&
                     (right.arity === 'string' || right.arity === 'number'))) {
                 warning(bundle.weird_relation, that);
             }
@@ -3190,7 +3206,7 @@ loop:   for (;;) {
                 semicolon();
             } else {
                 if (d) {
-                    warning(bundle.unreachable_a_b, nexttoken, nexttoken.value, 
+                    warning(bundle.unreachable_a_b, nexttoken, nexttoken.value,
                         d.value);
                     d = null;
                 }
@@ -3279,7 +3295,7 @@ loop:   for (;;) {
         }
     }
 
-    
+
 // ECMAScript parser
 
     syntax['(identifier)'] = {
@@ -3447,7 +3463,7 @@ loop:   for (;;) {
     reservevar('NaN');
     reservevar('null');
     reservevar('this', function (x) {
-        if (strict_mode && ((funct['(statement)'] && 
+        if (strict_mode && ((funct['(statement)'] &&
                 funct['(name)'].charAt(0) > 'Z') || funct['(global)'])) {
             warning(bundle.strict, x);
         } else if (option.safe) {
@@ -3490,9 +3506,9 @@ loop:   for (;;) {
                 warning(bundle.and, that);
             }
             return that;
-        }        
+        }
 
-        that.first = paren_check(expected_relation(left));        
+        that.first = paren_check(expected_relation(left));
         that.second = paren_check(expected_relation(expression(40)));
         if (are_similar(that.first, that.second)) {
             warning(bundle.weird_condition, that);
@@ -3539,7 +3555,7 @@ loop:   for (;;) {
         if (!right.value && (right.arity === 'number' || right.arity === 'string')) {
             warning(bundle.unexpected_a, right);
         }
-        if (left.arity === right.arity && 
+        if (left.arity === right.arity &&
                 (left.arity === 'string' && left.arity === 'number')) {
             left.value += right.value;
             left.thru = right.thru;
@@ -3715,7 +3731,7 @@ loop:   for (;;) {
                             warning(bundle.use_array, token);
                         }
                         advance(')', p);
-                        return p;                            
+                        return p;
                     }
                     warning(bundle.use_array, token);
                     break;
@@ -3990,7 +4006,7 @@ loop:   for (;;) {
                 if (option.safe) {
                     if (banned[id]) {
                         warning(bundle.adsafe_a);
-                    } else if (id.charAt(0) === '_' || 
+                    } else if (id.charAt(0) === '_' ||
                             id.charAt(id.length - 1) === '_') {
                         warning(bundle.dangling_a);
                     }
@@ -4155,12 +4171,12 @@ loop:   for (;;) {
         discard();
         return this;
     });
-    
+
     stmt('/*members', do_option);
     stmt('/*member', do_option);
     stmt('/*jslint', do_option);
     stmt('/*global', do_option);
-    
+
 
 
     stmt('var', function () {
@@ -4233,7 +4249,7 @@ loop:   for (;;) {
         var i = identifier();
         if (i) {
             add_label(i, 'unction');
-            no_space_only();
+            no_space();
         }
         do_function(this, i, true);
         if (nexttoken.id === '(' && nexttoken.line === token.line) {
@@ -4247,7 +4263,7 @@ loop:   for (;;) {
         one_space();
         var i = optional_identifier();
         if (i) {
-            no_space_only();
+            no_space();
         }
         do_function(this, i);
         if (funct['(loopage)']) {
@@ -4381,9 +4397,9 @@ loop:   for (;;) {
 //    case.second           the array of statements
 // If all of the arrays of statements are disrupt, then the switch is disrupt.
 
-        var b = true,
-            s,
-            t = nexttoken;
+        var particular,
+            the_case = nexttoken,
+            unbroken = true;
         funct['(breakage)'] += 1;
         one_space();
         advance('(');
@@ -4393,24 +4409,24 @@ loop:   for (;;) {
         this.arity = 'statement';
         this.first = expected_condition(expected_relation(expression(0)));
         no_space();
-        step_out(')', t);
+        step_out(')', the_case);
         discard();
         one_space();
         advance('{');
         step_in();
         this.second = [];
         while (nexttoken.id === 'case') {
-            t = nexttoken;
-            t.first = [];
+            the_case = nexttoken;
+            the_case.first = [];
             spaces();
             edge('case');
             advance('case');
             for (;;) {
                 one_space();
-                s = expression(0);
-                t.first.push(s);
-                if (s.id === 'NaN') {
-                    warning(bundle.unexpected_a, s);
+                particular = expression(0);
+                the_case.first.push(particular);
+                if (particular.id === 'NaN') {
+                    warning(bundle.unexpected_a, particular);
                 }
                 no_space_only();
                 advance(':');
@@ -4424,12 +4440,12 @@ loop:   for (;;) {
                 discard();
             }
             spaces();
-            t.second = statements();
-            if (t.second && t.second.length > 0) {
-                s = t.second[t.second.length - 1];
-                if (s.disrupt) {
-                    if (s.id === 'break') {
-                        b = false;
+            the_case.second = statements();
+            if (the_case.second && the_case.second.length > 0) {
+                particular = the_case.second[the_case.second.length - 1];
+                if (particular.disrupt) {
+                    if (particular.id === 'break') {
+                        unbroken = false;
                     }
                 } else {
                     warning(bundle.missing_a_after_b, nexttoken, 'break', 'case');
@@ -4437,14 +4453,14 @@ loop:   for (;;) {
             } else {
                 warning(bundle.empty_case);
             }
-            this.second.push(t);
+            this.second.push(the_case);
         }
         if (this.second.length === 0) {
             warning(bundle.missing_a, nexttoken, 'case');
         }
         if (nexttoken.id === 'default') {
             spaces();
-            t = nexttoken;
+            the_case = nexttoken;
             edge('case');
             advance('default');
             discard();
@@ -4452,14 +4468,14 @@ loop:   for (;;) {
             advance(':');
             discard();
             spaces();
-            t.second = statements();
-            if (t.second && t.second.length > 0) {
-                s = t.second[t.second.length - 1];
-                if (b && s.disrupt && s.id !== 'break') {
+            the_case.second = statements();
+            if (the_case.second && the_case.second.length > 0) {
+                particular = the_case.second[the_case.second.length - 1];
+                if (unbroken && particular.disrupt && particular.id !== 'break') {
                     this.disrupt = true;
                 }
             }
-            this.second.push(t);
+            this.second.push(the_case);
         }
         funct['(breakage)'] -= 1;
         spaces();
@@ -4712,7 +4728,7 @@ loop:   for (;;) {
                     if (nexttoken.id === '}') {
                         warning(bundle.unexpected_a, token);
                         break;
-                    }  
+                    }
                 }
             }
             advance('}', t);
@@ -4735,7 +4751,7 @@ loop:   for (;;) {
                     if (nexttoken.id === ']') {
                         warning(bundle.unexpected_a, token);
                         break;
-                    } 
+                    }
                 }
             }
             advance(']', t);
@@ -6101,7 +6117,7 @@ loop:   for (;;) {
             '(loopage)': 0
         };
         functions = [funct];
-        
+
         comments_off = false;
         ids = {};
         implied = {};
@@ -6385,7 +6401,7 @@ loop:   for (;;) {
                         names[j] = f.param[j].value;
                     }
                 }
-                o.push('<br><div class=function><i>' + f.line + '</i> ' + 
+                o.push('<br><div class=function><i>' + f.line + '</i> ' +
                     (f.name || '') + '(' + names.join(', ') + ')</div>');
                 detail('<big><b>Unused</b></big>', f.unused);
                 detail('Closure', f.closure);
