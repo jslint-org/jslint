@@ -171,22 +171,22 @@ SOFTWARE.
     System, Text, TextArea, Timer, TypeError, URIError, URL, VBArray,
     WScript, Web, Window, XMLDOM, XMLHttpRequest, "\\", a, a_function,
     a_label, a_not_allowed, a_not_defined, a_scope, abbr, acronym,
-    activeborder, activecaption, addEventListener, address, adsafe,
-    adsafe_a, adsafe_autocomplete, adsafe_bad_id, adsafe_div,
-    adsafe_fragment, adsafe_go, adsafe_html, adsafe_id, adsafe_id_go,
-    adsafe_lib, adsafe_lib_second, adsafe_missing_id, adsafe_name_a,
-    adsafe_placement, adsafe_prefix_a, adsafe_script, adsafe_source,
-    adsafe_subscript_a, adsafe_tag, alert, aliceblue, all, already_defined,
-    and, animator, antiquewhite, appleScript, applet, apply, approved,
-    appworkspace, aqua, aquamarine, area, arguments, arity, article, aside,
-    assign, assign_exception, assignment_function_expression, at,
-    attribute_case_a, audio, autocomplete, avoid_a, azure, b, background,
+    activeborder, activecaption, address, adsafe, adsafe_a,
+    adsafe_autocomplete, adsafe_bad_id, adsafe_div, adsafe_fragment,
+    adsafe_go, adsafe_html, adsafe_id, adsafe_id_go, adsafe_lib,
+    adsafe_lib_second, adsafe_missing_id, adsafe_name_a, adsafe_placement,
+    adsafe_prefix_a, adsafe_script, adsafe_source, adsafe_subscript_a,
+    adsafe_tag, alert, aliceblue, all, already_defined, and, animator,
+    antiquewhite, appleScript, applet, apply, approved, appworkspace, aqua,
+    aquamarine, area, arguments, arity, article, aside, assign,
+    assign_exception, assignment_function_expression, at, attribute_case_a,
+    audio, autocomplete, avoid_a, azure, b, background,
     "background-attachment", "background-color", "background-image",
     "background-position", "background-repeat", bad_assignment, bad_color_a,
     bad_constructor, bad_entity, bad_html, bad_id_a, bad_in_a,
     bad_invocation, bad_name_a, bad_new, bad_number, bad_operand, bad_type,
     bad_url, bad_wrap, base, bdo, beep, beige, big, bisque, bitwise, black,
-    blanchedalmond, block, blockquote, blue, blueviolet, blur, body, border,
+    blanchedalmond, block, blockquote, blue, blueviolet, body, border,
     "border-bottom", "border-bottom-color", "border-bottom-style",
     "border-bottom-width", "border-collapse", "border-color", "border-left",
     "border-left-color", "border-left-style", "border-left-width",
@@ -198,43 +198,42 @@ SOFTWARE.
     c, cadetblue, call, callee, caller, canvas, cap, caption,
     "caption-side", captiontext, case, center, charAt, charCodeAt,
     character, chartreuse, chocolate, chooseColor, chooseFile, chooseFolder,
-    cite, clear, clearInterval, clearTimeout, clip, close, closeWidget,
-    closed, closure, cm, code, col, colgroup, color, combine_var, command,
-    comments, concat, conditional_assignment, confirm, confusing_a,
-    confusing_regexp, console, constructor, constructor_name_a, content,
-    continue, control_a, convertPathToHFS, convertPathToPlatform, coral,
-    cornflowerblue, cornsilk, "counter-increment", "counter-reset", create,
-    crimson, css, cursor, cyan, d, dangerous_comment, dangling_a, darkblue,
-    darkcyan, darkgoldenrod, darkgray, darkgreen, darkkhaki, darkmagenta,
+    cite, clear, clearInterval, clearTimeout, clip, closeWidget, closure,
+    cm, code, col, colgroup, color, combine_var, command, comments, concat,
+    conditional_assignment, confirm, confusing_a, confusing_regexp, console,
+    constructor, constructor_name_a, content, continue, control_a,
+    convertPathToHFS, convertPathToPlatform, coral, cornflowerblue,
+    cornsilk, "counter-increment", "counter-reset", create, crimson, css,
+    cursor, cyan, d, dangerous_comment, dangling_a, darkblue, darkcyan,
+    darkgoldenrod, darkgray, darkgreen, darkkhaki, darkmagenta,
     darkolivegreen, darkorange, darkorchid, darkred, darksalmon,
     darkseagreen, darkslateblue, darkslategray, darkturquoise, darkviolet,
     data, datalist, dd, debug, decodeURI, decodeURIComponent, deeppink,
-    deepskyblue, default, defaultStatus, defineClass, del, deleted,
-    deserialize, details, devel, dfn, dialog, dimgray, dir, direction,
-    display, disrupt, div, dl, do, document, dodgerblue, dt, duplicate_a,
-    edge, edition, else, em, embed, embossed, empty, "empty-cells",
-    empty_block, empty_case, empty_class, encodeURI, encodeURIComponent,
-    entityify, errors, es5, escape, eval, event, evidence, evil, ex,
-    exception, exec, expected_a, expected_a_at_b_c, expected_a_b,
-    expected_a_b_from_c_d, expected_at_a, expected_attribute_a,
-    expected_attribute_value_a, expected_class_a, expected_fraction_a,
-    expected_id_a, expected_identifier_a, expected_identifier_a_reserved,
-    expected_lang_a, expected_linear_a, expected_media_a, expected_name_a,
-    expected_nonstandard_style_attribute, expected_number_a,
-    expected_operator_a, expected_percent_a, expected_positive_a,
-    expected_pseudo_a, expected_selector_a, expected_small_a,
-    expected_space_a_b, expected_string_a, expected_style_attribute,
-    expected_style_pattern, expected_tagname_a, fieldset, figure,
-    filesystem, firebrick, first, float, floor, floralwhite, focus,
-    focusWidget, font, "font-family", "font-size", "font-size-adjust",
-    "font-stretch", "font-style", "font-variant", "font-weight", footer,
-    for, for_if, forestgreen, forin, form, fragment, frame, frames,
-    frameset, from, fromCharCode, fuchsia, fud, funct, function,
-    function_block, function_eval, function_loop, function_statement,
-    function_strict, functions, g, gainsboro, gc, getComputedStyle, get_set,
-    ghostwhite, global, globals, gold, goldenrod, gray, graytext, green,
-    greenyellow, h1, h2, h3, h4, h5, h6, handheld, hasOwnProperty, head,
-    header, height, help, hgroup, highlight, highlighttext, history,
+    deepskyblue, default, defineClass, del, deleted, deserialize, details,
+    devel, dfn, dialog, dimgray, dir, direction, display, disrupt, div, dl,
+    do, document, dodgerblue, dt, duplicate_a, edge, edition, else, em,
+    embed, embossed, empty, "empty-cells", empty_block, empty_case,
+    empty_class, encodeURI, encodeURIComponent, entityify, errors, es5,
+    escape, eval, event, evidence, evil, ex, exception, exec, expected_a,
+    expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d, expected_at_a,
+    expected_attribute_a, expected_attribute_value_a, expected_class_a,
+    expected_fraction_a, expected_id_a, expected_identifier_a,
+    expected_identifier_a_reserved, expected_lang_a, expected_linear_a,
+    expected_media_a, expected_name_a, expected_nonstandard_style_attribute,
+    expected_number_a, expected_operator_a, expected_percent_a,
+    expected_positive_a, expected_pseudo_a, expected_selector_a,
+    expected_small_a, expected_space_a_b, expected_string_a,
+    expected_style_attribute, expected_style_pattern, expected_tagname_a,
+    fieldset, figure, filesystem, firebrick, first, float, floor,
+    floralwhite, focusWidget, font, "font-family", "font-size",
+    "font-size-adjust", "font-stretch", "font-style", "font-variant",
+    "font-weight", footer, for, for_if, forestgreen, forin, form, fragment,
+    frame, frames, frameset, from, fromCharCode, fuchsia, fud, funct,
+    function, function_block, function_eval, function_loop,
+    function_statement, function_strict, functions, g, gainsboro, gc,
+    get_set, ghostwhite, global, globals, gold, goldenrod, gray, graytext,
+    green, greenyellow, h1, h2, h3, h4, h5, h6, handheld, hasOwnProperty,
+    head, header, height, help, hgroup, highlight, highlighttext, history,
     honeydew, hotpink, hr, "hta:application", html, html_confusion_a,
     html_handlers, i, iTunes, id, identifier, identifier_function, iframe,
     img, immed, implied_evil, implieds, in, inactiveborder, inactivecaption,
@@ -258,37 +257,35 @@ SOFTWARE.
     midnightblue, "min-height", "min-width", mintcream, missing_a,
     missing_a_after_b, missing_option, missing_property, missing_space_a_b,
     missing_url, missing_use_strict, mistyrose, mixed, mm, moccasin, mode,
-    moveBy, moveTo, move_invocation, move_var, name, name_function, nav,
-    navajowhite, navigator, navy, nested_comment, newcap, next, noframes,
-    nomen, noscript, not, not_a_constructor, not_a_function, not_a_label,
+    move_invocation, move_var, name, name_function, nav, navajowhite,
+    navigator, navy, nested_comment, newcap, next, noframes, nomen,
+    noscript, not, not_a_constructor, not_a_function, not_a_label,
     not_a_scope, not_greater, nud, object, ol, oldlace, olive, olivedrab,
-    on, onbeforeunload, onblur, onerror, onevar, onfocus, onload, onresize,
-    onunload, opacity, open, openURL, opener, opera, optgroup, option,
-    orange, orangered, orchid, outer, outline, "outline-color",
-    "outline-style", "outline-width", output, overflow, "overflow-x",
-    "overflow-y", p, padding, "padding-bottom", "padding-left",
-    "padding-right", "padding-top", "page-break-after", "page-break-before",
-    palegoldenrod, palegreen, paleturquoise, palevioletred, papayawhip,
-    param, parameter_a_get_b, parameter_set_a, paren, parent, parseFloat,
-    parseInt, passfail, pc, peachpuff, peru, pink, play, plum, plusplus,
-    pop, popupMenu, position, postcomments, powderblue, pre, predef,
+    on, onevar, opacity, open, openURL, opera, optgroup, option, orange,
+    orangered, orchid, outer, outline, "outline-color", "outline-style",
+    "outline-width", output, overflow, "overflow-x", "overflow-y", p,
+    padding, "padding-bottom", "padding-left", "padding-right",
+    "padding-top", "page-break-after", "page-break-before", palegoldenrod,
+    palegreen, paleturquoise, palevioletred, papayawhip, param,
+    parameter_a_get_b, parameter_set_a, paren, parent, parseFloat, parseInt,
+    passfail, pc, peachpuff, peru, pink, play, plum, plusplus, pop,
+    popupMenu, position, postcomments, powderblue, pre, predef,
     preferenceGroups, preferences, prev, print, progress, projection,
     prompt, prototype, pt, purple, push, px, q, quit, quote, quotes, radix,
     random, range, raw, readFile, readUrl, read_only, reason, red,
-    redefinition_a, regexp, reloadWidget, removeEventListener, replace,
-    report, reserved, reserved_a, resizeBy, resizeTo, resolvePath,
-    resumeUpdates, rhino, right, rosybrown, royalblue, rp, rt, ruby,
-    runCommand, runCommandInBg, saddlebrown, safe, salmon, samp, sandybrown,
-    saveAs, savePreferences, scanned_a_b, screen, script, scroll, scrollBy,
-    scrollTo, scrollbar, seagreen, seal, search, seashell, second, section,
+    redefinition_a, regexp, reloadWidget, replace, report, reserved,
+    reserved_a, resolvePath, resumeUpdates, rhino, right, rosybrown,
+    royalblue, rp, rt, ruby, runCommand, runCommandInBg, saddlebrown, safe,
+    salmon, samp, sandybrown, saveAs, savePreferences, scanned_a_b, screen,
+    script, scrollbar, seagreen, seal, search, seashell, second, section,
     select, serialize, setInterval, setTimeout, shift,
     showWidgetPreferences, sienna, silver, skyblue, slash_equal, slateblue,
     slategray, sleep, slice, small, snow, sort, source, span, spawn, speak,
     speech, split, springgreen, src, stack, statement, statement_block,
-    status, steelblue, stopping, strange_loop, strict, strong, style,
-    styleproperty, sub, subscript, substr, sup, supplant, suppressUpdates,
-    switch, sync, system, table, "table-layout", tag_a_in_b, tan, tbody, td,
-    teal, tellWidget, test, "text-align", "text-decoration", "text-indent",
+    steelblue, stopping, strange_loop, strict, strong, style, styleproperty,
+    sub, subscript, substr, sup, supplant, suppressUpdates, switch, sync,
+    system, table, "table-layout", tag_a_in_b, tan, tbody, td, teal,
+    tellWidget, test, "text-align", "text-decoration", "text-indent",
     "text-shadow", "text-transform", textarea, tfoot, th, thead, third,
     thistle, threeddarkshadow, threedface, threedhighlight,
     threedlightshadow, threedshadow, thru, time, title, toLowerCase,
@@ -297,10 +294,10 @@ SOFTWARE.
     unclosed, unclosed_comment, unclosed_regexp, undef, unescape,
     unescaped_a, unexpected_a, unexpected_char_a_b, unexpected_comment,
     unexpected_member_a, unexpected_space_a_b, "unicode-bidi",
-    unnecessary_initialize, unnecessary_use,
-    unreachable_a_b, unrecognized_style_attribute_a, unrecognized_tag_a,
-    unsafe, unused, unwatch, updateNow, url, urls, use_array, use_braces,
-    use_object, used_before_a, value, valueOf, var, var_a_not, version,
+    unnecessary_initialize, unnecessary_use, unreachable_a_b,
+    unrecognized_style_attribute_a, unrecognized_tag_a, unsafe, unused,
+    unwatch, updateNow, url, urls, use_array, use_braces, use_object,
+    used_before_a, value, valueOf, var, var_a_not, version,
     "vertical-align", video, violet, visibility, was, watch,
     weird_assignment, weird_condition, weird_new, weird_program,
     weird_relation, weird_ternary, wheat, while, white, "white-space",
@@ -6039,25 +6036,26 @@ loop:   for (;;) {
                     }
                 }
             }
-            if (the_option.adsafe) {
-                the_option.safe = true;
+            option = Object.create(the_option);
+            if (option.adsafe) {
+                option.safe = true;
             }
-            if (the_option.safe) {
-                the_option.browser     =
-                    the_option.css     =
-                    the_option.debug   =
-                    the_option.devel   =
-                    the_option.evil    =
-                    the_option.forin   =
-                    the_option.on      =
-                    the_option.rhino   =
-                    the_option.windows =
-                    the_option.sub     =
-                    the_option.widget  = false;
+            if (option.safe) {
+                option.browser     =
+                    option.css     =
+                    option.debug   =
+                    option.devel   =
+                    option.evil    =
+                    option.forin   =
+                    option.on      =
+                    option.rhino   =
+                    option.windows =
+                    option.sub     =
+                    option.widget  = false;
 
-                the_option.nomen       =
-                    the_option.safe    =
-                    the_option.undef   = true;
+                option.nomen       =
+                    option.safe    =
+                    option.undef   = true;
 
                 predefined.Date         =
                     predefined['eval']  =
@@ -6067,7 +6065,6 @@ loop:   for (;;) {
                 predefined.ADSAFE  =
                     predefined.lib = false;
             }
-            option = the_option;
         } else {
             option = {};
         }
