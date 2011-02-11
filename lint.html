@@ -114,9 +114,9 @@ clearInterval: false, clearTimeout: false, document: false, event: false, frames
 */</code></blockquote>
 <p> The <code>browser</code> <a href="#options">option</a> does
   not include the aliases of the global object, <code>window</code> and
-  <code>self</code> because the potential for misuse is so great.</p>
+  <code>self</code> because the potential for misuse is so great. If you need access to <code>window</code>, you can write<code> var window; </code>or<code> /*global window*/</code>.</p>
 <p id=devel>Select the 
-  <label for="JSLINT_DEVEL" title="devel"><em>Assume console, alert, ...</em></label> 
+    <label for="JSLINT_DEVEL" title="devel"><em>Assume console, alert, ...</em></label> 
 (<code>devel</code>) <a href="#options">option</a> to predefine globals that are useful in development but that should be avoided in production, such as <code>console</code> and <code>alert</code>. It has the same
 effect as this comment:</p>
 <pre>/*global alert: false, confirm: false, console: false, Debug: false, opera: false, prompt: false */</pre>
