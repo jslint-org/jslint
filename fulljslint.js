@@ -394,49 +394,21 @@ var JSLINT = (function () {
 // web browser environment.
 
         browser = {
-            addEventListener: false,
-            blur            : false,
             clearInterval   : false,
             clearTimeout    : false,
-            close           : false,
-            closed          : false,
-            defaultStatus   : false,
             document        : false,
             event           : false,
-            focus           : false,
             frames          : false,
-            getComputedStyle: false,
             history         : false,
             Image           : false,
-            length          : false,
             location        : false,
-            moveBy          : false,
-            moveTo          : false,
             name            : false,
             navigator       : false,
-            onbeforeunload  : true,
-            onblur          : true,
-            onerror         : true,
-            onfocus         : true,
-            onload          : true,
-            onresize        : true,
-            onunload        : true,
-            open            : false,
-            opener          : false,
             Option          : false,
             parent          : false,
-            print           : false,
-            removeEventListener: false,
-            resizeBy        : false,
-            resizeTo        : false,
             screen          : false,
-            scroll          : false,
-            scrollBy        : false,
-            scrollTo        : false,
             setInterval     : false,
             setTimeout      : false,
-            status          : false,
-            top             : false,
             XMLHttpRequest  : false
         },
         bundle = {
@@ -1221,6 +1193,10 @@ var JSLINT = (function () {
         };
 
 
+    function return_this() {
+        return this;
+    }
+
     function F() {}     // Used by Object.create
 
     function is_own(object, name) {
@@ -1344,10 +1320,6 @@ var JSLINT = (function () {
                 combine(predefined, widget);
             }
         }
-    }
-
-    function return_this() {
-        return this;
     }
 
 

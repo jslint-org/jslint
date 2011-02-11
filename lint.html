@@ -109,7 +109,9 @@ at issuing warnings. <code>lint</code> is no longer needed.</p>
   such as <code>document</code> and <code>addEventListener</code>. It has the same
   effect as this comment:</p>
 <blockquote>
-<code>/*global addEventListener: false, blur: false, clearInterval: false, clearTimeout: false, close: false, closed: false, defaultStatus: false, document: false, event: false, focus: false, frames: false, getComputedStyle: false, history: false, Image: false, length: false, location: false, moveBy: false, moveTo: false, name: false, navigator: false, onblur: true, onerror: true, onfocus: true, onload: true, onresize: true, onunload: true, open: false, opener: false, Option: false, parent: false, print: false, resizeBy: false, resizeTo: false, screen: false, scroll: false, scrollBy: false, scrollTo: false, setInterval: false, setTimeout: false, status: false, top: false, XMLHttpRequest: false  */</code></blockquote>
+<code>/*global
+clearInterval: false, clearTimeout: false, document: false, event: false, frames: false, history: false, Image: false, location: false, name: false, navigator: false, Option: false, parent: false, screen: false, setInterval: false, setTimeout: false, XMLHttpRequest: false 
+*/</code></blockquote>
 <p> The <code>browser</code> <a href="#options">option</a> does
   not include the aliases of the global object, <code>window</code> and
   <code>self</code> because the potential for misuse is so great.</p>
