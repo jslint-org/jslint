@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-02-09
+// 2011-02-13
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -2628,7 +2628,7 @@ loop:   for (;;) {
                 }
                 return true;
             }
-            return true;
+            return false;
         }
         if (Array.isArray(b)) {
             return false;
@@ -6429,7 +6429,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-02-09';
+    itself.edition = '2011-02-13';
 
     return itself;
 
