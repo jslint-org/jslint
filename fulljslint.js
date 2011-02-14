@@ -2637,6 +2637,7 @@ loop:   for (;;) {
             switch (a.arity) {
             case 'prefix':
             case 'suffix':
+            case undefined:
                 return are_similar(a.first, b.first);
             case 'infix':
                 return are_similar(a.first, b.first) &&
