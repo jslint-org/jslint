@@ -2618,6 +2618,9 @@ loop:   for (;;) {
 
 
     function are_similar(a, b) {
+        if (a === b) {
+            return true;
+        }
         if (Array.isArray(a)) {
             if (Array.isArray(b) && a.length === b.length) {
                 var i;
