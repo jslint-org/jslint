@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-02-13
+// 2011-02-14
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -929,9 +929,9 @@ var JSLINT = (function () {
 
         ids,            // HTML ids
         implied,        // Implied globals
-        inblock,
+        in_block,
         indent,
-        jsonmode,
+        json_mode,
         labelled = {
             'do':     true,
             'for':    true,
@@ -1548,7 +1548,7 @@ var JSLINT = (function () {
                 function string(x) {
                     var c, j, r = '';
 
-                    if (jsonmode && x !== '"') {
+                    if (json_mode && x !== '"') {
                         warn_at(bundle.expected_a, line, character, '"');
                     }
 
@@ -1622,7 +1622,7 @@ var JSLINT = (function () {
                                 case '/':
                                     break;
                                 case '\'':
-                                    if (jsonmode) {
+                                    if (json_mode) {
                                         warn_at(bundle.unexpected_a, line, character, '\\\'');
                                     }
                                     break;
@@ -1645,13 +1645,13 @@ var JSLINT = (function () {
                                     esc(4);
                                     break;
                                 case 'v':
-                                    if (jsonmode) {
+                                    if (json_mode) {
                                         warn_at(bundle.unexpected_a, line, character, '\\v');
                                     }
                                     c = '\v';
                                     break;
                                 case 'x':
-                                    if (jsonmode) {
+                                    if (json_mode) {
                                         warn_at(bundle.unexpected_a, line, character, '\\x');
                                     }
                                     esc(2);
@@ -1726,7 +1726,7 @@ var JSLINT = (function () {
                                         warn_at(bundle.unexpected_a,
                                             line, character, t);
                                     }
-                                } else if (jsonmode && (digit === 'x' || digit === 'X')) {
+                                } else if (json_mode && (digit === 'x' || digit === 'X')) {
                                     warn_at(bundle.unexpected_a, line, character, '0x');
                                 }
                             }
@@ -2362,8 +2362,7 @@ klass:                                  do {
             value;
         comments_off = true;
         option.white = false;
-        if (inblock || !funct['(global)'] || lookahead.length > 0 || this.postcomments ||
-                nexttoken.comments) {
+        if (lookahead.length > 0 || this.postcomments || nexttoken.comments) {
             warn(bundle.unexpected_a, this);
         }
         switch (command) {
@@ -3216,11 +3215,11 @@ loop:   for (;;) {
 
         var array,
             curly = nexttoken,
-            old_inblock = inblock,
+            old_inblock = in_block,
             old_scope = scope,
             old_strict_mode = strict_mode;
 
-        inblock = ordinary;
+        in_block = ordinary;
         scope = Object.create(scope);
         spaces();
         if (nexttoken.id === '{') {
@@ -3243,7 +3242,7 @@ loop:   for (;;) {
         }
         funct['(verb)'] = null;
         scope = old_scope;
-        inblock = old_inblock;
+        in_block = old_inblock;
         if (ordinary && array.length === 0) {
             warn(bundle.empty_block);
         }
@@ -4232,7 +4231,7 @@ loop:   for (;;) {
 
     stmt('function', function () {
         one_space();
-        if (inblock) {
+        if (in_block) {
             warn(bundle.function_block, token);
         }
         var i = identifier();
@@ -6110,9 +6109,9 @@ loop:   for (;;) {
         comments_off = false;
         ids = {};
         implied = {};
-        inblock = false;
+        in_block = false;
         indent = false;
-        jsonmode = false;
+        json_mode = false;
         lookahead = [];
         member = {};
         members_only = null;
@@ -6142,7 +6141,7 @@ loop:   for (;;) {
                 switch (nexttoken.id) {
                 case '{':
                 case '[':
-                    jsonmode = true;
+                    json_mode = true;
                     json_value();
                     break;
                 case '@':
@@ -6224,7 +6223,7 @@ loop:   for (;;) {
             data.errors = itself.errors;
         }
 
-        if (jsonmode) {
+        if (json_mode) {
             data.json = true;
         }
 
@@ -6433,7 +6432,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-02-13';
+    itself.edition = '2011-02-14';
 
     return itself;
 
