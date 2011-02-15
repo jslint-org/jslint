@@ -2697,7 +2697,7 @@ loop:   for (;;) {
             anonname = 'anonymous';
             funct['(verb)'] = token.value;
         }
-        if (initial === true && token.fud) {
+        if ((initial === true) && token.fud) {
             left = token.fud();
         } else {
             if (token.nud) {
@@ -4518,7 +4518,13 @@ loop:   for (;;) {
         spaces(this, t);
         no_space();
         if (nexttoken.id === 'var') {
-            fail(bundle.move_var);
+            if (option.forvar) {
+                fail(bundle.move_var);
+            }
+            else {
+                advance();
+                add_label(nexttoken.value, 'unused');
+            }
         }
         edge();
         if (peek(0).id === 'in') {
