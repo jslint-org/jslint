@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-02-14
+// 2011-02-15
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -91,7 +91,7 @@ SOFTWARE.
             line: NUMBER,
             last: NUMBER,
             param: [
-                STRING
+                TOKEN
             ],
             closure: [
                 STRING
@@ -1397,17 +1397,19 @@ var JSLINT = (function () {
 
 // Private lex methods
 
-        function collect_comment(source_row) {
+        function collect_comment(comment) {
             if (older_token.line !== line) {
                 if (comments) {
-                    comments.push(source_row);
+                    comments.push(comment);
                 } else {
-                    comments = [source_row];
+                    comments = [comment];
                 }
-            } else if (older_token.postcomments) {
-                older_token.postcomments.push(source_row);
             } else {
-                older_token.postcomments = [source_row];
+                if (older_token.postcomments) {
+                    older_token.postcomments.push(comment);
+                } else {
+                    older_token.postcomments = [comment];
+                }
             }
         }
 
@@ -3123,18 +3125,15 @@ loop:   for (;;) {
             switch (begin) {
             case 'script':
 
-// JSLint is also the static analizer for ADsafe. See www.ADsafe.org.
+// JSLint is also the static analyzer for ADsafe. See www.ADsafe.org.
 
                 if (!adsafe_may) {
-                    if (nexttoken.value !== 'ADSAFE' ||
-                            peek(0).id !== '.' ||
-                            (peek(1).value !== 'id' &&
-                            peek(1).value !== 'go')) {
+                    if (nexttoken.value !== 'ADSAFE' || peek(0).id !== '.' ||
+                            (peek(1).value !== 'id' && peek(1).value !== 'go')) {
                         fail(bundle.adsafe_id_go);
                     }
                 }
-                if (nexttoken.value === 'ADSAFE' &&
-                        peek(0).id === '.' &&
+                if (nexttoken.value === 'ADSAFE' && peek(0).id === '.' &&
                         peek(1).value === 'id') {
                     if (adsafe_may) {
                         fail(bundle.adsafe, nexttoken);
@@ -3167,8 +3166,8 @@ loop:   for (;;) {
                     adsafe_params = adsafe_function.funct['(params)'];
                     adsafe_params = adsafe_params && adsafe_params.join(', ');
                     if (adsafe_params && adsafe_params !== 'lib') {
-                        fail(bundle.expected_a_b,
-                            adsafe_function, '(lib)', '(' + adsafe_params + ')');
+                        fail(bundle.expected_a_b, adsafe_function, '(lib)',
+                            '(' + adsafe_params + ')');
                     }
                     advance(')');
                     semicolon();
@@ -3250,14 +3249,14 @@ loop:   for (;;) {
     }
 
 
-    function tally_member(m) {
-        if (members_only && typeof members_only[m] !== 'boolean') {
-            warn(bundle.unexpected_member_a, token, m);
+    function tally_member(name) {
+        if (members_only && typeof members_only[name] !== 'boolean') {
+            warn(bundle.unexpected_member_a, token, name);
         }
-        if (typeof member[m] === 'number') {
-            member[m] += 1;
+        if (typeof member[name] === 'number') {
+            member[name] += 1;
         } else {
-            member[m] = 1;
+            member[name] = 1;
         }
     }
 
@@ -3838,19 +3837,19 @@ loop:   for (;;) {
         if (nexttoken.id === 'function') {
             nexttoken.immed = true;
         }
-        var v = expression(0);
-        v.paren = true;
+        var value = expression(0);
+        value.paren = true;
         no_space();
         step_out(')', this);
         discard();
-        if (v.id === 'function') {
+        if (value.id === 'function') {
             if (nexttoken.id === '(') {
                 warn(bundle.move_invocation);
             } else {
                 warn(bundle.bad_wrap, this);
             }
         }
-        return v;
+        return value;
     });
 
     infix('.', 170, function (left, that) {
@@ -6432,7 +6431,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-02-14';
+    itself.edition = '2011-02-15';
 
     return itself;
 
