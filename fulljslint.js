@@ -6279,6 +6279,14 @@ loop:   for (;;) {
             }
             function_data.name = the_function['(name)'];
             function_data.param = the_function['(params)'];
+            if (function_data.param) {
+                for (j = 0; j < function_data.param.length; j += 1) {
+                    if (function_data.param[j]
+                            && typeof function_data.param[j] == 'object') {
+                        function_data.param[j] = function_data.param[j].value;
+                    }
+                }
+            }
             function_data.line = the_function['(line)'];
             data.functions.push(function_data);
         }
