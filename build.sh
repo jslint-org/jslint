@@ -1,5 +1,7 @@
 # Get the latest source from Douglas Crockford's supporting Github repos and build fullwebjslint.js
 
+echo "Initializing Git submodules..."
+git submodule init
 echo "Getting latest JSLint..."
 git pull
 echo "Updating submodules..."
