@@ -2697,7 +2697,7 @@ loop:   for (;;) {
             anonname = 'anonymous';
             funct['(verb)'] = token.value;
         }
-        if ((initial === true) && token.fud) {
+        if (initial === true && token.fud) {
             left = token.fud();
         } else {
             if (token.nud) {
