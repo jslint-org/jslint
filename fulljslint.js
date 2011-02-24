@@ -4535,8 +4535,11 @@ loop:   for (;;) {
             blok = block(true);
             if (!option.forin) {
                 if (blok.length === 1 && typeof blok[0] === 'object' &&
-                        blok[0].value === 'if') {
+                        blok[0].value === 'if' && !blok[0]['else']) {
                     filter = blok[0].first;
+                    while (filter.id === '&&') {
+                        filter = filter.first;
+                    }
                     switch (filter.id) {
                     case '===':
                     case '!==':
