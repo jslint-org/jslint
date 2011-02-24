@@ -237,7 +237,7 @@ SOFTWARE.
     honeydew, hotpink, hr, "hta:application", html, html_confusion_a,
     html_handlers, i, iTunes, id, identifier, identifier_function, iframe,
     img, immed, implied_evil, implieds, in, inactiveborder, inactivecaption,
-    inactivecaptiontext, include, indent, indexOf, indianred, indigo,
+    inactivecaptiontext, include, indent, indexOf, indianred, indigo, infix_in,
     infobackground, infotext, init, input, ins, insecure_a, isAlpha,
     isApplicationRunning, isArray, isDigit, isFinite, isNaN, ivory, join,
     jslint, json, kbd, keygen, keys, khaki, konfabulatorVersion, label,
@@ -2560,7 +2560,7 @@ loop:   for (;;) {
 
     function comma() {
         if (nexttoken.id !== ',') {
-            warn(bundle.expected_a_b, nexttoken, ',', nexttoken.value);
+            warn_at(bundle.expected_a_b, token.line, token.thru, ',', nexttoken.value);
         } else {
             if (option.white) {
                 no_space_only();
@@ -2574,7 +2574,7 @@ loop:   for (;;) {
 
     function semicolon() {
         if (nexttoken.id !== ';') {
-            warn(bundle.expected_a_b, nexttoken, ';', nexttoken.value);
+            warn_at(bundle.expected_a_b, token.line, token.thru, ';', nexttoken.value);
         } else {
             if (option.white) {
                 no_space_only();
