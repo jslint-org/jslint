@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-02-24
+// 2011-02-28
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -67,9 +67,9 @@ SOFTWARE.
     implied global variables and other problems. The report is in HTML and
     can be inserted in an HTML <body>.
 
-        var myReport = JSLINT.report(limited);
+        var myReport = JSLINT.report(errors_only);
 
-    If limited is true, then the report will be limited to only errors.
+    If errors_only is true, then the report will be limited to only errors.
 
     You can request a data structure which contains JSLint's results.
 
@@ -269,7 +269,7 @@ SOFTWARE.
     palegreen, paleturquoise, palevioletred, papayawhip, param,
     parameter_a_get_b, parameter_set_a, paren, parent, parseFloat, parseInt,
     passfail, pc, peachpuff, peru, pink, play, plum, plusplus, pop,
-    popupMenu, position, postcomments, powderblue, pre, predef,
+    popupMenu, position, postcomments, postscript, powderblue, pre, predef,
     preferenceGroups, preferences, prev, print, progress, projection,
     prompt, prototype, pt, purple, push, px, q, quit, quote, quotes, radix,
     random, range, raw, readFile, readUrl, read_only, reason, red,
@@ -317,6 +317,7 @@ var JSLINT = (function () {
 
     var adsafe_id,      // The widget's ADsafe id.
         adsafe_may,     // The widget may load approved scripts.
+        adsafe_top,     // At the top of the widget script.
         adsafe_went,    // ADSAFE.go has been called.
         anonname,       // The guessed name for anonymous functions.
         approved,       // ADsafe approved urls.
@@ -341,7 +342,7 @@ var JSLINT = (function () {
 
 // These are property names that should not be permitted in the safe subset.
 
-        banned = {              // the member names that ADsafe prohibits.
+        banned = {
             'arguments'     : true,
             callee          : true,
             caller          : true,
@@ -387,7 +388,7 @@ var JSLINT = (function () {
             widget     : true  // if the Yahoo Widgets globals should be predefined
         },
 
-// browser contains a set of global names which are commonly provided by a
+// browser contains a set of global names that are commonly provided by a
 // web browser environment.
 
         browser = {
@@ -804,8 +805,7 @@ var JSLINT = (function () {
         funct,          // The current function
 
         functionicity = [
-            'closure', 'exception', 'global', 'label',
-            'outer', 'unused', 'var'
+            'closure', 'exception', 'global', 'label', 'outer', 'unused', 'var'
         ],
 
         functions,      // All of the functions
@@ -939,16 +939,6 @@ var JSLINT = (function () {
         members_only,
         nexttoken,
         option,
-        postscript = {
-            '(end)':    true,
-            '(error)':  true,
-            '</':       true,
-            '}':        true,
-            '"':        true,
-            '\'':       true,
-            'case':     true,
-            'default':  true
-        },
         predefined,     // Global variables defined by option
         prereg,
         prevtoken,
@@ -1372,6 +1362,16 @@ var JSLINT = (function () {
         if (option.white && nexttoken.from !== at) {
             warn(bundle.expected_a_at_b_c, nexttoken, nexttoken.value, at,
                 nexttoken.from);
+        }
+    }
+
+    function aint(it, name, expected) {
+
+        if (it[name] !== expected) {
+            warn(bundle.expected_a_b, it, expected, it[name]);
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -2202,31 +2202,6 @@ klass:                                  do {
     }
 
 
-    function discard() {
-
-// The token will not be included in the parse tree, so move the comments
-// that are attached to the token to tokens that are in the tree.
-
-        if (token.comments) {
-            nexttoken.comments = nexttoken.comments ?
-                nexttoken.comments.concat(token.comments) :
-                token.comments;
-        }
-        if (token.postcomments) {
-            var prev = prevtoken;
-            while (prev.postcomments === null) {
-                prev = prev.prev;
-            }
-            if (prev.postcomments) {
-                prev.comments = prev.postcomments.concat(token.postcomments);
-            } else {
-                prev.postcomments = token.postcomments;
-            }
-            token.postcomments = null;
-        }
-    }
-
-
     function peek(distance) {
 
 // Peek ahead to a future token. The distance is how far ahead to look. The
@@ -2243,6 +2218,35 @@ klass:                                  do {
             slot += 1;
         }
         return found;
+    }
+
+
+    function discard(it) {
+
+// The token will not be included in the parse tree, so move the comments
+// that are attached to the token to tokens that are in the tree.
+
+        var next, prev;
+        it = it || token;
+        if (it.postcomments) {
+            next = it.next || peek();
+            next.comments = next.comments ?
+                next.comments.concat(it.postcomments) :
+                it.postcomments;
+        }
+        if (it.comments) {
+            prev = it.prev;
+            while (prev.postcomments === null) {
+                prev = prev.prev;
+            }
+            if (prev.postcomments) {
+                prev.postcomments = prev.postcomments.concat(it.comments);
+            } else {
+                prev.postcomments = it.comments;
+            }
+        }
+        it.comments = null;
+        it.postcomments = null;
     }
 
 
@@ -2340,6 +2344,9 @@ klass:                                  do {
         prevtoken = token;
         token = nexttoken;
         nexttoken = lookahead.shift() || lex.token();
+        if (token.id === '(end)') {
+            discard();
+        }
     }
 
 
@@ -2735,6 +2742,11 @@ loop:   for (;;) {
     }
 
 
+    function postscript(x) {
+        x.postscript = true;
+        return x;
+    }
+
     function ultimate(s) {
         var x = symbol(s, 0);
         x.from = 1;
@@ -2742,7 +2754,7 @@ loop:   for (;;) {
         x.line = 0;
         x.edge = true;
         s.value = s;
-        return x;
+        return postscript(x);
     }
 
 
@@ -3057,7 +3069,9 @@ loop:   for (;;) {
             edge('label');
             label = nexttoken;
             advance();
+            discard();
             advance(':');
+            discard();
             scope = Object.create(old_scope);
             add_label(label.value, 'label');
             if (nexttoken.labeled !== true) {
@@ -3113,70 +3127,13 @@ loop:   for (;;) {
     }
 
 
-    function statements(begin) {
-        var adsafe_function, adsafe_params, array = [], disruptor, the_statement;
-        if (option.adsafe) {
-            switch (begin) {
-            case 'script':
-
-// JSLint is also the static analyzer for ADsafe. See www.ADsafe.org.
-
-                if (!adsafe_may) {
-                    if (nexttoken.value !== 'ADSAFE' || peek(0).id !== '.' ||
-                            (peek(1).value !== 'id' && peek(1).value !== 'go')) {
-                        fail(bundle.adsafe_id_go);
-                    }
-                }
-                if (nexttoken.value === 'ADSAFE' && peek(0).id === '.' &&
-                        peek(1).value === 'id') {
-                    if (adsafe_may) {
-                        fail(bundle.adsafe, nexttoken);
-                    }
-                    advance('ADSAFE');
-                    advance('.');
-                    advance('id');
-                    advance('(');
-                    if (nexttoken.value !== adsafe_id) {
-                        fail(bundle.adsafe_id, nexttoken);
-                    }
-                    advance('(string)');
-                    advance(')');
-                    semicolon();
-                    adsafe_may = true;
-                }
-                break;
-            case 'lib':
-                if (nexttoken.value === 'ADSAFE') {
-                    advance('ADSAFE');
-                    advance('.');
-                    advance('lib');
-                    advance('(');
-                    advance('(string)');
-                    comma();
-                    adsafe_function = expression(0);
-                    if (adsafe_function.id !== 'function') {
-                        fail(bundle.adsafe_lib_second, adsafe_function);
-                    }
-                    adsafe_params = adsafe_function.funct['(params)'];
-                    adsafe_params = adsafe_params && adsafe_params.join(', ');
-                    if (adsafe_params && adsafe_params !== 'lib') {
-                        fail(bundle.expected_a_b, adsafe_function, '(lib)',
-                            '(' + adsafe_params + ')');
-                    }
-                    advance(')');
-                    semicolon();
-                    return array;
-                } else {
-                    fail(bundle.adsafe_lib);
-                }
-                break;
-            }
-        }
+    function statements() {
+        var array = [], disruptor, the_statement;
 
 // A disrupt statement may not be followed by any other statement.
 // If the last statement is disrupt, then the sequence is disrupt.
 
-        while (postscript[nexttoken.id] !== true) {
+        while (nexttoken.postscript !== true) {
             if (nexttoken.id === ';') {
                 warn(bundle.unexpected_a, nexttoken);
                 semicolon();
@@ -3399,15 +3356,15 @@ loop:   for (;;) {
     ultimate('(begin)');
     ultimate('(end)');
     ultimate('(error)');
-    delim('</');
+    postscript(delim('</'));
     delim('<!');
     delim('<!--');
     delim('-->');
-    delim('}');
+    postscript(delim('}'));
     delim(')');
     delim(']');
-    delim('"');
-    delim('\'');
+    postscript(delim('"'));
+    postscript(delim('\''));
     delim(';');
     delim(':');
     delim(',');
@@ -3415,9 +3372,9 @@ loop:   for (;;) {
     delim('@');
     delim('*/');
     reserve('else');
-    reserve('case');
+    postscript(reserve('case'));
     reserve('catch');
-    reserve('default');
+    postscript(reserve('default'));
     reserve('finally');
     reservevar('arguments', function (x) {
         if (strict_mode && funct['(global)']) {
@@ -3464,6 +3421,7 @@ loop:   for (;;) {
         that.second = expression(0);
         spaces();
         advance(':');
+        discard();
         spaces();
         that.third = expression(10);
         that.arity = 'ternary';
@@ -3542,12 +3500,14 @@ loop:   for (;;) {
             }
         }
         if (left.arity === right.arity &&
-                (left.arity === 'string' && left.arity === 'number')) {
+                (left.arity === 'string' || left.arity === 'number')) {
             left.value += right.value;
             left.thru = right.thru;
             if (left.arity === 'string' && jx.test(left.value)) {
                 warn(bundle.url, left);
             }
+            discard(right);
+            discard(that);
             return left;
         }
         that.first = left;
@@ -3578,6 +3538,8 @@ loop:   for (;;) {
         if (left.arity === right.arity && left.arity === 'number') {
             left.value -= right.value;
             left.thru = right.thru;
+            discard(right);
+            discard(that);
             return left;
         }
         that.first = left;
@@ -3608,6 +3570,8 @@ loop:   for (;;) {
         if (left.arity === right.arity && left.arity === 'number') {
             left.value *= right.value;
             left.thru = right.thru;
+            discard(right);
+            discard(that);
             return left;
         }
         that.first = left;
@@ -3625,6 +3589,8 @@ loop:   for (;;) {
         if (left.arity === right.arity && left.arity === 'number') {
             left.value /= right.value;
             left.thru = right.thru;
+            discard(right);
+            discard(that);
             return left;
         }
         that.first = left;
@@ -3642,6 +3608,8 @@ loop:   for (;;) {
         if (left.arity === right.arity && left.arity === 'number') {
             left.value %= right.value;
             left.thru = right.thru;
+            discard(right);
+            discard(that);
             return left;
         }
         that.first = left;
@@ -3717,6 +3685,7 @@ loop:   for (;;) {
                             warn(bundle.use_array, token);
                         }
                         advance(')', p);
+                        discard();
                         return p;
                     }
                     warn(bundle.use_array, token);
@@ -3867,7 +3836,7 @@ loop:   for (;;) {
                 (m === 'write' || m === 'writeln')) {
             warn(bundle.write_is_wrong, left);
         } else if (option.adsafe) {
-            if (left && left.value === 'ADSAFE') {
+            if (!adsafe_top && left.value === 'ADSAFE') {
                 if (m === 'id' || m === 'lib') {
                     warn(bundle.adsafe, that);
                 } else if (m === 'go') {
@@ -3883,6 +3852,7 @@ loop:   for (;;) {
                     adsafe_may = false;
                 }
             }
+            adsafe_top = false;
         }
         if (!option.evil && (m === 'eval' || m === 'execScript')) {
             warn(bundle.evil);
@@ -3962,6 +3932,7 @@ loop:   for (;;) {
             while (nexttoken.id === ',') {
                 warn(bundle.unexpected_a, nexttoken);
                 advance(',');
+                discard();
             }
             if (nexttoken.id === ']') {
                 break;
@@ -4305,6 +4276,7 @@ loop:   for (;;) {
         if (nexttoken.id === 'catch') {
             one_space();
             advance('catch');
+            discard();
             one_space();
             t = nexttoken;
             advance('(');
@@ -4564,6 +4536,11 @@ loop:   for (;;) {
                             filter.first.first.value === the_in.second.value &&
                             filter.first.second.value === 'hasOwnProperty' &&
                             filter.second[0].value === the_in.first.value
+                        ) || (
+                            filter.first.first.value === 'ADSAFE' &&
+                            filter.first.second.value === 'has' &&
+                            filter.second[0].value === the_in.second.value &&
+                            filter.second[1].value === the_in.first.value
                         ) || (
                             filter.first.first.id === '.' &&
                             filter.first.first.first.id === '.' &&
@@ -5735,7 +5712,7 @@ loop:   for (;;) {
     }
 
     function do_tag(n, a) {
-        var i, t = html_tag[n], x;
+        var i, t = html_tag[n], script, x;
         src = false;
         if (!t) {
             fail(
@@ -5786,13 +5763,49 @@ loop:   for (;;) {
                     warn(bundle.type, token);
                 }
             } else {
-                if (adsafe_went) {
-                    fail(bundle.adsafe_script, token);
-                }
                 step_in(nexttoken.from);
                 edge();
                 use_strict();
-                statements('script');
+                adsafe_top = true;
+                script = statements();
+
+// JSLint is also the static analyzer for ADsafe. See www.ADsafe.org.
+
+                if (option.adsafe) {
+                    if (adsafe_went) {
+                        fail(bundle.adsafe_script, token);
+                    }
+                    if (script.length !== 1 ||
+                            aint(script[0],             'id',    '(') ||
+                            aint(script[0].first,       'id',    '.') ||
+                            aint(script[0].first.first, 'value', 'ADSAFE') ||
+                            aint(script[0].second[0],   'value', adsafe_id)) {
+                        fail(bundle.adsafe_id_go);
+                    }
+                    switch (script[0].first.second.value) {
+                    case 'id':
+                        if (adsafe_may || script[0].second.length !== 1) {
+                            fail(bundle.adsafe_id, nexttoken);
+                        }
+                        adsafe_may = true;
+                        break;
+                    case 'go':
+                        if (!adsafe_may) {
+                            fail(bundle.adsafe_id);
+                        }
+                        if (script[0].second.length !== 2 ||
+                                aint(script[0].second[1], 'id', 'function') ||
+                                script[0].second[1].first.length !== 2 ||
+                                aint(script[0].second[1].first[0], 'value', 'dom') ||
+                                aint(script[0].second[1].first[1], 'value', 'lib')) {
+                            fail(bundle.adsafe_go, nexttoken);
+                        }
+                        adsafe_went = true;
+                        break;
+                    default:
+                        fail(bundle.adsafe_id_go);
+                    }
+                }
                 indent = null;
             }
             xmode = 'html';
@@ -5936,7 +5949,7 @@ loop:   for (;;) {
                         option.white = false;
                         advance(q);
                         use_strict();
-                        statements('on');
+                        statements();
                         option.white = wmode;
                         if (nexttoken.id !== q) {
                             fail(bundle.expected_a_b, nexttoken, q, nexttoken.value);
@@ -6094,12 +6107,12 @@ loop:   for (;;) {
                     option.forin   =
                     option.on      =
                     option.rhino   =
-                    option.windows =
                     option.sub     =
-                    option.widget  = false;
+                    option.widget  =
+                    option.windows = false;
 
                 option.nomen       =
-                    option.safe    =
+                    option.strict  =
                     option.undef   = true;
 
                 predefined.Date         =
@@ -6116,8 +6129,7 @@ loop:   for (;;) {
         option.indent = +option.indent || 0;
         option.maxerr = option.maxerr || 50;
         adsafe_id = '';
-        adsafe_may = false;
-        adsafe_went = false;
+        adsafe_may = adsafe_top = adsafe_went = false;
         approved = {};
         if (option.approved) {
             for (i = 0; i < option.approved.length; i += 1) {
@@ -6219,7 +6231,18 @@ loop:   for (;;) {
                         warn(bundle.function_strict);
                         use_strict();
                     }
-                    JSLINT.tree = statements('lib');
+                    adsafe_top = true;
+                    JSLINT.tree = statements();
+                    if (option.adsafe && (JSLINT.tree.length !== 1 ||
+                            aint(JSLINT.tree[0], 'id', '(') ||
+                            aint(JSLINT.tree[0].first, 'id', '.') ||
+                            aint(JSLINT.tree[0].first.first, 'value', 'ADSAFE') ||
+                            aint(JSLINT.tree[0].first.second, 'value', 'lib') ||
+                            JSLINT.tree[0].second.length !== 2 ||
+                            JSLINT.tree[0].second[0].arity !== 'string' ||
+                            aint(JSLINT.tree[0].second[1], 'id', 'function'))) {
+                        fail(bundle.adsafe_lib);
+                    }
                     if (JSLINT.tree.disrupt) {
                         warn(bundle.weird_program, prevtoken);
                     }
@@ -6335,7 +6358,7 @@ loop:   for (;;) {
         return data;
     };
 
-    itself.report = function (option) {
+    itself.report = function (errors_only) {
         var data = itself.data();
 
         var err, evidence, i, j, key, keys, length, mem = '', name, names,
@@ -6399,7 +6422,7 @@ loop:   for (;;) {
             output.push('</div>');
         }
 
-        if (!option) {
+        if (!errors_only) {
 
             output.push('<br><div id=functions>');
 
@@ -6469,7 +6492,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-02-24';
+    itself.edition = '2011-02-28';
 
     return itself;
 

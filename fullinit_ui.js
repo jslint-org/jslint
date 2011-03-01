@@ -1,5 +1,5 @@
 // init_ui.js
-// 2011-01-19
+// 2011-02-28
 
 // This is the web browser companion to fulljslint.js. It is an ADsafe
 // lib file that implements a web ui by adding behavior to the widget's
@@ -11,7 +11,7 @@
 // option = {adsafe: true, fragment: false}
 
 /*members check, cookie, each, edition, get, getCheck, getTitle,
-    getValue, indent, isArray, join, jslint, length, lib, maxerr, maxlen,
+    getValue, has, indent, isArray, join, jslint, length, lib, maxerr, maxlen,
     on, predef, push, q, select, set, split, stringify, target, tree, value
 */
 
@@ -40,8 +40,10 @@ ADSAFE.lib("init_ui", function (lib) {
 
             var a = [], name;
             for (name in option) {
-                if (ADSAFE.get(option, name) === true) {
-                    a.push(name + ': true');
+                if (ADSAFE.has(option, name)) {
+                    if (ADSAFE.get(option, name) === true) {
+                        a.push(name + ': true');
+                    }
                 }
             }
             if (typeof option.maxerr === 'number' && option.maxerr >= 0) {
@@ -131,8 +133,8 @@ ADSAFE.lib("init_ui", function (lib) {
         dom.q('input&tree').on('click', function (e) {
             output.value('Tree:');
             tree.value(JSON.stringify(lib.tree(), [
-                'value',  'arity', 'name',  'first',
-                'second', 'third', 'block', 'else'
+                'label', 'value', 'arity', 'name', 'first', 'second',
+                'third', 'block', 'else', 'comments', 'postcomments'
             ], 4));
             input.select();
         });
