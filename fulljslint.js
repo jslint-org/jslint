@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-02-14
+// 2011-02-28
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -67,9 +67,9 @@ SOFTWARE.
     implied global variables and other problems. The report is in HTML and
     can be inserted in an HTML <body>.
 
-        var myReport = JSLINT.report(limited);
+        var myReport = JSLINT.report(errors_only);
 
-    If limited is true, then the report will be limited to only errors.
+    If errors_only is true, then the report will be limited to only errors.
 
     You can request a data structure which contains JSLint's results.
 
@@ -91,7 +91,7 @@ SOFTWARE.
             line: NUMBER,
             last: NUMBER,
             param: [
-                STRING
+                TOKEN
             ],
             closure: [
                 STRING
@@ -237,11 +237,11 @@ SOFTWARE.
     honeydew, hotpink, hr, "hta:application", html, html_confusion_a,
     html_handlers, i, iTunes, id, identifier, identifier_function, iframe,
     img, immed, implied_evil, implieds, in, inactiveborder, inactivecaption,
-    inactivecaptiontext, include, indent, indexOf, indianred, indigo,
+    inactivecaptiontext, include, indent, indexOf, indianred, indigo, infix_in,
     infobackground, infotext, init, input, ins, insecure_a, isAlpha,
     isApplicationRunning, isArray, isDigit, isFinite, isNaN, ivory, join,
     jslint, json, kbd, keygen, keys, khaki, konfabulatorVersion, label,
-    label_a_b, lang, lavender, lavenderblush, lawngreen, lbp,
+    label_a_b, labeled, lang, lavender, lavenderblush, lawngreen, lbp,
     leading_decimal_a, led, left, legend, lemonchiffon, length,
     "letter-spacing", li, lib, lightblue, lightcoral, lightcyan,
     lightgoldenrodyellow, lightgreen, lightpink, lightsalmon, lightseagreen,
@@ -269,7 +269,7 @@ SOFTWARE.
     palegreen, paleturquoise, palevioletred, papayawhip, param,
     parameter_a_get_b, parameter_set_a, paren, parent, parseFloat, parseInt,
     passfail, pc, peachpuff, peru, pink, play, plum, plusplus, pop,
-    popupMenu, position, postcomments, powderblue, pre, predef,
+    popupMenu, position, postcomments, postscript, powderblue, pre, predef,
     preferenceGroups, preferences, prev, print, progress, projection,
     prompt, prototype, pt, purple, push, px, q, quit, quote, quotes, radix,
     random, range, raw, readFile, readUrl, read_only, reason, red,
@@ -317,6 +317,7 @@ var JSLINT = (function () {
 
     var adsafe_id,      // The widget's ADsafe id.
         adsafe_may,     // The widget may load approved scripts.
+        adsafe_top,     // At the top of the widget script.
         adsafe_went,    // ADSAFE.go has been called.
         anonname,       // The guessed name for anonymous functions.
         approved,       // ADsafe approved urls.
@@ -341,7 +342,7 @@ var JSLINT = (function () {
 
 // These are property names that should not be permitted in the safe subset.
 
-        banned = {              // the member names that ADsafe prohibits.
+        banned = {
             'arguments'     : true,
             callee          : true,
             caller          : true,
@@ -368,7 +369,7 @@ var JSLINT = (function () {
             devel      : true, // if logging should be allowed (console, alert, etc.)
             es5        : true, // if ES5 syntax should be allowed
             evil       : true, // if eval should be allowed
-            forin      : true, // if for in statements must filter
+            forin      : true, // if for in statements need not filter
             fragment   : true, // if HTML fragments should be allowed
             newcap     : true, // if constructor names must be capitalized
             nomen      : true, // if names should be checked
@@ -387,7 +388,7 @@ var JSLINT = (function () {
             widget     : true  // if the Yahoo Widgets globals should be predefined
         },
 
-// browser contains a set of global names which are commonly provided by a
+// browser contains a set of global names that are commonly provided by a
 // web browser environment.
 
         browser = {
@@ -513,6 +514,7 @@ var JSLINT = (function () {
             html_handlers: "Avoid HTML event handlers.",
             identifier_function: "Expected an identifier in an assignment and instead saw a function invocation.",
             implied_evil: "Implied eval is evil. Pass a function instead of a string.",
+            infix_in: "Unexpected 'in'. Compare with undefined, or use the hasOwnProperty method instead.",
             insecure_a: "Insecure '{a}'.",
             isNaN: "Use the isNaN function to compare with NaN.",
             label_a_b: "Label '{a}' on '{b}' statement.",
@@ -803,8 +805,7 @@ var JSLINT = (function () {
         funct,          // The current function
 
         functionicity = [
-            'closure', 'exception', 'global', 'label',
-            'outer', 'unused', 'var'
+            'closure', 'exception', 'global', 'label', 'outer', 'unused', 'var'
         ],
 
         functions,      // All of the functions
@@ -932,28 +933,12 @@ var JSLINT = (function () {
         in_block,
         indent,
         json_mode,
-        labelled = {
-            'do':     true,
-            'for':    true,
-            'switch': true,
-            'while':  true
-        },
         lines,
         lookahead,
         member,
         members_only,
         nexttoken,
         option,
-        postscript = {
-            '(end)':    true,
-            '(error)':  true,
-            '</':       true,
-            '}':        true,
-            '"':        true,
-            '\'':       true,
-            'case':     true,
-            'default':  true
-        },
         predefined,     // Global variables defined by option
         prereg,
         prevtoken,
@@ -1196,14 +1181,6 @@ var JSLINT = (function () {
 
     function F() {}     // Used by Object.create
 
-    function is_own(object, name) {
-
-// The object.hasOwnProperty method fails when the property under consideration
-// is named 'hasOwnProperty'. So we have to use this more convoluted form.
-
-        return Object.prototype.hasOwnProperty.call(object, name);
-    }
-
 // Provide critical ES5 functions to ES3.
 
     if (typeof Array.isArray !== 'function') {
@@ -1223,7 +1200,7 @@ var JSLINT = (function () {
         Object.keys = function (o) {
             var a = [], k;
             for (k in o) {
-                if (is_own(o, k)) {
+                if (Object.prototype.hasOwnProperty.call(o, k)) {
                     a.push(k);
                 }
             }
@@ -1293,7 +1270,7 @@ var JSLINT = (function () {
     function combine(t, o) {
         var n;
         for (n in o) {
-            if (is_own(o, n)) {
+            if (Object.prototype.hasOwnProperty.call(o, n)) {
                 t[n] = o[n];
             }
         }
@@ -1388,6 +1365,16 @@ var JSLINT = (function () {
         }
     }
 
+    function aint(it, name, expected) {
+
+        if (it[name] !== expected) {
+            warn(bundle.expected_a_b, it, expected, it[name]);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
 
 
 // lexical analysis and token construction
@@ -1397,17 +1384,19 @@ var JSLINT = (function () {
 
 // Private lex methods
 
-        function collect_comment(source_row) {
+        function collect_comment(comment) {
             if (older_token.line !== line) {
                 if (comments) {
-                    comments.push(source_row);
+                    comments.push(comment);
                 } else {
-                    comments = [source_row];
+                    comments = [comment];
                 }
-            } else if (older_token.postcomments) {
-                older_token.postcomments.push(source_row);
             } else {
-                older_token.postcomments = [source_row];
+                if (older_token.postcomments) {
+                    older_token.postcomments.push(comment);
+                } else {
+                    older_token.postcomments = [comment];
+                }
             }
         }
 
@@ -1445,7 +1434,7 @@ var JSLINT = (function () {
             }
             the_token = Object.create(syntax[(
                 type === '(punctuator)' ||
-                    (type === '(identifier)' && is_own(syntax, value)) ?
+                    (type === '(identifier)' && Object.prototype.hasOwnProperty.call(syntax, value)) ?
                 value :
                 type
             )] || syntax['(error)']);
@@ -2194,7 +2183,7 @@ klass:                                  do {
 
 // Define t in the current function in the current scope.
 
-        if (is_own(funct, t) && !funct['(global)']) {
+        if (Object.prototype.hasOwnProperty.call(funct, t) && !funct['(global)']) {
             warn(funct[t] === true ?
                 bundle.used_before_a :
                 bundle.already_defined,
@@ -2203,7 +2192,7 @@ klass:                                  do {
         funct[t] = type;
         if (funct['(global)']) {
             global[t] = funct;
-            if (is_own(implied, t)) {
+            if (Object.prototype.hasOwnProperty.call(implied, t)) {
                 warn(bundle.used_before_a, nexttoken, t);
                 delete implied[t];
             }
@@ -2213,49 +2202,55 @@ klass:                                  do {
     }
 
 
-    function discard() {
+    function peek(distance) {
+
+// Peek ahead to a future token. The distance is how far ahead to look. The
+// default is the next token.
+
+        var found, slot = 0;
+
+        distance = distance || 0;
+        while (slot <= distance) {
+            found = lookahead[slot];
+            if (!found) {
+                found = lookahead[slot] = lex.token();
+            }
+            slot += 1;
+        }
+        return found;
+    }
+
+
+    function discard(it) {
 
 // The token will not be included in the parse tree, so move the comments
 // that are attached to the token to tokens that are in the tree.
 
-        if (token.comments) {
-            nexttoken.comments = nexttoken.comments ?
-                nexttoken.comments.concat(token.comments) :
-                token.comments;
+        var next, prev;
+        it = it || token;
+        if (it.postcomments) {
+            next = it.next || peek();
+            next.comments = next.comments ?
+                next.comments.concat(it.postcomments) :
+                it.postcomments;
         }
-        if (token.postcomments) {
-            var prev = prevtoken;
+        if (it.comments) {
+            prev = it.prev;
             while (prev.postcomments === null) {
                 prev = prev.prev;
             }
             if (prev.postcomments) {
-                prev.comments = prev.postcomments.concat(token.postcomments);
+                prev.postcomments = prev.postcomments.concat(it.comments);
             } else {
-                prev.postcomments = token.postcomments;
+                prev.postcomments = it.comments;
             }
-            token.postcomments = null;
         }
+        it.comments = null;
+        it.postcomments = null;
     }
 
 
-// We need a peek function. If it has an argument, it peeks that much farther
-// ahead.
-
-    function peek(distance) {
-        var i = distance || 0, j = 0, t;
-
-        while (j <= i) {
-            t = lookahead[j];
-            if (!t) {
-                t = lookahead[j] = lex.token();
-            }
-            j += 1;
-        }
-        return t;
-    }
-
-
-    function advance(id, t) {
+    function advance(id, match) {
 
 // Produce the next token, also looking for programming errors.
 
@@ -2298,8 +2293,8 @@ klass:                                  do {
 // If the token is not an edge, but is the first token on the line.
 
                 } else if (nexttoken.line !== token.line &&
-                        nexttoken.from < indent.at +
-                        (indent.mode === 'expression' ? 0 : option.indent)) {
+                        nexttoken.from < indent.at + (indent.mode ===
+                        'expression' ? 0 : option.indent)) {
                     expected_at(indent.at + option.indent);
                 }
             } else if (nexttoken.line !== token.line) {
@@ -2309,8 +2304,8 @@ klass:                                  do {
                     indent.wrap = true;
                     if (indent.mode === 'statement' || indent.mode === 'var') {
                         expected_at(indent.at + option.indent);
-                    } else if (nexttoken.from < indent.at +
-                            (indent.mode === 'expression' ? 0 : option.indent)) {
+                    } else if (nexttoken.from < indent.at + (indent.mode ===
+                            'expression' ? 0 : option.indent)) {
                         expected_at(indent.at + option.indent);
                     }
                 }
@@ -2339,18 +2334,21 @@ klass:                                  do {
         }
 
         if (id && nexttoken.id !== id) {
-            if (t) {
-                warn(bundle.expected_a_b_from_c_d, nexttoken,
-                    id, t.id, t.line, nexttoken.value);
+            if (match) {
+                warn(bundle.expected_a_b_from_c_d, nexttoken, id,
+                    match.id, match.line, nexttoken.value);
             } else if (!nexttoken.identifier || nexttoken.value !== id) {
-                warn(bundle.expected_a_b,
-                    nexttoken, id, nexttoken.value);
+                warn(bundle.expected_a_b, nexttoken, id, nexttoken.value);
             }
         }
         prevtoken = token;
         token = nexttoken;
         nexttoken = lookahead.shift() || lex.token();
+        if (token.id === '(end)') {
+            discard();
+        }
     }
+
 
     function do_option() {
         var command = this.id,
@@ -2475,34 +2473,32 @@ loop:   for (;;) {
 
     function step_in(mode) {
         var open, was;
-        if (option.indent) {
-            if (typeof mode === 'number') {
-                indent = {
-                    at: mode,
-                    open: true,
-                    was: was
-                };
-            } else if (!indent) {
-                indent = {
-                    at: 1,
-                    mode: 'statement',
-                    open: true
-                };
-            } else {
-                was = indent;
-                open = mode === 'var' ||
-                    (nexttoken.line !== token.line && mode !== 'statement');
-                indent = {
-                    at: (open || mode === 'control' ?
-                        was.at + option.indent : was.at) +
-                        (was.wrap ? option.indent : 0),
-                    mode: mode,
-                    open: open,
-                    was: was
-                };
-                if (mode === 'var' && open) {
-                    var_mode = indent;
-                }
+        if (typeof mode === 'number') {
+            indent = {
+                at: mode,
+                open: true,
+                was: was
+            };
+        } else if (!indent) {
+            indent = {
+                at: 1,
+                mode: 'statement',
+                open: true
+            };
+        } else {
+            was = indent;
+            open = mode === 'var' ||
+                (nexttoken.line !== token.line && mode !== 'statement');
+            indent = {
+                at: (open || mode === 'control' ?
+                    was.at + option.indent : was.at) +
+                    (was.wrap ? option.indent : 0),
+                mode: mode,
+                open: open,
+                was: was
+            };
+            if (mode === 'var' && open) {
+                var_mode = indent;
             }
         }
     }
@@ -2571,7 +2567,7 @@ loop:   for (;;) {
 
     function comma() {
         if (nexttoken.id !== ',') {
-            warn(bundle.expected_a_b, nexttoken, ',', nexttoken.value);
+            warn_at(bundle.expected_a_b, token.line, token.thru, ',', nexttoken.value);
         } else {
             if (option.white) {
                 no_space_only();
@@ -2585,7 +2581,7 @@ loop:   for (;;) {
 
     function semicolon() {
         if (nexttoken.id !== ';') {
-            warn(bundle.expected_a_b, nexttoken, ';', nexttoken.value);
+            warn_at(bundle.expected_a_b, token.line, token.thru, ';', nexttoken.value);
         } else {
             if (option.white) {
                 no_space_only();
@@ -2746,6 +2742,11 @@ loop:   for (;;) {
     }
 
 
+    function postscript(x) {
+        x.postscript = true;
+        return x;
+    }
+
     function ultimate(s) {
         var x = symbol(s, 0);
         x.from = 1;
@@ -2753,7 +2754,7 @@ loop:   for (;;) {
         x.line = 0;
         x.edge = true;
         s.value = s;
-        return x;
+        return postscript(x);
     }
 
 
@@ -2762,6 +2763,11 @@ loop:   for (;;) {
         x.identifier = x.reserved = true;
         x.fud = f;
         return x;
+    }
+
+    function labeled_stmt(s, f) {
+        var x = stmt(s, f);
+        x.labeled = true;
     }
 
     function disrupt_stmt(s, f) {
@@ -2817,7 +2823,9 @@ loop:   for (;;) {
     function reserve(s, f) {
         var x = delim(s);
         x.identifier = x.reserved = true;
-        x.nud = return_this;
+        if (typeof f === 'function') {
+            x.nud = f;
+        }
         return x;
     }
 
@@ -3055,16 +3063,18 @@ loop:   for (;;) {
             return;
         }
 
-// Is this a labelled statement?
+// Is this a labeled statement?
 
         if (nexttoken.identifier && !nexttoken.reserved && peek().id === ':') {
             edge('label');
             label = nexttoken;
             advance();
+            discard();
             advance(':');
+            discard();
             scope = Object.create(old_scope);
             add_label(label.value, 'label');
-            if (labelled[nexttoken.id] !== true) {
+            if (nexttoken.labeled !== true) {
                 warn(bundle.label_a_b, nexttoken, label.value, nexttoken.value);
             }
             if (jx.test(label.value + ':')) {
@@ -3117,73 +3127,13 @@ loop:   for (;;) {
     }
 
 
-    function statements(begin) {
-        var adsafe_function, adsafe_params, array = [], disruptor, the_statement;
-        if (option.adsafe) {
-            switch (begin) {
-            case 'script':
-
-// JSLint is also the static analizer for ADsafe. See www.ADsafe.org.
-
-                if (!adsafe_may) {
-                    if (nexttoken.value !== 'ADSAFE' ||
-                            peek(0).id !== '.' ||
-                            (peek(1).value !== 'id' &&
-                            peek(1).value !== 'go')) {
-                        fail(bundle.adsafe_id_go);
-                    }
-                }
-                if (nexttoken.value === 'ADSAFE' &&
-                        peek(0).id === '.' &&
-                        peek(1).value === 'id') {
-                    if (adsafe_may) {
-                        fail(bundle.adsafe, nexttoken);
-                    }
-                    advance('ADSAFE');
-                    advance('.');
-                    advance('id');
-                    advance('(');
-                    if (nexttoken.value !== adsafe_id) {
-                        fail(bundle.adsafe_id, nexttoken);
-                    }
-                    advance('(string)');
-                    advance(')');
-                    semicolon();
-                    adsafe_may = true;
-                }
-                break;
-            case 'lib':
-                if (nexttoken.value === 'ADSAFE') {
-                    advance('ADSAFE');
-                    advance('.');
-                    advance('lib');
-                    advance('(');
-                    advance('(string)');
-                    comma();
-                    adsafe_function = expression(0);
-                    if (adsafe_function.id !== 'function') {
-                        fail(bundle.adsafe_lib_second, adsafe_function);
-                    }
-                    adsafe_params = adsafe_function.funct['(params)'];
-                    adsafe_params = adsafe_params && adsafe_params.join(', ');
-                    if (adsafe_params && adsafe_params !== 'lib') {
-                        fail(bundle.expected_a_b,
-                            adsafe_function, '(lib)', '(' + adsafe_params + ')');
-                    }
-                    advance(')');
-                    semicolon();
-                    return array;
-                } else {
-                    fail(bundle.adsafe_lib);
-                }
-                break;
-            }
-        }
+    function statements() {
+        var array = [], disruptor, the_statement;
 
 // A disrupt statement may not be followed by any other statement.
 // If the last statement is disrupt, then the sequence is disrupt.
 
-        while (postscript[nexttoken.id] !== true) {
+        while (nexttoken.postscript !== true) {
             if (nexttoken.id === ';') {
                 warn(bundle.unexpected_a, nexttoken);
                 semicolon();
@@ -3250,14 +3200,14 @@ loop:   for (;;) {
     }
 
 
-    function tally_member(m) {
-        if (members_only && typeof members_only[m] !== 'boolean') {
-            warn(bundle.unexpected_member_a, token, m);
+    function tally_member(name) {
+        if (members_only && typeof members_only[name] !== 'boolean') {
+            warn(bundle.unexpected_member_a, token, name);
         }
-        if (typeof member[m] === 'number') {
-            member[m] += 1;
+        if (typeof member[name] === 'number') {
+            member[name] += 1;
         } else {
-            member[m] = 1;
+            member[name] = 1;
         }
     }
 
@@ -3406,15 +3356,15 @@ loop:   for (;;) {
     ultimate('(begin)');
     ultimate('(end)');
     ultimate('(error)');
-    delim('</');
+    postscript(delim('</'));
     delim('<!');
     delim('<!--');
     delim('-->');
-    delim('}');
+    postscript(delim('}'));
     delim(')');
     delim(']');
-    delim('"');
-    delim('\'');
+    postscript(delim('"'));
+    postscript(delim('\''));
     delim(';');
     delim(':');
     delim(',');
@@ -3422,9 +3372,9 @@ loop:   for (;;) {
     delim('@');
     delim('*/');
     reserve('else');
-    reserve('case');
+    postscript(reserve('case'));
     reserve('catch');
-    reserve('default');
+    postscript(reserve('default'));
     reserve('finally');
     reservevar('arguments', function (x) {
         if (strict_mode && funct['(global)']) {
@@ -3471,6 +3421,7 @@ loop:   for (;;) {
         that.second = expression(0);
         spaces();
         advance(':');
+        discard();
         spaces();
         that.third = expression(10);
         that.arity = 'ternary';
@@ -3525,7 +3476,12 @@ loop:   for (;;) {
     bitwise('<<', 120);
     bitwise('>>', 120);
     bitwise('>>>', 120);
-    infix('in', 120);
+    infix('in', 120, function (left, that) {
+        warn(bundle.infix_in, that);
+        that.left = left;
+        that.right = expression(130);
+        return that;
+    });
     infix('instanceof', 120);
     infix('+', 130, function (left, that) {
         if (!left.value) {
@@ -3544,12 +3500,14 @@ loop:   for (;;) {
             }
         }
         if (left.arity === right.arity &&
-                (left.arity === 'string' && left.arity === 'number')) {
+                (left.arity === 'string' || left.arity === 'number')) {
             left.value += right.value;
             left.thru = right.thru;
             if (left.arity === 'string' && jx.test(left.value)) {
                 warn(bundle.url, left);
             }
+            discard(right);
+            discard(that);
             return left;
         }
         that.first = left;
@@ -3580,6 +3538,8 @@ loop:   for (;;) {
         if (left.arity === right.arity && left.arity === 'number') {
             left.value -= right.value;
             left.thru = right.thru;
+            discard(right);
+            discard(that);
             return left;
         }
         that.first = left;
@@ -3610,6 +3570,8 @@ loop:   for (;;) {
         if (left.arity === right.arity && left.arity === 'number') {
             left.value *= right.value;
             left.thru = right.thru;
+            discard(right);
+            discard(that);
             return left;
         }
         that.first = left;
@@ -3627,6 +3589,8 @@ loop:   for (;;) {
         if (left.arity === right.arity && left.arity === 'number') {
             left.value /= right.value;
             left.thru = right.thru;
+            discard(right);
+            discard(that);
             return left;
         }
         that.first = left;
@@ -3644,6 +3608,8 @@ loop:   for (;;) {
         if (left.arity === right.arity && left.arity === 'number') {
             left.value %= right.value;
             left.thru = right.thru;
+            discard(right);
+            discard(that);
             return left;
         }
         that.first = left;
@@ -3719,6 +3685,7 @@ loop:   for (;;) {
                             warn(bundle.use_array, token);
                         }
                         advance(')', p);
+                        discard();
                         return p;
                     }
                     warn(bundle.use_array, token);
@@ -3761,10 +3728,10 @@ loop:   for (;;) {
     });
 
     infix('(', 160, function (left, that) {
-        if (indent && indent.statement) {
-            no_space_only(prevtoken, token);
-        } else {
+        if (indent && indent.mode === 'expression') {
             no_space(prevtoken, token);
+        } else {
+            no_space_only(prevtoken, token);
         }
         if (!left.immed && left.id === 'function') {
             warn(bundle.wrap_immediate);
@@ -3804,7 +3771,7 @@ loop:   for (;;) {
             }
         }
         no_space();
-        step_out(')', this);
+        step_out(')', that);
         if (typeof left === 'object') {
             if (left.value === 'parseInt' && p.length === 1) {
                 warn(bundle.radix, left);
@@ -3838,19 +3805,19 @@ loop:   for (;;) {
         if (nexttoken.id === 'function') {
             nexttoken.immed = true;
         }
-        var v = expression(0);
-        v.paren = true;
+        var value = expression(0);
+        value.paren = true;
         no_space();
         step_out(')', this);
         discard();
-        if (v.id === 'function') {
+        if (value.id === 'function') {
             if (nexttoken.id === '(') {
                 warn(bundle.move_invocation);
             } else {
                 warn(bundle.bad_wrap, this);
             }
         }
-        return v;
+        return value;
     });
 
     infix('.', 170, function (left, that) {
@@ -3869,7 +3836,7 @@ loop:   for (;;) {
                 (m === 'write' || m === 'writeln')) {
             warn(bundle.write_is_wrong, left);
         } else if (option.adsafe) {
-            if (left && left.value === 'ADSAFE') {
+            if (!adsafe_top && left.value === 'ADSAFE') {
                 if (m === 'id' || m === 'lib') {
                     warn(bundle.adsafe, that);
                 } else if (m === 'go') {
@@ -3885,6 +3852,7 @@ loop:   for (;;) {
                     adsafe_may = false;
                 }
             }
+            adsafe_top = false;
         }
         if (!option.evil && (m === 'eval' || m === 'execScript')) {
             warn(bundle.evil);
@@ -3964,6 +3932,7 @@ loop:   for (;;) {
             while (nexttoken.id === ',') {
                 warn(bundle.unexpected_a, nexttoken);
                 advance(',');
+                discard();
             }
             if (nexttoken.id === ']') {
                 break;
@@ -4307,6 +4276,7 @@ loop:   for (;;) {
         if (nexttoken.id === 'catch') {
             one_space();
             advance('catch');
+            discard();
             one_space();
             t = nexttoken;
             advance('(');
@@ -4347,7 +4317,7 @@ loop:   for (;;) {
     });
 
 
-    stmt('while', function () {
+    labeled_stmt('while', function () {
         one_space();
         var t = nexttoken;
         funct['(breakage)'] += 1;
@@ -4377,7 +4347,7 @@ loop:   for (;;) {
 
     reserve('with');
 
-    stmt('switch', function () {
+    labeled_stmt('switch', function () {
 
 // switch.first             the switch expression
 // switch.second            the array of cases. A case is 'case' or 'default' token:
@@ -4479,7 +4449,7 @@ loop:   for (;;) {
         return this;
     });
 
-    stmt('do', function () {
+    labeled_stmt('do', function () {
         funct['(breakage)'] += 1;
         funct['(loopage)'] += 1;
         one_space();
@@ -4507,15 +4477,15 @@ loop:   for (;;) {
         return this;
     });
 
-    stmt('for', function () {
-        var f = option.forin, i, s, t = nexttoken, v;
+    labeled_stmt('for', function () {
+        var blok, filter, ok = false, paren = nexttoken, the_in, value;
         this.arity = 'statement';
         funct['(breakage)'] += 1;
         funct['(loopage)'] += 1;
         advance('(');
         step_in('control');
         discard();
-        spaces(this, t);
+        spaces(this, paren);
         no_space();
         if (nexttoken.id === 'var') {
             if (option.forvar) {
@@ -4528,28 +4498,71 @@ loop:   for (;;) {
         }
         edge();
         if (peek(0).id === 'in') {
-            v = nexttoken;
-            switch (funct[v.value]) {
+            value = nexttoken;
+            switch (funct[value.value]) {
             case 'unused':
-                funct[v.value] = 'var';
+                funct[value.value] = 'var';
                 break;
             case 'var':
                 break;
             default:
-                warn(bundle.bad_in_a, v);
+                warn(bundle.bad_in_a, value);
             }
             advance();
-            i = nexttoken;
+            the_in = nexttoken;
             advance('in');
-            i.first = v;
-            i.second = expression(20);
-            step_out(')', t);
+            the_in.first = value;
+            the_in.second = expression(20);
+            step_out(')', paren);
             discard();
-            this.first = i;
-            s = block(true);
-            if (!f && (s.length > 1 || typeof s[0] !== 'object' ||
-                    s[0].value !== 'if')) {
-                warn(bundle.for_if, this);
+            this.first = the_in;
+            blok = block(true);
+            if (!option.forin) {
+                if (blok.length === 1 && typeof blok[0] === 'object' &&
+                        blok[0].value === 'if' && !blok[0]['else']) {
+                    filter = blok[0].first;
+                    while (filter.id === '&&') {
+                        filter = filter.first;
+                    }
+                    switch (filter.id) {
+                    case '===':
+                    case '!==':
+                        ok = filter.first.id === '[' ? (
+                            filter.first.first.value === the_in.second.value &&
+                            filter.first.second.value === the_in.first.value
+                        ) : (
+                            filter.first.id === 'typeof' &&
+                            filter.first.first.id === '[' &&
+                            filter.first.first.first.value === the_in.second.value &&
+                            filter.first.first.second.value === the_in.first.value
+                        );
+                        break;
+                    case '(':
+                        ok = filter.first.id === '.' && ((
+                            filter.first.first.value === the_in.second.value &&
+                            filter.first.second.value === 'hasOwnProperty' &&
+                            filter.second[0].value === the_in.first.value
+                        ) || (
+                            filter.first.first.value === 'ADSAFE' &&
+                            filter.first.second.value === 'has' &&
+                            filter.second[0].value === the_in.second.value &&
+                            filter.second[1].value === the_in.first.value
+                        ) || (
+                            filter.first.first.id === '.' &&
+                            filter.first.first.first.id === '.' &&
+                            filter.first.first.first.first.value === 'Object' &&
+                            filter.first.first.first.second.value === 'prototype' &&
+                            filter.first.first.second.value === 'hasOwnProperty' &&
+                            filter.first.second.value === 'call' &&
+                            filter.second[0].value === the_in.second.value &&
+                            filter.second[1].value === the_in.first.value
+                        ));
+                        break;
+                    }
+                }
+                if (!ok) {
+                    warn(bundle.for_if, this);
+                }
             }
         } else {
             if (nexttoken.id !== ';') {
@@ -4587,15 +4600,15 @@ loop:   for (;;) {
                 }
             }
             no_space();
-            step_out(')', t);
+            step_out(')', paren);
             discard();
             one_space();
-            s = block(true);
+            blok = block(true);
         }
-        if (s.disrupt) {
+        if (blok.disrupt) {
             warn(bundle.strange_loop, prevtoken);
         }
-        this.block = s;
+        this.block = blok;
         funct['(breakage)'] -= 1;
         funct['(loopage)'] -= 1;
         return this;
@@ -5289,7 +5302,7 @@ loop:   for (;;) {
             if (!nexttoken.identifier) {
                 warn(bundle.expected_style_attribute);
             } else {
-                if (is_own(css_attribute_data, nexttoken.value)) {
+                if (Object.prototype.hasOwnProperty.call(css_attribute_data, nexttoken.value)) {
                     v = css_attribute_data[nexttoken.value];
                 } else {
                     v = css_any;
@@ -5435,7 +5448,7 @@ loop:   for (;;) {
 
     function style_selector() {
         if (nexttoken.identifier) {
-            if (!is_own(html_tag, option.cap ?
+            if (!Object.prototype.hasOwnProperty.call(html_tag, option.cap ?
                     nexttoken.value.toLowerCase() : nexttoken.value)) {
                 warn(bundle.expected_tagname_a);
             }
@@ -5705,7 +5718,7 @@ loop:   for (;;) {
     }
 
     function do_tag(n, a) {
-        var i, t = html_tag[n], x;
+        var i, t = html_tag[n], script, x;
         src = false;
         if (!t) {
             fail(
@@ -5756,13 +5769,49 @@ loop:   for (;;) {
                     warn(bundle.type, token);
                 }
             } else {
-                if (adsafe_went) {
-                    fail(bundle.adsafe_script, token);
-                }
                 step_in(nexttoken.from);
                 edge();
                 use_strict();
-                statements('script');
+                adsafe_top = true;
+                script = statements();
+
+// JSLint is also the static analyzer for ADsafe. See www.ADsafe.org.
+
+                if (option.adsafe) {
+                    if (adsafe_went) {
+                        fail(bundle.adsafe_script, token);
+                    }
+                    if (script.length !== 1 ||
+                            aint(script[0],             'id',    '(') ||
+                            aint(script[0].first,       'id',    '.') ||
+                            aint(script[0].first.first, 'value', 'ADSAFE') ||
+                            aint(script[0].second[0],   'value', adsafe_id)) {
+                        fail(bundle.adsafe_id_go);
+                    }
+                    switch (script[0].first.second.value) {
+                    case 'id':
+                        if (adsafe_may || script[0].second.length !== 1) {
+                            fail(bundle.adsafe_id, nexttoken);
+                        }
+                        adsafe_may = true;
+                        break;
+                    case 'go':
+                        if (!adsafe_may) {
+                            fail(bundle.adsafe_id);
+                        }
+                        if (script[0].second.length !== 2 ||
+                                aint(script[0].second[1], 'id', 'function') ||
+                                script[0].second[1].first.length !== 2 ||
+                                aint(script[0].second[1].first[0], 'value', 'dom') ||
+                                aint(script[0].second[1].first[1], 'value', 'lib')) {
+                            fail(bundle.adsafe_go, nexttoken);
+                        }
+                        adsafe_went = true;
+                        break;
+                    default:
+                        fail(bundle.adsafe_id_go);
+                    }
+                }
                 indent = null;
             }
             xmode = 'html';
@@ -5888,7 +5937,7 @@ loop:   for (;;) {
                     }
                     a = a.toLowerCase();
                     xquote = '';
-                    if (is_own(attributes, a)) {
+                    if (Object.prototype.hasOwnProperty.call(attributes, a)) {
                         warn(bundle.duplicate_a, token, a);
                     }
                     if (a.slice(0, 2) === 'on') {
@@ -5906,7 +5955,7 @@ loop:   for (;;) {
                         option.white = false;
                         advance(q);
                         use_strict();
-                        statements('on');
+                        statements();
                         option.white = wmode;
                         if (nexttoken.id !== q) {
                             fail(bundle.expected_a_b, nexttoken, q, nexttoken.value);
@@ -6056,6 +6105,7 @@ loop:   for (;;) {
             }
             if (option.safe) {
                 option.browser     =
+                    option['continue'] =
                     option.css     =
                     option.debug   =
                     option.devel   =
@@ -6063,12 +6113,12 @@ loop:   for (;;) {
                     option.forin   =
                     option.on      =
                     option.rhino   =
-                    option.windows =
                     option.sub     =
-                    option.widget  = false;
+                    option.widget  =
+                    option.windows = false;
 
                 option.nomen       =
-                    option.safe    =
+                    option.strict  =
                     option.undef   = true;
 
                 predefined.Date         =
@@ -6082,13 +6132,10 @@ loop:   for (;;) {
         } else {
             option = {};
         }
-        if (option.indent) {
-            option.indent = +option.indent;
-        }
+        option.indent = +option.indent || 0;
         option.maxerr = option.maxerr || 50;
         adsafe_id = '';
-        adsafe_may = false;
-        adsafe_went = false;
+        adsafe_may = adsafe_top = adsafe_went = false;
         approved = {};
         if (option.approved) {
             for (i = 0; i < option.approved.length; i += 1) {
@@ -6190,7 +6237,18 @@ loop:   for (;;) {
                         warn(bundle.function_strict);
                         use_strict();
                     }
-                    JSLINT.tree = statements('lib');
+                    adsafe_top = true;
+                    JSLINT.tree = statements();
+                    if (option.adsafe && (JSLINT.tree.length !== 1 ||
+                            aint(JSLINT.tree[0], 'id', '(') ||
+                            aint(JSLINT.tree[0].first, 'id', '.') ||
+                            aint(JSLINT.tree[0].first.first, 'value', 'ADSAFE') ||
+                            aint(JSLINT.tree[0].first.second, 'value', 'lib') ||
+                            JSLINT.tree[0].second.length !== 2 ||
+                            JSLINT.tree[0].second[0].arity !== 'string' ||
+                            aint(JSLINT.tree[0].second[1], 'id', 'function'))) {
+                        fail(bundle.adsafe_lib);
+                    }
                     if (JSLINT.tree.disrupt) {
                         warn(bundle.weird_program, prevtoken);
                     }
@@ -6234,7 +6292,7 @@ loop:   for (;;) {
         }
 
         for (name in implied) {
-            if (is_own(implied, name)) {
+            if (Object.prototype.hasOwnProperty.call(implied, name)) {
                 implieds.push({
                     name: name,
                     line: implied[name]
@@ -6261,19 +6319,21 @@ loop:   for (;;) {
                 function_data[functionicity[j]] = [];
             }
             for (name in the_function) {
-                if (is_own(the_function, name) && name.charAt(0) !== '(') {
-                    variable = the_function[name];
-                    if (variable === 'unction') {
-                        variable = 'unused';
-                    }
-                    if (Array.isArray(function_data[variable])) {
-                        function_data[variable].push(name);
-                        if (variable === 'unused') {
-                            unused.push({
-                                name: name,
-                                line: the_function['(line)'],
-                                'function': the_function['(name)']
-                            });
+                if (Object.prototype.hasOwnProperty.call(the_function, name)) {
+                    if (name.charAt(0) !== '(') {
+                        variable = the_function[name];
+                        if (variable === 'unction') {
+                            variable = 'unused';
+                        }
+                        if (Array.isArray(function_data[variable])) {
+                            function_data[variable].push(name);
+                            if (variable === 'unused') {
+                                unused.push({
+                                    name: name,
+                                    line: the_function['(line)'],
+                                    'function': the_function['(name)']
+                                });
+                            }
                         }
                     }
                 }
@@ -6304,7 +6364,7 @@ loop:   for (;;) {
         return data;
     };
 
-    itself.report = function (option) {
+    itself.report = function (errors_only) {
         var data = itself.data();
 
         var err, evidence, i, j, key, keys, length, mem = '', name, names,
@@ -6368,7 +6428,7 @@ loop:   for (;;) {
             output.push('</div>');
         }
 
-        if (!option) {
+        if (!errors_only) {
 
             output.push('<br><div id=functions>');
 
@@ -6438,7 +6498,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-02-14';
+    itself.edition = '2011-02-28';
 
     return itself;
 
