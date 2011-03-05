@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-02-28
+// 2011-03-04
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -389,7 +389,8 @@ var JSLINT = (function () {
         },
 
 // browser contains a set of global names that are commonly provided by a
-// web browser environment.
+// web browser environment. self and window are intentially excluded because
+// of the high likelihood for misue.
 
         browser = {
             clearInterval   : false,
@@ -409,6 +410,9 @@ var JSLINT = (function () {
             setTimeout      : false,
             XMLHttpRequest  : false
         },
+
+// bundle contains the text messages.
+
         bundle = {
             a_function: "'{a}' is a function.",
             a_label: "'{a}' is a statement label.",
@@ -1384,7 +1388,7 @@ var JSLINT = (function () {
 
 // Private lex methods
 
-        function collect_comment(comment) {
+        function collect_comment(comment, quote,  at) {
             if (older_token.line !== line) {
                 if (comments) {
                     comments.push(comment);
@@ -1537,15 +1541,7 @@ var JSLINT = (function () {
                 function string(x) {
                     var c, j, r = '';
 
-                    if (json_mode && x !== '"') {
-                        warn_at(bundle.expected_a, line, character, '"');
-                    }
-
-                    if (xquote === x || (xmode === 'scriptstring' && !xquote)) {
-                        return it('(punctuator)', x);
-                    }
-
-                    function esc(n) {
+                    function hex(n) {
                         var i = parseInt(source_row.substr(j + 1, n), 16);
                         j += n;
                         if (i >= 32 && i <= 126 &&
@@ -1555,6 +1551,15 @@ var JSLINT = (function () {
                         character += n;
                         c = String.fromCharCode(i);
                     }
+
+                    if (json_mode && x !== '"') {
+                        warn_at(bundle.expected_a, line, character, '"');
+                    }
+
+                    if (xquote === x || (xmode === 'scriptstring' && !xquote)) {
+                        return it('(punctuator)', x);
+                    }
+
                     j = 0;
                     for (;;) {
                         while (j >= source_row.length) {
@@ -1631,7 +1636,7 @@ var JSLINT = (function () {
                                     c = '\t';
                                     break;
                                 case 'u':
-                                    esc(4);
+                                    hex(4);
                                     break;
                                 case 'v':
                                     if (json_mode) {
@@ -1643,7 +1648,7 @@ var JSLINT = (function () {
                                     if (json_mode) {
                                         warn_at(bundle.unexpected_a, line, character, '\\x');
                                     }
-                                    esc(2);
+                                    hex(2);
                                     break;
                                 default:
                                     warn_at(bundle.unexpected_a, line, character, '\\');
@@ -4008,8 +4013,10 @@ loop:   for (;;) {
 
 
     function do_function(func, name) {
-        var s = scope;
-        scope = Object.create(s);
+        var old_option = option,
+            old_scope = scope;
+        option = Object.create(option);
+        scope = Object.create(scope);
         funct = {
             '(name)'     : name || '"' + anonname + '"',
             '(line)'     : nexttoken.line,
@@ -4029,7 +4036,8 @@ loop:   for (;;) {
         one_space();
         func.block = block(false);
 
-        scope = s;
+        scope = old_scope;
+        option = old_option;
         funct = funct['(context)'];
         return func;
     }
@@ -6492,7 +6500,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-02-28';
+    itself.edition = '2011-03-04';
 
     return itself;
 
