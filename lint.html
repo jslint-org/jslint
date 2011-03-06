@@ -102,7 +102,7 @@ at issuing warnings. <code>lint</code> is no longer needed.</p>
 <p>The declaration should appears near the top of the file. It must appear before the use of the variables
   it declares. </p>
 <p>It is necessary to use a <code>var</code> statement to declare a variable before that variable is assigned to. </p>
-<p><code>JSLint</code> also recognizes a <code>/*global */</code> comment that can indicate to <code>JSLint</code> that variables used in this file were defined in other files. The comment can contain a comma separated list of names. Each name can optionally be followed by a colon and either <code>true</code> or <code>false</code>, <code>true</code> indicated that the variable may be assigned to by this file, and <code>false</code> indicating that assignment is not allowed (which is the default).</p>
+<p><code>JSLint</code> also recognizes a <code>/*global */</code> directive that can indicate to <code>JSLint</code> that variables used in this file were defined in other files. The comment can contain a comma separated list of names. Each name can optionally be followed by a colon and either <code>true</code> or <code>false</code>, <code>true</code> indicated that the variable may be assigned to by this file, and <code>false</code> indicating that assignment is not allowed (which is the default). The directive respects function scope.</p>
 <p id=browser>Some globals can be predefined for you. Select the <i>Assume
   a browser</i> (<code>browser</code>) <a href="#options">option</a> to
   predefine the standard global properties that are supplied by web browsers,
@@ -437,7 +437,7 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
   acceptable to you. The web page version of <code>JSLint</code> at <a href="http://www.JSLint.com/">http://www.JSLint.com/</a>
   does this for you. </p>
 <p>Options can also be specified within a script with a <code>/*jslint */</code>
-  comment:</p>
+  directive:</p>
 <pre>/*jslint nomen: true, debug: true,
     evil: false, onevar: true */</pre>
 <p>An option specification starts with <code>/*jslint</code>. Notice that
@@ -445,7 +445,7 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
   a sequence of name value pairs, where the names are <code>JSLint</code>
   options, and the values are <code>true</code> or <code>false</code>. The
   <code>indent</code> <a href="#options">option</a> can take a number. A <code>/*jslint */</code>
-  comment takes precedence over the <code>option</code> object. </p>
+  comment takes precedence over the <code>option</code> object. The directive respects function scope.</p>
 <table>
   <tbody>
   <tr>
@@ -628,20 +628,20 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
   </tr>
   </tbody>
 </table>
-<h2 id=members>Members</h2>
+<h2 id=members>Properties</h2>
 <p>Since JavaScript is a loosely-typed, dynamic-object language, it is not
   possible to determine at compile time if property names are spelled correctly.
   <code>JSLint</code> provides some assistance with this.</p>
-<p>At the bottom of its report, <code>JSLint</code> displays a <code>/*members*/</code>
+<p>At the bottom of its report, <code>JSLint</code> displays a <code>/*properties*/</code>
   comment. It contains all of the names and string literals that were used
   with dot notation, subscript notation, and object literals to name the
   members of objects. You can look through the list for misspellings. Member
   names that were only used once are shown in italics. This is to make misspellings
   easier to spot.</p>
-<p>You can copy the <code>/*members*/</code> comment into your script file.
+<p>You can copy the <code>/*properties*/</code> comment into your script file.
   <code>JSLint</code> will check the spelling of all property names against
   the list. That way, you can have <code>JSLint</code> look for misspellings
-  for you.</p>
+  for you. The directive respects function scope.</p>
 <h2 id=report>Report</h2>
 
 <p>If <code>JSLint</code> is able to complete its scan, it generates a function
