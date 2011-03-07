@@ -1,5 +1,5 @@
 // init_ui.js
-// 2011-02-28
+// 2011-03-06
 
 // This is the web browser companion to fulljslint.js. It is an ADsafe
 // lib file that implements a web ui by adding behavior to the widget's
@@ -10,7 +10,7 @@
 
 // option = {adsafe: true, fragment: false}
 
-/*members check, cookie, each, edition, get, getCheck, getTitle,
+/*properties check, cookie, each, edition, get, getCheck, getTitle,
     getValue, has, indent, isArray, join, jslint, length, lib, maxerr, maxlen,
     on, predef, push, q, select, set, split, stringify, target, tree, value
 */

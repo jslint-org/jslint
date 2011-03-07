@@ -1,5 +1,5 @@
 // intercept.js
-// 2011-01-06
+// 2011-03-06
 
 // This file makes it possible for JSLint to run as an ADsafe widget by
 // adding lib features.
@@ -17,7 +17,7 @@
 
 /*global ADSAFE, document, JSLINT */
 
-/*members ___nodes___, _intercept, cookie, edition, get, getTime,
+/*properties ___nodes___, _intercept, cookie, edition, get, getTime,
     indexOf, innerHTML, jslint, length, parse, replace, report, set,
     setTime, slice, stringify, toGMTString, tree
 */
