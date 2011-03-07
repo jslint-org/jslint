@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-03-06
+// 2011-03-07
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -313,7 +313,7 @@ SOFTWARE.
     missing_url, missing_use_strict, mistyrose, mixed, mm, moccasin, mode,
     move_invocation, move_var, name, name_function, nav, navajowhite,
     navigator, navy, nested_comment, newcap, next, noframes, nomen,
-    noscript, not, not_a_constructor, not_a_function, not_a_label,
+    noscript, not, not_a_constructor, not_a_defined, not_a_function, not_a_label,
     not_a_scope, not_greater, nud, object, ol, oldlace, olive, olivedrab,
     on, onevar, opacity, open, openURL, opera, optgroup, option, orange,
     orangered, orchid, outer, outline, "outline-color", "outline-style",
@@ -564,6 +564,7 @@ var JSLINT = (function () {
             nested_comment: "Nested comment.",
             not: "Nested not.",
             not_a_constructor: "Do not use {a} as a constructor.",
+            not_a_defined: "'{a}' has not been fully defined yet.",
             not_a_function: "'{a}' is not a function.",
             not_a_label: "'{a}' is not a label.",
             not_a_scope: "'{a}' is out of scope.",
@@ -1173,7 +1174,7 @@ var JSLINT = (function () {
 // unsafe characters that are silently deleted by one or more browsers
         cx = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
 // token
-        tx = /^\s*([(){}\[.,:;'"~\?\]#@]|==?=?|\/(\*(jslint|properties|members?|global)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/,
+        tx = /^\s*([(){}\[.,:;'"~\?\]#@]|==?=?|\/(\*(jslint|properties|members|global)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/,
 // html token
         hx = /^\s*(['"=>\/&#]|<(?:\/|\!(?:--)?)?|[a-zA-Z][a-zA-Z0-9_\-:]*|[0-9]+|--)/,
 // characters in strings that need escapement
@@ -2411,7 +2412,6 @@ klass:                                  do {
         switch (command) {
         case '/*properties':
         case '/*members':
-        case '/*member':
             command = '/*properties';
             if (!properties) {
                 properties = {};
@@ -3355,7 +3355,7 @@ loop:   for (;;) {
                     funct[variable] = global[variable];
                 } else {
                     if (option.undef) {
-                        warn(bundle.a_not_defined, token, variable);
+                        warn(bundle.not_a_defined, token, variable);
                     } else {
                         note_implied(token);
                     }
@@ -3413,6 +3413,9 @@ loop:   for (;;) {
                         case 'closure':
                         case 'parameter':
                             funct[variable] = site['(global)'] ? true : 'outer';
+                            break;
+                        case 'error':
+                            warn(bundle.not_a_defined, token);
                             break;
                         case 'label':
                             warn(bundle.a_label, token, variable);
@@ -4221,7 +4224,6 @@ loop:   for (;;) {
 
     stmt('/*properties', directive);
     stmt('/*members', directive);
-    stmt('/*member', directive);
     stmt('/*jslint', directive);
     stmt('/*global', directive);
 
@@ -6589,7 +6591,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-03-06';
+    itself.edition = '2011-03-07';
 
     return itself;
 
