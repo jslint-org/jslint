@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-03-05
+// 2011-03-06
 
 /*
 Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
@@ -4104,7 +4104,7 @@ loop:   for (;;) {
             '(scope)'    : scope,
             '(token)'    : func
         };
-        properties  = Object.create(old_properties);
+        properties  = old_properties && Object.create(old_properties);
         option      = Object.create(old_option);
         global      = Object.create(old_global);
         scope       = Object.create(old_scope);
@@ -6589,7 +6589,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-03-05';
+    itself.edition = '2011-03-06';
 
     return itself;
 
