@@ -206,9 +206,9 @@ effect as this comment:</p>
 <h2 id=forin><code>for</code> <code>in</code></h2>
 <p>The <code>for</code> <code>in</code> statement allows for looping through
   the names of all of the properties of an object. <a href="http://yuiblog.com/blog/2006/09/26/for-in-intrigue/">Unfortunately,
-  it also loops through all of the members which were inherited through
+  it also loops through all of the properties that were inherited through
   the prototype chain.</a> This has the bad side effect of serving up method
-  functions when the interest is in data members. If a program is written without awareness of this situation, then it can fail.</p>
+  functions when the interest is in data properties. If a program is written without awareness of this situation, then it can fail.</p>
 <p>The body of every <code>for</code> <code>in</code> statement should be
   wrapped in an <code>if</code> statement that does filtering. It can select
   for a particular type or range of values, or it can exclude functions,
@@ -248,8 +248,8 @@ effect as this comment:</p>
 <h2 id=with><code>with</code></h2>
 
 <p>The <code>with</code> statement was intended to provide a shorthand in accessing
-  members in deeply nested objects. Unfortunately, it behaves <a href="http://yuiblog.com/blog/2006/04/11/with-statement-considered-harmful/">very
-  badly</a> when setting new members. Never use the <code>with</code> statement. Use
+  properties in deeply nested objects. Unfortunately, it behaves <a href="http://yuiblog.com/blog/2006/04/11/with-statement-considered-harmful/">very
+  badly</a> when setting new properties. Never use the <code>with</code> statement. Use
   a <code>var</code> instead.</p>
 
 <p><code>JSLint</code> does not expect to see a <code>with</code> statement.</p>
@@ -385,8 +385,8 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
 <p><code>JSLint</code> does not do any kind of global analysis. It does
   not attempt to determine that functions used with <code>new</code> are
   really constructors (<a href="#new">except by enforcing capitalization
-  conventions</a>), or that property names are spelled correctly (<a href="#members">except
-  for matching against the <code>/*members */</code> comment</a>).</p>
+  conventions</a>), or that property names are spelled correctly (<a href="#properties">except
+  for matching against the <code>/*properties */</code> comment</a>).</p>
 <h2 id=html>HTML</h2>
 <p><code>JSLint</code> is able to handle HTML text. It can inspect the JavaScript content
   contained within <code>&lt;script&gt;</code>...<code>&lt;/script&gt;</code> tags. It
@@ -628,14 +628,14 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
   </tr>
   </tbody>
 </table>
-<h2 id=members>Properties</h2>
+<h2 id=properties>Properties</h2>
 <p>Since JavaScript is a loosely-typed, dynamic-object language, it is not
   possible to determine at compile time if property names are spelled correctly.
   <code>JSLint</code> provides some assistance with this.</p>
 <p>At the bottom of its report, <code>JSLint</code> displays a <code>/*properties*/</code>
   comment. It contains all of the names and string literals that were used
   with dot notation, subscript notation, and object literals to name the
-  members of objects. You can look through the list for misspellings. Member
+  properties of objects. You can look through the list for misspellings. Property
   names that were only used once are shown in italics. This is to make misspellings
   easier to spot.</p>
 <p>You can copy the <code>/*properties*/</code> comment into your script file.
@@ -665,7 +665,7 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
     these to a minimum.</li>
   <li><i>Label</i>: Statement labels that are used by this function.</li>
 </ul>
-<p>The report will also include a list of all of the <a href="#members">member
+<p>The report will also include a list of all of the <a href="#properties">property
   names</a> that were used. There is a <a href="msgs.html">list of <code>JSLint</code>
   messages</a>.</p>
 <h2 id=feedback>Feedback</h2>
