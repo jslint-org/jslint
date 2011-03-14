@@ -4336,7 +4336,7 @@ loop:   for (;;) {
 // try.third    The finally clause
 // try.block    The try block
 
-        var b, e, s, t;
+        var exception_variable, old_scope, paren;
         if (option.adsafe) {
             warn(bundle.adsafe_a, this);
         }
@@ -4348,39 +4348,37 @@ loop:   for (;;) {
             advance('catch');
             discard();
             one_space();
-            t = next_token;
+            paren = next_token;
             advance('(');
             step_in('control');
             discard();
             no_space();
             edge();
-            s = scope;
-            scope = Object.create(s);
-            e = next_token.value;
-            this.first = e;
+            old_scope = scope;
+            scope = Object.create(old_scope);
+            exception_variable = next_token.value;
+            this.first = exception_variable;
             if (!next_token.identifier) {
                 warn(bundle.expected_identifier_a, next_token);
             } else {
-                add_label(e, 'exception');
+                add_label(exception_variable, 'exception');
             }
             advance();
             no_space();
-            step_out(')', t);
+            step_out(')', paren);
             discard();
             one_space();
             this.second = block(false);
-            b = true;
-            scope = s;
+            scope = old_scope;
         }
         if (next_token.id === 'finally') {
             discard();
             one_space();
-            t = next_token;
             advance('finally');
             discard();
             one_space();
             this.third = block(false);
-        } else if (!b) {
+        } else if (!this.second) {
             fail(bundle.expected_a_b, next_token, 'catch', next_token.value);
         }
         return this;
@@ -4388,7 +4386,7 @@ loop:   for (;;) {
 
     labeled_stmt('while', function () {
         one_space();
-        var t = next_token;
+        var paren = next_token;
         funct['(breakage)'] += 1;
         funct['(loopage)'] += 1;
         advance('(');
@@ -4402,7 +4400,7 @@ loop:   for (;;) {
             expected_condition(this.first, bundle.unexpected_a);
         }
         no_space();
-        step_out(')', t);
+        step_out(')', paren);
         discard();
         one_space();
         this.block = block(true);
@@ -4678,16 +4676,16 @@ loop:   for (;;) {
     });
 
     disrupt_stmt('break', function () {
-        var v = next_token.value;
+        var label = next_token.value;
         this.arity = 'statement';
         if (funct['(breakage)'] === 0) {
             warn(bundle.unexpected_a, this);
         }
         if (next_token.identifier && token.line === next_token.line) {
             one_space_only();
-            if (funct[v] !== 'label') {
+            if (funct[label] !== 'label') {
                 warn(bundle.not_a_label, next_token);
-            } else if (scope[v] !== funct) {
+            } else if (scope[label] !== funct) {
                 warn(bundle.not_a_scope, next_token);
             }
             this.first = next_token;
@@ -4700,16 +4698,16 @@ loop:   for (;;) {
         if (!option['continue']) {
             warn(bundle.unexpected_a, this);
         }
-        var v = next_token.value;
+        var label = next_token.value;
         this.arity = 'statement';
         if (funct['(breakage)'] === 0) {
             warn(bundle.unexpected_a, this);
         }
         if (next_token.identifier && token.line === next_token.line) {
             one_space_only();
-            if (funct[v] !== 'label') {
+            if (funct[label] !== 'label') {
                 warn(bundle.not_a_label, next_token);
-            } else if (scope[v] !== funct) {
+            } else if (scope[label] !== funct) {
                 warn(bundle.not_a_scope, next_token);
             }
             this.first = next_token;
@@ -4766,7 +4764,7 @@ loop:   for (;;) {
     function json_value() {
 
         function json_object() {
-            var o = {}, t = next_token;
+            var brace = next_token, object = {};
             advance('{');
             if (next_token.id !== '}') {
                 while (next_token.id !== '(end)') {
@@ -4777,12 +4775,12 @@ loop:   for (;;) {
                     if (next_token.arity !== 'string') {
                         warn(bundle.expected_string_a);
                     }
-                    if (o[next_token.value] === true) {
+                    if (object[next_token.value] === true) {
                         warn(bundle.duplicate_a);
                     } else if (next_token.value === '__proto__') {
                         warn(bundle.dangling_a);
                     } else {
-                        o[next_token.value] = true;
+                        object[next_token.value] = true;
                     }
                     advance();
                     advance(':');
@@ -4797,11 +4795,11 @@ loop:   for (;;) {
                     }
                 }
             }
-            advance('}', t);
+            advance('}', brace);
         }
 
         function json_array() {
-            var t = next_token;
+            var bracket = next_token;
             advance('[');
             if (next_token.id !== ']') {
                 while (next_token.id !== '(end)') {
@@ -4820,7 +4818,7 @@ loop:   for (;;) {
                     }
                 }
             }
-            advance(']', t);
+            advance(']', bracket);
         }
 
         switch (next_token.id) {
