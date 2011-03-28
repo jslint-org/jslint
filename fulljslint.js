@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-03-22
+// 2011-03-27
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -407,8 +407,7 @@ var JSLINT = (function () {
         begin,          // The root token
 
 // browser contains a set of global names that are commonly provided by a
-// web browser environment. self and window are intentially excluded because
-// of the high likelihood for misue.
+// web browser environment.
 
         browser = {
             clearInterval  : false,
@@ -426,6 +425,7 @@ var JSLINT = (function () {
             screen         : false,
             setInterval    : false,
             setTimeout     : false,
+            window         : false,
             XMLHttpRequest : false
         },
 
@@ -1437,7 +1437,8 @@ var JSLINT = (function () {
                 at: at,
                 line: line
             };
-            if (comments_off || src || (xmode && xmode !== 'script' && xmode !== 'style' && xmode !== 'styleproperty')) {
+            if (comments_off || src || (xmode && xmode !== 'script' &&
+                    xmode !== 'style' && xmode !== 'styleproperty')) {
                 warn_at('unexpected_comment', line, character);
             } else if (xmode === 'script' && /<\//i.test(source_row)) {
                 warn_at('unexpected_a', line, character, '<\/');
@@ -1542,7 +1543,8 @@ var JSLINT = (function () {
                 var c, value = '';
                 from = character;
                 if (source_row.charAt(0) !== begin) {
-                    fail_at('expected_a_b', line, character, begin, source_row.charAt(0));
+                    fail_at('expected_a_b', line, character, begin,
+                        source_row.charAt(0));
                 }
                 for (;;) {
                     source_row = source_row.slice(1);
@@ -6579,7 +6581,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-03-22';
+    itself.edition = '2011-03-27';
 
     return itself;
 
