@@ -110,21 +110,33 @@ at issuing warnings. <code>lint</code> is no longer needed.</p>
   effect as this comment:</p>
 <blockquote>
 <code>/*global
-clearInterval: false, clearTimeout: false, document: false, event: false, frames: false, history: false, Image: false, location: false, name: false, navigator: false, Option: false, parent: false, screen: false, setInterval: false, setTimeout: false, XMLHttpRequest: false 
+clearInterval: false, clearTimeout: false, document: false, event: false, frames: false, history: false, Image: false, location: false, name: false, navigator: false, Option: false, parent: false, screen: false, setInterval: false, setTimeout: false, window: false, XMLHttpRequest: false 
 */</code></blockquote>
-<p> The <code>browser</code> <a href="#options">option</a> does
-  not include the aliases of the global object, <code>window</code> and
-  <code>self</code> because the potential for misuse is so great. If you need access to <code>window</code>, you can write<code> var window; </code>or<code> /*global window*/</code>.</p>
-<p id=devel>Select the
-    <label for="JSLINT_DEVEL" title="devel"><em>Assume console, alert, ...</em></label>
+<p>Select the
+    <em>Assume console, alert, ...</em>
 (<code>devel</code>) <a href="#options">option</a> to predefine globals that are useful in development but that should be avoided in production, such as <code>console</code> and <code>alert</code>. It has the same
 effect as this comment:</p>
 <pre>/*global alert: false, confirm: false, console: false, Debug: false, opera: false, prompt: false */</pre>
 <p id=node>Select the
-    <label for="JSLINT_DEVEL2" title="devel"><em>Assume Node.js</em></label>
+    <em>Assume Node.js</em>
     (<code>node</code>) <a href="#options">option</a> to predefine globals that are used in the Node.js environment<code></code>. It has the same
     effect as this comment:</p>
-<pre>/*global  __dirname: false, __filename: false, global: false, module: false, process: false, require: false */</pre>
+<pre>/*global 
+            Buffer       : false,
+            clearInterval: false,
+            clearTimout  : false,
+            console      : false,
+            global       : false,
+            module       : false,
+            process      : false,
+            querystring  : false,
+            require      : false,
+            setInterval  : false,
+            setTimeout   : false,
+            util         : false,
+            __filename   : false,
+            __dirname    : false
+*/</pre>
 <p id=rhino>Select the <i>Assume Rhino</i> (<code>rhino</code>) <a href="#options">option</a>
     to predefine the global properties provided by the Rhino environment.
   It has the same effect as this statement:</p>
