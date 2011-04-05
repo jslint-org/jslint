@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-03-29
+// 2011-04-04
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -2333,10 +2333,12 @@ klass:                                  do {
 
 // If the token is not an edge, but is the first token on the line.
 
-                } else if (next_token.line !== token.line &&
-                        next_token.from < indent.at + (indent.mode ===
-                        'expression' ? 0 : option.indent)) {
-                    expected_at(indent.at + option.indent);
+                } else if (next_token.line !== token.line) {
+                    if (next_token.from < indent.at + (indent.mode ===
+                            'expression' ? 0 : option.indent)) {
+                        expected_at(indent.at + option.indent);
+                    }
+                    indent.wrap = true;
                 }
             } else if (next_token.line !== token.line) {
                 if (next_token.edge) {
@@ -6590,7 +6592,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-03-29';
+    itself.edition = '2011-04-04';
 
     return itself;
 
