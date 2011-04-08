@@ -5875,14 +5875,15 @@ loop:   for (;;) {
                     }
                     switch (script[0].first.second.value) {
                     case 'id':
-                        if (adsafe_may || script[0].second.length !== 1) {
+                        if (adsafe_may || adsafe_went ||
+                                script[0].second.length !== 1) {
                             fail('adsafe_id', next_token);
                         }
                         adsafe_may = true;
                         break;
                     case 'go':
-                        if (!adsafe_may) {
-                            fail('adsafe_id');
+                        if (adsafe_went) {
+                            fail('adsafe_go');
                         }
                         if (script[0].second.length !== 2 ||
                                 aint(script[0].second[1], 'id', 'function') ||
