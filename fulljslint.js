@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-04-04
+// 2011-04-07
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -444,7 +444,7 @@ var JSLINT = (function () {
             adsafe_bad_id: "ADSAFE violation: bad id.",
             adsafe_div: "ADsafe violation: Wrap the widget in a div.",
             adsafe_fragment: "ADSAFE: Use the fragment option.",
-            adsafe_go: "ADsafe violation: Missing ADSAFE.go.",
+            adsafe_go: "ADsafe violation: Misformed ADSAFE.go.",
             adsafe_html: "Currently, ADsafe does not operate on whole HTML documents. It operates on <div> fragments and .js files.",
             adsafe_id: "ADsafe violation: id does not match.",
             adsafe_id_go: "ADsafe violation: Missing ADSAFE.id or ADSAFE.go.",
@@ -5886,6 +5886,7 @@ loop:   for (;;) {
                         }
                         if (script[0].second.length !== 2 ||
                                 aint(script[0].second[1], 'id', 'function') ||
+                                !script[0].second[1].first ||
                                 script[0].second[1].first.length !== 2 ||
                                 aint(script[0].second[1].first[0], 'value', 'dom') ||
                                 aint(script[0].second[1].first[1], 'value', 'lib')) {
@@ -6592,7 +6593,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-04-04';
+    itself.edition = '2011-04-07';
 
     return itself;
 
