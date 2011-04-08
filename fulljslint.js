@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-04-07
+// 2011-04-08
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -4027,6 +4027,7 @@ loop:   for (;;) {
             if (next_token.id === ']') {
                 break;
             }
+            indent.wrap = false;
             edge();
             this.first.push(expression(10));
             if (next_token.id === ',') {
@@ -4138,6 +4139,7 @@ loop:   for (;;) {
         this.first = [];
         step_in();
         while (next_token.id !== '}') {
+            indent.wrap = false;
 
 // JSLint recognizes the ES5 extension for get/set in object literals,
 // but requires that they be used in pairs.
@@ -6594,7 +6596,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-04-07';
+    itself.edition = '2011-04-08';
 
     return itself;
 
