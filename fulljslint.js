@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-04-08
+// 2011-04-13
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -340,7 +340,7 @@
     toint32, token, tomato, too_long, too_many, top, tr, trailing_decimal_a,
     tree, tt, tty, turquoise, tv, type, u, ul, unclosed, unclosed_comment,
     unclosed_regexp, undef, unescape, unescaped_a, unexpected_a,
-    unexpected_char_a_b, unexpected_comment, unexpected_member_a,
+    unexpected_char_a_b, unexpected_comment, unexpected_property_a,
     unexpected_space_a_b, "unicode-bidi", unnecessary_initialize,
     unnecessary_use, unreachable_a_b, unrecognized_style_attribute_a,
     unrecognized_tag_a, unsafe, unused, unwatch, updateNow, url, urls,
@@ -587,7 +587,7 @@ var JSLINT = (function () {
             unexpected_a: "Unexpected '{a}'.",
             unexpected_char_a_b: "Unexpected character '{a}' in {b}.",
             unexpected_comment: "Unexpected comment.",
-            unexpected_member_a: "Unexpected property '{a}'.",
+            unexpected_property_a: "Unexpected /*property*/ '{a}'.",
             unexpected_space_a_b: "Unexpected space between '{a}' and '{b}'.",
             unnecessary_initialize: "It is not necessary to initialize '{a}' to 'undefined'.",
             unnecessary_use: "Unnecessary \"use strict\".",
@@ -3279,7 +3279,7 @@ loop:   for (;;) {
 
     function tally_property(name) {
         if (properties && typeof properties[name] !== 'boolean') {
-            warn('unexpected_member_a', token, name);
+            warn('unexpected_property_a', token, name);
         }
         if (typeof member[name] === 'number') {
             member[name] += 1;
@@ -6596,7 +6596,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-04-08';
+    itself.edition = '2011-04-13';
 
     return itself;
 
