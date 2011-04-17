@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-04-15
+// 2011-04-16
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -6178,7 +6178,7 @@ loop:   for (;;) {
 // The actual JSLINT function itself.
 
     var itself = function (the_source, the_option) {
-        var i, keys, predef;
+        var i, keys, predef, tree;
         JSLINT.comments = [];
         JSLINT.errors = [];
         JSLINT.tree = '';
@@ -6337,19 +6337,20 @@ loop:   for (;;) {
                         use_strict();
                     }
                     adsafe_top = true;
-                    begin.first = statements();
+                    tree = statements();
+                    begin.first = tree;
                     JSLINT.tree = begin;
-                    if (option.adsafe && (JSLINT.tree.length !== 1 ||
-                            aint(JSLINT.tree[0], 'id', '(') ||
-                            aint(JSLINT.tree[0].first, 'id', '.') ||
-                            aint(JSLINT.tree[0].first.first, 'value', 'ADSAFE') ||
-                            aint(JSLINT.tree[0].first.second, 'value', 'lib') ||
-                            JSLINT.tree[0].second.length !== 2 ||
-                            JSLINT.tree[0].second[0].arity !== 'string' ||
-                            aint(JSLINT.tree[0].second[1], 'id', 'function'))) {
+                    if (option.adsafe && (tree.length !== 1 ||
+                            aint(tree[0], 'id', '(') ||
+                            aint(tree[0].first, 'id', '.') ||
+                            aint(tree[0].first.first, 'value', 'ADSAFE') ||
+                            aint(tree[0].first.second, 'value', 'lib') ||
+                            tree[0].second.length !== 2 ||
+                            tree[0].second[0].arity !== 'string' ||
+                            aint(tree[0].second[1], 'id', 'function'))) {
                         fail('adsafe_lib');
                     }
-                    if (JSLINT.tree.disrupt) {
+                    if (tree.disrupt) {
                         warn('weird_program', prev_token);
                     }
                 }
@@ -6603,7 +6604,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-04-15';
+    itself.edition = '2011-04-16';
 
     return itself;
 
