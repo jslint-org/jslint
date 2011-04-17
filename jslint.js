@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-04-16
+// 2011-04-17
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -2399,6 +2399,9 @@ klass:                                  do {
             old_comments_off = comments_off,
             old_option_white = option.white,
             value;
+        if (next_token.line === token.line && next_token.from === token.thru) {
+            warn('missing_space_a_b', next_token, token.value, next_token.value);
+        }
         comments_off = true;
         option.white = false;
         if (lookahead.length > 0 || next_token.comments) {
@@ -6604,7 +6607,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-04-16';
+    itself.edition = '2011-04-17';
 
     return itself;
 
