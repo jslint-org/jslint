@@ -11,11 +11,10 @@
 // option = {adsafe: true, fragment: false}
 
 /*properties check, cookie, each, edition, get, getCheck, getTitle, getValue,
-    has, indent, isArray, join, jslint, length, lib, maxerr, maxlen, on, predef,
-    push, q, select, set, split, stringify, style, target, tree, value
+    has, indent, isArray, join, jslint, length, lib, maxerr, maxlen, now, on,
+    predef, push, q, select, set, split, stringify, style, target, tree, value
 */
 
-/*global ADSAFE, JSMAX */
 
 ADSAFE.lib("init_ui", function (lib) {
     "use strict";
@@ -81,9 +80,9 @@ ADSAFE.lib("init_ui", function (lib) {
 
             var title = event.target.getTitle();
             if (title) {
-                option[title] =
-                    option[title] === true ? false :
-                    option[title] === false ? undefined : true;
+                ADSAFE.set(option, title,
+                    ADSAFE.get(option, title) === true ? false :
+                    ADSAFE.get(option, title) === false ? undefined : true);
             }
             show_jslint_control();
         }
@@ -92,9 +91,9 @@ ADSAFE.lib("init_ui", function (lib) {
             var value = event.target.getValue();
             if (value.length === 0 || +value < 0 || !isFinite(value)) {
                 value = '';
-                option[event.target.getTitle()] = undefined;
+                ADSAFE.set(option, event.target.getTitle(), undefined);
             } else {
-                option[event.target.getTitle()] = +value;
+                ADSAFE.set(option, event.target.getTitle(), +value);
             }
             event.target.value(String(value));
             show_jslint_control();
@@ -102,7 +101,7 @@ ADSAFE.lib("init_ui", function (lib) {
 
         function update_list(event) {
             var value = event.target.getValue().split(/\s*,\s*/);
-            option[event.target.getTitle()] = value;
+            ADSAFE.set(option, event.target.getTitle(), value);
             event.target.value(value.join(', '));
             show_jslint_control();
         }
@@ -133,12 +132,14 @@ ADSAFE.lib("init_ui", function (lib) {
 // Add click event handlers to the [JSLint] and [clear] buttons.
 
         dom.q('input&jslint').on('click', function (e) {
+            var then = lib.now();
             tree.value('');
 
 // Call JSLint and display the report.
 
             lib.jslint(input.getValue(), option, output);
             input.select();
+            tree.value((lib.now() - then) / 1000 + ' seconds.');
             return false;
         });
 
@@ -174,7 +175,7 @@ ADSAFE.lib("init_ui", function (lib) {
 
         dom.q('#JSLINT_GOODPARTS').on('click', function (e) {
             goodparts.each(function (bunch) {
-                option[bunch.getTitle()] = true;
+                ADSAFE.set(option, bunch.getTitle(), true);
             });
             option.indent = 4;
             show_options();
