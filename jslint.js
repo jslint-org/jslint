@@ -4016,9 +4016,8 @@ loop:   for (;;) {
                     (e.value === 'eval' || e.value === 'execScript')) {
                 warn('evil', e);
             } else if (option.safe) {
-                if (banned[e.value] === true) {
-                    warn('adsafe_a', e);
-                } else if (e.value.charAt(0) === '_' || e.value.slice(-1) === '_') {
+                if (banned[e.value] || e.value.charAt(0) === '_' ||
+                        e.value.slice(-1) === '_') {
                     warn('adsafe_subscript_a', e);
                 }
             }
