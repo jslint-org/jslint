@@ -374,6 +374,7 @@ var JSLINT = (function () {
             '%': true,
             '&': true,
             '|': true,
+            '^': true,
             '<<': true,
             '>>': true,
             '>>>': true,
