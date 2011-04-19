@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-04-17
+// 2011-04-18
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -367,6 +367,23 @@ var JSLINT = (function () {
     "use strict";
 
     var adsafe_id,      // The widget's ADsafe id.
+        adsafe_infix = {
+            '-': true,
+            '*': true,
+            '/': true,
+            '%': true,
+            '&': true,
+            '|': true,
+            '<<': true,
+            '>>': true,
+            '>>>': true,
+        },
+        adsafe_prefix = {
+            '-': true,
+            '+': true,
+            '~': true,
+            'typeof': true
+        },
         adsafe_may,     // The widget may load approved scripts.
         adsafe_top,     // At the top of the widget script.
         adsafe_went,    // ADSAFE.go has been called.
@@ -3997,8 +4014,7 @@ loop:   for (;;) {
             } else if (!option.evil &&
                     (e.value === 'eval' || e.value === 'execScript')) {
                 warn('evil', e);
-            } else if (option.safe &&
-                    (e.value.charAt(0) === '_' || e.value.charAt(0) === '-')) {
+            } else if (option.safe && e.value.charAt(0) === '_') {
                 warn('adsafe_subscript_a', e);
             }
             tally_property(e.value);
@@ -4008,8 +4024,9 @@ loop:   for (;;) {
                     warn('subscript', e);
                 }
             }
-        } else if (e.arity !== 'number' || e.value < 0) {
-            if (option.safe) {
+        } else if (e.arity !== 'number' && option.safe) {
+            if (!(  (e.arity === 'prefix' && adsafe_prefix[e.id] === true) ||
+                    (e.arity === 'infix' && adsafe_infix[e.id] === true))) {
                 warn('adsafe_subscript_a', e);
             }
         }
@@ -6607,7 +6624,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-04-17';
+    itself.edition = '2011-04-18';
 
     return itself;
 
