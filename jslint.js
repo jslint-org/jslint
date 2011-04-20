@@ -4012,12 +4012,12 @@ loop:   for (;;) {
         edge();
         var e = expression(0), s;
         if (e.arity === 'string') {
-            if (!option.evil &&
-                    (e.value === 'eval' || e.value === 'execScript')) {
-                warn('evil', e);
-            } else if (option.safe && (banned[e.value] ||
+            if (option.safe && (banned[e.value] ||
                     e.value.charAt(0) === '_' || e.value.slice(-1) === '_')) {
                 warn('adsafe_subscript_a', e);
+            } else if (!option.evil &&
+                    (e.value === 'eval' || e.value === 'execScript')) {
+                warn('evil', e);
             }
             tally_property(e.value);
             if (!option.sub && ix.test(e.value)) {
