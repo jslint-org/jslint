@@ -1,5 +1,5 @@
 // init_ui.js
-// 2011-04-15
+// 2011-04-19
 
 // This is the web browser companion to fulljslint.js. It is an ADsafe
 // lib file that implements a web ui by adding behavior to the widget's
@@ -11,7 +11,7 @@
 // option = {adsafe: true, fragment: false}
 
 /*properties check, cookie, each, edition, get, getCheck, getTitle, getValue,
-    has, indent, isArray, join, jslint, length, lib, maxerr, maxlen, now, on,
+    has, indent, isArray, join, jslint, length, lib, maxerr, maxlen, on,
     predef, push, q, select, set, split, stringify, style, target, tree, value
 */
 
@@ -132,14 +132,12 @@ ADSAFE.lib("init_ui", function (lib) {
 // Add click event handlers to the [JSLint] and [clear] buttons.
 
         dom.q('input&jslint').on('click', function (e) {
-            var then = lib.now();
             tree.value('');
 
 // Call JSLint and display the report.
 
-            lib.jslint(input.getValue(), option, output);
+            tree.value(lib.jslint(input.getValue(), option, output) / 1000 + ' seconds.');
             input.select();
-            tree.value((lib.now() - then) / 1000 + ' seconds.');
             return false;
         });
 
