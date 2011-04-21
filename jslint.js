@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-04-19
+// 2011-04-20
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -1203,29 +1203,29 @@ var JSLINT = (function () {
         ax = /@cc|<\/?|script|\]\s*\]|<\s*!|&lt/i,
 // unsafe characters that are silently deleted by one or more browsers
         cx = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
-// token
-        tx = /^\s*([(){}\[.,:;'"~\?\]#@]|==?=?|\/(\*(jslint|properties|property|members?|globals?)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/,
+// query characters for ids
+        dx = /[\[\]\/\\"'*<>.&:(){}+=#]/,
 // html token
         hx = /^\s*(['"=>\/&#]|<(?:\/|\!(?:--)?)?|[a-zA-Z][a-zA-Z0-9_\-:]*|[0-9]+|--)/,
-// characters in strings that need escapement
-        nx = /[\u0000-\u001f"\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
-// outer html token
-        ox = /[>&]|<[\/!]?|--/,
-// star slash
-        lx = /\*\/|\/\*/,
 // identifier
         ix = /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/,
 // javascript url
         jx = /^(?:javascript|jscript|ecmascript|vbscript|mocha|livescript)\s*:/i,
-// url badness
-        ux = /&|\+|\u00AD|\.\.|\/\*|%[^;]|base64|url|expression|data|mailto/i,
+// star slash
+        lx = /\*\/|\/\*/,
+// characters in strings that need escapement
+        nx = /[\u0000-\u001f"\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+// outer html token
+        ox = /[>&]|<[\/!]?|--/,
+// attributes characters
+        qx = /[^a-zA-Z0-9+\-_\/ ]/,
 // style
         sx = /^\s*([{:#%.=,>+\[\]@()"';]|\*=?|\$=|\|=|\^=|~=|[a-zA-Z_][a-zA-Z0-9_\-]*|[0-9]+|<\/|\/\*)/,
         ssx = /^\s*([@#!"'};:\-%.=,+\[\]()*_]|[a-zA-Z][a-zA-Z0-9._\-]*|\/\*?|\d+(?:\.\d+)?|<\/)/,
-// attributes characters
-        qx = /[^a-zA-Z0-9+\-_\/ ]/,
-// query characters for ids
-        dx = /[\[\]\/\\"'*<>.&:(){}+=#]/,
+// token
+        tx = /^\s*([(){}\[.,:;'"~\?\]#@]|==?=?|\/(\*(jslint|properties|property|members?|globals?)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/,
+// url badness
+        ux = /&|\+|\u00AD|\.\.|\/\*|%[^;]|base64|url|expression|data|mailto/i,
 
         rx = {
             outer: hx,
@@ -1407,13 +1407,13 @@ var JSLINT = (function () {
         }, a, b, c, d);
     }
 
-    function fail(message, offender, a, b, c, d) {
+    function stop(message, offender, a, b, c, d) {
         var warning = warn(message, offender, a, b, c, d);
         quit(bundle.stopping, warning.line, warning.character);
     }
 
-    function fail_at(message, line, character, a, b, c, d) {
-        return fail(message, {
+    function stop_at(message, line, character, a, b, c, d) {
+        return stop(message, {
             line: line,
             from: character
         }, a, b, c, d);
@@ -1508,7 +1508,7 @@ var JSLINT = (function () {
             if (type === '(identifier)') {
                 the_token.identifier = true;
                 if (value === '__iterator__' || value === '__proto__') {
-                    fail_at('reserved_a', line, from, value);
+                    stop_at('reserved_a', line, from, value);
                 } else if (option.nomen &&
                         (value.charAt(0) === '_' ||
                         value.charAt(value.length - 1) === '_')) {
@@ -1556,7 +1556,7 @@ var JSLINT = (function () {
                 var c, value = '';
                 from = character;
                 if (source_row.charAt(0) !== begin) {
-                    fail_at('expected_a_b', line, character, begin,
+                    stop_at('expected_a_b', line, character, begin,
                         source_row.charAt(0));
                 }
                 for (;;) {
@@ -1565,7 +1565,7 @@ var JSLINT = (function () {
                     c = source_row.charAt(0);
                     switch (c) {
                     case '':
-                        fail_at('missing_a', line, character, c);
+                        stop_at('missing_a', line, character, c);
                         break;
                     case end:
                         source_row = source_row.slice(1);
@@ -1625,7 +1625,7 @@ var JSLINT = (function () {
                         while (j >= source_row.length) {
                             j = 0;
                             if (xmode !== 'html' || !next_line()) {
-                                fail_at('unclosed', line, from);
+                                stop_at('unclosed', line, from);
                             }
                         }
                         c = source_row.charAt(j);
@@ -1752,7 +1752,7 @@ var JSLINT = (function () {
                             if (xmode === 'html') {
                                 return it('(error)', source_row.charAt(0));
                             } else {
-                                fail_at('unexpected_a',
+                                stop_at('unexpected_a',
                                     line, character, source_row.substr(0, 1));
                             }
                         }
@@ -1824,13 +1824,13 @@ var JSLINT = (function () {
                                 collect_comment(source_row, quote, line, character);
                                 quote = '';
                                 if (!next_line()) {
-                                    fail_at('unclosed_comment', line, character);
+                                    stop_at('unclosed_comment', line, character);
                                 }
                             }
                             collect_comment(source_row.slice(0, i), quote, character, line);
                             character += i + 2;
                             if (source_row.substr(i, 1) === '/') {
-                                fail_at('nested_comment', line, character);
+                                stop_at('nested_comment', line, character);
                             }
                             source_row = source_row.substr(i + 2);
                             break;
@@ -1840,7 +1840,7 @@ var JSLINT = (function () {
 //      /
                         case '/':
                             if (token.id === '/=') {
-                                fail_at(
+                                stop_at(
                                     bundle.slash_equal,
                                     line,
                                     from
@@ -1856,7 +1856,7 @@ var JSLINT = (function () {
                                     length += 1;
                                     switch (c) {
                                     case '':
-                                        fail_at('unclosed_regexp', line, from);
+                                        stop_at('unclosed_regexp', line, from);
                                         return;
                                     case '/':
                                         if (depth > 0) {
@@ -1870,14 +1870,14 @@ var JSLINT = (function () {
                                             length += 1;
                                         }
                                         if (source_row.charAt(length).isAlpha()) {
-                                            fail_at('unexpected_a',
+                                            stop_at('unexpected_a',
                                                 line, from, source_row.charAt(length));
                                         }
                                         character += length;
                                         source_row = source_row.substr(length);
                                         quote = source_row.charAt(0);
                                         if (quote === '/' || quote === '*') {
-                                            fail_at('confusing_regexp',
+                                            stop_at('confusing_regexp',
                                                 line, from);
                                         }
                                         return it('(regexp)', c);
@@ -1950,7 +1950,7 @@ var JSLINT = (function () {
                                                 warn_at('insecure_a',
                                                     line, from + length, c);
                                             } else if (source_row.charAt(length) === ']') {
-                                                fail_at('unescaped_a',
+                                                stop_at('unescaped_a',
                                                     line, from + length, '^');
                                             }
                                         }
@@ -2153,21 +2153,21 @@ klass:                                  do {
                                 }
                                 i = source_row.indexOf('<!');
                                 if (i >= 0) {
-                                    fail_at('nested_comment',
+                                    stop_at('nested_comment',
                                         line, character + i);
                                 }
                                 if (!next_line()) {
-                                    fail_at('unclosed_comment', length, c);
+                                    stop_at('unclosed_comment', length, c);
                                 }
                             }
                             length = source_row.indexOf('<!');
                             if (length >= 0 && length < i) {
-                                fail_at('nested_comment',
+                                stop_at('nested_comment',
                                     line, character + length);
                             }
                             character += i;
                             if (source_row.charAt(i + 2) !== '>') {
-                                fail_at('expected_a', line, character, '-->');
+                                stop_at('expected_a', line, character, '-->');
                             }
                             character += 3;
                             source_row = source_row.slice(i + 3);
@@ -2207,7 +2207,7 @@ klass:                                  do {
                                     if (!((c >= '0' && c <= '9') ||
                                             (c >= 'a' && c <= 'z') ||
                                             c === '#')) {
-                                        fail_at('bad_entity', line, from + length,
+                                        stop_at('bad_entity', line, from + length,
                                             character);
                                     }
                                 }
@@ -2434,7 +2434,7 @@ klass:                                  do {
             }
             break;
         default:
-            fail('unpexpected_a', this);
+            stop('unpexpected_a', this);
         }
 loop:   for (;;) {
             for (;;) {
@@ -2447,7 +2447,7 @@ loop:   for (;;) {
                 advance();
             }
             if (next_token.arity !== 'string' && !next_token.identifier) {
-                fail('unexpected_a', next_token);
+                stop('unexpected_a', next_token);
             }
             name = next_token.value;
             advance();
@@ -2459,31 +2459,31 @@ loop:   for (;;) {
                     case 'true':
                         if (typeof scope[name] === 'object' ||
                                 global[name] === false) {
-                            fail('unexpected_a');
+                            stop('unexpected_a');
                         }
                         global[name] = true;
                         advance('true');
                         break;
                     case 'false':
                         if (typeof scope[name] === 'object') {
-                            fail('unexpected_a');
+                            stop('unexpected_a');
                         }
                         global[name] = false;
                         advance('false');
                         break;
                     default:
-                        fail('unexpected_a');
+                        stop('unexpected_a');
                     }
                 } else {
                     if (typeof scope[name] === 'object') {
-                        fail('unexpected_a');
+                        stop('unexpected_a');
                     }
                     global[name] = false;
                 }
                 break;
             case '/*jslint':
                 if (next_token.id !== ':') {
-                    fail('expected_a_b', next_token, ':', next_token.value);
+                    stop('expected_a_b', next_token, ':', next_token.value);
                 }
                 advance(':');
                 switch (name) {
@@ -2492,7 +2492,7 @@ loop:   for (;;) {
                     if (typeof value !== 'number' ||
                             !isFinite(value) || value < 0 ||
                             Math.floor(value) !== value) {
-                        fail('expected_small_a');
+                        stop('expected_small_a');
                     }
                     if (value > 0) {
                         old_option_white = true;
@@ -2505,7 +2505,7 @@ loop:   for (;;) {
                             !isFinite(value) ||
                             value <= 0 ||
                             Math.floor(value) !== value) {
-                        fail('expected_small_a', next_token);
+                        stop('expected_small_a', next_token);
                     }
                     option.maxerr = value;
                     break;
@@ -2513,7 +2513,7 @@ loop:   for (;;) {
                     value = +next_token.value;
                     if (typeof value !== 'number' || !isFinite(value) || value < 0 ||
                             Math.floor(value) !== value) {
-                        fail('expected_small_a');
+                        stop('expected_small_a');
                     }
                     option.maxlen = value;
                     break;
@@ -2523,7 +2523,7 @@ loop:   for (;;) {
                     } else if (next_token.id === 'false') {
                         old_option_white = false;
                     } else {
-                        fail('unexpected_a');
+                        stop('unexpected_a');
                     }
                     break;
                 default:
@@ -2532,7 +2532,7 @@ loop:   for (;;) {
                     } else if (next_token.id === 'false') {
                         option[name] = false;
                     } else {
-                        fail('unexpected_a');
+                        stop('unexpected_a');
                     }
                 }
                 advance();
@@ -2541,7 +2541,7 @@ loop:   for (;;) {
                 properties[name] = true;
                 break;
             default:
-                fail('unexpected_a');
+                stop('unexpected_a');
             }
         }
         if (command === '/*jslint') {
@@ -2771,7 +2771,7 @@ loop:   for (;;) {
 
         var left;
         if (next_token.id === '(end)') {
-            fail('unexpected_a', token, next_token.id);
+            stop('unexpected_a', token, next_token.id);
         }
         advance();
         if (option.safe && typeof predefined[token.value] === 'boolean' &&
@@ -2794,7 +2794,7 @@ loop:   for (;;) {
                     advance();
                     return token;
                 } else {
-                    fail('expected_identifier_a', token, token.id);
+                    stop('expected_identifier_a', token, token.id);
                 }
             }
             while (rbp < next_token.lbp) {
@@ -2802,7 +2802,7 @@ loop:   for (;;) {
                 if (token.led) {
                     left = token.led(left);
                 } else {
-                    fail('expected_operator_a', token, token.id);
+                    stop('expected_operator_a', token, token.id);
                 }
             }
         }
@@ -3073,7 +3073,7 @@ loop:   for (;;) {
                     return that;
                 }
             }
-            fail('bad_assignment', that);
+            stop('bad_assignment', that);
         });
         x.assign = true;
         return x;
@@ -3131,7 +3131,7 @@ loop:   for (;;) {
         if (token.id === 'function' && next_token.id === '(') {
             warn('name_function');
         } else {
-            fail('expected_identifier_a');
+            stop('expected_identifier_a');
         }
     }
 
@@ -3272,7 +3272,7 @@ loop:   for (;;) {
             step_out('}', curly);
             discard();
         } else if (!ordinary) {
-            fail('expected_a_b', next_token, '{', next_token.value);
+            stop('expected_a_b', next_token, '{', next_token.value);
         } else {
             warn('expected_a_b', next_token, '{', next_token.value);
             array = [statement()];
@@ -3433,7 +3433,7 @@ loop:   for (;;) {
             return this;
         },
         led: function () {
-            fail('expected_operator_a');
+            stop('expected_operator_a');
         }
     };
 
@@ -3501,7 +3501,7 @@ loop:   for (;;) {
     assignop('-=');
     assignop('*=');
     assignop('/=').nud = function () {
-        fail('slash_equal');
+        stop('slash_equal');
     };
     assignop('%=');
     assignop('&=', true);
@@ -3947,7 +3947,7 @@ loop:   for (;;) {
                             peek(0).arity !== 'string' ||
                             peek(0).value !== adsafe_id ||
                             peek(1).id !== ',') {
-                        fail('adsafe_a', that, 'go');
+                        stop('adsafe_a', that, 'go');
                     }
                     adsafe_went = true;
                     adsafe_may = false;
@@ -4165,7 +4165,7 @@ loop:   for (;;) {
                 name = next_token;
                 i = property_name();
                 if (!i) {
-                    fail('missing_property');
+                    stop('missing_property');
                 }
                 do_function(get, '');
                 if (funct['(loopage)']) {
@@ -4183,21 +4183,21 @@ loop:   for (;;) {
                 one_space_only();
                 j = property_name();
                 if (i !== j) {
-                    fail('expected_a_b', token, i, j || next_token.value);
+                    stop('expected_a_b', token, i, j || next_token.value);
                 }
                 do_function(set, '');
                 p = set.first;
                 if (!p || p.length !== 1) {
-                    fail('parameter_set_a', set, 'value');
+                    stop('parameter_set_a', set, 'value');
                 } else if (p[0].value !== 'value') {
-                    fail('expected_a_b', p[0], 'value', p[0].value);
+                    stop('expected_a_b', p[0], 'value', p[0].value);
                 }
                 name.first = [get, set];
             } else {
                 name = next_token;
                 i = property_name();
                 if (typeof i !== 'string') {
-                    fail('missing_property');
+                    stop('missing_property');
                 }
                 advance(':');
                 discard();
@@ -4284,7 +4284,7 @@ loop:   for (;;) {
                     warn('unnecessary_initialize', token, id);
                 }
                 if (peek(0).id === '=' && next_token.identifier) {
-                    fail('var_a_not');
+                    stop('var_a_not');
                 }
                 assign.second = expression(0);
                 assign.arity = 'infix';
@@ -4323,7 +4323,7 @@ loop:   for (;;) {
         }
         do_function(this, i, true);
         if (next_token.id === '(' && next_token.line === token.line) {
-            fail('function_statement');
+            stop('function_statement');
         }
         this.arity = 'statement';
         return this;
@@ -4422,7 +4422,7 @@ loop:   for (;;) {
             one_space();
             this.third = block(false);
         } else if (!this.second) {
-            fail('expected_a_b', next_token, 'catch', next_token.value);
+            stop('expected_a_b', next_token, 'catch', next_token.value);
         }
         return this;
     });
@@ -4598,7 +4598,7 @@ loop:   for (;;) {
         spaces(this, paren);
         no_space();
         if (next_token.id === 'var') {
-            fail('move_var');
+            stop('move_var');
         }
         edge();
         if (peek(0).id === 'in') {
@@ -4690,7 +4690,7 @@ loop:   for (;;) {
             }
             semicolon(token);
             if (next_token.id === ';') {
-                fail('expected_a_b', next_token, ')', ';');
+                stop('expected_a_b', next_token, ')', ';');
             }
             if (next_token.id !== ')') {
                 this.third = [];
@@ -4884,7 +4884,7 @@ loop:   for (;;) {
             advance('(number)');
             break;
         default:
-            fail('unexpected_a');
+            stop('unexpected_a');
         }
     }
 
@@ -5147,7 +5147,7 @@ loop:   for (;;) {
                 warn('missing_url');
             }
             if (option.safe && ux.test(url)) {
-                fail('adsafe_a', next_token, url);
+                stop('adsafe_a', next_token, url);
             }
             urls.push(url);
             advance();
@@ -5652,7 +5652,7 @@ loop:   for (;;) {
                 advance(']');
                 break;
             default:
-                fail('expected_selector_a');
+                stop('expected_selector_a');
             }
         }
     }
@@ -5708,7 +5708,7 @@ loop:   for (;;) {
                     advance();
                     for (;;) {
                         if (!next_token.identifier || css_media[next_token.value] === true) {
-                            fail('expected_media_a');
+                            stop('expected_media_a');
                         }
                         advance();
                         if (next_token.id !== ',') {
@@ -5736,21 +5736,21 @@ loop:   for (;;) {
     function do_begin(n) {
         if (n !== 'html' && !option.fragment) {
             if (n === 'div' && option.adsafe) {
-                fail('adsafe_fragment');
+                stop('adsafe_fragment');
             } else {
-                fail('expected_a_b', token, 'html', n);
+                stop('expected_a_b', token, 'html', n);
             }
         }
         if (option.adsafe) {
             if (n === 'html') {
-                fail('adsafe_html', token);
+                stop('adsafe_html', token);
             }
             if (option.fragment) {
                 if (n !== 'div') {
-                    fail('adsafe_div', token);
+                    stop('adsafe_div', token);
                 }
             } else {
-                fail('adsafe_fragment', token);
+                stop('adsafe_fragment', token);
             }
         }
         option.browser = true;
@@ -5795,7 +5795,7 @@ loop:   for (;;) {
                 a === 'content' || a === 'data' ||
                 a.indexOf('src') >= 0 || a.indexOf('url') >= 0) {
             if (option.safe && ux.test(v)) {
-                fail('bad_url', next_token, v);
+                stop('bad_url', next_token, v);
             }
             urls.push(v);
         } else if (a === 'for') {
@@ -5821,7 +5821,7 @@ loop:   for (;;) {
         var i, tag = html_tag[name], script, x;
         src = false;
         if (!tag) {
-            fail(
+            stop(
                 bundle.unrecognized_tag_a,
                 next_token,
                 name === name.toLowerCase() ? name : name + ' (capitalization error)'
@@ -5829,18 +5829,18 @@ loop:   for (;;) {
         }
         if (stack.length > 0) {
             if (name === 'html') {
-                fail('unexpected_a', token, name);
+                stop('unexpected_a', token, name);
             }
             x = tag.parent;
             if (x) {
                 if (x.indexOf(' ' + stack[stack.length - 1].name + ' ') < 0) {
-                    fail('tag_a_in_b', token, name, x);
+                    stop('tag_a_in_b', token, name, x);
                 }
             } else if (!option.adsafe && !option.fragment) {
                 i = stack.length;
                 do {
                     if (i <= 0) {
-                        fail('tag_a_in_b', token, name, 'body');
+                        stop('tag_a_in_b', token, name, 'body');
                     }
                     i -= 1;
                 } while (stack[i].name !== 'body');
@@ -5879,26 +5879,26 @@ loop:   for (;;) {
 
                 if (option.adsafe) {
                     if (adsafe_went) {
-                        fail('adsafe_script', token);
+                        stop('adsafe_script', token);
                     }
                     if (script.length !== 1 ||
                             aint(script[0],             'id',    '(') ||
                             aint(script[0].first,       'id',    '.') ||
                             aint(script[0].first.first, 'value', 'ADSAFE') ||
                             aint(script[0].second[0],   'value', adsafe_id)) {
-                        fail('adsafe_id_go');
+                        stop('adsafe_id_go');
                     }
                     switch (script[0].first.second.value) {
                     case 'id':
                         if (adsafe_may || adsafe_went ||
                                 script[0].second.length !== 1) {
-                            fail('adsafe_id', next_token);
+                            stop('adsafe_id', next_token);
                         }
                         adsafe_may = true;
                         break;
                     case 'go':
                         if (adsafe_went) {
-                            fail('adsafe_go');
+                            stop('adsafe_go');
                         }
                         if (script[0].second.length !== 2 ||
                                 aint(script[0].second[1], 'id', 'function') ||
@@ -5906,12 +5906,12 @@ loop:   for (;;) {
                                 script[0].second[1].first.length !== 2 ||
                                 aint(script[0].second[1].first[0], 'value', 'dom') ||
                                 aint(script[0].second[1].first[1], 'value', 'lib')) {
-                            fail('adsafe_go', next_token);
+                            stop('adsafe_go', next_token);
                         }
                         adsafe_went = true;
                         break;
                     default:
-                        fail('adsafe_id_go');
+                        stop('adsafe_id_go');
                     }
                 }
                 indent = null;
@@ -6009,7 +6009,7 @@ loop:   for (;;) {
                 }
                 tag = html_tag[name];
                 if (typeof tag !== 'object') {
-                    fail('unrecognized_tag_a', tag_name, name);
+                    stop('unrecognized_tag_a', tag_name, name);
                 }
                 is_empty = tag.empty;
                 tag_name.type = name;
@@ -6051,7 +6051,7 @@ loop:   for (;;) {
                         advance('=');
                         quote = next_token.id;
                         if (quote !== '"' && quote !== '\'') {
-                            fail('expected_a_b', next_token, '"', next_token.value);
+                            stop('expected_a_b', next_token, '"', next_token.value);
                         }
                         xquote = quote;
                         wmode = option.white;
@@ -6061,7 +6061,7 @@ loop:   for (;;) {
                         statements();
                         option.white = wmode;
                         if (next_token.id !== quote) {
-                            fail('expected_a_b', next_token, quote, next_token.value);
+                            stop('expected_a_b', next_token, quote, next_token.value);
                         }
                         xmode = 'html';
                         xquote = '';
@@ -6072,7 +6072,7 @@ loop:   for (;;) {
                         advance('=');
                         quote = next_token.id;
                         if (quote !== '"' && quote !== '\'') {
-                            fail('expected_a_b', next_token, '"', next_token.value);
+                            stop('expected_a_b', next_token, '"', next_token.value);
                         }
                         xmode = 'styleproperty';
                         xquote = quote;
@@ -6121,18 +6121,18 @@ loop:   for (;;) {
                 }
                 advance();
                 if (!stack) {
-                    fail('unexpected_a', next_token, closetag(name));
+                    stop('unexpected_a', next_token, closetag(name));
                 }
                 tag_name = stack.pop();
                 if (!tag_name) {
-                    fail('unexpected_a', next_token, closetag(name));
+                    stop('unexpected_a', next_token, closetag(name));
                 }
                 if (tag_name.name !== name) {
-                    fail('expected_a_b',
+                    stop('expected_a_b',
                         next_token, closetag(tag_name.name), closetag(name));
                 }
                 if (next_token.id !== '>') {
-                    fail('expected_a_b', next_token, '>', next_token.value);
+                    stop('expected_a_b', next_token, '>', next_token.value);
                 }
                 xmode = 'outer';
                 advance('>');
@@ -6148,13 +6148,13 @@ loop:   for (;;) {
                         break;
                     }
                     if (next_token.value.indexOf('--') >= 0) {
-                        fail('unexpected_a', next_token, '--');
+                        stop('unexpected_a', next_token, '--');
                     }
                     if (next_token.value.indexOf('<') >= 0) {
-                        fail('unexpected_a', next_token, '<');
+                        stop('unexpected_a', next_token, '<');
                     }
                     if (next_token.value.indexOf('>') >= 0) {
-                        fail('unexpected_a', next_token, '>');
+                        stop('unexpected_a', next_token, '>');
                     }
                 }
                 xmode = 'outer';
@@ -6164,7 +6164,7 @@ loop:   for (;;) {
                 return;
             default:
                 if (next_token.id === '(end)') {
-                    fail('missing_a', next_token,
+                    stop('missing_a', next_token,
                         '</' + stack[stack.length - 1].value + '>');
                 } else {
                     advance();
@@ -6176,7 +6176,7 @@ loop:   for (;;) {
             }
         }
         if (next_token.id !== '(end)') {
-            fail('unexpected_a');
+            stop('unexpected_a');
         }
     }
 
@@ -6289,7 +6289,7 @@ loop:   for (;;) {
         try {
             advance();
             if (next_token.arity === 'number') {
-                fail('unexpected_a');
+                stop('unexpected_a');
             } else if (next_token.value.charAt(0) === '<') {
                 html();
                 if (option.adsafe && !adsafe_went) {
@@ -6312,12 +6312,12 @@ loop:   for (;;) {
                     if (token.id !== '@' || !next_token.identifier ||
                             next_token.value !== 'charset' || token.line !== 1 ||
                             token.from !== 1) {
-                        fail('css');
+                        stop('css');
                     }
                     advance();
                     if (next_token.arity !== 'string' &&
                             next_token.value !== 'UTF-8') {
-                        fail('css');
+                        stop('css');
                     }
                     advance();
                     semicolon();
@@ -6326,7 +6326,7 @@ loop:   for (;;) {
 
                 default:
                     if (option.adsafe && option.fragment) {
-                        fail('expected_a_b',
+                        stop('expected_a_b',
                             next_token, '<div>', next_token.value);
                     }
 
@@ -6354,7 +6354,7 @@ loop:   for (;;) {
                             tree[0].second.length !== 2 ||
                             tree[0].second[0].arity !== 'string' ||
                             aint(tree[0].second[1], 'id', 'function'))) {
-                        fail('adsafe_lib');
+                        stop('adsafe_lib');
                     }
                     if (tree.disrupt) {
                         warn('weird_program', prev_token);
@@ -6611,7 +6611,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-04-19';
+    itself.edition = '2011-04-20';
 
     return itself;
 
