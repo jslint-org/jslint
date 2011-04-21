@@ -1208,8 +1208,7 @@ var JSLINT = (function () {
 // html token
         hx = /^\s*(['"=>\/&#]|<(?:\/|\!(?:--)?)?|[a-zA-Z][a-zA-Z0-9_\-:]*|[0-9]+|--)/,
 // characters in strings that need escapement
-        nx = /[\u0000-\u001f"\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
-        nxg = /[\u0000-\u001f"\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+        nx = /[\u0000-\u001f"\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
 // outer html token
         ox = /[>&]|<[\/!]?|--/,
 // star slash
@@ -6587,13 +6586,8 @@ loop:   for (;;) {
                     length = 13;
                     for (i = 0; i < keys.length; i += 1) {
                         key = keys[i];
-                        if (ix.test(key)) {
-                            name = key;
-                        } else {
-                            key = key.entityify();
-                            name = '"' + (nx.test(key) ?
-                                key.replace(nxg, sanitize) : key) + '"';
-                        }
+                        name = ix.test(key) ? key :
+                            '"' + key.entityify().replace(nx, sanitize) + '"';
                         if (length + name.length > 72) {
                             output.push(mem + '<br>');
                             mem = '    ';
