@@ -1208,8 +1208,8 @@ var JSLINT = (function () {
 // html token
         hx = /^\s*(['"=>\/&#]|<(?:\/|\!(?:--)?)?|[a-zA-Z][a-zA-Z0-9_\-:]*|[0-9]+|--)/,
 // characters in strings that need escapement
-        nx = /[\u0000-\u001f&<"\/\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
-        nxg = /[\u0000-\u001f&<"\/\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+        nx = /[\u0000-\u001f"\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
+        nxg = /[\u0000-\u001f"\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
 // outer html token
         ox = /[>&]|<[\/!]?|--/,
 // star slash
@@ -1316,28 +1316,13 @@ var JSLINT = (function () {
         };
     }
 
-    if (typeof String.prototype.name !== 'function') {
-        String.prototype.name = function () {
 
-// If the string looks like an identifier, then we can return it as is.
-// If the string contains no control characters, no quote characters, and no
-// backslash characters, then we can simply slap some quotes around it.
-// Otherwise we must also replace the offending characters with safe
-// sequences.
+    function sanitize(a) {
 
-            if (ix.test(this)) {
-                return this;
-            }
-            if (nx.test(this)) {
-                return '"' + this.replace(nxg, function (a) {
-                    if (escapes[a]) {
-                        return escapes[a];
-                    }
-                    return '\\u' + ('0000' + a.charCodeAt().toString(16)).slice(-4);
-                }) + '"';
-            }
-            return '"' + this + '"';
-        };
+//  Escapify a troublesome character.
+
+        return escapes[a] ? escapes[a] :
+            '\\u' + ('0000' + a.charCodeAt().toString(16)).slice(-4);
     }
 
 
@@ -6602,7 +6587,13 @@ loop:   for (;;) {
                     length = 13;
                     for (i = 0; i < keys.length; i += 1) {
                         key = keys[i];
-                        name = key.name();
+                        if (ix.test(key)) {
+                            name = key;
+                        } else {
+                            key = key.entityify();
+                            name = '"' + (nx.test(key) ?
+                                key.replace(nxg, sanitize) : key) + '"';
+                        }
                         if (length + name.length > 72) {
                             output.push(mem + '<br>');
                             mem = '    ';
