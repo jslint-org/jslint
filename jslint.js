@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-04-20
+// 2011-04-21
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -246,7 +246,7 @@
     c, cadetblue, call, callee, caller, canvas, cap, caption,
     "caption-side", captiontext, center, charAt, charCodeAt, character,
     chartreuse, chocolate, chooseColor, chooseFile, chooseFolder, cite,
-    clear, clearInterval, clearTimeout, clearTimout, clip, closeWidget,
+    clear, clearInterval, clearTimeout, clip, closeWidget,
     closure, cm, code, col, colgroup, color, combine_var, command, comment,
     comments, concat, conditional_assignment, confirm, confusing_a,
     confusing_regexp, console, constructor, constructor_name_a, content,
@@ -983,7 +983,7 @@ var JSLINT = (function () {
         node = {
             Buffer       : false,
             clearInterval: false,
-            clearTimout  : false,
+            clearTimeout : false,
             console      : false,
             global       : false,
             module       : false,
@@ -6611,7 +6611,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-04-20';
+    itself.edition = '2011-04-21';
 
     return itself;
 
