@@ -1,5 +1,5 @@
 // intercept.js
-// 2011-04-19
+// 2011-04-20
 
 // This file makes it possible for JSLint to run as an ADsafe widget by
 // adding lib features.
@@ -77,6 +77,7 @@ ADSAFE._intercept(function (id, dom, lib, bunch) {
 
     if (id === 'JSLINT_') {
         lib.jslint = function (source, options, output, then) {
+            output.___nodes___[0].innerHTML = "Working.";
             var now, report, then = Date.now();
             JSLINT(source, options);
             report = JSLINT.report();
