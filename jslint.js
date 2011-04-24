@@ -2979,7 +2979,9 @@ loop:   for (;;) {
             warn(message || bundle.weird_condition, node);
             break;
         case '(':
-            if (node.first.id === '.' && node.first.second.value === 'indexOf') {
+            if (node.first.id === '.' &&
+                    (node.first.second.value === 'indexOf' ||
+                    node.first.second.value === 'lastIndexOf')) {
                 warn(message || bundle.weird_condition, node);
             }
             break;
