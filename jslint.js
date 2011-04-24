@@ -289,8 +289,8 @@
     infix_in, infobackground, infotext, init, input, ins, insecure_a,
     isAlpha, isApplicationRunning, isArray, isDigit, isFinite, isNaN, ivory,
     join, jslint, json, kbd, keygen, keys, khaki, konfabulatorVersion,
-    label, label_a_b, labeled, lang, lavender, lavenderblush, lawngreen,
-    lbp, leading_decimal_a, led, left, legend, lemonchiffon, length,
+    label, label_a_b, labeled, lang, lastIndexOf, lavender, lavenderblush,
+    lawngreen, lbp, leading_decimal_a, led, left, legend, lemonchiffon, length,
     "letter-spacing", li, lib, lightblue, lightcoral, lightcyan,
     lightgoldenrodyellow, lightgreen, lightpink, lightsalmon, lightseagreen,
     lightskyblue, lightslategray, lightsteelblue, lightyellow, lime,
@@ -995,6 +995,11 @@ var JSLINT = (function () {
             util         : false,
             __filename   : false,
             __dirname    : false
+        },
+        numbery = {
+            indexOf     : true,
+            lastIndexOf : true,
+            search      : true
         },
         properties,
         next_token,
@@ -2979,9 +2984,7 @@ loop:   for (;;) {
             warn(message || bundle.weird_condition, node);
             break;
         case '(':
-            if (node.first.id === '.' &&
-                    (node.first.second.value === 'indexOf' ||
-                    node.first.second.value === 'lastIndexOf')) {
+            if (node.first.id === '.' && numbery[node.first.second.value] === true) {
                 warn(message || bundle.weird_condition, node);
             }
             break;
