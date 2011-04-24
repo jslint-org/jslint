@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-04-21
+// 2011-04-23
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -2977,6 +2977,11 @@ loop:   for (;;) {
         case '(string)':
         case '{':
             warn(message || bundle.weird_condition, node);
+            break;
+        case '(':
+            if (node.first.id === '.' && node.first.second.value === 'indexOf') {
+                warn(message || bundle.weird_condition, node);
+            }
             break;
         }
         return node;
@@ -6611,7 +6616,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-04-21';
+    itself.edition = '2011-04-23';
 
     return itself;
 
