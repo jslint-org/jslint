@@ -3754,7 +3754,7 @@ loop:   for (;;) {
     });
     prefix('!', function () {
         no_space_only();
-        this.first = expression(150);
+        this.first = expected_condition(expression(150));
         this.arity = 'prefix';
         if (bang[this.first.id] === true) {
             warn('confusing_a', this);
