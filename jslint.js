@@ -60,7 +60,7 @@
 // If a stopping error was found, a null will be the last element of the
 // JSLINT.errors array. A stopping error means that JSLint was not confident
 // enough to continue. It does not necessarily mean that the error was
-// especailly heinous.
+// especially heinous.
 
 // You can request a Function Report, which shows all of the functions
 // and the parameters and vars that they use. This can be used to find
