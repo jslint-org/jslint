@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-04-27
+// 2011-04-28
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -3716,7 +3716,7 @@ loop:   for (;;) {
             warn('unexpected_a', left);
         }
         var right = expression(140);
-        if ((right.arity === 'number' && (right.value === 0 || right.value === 1)) || right.arity === 'string') {
+        if ((right.arity === 'number' && right.value === 0) || right.arity === 'string') {
             warn('unexpected_a', right);
         }
         if (left.arity === right.arity && left.arity === 'number') {
@@ -6624,7 +6624,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-04-27';
+    itself.edition = '2011-04-28';
 
     return itself;
 
