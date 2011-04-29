@@ -3869,6 +3869,9 @@ loop:   for (;;) {
                 if (option.safe && left.first.value === 'Math' &&
                         left.second === 'random') {
                     warn('adsafe', left);
+                } else if (left.second.value === 'split' &&
+                        left.first.id === '(string)') {
+                    warn('use_array', left.second);
                 }
             }
         }
@@ -4310,6 +4313,7 @@ loop:   for (;;) {
                 break;
             }
             comma();
+            indent.wrap = false;
             if (var_mode && next_token.line === token.line &&
                     this.first.length === 1) {
                 var_mode = false;
