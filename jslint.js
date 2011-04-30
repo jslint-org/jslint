@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-04-28
+// 2011-04-30
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -184,6 +184,7 @@
 //     regexp     true, if the . should not be allowed in regexp literals
 //     rhino      true, if the Rhino environment globals should be predefined
 //     undef      true, if variables should be declared before used
+//     unparam    true, if unused parameters should be tolerated
 //     safe       true, if use of some browser features should be restricted
 //     windows    true, if MS Windows-specific globals should be predefined
 //     strict     true, require the "use strict"; pragma
@@ -468,7 +469,8 @@ var JSLINT = (function () {
             adsafe_div: "ADsafe violation: Wrap the widget in a div.",
             adsafe_fragment: "ADSAFE: Use the fragment option.",
             adsafe_go: "ADsafe violation: Misformed ADSAFE.go.",
-            adsafe_html: "Currently, ADsafe does not operate on whole HTML documents. It operates on <div> fragments and .js files.",
+            adsafe_html: "Currently, ADsafe does not operate on whole HTML " +
+                "documents. It operates on <div> fragments and .js files.",
             adsafe_id: "ADsafe violation: id does not match.",
             adsafe_id_go: "ADsafe violation: Missing ADSAFE.id or ADSAFE.go.",
             adsafe_lib: "ADsafe lib violation.",
@@ -484,7 +486,8 @@ var JSLINT = (function () {
             already_defined: "'{a}' is already defined.",
             and: "The '&&' subexpression should be wrapped in parens.",
             assign_exception: "Do not assign to the exception parameter.",
-            assignment_function_expression: "Expected an assignment or function call and instead saw an expression.",
+            assignment_function_expression: "Expected an assignment or " +
+                "function call and instead saw an expression.",
             attribute_case_a: "Attribute '{a}' not all lower case.",
             avoid_a: "Avoid '{a}'.",
             bad_assignment: "Bad assignment.",
@@ -501,12 +504,15 @@ var JSLINT = (function () {
             bad_operand: "Bad operand.",
             bad_type: "Bad type.",
             bad_url: "Bad url string.",
-            bad_wrap: "Do not wrap function literals in parens unless they are to be immediately invoked.",
+            bad_wrap: "Do not wrap function literals in parens unless they " +
+                "are to be immediately invoked.",
             combine_var: "Combine this with the previous 'var' statement.",
-            conditional_assignment: "Expected a conditional expression and instead saw an assignment.",
+            conditional_assignment: "Expected a conditional expression and " +
+                "instead saw an assignment.",
             confusing_a: "Confusing use of '{a}'.",
             confusing_regexp: "Confusing regular expression.",
-            constructor_name_a: "A constructor name '{a}' should start with an uppercase letter.",
+            constructor_name_a: "A constructor name '{a}' should start with " +
+                "an uppercase letter.",
             control_a: "Unexpected control character '{a}'.",
             css: "A css file should begin with @charset 'UTF-8';",
             dangling_a: "Unexpected dangling '_' in '{a}'.",
@@ -519,21 +525,26 @@ var JSLINT = (function () {
             evil: "eval is evil.",
             expected_a: "Expected '{a}'.",
             expected_a_b: "Expected '{a}' and instead saw '{b}'.",
-            expected_a_b_from_c_d: "Expected '{a}' to match '{b}' from line {c} and instead saw '{d}'.",
+            expected_a_b_from_c_d: "Expected '{a}' to match '{b}' from line " +
+                "{c} and instead saw '{d}'.",
             expected_at_a: "Expected an at-rule, and instead saw @{a}.",
             expected_a_at_b_c: "Expected '{a}' at column {b}, not column {c}.",
             expected_attribute_a: "Expected an attribute, and instead saw [{a}].",
-            expected_attribute_value_a: "Expected an attribute value and instead saw '{a}'.",
+            expected_attribute_value_a: "Expected an attribute value and " +
+                "instead saw '{a}'.",
             expected_class_a: "Expected a class, and instead saw .{a}.",
-            expected_fraction_a: "Expected a number between 0 and 1 and instead saw '{a}'",
+            expected_fraction_a: "Expected a number between 0 and 1 and " +
+                "instead saw '{a}'",
             expected_id_a: "Expected an id, and instead saw #{a}.",
             expected_identifier_a: "Expected an identifier and instead saw '{a}'.",
-            expected_identifier_a_reserved: "Expected an identifier and instead saw '{a}' (a reserved word).",
+            expected_identifier_a_reserved: "Expected an identifier and " +
+                "instead saw '{a}' (a reserved word).",
             expected_linear_a: "Expected a linear unit and instead saw '{a}'.",
             expected_lang_a: "Expected a lang code, and instead saw :{a}.",
             expected_media_a: "Expected a CSS media type, and instead saw '{a}'.",
             expected_name_a: "Expected a name and instead saw '{a}'.",
-            expected_nonstandard_style_attribute: "Expected a non-standard style attribute and instead saw '{a}'.",
+            expected_nonstandard_style_attribute: "Expected a non-standard " +
+                "style attribute and instead saw '{a}'.",
             expected_number_a: "Expected a number and instead saw '{a}'.",
             expected_operator_a: "Expected an operator and instead saw '{a}'.",
             expected_percent_a: "Expected a percentage and instead saw '{a}'",
@@ -546,7 +557,8 @@ var JSLINT = (function () {
             expected_style_attribute: "Excepted a style attribute, and instead saw '{a}'.",
             expected_style_pattern: "Expected a style pattern, and instead saw '{a}'.",
             expected_tagname_a: "Expected a tagName, and instead saw {a}.",
-            for_if: "The body of a for in should be wrapped in an if statement to filter unwanted properties from the prototype.",
+            for_if: "The body of a for in should be wrapped in an if " +
+                "statement to filter unwanted properties from the prototype.",
             function_block: "Function statements should not be placed in blocks. " +
                 "Use a function expression or move the statement to the top of " +
                 "the outer function.",
@@ -558,9 +570,11 @@ var JSLINT = (function () {
             get_set: "get/set are ES5 features.",
             html_confusion_a: "HTML confusion in regular expression '<{a}'.",
             html_handlers: "Avoid HTML event handlers.",
-            identifier_function: "Expected an identifier in an assignment and instead saw a function invocation.",
+            identifier_function: "Expected an identifier in an assignment " +
+                "and instead saw a function invocation.",
             implied_evil: "Implied eval is evil. Pass a function instead of a string.",
-            infix_in: "Unexpected 'in'. Compare with undefined, or use the hasOwnProperty method instead.",
+            infix_in: "Unexpected 'in'. Compare with undefined, or use the " +
+                "hasOwnProperty method instead.",
             insecure_a: "Insecure '{a}'.",
             isNaN: "Use the isNaN function to compare with NaN.",
             label_a_b: "Label '{a}' on '{b}' statement.",
@@ -574,7 +588,8 @@ var JSLINT = (function () {
             missing_url: "Missing url.",
             missing_use_strict: "Missing \"use strict\" statement.",
             mixed: "Mixed spaces and tabs.",
-            move_invocation: "Move the invocation into the parens that contain the function.",
+            move_invocation: "Move the invocation into the parens that " +
+                "contain the function.",
             move_var: "Move 'var' declarations to the top of the function.",
             name_function: "Missing name in function statement.",
             nested_comment: "Nested comment.",
@@ -601,7 +616,8 @@ var JSLINT = (function () {
             tag_a_in_b: "A '<{a}>' must be within '<{b}>'.",
             too_long: "Line too long.",
             too_many: "Too many errors.",
-            trailing_decimal_a: "A trailing decimal point can be confused with a dot: '.{a}'.",
+            trailing_decimal_a: "A trailing decimal point can be confused " +
+                "with a dot: '.{a}'.",
             type: "type is unnecessary.",
             unclosed: "Unclosed string.",
             unclosed_comment: "Unclosed comment.",
@@ -612,7 +628,8 @@ var JSLINT = (function () {
             unexpected_comment: "Unexpected comment.",
             unexpected_property_a: "Unexpected /*property*/ '{a}'.",
             unexpected_space_a_b: "Unexpected space between '{a}' and '{b}'.",
-            unnecessary_initialize: "It is not necessary to initialize '{a}' to 'undefined'.",
+            unnecessary_initialize: "It is not necessary to initialize '{a}' " +
+                "to 'undefined'.",
             unnecessary_use: "Unnecessary \"use strict\".",
             unreachable_a_b: "Unreachable '{a}' after '{b}'.",
             unrecognized_style_attribute_a: "Unrecognized style attribute '{a}'.",
@@ -633,7 +650,8 @@ var JSLINT = (function () {
             wrap_immediate: "Wrap an immediate function invocation in parentheses " +
                 "to assist the reader in understanding that the expression " +
                 "is the result of a function, and not the function itself.",
-            wrap_regexp: "Wrap the /regexp/ literal in parens to disambiguate the slash operator.",
+            wrap_regexp: "Wrap the /regexp/ literal in parens to " +
+                "disambiguate the slash operator.",
             write_is_wrong: "document.write can be a form of eval."
         },
         comments_off,
@@ -3105,7 +3123,7 @@ loop:   for (;;) {
     }
 
 
-    function suffix(s, f) {
+    function suffix(s) {
         var x = symbol(s, 150);
         x.led = function (left) {
             no_space_only(prev_token, token);
@@ -3149,7 +3167,7 @@ loop:   for (;;) {
     }
 
 
-    function statement(no_indent) {
+    function statement() {
 
 // Usually a statement starts a line. Exceptions include the var statement in the
 // initialization part of a for statement, and an if after an else.
@@ -3354,6 +3372,9 @@ loop:   for (;;) {
                 case 'unused':
                     funct[variable] = 'var';
                     break;
+                case 'unparam':
+                    funct[variable] = 'parameter';
+                    break;
                 case 'unction':
                     funct[variable] = 'function';
                     this['function'] = true;
@@ -3432,6 +3453,10 @@ loop:   for (;;) {
                         case 'closure':
                         case 'parameter':
                             funct[variable] = site['(global)'] ? true : 'outer';
+                            break;
+                        case 'unparam':
+                            site[variable] = 'parameter';
+                            funct[variable] = site['(global)'] ? false : 'outer';
                             break;
                         case 'error':
                             warn('not_a_defined', token);
@@ -4111,7 +4136,7 @@ loop:   for (;;) {
             edge();
             id = identifier();
             params.push(token);
-            add_label(id, 'parameter');
+            add_label(id, 'unparam');
             if (next_token.id === ',') {
                 comma();
             } else {
@@ -5774,7 +5799,7 @@ loop:   for (;;) {
         assume();
     }
 
-    function do_attribute(n, a, v) {
+    function do_attribute(a, v) {
         var u, x;
         if (a === 'id') {
             u = typeof v === 'string' ? v.toUpperCase() : '';
@@ -6117,7 +6142,7 @@ loop:   for (;;) {
                         }
                     }
                     attributes[attribute] = tag;
-                    do_attribute(name, attribute, tag);
+                    do_attribute(attribute, tag);
                 }
                 do_tag(name, attributes);
                 if (!is_empty) {
@@ -6448,7 +6473,8 @@ loop:   for (;;) {
                 if (Object.prototype.hasOwnProperty.call(the_function, name)) {
                     if (name.charAt(0) !== '(') {
                         kind = the_function[name];
-                        if (kind === 'unction') {
+                        if (kind === 'unction' ||
+                                (kind === 'unparam' && !option.unparam)) {
                             kind = 'unused';
                         } else if (typeof kind === 'boolean') {
                             kind = 'global';
@@ -6628,7 +6654,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-04-28';
+    itself.edition = '2011-04-30';
 
     return itself;
 

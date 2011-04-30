@@ -1,5 +1,5 @@
 // init_ui.js
-// 2011-04-19
+// 2011-04-30
 
 // This is the web browser companion to fulljslint.js. It is an ADsafe
 // lib file that implements a web ui by adding behavior to the widget's
@@ -131,7 +131,7 @@ ADSAFE.lib("init_ui", function (lib) {
 
 // Add click event handlers to the [JSLint] and [clear] buttons.
 
-        dom.q('input&jslint').on('click', function (e) {
+        dom.q('input&jslint').on('click', function () {
             tree.value('');
 
 // Call JSLint and display the report.
@@ -141,7 +141,7 @@ ADSAFE.lib("init_ui", function (lib) {
             return false;
         });
 
-        dom.q('input&tree').on('click', function (e) {
+        dom.q('input&tree').on('click', function () {
             output.value('Tree:');
             tree.value(JSON.stringify(lib.tree(), [
                 'label', 'value', 'arity', 'name', 'first', 'second',
@@ -150,20 +150,20 @@ ADSAFE.lib("init_ui", function (lib) {
             input.select();
         });
 
-        //dom.q('input&jsmax').on('click', function (e) {
+        //dom.q('input&jsmax').on('click', function () {
         //    output.value('JSMax:');
         //    tree.value(JSMAX(lib.tree()));
         //    input.select();
         //});
 
-        dom.q('input&clear').on('click', function (e) {
+        dom.q('input&clear').on('click', function () {
             output.value('');
             tree.value('');
             input.value('').select();
         });
 
 
-        dom.q('#JSLINT_CLEARALL').on('click', function (e) {
+        dom.q('#JSLINT_CLEARALL').on('click', function () {
             option = {
                 indent: 4,
                 maxerr: 50
@@ -171,7 +171,7 @@ ADSAFE.lib("init_ui", function (lib) {
             show_options();
         });
 
-        dom.q('#JSLINT_GOODPARTS').on('click', function (e) {
+        dom.q('#JSLINT_GOODPARTS').on('click', function () {
             goodparts.each(function (bunch) {
                 ADSAFE.set(option, bunch.getTitle(), true);
             });
@@ -185,7 +185,7 @@ ADSAFE.lib("init_ui", function (lib) {
         maxlen.on('change', update_number);
         predefined.on('change', update_list);
         input
-            .on('change', function (e) {
+            .on('change', function () {
                 output.value('');
             })
             .select();
