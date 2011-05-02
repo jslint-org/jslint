@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-04-30
+// 2011-05-01
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -187,7 +187,7 @@
 //     unparam    true, if unused parameters should be tolerated
 //     safe       true, if use of some browser features should be restricted
 //     windows    true, if MS Windows-specific globals should be predefined
-//     strict     true, require the "use strict"; pragma
+//     strict     true, require the 'use strict'; pragma
 //     sub        true, if all forms of subscript notation are tolerated
 //     white      true, if strict whitespace rules apply
 //     widget     true  if the Yahoo Widgets globals should be predefined
@@ -345,8 +345,8 @@
     unexpected_a, unexpected_char_a_b, unexpected_comment,
     unexpected_property_a, unexpected_space_a_b, "unicode-bidi",
     unnecessary_initialize, unnecessary_use, unreachable_a_b,
-    unrecognized_style_attribute_a, unrecognized_tag_a, unsafe, unused,
-    unwatch, updateNow, url, urls, use_array, use_braces, use_object,
+    unrecognized_style_attribute_a, unrecognized_tag_a, unparam, unsafe, unused,
+    unwatch, updateNow, url, urls, use_array, use_braces, use_object, use_param,
     used_before_a, util, value, valueOf, var, var_a_not, version,
     "vertical-align", video, violet, visibility, was, watch,
     weird_assignment, weird_condition, weird_new, weird_program,
@@ -367,7 +367,7 @@
 // can contain data and other functions.
 
 var JSLINT = (function () {
-    "use strict";
+    'use strict';
 
     var adsafe_id,      // The widget's ADsafe id.
         adsafe_infix = {
@@ -566,7 +566,7 @@ var JSLINT = (function () {
             function_loop: "Don't make functions within a loop.",
             function_statement: "Function statements are not invocable. " +
                 "Wrap the whole function invocation in parens.",
-            function_strict: "Use the function form of \"use strict\".",
+            function_strict: "Use the function form of 'use strict'.",
             get_set: "get/set are ES5 features.",
             html_confusion_a: "HTML confusion in regular expression '<{a}'.",
             html_handlers: "Avoid HTML event handlers.",
@@ -586,7 +586,7 @@ var JSLINT = (function () {
             missing_property: "Missing property name.",
             missing_space_a_b: "Missing space between '{a}' and '{b}'.",
             missing_url: "Missing url.",
-            missing_use_strict: "Missing \"use strict\" statement.",
+            missing_use_strict: "Missing 'use strict' statement.",
             mixed: "Mixed spaces and tabs.",
             move_invocation: "Move the invocation into the parens that " +
                 "contain the function.",
@@ -630,7 +630,7 @@ var JSLINT = (function () {
             unexpected_space_a_b: "Unexpected space between '{a}' and '{b}'.",
             unnecessary_initialize: "It is not necessary to initialize '{a}' " +
                 "to 'undefined'.",
-            unnecessary_use: "Unnecessary \"use strict\".",
+            unnecessary_use: "Unnecessary 'use strict'.",
             unreachable_a_b: "Unreachable '{a}' after '{b}'.",
             unrecognized_style_attribute_a: "Unrecognized style attribute '{a}'.",
             unrecognized_tag_a: "Unrecognized tag '<{a}>'.",
@@ -639,6 +639,7 @@ var JSLINT = (function () {
             use_array: "Use the array literal notation [].",
             use_braces: "Spaces are hard to count. Use {{a}}.",
             use_object: "Use the object literal notation {}.",
+            use_param: "Use a named parameter.",
             used_before_a: "'{a}' was used before it was defined.",
             var_a_not: "Variable {a} was not declared correctly.",
             weird_assignment: "Weird assignment.",
@@ -4036,7 +4037,11 @@ loop:   for (;;) {
         step_in();
         edge();
         var e = expression(0), s;
-        if (e.arity === 'string') {
+        if (e.arity === 'number') {
+            if (left.id === 'arguments') {
+                warn('use_param', left);
+            }
+        } else if (e.arity === 'string') {
             if (option.safe && (banned[e.value] ||
                     e.value.charAt(0) === '_' || e.value.slice(-1) === '_')) {
                 warn('adsafe_subscript_a', e);
@@ -4051,7 +4056,7 @@ loop:   for (;;) {
                     warn('subscript', e);
                 }
             }
-        } else if (e.arity !== 'number' && option.safe) {
+        } else if (option.safe) {
             if (!((e.arity === 'prefix' && adsafe_prefix[e.id] === true) ||
                     (e.arity === 'infix' && adsafe_infix[e.id] === true))) {
                 warn('adsafe_subscript_a', e);
@@ -6654,7 +6659,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-04-30';
+    itself.edition = '2011-05-01';
 
     return itself;
 
