@@ -282,7 +282,7 @@
     frame, frames, frameset, from, fromCharCode, fuchsia, fud, funct,
     function, function_block, function_eval, function_loop,
     function_statement, function_strict, functions, g, gainsboro, gc,
-    get_set, ghostwhite, global, globals, gold, goldenrod, gray, graytext,
+    ghostwhite, global, globals, gold, goldenrod, gray, graytext,
     green, greenyellow, h1, h2, h3, h4, h5, h6, handheld, hasOwnProperty,
     head, header, height, help, hgroup, highlight, highlighttext, history,
     honeydew, hotpink, hr, "hta:application", html, html_confusion_a,
@@ -524,6 +524,7 @@ var JSLINT = (function () {
             empty_block: "Empty block.",
             empty_case: "Empty case.",
             empty_class: "Empty class.",
+            es5: "This is an ES5 feature.",
             evil: "eval is evil.",
             expected_a: "Expected '{a}'.",
             expected_a_b: "Expected '{a}' and instead saw '{b}'.",
@@ -569,7 +570,6 @@ var JSLINT = (function () {
             function_statement: "Function statements are not invocable. " +
                 "Wrap the whole function invocation in parens.",
             function_strict: "Use the function form of 'use strict'.",
-            get_set: "get/set are ES5 features.",
             html_confusion_a: "HTML confusion in regular expression '<{a}'.",
             html_handlers: "Avoid HTML event handlers.",
             identifier_function: "Expected an identifier in an assignment " +
@@ -865,6 +865,7 @@ var JSLINT = (function () {
             '\n': '\\n',
             '\f': '\\f',
             '\r': '\\r',
+            '\'': '\\\'',
             '"' : '\\"',
             '/' : '\\/',
             '\\': '\\\\'
@@ -1243,7 +1244,7 @@ var JSLINT = (function () {
 // star slash
         lx = /\*\/|\/\*/,
 // characters in strings that need escapement
-        nx = /[\u0000-\u001f"\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+        nx = /[\u0000-\u001f'\\\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
 // outer html token
         ox = /[>&]|<[\/!]?|--/,
 // attributes characters
@@ -1697,6 +1698,13 @@ var JSLINT = (function () {
                                 character += 1;
                                 c = source_row.charAt(j);
                                 switch (c) {
+                                case '':
+                                    if (!option.es5) {
+                                        warn_at('es5', line, character);
+                                    }
+                                    next_line();
+                                    j = -1;
+                                    break;
                                 case xquote:
                                     warn_at('bad_html', line, character + j);
                                     break;
@@ -4203,7 +4211,7 @@ loop:   for (;;) {
             edge();
             if (next_token.value === 'get' && peek().id !== ':') {
                 if (!option.es5) {
-                    warn('get_set');
+                    warn('es5');
                 }
                 get = next_token;
                 advance('get');
@@ -6614,8 +6622,9 @@ loop:   for (;;) {
                         names[j] = the_function.param[j].value;
                     }
                 }
-                output.push('<br><div class=function><i>' + the_function.line + '</i> ' +
-                    (the_function.name || '') + '(' + names.join(', ') + ')</div>');
+                output.push('<br><div class=function><i>' + the_function.line +
+                    '</i> ' + (the_function.name || '').entityify().replace(nx, sanitize) +
+                    '(' + names.join(', ') + ')</div>');
                 detail('<big><b>Unused</b></big>', the_function.unused);
                 detail('Closure', the_function.closure);
                 detail('Variable', the_function['var']);
@@ -6634,7 +6643,7 @@ loop:   for (;;) {
                     for (i = 0; i < keys.length; i += 1) {
                         key = keys[i];
                         name = ix.test(key) ? key :
-                            '"' + key.entityify().replace(nx, sanitize) + '"';
+                            '\'' + key.entityify().replace(nx, sanitize) + '\'';
                         if (length + name.length > 72) {
                             output.push(mem + '<br>');
                             mem = '    ';
