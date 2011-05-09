@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-05-06
+// 2011-05-08
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -3450,11 +3450,9 @@ loop:   for (;;) {
                             break;
                         case 'var':
                         case 'unused':
-                            site[variable] = 'closure';
-                            funct[variable] = site['(global)'] ? true : 'outer';
-                            break;
                         case 'closure':
                         case 'parameter':
+                            site[variable] = 'closure';
                             funct[variable] = site['(global)'] ? true : 'outer';
                             break;
                         case 'unparam':
@@ -6660,7 +6658,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-05-06';
+    itself.edition = '2011-05-08';
 
     return itself;
 
