@@ -92,7 +92,9 @@
 //                 line: NUMBER,
 //                 last: NUMBER,
 //                 param: [
-//                     TOKEN
+//                     {
+//                         value: STRING
+//                     }
 //                 ],
 //                 closure: [
 //                     STRING
