@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-05-09
+// 2011-05-10
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -4170,7 +4170,7 @@ loop:   for (;;) {
             old_global     = global,
             old_scope      = scope;
         funct = {
-            '(name)'     : name || '\'' + (anonname || '').entityify().replace(nx, sanitize) + '\'',
+            '(name)'     : name || '\'' + (anonname || '').replace(nx, sanitize) + '\'',
             '(line)'     : next_token.line,
             '(context)'  : funct,
             '(breakage)' : 0,
@@ -6626,7 +6626,7 @@ loop:   for (;;) {
                     }
                 }
                 output.push('<br><div class=function><i>' + the_function.line +
-                    '</i> ' + the_function.name  +
+                    '</i> ' + the_function.name.entityify() +
                     '(' + names.join(', ') + ')</div>');
                 detail('<big><b>Unused</b></big>', the_function.unused);
                 detail('Closure', the_function.closure);
@@ -6670,7 +6670,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-05-09';
+    itself.edition = '2011-05-10';
 
     return itself;
 
