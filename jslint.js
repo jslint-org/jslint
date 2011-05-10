@@ -4662,6 +4662,7 @@ loop:   for (;;) {
             case 'unused':
                 funct[value.value] = 'var';
                 break;
+            case 'closure':
             case 'var':
                 break;
             default:
