@@ -209,7 +209,7 @@
 // For example:
 
 /*properties "\b", "\t", "\n", "\f", "\r", "!=", "!==", "\"", "%",
-    "&", "'", "(begin)", "(breakage)", "(context)", "(error)",
+    "&", "'", "(begin)", "(breakage)", "(complexity)", "(context)", "(error)",
     "(global)", "(identifier)", "(line)", "(loopage)", "(name)", "(onevar)",
     "(params)", "(scope)", "(statement)", "(token)", "(verb)", ")", "*",
     "+", "-", "/", ";", "<", "<<", "<=", "==", "===", ">",
@@ -280,7 +280,7 @@
     fieldset, figure, filesystem, filter, firebrick, first, float, floor,
     floralwhite, focusWidget, font, "font-family", "font-size",
     "font-size-adjust", "font-stretch", "font-style", "font-variant",
-    "font-weight", footer, for_if, forestgreen, forin, form, fragment,
+    "font-weight", footer, for_if, forestgreen, forEach, forin, form, fragment,
     frame, frames, frameset, from, fromCharCode, fuchsia, fud, funct,
     function, function_block, function_eval, function_loop,
     function_statement, function_strict, functions, g, gainsboro, gc,
@@ -1277,10 +1277,26 @@ var JSLINT = (function () {
 
     if (typeof Array.prototype.filter !== 'function') {
         Array.prototype.filter = function (f) {
+            var i, length = this.length, result = [], value;
+            for (i = 0; i < length; i += 1) {
+                try {
+                    value = this[i];
+                    if (f(value)) {
+                        result.push(value);
+                    }
+                } catch (ignore) {
+                }
+            }
+            return result;
+        };
+    }
+
+    if (typeof Array.prototype.forEach !== 'function') {
+        Array.prototype.forEach = function (f) {
             var i, length = this.length, result = [];
             for (i = 0; i < length; i += 1) {
                 try {
-                    result.push(f(this[i]));
+                    f(this[i]);
                 } catch (ignore) {
                 }
             }
@@ -4164,6 +4180,76 @@ loop:   for (;;) {
     }
 
 
+    function complexity(exp) {
+        var score = 0;
+        if (exp) {
+            if (Array.isArray(exp)) {
+                exp.forEach(function (tok) {
+                    score += complexity(tok);
+                });
+            } else {
+                switch (exp.arity) {
+                case 'statement':
+                    switch (exp.id) {
+                    case 'if':
+                        score += complexity(exp.first) + complexity(exp.block) +
+                            complexity(exp['else']) + 1;
+                        break;
+                    case 'while':
+                    case 'do':
+                        if (exp.first.id !== 'true' && exp.first.value !== 1) {
+                            score += 1;
+                        }
+                        score += complexity(exp.first) + complexity(exp.block);
+                        break;
+                    case 'for':
+                        if (exp.second !== undefined &&
+                                exp.second.id !== 'true' &&
+                                exp.second.value !== 1) {
+                            score += 1;
+                        }
+                        score += complexity(exp.first) + complexity(exp.second) +
+                            complexity(exp.third) + complexity(exp.block);
+                        break;
+                    case 'switch':
+                        score += complexity(exp.first) +
+                            complexity(exp.second) + exp.second.length;
+                        if (exp.second[exp.second.length - 1].id === 'default') {
+                            score -= 1;
+                        }
+                        break;
+                    case 'try':
+                        if (exp.second) {
+                            score += 1;
+                        }
+                        if (exp.third) {
+                            score += 1;
+                        }
+                        score += complexity(exp.first) + complexity(exp.second) +
+                            complexity(exp.third) + complexity(exp.block);
+                        break;
+                    }
+                    break;
+                case 'prefix':
+                    score += complexity(exp.first);
+                    break;
+                case 'case':
+                case 'infix':
+                    score += complexity(exp.first) + complexity(exp.second);
+                    if (exp.id === '&&' || exp.id === '||') {
+                        score += 1;
+                    }
+                    break;
+                case 'ternary':
+                    score += complexity(exp.first) + complexity(exp.second) + complexity(exp.third);
+                    break;
+                }
+            }
+        }
+        return score;
+    }
+
+
     function do_function(func, name) {
         var old_properties = properties,
             old_option     = option,
@@ -4191,6 +4277,7 @@ loop:   for (;;) {
         func.first = funct['(params)'] = function_params();
         one_space();
         func.block = block(false);
+        funct['(complexity)'] = complexity(func.block) + 1;
         funct      = funct['(context)'];
         properties = old_properties;
         option     = old_option;
@@ -4543,6 +4630,7 @@ loop:   for (;;) {
         while (next_token.id === 'case') {
             the_case = next_token;
             the_case.first = [];
+            the_case.arity = 'case';
             spaces();
             edge('case');
             advance('case');
@@ -4586,6 +4674,7 @@ loop:   for (;;) {
         if (next_token.id === 'default') {
             spaces();
             the_case = next_token;
+            the_case.arity = 'case';
             edge('case');
             advance('default');
             discard();
@@ -6515,6 +6604,7 @@ loop:   for (;;) {
             function_data.name = the_function['(name)'];
             function_data.param = the_function['(params)'];
             function_data.line = the_function['(line)'];
+            function_data['(complexity)'] = the_function['(complexity)'];
             data.functions.push(function_data);
         }
 
@@ -6540,19 +6630,20 @@ loop:   for (;;) {
         var err, evidence, i, j, key, keys, length, mem = '', name, names,
             output = [], snippets, the_function, warning;
 
-        function detail(h, array) {
-            var comma_needed, i, singularity;
-            if (array) {
+        function detail(h, value) {
+            var comma_needed, singularity;
+            if (Array.isArray(value)) {
                 output.push('<div><i>' + h + '</i> ');
-                array = array.sort();
-                for (i = 0; i < array.length; i += 1) {
-                    if (array[i] !== singularity) {
-                        singularity = array[i];
+                value = value.sort().forEach(function (item) {
+                    if (item !== singularity) {
+                        singularity = item;
                         output.push((comma_needed ? ', ' : '') + singularity);
                         comma_needed = true;
                     }
-                }
+                });
                 output.push('</div>');
+            } else if (value) {
+                output.push('<div><i>' + h + '</i> ' + value + '</div>');
             }
         }
 
@@ -6635,6 +6726,7 @@ loop:   for (;;) {
                 detail('Outer', the_function.outer);
                 detail('Global', the_function.global);
                 detail('Label', the_function.label);
+                detail('Complexity', the_function['(complexity)']);
             }
 
             if (data.member) {
