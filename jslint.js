@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-05-10
+// 2011-05-15
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -276,7 +276,7 @@
     expected_number_a, expected_operator_a, expected_percent_a,
     expected_positive_a, expected_pseudo_a, expected_selector_a,
     expected_small_a, expected_space_a_b, expected_string_a,
-    expected_style_attribute, expected_style_pattern, expected_tagname_a,
+    expected_style_attribute, expected_style_pattern, expected_tagname_a,  f,
     fieldset, figure, filesystem, filter, firebrick, first, float, floor,
     floralwhite, focusWidget, font, "font-family", "font-size",
     "font-size-adjust", "font-stretch", "font-style", "font-variant",
@@ -310,7 +310,7 @@
     midnightblue, "min-height", "min-width", mintcream, missing_a,
     missing_a_after_b, missing_option, missing_property, missing_space_a_b,
     missing_url, missing_use_strict, mistyrose, mixed, mm, moccasin, mode,
-    module, move_invocation, move_var, name, name_function, nav,
+    module, move_invocation, move_var, n, name, name_function, nav,
     navajowhite, navigator, navy, nested_comment, newcap, next, node,
     noframes, nomen, noscript, not, not_a_constructor, not_a_defined,
     not_a_function, not_a_label, not_a_scope, not_greater, nud, object, ol,
@@ -325,7 +325,7 @@
     pink, play, plum, plusplus, pop, popupMenu, position, postscript,
     powderblue, pre, predef, preferenceGroups, preferences, prev, print,
     process, progress, projection, prompt, prototype, pt, purple, push, px,
-    q, querystring, quit, quote, quotes, radix, random, range, raw,
+    q, querystring, quit, quote, quotes, r, radix, random, range, raw,
     readFile, readUrl, read_only, reason, red, redefinition_a, regexp,
     reloadWidget, replace, report, require, reserved, reserved_a,
     resolvePath, resumeUpdates, rhino, right, rosybrown, royalblue, rp, rt,
@@ -337,7 +337,7 @@
     slategray, sleep, slice, small, snow, sort, source, span, spawn, speak,
     speech, split, springgreen, src, stack, statement_block, steelblue,
     stopping, strange_loop, strict, strong, style, styleproperty, sub,
-    subscript, substr, sup, supplant, suppressUpdates, sync, system, table,
+    subscript, substr, sup, supplant, suppressUpdates, sync, system, t, table,
     "table-layout", tag_a_in_b, tan, tbody, td, teal, tellWidget, test,
     "text-align", "text-decoration", "text-indent", "text-shadow",
     "text-transform", textarea, tfoot, th, thead, third, thistle,
@@ -851,6 +851,17 @@ var JSLINT = (function () {
 
         css_media,
         css_overflow,
+
+        descapes = {
+            'b': '\b',
+            't': '\t',
+            'n': '\n',
+            'f': '\f',
+            'r': '\r',
+            '"': '"',
+            '/': '/',
+            '\\': '\\'
+        },
 
         devel = {
             alert           : false,
@@ -1726,29 +1737,10 @@ var JSLINT = (function () {
                                 case xquote:
                                     warn_at('bad_html', line, character + j);
                                     break;
-                                case '\\':
-                                case '"':
-                                case '/':
-                                    break;
                                 case '\'':
                                     if (json_mode) {
                                         warn_at('unexpected_a', line, character, '\\\'');
                                     }
-                                    break;
-                                case 'b':
-                                    c = '\b';
-                                    break;
-                                case 'f':
-                                    c = '\f';
-                                    break;
-                                case 'n':
-                                    c = '\n';
-                                    break;
-                                case 'r':
-                                    c = '\r';
-                                    break;
-                                case 't':
-                                    c = '\t';
                                     break;
                                 case 'u':
                                     hex(4);
@@ -1766,7 +1758,10 @@ var JSLINT = (function () {
                                     hex(2);
                                     break;
                                 default:
-                                    warn_at('unexpected_a', line, character, '\\');
+                                    c = descapes[c];
+                                    if (typeof c !== 'string') {
+                                        warn_at('unexpected_a', line, character, '\\');
+                                    }
                                 }
                             }
                         }
@@ -6762,7 +6757,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-05-10';
+    itself.edition = '2011-05-15';
 
     return itself;
 
