@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-05-15
+// 2011-05-19
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -351,7 +351,7 @@
     unnecessary_initialize, unnecessary_use, unreachable_a_b,
     unrecognized_style_attribute_a, unrecognized_tag_a, unparam, unsafe, unused,
     unwatch, updateNow, url, urls, use_array, use_braces, use_object, use_param,
-    used_before_a, util, value, valueOf, var, var_a_not, version,
+    used_before_a, value, valueOf, var, var_a_not, version,
     "vertical-align", video, violet, visibility, was, watch,
     weird_assignment, weird_condition, weird_new, weird_program,
     weird_relation, weird_ternary, wheat, white, "white-space", whitesmoke,
@@ -1030,7 +1030,6 @@ var JSLINT = (function () {
             require      : false,
             setInterval  : false,
             setTimeout   : false,
-            util         : false,
             __filename   : false,
             __dirname    : false
         },
@@ -6757,7 +6756,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-05-15';
+    itself.edition = '2011-05-19';
 
     return itself;
 
