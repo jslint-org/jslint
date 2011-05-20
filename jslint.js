@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-05-19
+// 2011-05-20
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -23,6 +23,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+// WARNING: JSLint will hurt your feelings.
 
 // JSLINT is a global function. It takes two parameters.
 
@@ -4162,7 +4163,7 @@ loop:   for (;;) {
             edge();
             id = identifier();
             params.push(token);
-            add_label(id, option.unparam ? 'unparam' : 'parameter');
+            add_label(id, option.unparam ? 'parameter' : 'unparam');
             if (next_token.id === ',') {
                 comma();
             } else {
@@ -6757,7 +6758,7 @@ loop:   for (;;) {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-05-19';
+    itself.edition = '2011-05-20';
 
     return itself;
 
