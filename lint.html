@@ -99,7 +99,7 @@ at issuing warnings. <code>lint</code> is no longer needed.</p>
   that your program depends on. </p>
 <p>A global declaration can look like this:</p>
 <pre>var getElementByAttribute, breakCycles, hanoi;</pre>
-<p>The declaration should appears near the top of the file. It must appear before the use of the variables
+<p>The declaration should appear near the top of the file. It must appear before the use of the variables
   it declares. </p>
 <p>It is necessary to use a <code>var</code> statement to declare a variable before that variable is assigned to. </p>
 <p><code>JSLint</code> also recognizes a <code>/*global */</code> directive that can indicate to <code>JSLint</code> that variables used in this file were defined in other files. The comment can contain a comma separated list of names. Each name can optionally be followed by a colon and either <code>true</code> or <code>false</code>, <code>true</code> indicated that the variable may be assigned to by this file, and <code>false</code> indicating that assignment is not allowed (which is the default). The directive respects function scope.</p>
