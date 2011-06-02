@@ -1,5 +1,5 @@
 // init_ui.js
-// 2011-04-30
+// 2011-05-31
 
 // This is the web browser companion to fulljslint.js. It is an ADsafe
 // lib file that implements a web ui by adding behavior to the widget's
@@ -136,7 +136,7 @@ ADSAFE.lib("init_ui", function (lib) {
 
 // Call JSLint and display the report.
 
-            tree.value(lib.jslint(input.getValue(), option, output) / 1000 + ' seconds.');
+            tree.value(String(lib.jslint(input.getValue(), option, output) / 1000) + ' seconds.');
             input.select();
             return false;
         });
