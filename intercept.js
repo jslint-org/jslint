@@ -1,5 +1,5 @@
 // intercept.js
-// 2011-04-30
+// 2011-05-23
 
 // This file makes it possible for JSLint to run as an ADsafe widget by
 // adding lib features.
@@ -75,15 +75,18 @@ ADSAFE._intercept(function (id, dom, lib, bunch) {
 // We also add an edition function to the lib that gives the
 // widget access to the current edition string.
 
+    var now = Date.now || function () {
+        return new Date().getTime();
+    };
     if (id === 'JSLINT_') {
         lib.jslint = function (source, options, output) {
             output.___nodes___[0].innerHTML = "Working.";
-            var now, report, then = Date.now();
+            var after, report, before = now();
             JSLINT(source, options);
             report = JSLINT.report();
-            now = Date.now();
+            after = now();
             output.___nodes___[0].innerHTML = report;
-            return now - then;
+            return after - before;
         };
         lib.edition = function () {
             return JSLINT.edition;
