@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-06-02
+// 2011-06-03
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -1243,8 +1243,9 @@ var JSLINT = (function () {
 
 // Regular expressions. Some of these are stupidly long.
 
-        crx = /'\r'/g,
-        crlfx = /'\r\n'/g,
+        crx = /\r/g,
+        crlfx = /\r\n/g,
+        lfx = /\n/g,
 
 // unsafe comment or string
         ax = /@cc|<\/?|script|\]\s*\]|<\s*!|&lt/i,
@@ -1609,7 +1610,7 @@ var JSLINT = (function () {
                     lines = source
                         .replace(crlfx, '\n')
                         .replace(crx, '\n')
-                        .split('\n');
+                        .split(lfx);
                 } else {
                     lines = source;
                 }
@@ -6808,7 +6809,7 @@ klass:                                  do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-06-02';
+    itself.edition = '2011-06-03';
 
     return itself;
 
