@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-06-01
+// 2011-06-02
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -192,7 +192,7 @@
 // For example:
 
 /*jslint
-    evil: true, nomen: false, onevar: false, regexp: false, strict: true
+    evil: true, nomen: false, regexp: false, strict: true
 */
 
 // The properties directive declares an exclusive list of property names.
@@ -1012,7 +1012,9 @@ var JSLINT = (function () {
         ids,            // HTML ids
         in_block,
         indent,
+        itself,         //  JSLint itself
         json_mode,
+        lex,            // the tokenizer
         lines,
         lookahead,
         member,
@@ -1032,18 +1034,19 @@ var JSLINT = (function () {
             __filename   : false,
             __dirname    : false
         },
+        node_js,
         numbery = {
             indexOf     : true,
             lastIndexOf : true,
             search      : true
         },
-        properties,
         next_token,
         older_token,
         option,
         predefined,     // Global variables defined by option
         prereg,
         prev_token,
+        properties,
         regexp_flag = {
             g: true,
             i: true,
@@ -1411,6 +1414,7 @@ var JSLINT = (function () {
             if (option.node) {
                 add_to_predefined(node);
                 option.node = false;
+                node_js = true;
             }
             if (option.widget) {
                 add_to_predefined(widget);
@@ -1500,7 +1504,7 @@ var JSLINT = (function () {
 
 // lexical analysis and token construction
 
-    var lex = (function lex() {
+    lex = (function lex() {
         var character, from, line, source_row;
 
 // Private lex methods
@@ -3288,9 +3292,6 @@ klass:                                  do {
 
     function statement() {
 
-// Usually a statement starts a line. Exceptions include the var statement in the
-// initialization part of a for statement, and an if after an else.
-
         var label, old_scope = scope, the_statement;
 
 // We don't like the empty statement.
@@ -3377,6 +3378,12 @@ klass:                                  do {
                 warn('unexpected_a', next_token);
                 semicolon();
             } else {
+                if (next_token.value === 'use strict') {
+                    if (!node_js || funct !== global_funct || array.length > 0) {
+                        warn('function_strict');
+                    }
+                    use_strict();
+                }
                 if (disruptor) {
                     warn('unreachable_a_b', next_token, next_token.value,
                         disruptor.value);
@@ -6411,7 +6418,7 @@ klass:                                  do {
 
 // The actual JSLINT function itself.
 
-    var itself = function (the_source, the_option) {
+    itself = function (the_source, the_option) {
         var i, predef, tree;
         JSLINT.comments = [];
         JSLINT.errors = [];
@@ -6467,6 +6474,7 @@ klass:                                  do {
         json_mode = false;
         lookahead = [];
         member = {};
+        node_js = false;
         properties = null;
         prereg = true;
         src = false;
@@ -6529,12 +6537,8 @@ klass:                                  do {
 // file may be depending on semicolon insertion on its last line.
 
                     step_in(1);
-                    if (next_token.id === ';') {
+                    if (next_token.id === ';' && !node_js) {
                         semicolon();
-                    }
-                    if (next_token.value === 'use strict') {
-                        warn('function_strict');
-                        use_strict();
                     }
                     adsafe_top = true;
                     tree = statements();
@@ -6804,7 +6808,7 @@ klass:                                  do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-06-01';
+    itself.edition = '2011-06-02';
 
     return itself;
 
