@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-05-31
+// 2011-06-01
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -203,21 +203,21 @@
 
 /*properties '\b', '\t', '\n', '\f', '\r', '!=', '!==', '"', '%',
     '&', '\'', '(begin)', '(breakage)', '(complexity)', '(context)',
-    '(error)', '(identifier)', '(line)', '(loopage)', '(name)',
-    '(onevar)', '(params)', '(scope)', '(statement)', '(token)', '(verb)',
-    ')', '*', '+', '-', '/', ';', '<', '<<', '<=', '==', '===',
-    '>', '>=', '>>', '>>>', ADSAFE, ActiveXObject,
-    Array, Boolean, Buffer, COM, CScript, Canvas, CustomAnimation, Date,
-    Debug, E, Enumerator, Error, EvalError, FadeAnimation, Flash, FormField,
-    Frame, Function, HotKey, Image, JSON, LN10, LN2, LOG10E, LOG2E,
-    MAX_VALUE, MIN_VALUE, Math, MenuItem, MoveAnimation, NEGATIVE_INFINITY,
-    Number, Object, Option, PI, POSITIVE_INFINITY, Point, RangeError,
-    Rectangle, ReferenceError, RegExp, ResizeAnimation, RotateAnimation,
-    SQRT1_2, SQRT2, ScrollBar, Storage, String, Style, SyntaxError, System,
-    Text, TextArea, Timer, TypeError, URIError, URL, VBArray, WScript, Web,
+    '(error)', '(identifier)', '(line)', '(loopage)', '(name)', '(onevar)',
+    '(params)', '(scope)', '(statement)', '(token)', '(verb)', ')', '*',
+    '+', '-', '/', ';', '<', '<<', '<=', '==', '===', '>',
+    '>=', '>>', '>>>', ADSAFE, ActiveXObject, Array,
+    Boolean, Buffer, COM, CScript, Canvas, CustomAnimation, Date, Debug, E,
+    Enumerator, Error, EvalError, FadeAnimation, Flash, FormField, Frame,
+    Function, HotKey, Image, JSON, LN10, LN2, LOG10E, LOG2E, MAX_VALUE,
+    MIN_VALUE, Math, MenuItem, MoveAnimation, NEGATIVE_INFINITY, Number,
+    Object, Option, PI, POSITIVE_INFINITY, Point, RangeError, Rectangle,
+    ReferenceError, RegExp, ResizeAnimation, RotateAnimation, SQRT1_2,
+    SQRT2, ScrollBar, Storage, String, Style, SyntaxError, System, Text,
+    TextArea, Timer, TypeError, URIError, URL, VBArray, WScript, Web,
     Window, XMLDOM, XMLHttpRequest, '\\', '^', __dirname, __filename, a,
-    a_label, a_not_allowed, a_not_defined, a_scope, abbr,
-    acronym, activeborder, activecaption, address, adsafe, adsafe_a,
+    a_label, a_not_allowed, a_not_defined, a_scope, abbr, acronym,
+    activeborder, activecaption, address, adsafe, adsafe_a,
     adsafe_autocomplete, adsafe_bad_id, adsafe_div, adsafe_fragment,
     adsafe_go, adsafe_html, adsafe_id, adsafe_id_go, adsafe_lib,
     adsafe_lib_second, adsafe_missing_id, adsafe_name_a, adsafe_placement,
@@ -338,11 +338,11 @@
     threedlightshadow, threedshadow, thru, time, title, toLowerCase,
     toString, toUpperCase, toint32, token, tomato, too_long, too_many, top,
     tr, trailing_decimal_a, tree, tt, tty, turquoise, tv, type,
-    type_inconsistency_a_b, typeof, u,
-    ul, unclosed, unclosed_comment, unclosed_regexp, undef, unescape,
-    unescaped_a, unexpected_a, unexpected_char_a_b, unexpected_comment,
-    unexpected_property_a, unexpected_space_a_b, 'unicode-bidi',
-    unnecessary_initialize, unnecessary_use, unparam, unreachable_a_b,
+    type_inconsistency_a_b, typeof, u, ul, unclosed, unclosed_comment,
+    unclosed_regexp, undef, unescape, unescaped_a, unexpected_a,
+    unexpected_char_a_b, unexpected_comment, unexpected_property_a,
+    unexpected_space_a_b, 'unicode-bidi', unnecessary_initialize,
+    unnecessary_use, unparam, unreachable_a_b,
     unrecognized_style_attribute_a, unrecognized_tag_a, unsafe, unused,
     unwatch, updateNow, url, urls, use_array, use_braces, use_object,
     use_param, used_before_a, value, valueOf, var, var_a_not, version,
@@ -350,9 +350,9 @@
     weird_assignment, weird_condition, weird_new, weird_program,
     weird_relation, weird_ternary, wheat, white, 'white-space', whitesmoke,
     widget, width, window, windowframe, windows, windowtext, 'word-spacing',
-    'word-wrap', wrap, wrap_immediate, wrap_regexp, writeable, write_is_wrong,
-    yahooCheckLogin, yahooLogin, yahooLogout, yellow, yellowgreen,
-    'z-index', '|', '~'
+    'word-wrap', wrap, wrap_immediate, wrap_regexp, write_is_wrong,
+    writeable, yahooCheckLogin, yahooLogin, yahooLogout, yellow,
+    yellowgreen, 'z-index', '|', '~'
 */
 
 // The global directive is used to declare global variables that can
@@ -2515,6 +2515,7 @@ klass:                                  do {
                 return;
             }
             name = next_token.value;
+            advance();
             writeable = false;
             if (next_token.id === ':') {
                 advance(':');
@@ -2531,7 +2532,6 @@ klass:                                  do {
                 }
             }
             predefined[name] = writeable;
-            advance();
             if (next_token.id !== ',') {
                 return;
             }
@@ -6804,7 +6804,7 @@ klass:                                  do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-05-31';
+    itself.edition = '2011-06-01';
 
     return itself;
 
