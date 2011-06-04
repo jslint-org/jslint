@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-06-03
+// 2011-06-04
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -1097,7 +1097,6 @@ var JSLINT = (function () {
             'eval'              : false,
             EvalError           : false,
             Function            : false,
-            hasOwnProperty      : false,
             isFinite            : false,
             isNaN               : false,
             JSON                : false,
@@ -3474,7 +3473,7 @@ klass:                                  do {
 // Check the predefined list. If it was predefined, create the global
 // variable.
 
-            if (!variable) {
+            if (typeof variable !== 'object') {
                 writeable = predefined[name];
                 if (typeof writeable === 'boolean') {
                     global_scope[name] = variable = {
@@ -6809,7 +6808,7 @@ klass:                                  do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-06-03';
+    itself.edition = '2011-06-04';
 
     return itself;
 
