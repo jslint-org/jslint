@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-06-04
+// 2011-06-05
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -1242,12 +1242,10 @@ var JSLINT = (function () {
 
 // Regular expressions. Some of these are stupidly long.
 
-        crx = /\r/g,
-        crlfx = /\r\n/g,
-        lfx = /\n/g,
-
 // unsafe comment or string
         ax = /@cc|<\/?|script|\]\s*\]|<\s*!|&lt/i,
+// linefeed, or carriage return, or carriage return linefeed
+        crlfx = /\n|\r\n?/,
 // unsafe characters that are silently deleted by one or more browsers
         cx = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
 // query characters for ids
@@ -1381,7 +1379,7 @@ var JSLINT = (function () {
 
 //  Escapify a troublesome character.
 
-        return escapes[a] ? escapes[a] :
+        return escapes[a] ||
             '\\u' + ('0000' + a.charCodeAt().toString(16)).slice(-4);
     }
 
@@ -1605,14 +1603,8 @@ var JSLINT = (function () {
 
         return {
             init: function (source) {
-                if (typeof source === 'string') {
-                    lines = source
-                        .replace(crlfx, '\n')
-                        .replace(crx, '\n')
-                        .split(lfx);
-                } else {
-                    lines = source;
-                }
+                lines = typeof source === 'string' ?
+                    source.split(crlfx) : source;
                 line = 0;
                 next_line();
                 from = 1;
@@ -3341,7 +3333,7 @@ klass:                                  do {
                 }
             } else {
 
-// If this is an expression statement, determine if it is acceptble.
+// If this is an expression statement, determine if it is acceptable.
 // We do not like
 //      new Blah();
 // statments. If it is to be used at all, new should only be used to make
@@ -6808,7 +6800,7 @@ klass:                                  do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-06-04';
+    itself.edition = '2011-06-05';
 
     return itself;
 
