@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-06-05
+// 2011-06-06
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -3545,6 +3545,7 @@ klass:                                  do {
                     case 'unction':
                     case 'var':
                     case 'unused':
+                    case 'becoming':
                     case 'closure':
                     case 'parameter':
                         site[name] = 'closure';
@@ -3556,9 +3557,6 @@ klass:                                  do {
                         break;
                     case 'undef':
                         funct[name] = 'undef';
-                        break;
-                    case 'becoming':
-                        warn('not_a_defined', token);
                         break;
                     case 'label':
                         warn('a_label', token, name);
@@ -6800,7 +6798,7 @@ klass:                                  do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-06-05';
+    itself.edition = '2011-06-06';
 
     return itself;
 
