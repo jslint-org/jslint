@@ -2826,7 +2826,7 @@ klass:                                  do {
             case 'prefix':
             case 'suffix':
             case undefined:
-                return are_similar(a.first, b.first);
+                return a.id === b.id && are_similar(a.first, b.first);
             case 'infix':
                 return are_similar(a.first, b.first) &&
                     are_similar(a.second, b.second);
