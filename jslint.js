@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-06-06
+// 2011-06-07
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -344,7 +344,7 @@
     unexpected_space_a_b, 'unicode-bidi', unnecessary_initialize,
     unnecessary_use, unparam, unreachable_a_b,
     unrecognized_style_attribute_a, unrecognized_tag_a, unsafe, unused,
-    unwatch, updateNow, url, urls, use_array, use_braces, use_object,
+    unwatch, updateNow, url, urls, use_array, use_braces, use_object, use_or,
     use_param, used_before_a, value, valueOf, var, var_a_not, version,
     'vertical-align', video, violet, visibility, was, watch,
     weird_assignment, weird_condition, weird_new, weird_program,
@@ -637,6 +637,7 @@ var JSLINT = (function () {
             use_array: "Use the array literal notation [].",
             use_braces: "Spaces are hard to count. Use {{a}}.",
             use_object: "Use the object literal notation {}.",
+            use_or: "Use the || operator.",
             use_param: "Use a named parameter.",
             used_before_a: "'{a}' was used before it was defined.",
             var_a_not: "Variable {a} was not declared correctly.",
@@ -3002,7 +3003,7 @@ klass:                                  do {
 
     function type(s, t, nud) {
         var x = delim(s);
-        x.type = t;
+        x.arity = x.type = t;
         if (nud) {
             x.nud = nud;
         }
@@ -3643,6 +3644,8 @@ klass:                                  do {
         that.type = conform_type(that.second, that.third);
         if (are_similar(that.second, that.third)) {
             warn('weird_ternary', that);
+        } else if (are_similar(that.first, that.second)) {
+            warn('use_or', that);
         }
         return that;
     });
@@ -6798,7 +6801,7 @@ klass:                                  do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-06-06';
+    itself.edition = '2011-06-07';
 
     return itself;
 
