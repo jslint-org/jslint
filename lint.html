@@ -177,7 +177,7 @@ effect as this comment:</p>
   be declared at the site of first use. But because JavaScript does not
   have block scope, it is wiser to declare all of a function's variables
   at the top of the function. It is recommended that a single <code>var</code>
-  statement be used per function. This can be enforced with the <code>onevar</code>
+  statement be used per function. This can be declined with the <code>vars</code>
   <a href="#options">option</a>.</p>
 
 <h2 id=required>Required Blocks</h2>
@@ -308,15 +308,15 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
 <p>The <code>++</code> <small>(increment)</small> and <code>--</code> <small>(decrement)</small>
   operators have been known to contribute to bad code by encouraging excessive
   trickiness. They are second only to faulty architecture in enabling to
-  viruses and other security menaces. There is a <code>plusplus</code> <a href="#options">option</a>
-  that prohibits the use of these operators.</p>
+  viruses and other security menaces. Also, preincrement/postincrement confusion can produce off-by-one errors that are extrenmely difficult to diagnose. There is a <code>plusplus</code> <a href="#options">option</a>
+  that allows the use of these operators.</p>
 <h2 id=bitwise>Bitwise Operators</h2>
 <p>JavaScript does not have an integer type, but it does have bitwise operators.
   The bitwise operators convert their operands from floating point to integers
   and back, so they are not as efficient as in C or other languages. They
   are rarely useful in browser applications. The similarity to the logical
   operators can mask some programming errors. The <code>bitwise</code> <a href="#options">option</a>
-  prohibits the use of these operators: <code>&lt;&lt; &gt;&gt; &gt;&gt;&gt;
+  allows the use of these operators: <code>&lt;&lt; &gt;&gt; &gt;&gt;&gt;
   ~ &amp; |</code>.</p>
 <h2 id=evil><code>eval</code> is evil</h2>
 <p>The <code>eval</code> function (and its relatives, <code>Function</code>,
@@ -352,7 +352,7 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
   to see a function invocation with an initial uppercase name unless it
   has the <code>new</code> prefix. <code>JSLint</code> does not expect to
   see the <code>new</code> prefix used with functions whose names do not
-  start with initial uppercase. This can be controlled with the <code>newcap</code>
+  start with initial uppercase. This can be disabled with the <code>newcap</code>
   <a href="#options">option</a>.</p>
 <p><code>JSLint</code> does not expect to see the wrapper forms <code>new Number</code>,
   <code>new String</code>, <code>new Boolean</code>. </p>
@@ -423,11 +423,7 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
 <h2 id=options>Options</h2>
 <p><code>JSLint</code> provides several options that control its operation and
   its sensitivity. In the <a href="http://www.JSLint.com/">web edition</a>, the
-  options are selected with several checkboxes and two fields. Clicking on
-  the <a href="http://www.amazon.com/exec/obidos/ASIN/0596517742/wrrrldwideweb"
-  target="_blank"><input type="button" value="Good Parts"></a> button will give
-  you the ideal settings.
-</p>
+options are selected with several checkboxes and two fields. </p>
 <p>It also provides assistance in constructing <code>/*jslint*/</code>
   comments.
 </p>
@@ -438,7 +434,7 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
 <p>Options can also be specified within a script with a <code>/*jslint */</code>
   directive:</p>
 <pre>/*jslint nomen: true, debug: true,
-    evil: false, onevar: true */</pre>
+    evil: false, vars: true */</pre>
 <p>An option specification starts with <code>/*jslint</code>. Notice that
   there is no space before the <code>j</code>. The specification contains
   a sequence of name value pairs, where the names are <code>JSLint</code>
@@ -459,9 +455,9 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
       rules should be enforced. See <a href="http://www.ADsafe.org/">http://www.ADsafe.org/</a>.</td>
   </tr>
   <tr>
-    <td>Disallow bitwise operators </td>
+    <td>Tolerate bitwise operators </td>
     <td><code>bitwise</code></td>
-    <td><code>true</code> if bitwise operators should not be allowed. <a href="#bitwise"><small>(more)</small></a></td>
+    <td><code>true</code> if bitwise operators should  be allowed. <a href="#bitwise"><small>(more)</small></a></td>
   </tr>
   <tr>
     <td>Assume a browser </td>
@@ -533,10 +529,10 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
     <td>The maximum number of characters in a line</td>
   </tr>
   <tr>
-    <td>Require Initial Caps for constructors </td>
+    <td>Tolerate uncapitalized constructors</td>
     <td><code>newcap</code></td>
-    <td><code>true</code> if Initial Caps must be used with constructor
-      functions. <a href="#new"><small>(more)</small></a></td>
+    <td><code>true</code> if Initial Caps  with constructor
+      functions is optional. <a href="#new"><small>(more)</small></a></td>
   </tr>
   <tr>
     <td>Assume Node.js</td>
@@ -544,9 +540,9 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
     <td><code>true</code> if Node.js globals should be predefined <a href="#node"><small>(more)</small></a></td>
   </tr>
   <tr>
-    <td>Disallow dangling _ in identifiers </td>
+    <td>Tolerate dangling _ in identifiers </td>
     <td><code>nomen</code></td>
-    <td><code>true</code> if names should be checked for initial or trailing underbars</td>
+    <td><code>true</code> if names should not be checked for initial or trailing underbars</td>
   </tr>
   <tr>
     <td>Tolerate HTML event handlers </td>
@@ -554,9 +550,9 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
     <td><code>true</code> if HTML event handlers should be allowed. <a href="#html"><small>(more)</small></a></td>
   </tr>
   <tr>
-    <td>Allow one <code>var</code> statement per function</td>
-    <td><code>onevar</code></td>
-    <td><code>true</code> if only one <code>var</code> statement per function
+    <td>Tolerate many&nbsp;<tt>var</tt>&nbsp;statements per function</td>
+    <td><code>var</code></td>
+    <td><code>true</code> if multiple <code>var</code> statement per function
       should be allowed. <a href="#scope"><small>(more)</small></a></td>
   </tr>
   <tr>
@@ -565,10 +561,10 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
     <td><code>true</code> if the scan should stop on first error.</td>
   </tr>
   <tr>
-    <td>Disallow <code>++</code> and <code>--</code> </td>
+    <td>Tolerate <code>++</code> and <code>--</code> </td>
     <td><code>plusplus</code></td>
     <td><code>true</code> if <code>++</code> and <code>--</code> should
-      not be allowed. <a href="#inc"><small>(more)</small></a></td>
+       be allowed. <a href="#inc"><small>(more)</small></a></td>
   </tr>
   <tr>
     <td>Predefined <small>( , separated)</small></td>
@@ -578,9 +574,9 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
       statement to declare global variables in a script file.</td>
   </tr>
   <tr>
-    <td>Disallow  <code>.</code> and <code>[^</code>...<code>]</code>. in /RegExp/ </td>
+    <td>Tolerate  <code>.</code> and <code>[^</code>...<code>]</code>. in /RegExp/ </td>
     <td><code>regexp</code></td>
-    <td><code>true</code> if <code>.</code> and <code>[^</code>...<code>]</code> should not be allowed in RegExp
+    <td><code>true</code> if <code>.</code> and <code>[^</code>...<code>]</code> should  be allowed in RegExp
       literals. They match more material than might be expected, allowing attackers to confuse applications. These forms should not be used when validating in secure applications. </td>
   </tr>
   <tr>
@@ -597,10 +593,10 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
       the safe subset rules but not the widget structure rules.</td>
   </tr>
   <tr>
-    <td>Require <code>&quot;use strict&quot;;</code> </td>
-    <td><code>strict</code></td>
-    <td><code>true</code> if the ES5 <code><a href="http://www.yuiblog.com/blog/2010/12/14/strict-mode-is-coming-to-town/">"use strict";</a></code> pragma
-      is required. Do not use this option carelessly.</td>
+    <td> Tolerate missing&nbsp;<code>'use strict'</code>&nbsp;pragma </td>
+    <td><code>sloppy</code></td>
+    <td><code>true</code> if the ES5 <code><a href="http://www.yuiblog.com/blog/2010/12/14/strict-mode-is-coming-to-town/">'use strict';</a></code> pragma
+      is not required. Do not use this pragma unless you know what yo are doing.</td>
   </tr>
   <tr>
     <td>Tolerate inefficient subscripting<br>
@@ -616,14 +612,14 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
     <td><code>true</code> if variables are allowed to contain more than one type of value.</td>
   </tr>
   <tr>
-    <td>Disallow undefined variables </td>
+    <td> Tolerate misordered definitions </td>
     <td><code>undef</code></td>
-    <td><code>true</code> if variables must be declared before used. <a href="#undefined"><small>(more)</small></a></td>
+    <td><code>true</code> if variables and functions need not be declared before used. <a href="#undefined"><small>(more)</small></a></td>
   </tr>
   <tr>
-    <td>Strict white space </td>
+    <td> Tolerate messy white space</td>
     <td><code>white</code></td>
-    <td><code>true</code> if strict whitespace rules apply.</td>
+    <td><code>true</code> if strict whitespace rules should be ignored..</td>
   </tr>
   <tr>
     <td>Assume a Yahoo Widget </td>

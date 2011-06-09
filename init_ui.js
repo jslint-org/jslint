@@ -1,5 +1,5 @@
 // init_ui.js
-// 2011-05-31
+// 2011-06-08
 
 // This is the web browser companion to fulljslint.js. It is an ADsafe
 // lib file that implements a web ui by adding behavior to the widget's
@@ -22,7 +22,6 @@ ADSAFE.lib("init_ui", function (lib) {
     return function (dom) {
         var table = dom.q('#JSLINT_TABLE'),
             boxes = table.q('span'),
-            goodparts = boxes.q('.goodpart'),
             indent = dom.q('#JSLINT_INDENT'),
             input = dom.q('#JSLINT_INPUT'),
             jslintstring = dom.q('#JSLINT_JSLINTSTRING'),
@@ -168,14 +167,6 @@ ADSAFE.lib("init_ui", function (lib) {
                 indent: 4,
                 maxerr: 50
             };
-            show_options();
-        });
-
-        dom.q('#JSLINT_GOODPARTS').on('click', function () {
-            goodparts.each(function (bunch) {
-                ADSAFE.set(option, bunch.getTitle(), true);
-            });
-            option.indent = 4;
             show_options();
         });
 
