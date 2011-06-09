@@ -550,12 +550,6 @@ options are selected with several checkboxes and two fields. </p>
     <td><code>true</code> if HTML event handlers should be allowed. <a href="#html"><small>(more)</small></a></td>
   </tr>
   <tr>
-    <td>Tolerate many&nbsp;<tt>var</tt>&nbsp;statements per function</td>
-    <td><code>vars</code></td>
-    <td><code>true</code> if multiple <code>var</code> statement per function
-      should be allowed. <a href="#scope"><small>(more)</small></a></td>
-  </tr>
-  <tr>
     <td>Stop on first error </td>
     <td><code>passfail</code></td>
     <td><code>true</code> if the scan should stop on first error.</td>
@@ -617,9 +611,20 @@ options are selected with several checkboxes and two fields. </p>
     <td><code>true</code> if variables and functions need not be declared before used. <a href="#undefined"><small>(more)</small></a></td>
   </tr>
   <tr>
+    <td> Tolerate unused parameters</td>
+    <td><code>unparam</code></td>
+    <td><code>true</code> if warnings should not be given for unused paramters></td>
+  </tr>
+  <tr>
+    <td>Tolerate many&nbsp;<tt>var</tt>&nbsp;statements per function</td>
+    <td><code>vars</code></td>
+    <td><code>true</code> if multiple <code>var</code> statement per function
+      should be allowed. <a href="#scope"><small>(more)</small></a></td>
+  </tr>
+  <tr>
     <td> Tolerate messy white space</td>
     <td><code>white</code></td>
-    <td><code>true</code> if strict whitespace rules should be ignored..</td>
+    <td><code>true</code> if strict whitespace rules should be ignored.</td>
   </tr>
   <tr>
     <td>Assume a Yahoo Widget </td>
@@ -628,7 +633,7 @@ options are selected with several checkboxes and two fields. </p>
       Widgets</a> globals should be predefined. <a href="#widget"><small>(more)</small></a></td>
   </tr>
   <tr>
-    <td>AssumeWindows</td>
+    <td>Assume Windows</td>
     <td><code>windows</code></td>
     <td><code>true</code> if the Windows</a> globals should be predefined. <a href="#windows"><small>(more)</small></a></td>
   </tr>
