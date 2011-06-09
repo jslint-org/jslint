@@ -1245,8 +1245,9 @@ var JSLINT = (function () {
 
 // unsafe comment or string
         ax = /@cc|<\/?|script|\]\s*\]|<\s*!|&lt/i,
-// linefeed, or carriage return, or carriage return linefeed
-        crlfx = /\n|\r\n?/,
+// carriage return, or carriage return linefeed
+        crx = /\r/g,
+        crlfx = /\r\n/g,
 // unsafe characters that are silently deleted by one or more browsers
         cx = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
 // query characters for ids
@@ -1604,8 +1605,14 @@ var JSLINT = (function () {
 
         return {
             init: function (source) {
-                lines = typeof source === 'string' ?
-                    source.split(crlfx) : source;
+                if (typeof source === 'string') {
+                    lines = source
+                        .replace(crlfx, '\n')
+                        .replace(crx, '\n')
+                        .split('\n');
+                } else {
+                    lines = source;
+                }
                 line = 0;
                 next_line();
                 from = 1;
