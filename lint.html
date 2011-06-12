@@ -270,10 +270,10 @@ effect as this comment:</p>
 }</pre>
 <p>It is difficult to write correct programs while using idioms that are
   hard to distinguish from obvious errors.</p>
-<h2 id=equal>== and !=</h2>
+<h2 id=eqeq>== and !=</h2>
 <p>The <code>==</code> and <code>!=</code> operators do type coercion before
   comparing. This is bad because it causes <code>' \t\r\n' == 0</code> to
-  be <code>true</code>. This can mask type errors.</p>
+  be <code>true</code>. This can mask type errors. JSLint cannot reliably determine if == is being used correctly, to it is best to not use <code>==</code> and != and use the more reliable  the <code>===</code> and <code>!==</code> operators instead. </p>
 <p align="left">If you only care that a value is <i>truthy</i> or <i>falsy</i>,
   then use the short form. Instead of </p>
 <pre align="left">(foo != 0)</pre>
@@ -283,7 +283,7 @@ effect as this comment:</p>
 <pre align="left">(foo == 0)</pre>
 <p align="left"> say</p>
 <pre align="left">(!foo)</pre>
-<p>Always use the  <code>===</code> and <code>!==</code> operators. </p>
+<p>There is an <code>eqeq</code> <a href="#options">option</a> that allows the use of <code>==</code> and <code>!=</code>.</p>
 <h2 id=labels>Labels</h2>
 <p>JavaScript allows any statement to have a label, and labels have a
   separate name space. <code>JSLint</code> is more strict.</p>
@@ -492,6 +492,10 @@ options are selected with several checkboxes and two fields. </p>
     <td><code>true</code> if browser globals that are useful in development should be
       predefined. (<a href="#devel">more</a>)</td>
   </tr>
+  <tr>
+      <td>Tolerate <code>==</code> and <code>!=</code></td>
+      <td><code>eqeq</code></td>
+      <td><code>true</code> if the <code>==</code> and <code>!=</code> operators should be tolerated. (<a href="#eqeq">more</a>).</td>
   <tr>
       <td>Tolerate ES5 syntax</td>
       <td><code>es5</code></td>

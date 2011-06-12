@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-06-08
+// 2011-06-10
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -163,6 +163,7 @@
 //     css        true, if CSS workarounds should be tolerated
 //     debug      true, if debugger statements should be allowed
 //     devel      true, if logging should be allowed (console, alert, etc.)
+//     eqeq       true, if == should be allowed
 //     es5        true, if ES5 syntax should be allowed
 //     evil       true, if eval should be allowed
 //     forin      true, if for in statements need not filter
@@ -202,9 +203,9 @@
 // For example:
 
 /*properties '\b', '\t', '\n', '\f', '\r', '!=', '!==', '"', '%',
-    '&', '\'', '(begin)', '(breakage)', '(complexity)', '(context)',
-    '(error)', '(function)', '(identifier)', '(line)', '(loopage)',
-    '(name)', '(object)', '(params)', '(scope)', '(statement)', '(string)',
+    '&', '\'', '(array)', '(begin)', '(breakage)', '(complexity)', '(context)',
+    '(error)', '(function)', '(identifier)', '(line)', '(loopage)', '(name)',
+    '(number)', '(object)', '(params)', '(scope)', '(statement)', '(string)',
     '(token)', '(vars)', '(verb)', ')', '*', '+', '-', '/', ';', '<',
     '<<', '<=', '==', '===', '>', '>=', '>>',
     '>>>', ADSAFE, ActiveXObject, Array, Boolean, Buffer, COM,
@@ -259,7 +260,7 @@
     devel, dfn, dialog, dimgray, dir, direction, display, disrupt, div, dl,
     document, dodgerblue, dt, duplicate_a, edge, edition, else, em, embed,
     embossed, empty, 'empty-cells', empty_block, empty_case, empty_class,
-    encodeURI, encodeURIComponent, entityify, errors, es5, escape, eval,
+    encodeURI, encodeURIComponent, entityify, eqeq, errors, es5, escape, eval,
     event, evidence, evil, ex, exception, exec, expected_a,
     expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d, expected_at_a,
     expected_attribute_a, expected_attribute_value_a, expected_class_a,
@@ -3176,7 +3177,7 @@ klass:                                  do {
     function relation(s, eqeq) {
         return infix(s, 100, function (left, that) {
             check_relation(left);
-            if (eqeq) {
+            if (eqeq && !option.eqeq) {
                 warn('expected_a_b', that, eqeq, that.id);
             }
             var right = expression(100);
@@ -6847,7 +6848,7 @@ klass:                                  do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-06-08';
+    itself.edition = '2011-06-10';
 
     return itself;
 
