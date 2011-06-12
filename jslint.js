@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-06-10
+// 2011-06-11
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -637,6 +637,7 @@ var JSLINT = (function () {
             url: "JavaScript URL.",
             use_array: "Use the array literal notation [].",
             use_braces: "Spaces are hard to count. Use {{a}}.",
+            use_charAt: "Use the charAt method.",
             use_object: "Use the object literal notation {}.",
             use_or: "Use the || operator.",
             use_param: "Use a named parameter.",
@@ -1759,6 +1760,306 @@ var JSLINT = (function () {
             return it('(number)', snippet);
         }
 
+        function regexp() {
+            var b,
+                bit,
+                captures = 0,
+                depth = 0,
+                flag,
+                high,
+                length = 0,
+                low,
+                quote;
+            for (;;) {
+                b = true;
+                c = source_row.charAt(length);
+                length += 1;
+                switch (c) {
+                case '':
+                    stop_at('unclosed_regexp', line, from);
+                    return;
+                case '/':
+                    if (depth > 0) {
+                        warn_at('unescaped_a',
+                            line, from + length, '/');
+                    }
+                    c = source_row.slice(0, length - 1);
+                    flag = Object.create(regexp_flag);
+                    while (flag[source_row.charAt(length)] === true) {
+                        flag[source_row.charAt(length)] = false;
+                        length += 1;
+                    }
+                    if (source_row.charAt(length).isAlpha()) {
+                        stop_at('unexpected_a',
+                            line, from, source_row.charAt(length));
+                    }
+                    character += length;
+                    source_row = source_row.slice(length);
+                    quote = source_row.charAt(0);
+                    if (quote === '/' || quote === '*') {
+                        stop_at('confusing_regexp',
+                            line, from);
+                    }
+                    return it('(regexp)', c);
+                case '\\':
+                    c = source_row.charAt(length);
+                    if (c < ' ') {
+                        warn_at('control_a',
+                            line, from + length, String(c));
+                    } else if (c === '<') {
+                        warn_at(
+                            bundle.unexpected_a,
+                            line,
+                            from + length,
+                            '\\'
+                        );
+                    }
+                    length += 1;
+                    break;
+                case '(':
+                    depth += 1;
+                    b = false;
+                    if (source_row.charAt(length) === '?') {
+                        length += 1;
+                        switch (source_row.charAt(length)) {
+                        case ':':
+                        case '=':
+                        case '!':
+                            length += 1;
+                            break;
+                        default:
+                            warn_at(
+                                bundle.expected_a_b,
+                                line,
+                                from + length,
+                                ':',
+                                source_row.charAt(length)
+                            );
+                        }
+                    } else {
+                        captures += 1;
+                    }
+                    break;
+                case '|':
+                    b = false;
+                    break;
+                case ')':
+                    if (depth === 0) {
+                        warn_at('unescaped_a',
+                            line, from + length, ')');
+                    } else {
+                        depth -= 1;
+                    }
+                    break;
+                case ' ':
+                    pos = 1;
+                    while (source_row.charAt(length) === ' ') {
+                        length += 1;
+                        pos += 1;
+                    }
+                    if (pos > 1) {
+                        warn_at('use_braces',
+                            line, from + length, pos);
+                    }
+                    break;
+                case '[':
+                    c = source_row.charAt(length);
+                    if (c === '^') {
+                        length += 1;
+                        if (!option.regexp) {
+                            warn_at('insecure_a',
+                                line, from + length, c);
+                        } else if (source_row.charAt(length) === ']') {
+                            stop_at('unescaped_a',
+                                line, from + length, '^');
+                        }
+                    }
+                    bit = false;
+                    if (c === ']') {
+                        warn_at('empty_class', line,
+                            from + length - 1);
+                        bit = true;
+                    }
+klass:              do {
+                        c = source_row.charAt(length);
+                        length += 1;
+                        switch (c) {
+                        case '[':
+                        case '^':
+                            warn_at('unescaped_a',
+                                line, from + length, c);
+                            bit = true;
+                            break;
+                        case '-':
+                            if (bit) {
+                                bit = false;
+                            } else {
+                                warn_at('unescaped_a',
+                                    line, from + length, '-');
+                                bit = true;
+                            }
+                            break;
+                        case ']':
+                            if (!bit) {
+                                warn_at('unescaped_a',
+                                    line, from + length - 1, '-');
+                            }
+                            break klass;
+                        case '\\':
+                            c = source_row.charAt(length);
+                            if (c < ' ') {
+                                warn_at(
+                                    bundle.control_a,
+                                    line,
+                                    from + length,
+                                    String(c)
+                                );
+                            } else if (c === '<') {
+                                warn_at(
+                                    bundle.unexpected_a,
+                                    line,
+                                    from + length,
+                                    '\\'
+                                );
+                            }
+                            length += 1;
+                            bit = true;
+                            break;
+                        case '/':
+                            warn_at('unescaped_a',
+                                line, from + length - 1, '/');
+                            bit = true;
+                            break;
+                        case '<':
+                            if (xmode === 'script') {
+                                c = source_row.charAt(length);
+                                if (c === '!' || c === '/') {
+                                    warn_at(
+                                        bundle.html_confusion_a,
+                                        line,
+                                        from + length,
+                                        c
+                                    );
+                                }
+                            }
+                            bit = true;
+                            break;
+                        default:
+                            bit = true;
+                        }
+                    } while (c);
+                    break;
+                case '.':
+                    if (!option.regexp) {
+                        warn_at('insecure_a', line,
+                            from + length, c);
+                    }
+                    break;
+                case ']':
+                case '?':
+                case '{':
+                case '}':
+                case '+':
+                case '*':
+                    warn_at('unescaped_a', line,
+                        from + length, c);
+                    break;
+                case '<':
+                    if (xmode === 'script') {
+                        c = source_row.charAt(length);
+                        if (c === '!' || c === '/') {
+                            warn_at(
+                                bundle.html_confusion_a,
+                                line,
+                                from + length,
+                                c
+                            );
+                        }
+                    }
+                    break;
+                }
+                if (b) {
+                    switch (source_row.charAt(length)) {
+                    case '?':
+                    case '+':
+                    case '*':
+                        length += 1;
+                        if (source_row.charAt(length) === '?') {
+                            length += 1;
+                        }
+                        break;
+                    case '{':
+                        length += 1;
+                        c = source_row.charAt(length);
+                        if (c < '0' || c > '9') {
+                            warn_at(
+                                bundle.expected_number_a,
+                                line,
+                                from + length,
+                                c
+                            );
+                        }
+                        length += 1;
+                        low = +c;
+                        for (;;) {
+                            c = source_row.charAt(length);
+                            if (c < '0' || c > '9') {
+                                break;
+                            }
+                            length += 1;
+                            low = +c + (low * 10);
+                        }
+                        high = low;
+                        if (c === ',') {
+                            length += 1;
+                            high = Infinity;
+                            c = source_row.charAt(length);
+                            if (c >= '0' && c <= '9') {
+                                length += 1;
+                                high = +c;
+                                for (;;) {
+                                    c = source_row.charAt(length);
+                                    if (c < '0' || c > '9') {
+                                        break;
+                                    }
+                                    length += 1;
+                                    high = +c + (high * 10);
+                                }
+                            }
+                        }
+                        if (source_row.charAt(length) !== '}') {
+                            warn_at(
+                                bundle.expected_a_b,
+                                line,
+                                from + length,
+                                '}',
+                                c
+                            );
+                        } else {
+                            length += 1;
+                        }
+                        if (source_row.charAt(length) === '?') {
+                            length += 1;
+                        }
+                        if (low > high) {
+                            warn_at(
+                                bundle.not_greater,
+                                line,
+                                from + length,
+                                low,
+                                high
+                            );
+                        }
+                        break;
+                    }
+                }
+            }
+            c = source_row.slice(0, length - 1);
+            character += length;
+            source_row = source_row.slice(length);
+            return it('(regexp)', c);
+        }
+
 // Public lex methods
 
         return {
@@ -1807,8 +2108,7 @@ var JSLINT = (function () {
 // token -- this is called by advance to get the next token.
 
             token: function () {
-                var b, bit, c, captures, depth, flag, high, i,
-                    low, quote, snippet;
+                var c, i, quote, snippet;
 
                 for (;;) {
                     while (!source_row) {
@@ -1908,300 +2208,7 @@ var JSLINT = (function () {
                                     from
                                 );
                             }
-                            if (prereg) {
-                                depth = 0;
-                                captures = 0;
-                                length = 0;
-                                for (;;) {
-                                    b = true;
-                                    c = source_row.charAt(length);
-                                    length += 1;
-                                    switch (c) {
-                                    case '':
-                                        stop_at('unclosed_regexp', line, from);
-                                        return;
-                                    case '/':
-                                        if (depth > 0) {
-                                            warn_at('unescaped_a',
-                                                line, from + length, '/');
-                                        }
-                                        c = source_row.slice(0, length - 1);
-                                        flag = Object.create(regexp_flag);
-                                        while (flag[source_row.charAt(length)] === true) {
-                                            flag[source_row.charAt(length)] = false;
-                                            length += 1;
-                                        }
-                                        if (source_row.charAt(length).isAlpha()) {
-                                            stop_at('unexpected_a',
-                                                line, from, source_row.charAt(length));
-                                        }
-                                        character += length;
-                                        source_row = source_row.slice(length);
-                                        quote = source_row.charAt(0);
-                                        if (quote === '/' || quote === '*') {
-                                            stop_at('confusing_regexp',
-                                                line, from);
-                                        }
-                                        return it('(regexp)', c);
-                                    case '\\':
-                                        c = source_row.charAt(length);
-                                        if (c < ' ') {
-                                            warn_at('control_a',
-                                                line, from + length, String(c));
-                                        } else if (c === '<') {
-                                            warn_at(
-                                                bundle.unexpected_a,
-                                                line,
-                                                from + length,
-                                                '\\'
-                                            );
-                                        }
-                                        length += 1;
-                                        break;
-                                    case '(':
-                                        depth += 1;
-                                        b = false;
-                                        if (source_row.charAt(length) === '?') {
-                                            length += 1;
-                                            switch (source_row.charAt(length)) {
-                                            case ':':
-                                            case '=':
-                                            case '!':
-                                                length += 1;
-                                                break;
-                                            default:
-                                                warn_at(
-                                                    bundle.expected_a_b,
-                                                    line,
-                                                    from + length,
-                                                    ':',
-                                                    source_row.charAt(length)
-                                                );
-                                            }
-                                        } else {
-                                            captures += 1;
-                                        }
-                                        break;
-                                    case '|':
-                                        b = false;
-                                        break;
-                                    case ')':
-                                        if (depth === 0) {
-                                            warn_at('unescaped_a',
-                                                line, from + length, ')');
-                                        } else {
-                                            depth -= 1;
-                                        }
-                                        break;
-                                    case ' ':
-                                        pos = 1;
-                                        while (source_row.charAt(length) === ' ') {
-                                            length += 1;
-                                            pos += 1;
-                                        }
-                                        if (pos > 1) {
-                                            warn_at('use_braces',
-                                                line, from + length, pos);
-                                        }
-                                        break;
-                                    case '[':
-                                        c = source_row.charAt(length);
-                                        if (c === '^') {
-                                            length += 1;
-                                            if (!option.regexp) {
-                                                warn_at('insecure_a',
-                                                    line, from + length, c);
-                                            } else if (source_row.charAt(length) === ']') {
-                                                stop_at('unescaped_a',
-                                                    line, from + length, '^');
-                                            }
-                                        }
-                                        bit = false;
-                                        if (c === ']') {
-                                            warn_at('empty_class', line,
-                                                from + length - 1);
-                                            bit = true;
-                                        }
-klass:                                  do {
-                                            c = source_row.charAt(length);
-                                            length += 1;
-                                            switch (c) {
-                                            case '[':
-                                            case '^':
-                                                warn_at('unescaped_a',
-                                                    line, from + length, c);
-                                                bit = true;
-                                                break;
-                                            case '-':
-                                                if (bit) {
-                                                    bit = false;
-                                                } else {
-                                                    warn_at('unescaped_a',
-                                                        line, from + length, '-');
-                                                    bit = true;
-                                                }
-                                                break;
-                                            case ']':
-                                                if (!bit) {
-                                                    warn_at('unescaped_a',
-                                                        line, from + length - 1, '-');
-                                                }
-                                                break klass;
-                                            case '\\':
-                                                c = source_row.charAt(length);
-                                                if (c < ' ') {
-                                                    warn_at(
-                                                        bundle.control_a,
-                                                        line,
-                                                        from + length,
-                                                        String(c)
-                                                    );
-                                                } else if (c === '<') {
-                                                    warn_at(
-                                                        bundle.unexpected_a,
-                                                        line,
-                                                        from + length,
-                                                        '\\'
-                                                    );
-                                                }
-                                                length += 1;
-                                                bit = true;
-                                                break;
-                                            case '/':
-                                                warn_at('unescaped_a',
-                                                    line, from + length - 1, '/');
-                                                bit = true;
-                                                break;
-                                            case '<':
-                                                if (xmode === 'script') {
-                                                    c = source_row.charAt(length);
-                                                    if (c === '!' || c === '/') {
-                                                        warn_at(
-                                                            bundle.html_confusion_a,
-                                                            line,
-                                                            from + length,
-                                                            c
-                                                        );
-                                                    }
-                                                }
-                                                bit = true;
-                                                break;
-                                            default:
-                                                bit = true;
-                                            }
-                                        } while (c);
-                                        break;
-                                    case '.':
-                                        if (!option.regexp) {
-                                            warn_at('insecure_a', line,
-                                                from + length, c);
-                                        }
-                                        break;
-                                    case ']':
-                                    case '?':
-                                    case '{':
-                                    case '}':
-                                    case '+':
-                                    case '*':
-                                        warn_at('unescaped_a', line,
-                                            from + length, c);
-                                        break;
-                                    case '<':
-                                        if (xmode === 'script') {
-                                            c = source_row.charAt(length);
-                                            if (c === '!' || c === '/') {
-                                                warn_at(
-                                                    bundle.html_confusion_a,
-                                                    line,
-                                                    from + length,
-                                                    c
-                                                );
-                                            }
-                                        }
-                                        break;
-                                    }
-                                    if (b) {
-                                        switch (source_row.charAt(length)) {
-                                        case '?':
-                                        case '+':
-                                        case '*':
-                                            length += 1;
-                                            if (source_row.charAt(length) === '?') {
-                                                length += 1;
-                                            }
-                                            break;
-                                        case '{':
-                                            length += 1;
-                                            c = source_row.charAt(length);
-                                            if (c < '0' || c > '9') {
-                                                warn_at(
-                                                    bundle.expected_number_a,
-                                                    line,
-                                                    from + length,
-                                                    c
-                                                );
-                                            }
-                                            length += 1;
-                                            low = +c;
-                                            for (;;) {
-                                                c = source_row.charAt(length);
-                                                if (c < '0' || c > '9') {
-                                                    break;
-                                                }
-                                                length += 1;
-                                                low = +c + (low * 10);
-                                            }
-                                            high = low;
-                                            if (c === ',') {
-                                                length += 1;
-                                                high = Infinity;
-                                                c = source_row.charAt(length);
-                                                if (c >= '0' && c <= '9') {
-                                                    length += 1;
-                                                    high = +c;
-                                                    for (;;) {
-                                                        c = source_row.charAt(length);
-                                                        if (c < '0' || c > '9') {
-                                                            break;
-                                                        }
-                                                        length += 1;
-                                                        high = +c + (high * 10);
-                                                    }
-                                                }
-                                            }
-                                            if (source_row.charAt(length) !== '}') {
-                                                warn_at(
-                                                    bundle.expected_a_b,
-                                                    line,
-                                                    from + length,
-                                                    '}',
-                                                    c
-                                                );
-                                            } else {
-                                                length += 1;
-                                            }
-                                            if (source_row.charAt(length) === '?') {
-                                                length += 1;
-                                            }
-                                            if (low > high) {
-                                                warn_at(
-                                                    bundle.not_greater,
-                                                    line,
-                                                    from + length,
-                                                    low,
-                                                    high
-                                                );
-                                            }
-                                            break;
-                                        }
-                                    }
-                                }
-                                c = source_row.slice(0, length - 1);
-                                character += length;
-                                source_row = source_row.slice(length);
-                                return it('(regexp)', c);
-                            }
-                            return it('(punctuator)', snippet);
+                            return prereg ? regexp() : it('(punctuator)', snippet);
 
 //      punctuator
 
@@ -4160,7 +4167,9 @@ klass:                                  do {
             conform_type(syntax['(string)'], e);
             break;
         case 'string':
-            warn('use_charAt', that);
+            if (!option.type) {
+                warn('use_charAt', that);
+            }
             break;
         }
         if (e.id === '(number)') {
@@ -6848,7 +6857,7 @@ klass:                                  do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-06-10';
+    itself.edition = '2011-06-11';
 
     return itself;
 
