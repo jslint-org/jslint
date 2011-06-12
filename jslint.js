@@ -1505,7 +1505,7 @@ var JSLINT = (function () {
 // lexical analysis and token construction
 
     lex = (function lex() {
-        var character, from, line, source_row;
+        var character, c, from, length, line, pos, source_row;
 
 // Private lex methods
 
@@ -1601,6 +1601,163 @@ var JSLINT = (function () {
             return the_token;
         }
 
+        function match(x) {
+            var exec = x.exec(source_row), first;
+            if (exec) {
+                length = exec[0].length;
+                first = exec[1];
+                c = first.charAt(0);
+                source_row = source_row.slice(length);
+                from = character + length - first.length;
+                character += length;
+                return first;
+            }
+        }
+
+        function string(x) {
+            var c, j, r = '';
+
+            function hex(n) {
+                var i = parseInt(source_row.substr(j + 1, n), 16);
+                j += n;
+                if (i >= 32 && i <= 126 &&
+                        i !== 34 && i !== 92 && i !== 39) {
+                    warn_at('unexpected_a', line, character, '\\');
+                }
+                character += n;
+                c = String.fromCharCode(i);
+            }
+
+            if (json_mode && x !== '"') {
+                warn_at('expected_a', line, character, '"');
+            }
+
+            if (xquote === x || (xmode === 'scriptstring' && !xquote)) {
+                return it('(punctuator)', x);
+            }
+
+            j = 0;
+            for (;;) {
+                while (j >= source_row.length) {
+                    j = 0;
+                    if (xmode !== 'html' || !next_line()) {
+                        stop_at('unclosed', line, from);
+                    }
+                }
+                c = source_row.charAt(j);
+                if (c === x) {
+                    character += 1;
+                    source_row = source_row.slice(j + 1);
+                    return it('(string)', r, x);
+                }
+                if (c < ' ') {
+                    if (c === '\n' || c === '\r') {
+                        break;
+                    }
+                    warn_at('control_a',
+                        line, character + pos, source_row.slice(0, pos));
+                } else if (c === xquote) {
+                    warn_at('bad_html', line, character + j);
+                } else if (c === '<') {
+                    if (option.safe && xmode === 'html') {
+                        warn_at('adsafe_a', line, character + pos, c);
+                    } else if (source_row.charAt(pos + 1) === '/' && (xmode || option.safe)) {
+                        warn_at('expected_a_b', line, character,
+                            '<\\/', '</');
+                    } else if (source_row.charAt(pos + 1) === '!' && (xmode || option.safe)) {
+                        warn_at('unexpected_a', line, character, '<!');
+                    }
+                } else if (c === '\\') {
+                    if (xmode === 'html') {
+                        if (option.safe) {
+                            warn_at('adsafe_a', line, character + pos, c);
+                        }
+                    } else if (xmode === 'styleproperty') {
+                        j += 1;
+                        character += 1;
+                        c = source_row.charAt(j);
+                        if (c !== x) {
+                            warn_at('unexpected_a', line, character, '\\');
+                        }
+                    } else {
+                        j += 1;
+                        character += 1;
+                        c = source_row.charAt(j);
+                        switch (c) {
+                        case '':
+                            if (!option.es5) {
+                                warn_at('es5', line, character);
+                            }
+                            next_line();
+                            j = -1;
+                            break;
+                        case xquote:
+                            warn_at('bad_html', line, character + j);
+                            break;
+                        case '\'':
+                            if (json_mode) {
+                                warn_at('unexpected_a', line, character, '\\\'');
+                            }
+                            break;
+                        case 'u':
+                            hex(4);
+                            break;
+                        case 'v':
+                            if (json_mode) {
+                                warn_at('unexpected_a', line, character, '\\v');
+                            }
+                            c = '\v';
+                            break;
+                        case 'x':
+                            if (json_mode) {
+                                warn_at('unexpected_a', line, character, '\\x');
+                            }
+                            hex(2);
+                            break;
+                        default:
+                            c = descapes[c];
+                            if (typeof c !== 'string') {
+                                warn_at('unexpected_a', line, character, '\\');
+                            }
+                        }
+                    }
+                }
+                r += c;
+                character += 1;
+                j += 1;
+            }
+        }
+
+        function number(snippet) {
+            var digit;
+            if (xmode !== 'style' && xmode !== 'styleproperty' &&
+                    source_row.charAt(0).isAlpha()) {
+                warn_at('expected_space_a_b',
+                    line, character, c, source_row.charAt(0));
+            }
+            if (c === '0') {
+                digit = snippet.charAt(1);
+                if (digit.isDigit()) {
+                    if (token.id !== '.' && xmode !== 'styleproperty') {
+                        warn_at('unexpected_a', line, character, snippet);
+                    }
+                } else if (json_mode && (digit === 'x' || digit === 'X')) {
+                    warn_at('unexpected_a', line, character, '0x');
+                }
+            }
+            if (snippet.slice(snippet.length - 1) === '.') {
+                warn_at('trailing_decimal_a', line, character, snippet);
+            }
+            if (xmode !== 'style') {
+                digit = +snippet;
+                if (!isFinite(digit)) {
+                    warn_at('bad_number', line, character, snippet);
+                }
+                snippet = digit;
+            }
+            return it('(number)', snippet);
+        }
+
 // Public lex methods
 
         return {
@@ -1649,135 +1806,8 @@ var JSLINT = (function () {
 // token -- this is called by advance to get the next token.
 
             token: function () {
-                var b, bit, c, captures, digit, depth, flag, high, i, j,
-                    length, low, quote, symbol;
-
-                function match(x) {
-                    var exec = x.exec(source_row), first;
-                    if (exec) {
-                        length = exec[0].length;
-                        first = exec[1];
-                        c = first.charAt(0);
-                        source_row = source_row.substr(length);
-                        from = character + length - first.length;
-                        character += length;
-                        return first;
-                    }
-                }
-
-                function string(x) {
-                    var c, j, r = '';
-
-                    function hex(n) {
-                        var i = parseInt(source_row.substr(j + 1, n), 16);
-                        j += n;
-                        if (i >= 32 && i <= 126 &&
-                                i !== 34 && i !== 92 && i !== 39) {
-                            warn_at('unexpected_a', line, character, '\\');
-                        }
-                        character += n;
-                        c = String.fromCharCode(i);
-                    }
-
-                    if (json_mode && x !== '"') {
-                        warn_at('expected_a', line, character, '"');
-                    }
-
-                    if (xquote === x || (xmode === 'scriptstring' && !xquote)) {
-                        return it('(punctuator)', x);
-                    }
-
-                    j = 0;
-                    for (;;) {
-                        while (j >= source_row.length) {
-                            j = 0;
-                            if (xmode !== 'html' || !next_line()) {
-                                stop_at('unclosed', line, from);
-                            }
-                        }
-                        c = source_row.charAt(j);
-                        if (c === x) {
-                            character += 1;
-                            source_row = source_row.substr(j + 1);
-                            return it('(string)', r, x);
-                        }
-                        if (c < ' ') {
-                            if (c === '\n' || c === '\r') {
-                                break;
-                            }
-                            warn_at('control_a',
-                                line, character + j, source_row.slice(0, j));
-                        } else if (c === xquote) {
-                            warn_at('bad_html', line, character + j);
-                        } else if (c === '<') {
-                            if (option.safe && xmode === 'html') {
-                                warn_at('adsafe_a', line, character + j, c);
-                            } else if (source_row.charAt(j + 1) === '/' && (xmode || option.safe)) {
-                                warn_at('expected_a_b', line, character,
-                                    '<\\/', '</');
-                            } else if (source_row.charAt(j + 1) === '!' && (xmode || option.safe)) {
-                                warn_at('unexpected_a', line, character, '<!');
-                            }
-                        } else if (c === '\\') {
-                            if (xmode === 'html') {
-                                if (option.safe) {
-                                    warn_at('adsafe_a', line, character + j, c);
-                                }
-                            } else if (xmode === 'styleproperty') {
-                                j += 1;
-                                character += 1;
-                                c = source_row.charAt(j);
-                                if (c !== x) {
-                                    warn_at('unexpected_a', line, character, '\\');
-                                }
-                            } else {
-                                j += 1;
-                                character += 1;
-                                c = source_row.charAt(j);
-                                switch (c) {
-                                case '':
-                                    if (!option.es5) {
-                                        warn_at('es5', line, character);
-                                    }
-                                    next_line();
-                                    j = -1;
-                                    break;
-                                case xquote:
-                                    warn_at('bad_html', line, character + j);
-                                    break;
-                                case '\'':
-                                    if (json_mode) {
-                                        warn_at('unexpected_a', line, character, '\\\'');
-                                    }
-                                    break;
-                                case 'u':
-                                    hex(4);
-                                    break;
-                                case 'v':
-                                    if (json_mode) {
-                                        warn_at('unexpected_a', line, character, '\\v');
-                                    }
-                                    c = '\v';
-                                    break;
-                                case 'x':
-                                    if (json_mode) {
-                                        warn_at('unexpected_a', line, character, '\\x');
-                                    }
-                                    hex(2);
-                                    break;
-                                default:
-                                    c = descapes[c];
-                                    if (typeof c !== 'string') {
-                                        warn_at('unexpected_a', line, character, '\\');
-                                    }
-                                }
-                            }
-                        }
-                        r += c;
-                        character += 1;
-                        j += 1;
-                    }
-                }
+                var b, bit, c, captures, depth, flag, high, i,
+                    low, quote, snippet;
 
                 for (;;) {
                     while (!source_row) {
@@ -1799,69 +1829,42 @@ var JSLINT = (function () {
                             }
                         }
                     }
-                    symbol = match(rx[xmode] || tx);
-                    if (!symbol) {
-                        symbol = '';
+                    snippet = match(rx[xmode] || tx);
+                    if (!snippet) {
+                        snippet = '';
                         c = '';
                         while (source_row && source_row < '!') {
-                            source_row = source_row.substr(1);
+                            source_row = source_row.slice(1);
                         }
                         if (source_row) {
                             if (xmode === 'html') {
                                 return it('(error)', source_row.charAt(0));
                             } else {
                                 stop_at('unexpected_a',
-                                    line, character, source_row.substr(0, 1));
+                                    line, character, source_row.charAt(0));
                             }
                         }
                     } else {
 
 //      identifier
 
+                        c = snippet.charAt(0);
                         if (c.isAlpha() || c === '_' || c === '$') {
-                            return it('(identifier)', symbol);
+                            return it('(identifier)', snippet);
                         }
 
 //      number
 
                         if (c.isDigit()) {
-                            if (xmode !== 'style' &&
-                                    xmode !== 'styleproperty' &&
-                                    source_row.substr(0, 1).isAlpha()) {
-                                warn_at('expected_space_a_b',
-                                    line, character, c, source_row.charAt(0));
-                            }
-                            if (c === '0') {
-                                digit = symbol.substr(1, 1);
-                                if (digit.isDigit()) {
-                                    if (token.id !== '.' && xmode !== 'styleproperty') {
-                                        warn_at('unexpected_a',
-                                            line, character, symbol);
-                                    }
-                                } else if (json_mode && (digit === 'x' || digit === 'X')) {
-                                    warn_at('unexpected_a', line, character, '0x');
-                                }
-                            }
-                            if (symbol.substr(symbol.length - 1) === '.') {
-                                warn_at('trailing_decimal_a', line,
-                                    character, symbol);
-                            }
-                            if (xmode !== 'style') {
-                                digit = +symbol;
-                                if (!isFinite(digit)) {
-                                    warn_at('bad_number', line, character, symbol);
-                                }
-                                symbol = digit;
-                            }
-                            return it('(number)', symbol);
+                            return number(snippet);
                         }
-                        switch (symbol) {
+                        switch (snippet) {
 
 //      string
 
                         case '"':
                         case "'":
-                            return string(symbol);
+                            return string(snippet);
 
 //      // comment
 
@@ -1887,10 +1890,10 @@ var JSLINT = (function () {
                             }
                             collect_comment(source_row.slice(0, i), quote, character, line);
                             character += i + 2;
-                            if (source_row.substr(i, 1) === '/') {
+                            if (source_row.charAt(i) === '/') {
                                 stop_at('nested_comment', line, character);
                             }
-                            source_row = source_row.substr(i + 2);
+                            source_row = source_row.slice(i + 2);
                             break;
 
                         case '':
@@ -1921,7 +1924,7 @@ var JSLINT = (function () {
                                             warn_at('unescaped_a',
                                                 line, from + length, '/');
                                         }
-                                        c = source_row.substr(0, length - 1);
+                                        c = source_row.slice(0, length - 1);
                                         flag = Object.create(regexp_flag);
                                         while (flag[source_row.charAt(length)] === true) {
                                             flag[source_row.charAt(length)] = false;
@@ -1932,7 +1935,7 @@ var JSLINT = (function () {
                                                 line, from, source_row.charAt(length));
                                         }
                                         character += length;
-                                        source_row = source_row.substr(length);
+                                        source_row = source_row.slice(length);
                                         quote = source_row.charAt(0);
                                         if (quote === '/' || quote === '*') {
                                             stop_at('confusing_regexp',
@@ -1990,14 +1993,14 @@ var JSLINT = (function () {
                                         }
                                         break;
                                     case ' ':
-                                        j = 1;
+                                        pos = 1;
                                         while (source_row.charAt(length) === ' ') {
                                             length += 1;
-                                            j += 1;
+                                            pos += 1;
                                         }
-                                        if (j > 1) {
+                                        if (pos > 1) {
                                             warn_at('use_braces',
-                                                line, from + length, j);
+                                                line, from + length, pos);
                                         }
                                         break;
                                     case '[':
@@ -2192,12 +2195,12 @@ klass:                                  do {
                                         }
                                     }
                                 }
-                                c = source_row.substr(0, length - 1);
+                                c = source_row.slice(0, length - 1);
                                 character += length;
-                                source_row = source_row.substr(length);
+                                source_row = source_row.slice(length);
                                 return it('(regexp)', c);
                             }
-                            return it('(punctuator)', symbol);
+                            return it('(punctuator)', snippet);
 
 //      punctuator
 
@@ -2240,25 +2243,25 @@ klass:                                  do {
                                         break;
                                     }
                                     character += 1;
-                                    source_row = source_row.substr(1);
-                                    symbol += c;
+                                    source_row = source_row.slice(1);
+                                    snippet += c;
                                 }
-                                if (symbol.length !== 4 && symbol.length !== 7) {
+                                if (snippet.length !== 4 && snippet.length !== 7) {
                                     warn_at('bad_color_a', line,
-                                        from + length, symbol);
+                                        from + length, snippet);
                                 }
-                                return it('(color)', symbol);
+                                return it('(color)', snippet);
                             }
-                            return it('(punctuator)', symbol);
+                            return it('(punctuator)', snippet);
 
                         default:
                             if (xmode === 'outer' && c === '&') {
                                 character += 1;
-                                source_row = source_row.substr(1);
+                                source_row = source_row.slice(1);
                                 for (;;) {
                                     c = source_row.charAt(0);
                                     character += 1;
-                                    source_row = source_row.substr(1);
+                                    source_row = source_row.slice(1);
                                     if (c === ';') {
                                         break;
                                     }
@@ -2271,7 +2274,7 @@ klass:                                  do {
                                 }
                                 break;
                             }
-                            return it('(punctuator)', symbol);
+                            return it('(punctuator)', snippet);
                         }
                     }
                 }
@@ -2496,13 +2499,11 @@ klass:                                  do {
                 option.windows = false;
 
 
+            delete predefined.Array;
             delete predefined.Date;
-            delete predefined['eval'];
             delete predefined.Function;
             delete predefined.Object;
-            delete predefined.Array;
-            delete predefined.String;
-            delete predefined.Number;
+            delete predefined['eval'];
 
             add_to_predefined({
                 ADSAFE: false,
@@ -2883,7 +2884,8 @@ klass:                                  do {
             stop('unexpected_a', token, next_token.id);
         }
         advance();
-        if (option.safe && scope[token.value] === global_scope[token.value] &&
+        if (option.safe && scope[token.value] &&
+                scope[token.value] === global_scope[token.value] &&
                 (next_token.id !== '(' && next_token.id !== '.')) {
             warn('adsafe', token);
         }
@@ -3015,6 +3017,11 @@ klass:                                  do {
             x.nud = nud;
         }
         return x;
+    }
+
+    function get_type(one) {
+        var a = (one.identifier && scope[one.value]) || one;
+        return a && a.type;
     }
 
 
@@ -3587,6 +3594,7 @@ klass:                                  do {
 
 // Build the syntax table by declaring the syntactic elements.
 
+    type('(array)', 'array');
     type('(color)', 'color');
     type('(function)', 'function');
     type('(number)', 'number', return_this);
@@ -3949,7 +3957,7 @@ klass:                                  do {
                     break;
                 default:
                     if (c.id !== 'function') {
-                        v = c.value.substr(0, 1);
+                        v = c.value.charAt(0);
                         if (!option.newcap && (v < 'A' || v > 'Z')) {
                             warn('constructor_name_a', token);
                         }
@@ -4131,6 +4139,9 @@ klass:                                  do {
                 }
             }
         }
+        if (name === 'length') {
+            conform_type(syntax['(number)'], that);
+        }
         return that;
     }, '', true);
 
@@ -4140,9 +4151,22 @@ klass:                                  do {
         step_in();
         edge();
         var e = expression(0), s;
+        switch (get_type(left)) {
+        case 'array':
+            conform_type(syntax['(number)'], e);
+            break;
+        case 'object':
+            conform_type(syntax['(string)'], e);
+            break;
+        case 'string':
+            warn('use_charAt', that);
+            break;
+        }
         if (e.id === '(number)') {
             if (left.id === 'arguments') {
                 warn('use_param', left);
+            } else {
+                conform_type(syntax['(array)'], left);
             }
         } else if (e.id === '(string)') {
             if (option.safe && (banned[e.value] ||
@@ -4151,6 +4175,8 @@ klass:                                  do {
             } else if (!option.evil &&
                     (e.value === 'eval' || e.value === 'execScript')) {
                 warn('evil', e);
+            } else {
+                conform_type(syntax['(object)'], left);
             }
             tally_property(e.value);
             if (!option.sub && ix.test(e.value)) {
@@ -4159,10 +4185,12 @@ klass:                                  do {
                     warn('subscript', e);
                 }
             }
-        } else if (option.safe) {
-            if (!((e.arity === 'prefix' && adsafe_prefix[e.id] === true) ||
-                    (e.arity === 'infix' && adsafe_infix[e.id] === true))) {
-                warn('adsafe_subscript_a', e);
+        } else {
+            if (option.safe) {
+                if (!((e.arity === 'prefix' && adsafe_prefix[e.id] === true) ||
+                        (e.arity === 'infix' && adsafe_infix[e.id] === true))) {
+                    warn('adsafe_subscript_a', e);
+                }
             }
         }
         step_out(']', that);
@@ -6267,7 +6295,7 @@ klass:                                  do {
                         }
                         break;
                     }
-                    if (next_token.id && next_token.id.substr(0, 1) === '>') {
+                    if (next_token.id && next_token.id.charAt(0) === '>') {
                         break;
                     }
                     if (!next_token.identifier) {
