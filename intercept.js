@@ -1,5 +1,5 @@
 // intercept.js
-// 2011-05-23
+// 2011-06-13
 
 // This file makes it possible for JSLint to run as an ADsafe widget by
 // adding lib features.
@@ -13,7 +13,7 @@
 
 // And it provides access to the syntax tree that JSLint constructed.
 
-/*jslint nomen: false, unparam: true */
+/*jslint nomen: true, unparam: true */
 
 /*global ADSAFE, document, JSLINT */
 
