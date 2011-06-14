@@ -205,6 +205,23 @@ effect as this comment:</p>
 <p>An expression statement is expected to be an assignment or a function/method
   call or <code>delete</code>. All other expression statements are considered
   to be errors.</p>
+<h2 id="confusion">Type Confusion</h2>
+<p>JSLint can do type inference. It can report cases were variables and properties are
+used to house multiple types. The warning is <code>Type confusion:</code> {a} <code>and</code> {b}<code>.</code> where the {a} and {b} will be
+replaced with the names of types.</p>
+<p> It is usually easy to see what caused the
+    warning. In some cases, it can be very puzzling. In the puzzling cases, try
+    initializing your vars with typed values. For example, if you expect that <code>n</code> will
+    contain numbers, then write</p>
+<pre>var n = 0;</pre>
+<p>That should produce clearer warnings. </p>
+<p>Type confusion is not necessarily an error, particularly in a language that
+    provides as much type freedom as this one does. But some inconsistencies are
+    errors, so type discipline might be something to consider adding to your
+    programming style. Also, the fastest JavaScript engines will slow down in the
+    presence of type confusion.
+    
+    To turn off these warnings, turn on the  <i>Tolerate type confusion</i> <a href="#options">option</a>. </p>
 <h2 id=forin><code>for</code> <code>in</code></h2>
 <p>The <code>for</code> <code>in</code> statement allows for looping through
   the names of all of the properties of an object. <a href="http://yuiblog.com/blog/2006/09/26/for-in-intrigue/">Unfortunately,
@@ -471,6 +488,12 @@ options are selected with several checkboxes and two fields. </p>
     <td><code>true</code> if uppercase HTML should be allowed.</td>
   </tr>
   <tr>
+    <td>Tolerate type confusion<br>
+    </td>
+    <td><code>confusion</code></td>
+    <td><code>true</code> if variables and properties are allowed to contain more than one type of value.</td>
+  </tr>
+  <tr>
     <td>Tolerate <code>continue</code></td>
     <td><code>continue</code></td>
     <td><code>true</code> if the <code>continue</code> statement should be allowed.</td>
@@ -602,12 +625,6 @@ options are selected with several checkboxes and two fields. </p>
     <td><code>sub</code></td>
     <td><code>true</code> if subscript notation may be used for expressions
       better expressed in dot notation.</td>
-  </tr>
-  <tr>
-    <td>Tolerate type inconsistency<br>
-    </td>
-    <td><code>type</code></td>
-    <td><code>true</code> if variables are allowed to contain more than one type of value.</td>
   </tr>
   <tr>
     <td> Tolerate misordered definitions </td>
