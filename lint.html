@@ -273,7 +273,7 @@ effect as this comment:</p>
 <h2 id=eqeq>== and !=</h2>
 <p>The <code>==</code> and <code>!=</code> operators do type coercion before
   comparing. This is bad because it causes <code>' \t\r\n' == 0</code> to
-  be <code>true</code>. This can mask type errors. JSLint cannot reliably determine if == is being used correctly, to it is best to not use <code>==</code> and != and always use the more reliable <code>===</code> and <code>!==</code> operators instead. </p>
+  be <code>true</code>. This can mask type errors. JSLint cannot reliably determine if == is being used correctly, so it is best to not use <code>==</code> and != and to always use the more reliable <code>===</code> and <code>!==</code> operators instead. </p>
 <p align="left">If you only care that a value is <i>truthy</i> or <i>falsy</i>,
   then use the short form. Instead of </p>
 <pre align="left">(foo != 0)</pre>
