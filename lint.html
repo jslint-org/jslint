@@ -102,7 +102,7 @@ at issuing warnings. <code>lint</code> is no longer needed.</p>
 <p>The declaration should appear near the top of the file. It must appear before the use of the variables
   it declares. </p>
 <p>It is necessary to use a <code>var</code> statement to declare a variable before that variable is assigned to. </p>
-<p><code>JSLint</code> also recognizes a <code>/*global */</code> directive that can indicate to <code>JSLint</code> that variables used in this file were defined in other files. The comment can contain a comma separated list of names. Each name can optionally be followed by a colon and either <code>true</code> or <code>false</code>, <code>true</code> indicated that the variable may be assigned to by this file, and <code>false</code> indicating that assignment is not allowed (which is the default). The directive respects function scope.</p>
+<p><code>JSLint</code> also recognizes a <code>/*global */</code> directive that can indicate to <code>JSLint</code> that variables used in this file were defined in other files. The comment can contain a comma separated list of names. Each name can optionally be followed by a colon and either <code>true</code> or <code>false</code>, <code>true</code> indicating that the variable may be assigned to by this file, and <code>false</code> indicating that assignment is not allowed (which is the default). The directive respects function scope.</p>
 <p id=browser>Some globals can be predefined for you. Select the <i>Assume
   a browser</i> (<code>browser</code>) <a href="#options">option</a> to
   predefine the standard global properties that are supplied by web browsers,
@@ -273,7 +273,7 @@ effect as this comment:</p>
 <h2 id=eqeq>== and !=</h2>
 <p>The <code>==</code> and <code>!=</code> operators do type coercion before
   comparing. This is bad because it causes <code>' \t\r\n' == 0</code> to
-  be <code>true</code>. This can mask type errors. JSLint cannot reliably determine if == is being used correctly, to it is best to not use <code>==</code> and != and use the more reliable  the <code>===</code> and <code>!==</code> operators instead. </p>
+  be <code>true</code>. This can mask type errors. JSLint cannot reliably determine if == is being used correctly, to it is best to not use <code>==</code> and != and always use the more reliable <code>===</code> and <code>!==</code> operators instead. </p>
 <p align="left">If you only care that a value is <i>truthy</i> or <i>falsy</i>,
   then use the short form. Instead of </p>
 <pre align="left">(foo != 0)</pre>
@@ -308,7 +308,7 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
 <p>The <code>++</code> <small>(increment)</small> and <code>--</code> <small>(decrement)</small>
   operators have been known to contribute to bad code by encouraging excessive
   trickiness. They are second only to faulty architecture in enabling to
-  viruses and other security menaces. Also, preincrement/postincrement confusion can produce off-by-one errors that are extrenmely difficult to diagnose. There is a <code>plusplus</code> <a href="#options">option</a>
+  viruses and other security menaces. Also, preincrement/postincrement confusion can produce off-by-one errors that are extremely difficult to diagnose. There is a <code>plusplus</code> <a href="#options">option</a>
   that allows the use of these operators.</p>
 <h2 id=bitwise>Bitwise Operators</h2>
 <p>JavaScript does not have an integer type, but it does have bitwise operators.
@@ -405,7 +405,7 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
   The extra backslash is ignored by the JavaScript compiler but not by the
   HTML parser. Tricks like this should not be necessary, and yet they are.</p>
 <p>There is a <code>cap</code> <a href="#options">option</a> that allows
-  use of upper case tag names. There is also an <code>on</code> <a href="#options">option</a>
+  use of uppercase tag names. There is also an <code>on</code> <a href="#options">option</a>
   that allows the use of inline HTML event handlers.</p>
 <p>There is a <code>fragment</code> <a href="#options">option</a> that can
   inspect a well formed HTML fragment. If the <code>adsafe</code> <a href="#options">option</a>
@@ -468,7 +468,7 @@ options are selected with several checkboxes and two fields. </p>
   <tr>
     <td>Tolerate HTML case </td>
     <td><code>cap</code></td>
-    <td><code>true</code> if upper case HTML should be allowed.</td>
+    <td><code>true</code> if uppercase HTML should be allowed.</td>
   </tr>
   <tr>
     <td>Tolerate <code>continue</code></td>
