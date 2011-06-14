@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-06-13
+// 2011-06-14
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -2550,28 +2550,23 @@ klass:              do {
             advance(':');
             switch (name) {
             case 'indent':
-                value = +next_token.value;
-                if (typeof value !== 'number' ||
-                        !isFinite(value) || value < 0 ||
-                        Math.floor(value) !== value) {
+                value = next_token.number;
+                if (!isFinite(value) || value < 0 || Math.floor(value) !== value) {
                     stop('expected_small_a');
                 }
                 option.indent = value;
                 break;
             case 'maxerr':
                 value = +next_token.value;
-                if (typeof value !== 'number' ||
-                        !isFinite(value) ||
-                        value <= 0 ||
-                        Math.floor(value) !== value) {
-                    stop('expected_small_a', next_token);
+                value = next_token.number;
+                if (!isFinite(value) || value <= 0 || Math.floor(value) !== value) {
+                    stop('expected_small_a');
                 }
                 option.maxerr = value;
                 break;
             case 'maxlen':
-                value = +next_token.value;
-                if (typeof value !== 'number' || !isFinite(value) || value < 0 ||
-                        Math.floor(value) !== value) {
+                value = next_token.number;
+                if (!isFinite(value) || value <= 0 || Math.floor(value) !== value) {
                     stop('expected_small_a');
                 }
                 option.maxlen = value;
@@ -6922,7 +6917,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-06-13';
+    itself.edition = '2011-06-14';
 
     return itself;
 
