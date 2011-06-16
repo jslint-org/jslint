@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-06-14
+// 2011-06-15
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -1435,7 +1435,7 @@ var JSLINT = (function () {
             evidence: lines[line - 1] || '',
             line: line,
             character: character,
-            a: a || offender.value,
+            a: a || (offender.id === '(number)' ? offender.number : offender.value),
             b: b,
             c: c,
             d: d
@@ -1473,7 +1473,7 @@ var JSLINT = (function () {
 
     function expected_at(at) {
         if (!option.white && next_token.from !== at) {
-            warn('expected_a_at_b_c', next_token, next_token.value, at,
+            warn('expected_a_at_b_c', next_token, '', at,
                 next_token.from);
         }
     }
@@ -4306,7 +4306,7 @@ klass:              do {
                 }
                 advance();
             } else if (next_token.id === '(number)') {
-                id = next_token.value.toString();
+                id = next_token.number.toString();
                 advance();
             }
         }
@@ -6917,7 +6917,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-06-14';
+    itself.edition = '2011-06-15';
 
     return itself;
 
