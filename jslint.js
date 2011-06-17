@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-06-15
+// 2011-06-16
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -4786,15 +4786,23 @@ klass:              do {
 
     labeled_stmt('switch', function () {
 
-// switch.first             the switch expression
-// switch.second            the array of cases. A case is 'case' or 'default' token:
-//    case.first            the array of case expressions
-//    case.second           the array of statements
+// switch.first         the switch expression
+// switch.second        the array of cases. A case is 'case' or 'default' token:
+//    case.first        the array of case expressions
+//    case.second       the array of statements
 // If all of the arrays of statements are disrupt, then the switch is disrupt.
 
-        var particular,
+        var cases = [],
+            particular,
             the_case = next_token,
             unbroken = true;
+
+        function find_duplicate_case(value) {
+            if (are_similar(particular, value)) {
+                warn('duplicate_a', value);
+            }
+        }
+
         funct['(breakage)'] += 1;
         one_space();
         advance('(');
@@ -4812,6 +4820,7 @@ klass:              do {
         this.second = [];
         while (next_token.id === 'case') {
             the_case = next_token;
+            cases.forEach(find_duplicate_case);
             the_case.first = [];
             the_case.arity = 'case';
             spaces();
@@ -4820,6 +4829,8 @@ klass:              do {
             for (;;) {
                 one_space();
                 particular = expression(0);
+                cases.forEach(find_duplicate_case);
+                cases.push(particular);
                 the_case.first.push(particular);
                 if (particular.id === 'NaN') {
                     warn('unexpected_a', particular);
@@ -6276,18 +6287,17 @@ klass:              do {
             break;
         case 'input':
             switch (attribute.type) {
-            case 'radio':
-            case 'checkbox':
             case 'button':
+            case 'checkbox':
+            case 'radio':
             case 'reset':
             case 'submit':
                 break;
-            case 'text':
-            case 'file':
-            case 'password':
             case 'file':
             case 'hidden':
             case 'image':
+            case 'password':
+            case 'text':
                 if (option.adsafe && attribute.autocomplete !== 'off') {
                     warn('adsafe_autocomplete');
                 }
@@ -6917,7 +6927,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-06-15';
+    itself.edition = '2011-06-16';
 
     return itself;
 
