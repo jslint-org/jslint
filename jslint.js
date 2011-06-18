@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-06-16
+// 2011-06-17
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -242,7 +242,7 @@
     'border-width', bottom, br, braille, brown, browser, burlywood, button,
     buttonface, buttonhighlight, buttonshadow, buttontext, bytesToUIString,
     c, cadetblue, call, callee, caller, canvas, cap, caption,
-    'caption-side', captiontext, center, charAt, charCodeAt, character,
+    'caption-side', captiontext, ceil, center, charAt, charCodeAt, character,
     chartreuse, chocolate, chooseColor, chooseFile, chooseFolder, cite,
     clear, clearInterval, clearTimeout, clip, closeWidget, closure, cm,
     code, col, colgroup, color, combine_var, command, comment, comments,
@@ -329,8 +329,8 @@
     setInterval, setTimeout, shift, showWidgetPreferences, sienna, silver,
     skyblue, slash_equal, slateblue, slategray, sleep, slice, sloppy, small,
     snow, sort, source, span, spawn, speak, speech, split, springgreen, src,
-    stack, statement_block, steelblue, stopping, strange_loop, strict,
-    strong, style, styleproperty, sub, subscript, substr, sup, supplant,
+    stack, statement_block, steelblue, stopping, strange_loop, strict, stringify,
+    strong, style, styleproperty, sub, subscript, substr, substring, sup, supplant,
     suppressUpdates, sync, system, t, table, 'table-layout', tag_a_in_b,
     tan, tbody, td, teal, tellWidget, test, 'text-align', 'text-decoration',
     'text-indent', 'text-shadow', 'text-transform', textarea, tfoot, th,
@@ -1098,19 +1098,26 @@ var JSLINT = (function () {
             URIError            : false
         },
 
-        standard_property = {
-            E                   : true,
-            LN2                 : true,
-            LN10                : true,
-            LOG2E               : true,
-            LOG10E              : true,
-            MAX_VALUE           : true,
-            MIN_VALUE           : true,
-            NEGATIVE_INFINITY   : true,
-            PI                  : true,
-            POSITIVE_INFINITY   : true,
-            SQRT1_2             : true,
-            SQRT2               : true
+        standard_property_type = {
+            E                   : 'number',
+            LN2                 : 'number',
+            LN10                : 'number',
+            LOG2E               : 'number',
+            LOG10E              : 'number',
+            MAX_VALUE           : 'number',
+            MIN_VALUE           : 'number',
+            NEGATIVE_INFINITY   : 'number',
+            PI                  : 'number',
+            POSITIVE_INFINITY   : 'number',
+            SQRT1_2             : 'number',
+            SQRT2               : 'number',
+            ceil                : 'number',
+            charAt              : 'function string',
+            floor               : 'function number',
+            length              : 'number',
+            stringify           : 'function string',
+            substring           : 'function string',
+            toString            : 'function string'
         },
 
         strict_mode,
@@ -3930,7 +3937,7 @@ klass:              do {
     prefix('typeof', null, 'string');
     prefix('new', function () {
         one_space();
-        var c = expression(160), i, p, v;
+        var c = expression(160), n, p, v;
         this.first = c;
         if (c.id !== 'function') {
             if (c.identifier) {
@@ -3944,19 +3951,14 @@ klass:              do {
                         p.first = this;
                         advance('(');
                         if (next_token.id !== ')') {
-                            p.second = expression(0);
-                            if (p.second.id !== '(string)' || !p.second.value) {
-                                expected_condition(p.second,  bundle.use_array);
-                                i = false;
-                            } else {
-                                i = true;
+                            n = expression(0);
+                            p.second = [n];
+                            if (get_type(n) !== 'number' || next_token.id === ',') {
+                                warn('use_array', p);
                             }
-                            while (next_token.id !== ')' && next_token.id !== '(end)') {
-                                if (i) {
-                                    warn('use_array', p);
-                                    i = false;
-                                }
-                                advance();
+                            while (next_token.id === ',') {
+                                advance(',');
+                                p.second.push(expression(0));
                             }
                         } else {
                             warn('use_array', token);
@@ -4015,29 +4017,27 @@ klass:              do {
             warn('wrap_immediate');
         }
         p = [];
-        if (left) {
-            set_type(that, conform_type('function', left).slice(9));
-            if (left.identifier) {
-                if (left.value.match(/^[A-Z]([A-Z0-9_$]*[a-z][A-Za-z0-9_$]*)?$/)) {
-                    if (left.value !== 'Number' && left.value !== 'String' &&
-                            left.value !== 'Boolean' && left.value !== 'Date') {
-                        if (left.value === 'Math' || left.value === 'JSON') {
-                            warn('not_a_function', left);
-                        } else if (left.value === 'Object') {
-                            warn('use_object', token);
-                        } else if (left.value === 'Array' || !option.newcap) {
-                            warn('missing_a', left, 'new');
-                        }
+        set_type(that, conform_type('function', left).slice(9));
+        if (left.identifier) {
+            if (left.value.match(/^[A-Z]([A-Z0-9_$]*[a-z][A-Za-z0-9_$]*)?$/)) {
+                if (left.value !== 'Number' && left.value !== 'String' &&
+                        left.value !== 'Boolean' && left.value !== 'Date') {
+                    if (left.value === 'Math' || left.value === 'JSON') {
+                        warn('not_a_function', left);
+                    } else if (left.value === 'Object') {
+                        warn('use_object', token);
+                    } else if (left.value === 'Array' || !option.newcap) {
+                        warn('missing_a', left, 'new');
                     }
                 }
-            } else if (left.id === '.') {
-                if (option.safe && left.first.value === 'Math' &&
-                        left.second === 'random') {
-                    warn('adsafe', left);
-                } else if (left.second.value === 'split' &&
-                        left.first.id === '(string)') {
-                    warn('use_array', left.second);
-                }
+            }
+        } else if (left.id === '.') {
+            if (option.safe && left.first.value === 'Math' &&
+                    left.second === 'random') {
+                warn('adsafe', left);
+            } else if (left.second.value === 'split' &&
+                    left.first.id === '(string)') {
+                warn('use_array', left.second);
             }
         }
         step_in();
@@ -4076,21 +4076,9 @@ klass:              do {
         }
         that.first = left;
         that.second = p;
-        if (!option.confusion) {
-            if (left.id === '.') {
-                if (left.second.value === 'charAt' || left.second.value === 'substring') {
-                    conform_type('string', that);
-                    conform_type('string', left.first);
-                    p.forEach(function (value) {
-                        conform_type('number', value);
-                    });
-                } else if (left.second.value === 'toString' || left.second.value === 'stringify') {
-                    conform_type('string', that);
-                }
-            } else if (left.identifier) {
-                if (left.value === 'String') {
-                    conform_type('string', that);
-                }
+        if (left.identifier) {
+            if (left.value === 'String') {
+                conform_type('string', that);
             }
         }
         return that;
@@ -4162,12 +4150,6 @@ klass:              do {
                 }
                 if (typeof predefined[left.value] !== 'boolean' ||    //// check for writeable
                         next_token.id === '(') {
-                    break;
-                }
-                if (standard_property[name] === true) {
-                    if (next_token.id === '.') {
-                        warn('adsafe', that);
-                    }
                     break;
                 }
                 if (next_token.id !== '.') {
@@ -6543,6 +6525,7 @@ klass:              do {
             Object.create(syntax['(begin)']);
         predefined = {};
         add_to_predefined(standard);
+        property_type = Object.create(standard_property_type);
         if (the_option) {
             option = Object.create(the_option);
             predef = option.predef;
@@ -6592,7 +6575,6 @@ klass:              do {
         member = {};
         node_js = false;
         properties = null;
-        property_type = {};
         prereg = true;
         src = false;
         stack = null;
@@ -6927,7 +6909,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-06-16';
+    itself.edition = '2011-06-17';
 
     return itself;
 
