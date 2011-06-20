@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-06-19
+// 2011-06-20
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -1129,7 +1129,7 @@ var JSLINT = (function () {
             apply               : 'function',
             bind                : 'function function',
             call                : 'function',
-            ceil                : 'number',
+            ceil                : 'function number',
             charAt              : 'function string',
             concat              : 'function',
             constructor         : 'function object',
@@ -7072,7 +7072,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-06-19';
+    itself.edition = '2011-06-20';
 
     return itself;
 
