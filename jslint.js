@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-06-18
+// 2011-06-19
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -1137,7 +1137,7 @@ var JSLINT = (function () {
             defineProperty      : 'function object',
             defineProperties    : 'function object',
             every               : 'function boolean',
-            exec                : 'function object',
+            exec                : 'function array',
             filter              : 'function array',
             floor               : 'function number',
             forEach             : 'function',
@@ -3160,13 +3160,14 @@ klass:              do {
     }
 
 
-    function conform_type(one, two, three) {
+    function conform_type(one, two) {
 
-// This takes a type string or a token, or two tokens. Optionally, it can
-// take a third token that is used as the site of the warning.
+// This takes a type string or a token, or two tokens.
 
         var one_type = get_type(one),
-            two_type = get_type(two);
+            two_type = get_type(two),
+            one_string,
+            two_string;
         if (one_type) {
             if (two_type) {
                 if (one_type === two_type) {
@@ -3179,8 +3180,19 @@ klass:              do {
                     return set_type(two, one_type);
                 } else {
                     if (!option.confusion) {
-                        warn('type_confusion_a_b', three || two,
-                            one_type, two_type);
+                        if (typeof one === 'string') {
+                            one_string = one_type;
+                        } else if (one.id === '.') {
+                            one_string = '.' + one.second.value + ': ' + one_type;
+                        } else {
+                            one_string = '\'' + (one.number || one.value) + '\': ' + one_type;
+                        }
+                        if (two.id === '.') {
+                            two_string = '.' + two.second.value + ': ' + two_type;
+                        } else {
+                            two_string = '\'' + (two.number || two.value) + '\': ' + two_type;
+                        }
+                        warn('type_confusion_a_b', two, one_string, two_string);
                     }
                     return one_type;
                 }
@@ -3374,9 +3386,9 @@ klass:              do {
                 }
                 if (that.type) {
                     conform_type(left, that);
-                    conform_type(that, that.second, that);
+                    conform_type(that, that.second);
                 } else {
-                    conform_type(left, that.second, that);
+                    conform_type(left, that.second);
                 }
             }
             return that;
@@ -3910,7 +3922,7 @@ klass:              do {
         }
         that.first = left;
         that.second = right;
-        set_type(that, conform_type(left, right, that));
+        set_type(that, conform_type(left, right));
         return that;
     });
     prefix('+', 'num');
@@ -4122,9 +4134,6 @@ klass:              do {
     });
 
     infix('(', 160, function (left, that) {
-
-        //// apply, call, concat, parse, slice, toJSON
-
         var p;
         if (indent && indent.mode === 'expression') {
             no_space(prev_token, token);
@@ -4135,7 +4144,36 @@ klass:              do {
             warn('wrap_immediate');
         }
         p = [];
-        set_type(that, conform_type('function', left).slice(9));
+        if (left.identifier) {
+            if (left.value === 'String') {
+                conform_type('string', that);
+            } else if (left.value === 'Number') {
+                conform_type('number', that);
+            } else if (left.value === 'Boolean') {
+                conform_type('boolean', that);
+            } else {
+                set_type(that, conform_type('function', left).slice(9));
+            }
+        } else if (left.id === '.') {
+            switch (left.second.value) {
+            case 'apply':
+            case 'call':
+                set_type(that, conform_type('function', left.first).slice(9));
+                break;
+            case 'concat':
+            case 'slice':
+                conform_type(that, left.first);
+                break;
+            case 'parse':
+            case 'toJSON':
+                conform_type('function', left);
+                break;
+            default:
+                set_type(that, conform_type('function', left).slice(9));
+            }
+        } else {
+            set_type(that, conform_type('function', left).slice(9));
+        }
         if (left.identifier) {
             if (left.value.match(/^[A-Z]([A-Z0-9_$]*[a-z][A-Za-z0-9_$]*)?$/)) {
                 if (left.value !== 'Number' && left.value !== 'String' &&
@@ -4194,11 +4232,6 @@ klass:              do {
         }
         that.first = left;
         that.second = p;
-        if (left.identifier) {
-            if (left.value === 'String') {
-                conform_type('string', that);
-            }
-        }
         return that;
     }, '', true);
 
@@ -4291,7 +4324,7 @@ klass:              do {
     }, '', true);
 
     infix('[', 170, function (left, that) {
-        var left_type = get_type(left), e, s;
+        var e, s;
         no_space_only(prev_token, token);
         no_space();
         step_in();
@@ -4302,9 +4335,7 @@ klass:              do {
             if (e.id === '(number)' && left.id === 'arguments') {
                 warn('use_param', left);
             }
-            if (!left_type) {
-                conform_type('array', left);
-            }
+            conform_type('array', left);
             break;
         case 'string':
             if (e.id === '(string)') {
@@ -4444,6 +4475,9 @@ klass:              do {
 
 
     function complexity(exp) {
+
+        /*jslint confusion: true */
+
         var score = 0;
         if (exp) {
             if (Array.isArray(exp)) {
@@ -4892,6 +4926,8 @@ klass:              do {
 //    case.second       the array of statements
 // If all of the arrays of statements are disrupt, then the switch is disrupt.
 
+        /*jslint confusion: true */
+
         var cases = [],
             particular,
             the_case = next_token,
@@ -5028,6 +5064,9 @@ klass:              do {
     });
 
     labeled_stmt('for', function () {
+
+        /*jslint confusion: true */
+
         var blok, filter, ok = false, paren = next_token, the_in, value;
         this.arity = 'statement';
         funct['(breakage)'] += 1;
@@ -6267,6 +6306,9 @@ klass:              do {
     }
 
     function do_tag(name, attribute) {
+
+        /*jslint confusion: true */
+
         var i, tag = html_tag[name], script, x;
         src = false;
         if (!tag) {
@@ -6635,6 +6677,9 @@ klass:              do {
 // The actual JSLINT function itself.
 
     itself = function JSLint(the_source, the_option) {
+
+        /*jslint confusion: true */
+
         var i, predef, tree;
         JSLINT.comments = [];
         JSLINT.errors = [];
@@ -7027,7 +7072,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-06-18';
+    itself.edition = '2011-06-19';
 
     return itself;
 
