@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-06-17
+// 2011-06-18
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -231,9 +231,9 @@
     'background-position', 'background-repeat', bad_assignment, bad_color_a,
     bad_constructor, bad_entity, bad_html, bad_id_a, bad_in_a,
     bad_invocation, bad_name_a, bad_new, bad_number, bad_operand, bad_type,
-    bad_url, bad_wrap, base, bdo, beep, beige, big, bisque, bitwise, black,
-    blanchedalmond, block, blockquote, blue, blueviolet, body, border,
-    'border-bottom', 'border-bottom-color', 'border-bottom-style',
+    bad_url, bad_wrap, base, bdo, beep, beige, big, bind, bisque, bitwise,
+    black, blanchedalmond, block, blockquote, blue, blueviolet, body,
+    border, 'border-bottom', 'border-bottom-color', 'border-bottom-style',
     'border-bottom-width', 'border-collapse', 'border-color', 'border-left',
     'border-left-color', 'border-left-style', 'border-left-width',
     'border-right', 'border-right-color', 'border-right-style',
@@ -242,10 +242,10 @@
     'border-width', bottom, br, braille, brown, browser, burlywood, button,
     buttonface, buttonhighlight, buttonshadow, buttontext, bytesToUIString,
     c, cadetblue, call, callee, caller, canvas, cap, caption,
-    'caption-side', captiontext, ceil, center, charAt, charCodeAt, character,
-    chartreuse, chocolate, chooseColor, chooseFile, chooseFolder, cite,
-    clear, clearInterval, clearTimeout, clip, closeWidget, closure, cm,
-    code, col, colgroup, color, combine_var, command, comment, comments,
+    'caption-side', captiontext, ceil, center, charAt, charCodeAt,
+    character, chartreuse, chocolate, chooseColor, chooseFile, chooseFolder,
+    cite, clear, clearInterval, clearTimeout, clip, closeWidget, closure,
+    cm, code, col, colgroup, color, combine_var, command, comment, comments,
     concat, conditional_assignment, confirm, confusing_a, confusing_regexp,
     confusion, console, constructor, constructor_name_a, content, continue,
     control_a, convertPathToHFS, convertPathToPlatform, coral,
@@ -255,12 +255,13 @@
     darkolivegreen, darkorange, darkorchid, darkred, darksalmon,
     darkseagreen, darkslateblue, darkslategray, darkturquoise, darkviolet,
     data, datalist, dd, debug, decodeURI, decodeURIComponent, deeppink,
-    deepskyblue, defineClass, del, deleted, deserialize, details, devel,
-    dfn, dialog, dimgray, dir, direction, display, disrupt, div, dl,
-    document, dodgerblue, dt, duplicate_a, edge, edition, else, em, embed,
-    embossed, empty, 'empty-cells', empty_block, empty_case, empty_class,
-    encodeURI, encodeURIComponent, entityify, eqeq, errors, es5, escape,
-    eval, event, evidence, evil, ex, exception, exec, expected_a,
+    deepskyblue, defineClass, defineProperties, defineProperty, del,
+    deleted, deserialize, details, devel, dfn, dialog, dimgray, dir,
+    direction, display, disrupt, div, dl, document, dodgerblue, dt,
+    duplicate_a, edge, edition, else, em, embed, embossed, empty,
+    'empty-cells', empty_block, empty_case, empty_class, encodeURI,
+    encodeURIComponent, entityify, eqeq, errors, es5, escape, eval, event,
+    every, evidence, evil, ex, exception, exec, expected_a,
     expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d, expected_at_a,
     expected_attribute_a, expected_attribute_value_a, expected_class_a,
     expected_fraction_a, expected_id_a, expected_identifier_a,
@@ -274,80 +275,94 @@
     float, floor, floralwhite, focusWidget, font, 'font-family',
     'font-size', 'font-size-adjust', 'font-stretch', 'font-style',
     'font-variant', 'font-weight', footer, forEach, for_if, forestgreen,
-    forin, form, fragment, frame, frames, frameset, from, fromCharCode,
-    fuchsia, fud, funct, function, function_block, function_eval,
-    function_loop, function_statement, function_strict, functions, g,
-    gainsboro, gc, ghostwhite, global, globals, gold, goldenrod, gray,
-    graytext, green, greenyellow, h1, h2, h3, h4, h5, h6, handheld,
-    hasOwnProperty, head, header, height, help, hgroup, highlight,
-    highlighttext, history, honeydew, hotpink, hr, 'hta:application', html,
-    html_confusion_a, html_handlers, i, iTunes, id, identifier,
-    identifier_function, iframe, img, immed, implied_evil, in,
-    inactiveborder, inactivecaption, inactivecaptiontext, include, indent,
-    indexOf, indianred, indigo, infix_in, infobackground, infotext, init,
-    input, ins, insecure_a, isAlpha, isApplicationRunning, isArray, isDigit,
-    isFinite, isNaN, ivory, join, jslint, json, kbd, keygen, keys, khaki,
-    konfabulatorVersion, label, label_a_b, labeled, lang, lastIndexOf,
-    lavender, lavenderblush, lawngreen, lbp, leading_decimal_a, led, left,
-    legend, lemonchiffon, length, 'letter-spacing', li, lib, lightblue,
-    lightcoral, lightcyan, lightgoldenrodyellow, lightgreen, lightpink,
-    lightsalmon, lightseagreen, lightskyblue, lightslategray,
-    lightsteelblue, lightyellow, lime, limegreen, line, 'line-height',
-    linen, link, 'list-style', 'list-style-image', 'list-style-position',
-    'list-style-type', load, loadClass, localStorage, location, log, m,
-    magenta, map, margin, 'margin-bottom', 'margin-left', 'margin-right',
-    'margin-top', mark, 'marker-offset', maroon, match, 'max-height',
-    'max-width', maxerr, maxlen, md5, mediumaquamarine, mediumblue,
-    mediumorchid, mediumpurple, mediumseagreen, mediumslateblue,
-    mediumspringgreen, mediumturquoise, mediumvioletred, member, menu,
-    menutext, message, meta, meter, midnightblue, 'min-height', 'min-width',
-    mintcream, missing_a, missing_a_after_b, missing_option,
-    missing_property, missing_space_a_b, missing_url, missing_use_strict,
-    mistyrose, mixed, mm, moccasin, mode, module, move_invocation, move_var,
-    n, name, name_function, nav, navajowhite, navigator, navy,
-    nested_comment, newcap, next, node, noframes, nomen, noscript, not,
-    not_a_constructor, not_a_defined, not_a_function, not_a_label,
-    not_a_scope, not_greater, nud, number, object, ol, oldlace, olive,
-    olivedrab, on, opacity, open, openURL, opera, optgroup, option, orange,
-    orangered, orchid, outer, outline, 'outline-color', 'outline-style',
-    'outline-width', output, overflow, 'overflow-x', 'overflow-y', p,
-    padding, 'padding-bottom', 'padding-left', 'padding-right',
-    'padding-top', 'page-break-after', 'page-break-before', palegoldenrod,
-    palegreen, paleturquoise, palevioletred, papayawhip, param,
-    parameter_a_get_b, parameter_set_a, paren, parent, parseFloat, parseInt,
-    passfail, pc, peachpuff, peru, pink, play, plum, plusplus, pop,
-    popupMenu, position, postscript, powderblue, pre, predef,
-    preferenceGroups, preferences, prev, print, process, progress,
-    projection, prompt, prototype, pt, purple, push, px, q, querystring,
+    forin, form, fragment, frame, frames, frameset, freeze, from,
+    fromCharCode, fuchsia, fud, funct, function, function_block,
+    function_eval, function_loop, function_statement, function_strict,
+    functions, g, gainsboro, gc, getDate, getDay, getFullYear, getHours,
+    getMilliseconds, getMinutes, getMonth, getOwnPropertyDescriptor,
+    getOwnPropertyNames, getPrototypeOf, getSeconds, getTime,
+    getTimezoneOffset, getUTCDate, getUTCDay, getUTCFullYear, getUTCHours,
+    getUTCMilliseconds, getUTCMinutes, getUTCMonth, getUTCSeconds, getYear,
+    ghostwhite, global, globals, gold, goldenrod, gray, graytext, green,
+    greenyellow, h1, h2, h3, h4, h5, h6, handheld, hasOwnProperty, head,
+    header, height, help, hgroup, highlight, highlighttext, history,
+    honeydew, hotpink, hr, 'hta:application', html, html_confusion_a,
+    html_handlers, i, iTunes, id, identifier, identifier_function, iframe,
+    img, immed, implied_evil, in, inactiveborder, inactivecaption,
+    inactivecaptiontext, include, indent, indexOf, indianred, indigo,
+    infix_in, infobackground, infotext, init, input, ins, insecure_a,
+    isAlpha, isApplicationRunning, isArray, isDigit, isExtensible, isFinite,
+    isFrozen, isNaN, isPrototypeOf, isSealed, ivory, join, jslint, json,
+    kbd, keygen, keys, khaki, konfabulatorVersion, label, label_a_b,
+    labeled, lang, lastIndex, lastIndexOf, lavender, lavenderblush,
+    lawngreen, lbp, leading_decimal_a, led, left, legend, lemonchiffon,
+    length, 'letter-spacing', li, lib, lightblue, lightcoral, lightcyan,
+    lightgoldenrodyellow, lightgreen, lightpink, lightsalmon, lightseagreen,
+    lightskyblue, lightslategray, lightsteelblue, lightyellow, lime,
+    limegreen, line, 'line-height', linen, link, 'list-style',
+    'list-style-image', 'list-style-position', 'list-style-type', load,
+    loadClass, localStorage, location, log, m, magenta, map, margin,
+    'margin-bottom', 'margin-left', 'margin-right', 'margin-top', mark,
+    'marker-offset', maroon, match, 'max-height', 'max-width', maxerr,
+    maxlen, md5, mediumaquamarine, mediumblue, mediumorchid, mediumpurple,
+    mediumseagreen, mediumslateblue, mediumspringgreen, mediumturquoise,
+    mediumvioletred, member, menu, menutext, message, meta, meter,
+    midnightblue, 'min-height', 'min-width', mintcream, missing_a,
+    missing_a_after_b, missing_option, missing_property, missing_space_a_b,
+    missing_url, missing_use_strict, mistyrose, mixed, mm, moccasin, mode,
+    module, move_invocation, move_var, n, name, name_function, nav,
+    navajowhite, navigator, navy, nested_comment, newcap, next, node,
+    noframes, nomen, noscript, not, not_a_constructor, not_a_defined,
+    not_a_function, not_a_label, not_a_scope, not_greater, now, nud, number,
+    object, ol, oldlace, olive, olivedrab, on, opacity, open, openURL,
+    opera, optgroup, option, orange, orangered, orchid, outer, outline,
+    'outline-color', 'outline-style', 'outline-width', output, overflow,
+    'overflow-x', 'overflow-y', p, padding, 'padding-bottom',
+    'padding-left', 'padding-right', 'padding-top', 'page-break-after',
+    'page-break-before', palegoldenrod, palegreen, paleturquoise,
+    palevioletred, papayawhip, param, parameter_a_get_b, parameter_set_a,
+    paren, parent, parse, parseFloat, parseInt, passfail, pc, peachpuff,
+    peru, pink, play, plum, plusplus, pop, popupMenu, position, postscript,
+    powderblue, pre, predef, preferenceGroups, preferences, prev,
+    preventExtensions, print, process, progress, projection, prompt,
+    propertyIsEnumerable, prototype, pt, purple, push, px, q, querystring,
     quit, quote, quotes, r, radix, random, range, raw, readFile, readUrl,
-    read_only, reason, red, redefinition_a, regexp, reloadWidget, replace,
-    report, require, reserved, reserved_a, resolvePath, resumeUpdates,
-    rhino, right, rosybrown, royalblue, rp, rt, ruby, runCommand,
-    runCommandInBg, saddlebrown, safe, salmon, samp, sandybrown, saveAs,
-    savePreferences, scanned_a_b, screen, script, scrollbar, seagreen, seal,
-    search, seashell, second, section, select, serialize, sessionStorage,
-    setInterval, setTimeout, shift, showWidgetPreferences, sienna, silver,
+    read_only, reason, red, redefinition_a, reduce, reduceRight, regexp,
+    reloadWidget, replace, report, require, reserved, reserved_a,
+    resolvePath, resumeUpdates, reverse, rhino, right, rosybrown, royalblue,
+    rp, rt, ruby, runCommand, runCommandInBg, saddlebrown, safe, salmon,
+    samp, sandybrown, saveAs, savePreferences, scanned_a_b, screen, script,
+    scrollbar, seagreen, seal, search, seashell, second, section, select,
+    serialize, sessionStorage, setDate, setDay, setFullYear, setHours,
+    setInterval, setMilliseconds, setMinutes, setMonth, setSeconds, setTime,
+    setTimeout, setTimezoneOffset, setUTCDate, setUTCDay, setUTCFullYear,
+    setUTCHours, setUTCMilliseconds, setUTCMinutes, setUTCMonth,
+    setUTCSeconds, setYear, shift, showWidgetPreferences, sienna, silver,
     skyblue, slash_equal, slateblue, slategray, sleep, slice, sloppy, small,
-    snow, sort, source, span, spawn, speak, speech, split, springgreen, src,
-    stack, statement_block, steelblue, stopping, strange_loop, strict, stringify,
-    strong, style, styleproperty, sub, subscript, substr, substring, sup, supplant,
-    suppressUpdates, sync, system, t, table, 'table-layout', tag_a_in_b,
-    tan, tbody, td, teal, tellWidget, test, 'text-align', 'text-decoration',
-    'text-indent', 'text-shadow', 'text-transform', textarea, tfoot, th,
-    thead, third, thistle, threeddarkshadow, threedface, threedhighlight,
-    threedlightshadow, threedshadow, thru, time, title, toLowerCase,
-    toString, toUpperCase, toint32, token, tomato, too_long, too_many, top,
-    tr, trailing_decimal_a, tree, tt, tty, turquoise, tv, type,
+    snow, some, sort, source, span, spawn, speak, speech, splice, split,
+    springgreen, src, stack, statement_block, steelblue, stopping,
+    strange_loop, strict, stringify, strong, style, styleproperty, sub,
+    subscript, substr, substring, sup, supplant, suppressUpdates, sync,
+    system, t, table, 'table-layout', tag_a_in_b, tan, tbody, td, teal,
+    tellWidget, test, 'text-align', 'text-decoration', 'text-indent',
+    'text-shadow', 'text-transform', textarea, tfoot, th, thead, third,
+    thistle, threeddarkshadow, threedface, threedhighlight,
+    threedlightshadow, threedshadow, thru, time, title, toDateString,
+    toExponential, toFixed, toISOString, toJSON, toLocaleDateString,
+    toLocaleLowerCase, toLocaleString, toLocaleTimeString,
+    toLocaleUpperCase, toLowerCase, toPrecision, toString, toTimeString,
+    toUTCString, toUpperCase, toint32, token, tomato, too_long, too_many,
+    top, tr, trailing_decimal_a, tree, trim, tt, tty, turquoise, tv, type,
     type_confusion_a_b, u, ul, unclosed, unclosed_comment, unclosed_regexp,
     undef, unescape, unescaped_a, unexpected_a, unexpected_char_a_b,
     unexpected_comment, unexpected_property_a, unexpected_space_a_b,
     'unicode-bidi', unnecessary_initialize, unnecessary_use, unparam,
     unreachable_a_b, unrecognized_style_attribute_a, unrecognized_tag_a,
-    unsafe, unused, unwatch, updateNow, url, urls, use_array, use_braces,
-    use_charAt, use_object, use_or, use_param, used_before_a, value,
-    valueOf, var, var_a_not, vars, version, 'vertical-align', video, violet,
-    visibility, was, watch, weird_assignment, weird_condition, weird_new,
-    weird_program, weird_relation, weird_ternary, wheat, white,
+    unsafe, unshift, unused, unwatch, updateNow, url, urls, use_array,
+    use_braces, use_charAt, use_object, use_or, use_param, used_before_a,
+    value, valueOf, var, var_a_not, vars, version, 'vertical-align', video,
+    violet, visibility, was, watch, weird_assignment, weird_condition,
+    weird_new, weird_program, weird_relation, weird_ternary, wheat, white,
     'white-space', whitesmoke, widget, width, window, windowframe, windows,
     windowtext, 'word-spacing', 'word-wrap', wrap, wrap_immediate,
     wrap_regexp, write_is_wrong, writeable, yahooCheckLogin, yahooLogin,
@@ -1111,13 +1126,114 @@ var JSLINT = (function () {
             POSITIVE_INFINITY   : 'number',
             SQRT1_2             : 'number',
             SQRT2               : 'number',
+            apply               : 'function',
+            bind                : 'function function',
+            call                : 'function',
             ceil                : 'number',
             charAt              : 'function string',
+            concat              : 'function',
+            constructor         : 'function object',
+            create              : 'function object',
+            defineProperty      : 'function object',
+            defineProperties    : 'function object',
+            every               : 'function boolean',
+            exec                : 'function object',
+            filter              : 'function array',
             floor               : 'function number',
+            forEach             : 'function',
+            freeze              : 'function object',
+            getDate             : 'function number',
+            getDay              : 'function number',
+            getFullYear         : 'function number',
+            getHours            : 'function number',
+            getMilliseconds     : 'function number',
+            getMinutes          : 'function number',
+            getMonth            : 'function number',
+            getOwnPropertyDescriptor
+                                : 'function object',
+            getOwnPropertyNames : 'function array',
+            getPrototypeOf      : 'function object',
+            getSeconds          : 'function number',
+            getTime             : 'function number',
+            getTimezoneOffset   : 'function number',
+            getUTCDate          : 'function number',
+            getUTCDay           : 'function number',
+            getUTCFullYear      : 'function number',
+            getUTCHours         : 'function number',
+            getUTCMilliseconds  : 'function number',
+            getUTCMinutes       : 'function number',
+            getUTCMonth         : 'function number',
+            getUTCSeconds       : 'function number',
+            getYear             : 'function number',
+            hasOwnProperty      : 'function boolean',
+            indexOf             : 'function number',
+            isExtensible        : 'function boolean',
+            isFrozen            : 'function boolean',
+            isPrototypeOf       : 'function boolean',
+            isSealed            : 'function boolean',
+            join                : 'function string',
+            keys                : 'function array',
+            lastIndexOf         : 'function number',
+            lastIndex           : 'number',
             length              : 'number',
+            map                 : 'function array',
+            now                 : 'function number',
+            parse               : 'function',
+            pop                 : 'function',
+            preventExtensions   : 'function object',
+            propertyIsEnumerable: 'function boolean',
+            prototype           : 'object',
+            push                : 'function number',
+            reduce              : 'function',
+            reduceRight         : 'function',
+            reverse             : 'function',
+            seal                : 'function object',
+            setDate             : 'function',
+            setDay              : 'function',
+            setFullYear         : 'function',
+            setHours            : 'function',
+            setMilliseconds     : 'function',
+            setMinutes          : 'function',
+            setMonth            : 'function',
+            setSeconds          : 'function',
+            setTime             : 'function',
+            setTimezoneOffset   : 'function',
+            setUTCDate          : 'function',
+            setUTCDay           : 'function',
+            setUTCFullYear      : 'function',
+            setUTCHours         : 'function',
+            setUTCMilliseconds  : 'function',
+            setUTCMinutes       : 'function',
+            setUTCMonth         : 'function',
+            setUTCSeconds       : 'function',
+            setYear             : 'function',
+            shift               : 'function',
+            slice               : 'function',
+            some                : 'function boolean',
+            sort                : 'function',
+            splice              : 'function',
             stringify           : 'function string',
+            substr              : 'function string',
             substring           : 'function string',
-            toString            : 'function string'
+            test                : 'function boolean',
+            toDateString        : 'function string',
+            toExponential       : 'function string',
+            toFixed             : 'function string',
+            toJSON              : 'function',
+            toISOString         : 'function string',
+            toLocaleDateString  : 'function string',
+            toLocaleLowerCase   : 'function string',
+            toLocaleUpperCase   : 'function string',
+            toLocaleString      : 'function string',
+            toLocaleTimeString  : 'function string',
+            toLowerCase         : 'function string',
+            toPrecision         : 'function string',
+            toTimeString        : 'function string',
+            toUpperCase         : 'function string',
+            toUTCString         : 'function string',
+            trim                : 'function string',
+            unshift             : 'function number',
+            valueOf             : 'function'
         },
 
         strict_mode,
@@ -1610,11 +1726,11 @@ var JSLINT = (function () {
         }
 
         function string(x) {
-            var c, j, r = '';
+            var c, pos = 0, r = '';
 
             function hex(n) {
-                var i = parseInt(source_row.substr(j + 1, n), 16);
-                j += n;
+                var i = parseInt(source_row.substr(pos + 1, n), 16);
+                pos += n;
                 if (i >= 32 && i <= 126 &&
                         i !== 34 && i !== 92 && i !== 39) {
                     warn_at('unexpected_a', line, character, '\\');
@@ -1631,18 +1747,17 @@ var JSLINT = (function () {
                 return it('(punctuator)', x);
             }
 
-            j = 0;
             for (;;) {
-                while (j >= source_row.length) {
-                    j = 0;
+                while (pos >= source_row.length) {
+                    pos = 0;
                     if (xmode !== 'html' || !next_line()) {
                         stop_at('unclosed', line, from);
                     }
                 }
-                c = source_row.charAt(j);
+                c = source_row.charAt(pos);
                 if (c === x) {
                     character += 1;
-                    source_row = source_row.slice(j + 1);
+                    source_row = source_row.slice(pos + 1);
                     return it('(string)', r, x);
                 }
                 if (c < ' ') {
@@ -1652,7 +1767,7 @@ var JSLINT = (function () {
                     warn_at('control_a',
                         line, character + pos, source_row.slice(0, pos));
                 } else if (c === xquote) {
-                    warn_at('bad_html', line, character + j);
+                    warn_at('bad_html', line, character + pos);
                 } else if (c === '<') {
                     if (option.safe && xmode === 'html') {
                         warn_at('adsafe_a', line, character + pos, c);
@@ -1668,26 +1783,26 @@ var JSLINT = (function () {
                             warn_at('adsafe_a', line, character + pos, c);
                         }
                     } else if (xmode === 'styleproperty') {
-                        j += 1;
+                        pos += 1;
                         character += 1;
-                        c = source_row.charAt(j);
+                        c = source_row.charAt(pos);
                         if (c !== x) {
                             warn_at('unexpected_a', line, character, '\\');
                         }
                     } else {
-                        j += 1;
+                        pos += 1;
                         character += 1;
-                        c = source_row.charAt(j);
+                        c = source_row.charAt(pos);
                         switch (c) {
                         case '':
                             if (!option.es5) {
                                 warn_at('es5', line, character);
                             }
                             next_line();
-                            j = -1;
+                            pos = -1;
                             break;
                         case xquote:
-                            warn_at('bad_html', line, character + j);
+                            warn_at('bad_html', line, character + pos);
                             break;
                         case '\'':
                             if (json_mode) {
@@ -1719,7 +1834,7 @@ var JSLINT = (function () {
                 }
                 r += c;
                 character += 1;
-                j += 1;
+                pos += 1;
             }
         }
 
@@ -4007,6 +4122,9 @@ klass:              do {
     });
 
     infix('(', 160, function (left, that) {
+
+        //// apply, call, concat, parse, slice, toJSON
+
         var p;
         if (indent && indent.mode === 'expression') {
             no_space(prev_token, token);
@@ -5314,7 +5432,7 @@ klass:              do {
                     css_lengthData[next_token.value] === true) {
                 no_space_only();
                 advance();
-            } else if (+token.value !== 0) {
+            } else if (+token.number !== 0) {
                 warn('expected_linear_a');
             }
             return true;
@@ -6909,7 +7027,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-06-17';
+    itself.edition = '2011-06-18';
 
     return itself;
 
