@@ -193,7 +193,7 @@
 // For example:
 
 /*jslint
-    evil: true, nomen: true, regexp: true
+    confusion: true, evil: true, nomen: true, regexp: true
 */
 
 // The properties directive declares an exclusive list of property names.
@@ -4601,7 +4601,7 @@ klass:              do {
 
 
     prefix('{', function () {
-        var get, i, j, name, p, set, seen = {};
+        var get, i, j, name, p, set, seen = {}, type;
         this.arity = 'prefix';
         this.first = [];
         set_type(this, 'object');
@@ -4663,6 +4663,14 @@ klass:              do {
                 discard();
                 spaces();
                 name.first = expression(10);
+                type = property_type[i];
+                if (type) {
+                    name.type = conform_type(type, name.first);
+                } else {
+                    type = get_type(name.first);
+                    name.type = type;
+                    property_type[i] = type;
+                }
             }
             this.first.push(name);
             if (seen[i] === true) {
