@@ -377,6 +377,29 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
   instead). </p>
 <p><code>JSLint</code> does not expect to see <code>new Array</code> (use <code>[]</code>
   instead).</p>
+<h2 id=type>Type Inference</h2>
+<p>Type inference is being added to JSLint. The goal is to ultimately make JSLint more helpful in spotting type inconsistencies and confusions. If you do not want this service, then select the <code>confusion</code> <a href="#options">option</a>.</p>
+
+<h2 id=properties>Properties</h2>
+<p>Since JavaScript is a loosely-typed, dynamic-object language, it is not
+  possible to determine at compile time if property names are spelled correctly.
+  <code>JSLint</code> provides some assistance with this.</p>
+<p>At the bottom of its report, <code>JSLint</code> displays a <code>/*properties*/</code>
+  comment. It contains all of the names and string literals that were used
+  with dot notation, subscript notation, and object literals to name the
+  properties of objects. You can look through the list for misspellings. Property
+  names that were only used once are shown in italics. This is to make misspellings
+  easier to spot.</p>
+<p>You can copy the <code>/*properties*/</code> comment into your script file.
+  <code>JSLint</code> will check the spelling of all property names against
+  the list. That way, you can have <code>JSLint</code> look for misspellings
+  for you. The directive respects function scope.</p>
+<p>JSLint allows the property names to be annotated with types: <code>array</code>, <code>boolean</code>, <code>function</code>, <code>number</code>, <code>object</code>, <code>regexp</code>, <code>string</code>, or <code>*</code> (a wildcard allowing any type). A function type can be followed by another type, indicating a function's return type.</p>
+<p>For example,</p>
+<pre>/*properties
+    charAt: function string, slice: function *
+*/</pre>
+
 <h2 id=unsafe>Unsafe Characters</h2>
 <p> There are characters that are handled inconsistently in browsers, and
   so must be escaped when placed in strings. </p>
@@ -434,8 +457,7 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
 <pre>@charset &quot;UTF-8&quot;;</pre>
 <p>This feature is experimental. Please report any problems or limitations.
   There is a <code>css</code> <a href="#options">option</a> that will tolerate
-  some of the non-standard-but-customary workarounds. <br>
-</p>
+  some of the non-standard-but-customary workarounds. </p>
 
 <h2 id=options>Options</h2>
 <p><code>JSLint</code> provides several options that control its operation and
@@ -660,20 +682,6 @@ options are selected with several checkboxes and two fields. </p>
   </tr>
   </tbody>
 </table>
-<h2 id=properties>Properties</h2>
-<p>Since JavaScript is a loosely-typed, dynamic-object language, it is not
-  possible to determine at compile time if property names are spelled correctly.
-  <code>JSLint</code> provides some assistance with this.</p>
-<p>At the bottom of its report, <code>JSLint</code> displays a <code>/*properties*/</code>
-  comment. It contains all of the names and string literals that were used
-  with dot notation, subscript notation, and object literals to name the
-  properties of objects. You can look through the list for misspellings. Property
-  names that were only used once are shown in italics. This is to make misspellings
-  easier to spot.</p>
-<p>You can copy the <code>/*properties*/</code> comment into your script file.
-  <code>JSLint</code> will check the spelling of all property names against
-  the list. That way, you can have <code>JSLint</code> look for misspellings
-  for you. The directive respects function scope.</p>
 <h2 id=report>Report</h2>
 
 <p>If <code>JSLint</code> is able to complete its scan, it generates a function
@@ -714,8 +722,7 @@ options are selected with several checkboxes and two fields. </p>
   into the window and click the
   <a href="http://www.JSLint.com" target=jslint><input type="button" value="JSLint"></a>
    button. The analysis is done by a script running on your machine.
-  Your script is not sent over the network. You can set the options used.
-  </p>
+  Your script is not sent over the network. You can set the <a href="#options">options</a> used. </p>
 <p>
   JSLint is written entirely in JavaScript, so it can run anywhere that JavaScript can run. See for example  <a href="http://tech.groups.yahoo.com/group/jslint_com/database?method=reportRows&tbl=1">http://tech.groups.yahoo.com/group/jslint_com/database?method=reportRows&amp;tbl=1</a>.</p>
 <h2 id=implementation>Implementation</h2>
