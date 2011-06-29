@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-06-22
+// 2011-06-23
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -384,6 +384,7 @@
     unrecognized_style_attribute_a: string, unrecognized_tag_a: string,
     unsafe: string, unshift: string, unused: array, url: string, urls: array,
     use_array: string, use_braces: string, use_charAt: string,
+    use_named_function_a: string,
     use_object: string, use_or: string, use_param: string,
     used_before_a: string, value: *, valueOf: string, var: object,
     var_a_not: string, vars, 'vertical-align': array, video: object,
@@ -645,6 +646,7 @@ var JSLINT = (function () {
             use_array: "Use the array literal notation [].",
             use_braces: "Spaces are hard to count. Use {{a}}.",
             use_charAt: "Use the charAt method.",
+            use_named_function_a: "Use a named function {a}.",
             use_object: "Use the object literal notation {}.",
             use_or: "Use the || operator.",
             use_param: "Use a named parameter.",
@@ -2499,8 +2501,8 @@ klass:              do {
                         type = 'function ' + next_token.value;
                         advance();
                     } else {
-                         type = 'function';
-                     }
+                        type = 'function';
+                    }
                 } else {
                     type = next_token.value;
                     if (is_type[type] !== true) {
@@ -3499,9 +3501,13 @@ klass:              do {
                     case 'unction':
                     case 'var':
                     case 'unused':
-                    case 'becoming':
                     case 'closure':
                     case 'parameter':
+                        site[name] = 'closure';
+                        funct[name] = site === global_funct ? 'global' : 'outer';
+                        break;
+                    case 'becoming':
+                        warn('use_named_function_a', token);
                         site[name] = 'closure';
                         funct[name] = site === global_funct ? 'global' : 'outer';
                         break;
@@ -6888,7 +6894,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-06-22';
+    itself.edition = '2011-06-23';
 
     return itself;
 
