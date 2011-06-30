@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-06-23
+// 2011-06-24
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -94,7 +94,7 @@
 //                 last: NUMBER,
 //                 params: [
 //                     {
-//                         value: STRING
+//                         string: STRING
 //                     }
 //                 ],
 //                 closure: [
@@ -142,7 +142,7 @@
 // with
 
 //     JSON.stringify(JSLINT.tree, [
-//         'value',  'arity', 'name',  'first',
+//         'string',  'arity', 'name',  'first',
 //         'second', 'third', 'block', 'else'
 //     ], 4));
 
@@ -281,7 +281,7 @@
     expected_string_a: string, expected_style_attribute: string,
     expected_style_pattern: string, expected_tagname_a: string,
     expected_type_a: string, f: string, fieldset: object, figure: object,
-    filter: *, first: array, float: array, floor: *, font: *, 'font-family',
+    filter: *, first: *, float: array, floor: *, font: *, 'font-family',
     'font-size': array, 'font-size-adjust': array, 'font-stretch': array,
     'font-style': array, 'font-variant': array, 'font-weight': array,
     footer: object, forEach: *, for_if: string, forin, form: object, fragment,
@@ -358,7 +358,7 @@
     small: object, some: string, sort: *, source: object, span: object,
     speech: boolean, splice: string, split: function, src,
     statement_block: string, stopping: string, strange_loop: string,
-    strict: string, stringify: string, strong: object, style: *,
+    strict: string, string: string, stringify: string, strong: object, style: *,
     styleproperty: regexp, sub: object, subscript: string, substr: *,
     substring: string, sup: object, supplant: function, t: string,
     table: object, 'table-layout': array, tag_a_in_b: string, tbody: object,
@@ -386,7 +386,7 @@
     use_array: string, use_braces: string, use_charAt: string,
     use_named_function_a: string,
     use_object: string, use_or: string, use_param: string,
-    used_before_a: string, value: *, valueOf: string, var: object,
+    used_before_a: string, valueOf: string, var: object,
     var_a_not: string, vars, 'vertical-align': array, video: object,
     visibility: array, was: object, weird_assignment: string,
     weird_condition: string, weird_new: string, weird_program: string,
@@ -1317,7 +1317,7 @@ var JSLINT = (function () {
             evidence: lines[line - 1] || '',
             line: line,
             character: character,
-            a: a || (offender.id === '(number)' ? offender.number : offender.value),
+            a: a || (offender.id === '(number)' ? +offender.number : offender.string),
             b: b,
             c: c,
             d: d
@@ -1452,7 +1452,7 @@ var JSLINT = (function () {
             if (type === '(number)') {
                 the_token.number = +value;
             } else if (value !== undefined) {
-                the_token.value = String(value);
+                the_token.string = String(value);
             }
             if (quote) {
                 the_token.quote = quote;
@@ -2162,7 +2162,7 @@ klass:              do {
 
 // Define the symbol in the current function in the current scope.
 
-        name = name || token.value;
+        name = name || token.string;
 
 // Global variables cannot be created in the safe subset. If a global variable
 // already exists, do nothing. If it is predefined, define it.
@@ -2331,15 +2331,15 @@ klass:              do {
             break;
         }
         if (token.id === '(string)' || token.identifier) {
-            anonname = token.value;
+            anonname = token.string;
         }
 
         if (id && next_token.id !== id) {
             if (match) {
                 warn('expected_a_b_from_c_d', next_token, id,
-                    match.id, match.line, next_token.value);
-            } else if (!next_token.identifier || next_token.value !== id) {
-                warn('expected_a_b', next_token, id, next_token.value);
+                    match.id, match.line, next_token.string);
+            } else if (!next_token.identifier || next_token.string !== id) {
+                warn('expected_a_b', next_token, id, next_token.string);
             }
         }
         prev_token = token;
@@ -2394,7 +2394,7 @@ klass:              do {
             if (next_token.id !== '(string)' && !next_token.identifier) {
                 return;
             }
-            name = next_token.value;
+            name = next_token.string;
             advance();
             writeable = false;
             if (next_token.id === ':') {
@@ -2423,10 +2423,10 @@ klass:              do {
     function do_jslint() {
         var name, value;
         while (next_token.id === '(string)' || next_token.identifier) {
-            name = next_token.value;
+            name = next_token.string;
             advance();
             if (next_token.id !== ':') {
-                stop('expected_a_b', next_token, ':', next_token.value);
+                stop('expected_a_b', next_token, ':', next_token.string);
             }
             advance(':');
             switch (name) {
@@ -2438,7 +2438,7 @@ klass:              do {
                 option.indent = value;
                 break;
             case 'maxerr':
-                value = +next_token.value;
+                value = +next_token.string;
                 value = next_token.number;
                 if (!isFinite(value) || value <= 0 || Math.floor(value) !== value) {
                     stop('expected_small_a');
@@ -2490,21 +2490,21 @@ klass:              do {
             if (next_token.id !== '(string)' && !next_token.identifier) {
                 return;
             }
-            name = next_token.value;
+            name = next_token.string;
             type = '';
             advance();
             if (next_token.id === ':') {
                 advance(':');
                 if (next_token.id === 'function') {
                     advance('function');
-                    if (is_type[next_token.value] === true) {
-                        type = 'function ' + next_token.value;
+                    if (is_type[next_token.string] === true) {
+                        type = 'function ' + next_token.string;
                         advance();
                     } else {
                         type = 'function';
                     }
                 } else {
-                    type = next_token.value;
+                    type = next_token.string;
                     if (is_type[type] !== true) {
                         warn('expected_type_a', next_token);
                         type = '';
@@ -2528,7 +2528,7 @@ klass:              do {
         comments_off = true;
         indent = null;
         if (next_token.line === token.line && next_token.from === token.thru) {
-            warn('missing_space_a_b', next_token, token.value, next_token.value);
+            warn('missing_space_a_b', next_token, token.string, next_token.string);
         }
         if (lookahead.length > 0 || next_token.comments) {
             warn('unexpected_a', this);
@@ -2622,7 +2622,7 @@ klass:              do {
         if (right.id !== '(end)' && !option.white &&
                 (token.line !== right.line ||
                 token.thru + 1 !== right.from)) {
-            warn('expected_space_a_b', right, token.value, right.value);
+            warn('expected_space_a_b', right, token.string, right.string);
         }
     }
 
@@ -2631,7 +2631,7 @@ klass:              do {
         right = right || next_token;
         if (right.id !== '(end)' && (left.line !== right.line ||
                 (!option.white && left.thru + 1 !== right.from))) {
-            warn('expected_space_a_b', right, left.value, right.value);
+            warn('expected_space_a_b', right, left.string, right.string);
         }
     }
 
@@ -2640,7 +2640,7 @@ klass:              do {
         right = right || next_token;
         if ((!option.white || xmode === 'styleproperty' || xmode === 'style') &&
                 left.thru !== right.from && left.line === right.line) {
-            warn('unexpected_space_a_b', right, left.value, right.value);
+            warn('unexpected_space_a_b', right, left.string, right.string);
         }
     }
 
@@ -2649,7 +2649,7 @@ klass:              do {
         right = right || next_token;
         if (right.id !== '(end)' && (left.line !== right.line ||
                 (!option.white && left.thru !== right.from))) {
-            warn('unexpected_space_a_b', right, left.value, right.value);
+            warn('unexpected_space_a_b', right, left.string, right.string);
         }
     }
 
@@ -2658,14 +2658,14 @@ klass:              do {
             left = left || token;
             right = right || next_token;
             if (left.thru === right.from && left.line === right.line) {
-                warn('missing_space_a_b', right, left.value, right.value);
+                warn('missing_space_a_b', right, left.string, right.string);
             }
         }
     }
 
     function comma() {
         if (next_token.id !== ',') {
-            warn_at('expected_a_b', token.line, token.thru, ',', next_token.value);
+            warn_at('expected_a_b', token.line, token.thru, ',', next_token.string);
         } else {
             if (!option.white) {
                 no_space_only();
@@ -2679,7 +2679,7 @@ klass:              do {
 
     function semicolon() {
         if (next_token.id !== ';') {
-            warn_at('expected_a_b', token.line, token.thru, ';', next_token.value);
+            warn_at('expected_a_b', token.line, token.thru, ';', next_token.string);
         } else {
             if (!option.white) {
                 no_space_only();
@@ -2693,7 +2693,7 @@ klass:              do {
     }
 
     function use_strict() {
-        if (next_token.value === 'use strict') {
+        if (next_token.string === 'use strict') {
             if (strict_mode) {
                 warn('unnecessary_use');
             }
@@ -2732,7 +2732,7 @@ klass:              do {
         if (a.id === '(number)' && b.id === '(number)') {
             return a.number === b.number;
         }
-        if (a.arity === b.arity && a.value === b.value) {
+        if (a.arity === b.arity && a.string === b.string) {
             switch (a.arity) {
             case 'prefix':
             case 'suffix':
@@ -2753,9 +2753,9 @@ klass:              do {
             }
         } else {
             if (a.id === '.' && b.id === '[' && b.arity === 'infix') {
-                return a.second.value === b.second.value && b.second.id === '(string)';
+                return a.second.string === b.second.string && b.second.id === '(string)';
             } else if (a.id === '[' && a.arity === 'infix' && b.id === '.') {
-                return a.second.value === b.second.value && a.second.id === '(string)';
+                return a.second.string === b.second.string && a.second.id === '(string)';
             }
         }
         return false;
@@ -2786,14 +2786,14 @@ klass:              do {
             stop('unexpected_a', token, next_token.id);
         }
         advance();
-        if (option.safe && scope[token.value] &&
-                scope[token.value] === global_scope[token.value] &&
+        if (option.safe && scope[token.string] &&
+                scope[token.string] === global_scope[token.string] &&
                 (next_token.id !== '(' && next_token.id !== '.')) {
             warn('adsafe_a', token);
         }
         if (initial) {
             anonname = 'anonymous';
-            funct['(verb)'] = token.value;
+            funct['(verb)'] = token.string;
         }
         if (initial === true && token.fud) {
             left = token.fud();
@@ -2803,7 +2803,7 @@ klass:              do {
             } else {
                 if (next_token.id === '(number)' && token.id === '.') {
                     warn('leading_decimal_a', token,
-                        next_token.value);
+                        next_token.string);
                     advance();
                     return token;
                 } else {
@@ -2832,7 +2832,7 @@ klass:              do {
             syntax[s] = x = {
                 id: s,
                 lbp: p,
-                value: s
+                string: s
             };
         }
         return x;
@@ -2855,7 +2855,7 @@ klass:              do {
         x.thru = 1;
         x.line = 0;
         x.edge = 'edge';
-        s.value = s;
+        s.string = s;
         return postscript(x);
     }
 
@@ -2928,10 +2928,10 @@ klass:              do {
         if (typeof one !== 'object') {
             return one;
         } if (one.id === '.') {
-            type = property_type[one.second.value];
+            type = property_type[one.second.string];
             return typeof type === 'string' ? type : '';
         } else {
-            return ((one.identifier && scope[one.value]) || one).type;
+            return ((one.identifier && scope[one.string]) || one).type;
         }
     }
 
@@ -2939,9 +2939,9 @@ klass:              do {
     function set_type(one, type) {
         if (type && typeof one === 'object') {
             if (one.id === '.') {
-                property_type[one.second.value] = type;
+                property_type[one.second.string] = type;
             } else {
-                ((one.identifier && scope[one.value]) || one).type = type;
+                ((one.identifier && scope[one.string]) || one).type = type;
             }
         }
         return type;
@@ -2971,14 +2971,14 @@ klass:              do {
                         if (typeof one === 'string') {
                             one_string = one_type;
                         } else if (one.id === '.') {
-                            one_string = '.' + one.second.value + ': ' + one_type;
+                            one_string = '.' + one.second.string + ': ' + one_type;
                         } else {
-                            one_string = '\'' + (one.number || one.value) + '\': ' + one_type;
+                            one_string = '\'' + (one.number || one.string) + '\': ' + one_type;
                         }
                         if (two.id === '.') {
-                            two_string = '.' + two.second.value + ': ' + two_type;
+                            two_string = '.' + two.second.string + ': ' + two_type;
                         } else {
-                            two_string = '\'' + (two.number || two.value) + '\': ' + two_type;
+                            two_string = '\'' + (two.number || two.string) + '\': ' + two_type;
                         }
                         warn('type_confusion_a_b', two, one_string, two_string);
                     }
@@ -3003,10 +3003,10 @@ klass:              do {
     }
 
 
-    function constant(name, type, value) {
+    function constant(name, type) {
         var x = reserve(name);
         x.type = type;
-        x.value = value;
+        x.string = name;
         x.nud = return_this;
         return x;
     }
@@ -3078,7 +3078,7 @@ klass:              do {
             warn(message || bundle.weird_condition, node);
             break;
         case '(':
-            if (node.first.id === '.' && numbery[node.first.second.value] === true) {
+            if (node.first.id === '.' && numbery[node.first.second.string] === true) {
                 warn(message || bundle.weird_condition, node);
             }
             break;
@@ -3137,8 +3137,8 @@ klass:              do {
             var l;
             that.first = left;
             if (left.identifier) {
-                if (scope[left.value]) {
-                    if (scope[left.value].writeable === false) {
+                if (scope[left.string]) {
+                    if (scope[left.string].writeable === false) {
                         warn('read_only', left);
                     }
                 } else {
@@ -3147,7 +3147,7 @@ klass:              do {
             } else if (option.safe) {
                 l = left;
                 do {
-                    if (typeof predefined[l.value] === 'boolean') {
+                    if (typeof predefined[l.string] === 'boolean') {
                         warn('adsafe_a', l);
                     }
                     l = l.first;
@@ -3157,11 +3157,11 @@ klass:              do {
                 warn('identifier_function', token);
             }
             if (left.id === '.' || left.id === '[') {
-                if (!left.first || left.first.value === 'arguments') {
+                if (!left.first || left.first.string === 'arguments') {
                     warn('bad_assignment', that);
                 }
             } else if (left.identifier && !left.reserved) {
-                if (funct[left.value] === 'exception') {
+                if (funct[left.string] === 'exception') {
                     warn('assign_exception', left);
                 }
             }
@@ -3218,12 +3218,12 @@ klass:              do {
     function optional_identifier() {
         if (next_token.identifier) {
             advance();
-            if (option.safe && banned[token.value]) {
+            if (option.safe && banned[token.string]) {
                 warn('adsafe_a', token);
             } else if (token.reserved && !option.es5) {
                 warn('expected_identifier_a_reserved', token);
             }
-            return token.value;
+            return token.string;
         }
     }
 
@@ -3262,8 +3262,8 @@ klass:              do {
             scope = Object.create(old_scope);
             add_label(label, 'label');
             if (next_token.labeled !== true) {
-                warn('label_a_b', next_token, label.value, next_token.value);
-            } else if (jx.test(label.value + ':')) {
+                warn('label_a_b', next_token, label.string, next_token.string);
+            } else if (jx.test(label.string + ':')) {
                 warn('url', label);
             } else if (funct === global_funct) {
                 stop('unexpected_a', token);
@@ -3326,15 +3326,15 @@ klass:              do {
                 warn('unexpected_a', next_token);
                 semicolon();
             } else {
-                if (next_token.value === 'use strict') {
+                if (next_token.string === 'use strict') {
                     if (!node_js || funct !== global_funct || array.length > 0) {
                         warn('function_strict');
                     }
                     use_strict();
                 }
                 if (disruptor) {
-                    warn('unreachable_a_b', next_token, next_token.value,
-                        disruptor.value);
+                    warn('unreachable_a_b', next_token, next_token.string,
+                        disruptor.string);
                     disruptor = null;
                 }
                 the_statement = statement();
@@ -3378,9 +3378,9 @@ klass:              do {
             step_out('}', curly);
             discard();
         } else if (!ordinary) {
-            stop('expected_a_b', next_token, '{', next_token.value);
+            stop('expected_a_b', next_token, '{', next_token.string);
         } else {
-            warn('expected_a_b', next_token, '{', next_token.value);
+            warn('expected_a_b', next_token, '{', next_token.string);
             array = [statement()];
             array.disrupt = array[0].disrupt;
         }
@@ -3412,7 +3412,7 @@ klass:              do {
         lbp: 0,
         identifier: true,
         nud: function () {
-            var name = this.value,
+            var name = this.string,
                 variable = scope[name],
                 site,
                 writeable;
@@ -3425,7 +3425,7 @@ klass:              do {
                 writeable = predefined[name];
                 if (typeof writeable === 'boolean') {
                     global_scope[name] = variable = {
-                        value:     name,
+                        string:    name,
                         writeable: writeable,
                         funct:     global_funct
                     };
@@ -3439,7 +3439,7 @@ klass:              do {
                         warn('used_before_a', token);
                     }
                     scope[name] = variable = {
-                        value: name,
+                        string: name,
                         writeable: true,
                         funct: funct
                     };
@@ -3579,10 +3579,10 @@ klass:              do {
             warn('adsafe_a', x);
         }
     });
-    constant('false', 'boolean', false);
-    constant('Infinity', 'number', Infinity);
-    constant('NaN', 'number', NaN);
-    constant('null', '', null);
+    constant('false', 'boolean');
+    constant('Infinity', 'number');
+    constant('NaN', 'number');
+    constant('null', '');
     reservevar('this', function (x) {
         if (strict_mode && ((funct['(statement)'] &&
                 funct['(name)'].charAt(0) > 'Z') || funct === global_funct)) {
@@ -3591,8 +3591,8 @@ klass:              do {
             warn('adsafe_a', x);
         }
     });
-    constant('true', 'boolean', true);
-    constant('undefined', '', undefined);
+    constant('true', 'boolean');
+    constant('undefined', '');
 
     infix('?', 30, function (left, that) {
         that.first = expected_condition(expected_relation(left));
@@ -3640,7 +3640,7 @@ klass:              do {
 
     prefix('void', function () {
         this.first = expression(0);
-        if (this.first.id !== '(number)' || this.first.value) {
+        if (this.first.id !== '(number)' || this.first.string) {
             warn('unexpected_a', this);
             return this;
         }
@@ -3678,7 +3678,7 @@ klass:              do {
                 warn('unexpected_a', left, '0');
             }
         } else if (left.id === '(string)') {
-            if (left.value === '') {
+            if (left.string === '') {
                 warn('expected_a_b', left, 'String', '\'\'');
             }
         }
@@ -3688,15 +3688,15 @@ klass:              do {
                 warn('unexpected_a', right, '0');
             }
         } else if (right.id === '(string)') {
-            if (right.value === '') {
+            if (right.string === '') {
                 warn('expected_a_b', right, 'String', '\'\'');
             }
         }
         if (left.id === right.id) {
             if (left.id === '(string)' || left.id === '(number)') {
                 if (left.id === '(string)') {
-                    left.value += right.value;
-                    if (jx.test(left.value)) {
+                    left.string += right.string;
+                    if (jx.test(left.string)) {
                         warn('url', left);
                     }
                 } else {
@@ -3856,7 +3856,7 @@ klass:              do {
         this.first = c;
         if (c.id !== 'function') {
             if (c.identifier) {
-                switch (c.value) {
+                switch (c.string) {
                 case 'Object':
                     warn('use_object', token);
                     break;
@@ -3901,7 +3901,7 @@ klass:              do {
                     break;
                 default:
                     if (c.id !== 'function') {
-                        v = c.value.charAt(0);
+                        v = c.string.charAt(0);
                         if (!option.newcap && (v < 'A' || v > 'Z')) {
                             warn('constructor_name_a', token);
                         }
@@ -3933,17 +3933,17 @@ klass:              do {
         }
         p = [];
         if (left.identifier) {
-            if (left.value === 'String') {
+            if (left.string === 'String') {
                 conform_type('string', that);
-            } else if (left.value === 'Number') {
+            } else if (left.string === 'Number') {
                 conform_type('number', that);
-            } else if (left.value === 'Boolean') {
+            } else if (left.string === 'Boolean') {
                 conform_type('boolean', that);
             } else {
                 set_type(that, conform_type('function', left).slice(9));
             }
         } else if (left.id === '.') {
-            switch (left.second.value) {
+            switch (left.second.string) {
             case 'apply':
             case 'call':
                 set_type(that, conform_type('function', left.first).slice(9));
@@ -3963,23 +3963,23 @@ klass:              do {
             set_type(that, conform_type('function', left).slice(9));
         }
         if (left.identifier) {
-            if (left.value.match(/^[A-Z]([A-Z0-9_$]*[a-z][A-Za-z0-9_$]*)?$/)) {
-                if (left.value !== 'Number' && left.value !== 'String' &&
-                        left.value !== 'Boolean' && left.value !== 'Date') {
-                    if (left.value === 'Math' || left.value === 'JSON') {
+            if (left.string.match(/^[A-Z]([A-Z0-9_$]*[a-z][A-Za-z0-9_$]*)?$/)) {
+                if (left.string !== 'Number' && left.string !== 'String' &&
+                        left.string !== 'Boolean' && left.string !== 'Date') {
+                    if (left.string === 'Math' || left.string === 'JSON') {
                         warn('not_a_function', left);
-                    } else if (left.value === 'Object') {
+                    } else if (left.string === 'Object') {
                         warn('use_object', token);
-                    } else if (left.value === 'Array' || !option.newcap) {
+                    } else if (left.string === 'Array' || !option.newcap) {
                         warn('missing_a', left, 'new');
                     }
                 }
             }
         } else if (left.id === '.') {
-            if (option.safe && left.first.value === 'Math' &&
+            if (option.safe && left.first.string === 'Math' &&
                     left.second === 'random') {
                 warn('adsafe_a', left);
-            } else if (left.second.value === 'split' &&
+            } else if (left.second.string === 'split' &&
                     left.first.id === '(string)') {
                 warn('use_array', left.second);
             }
@@ -3999,16 +3999,16 @@ klass:              do {
         no_space();
         step_out(')', that);
         if (typeof left === 'object') {
-            if (left.value === 'parseInt' && p.length === 1) {
+            if (left.string === 'parseInt' && p.length === 1) {
                 warn('radix', left);
             }
             if (!option.evil) {
-                if (left.value === 'eval' || left.value === 'Function' ||
-                        left.value === 'execScript') {
+                if (left.string === 'eval' || left.string === 'Function' ||
+                        left.string === 'execScript') {
                     warn('evil', left);
                 } else if (p[0] && p[0].id === '(string)' &&
-                        (left.value === 'setTimeout' ||
-                        left.value === 'setInterval')) {
+                        (left.string === 'setTimeout' ||
+                        left.string === 'setInterval')) {
                     warn('implied_evil', left);
                 }
             }
@@ -4055,14 +4055,14 @@ klass:              do {
         }
         that.first = left;
         that.second = token;
-        if (left && left.value === 'arguments' &&
+        if (left && left.string === 'arguments' &&
                 (name === 'callee' || name === 'caller')) {
             warn('avoid_a', left, 'arguments.' + name);
-        } else if (!option.evil && left && left.value === 'document' &&
+        } else if (!option.evil && left && left.string === 'document' &&
                 (name === 'write' || name === 'writeln')) {
             warn('write_is_wrong', left);
         } else if (option.adsafe) {
-            if (!adsafe_top && left.value === 'ADSAFE') {
+            if (!adsafe_top && left.string === 'ADSAFE') {
                 if (name === 'id' || name === 'lib') {
                     warn('adsafe_a', that);
                 } else if (name === 'go') {
@@ -4070,7 +4070,7 @@ klass:              do {
                         warn('adsafe_a', that);
                     } else if (adsafe_went || next_token.id !== '(' ||
                             peek(0).id !== '(string)' ||
-                            peek(0).value !== adsafe_id ||
+                            peek(0).string !== adsafe_id ||
                             peek(1).id !== ',') {
                         stop('adsafe_a', that, 'go');
                     }
@@ -4087,7 +4087,7 @@ klass:              do {
                 if (banned[name] === true) {
                     warn('adsafe_a', token, name);
                 }
-                if (typeof predefined[left.value] !== 'boolean' ||    //// check for writeable
+                if (typeof predefined[left.string] !== 'boolean' ||    //// check for writeable
                         next_token.id === '(') {
                     break;
                 }
@@ -4128,19 +4128,19 @@ klass:              do {
             break;
         case 'string':
             if (e.id === '(string)') {
-                if (option.safe && (banned[e.value] ||
-                        e.value.charAt(0) === '_' || e.value.slice(-1) === '_')) {
+                if (option.safe && (banned[e.string] ||
+                        e.string.charAt(0) === '_' || e.string.slice(-1) === '_')) {
                     warn('adsafe_subscript_a', e);
                 } else if (!option.evil &&
-                        (e.value === 'eval' || e.value === 'execScript')) {
+                        (e.string === 'eval' || e.string === 'execScript')) {
                     warn('evil', e);
-                } else if (!option.sub && ix.test(e.value)) {
-                    s = syntax[e.value];
+                } else if (!option.sub && ix.test(e.string)) {
+                    s = syntax[e.string];
                     if (!s || !s.reserved) {
                         warn('subscript', e);
                     }
                 }
-                tally_property(e.value);
+                tally_property(e.string);
             } else if (option.safe && e.id !== 'typeof') {
                 warn('adsafe_subscript_a', e);
             }
@@ -4215,7 +4215,7 @@ klass:              do {
         var id = optional_identifier(true);
         if (!id) {
             if (next_token.id === '(string)') {
-                id = next_token.value;
+                id = next_token.string;
                 if (option.safe) {
                     if (banned[id]) {
                         warn('adsafe_a');
@@ -4400,7 +4400,7 @@ klass:              do {
 // but requires that they be used in pairs.
 
             edge();
-            if (next_token.value === 'get' && peek().id !== ':') {
+            if (next_token.string === 'get' && peek().id !== ':') {
                 if (!option.es5) {
                     warn('es5');
                 }
@@ -4412,32 +4412,32 @@ klass:              do {
                 if (!i) {
                     stop('missing_property');
                 }
-                get.value = '';
+                get.string = '';
                 do_function(get);
                 if (funct['(loopage)']) {
                     warn('function_loop', get);
                 }
                 p = get.first;
                 if (p) {
-                    warn('parameter_a_get_b', p[0], p[0].value, i);
+                    warn('parameter_a_get_b', p[0], p[0].string, i);
                 }
                 comma();
                 set = next_token;
-                set.value = '';
+                set.string = '';
                 spaces();
                 edge();
                 advance('set');
                 one_space_only();
                 j = property_name();
                 if (i !== j) {
-                    stop('expected_a_b', token, i, j || next_token.value);
+                    stop('expected_a_b', token, i, j || next_token.string);
                 }
                 do_function(set);
                 p = set.first;
                 if (!p || p.length !== 1) {
                     stop('parameter_set_a', set, 'value');
-                } else if (p[0].value !== 'value') {
-                    stop('expected_a_b', p[0], 'value', p[0].value);
+                } else if (p[0].string !== 'value') {
+                    stop('expected_a_b', p[0], 'value', p[0].string);
                 }
                 name.first = [get, set];
             } else {
@@ -4656,7 +4656,7 @@ klass:              do {
             edge();
             old_scope = scope;
             scope = Object.create(old_scope);
-            exception_variable = next_token.value;
+            exception_variable = next_token.string;
             this.first = exception_variable;
             if (!next_token.identifier) {
                 warn('expected_identifier_a', next_token);
@@ -4679,7 +4679,7 @@ klass:              do {
             one_space();
             this.third = block(false);
         } else if (!this.second) {
-            stop('expected_a_b', next_token, 'catch', next_token.value);
+            stop('expected_a_b', next_token, 'catch', next_token.string);
         }
         return this;
     });
@@ -4874,9 +4874,9 @@ klass:              do {
         edge();
         if (peek(0).id === 'in') {
             value = next_token;
-            switch (funct[value.value]) {
+            switch (funct[value.string]) {
             case 'unused':
-                funct[value.value] = 'var';
+                funct[value.string] = 'var';
                 break;
             case 'closure':
             case 'var':
@@ -4897,7 +4897,7 @@ klass:              do {
             blok = block(true);
             if (!option.forin) {
                 if (blok.length === 1 && typeof blok[0] === 'object' &&
-                        blok[0].value === 'if' && !blok[0]['else']) {
+                        blok[0].string === 'if' && !blok[0]['else']) {
                     filter = blok[0].first;
                     while (filter.id === '&&') {
                         filter = filter.first;
@@ -4906,34 +4906,34 @@ klass:              do {
                     case '===':
                     case '!==':
                         ok = filter.first.id === '[' ? (
-                            filter.first.first.value === the_in.second.value &&
-                            filter.first.second.value === the_in.first.value
+                            filter.first.first.string === the_in.second.string &&
+                            filter.first.second.string === the_in.first.string
                         ) : (
                             filter.first.id === 'typeof' &&
                             filter.first.first.id === '[' &&
-                            filter.first.first.first.value === the_in.second.value &&
-                            filter.first.first.second.value === the_in.first.value
+                            filter.first.first.first.string === the_in.second.string &&
+                            filter.first.first.second.string === the_in.first.string
                         );
                         break;
                     case '(':
                         ok = filter.first.id === '.' && ((
-                            filter.first.first.value === the_in.second.value &&
-                            filter.first.second.value === 'hasOwnProperty' &&
-                            filter.second[0].value === the_in.first.value
+                            filter.first.first.string === the_in.second.string &&
+                            filter.first.second.string === 'hasOwnProperty' &&
+                            filter.second[0].string === the_in.first.string
                         ) || (
-                            filter.first.first.value === 'ADSAFE' &&
-                            filter.first.second.value === 'has' &&
-                            filter.second[0].value === the_in.second.value &&
-                            filter.second[1].value === the_in.first.value
+                            filter.first.first.string === 'ADSAFE' &&
+                            filter.first.second.string === 'has' &&
+                            filter.second[0].string === the_in.second.string &&
+                            filter.second[1].string === the_in.first.string
                         ) || (
                             filter.first.first.id === '.' &&
                             filter.first.first.first.id === '.' &&
-                            filter.first.first.first.first.value === 'Object' &&
-                            filter.first.first.first.second.value === 'prototype' &&
-                            filter.first.first.second.value === 'hasOwnProperty' &&
-                            filter.first.second.value === 'call' &&
-                            filter.second[0].value === the_in.second.value &&
-                            filter.second[1].value === the_in.first.value
+                            filter.first.first.first.first.string === 'Object' &&
+                            filter.first.first.first.second.string === 'prototype' &&
+                            filter.first.first.second.string === 'hasOwnProperty' &&
+                            filter.first.second.string === 'call' &&
+                            filter.second[0].string === the_in.second.string &&
+                            filter.second[1].string === the_in.first.string
                         ));
                         break;
                     }
@@ -4993,7 +4993,7 @@ klass:              do {
     });
 
     disrupt_stmt('break', function () {
-        var label = next_token.value;
+        var label = next_token.string;
         this.arity = 'statement';
         if (funct['(breakage)'] === 0) {
             warn('unexpected_a', this);
@@ -5015,7 +5015,7 @@ klass:              do {
         if (!option['continue']) {
             warn('unexpected_a', this);
         }
-        var label = next_token.value;
+        var label = next_token.string;
         this.arity = 'statement';
         if (funct['(breakage)'] === 0) {
             warn('unexpected_a', this);
@@ -5096,12 +5096,12 @@ klass:              do {
                     if (next_token.id !== '(string)') {
                         warn('expected_string_a');
                     }
-                    if (object[next_token.value] === true) {
+                    if (object[next_token.string] === true) {
                         warn('duplicate_a');
-                    } else if (next_token.value === '__proto__') {
+                    } else if (next_token.string === '__proto__') {
                         warn('dangling_a');
                     } else {
-                        object[next_token.value] = true;
+                        object[next_token.string] = true;
                     }
                     advance();
                     advance(':');
@@ -5199,7 +5199,7 @@ klass:              do {
     function css_color() {
         var i, number, paren, value;
         if (next_token.identifier) {
-            value = next_token.value;
+            value = next_token.string;
             if (value === 'rgb' || value === 'rgba') {
                 advance();
                 paren = next_token;
@@ -5240,7 +5240,7 @@ klass:              do {
                 }
                 advance(')', paren);
                 return true;
-            } else if (css_colorData[next_token.value] === true) {
+            } else if (css_colorData[next_token.string] === true) {
                 advance();
                 return true;
             }
@@ -5260,7 +5260,7 @@ klass:              do {
         if (next_token.id === '(number)') {
             advance();
             if (next_token.id !== '(string)' &&
-                    css_lengthData[next_token.value] === true) {
+                    css_lengthData[next_token.string] === true) {
                 no_space_only();
                 advance();
             } else if (+token.number !== 0) {
@@ -5280,7 +5280,7 @@ klass:              do {
         if (next_token.id === '(number)') {
             advance();
             if (next_token.id !== '(string)' &&
-                    css_lengthData[next_token.value] === true) {
+                    css_lengthData[next_token.string] === true) {
                 no_space_only();
                 advance();
             }
@@ -5292,7 +5292,7 @@ klass:              do {
 
     function css_width() {
         if (next_token.identifier) {
-            switch (next_token.value) {
+            switch (next_token.string) {
             case 'thin':
             case 'medium':
             case 'thick':
@@ -5307,7 +5307,7 @@ klass:              do {
 
     function css_margin() {
         if (next_token.identifier) {
-            if (next_token.value === 'auto') {
+            if (next_token.string === 'auto') {
                 advance();
                 return true;
             }
@@ -5317,7 +5317,7 @@ klass:              do {
     }
 
     function css_attr() {
-        if (next_token.identifier && next_token.value === 'attr') {
+        if (next_token.identifier && next_token.string === 'attr') {
             advance();
             advance('(');
             if (!next_token.identifier) {
@@ -5345,7 +5345,7 @@ klass:              do {
 
 
     function css_counter() {
-        if (next_token.identifier && next_token.value === 'counter') {
+        if (next_token.identifier && next_token.string === 'counter') {
             advance();
             advance('(');
             advance();
@@ -5359,7 +5359,7 @@ klass:              do {
             advance(')');
             return true;
         }
-        if (next_token.identifier && next_token.value === 'counters') {
+        if (next_token.identifier && next_token.string === 'counters') {
             advance();
             advance('(');
             if (!next_token.identifier) {
@@ -5389,7 +5389,7 @@ klass:              do {
 
     function css_shape() {
         var i;
-        if (next_token.identifier && next_token.value === 'rect') {
+        if (next_token.identifier && next_token.string === 'rect') {
             advance();
             advance('(');
             for (i = 0; i < 4; i += 1) {
@@ -5407,9 +5407,9 @@ klass:              do {
 
     function css_url() {
         var c, url;
-        if (next_token.identifier && next_token.value === 'url') {
+        if (next_token.identifier && next_token.string === 'url') {
             next_token = lex.range('(', ')');
-            url = next_token.value;
+            url = next_token.string;
             c = url.charAt(0);
             if (c === '"' || c === '\'') {
                 if (url.slice(-1) !== c) {
@@ -5438,7 +5438,7 @@ klass:              do {
     css_any = [css_url, function () {
         for (;;) {
             if (next_token.identifier) {
-                switch (next_token.value.toLowerCase()) {
+                switch (next_token.string.toLowerCase()) {
                 case 'url':
                     css_url();
                     break;
@@ -5660,7 +5660,7 @@ klass:              do {
     function style_attribute() {
         var v;
         while (next_token.id === '*' || next_token.id === '#' ||
-                next_token.value === '_') {
+                next_token.string === '_') {
             if (!option.css) {
                 warn('unexpected_a');
             }
@@ -5680,8 +5680,8 @@ klass:              do {
             if (!next_token.identifier) {
                 warn('expected_style_attribute');
             } else {
-                if (Object.prototype.hasOwnProperty.call(css_attribute_data, next_token.value)) {
-                    v = css_attribute_data[next_token.value];
+                if (Object.prototype.hasOwnProperty.call(css_attribute_data, next_token.string)) {
+                    v = css_attribute_data[next_token.string];
                 } else {
                     v = css_any;
                     if (!option.css) {
@@ -5710,7 +5710,7 @@ klass:              do {
         case 'function':
             return v();
         case 'string':
-            if (next_token.identifier && next_token.value === v) {
+            if (next_token.identifier && next_token.string === v) {
                 advance();
                 return true;
             }
@@ -5767,7 +5767,7 @@ klass:              do {
     function style_child() {
         if (next_token.id === '(number)') {
             advance();
-            if (next_token.value === 'n' && next_token.identifier) {
+            if (next_token.string === 'n' && next_token.identifier) {
                 no_space_only();
                 advance();
                 if (next_token.id === '+') {
@@ -5780,7 +5780,7 @@ klass:              do {
             return;
         } else {
             if (next_token.identifier &&
-                    (next_token.value === 'odd' || next_token.value === 'even')) {
+                    (next_token.string === 'odd' || next_token.string === 'even')) {
                 advance();
                 return;
             }
@@ -5801,7 +5801,7 @@ klass:              do {
             }
             v = style_attribute();
             advance(':');
-            if (next_token.identifier && next_token.value === 'inherit') {
+            if (next_token.identifier && next_token.string === 'inherit') {
                 advance();
             } else {
                 if (!style_value(v)) {
@@ -5812,15 +5812,15 @@ klass:              do {
             if (next_token.id === '!') {
                 advance('!');
                 no_space_only();
-                if (next_token.identifier && next_token.value === 'important') {
+                if (next_token.identifier && next_token.string === 'important') {
                     advance();
                 } else {
                     warn('expected_a_b',
-                        next_token, 'important', next_token.value);
+                        next_token, 'important', next_token.string);
                 }
             }
             if (next_token.id === '}' || next_token.id === xquote) {
-                warn('expected_a_b', next_token, ';', next_token.value);
+                warn('expected_a_b', next_token, ';', next_token.string);
             } else {
                 semicolon();
             }
@@ -5830,7 +5830,7 @@ klass:              do {
     function style_selector() {
         if (next_token.identifier) {
             if (!Object.prototype.hasOwnProperty.call(html_tag, option.cap ?
-                    next_token.value.toLowerCase() : next_token.value)) {
+                    next_token.string.toLowerCase() : next_token.string)) {
                 warn('expected_tagname_a');
             }
             advance();
@@ -5843,7 +5843,7 @@ klass:              do {
                 break;
             case ':':
                 advance(':');
-                switch (next_token.value) {
+                switch (next_token.string) {
                 case 'active':
                 case 'after':
                 case 'before':
@@ -5886,7 +5886,7 @@ klass:              do {
                 case 'not':
                     advance();
                     advance('(');
-                    if (next_token.id === ':' && peek(0).value === 'not') {
+                    if (next_token.id === ':' && peek(0).string === 'not') {
                         warn('not');
                     }
                     style_selector();
@@ -5919,9 +5919,9 @@ klass:              do {
                     warn('expected_attribute_a');
                 }
                 advance();
-                if (next_token.id === '=' || next_token.value === '~=' ||
-                        next_token.value === '$=' ||
-                        next_token.value === '|=' ||
+                if (next_token.id === '=' || next_token.string === '~=' ||
+                        next_token.string === '$=' ||
+                        next_token.string === '|=' ||
                         next_token.id === '*=' ||
                         next_token.id === '^=') {
                     advance();
@@ -5975,12 +5975,12 @@ klass:              do {
             i = peek();
             advance('@');
             if (next_token.identifier) {
-                switch (next_token.value) {
+                switch (next_token.string) {
                 case 'import':
                     advance();
                     if (!css_url()) {
                         warn('expected_a_b',
-                            next_token, 'url', next_token.value);
+                            next_token, 'url', next_token.string);
                         advance();
                     }
                     semicolon();
@@ -5988,7 +5988,7 @@ klass:              do {
                 case 'media':
                     advance();
                     for (;;) {
-                        if (!next_token.identifier || css_media[next_token.value] === true) {
+                        if (!next_token.identifier || css_media[next_token.string] === true) {
                             stop('expected_media_a');
                         }
                         advance();
@@ -6168,7 +6168,7 @@ klass:              do {
                             aint(script[0].second[0],   'value', adsafe_id)) {
                         stop('adsafe_id_go');
                     }
-                    switch (script[0].first.second.value) {
+                    switch (script[0].first.second.string) {
                     case 'id':
                         if (adsafe_may || adsafe_went ||
                                 script[0].second.length !== 1) {
@@ -6198,8 +6198,8 @@ klass:              do {
             }
             xmode = 'html';
             advance('</');
-            if (!next_token.identifier && next_token.value !== 'script') {
-                warn('expected_a_b', next_token, 'script', next_token.value);
+            if (!next_token.identifier && next_token.string !== 'script') {
+                warn('expected_a_b', next_token, 'script', next_token.string);
             }
             advance();
             xmode = 'outer';
@@ -6210,8 +6210,8 @@ klass:              do {
             styles();
             xmode = 'html';
             advance('</');
-            if (!next_token.identifier && next_token.value !== 'style') {
-                warn('expected_a_b', next_token, 'style', next_token.value);
+            if (!next_token.identifier && next_token.string !== 'style') {
+                warn('expected_a_b', next_token, 'style', next_token.string);
             }
             advance();
             xmode = 'outer';
@@ -6261,13 +6261,16 @@ klass:              do {
     }
 
     function html() {
+
+        /*jslint confusion: true */
+
         var attribute, attributes, is_empty, name, old_white = option.white,
             quote, tag_name, tag, wmode;
         xmode = 'html';
         xquote = '';
         stack = null;
         for (;;) {
-            switch (next_token.value) {
+            switch (next_token.string) {
             case '<':
                 xmode = 'html';
                 advance('<');
@@ -6276,7 +6279,7 @@ klass:              do {
                 if (!tag_name.identifier) {
                     warn('bad_name_a', tag_name);
                 }
-                name = tag_name.value;
+                name = tag_name.string;
                 if (option.cap) {
                     name = name.toLowerCase();
                 }
@@ -6296,7 +6299,7 @@ klass:              do {
                     if (next_token.id === '/') {
                         advance('/');
                         if (next_token.id !== '>') {
-                            warn('expected_a_b', next_token, '>', next_token.value);
+                            warn('expected_a_b', next_token, '>', next_token.string);
                         }
                         break;
                     }
@@ -6305,13 +6308,13 @@ klass:              do {
                     }
                     if (!next_token.identifier) {
                         if (next_token.id === '(end)' || next_token.id === '(error)') {
-                            warn('expected_a_b', next_token, '>', next_token.value);
+                            warn('expected_a_b', next_token, '>', next_token.string);
                         }
                         warn('bad_name_a');
                     }
                     option.white = false;
                     spaces();
-                    attribute = next_token.value;
+                    attribute = next_token.string;
                     option.white = old_white;
                     advance();
                     if (!option.cap && attribute !== attribute.toLowerCase()) {
@@ -6330,7 +6333,7 @@ klass:              do {
                         advance('=');
                         quote = next_token.id;
                         if (quote !== '"' && quote !== '\'') {
-                            stop('expected_a_b', next_token, '"', next_token.value);
+                            stop('expected_a_b', next_token, '"', next_token.string);
                         }
                         xquote = quote;
                         wmode = option.white;
@@ -6340,7 +6343,7 @@ klass:              do {
                         statements();
                         option.white = wmode;
                         if (next_token.id !== quote) {
-                            stop('expected_a_b', next_token, quote, next_token.value);
+                            stop('expected_a_b', next_token, quote, next_token.string);
                         }
                         xmode = 'html';
                         xquote = '';
@@ -6351,7 +6354,7 @@ klass:              do {
                         advance('=');
                         quote = next_token.id;
                         if (quote !== '"' && quote !== '\'') {
-                            stop('expected_a_b', next_token, '"', next_token.value);
+                            stop('expected_a_b', next_token, '"', next_token.string);
                         }
                         xmode = 'styleproperty';
                         xquote = quote;
@@ -6364,7 +6367,7 @@ klass:              do {
                     } else {
                         if (next_token.id === '=') {
                             advance('=');
-                            tag = next_token.value;
+                            tag = next_token.string;
                             if (!next_token.identifier &&
                                     next_token.id !== '"' &&
                                     next_token.id !== '\'' &&
@@ -6394,7 +6397,7 @@ klass:              do {
                 if (!next_token.identifier) {
                     warn('bad_name_a');
                 }
-                name = next_token.value;
+                name = next_token.string;
                 if (option.cap) {
                     name = name.toLowerCase();
                 }
@@ -6411,7 +6414,7 @@ klass:              do {
                         next_token, closetag(tag_name.name), closetag(name));
                 }
                 if (next_token.id !== '>') {
-                    stop('expected_a_b', next_token, '>', next_token.value);
+                    stop('expected_a_b', next_token, '>', next_token.string);
                 }
                 xmode = 'outer';
                 advance('>');
@@ -6426,13 +6429,13 @@ klass:              do {
                     if (next_token.id === '>' || next_token.id === '(end)') {
                         break;
                     }
-                    if (next_token.value.indexOf('--') >= 0) {
+                    if (next_token.string.indexOf('--') >= 0) {
                         stop('unexpected_a', next_token, '--');
                     }
-                    if (next_token.value.indexOf('<') >= 0) {
+                    if (next_token.string.indexOf('<') >= 0) {
                         stop('unexpected_a', next_token, '<');
                     }
-                    if (next_token.value.indexOf('>') >= 0) {
+                    if (next_token.string.indexOf('>') >= 0) {
                         stop('unexpected_a', next_token, '>');
                     }
                 }
@@ -6444,7 +6447,7 @@ klass:              do {
             default:
                 if (next_token.id === '(end)') {
                     stop('missing_a', next_token,
-                        '</' + stack[stack.length - 1].value + '>');
+                        '</' + stack[stack.length - 1].string + '>');
                 } else {
                     advance();
                 }
@@ -6537,7 +6540,7 @@ klass:              do {
             advance();
             if (next_token.id === '(number)') {
                 stop('unexpected_a');
-            } else if (next_token.value.charAt(0) === '<') {
+            } else if (next_token.string.charAt(0) === '<') {
                 html();
                 if (option.adsafe && !adsafe_went) {
                     warn('adsafe_go', this);
@@ -6557,13 +6560,13 @@ klass:              do {
                     xmode = 'style';
                     advance();
                     if (token.id !== '@' || !next_token.identifier ||
-                            next_token.value !== 'charset' || token.line !== 1 ||
+                            next_token.string !== 'charset' || token.line !== 1 ||
                             token.from !== 1) {
                         stop('css');
                     }
                     advance();
                     if (next_token.id !== '(string)' &&
-                            next_token.value !== 'UTF-8') {
+                            next_token.string !== 'UTF-8') {
                         stop('css');
                     }
                     advance();
@@ -6574,7 +6577,7 @@ klass:              do {
                 default:
                     if (option.adsafe && option.fragment) {
                         stop('expected_a_b',
-                            next_token, '<div>', next_token.value);
+                            next_token, '<div>', next_token.string);
                     }
 
 // If the first token is predef semicolon, ignore it. This is sometimes used when
@@ -6804,7 +6807,7 @@ klass:              do {
                 names = [];
                 if (the_function.params) {
                     for (j = 0; j < the_function.params.length; j += 1) {
-                        names[j] = the_function.params[j].value;
+                        names[j] = the_function.params[j].string;
                     }
                 }
                 output.push('<br><div class=function><i>' +
@@ -6894,7 +6897,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-06-23';
+    itself.edition = '2011-06-24';
 
     return itself;
 
