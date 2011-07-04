@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-06-24
+// 2011-07-01
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -1317,7 +1317,8 @@ var JSLINT = (function () {
             evidence: lines[line - 1] || '',
             line: line,
             character: character,
-            a: a || (offender.id === '(number)' ? +offender.number : offender.string),
+            a: a || (offender.id === '(number)' ?
+                String(offender.number) : offender.string),
             b: b,
             c: c,
             d: d
@@ -3640,6 +3641,7 @@ klass:              do {
 
     prefix('void', function () {
         this.first = expression(0);
+        this.arity = 'prefix';
         if (this.first.id !== '(number)' || this.first.string) {
             warn('unexpected_a', this);
             return this;
@@ -6162,10 +6164,10 @@ klass:              do {
                         stop('adsafe_script', token);
                     }
                     if (script.length !== 1 ||
-                            aint(script[0],             'id',    '(') ||
-                            aint(script[0].first,       'id',    '.') ||
-                            aint(script[0].first.first, 'value', 'ADSAFE') ||
-                            aint(script[0].second[0],   'value', adsafe_id)) {
+                            aint(script[0],             'id',     '(') ||
+                            aint(script[0].first,       'id',     '.') ||
+                            aint(script[0].first.first, 'string', 'ADSAFE') ||
+                            aint(script[0].second[0],   'string', adsafe_id)) {
                         stop('adsafe_id_go');
                     }
                     switch (script[0].first.second.string) {
@@ -6184,8 +6186,8 @@ klass:              do {
                                 aint(script[0].second[1], 'id', 'function') ||
                                 !script[0].second[1].first ||
                                 script[0].second[1].first.length !== 2 ||
-                                aint(script[0].second[1].first[0], 'value', 'dom') ||
-                                aint(script[0].second[1].first[1], 'value', 'lib')) {
+                                aint(script[0].second[1].first[0], 'string', 'dom') ||
+                                aint(script[0].second[1].first[1], 'string', 'lib')) {
                             stop('adsafe_go', next_token);
                         }
                         adsafe_went = true;
@@ -6595,8 +6597,8 @@ klass:              do {
                     if (option.adsafe && (tree.length !== 1 ||
                             aint(tree[0], 'id', '(') ||
                             aint(tree[0].first, 'id', '.') ||
-                            aint(tree[0].first.first, 'value', 'ADSAFE') ||
-                            aint(tree[0].first.second, 'value', 'lib') ||
+                            aint(tree[0].first.first, 'string', 'ADSAFE') ||
+                            aint(tree[0].first.second, 'string', 'lib') ||
                             tree[0].second.length !== 2 ||
                             tree[0].second[0].id !== '(string)' ||
                             aint(tree[0].second[1], 'id', 'function'))) {
@@ -6897,7 +6899,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-06-24';
+    itself.edition = '2011-07-01';
 
     return itself;
 
