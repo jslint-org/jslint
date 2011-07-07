@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-07-01
+// 2011-07-04
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -206,7 +206,8 @@
 /*properties
     '\b': string, '\t': string, '\n': string, '\f': string, '\r': string,
     '!=': boolean, '!==': boolean, '"': string, '%': boolean, '\'': string,
-    '(begin)', '(breakage)': number, '(complexity)', '(context)': object,
+    '(begin)', '(breakage)': number, '(complexity)',
+    '(confusion)': boolean, '(context)': object,
     '(error)', '(identifier)', '(line)': number, '(loopage)': number, '(name)',
     '(old_property_type)', '(params)', '(return_type)', '(scope)': object,
     '(statement)', '(token)', '(vars)', '(verb)', '*': boolean, '+': boolean,
@@ -384,7 +385,6 @@
     unrecognized_style_attribute_a: string, unrecognized_tag_a: string,
     unsafe: string, unshift: string, unused: array, url: string, urls: array,
     use_array: string, use_braces: string, use_charAt: string,
-    use_named_function_a: string,
     use_object: string, use_or: string, use_param: string,
     used_before_a: string, valueOf: string, var: object,
     var_a_not: string, vars, 'vertical-align': array, video: object,
@@ -646,7 +646,6 @@ var JSLINT = (function () {
             use_array: "Use the array literal notation [].",
             use_braces: "Spaces are hard to count. Use {{a}}.",
             use_charAt: "Use the charAt method.",
-            use_named_function_a: "Use a named function {a}.",
             use_object: "Use the object literal notation {}.",
             use_or: "Use the || operator.",
             use_param: "Use a named parameter.",
@@ -3498,17 +3497,13 @@ klass:              do {
 // it was unused, make it var.
 
                     switch (site[name]) {
+                    case 'becoming':
                     case 'function':
                     case 'unction':
                     case 'var':
                     case 'unused':
                     case 'closure':
                     case 'parameter':
-                        site[name] = 'closure';
-                        funct[name] = site === global_funct ? 'global' : 'outer';
-                        break;
-                    case 'becoming':
-                        warn('use_named_function_a', token);
                         site[name] = 'closure';
                         funct[name] = site === global_funct ? 'global' : 'outer';
                         break;
@@ -4367,6 +4362,9 @@ klass:              do {
             delete funct['(old_property_type)'];
         }
         funct['(complexity)'] = complexity(func.block) + 1;
+        if (option.confusion) {
+            funct['(confusion)'] = true;
+        }
         funct      = old_funct;
         option     = old_option;
         scope      = old_scope;
@@ -6899,7 +6897,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-07-01';
+    itself.edition = '2011-07-04';
 
     return itself;
 
