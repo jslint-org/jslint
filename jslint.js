@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-07-04
+// 2011-07-11
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -5091,7 +5091,7 @@ klass:              do {
                 while (next_token.id !== '(end)') {
                     while (next_token.id === ',') {
                         warn('unexpected_a', next_token);
-                        comma();
+                        advance(',');
                     }
                     if (next_token.id !== '(string)') {
                         warn('expected_string_a');
@@ -5109,7 +5109,7 @@ klass:              do {
                     if (next_token.id !== ',') {
                         break;
                     }
-                    comma();
+                    advance(',');
                     if (next_token.id === '}') {
                         warn('unexpected_a', token);
                         break;
@@ -5126,13 +5126,13 @@ klass:              do {
                 while (next_token.id !== '(end)') {
                     while (next_token.id === ',') {
                         warn('unexpected_a', next_token);
-                        comma();
+                        advance(',');
                     }
                     json_value();
                     if (next_token.id !== ',') {
                         break;
                     }
-                    comma();
+                    advance(',');
                     if (next_token.id === ']') {
                         warn('unexpected_a', token);
                         break;
@@ -6897,7 +6897,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-07-04';
+    itself.edition = '2011-07-11';
 
     return itself;
 
