@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-07-11
+// 2011-07-13
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -1132,7 +1132,7 @@ var JSLINT = (function () {
 // attributes characters
         qx = /[^a-zA-Z0-9+\-_\/ ]/,
 // style
-        sx = /^\s*([{:#%.=,>+\[\]@()"';]|\*=?|\$=|\|=|\^=|~=|[a-zA-Z_][a-zA-Z0-9_\-]*|[0-9]+|<\/|\/\*)/,
+        sx = /^\s*([{}:#%.=,>+\[\]@()"';]|\*=?|\$=|\|=|\^=|~=|[a-zA-Z_][a-zA-Z0-9_\-]*|[0-9]+|<\/|\/\*)/,
         ssx = /^\s*([@#!"'};:\-%.=,+\[\]()*_]|[a-zA-Z][a-zA-Z0-9._\-]*|\/\*?|\d+(?:\.\d+)?|<\/)/,
 // token
         tx = /^\s*([(){}\[.,:;'"~\?\]#@]|==?=?|\/(\*(jslint|properties|property|members?|globals?)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/,
@@ -5945,7 +5945,7 @@ klass:              do {
         for (;;) {
             style_selector();
             if (next_token.id === '</' || next_token.id === '{' ||
-                    next_token.id === '(end)') {
+                    next_token.id === '}' || next_token.id === '(end)') {
                 return '';
             }
             if (next_token.id === ',') {
@@ -5955,7 +5955,8 @@ klass:              do {
     }
 
     function style_list() {
-        while (next_token.id !== '</' && next_token.id !== '(end)') {
+        while (next_token.id !== '}' && next_token.id !== '</' &&
+                next_token.id !== '(end)') {
             style_pattern();
             xmode = 'styleproperty';
             if (next_token.id === ';') {
@@ -5988,7 +5989,7 @@ klass:              do {
                 case 'media':
                     advance();
                     for (;;) {
-                        if (!next_token.identifier || css_media[next_token.string] === true) {
+                        if (!next_token.identifier || css_media[next_token.string] !== true) {
                             stop('expected_media_a');
                         }
                         advance();
@@ -6897,7 +6898,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-07-11';
+    itself.edition = '2011-07-13';
 
     return itself;
 
