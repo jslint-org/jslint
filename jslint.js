@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-07-17
+// 2011-07-18
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -237,7 +237,7 @@
     bad_entity: string, bad_html: string, bad_id_a: string, bad_in_a: string,
     bad_invocation: string, bad_name_a: string, bad_new: string,
     bad_number: string, bad_operand: string, bad_style: string,
-    bad_type: string, bad_url: string, bad_wrap: string, base: object,
+    bad_type: string, bad_url_a: string, bad_wrap: string, base: object,
     bdo: object, big: object, bind: string, bitwise: boolean, block: array,
     blockquote: object, body: object, border: array, 'border-bottom': array,
     'border-bottom-color', 'border-bottom-left-radius',
@@ -512,7 +512,7 @@ var JSLINT = (function () {
             bad_operand: "Bad operand.",
             bad_style: "Bad style.",
             bad_type: "Bad type.",
-            bad_url: "Bad url string.",
+            bad_url_a: "Bad url '{a}'.",
             bad_wrap: "Do not wrap function literals in parens unless they " +
                 "are to be immediately invoked.",
             combine_var: "Combine this with the previous 'var' statement.",
@@ -1142,7 +1142,7 @@ var JSLINT = (function () {
 // token
         tx = /^\s*([(){}\[.,:;'"~\?\]#@]|==?=?|\/(\*(jslint|properties|property|members?|globals?)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|%=?|&[&=]?|\|[|=]?|>>?>?=?|<([\/=!]|\!(\[|--)?|<=?)?|\^=?|\!=?=?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+([xX][0-9a-fA-F]+|\.[0-9]*)?([eE][+\-]?[0-9]+)?)/,
 // url badness
-        ux = /&|\+|\u00AD|\.\.|\/\*|%[^;]|base64|url|expression|data|mailto/i,
+        ux = /&|\+|\u00AD|\.\.|\/\*|%[^;]|base64|url|expression|data|mailto|script/i,
 
         rx = {
             outer: hx,
@@ -2322,6 +2322,15 @@ klass:              do {
     }
 
 
+    function advance_identifier(string) {
+        if (next_token.identifier && next_token.string === string) {
+            advance();
+        } else {
+            warn('expected_a_b', next_token, string, artifact());
+        }
+    }
+
+
     function do_safe() {
         if (option.adsafe) {
             option.safe = true;
@@ -2799,18 +2808,12 @@ klass:              do {
         if (!x || typeof x !== 'object') {
             syntax[s] = x = {
                 id: s,
-                lbp: p,
+                lbp: p || 0,
                 string: s
             };
         }
         return x;
     }
-
-
-    function delim(s) {
-        return symbol(s, 0);
-    }
-
 
     function postscript(x) {
         x.postscript = true;
@@ -2829,7 +2832,7 @@ klass:              do {
 
 
     function stmt(s, f) {
-        var x = delim(s);
+        var x = symbol(s);
         x.identifier = x.reserved = true;
         x.fud = f;
         return x;
@@ -2882,7 +2885,7 @@ klass:              do {
 
 
     function type(s, t, nud) {
-        var x = delim(s);
+        var x = symbol(s);
         x.arity = x.type = t;
         if (nud) {
             x.nud = nud;
@@ -2892,7 +2895,7 @@ klass:              do {
 
 
     function reserve(s, f) {
-        var x = delim(s);
+        var x = symbol(s);
         x.identifier = x.reserved = true;
         if (typeof f === 'function') {
             x.nud = f;
@@ -3431,21 +3434,21 @@ klass:              do {
     ultimate('(begin)');
     ultimate('(end)');
     ultimate('(error)');
-    postscript(delim('</'));
-    delim('<!');
-    delim('<!--');
-    delim('-->');
-    postscript(delim('}'));
-    delim(')');
-    delim(']');
-    postscript(delim('"'));
-    postscript(delim('\''));
-    delim(';');
-    delim(':');
-    delim(',');
-    delim('#');
-    delim('@');
-    delim('*/');
+    postscript(symbol('</'));
+    symbol('<!');
+    symbol('<!--');
+    symbol('-->');
+    postscript(symbol('}'));
+    symbol(')');
+    symbol(']');
+    postscript(symbol('"'));
+    postscript(symbol('\''));
+    symbol(';');
+    symbol(':');
+    symbol(',');
+    symbol('#');
+    symbol('@');
+    symbol('*/');
     postscript(reserve('case'));
     reserve('catch');
     postscript(reserve('default'));
@@ -5400,19 +5403,19 @@ klass:              do {
             c = url.charAt(0);
             if (c === '"' || c === '\'') {
                 if (url.slice(-1) !== c) {
-                    warn('bad_url');
+                    warn('bad_url_a');
                 } else {
                     url = url.slice(1, -1);
                     if (url.indexOf(c) >= 0) {
-                        warn('bad_url');
+                        warn('bad_url_a');
                     }
                 }
             }
             if (!url) {
                 warn('missing_url');
             }
-            if (option.safe && ux.test(url)) {
-                stop('adsafe_a', next_token, url);
+            if (ux.test(url)) {
+                stop('bad_url_a');
             }
             urls.push(url);
             advance();
@@ -5445,6 +5448,39 @@ klass:              do {
             }
         }
     }];
+
+
+    function font_face() {
+        advance_identifier('font-family');
+        advance(':');
+        if (!css_name() && !css_string()) {
+            stop('expected_name_a');
+        }
+        semicolon();
+        advance_identifier('src');
+        advance(':');
+        while (true) {
+            if (next_token.string === 'local') {
+                advance_identifier('local');
+                advance('(');
+                if (ux.test(next_token.string)) {
+                    stop('bad_url_a');
+                }
+
+                if (!css_name() && !css_string()) {
+                    stop('expected_name_a');
+                }
+                advance(')');
+            } else if (!css_url()) {
+                stop('expected_a_b', next_token, 'url', artifact());
+            }
+            if (next_token.id !== ',') {
+                break;
+            }
+            comma();
+        }
+        semicolon();
+    }
 
 
     css_border_style = [
@@ -6013,6 +6049,12 @@ klass:              do {
                     style_list();
                     advance('}');
                     break;
+                case 'font-face':
+                    advance();
+                    advance('{');
+                    font_face();
+                    advance('}');
+                    break;
                 default:
                     warn('expected_at_a');
                 }
@@ -6087,7 +6129,7 @@ klass:              do {
                 a === 'content' || a === 'data' ||
                 a.indexOf('src') >= 0 || a.indexOf('url') >= 0) {
             if (option.safe && ux.test(v)) {
-                stop('bad_url', next_token, v);
+                stop('bad_url_a', next_token, v);
             }
             urls.push(v);
         } else if (a === 'for') {
@@ -6909,7 +6951,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-07-17';
+    itself.edition = '2011-07-18';
 
     return itself;
 
