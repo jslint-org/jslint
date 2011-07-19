@@ -8,24 +8,51 @@ body {
     margin-left: 8%;
     margin-right: 8%;
 }
-pre {margin-left: 40px;}
-table {margin: 10px; border: 0px;}
-th, td {border: black solid 1pt; padding-left: 10px;
-    padding-right: 10px; vertical-align: top;}
+pre {
+    margin-left: 40px;
+}
+table {
+    margin: 10px;
+    border: 0px;
+}
+th, td {
+    border: black solid 1pt;
+    padding-left: 10px;
+    padding-right: 10px;
+    vertical-align: top;
+}
 th {
     background-color: thistle;
 }
 td {
     background-color: white;
 }
-#top table {margin: 0px;}
-#top td {background-color: linen; border: 0pt; vertical-align: middle;}
-ul {list-style-type: square;}
-input[type="button"] {border: 2px solid black;}
-a:link {color: darkblue;}
-a:visited {color: purple;}
-a:hover {color: blue; text-decoration: underline;}
-a:active {color: red;}
+#top table {
+    margin: 0px;
+}
+#top td {
+    background-color: linen;
+    border: 0pt;
+    vertical-align: middle;
+}
+ul {
+    list-style-type: square;
+}
+input[type="button"] {
+    border: 2px solid black;
+}
+a:link {
+    color: darkblue;
+}
+a:visited {
+    color: purple;
+}
+a:hover {
+    color: blue;
+    text-decoration: underline;
+}
+a:active {color: red;
+}
 </style>
 </head>
 <body bgcolor="gainsboro">
@@ -110,7 +137,7 @@ at issuing warnings. <code>lint</code> is no longer needed.</p>
   effect as this comment:</p>
 <blockquote>
 <code>/*global
-clearInterval: false, clearTimeout: false, document: false, event: false, frames: false, history: false, Image: false, location: false, name: false, navigator: false, Option: false, parent: false, screen: false, setInterval: false, setTimeout: false, window: false, XMLHttpRequest: false 
+clearInterval: false, clearTimeout: false, document: false, event: false, frames: false, history: false, Image: false, location: false, name: false, navigator: false, Option: false, parent: false, screen: false, setInterval: false, setTimeout: false, window: false, XMLHttpRequest: false
 */</code></blockquote>
 <p>Select the
     <em>Assume console, alert, ...</em>
@@ -220,7 +247,7 @@ replaced with the names of types.</p>
     errors, so type discipline might be something to consider adding to your
     programming style. Also, the fastest JavaScript engines will slow down in the
     presence of type confusion.
-    
+
     To turn off these warnings, turn on the  <i>Tolerate type confusion</i> <a href="#options">option</a>. </p>
 <h2 id=forin><code>for</code> <code>in</code></h2>
 <p>The <code>for</code> <code>in</code> statement allows for looping through
@@ -541,10 +568,12 @@ options are selected with several checkboxes and two fields. </p>
       <td>Tolerate <code>==</code> and <code>!=</code></td>
       <td><code>eqeq</code></td>
       <td><code>true</code> if the <code>==</code> and <code>!=</code> operators should be tolerated. (<a href="#eqeq">more</a>).</td>
+  </tr>
   <tr>
       <td>Tolerate ES5 syntax</td>
       <td><code>es5</code></td>
-      <td><code>true</code> if ES5 syntax should be allowed.</a> It is likely that programs using this option will produce syntax errors on ES3 systems.</td>
+      <td><code>true</code> if ES5 syntax should be allowed.
+       It is likely that programs using this option will produce syntax errors on ES3 systems.</td>
   </tr>
   <tr>
     <td>Tolerate <code>eval</code> </td>
@@ -678,7 +707,7 @@ options are selected with several checkboxes and two fields. </p>
   <tr>
     <td>Assume Windows</td>
     <td><code>windows</code></td>
-    <td><code>true</code> if the Windows</a> globals should be predefined. <a href="#windows"><small>(more)</small></a></td>
+    <td><code>true</code> if the Windows globals should be predefined. <a href="#windows"><small>(more)</small></a></td>
   </tr>
   </tbody>
 </table>
