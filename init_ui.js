@@ -1,5 +1,5 @@
 // init_ui.js
-// 2011-07-17
+// 2011-07-19
 
 // This is the web browser companion to fulljslint.js. It is an ADsafe
 // lib file that implements a web ui by adding behavior to the widget's
@@ -143,7 +143,7 @@ ADSAFE.lib("init_ui", function (lib) {
         dom.q('input&tree').on('click', function () {
             output.value('Tree:');
             tree.value(JSON.stringify(lib.tree(), [
-                'label', 'string', 'number', 'arity', 'name', 'first',
+                'label', 'id', 'string', 'number', 'arity', 'name', 'first',
                 'second', 'third', 'block', 'else', 'quote', 'type'
             ], 4));
             input.select();
