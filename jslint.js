@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-07-18
+// 2011-07-19
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -3527,9 +3527,10 @@ klass:              do {
     prefix('void', function () {
         this.first = expression(0);
         this.arity = 'prefix';
-        if (this.first.id !== '(number)' || this.first.string) {
-            warn('unexpected_a', this);
-            return this;
+        if (option.es5) {
+            warn('expected_a_b', this, 'undefined', 'void');
+        } else if (this.first.number !== 0) {
+            warn('expected_a_b', this.first, '0', artifact(this.first));
         }
         this.type = 'undefined';
         return this;
@@ -5911,10 +5912,10 @@ klass:              do {
                 case 'root':
                 case 'target':
                 case 'visited':
-                    advance();
+                    advance_identifier(next_token.string);
                     break;
                 case 'lang':
-                    advance();
+                    advance_identifier('lang');
                     advance('(');
                     if (!next_token.identifier) {
                         warn('expected_lang_a');
@@ -5925,13 +5926,13 @@ klass:              do {
                 case 'nth-last-child':
                 case 'nth-last-of-type':
                 case 'nth-of-type':
-                    advance();
+                    advance_identifier(next_token.string);
                     advance('(');
                     style_child();
                     advance(')');
                     break;
                 case 'not':
-                    advance();
+                    advance_identifier('not');
                     advance('(');
                     if (next_token.id === ':' && peek(0).string === 'not') {
                         warn('not');
@@ -6022,44 +6023,40 @@ klass:              do {
         while (next_token.id === '@') {
             i = peek();
             advance('@');
-            if (next_token.identifier) {
-                switch (next_token.string) {
-                case 'import':
+            switch (next_token.string) {
+            case 'import':
+                advance_identifier('import');
+                if (!css_url()) {
+                    warn('expected_a_b',
+                        next_token, 'url', artifact());
                     advance();
-                    if (!css_url()) {
-                        warn('expected_a_b',
-                            next_token, 'url', artifact());
-                        advance();
-                    }
-                    semicolon();
-                    break;
-                case 'media':
-                    advance();
-                    for (;;) {
-                        if (!next_token.identifier || css_media[next_token.string] !== true) {
-                            stop('expected_media_a');
-                        }
-                        advance();
-                        if (next_token.id !== ',') {
-                            break;
-                        }
-                        comma();
-                    }
-                    advance('{');
-                    style_list();
-                    advance('}');
-                    break;
-                case 'font-face':
-                    advance();
-                    advance('{');
-                    font_face();
-                    advance('}');
-                    break;
-                default:
-                    warn('expected_at_a');
                 }
-            } else {
-                warn('expected_at_a');
+                semicolon();
+                break;
+            case 'media':
+                advance_identifier('media');
+                for (;;) {
+                    if (!next_token.identifier || css_media[next_token.string] !== true) {
+                        stop('expected_media_a');
+                    }
+                    advance();
+                    if (next_token.id !== ',') {
+                        break;
+                    }
+                    comma();
+                }
+                advance('{');
+                style_list();
+                advance('}');
+                break;
+            case 'font-face':
+                advance_identifier('font-face');
+                advance('{');
+                font_face();
+                advance('}');
+                break;
+            default:
+                stop('expected_at_a');
             }
         }
         style_list();
@@ -6252,10 +6249,7 @@ klass:              do {
             }
             xmode = 'html';
             advance('</');
-            if (!next_token.identifier && next_token.string !== 'script') {
-                warn('expected_a_b', next_token, 'script', artifact());
-            }
-            advance();
+            advance_identifier('script');
             xmode = 'outer';
             break;
         case 'style':
@@ -6264,11 +6258,7 @@ klass:              do {
             styles();
             xmode = 'html';
             advance('</');
-            if (!next_token.identifier && next_token.string !== 'style') {
-                warn('expected_a_b', next_token, 'style', artifact());
-            }
-            advance();
-            xmode = 'outer';
+            advance_identifier('style');
             break;
         case 'input':
             switch (attribute.type) {
@@ -6330,15 +6320,12 @@ klass:              do {
                 advance('<');
                 attributes = {};
                 tag_name = next_token;
-                if (!tag_name.identifier) {
-                    warn('bad_name_a', tag_name);
-                }
                 name = tag_name.string;
+                advance_identifier(name);
                 if (option.cap) {
                     name = name.toLowerCase();
                 }
                 tag_name.name = name;
-                advance();
                 if (!stack) {
                     stack = [];
                     do_begin(name);
@@ -6951,7 +6938,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-07-18';
+    itself.edition = '2011-07-19';
 
     return itself;
 
