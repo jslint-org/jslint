@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-07-19
+// 2011-07-24
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -172,6 +172,7 @@
 //     indent     the indentation factor
 //     maxerr     the maximum number of errors to allow
 //     maxlen     the maximum length of a source line
+//     narwhal    true, if Narwhal globals should be predefined
 //     newcap     true, if constructor names capitalization is ignored
 //     node       true, if Node.js globals should be predefined
 //     nomen      true, if names may have dangling _
@@ -327,7 +328,7 @@
     missing_property: string, missing_space_a_b: string, missing_url: string,
     missing_use_strict: string, mixed: string, mm: boolean, mode: string,
     move_invocation: string, move_var: string, n: string, name: string,
-    name_function: string, nav: object, nested_comment: string,
+    name_function: string, narwhal: boolean, nav: object, nested_comment: string,
     newcap: boolean, node: boolean, noframes: object, nomen, noscript: object,
     not: string, not_a_constructor: string, not_a_defined: string,
     not_a_function: string, not_a_label: string, not_a_scope: string,
@@ -903,6 +904,9 @@ var JSLINT = (function () {
         lines,
         lookahead,
         member,
+		narwhal = array_to_object([
+            'require', 'exports', 'print'
+        ], false),
         node = array_to_object([
             'Buffer', 'clearInterval', 'clearTimeout', 'console', 'exports',
             'global', 'module', 'process', 'querystring', 'require',
@@ -1279,6 +1283,10 @@ var JSLINT = (function () {
             if (option.windows) {
                 add_to_predefined(windows);
                 option.windows = false;
+            }
+            if (option.narwhal) {
+                add_to_predefined(narwhal);
+                option.narwhal = false;
             }
             if (option.node) {
                 add_to_predefined(node);
@@ -6938,7 +6946,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-07-19';
+    itself.edition = '2011-07-24';
 
     return itself;
 
