@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-07-19
+// 2011-08-03
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -209,7 +209,7 @@
     '(begin)', '(breakage)': number, '(complexity)', '(confusion)': boolean,
     '(context)': object, '(error)', '(identifier)', '(line)': number,
     '(loopage)': number, '(name)', '(old_property_type)', '(params)',
-    '(scope)': object, '(statement)', '(token)', '(vars)', '(verb)',
+    '(scope)': object, '(token)', '(vars)', '(verb)',
     '*': boolean, '+': boolean, '-': boolean, '/': *, '<': boolean,
     '<=': boolean, '==': boolean, '===': boolean, '>': boolean,
     '>=': boolean, ADSAFE: boolean, Array, Date, E: string, Function,
@@ -745,7 +745,7 @@ var JSLINT = (function () {
         devel = array_to_object([
             'alert', 'confirm', 'console', 'Debug', 'opera', 'prompt'
         ], false),
-
+        directive,
         escapes = {
             '\b': '\\b',
             '\t': '\\t',
@@ -758,10 +758,10 @@ var JSLINT = (function () {
             '\\': '\\\\'
         },
 
-        funct,          // The current function, including the labels used
-                        // in the function, as well as (verb), (context),
-                        // (statement), (name), (params), (complexity),
-                        // (loopage), (breakage), (vars)
+        funct,          // The current function, including the labels used in
+                        // the function, as well as (breakage), (complexity),
+                        // (context), (loopage), (name), (params), (token),
+                        // (vars), (verb)
 
         functionicity = [
             'closure', 'exception', 'global', 'label', 'outer', 'undef',
@@ -917,6 +917,9 @@ var JSLINT = (function () {
         prev_token,
         property_type,
         regexp_flag = array_to_object(['g', 'i', 'm'], true),
+        return_this = function return_this() {
+            return this;
+        },
         rhino = array_to_object([
             'defineClass', 'deserialize', 'gc', 'help', 'load', 'loadClass',
             'print', 'quit', 'readFile', 'readUrl', 'runCommand', 'seal',
@@ -1151,10 +1154,6 @@ var JSLINT = (function () {
             styleproperty: ssx
         };
 
-
-    function return_this() {
-        return this;
-    }
 
     function F() {}     // Used by Object.create
 
@@ -2501,7 +2500,7 @@ klass:              do {
     }
 
 
-    function directive() {
+    directive = function directive() {
         var command = this.id,
             old_comments_off = comments_off,
             old_indent = indent;
@@ -2539,7 +2538,7 @@ klass:              do {
         comments_off = old_comments_off;
         advance('*/');
         indent = old_indent;
-    }
+    };
 
 
 // Indentation intention
@@ -3472,11 +3471,10 @@ klass:              do {
     constant('NaN', 'number');
     constant('null', '');
     reservevar('this', function (x) {
-        if (strict_mode && ((funct['(statement)'] &&
-                funct['(name)'].charAt(0) > 'Z') || funct === global_funct)) {
-            warn('strict', x);
-        } else if (option.safe) {
+        if (option.safe) {
             warn('adsafe_a', x);
+        } else if (strict_mode && funct['(token)'].arity === 'statement') {
+            warn('strict', x);
         }
     });
     constant('true', 'boolean');
@@ -4382,11 +4380,11 @@ klass:              do {
         var name = next_token, id = identifier();
         add_label(name, 'unction');
         no_space();
+        this.arity = 'statement';
         do_function(this, id);
         if (next_token.id === '(' && next_token.line === token.line) {
             stop('function_statement');
         }
-        this.arity = 'statement';
         return this;
     });
 
@@ -6938,7 +6936,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-07-19';
+    itself.edition = '2011-08-03';
 
     return itself;
 
