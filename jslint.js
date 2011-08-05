@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-08-03
+// 2011-08-04
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -3218,7 +3218,7 @@ klass:              do {
                 semicolon();
             } else {
                 if (next_token.string === 'use strict') {
-                    if (!node_js || funct !== global_funct || array.length > 0) {
+                    if ((!node_js && xmode !== 'script') || funct !== global_funct || array.length > 0) {
                         warn('function_strict');
                     }
                     use_strict();
@@ -3473,7 +3473,8 @@ klass:              do {
     reservevar('this', function (x) {
         if (option.safe) {
             warn('adsafe_a', x);
-        } else if (strict_mode && funct['(token)'].arity === 'statement') {
+        } else if (strict_mode && funct['(token)'].arity === 'statement' &&
+                funct['(name)'].charAt(0) > 'Z') {
             warn('strict', x);
         }
     });
@@ -6936,7 +6937,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-08-03';
+    itself.edition = '2011-08-04';
 
     return itself;
 
