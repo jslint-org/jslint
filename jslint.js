@@ -6531,7 +6531,10 @@ klass:              do {
         } else {
             option = {};
         }
-        option.indent = +option.indent || 0;
+        option.indent = +option.indent;
+        if (!isFinite(option.indent)) {
+            option.indent = 4;
+        }
         option.maxerr = option.maxerr || 50;
         adsafe_id = '';
         adsafe_may = adsafe_top = adsafe_went = false;
