@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-08-05
+// 2011-08-06
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -319,7 +319,7 @@
     'list-style-position': array, 'list-style-type': array, map: *,
     margin: array, 'margin-bottom', 'margin-left', 'margin-right',
     'margin-top', mark: object, 'marker-offset': array, match: function,
-    'max-height': array, 'max-width': array, max_err, max_len, maxerr: number,
+    'max-height': array, 'max-width': array, maxerr: number,
     maxlen: number, member: object, menu: object, message, meta: object,
     meter: object, 'min-height': function, 'min-width': function,
     missing_a: string, missing_a_after_b: string, missing_option: string,
@@ -899,8 +899,8 @@ var JSLINT = (function () {
         itself,         // JSLint itself
         jslint_limit = {
             indent: 10,
-            max_err: 1000,
-            max_len: 256
+            maxerr: 1000,
+            maxlen: 256
         },
         json_mode,
         lex,            // the tokenizer
@@ -6925,7 +6925,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-08-05';
+    itself.edition = '2011-08-06';
 
     return itself;
 
