@@ -2226,9 +2226,9 @@ klass:              do {
 
 // Produce the next token, also looking for programming errors.
 
-        if (indent && option.indent) {
+        if (indent) {
 
-// If indentation checking was requested, then inspect all of the line breakings.
+// In indentation checking was requested, then inspect all of the line breakings.
 // The var statement is tricky because the names might be aligned or not. We
 // look at the first line break after the var to determine the programmer's
 // intention.
@@ -6531,10 +6531,7 @@ klass:              do {
         } else {
             option = {};
         }
-        option.indent = +option.indent;
-        if (!isFinite(option.indent)) {
-            option.indent = 4;
-        }
+        option.indent = +option.indent || 0;
         option.maxerr = option.maxerr || 50;
         adsafe_id = '';
         adsafe_may = adsafe_top = adsafe_went = false;
