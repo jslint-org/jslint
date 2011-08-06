@@ -2226,9 +2226,9 @@ klass:              do {
 
 // Produce the next token, also looking for programming errors.
 
-        if (indent) {
+        if (indent && option.indent) {
 
-// In indentation checking was requested, then inspect all of the line breakings.
+// If indentation checking was requested, then inspect all of the line breakings.
 // The var statement is tricky because the names might be aligned or not. We
 // look at the first line break after the var to determine the programmer's
 // intention.
