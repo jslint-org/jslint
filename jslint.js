@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-08-04
+// 2011-08-05
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -209,27 +209,26 @@
     '(begin)', '(breakage)': number, '(complexity)', '(confusion)': boolean,
     '(context)': object, '(error)', '(identifier)', '(line)': number,
     '(loopage)': number, '(name)', '(old_property_type)', '(params)',
-    '(scope)': object, '(token)', '(vars)', '(verb)',
-    '*': boolean, '+': boolean, '-': boolean, '/': *, '<': boolean,
-    '<=': boolean, '==': boolean, '===': boolean, '>': boolean,
-    '>=': boolean, ADSAFE: boolean, Array, Date, E: string, Function,
-    LN10: string, LN2: string, LOG10E: string, LOG2E: string,
-    MAX_VALUE: string, MIN_VALUE: string, NEGATIVE_INFINITY: string, Object,
-    PI: string, POSITIVE_INFINITY: string, SQRT1_2: string, SQRT2: string,
-    '\\': string, a: object, a_label: string, a_not_allowed: string,
-    a_not_defined: string, a_scope: string, abbr: object, acronym: object,
-    address: object, adsafe, adsafe_a: string, adsafe_autocomplete: string,
-    adsafe_bad_id: string, adsafe_div: string, adsafe_fragment: string,
-    adsafe_go: string, adsafe_html: string, adsafe_id: string,
-    adsafe_id_go: string, adsafe_lib: string, adsafe_lib_second: string,
-    adsafe_missing_id: string, adsafe_name_a: string, adsafe_placement: string,
-    adsafe_prefix_a: string, adsafe_script: string, adsafe_source: string,
-    adsafe_subscript_a: string, adsafe_tag: string, all: boolean,
-    already_defined: string, and: string, applet: object, apply: string,
-    approved: array, area: object, arity: string, article: object,
-    aside: object, assign: boolean, assign_exception: string,
-    assignment_function_expression: string, at: number,
-    attribute_case_a: string, audio: object, autocomplete: string,
+    '(scope)': object, '(token)', '(vars)', '(verb)', '*': boolean,
+    '+': boolean, '-': boolean, '/': *, '<': boolean, '<=': boolean,
+    '==': boolean, '===': boolean, '>': boolean, '>=': boolean,
+    ADSAFE: boolean, Array, Date, E: string, Function, LN10: string,
+    LN2: string, LOG10E: string, LOG2E: string, MAX_VALUE: string,
+    MIN_VALUE: string, NEGATIVE_INFINITY: string, Object, PI: string,
+    POSITIVE_INFINITY: string, SQRT1_2: string, SQRT2: string, '\\': string,
+    a: object, a_label: string, a_not_allowed: string, a_not_defined: string,
+    a_scope: string, abbr: object, acronym: object, address: object, adsafe,
+    adsafe_a: string, adsafe_autocomplete: string, adsafe_bad_id: string,
+    adsafe_div: string, adsafe_fragment: string, adsafe_go: string,
+    adsafe_html: string, adsafe_id: string, adsafe_id_go: string,
+    adsafe_lib: string, adsafe_lib_second: string, adsafe_missing_id: string,
+    adsafe_name_a: string, adsafe_placement: string, adsafe_prefix_a: string,
+    adsafe_script: string, adsafe_source: string, adsafe_subscript_a: string,
+    adsafe_tag: string, all: boolean, already_defined: string, and: string,
+    applet: object, apply: string, approved: array, area: object,
+    arity: string, article: object, aside: object, assign: boolean,
+    assign_exception: string, assignment_function_expression: string,
+    at: number, attribute_case_a: string, audio: object, autocomplete: string,
     avoid_a: string, b: *, background: array, 'background-attachment': array,
     'background-color': array, 'background-image': array,
     'background-position': array, 'background-repeat': array,
@@ -320,10 +319,10 @@
     'list-style-position': array, 'list-style-type': array, map: *,
     margin: array, 'margin-bottom', 'margin-left', 'margin-right',
     'margin-top', mark: object, 'marker-offset': array, match: function,
-    'max-height': array, 'max-width': array, maxerr: number, maxlen: number,
-    member: object, menu: object, message, meta: object, meter: object,
-    'min-height': function, 'min-width': function, missing_a: string,
-    missing_a_after_b: string, missing_option: string,
+    'max-height': array, 'max-width': array, max_err, max_len, maxerr: number,
+    maxlen: number, member: object, menu: object, message, meta: object,
+    meter: object, 'min-height': function, 'min-width': function,
+    missing_a: string, missing_a_after_b: string, missing_option: string,
     missing_property: string, missing_space_a_b: string, missing_url: string,
     missing_use_strict: string, mixed: string, mm: boolean, mode: string,
     move_invocation: string, move_var: string, n: string, name: string,
@@ -561,7 +560,7 @@ var JSLINT = (function () {
             expected_positive_a: "Expected a positive number and instead saw '{a}'",
             expected_pseudo_a: "Expected a pseudo, and instead saw :{a}.",
             expected_selector_a: "Expected a CSS selector, and instead saw {a}.",
-            expected_small_a: "Expected a small number and instead saw '{a}'",
+            expected_small_a: "Expected a small positive integer and instead saw '{a}'",
             expected_space_a_b: "Expected exactly one space between '{a}' and '{b}'.",
             expected_string_a: "Expected a string and instead saw {a}.",
             expected_style_attribute: "Excepted a style attribute, and instead saw '{a}'.",
@@ -898,6 +897,11 @@ var JSLINT = (function () {
             'regexp', 'string'
         ], true),
         itself,         // JSLint itself
+        jslint_limit = {
+            indent: 10,
+            max_err: 1000,
+            max_len: 256
+        },
         json_mode,
         lex,            // the tokenizer
         lines,
@@ -2228,7 +2232,7 @@ klass:              do {
 
         if (indent) {
 
-// In indentation checking was requested, then inspect all of the line breakings.
+// If indentation checking was requested, then inspect all of the line breakings.
 // The var statement is tricky because the names might be aligned or not. We
 // look at the first line break after the var to determine the programmer's
 // intention.
@@ -2408,30 +2412,14 @@ klass:              do {
                 stop('expected_a_b', next_token, ':', artifact());
             }
             advance(':');
-            switch (name) {
-            case 'indent':
+            if (typeof jslint_limit[name] === 'number') {
                 value = next_token.number;
-                if (!isFinite(value) || value < 0 || Math.floor(value) !== value) {
+                if (value > jslint_limit[name] || value <= 0 ||
+                        Math.floor(value) !== value) {
                     stop('expected_small_a');
                 }
-                option.indent = value;
-                break;
-            case 'maxerr':
-                value = +next_token.string;
-                value = next_token.number;
-                if (!isFinite(value) || value <= 0 || Math.floor(value) !== value) {
-                    stop('expected_small_a');
-                }
-                option.maxerr = value;
-                break;
-            case 'maxlen':
-                value = next_token.number;
-                if (!isFinite(value) || value <= 0 || Math.floor(value) !== value) {
-                    stop('expected_small_a');
-                }
-                option.maxlen = value;
-                break;
-            default:
+                option[name] = value;
+            } else {
                 if (next_token.id === 'true') {
                     option[name] = true;
                 } else if (next_token.id === 'false') {
@@ -2441,7 +2429,7 @@ klass:              do {
                 }
                 switch (name) {
                 case 'adsafe':
-                    option.adsafe = option.safe = true;
+                    option.safe = true;
                     do_safe();
                     break;
                 case 'safe':
@@ -6531,8 +6519,8 @@ klass:              do {
         } else {
             option = {};
         }
-        option.indent = +option.indent || 0;
-        option.maxerr = option.maxerr || 50;
+        option.indent = +option.indent || 4;
+        option.maxerr = +option.maxerr || 50;
         adsafe_id = '';
         adsafe_may = adsafe_top = adsafe_went = false;
         approved = {};
@@ -6937,7 +6925,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-08-04';
+    itself.edition = '2011-08-05';
 
     return itself;
 
