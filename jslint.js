@@ -6930,3 +6930,8 @@ klass:              do {
     return itself;
 
 }());
+
+/*properties JSLINT: function */
+if (exports !== undefined) {
+    exports.JSLINT = JSLINT;
+}
