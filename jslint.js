@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-08-06
+// 2011-08-14
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -742,7 +742,7 @@ var JSLINT = (function () {
         },
 
         devel = array_to_object([
-            'alert', 'confirm', 'console', 'Debug', 'opera', 'prompt'
+            'alert', 'confirm', 'console', 'Debug', 'opera', 'prompt', 'WSH'
         ], false),
         directive,
         escapes = {
@@ -1102,7 +1102,7 @@ var JSLINT = (function () {
 
         windows = array_to_object([
             'ActiveXObject', 'CScript', 'Debug', 'Enumerator', 'System',
-            'VBArray', 'WScript'
+            'VBArray', 'WScript', 'WSH'
         ], false),
 
 //  xmode is used to adapt to the exceptions in html parsing.
@@ -6925,7 +6925,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-08-06';
+    itself.edition = '2011-08-14';
 
     return itself;
 

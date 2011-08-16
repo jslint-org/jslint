@@ -143,7 +143,7 @@ clearInterval: false, clearTimeout: false, document: false, event: false, frames
     <em>Assume console, alert, ...</em>
 (<code>devel</code>) <a href="#options">option</a> to predefine globals that are useful in development but that should be avoided in production, such as <code>console</code> and <code>alert</code>. It has the same
 effect as this comment:</p>
-<pre>/*global alert: false, confirm: false, console: false, Debug: false, opera: false, prompt: false */</pre>
+<pre>/*global alert: false, confirm: false, console: false, Debug: false, opera: false, prompt: false, WSH: false */</pre>
 <p id=node>Select the
     <em>Assume Node.js</em>
     (<code>node</code>) <a href="#options">option</a> to predefine globals that are used in the Node.js environment<code></code>. It has the same
@@ -164,7 +164,7 @@ effect as this comment:</p>
 <p id=windows>Select the <i>Assume Windows</i> (<code>windows</code>)
   <a href="#options">option</a> to predefine the global properties provided by Microsoft Windows. It has the same effect as this statement:</p>
 <blockquote>
-    <p><code>/*global ActiveXObject: false, CScript: false, Debug: false, Enumerator: false, System: false, VBArray: false, WScript: false  */</code></p>
+    <p><code>/*global ActiveXObject: false, CScript: false, Debug: false, Enumerator: false, System: false, VBArray: false, WScript: false, WSH: false */</code></p>
 </blockquote>
 <h2 id=semicolon>Semicolon</h2>
 <p>JavaScript uses a C-like syntax which requires the use of semicolons to delimit certain
