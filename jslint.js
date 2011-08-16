@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-08-14
+// 2011-08-15
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -3238,7 +3238,7 @@ klass:              do {
 
         var array,
             curly = next_token,
-            old_inblock = in_block,
+            old_in_block = in_block,
             old_scope = scope,
             old_strict_mode = strict_mode;
 
@@ -3264,7 +3264,7 @@ klass:              do {
         }
         funct['(verb)'] = null;
         scope = old_scope;
-        in_block = old_inblock;
+        in_block = old_in_block;
         if (ordinary && array.length === 0) {
             warn('empty_block');
         }
@@ -4506,6 +4506,7 @@ klass:              do {
 // If all of the arrays of statements are disrupt, then the switch is disrupt.
 
         var cases = [],
+            old_in_block = in_block,
             particular,
             the_case = next_token,
             unbroken = true;
@@ -4528,6 +4529,7 @@ klass:              do {
         one_space();
         advance('{');
         step_in();
+        in_block = true;
         this.second = [];
         while (next_token.id === 'case') {
             the_case = next_token;
@@ -4595,6 +4597,7 @@ klass:              do {
         funct['(breakage)'] -= 1;
         spaces();
         step_out('}', this);
+        in_block = old_in_block;
         return this;
     });
 
@@ -6925,7 +6928,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-08-14';
+    itself.edition = '2011-08-15';
 
     return itself;
 
