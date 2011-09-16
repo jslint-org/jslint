@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-08-15
+// 2011-09-15
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -1331,8 +1331,9 @@ var JSLINT = (function () {
             evidence: lines[line - 1] || '',
             line: line,
             character: character,
-            a: a || (offender.id === '(number)' ?
-                String(offender.number) : offender.string),
+            a: a || (offender.id === '(number)'
+                ? String(offender.number)
+                : offender.string),
             b: b,
             c: c,
             d: d
@@ -1425,11 +1426,10 @@ var JSLINT = (function () {
                 }
             }
             the_token = Object.create(syntax[(
-                type === '(punctuator)' ||
-                    (type === '(identifier)' &&
-                    Object.prototype.hasOwnProperty.call(syntax, value)) ?
-                value :
-                type
+                type === '(punctuator)' || (type === '(identifier)' &&
+                        Object.prototype.hasOwnProperty.call(syntax, value))
+                    ? value
+                    : type
             )] || syntax['(error)']);
             if (type === '(identifier)') {
                 the_token.identifier = true;
@@ -1999,18 +1999,9 @@ klass:              do {
                     }
                     snippet = match(rx[xmode] || tx);
                     if (!snippet) {
-                        snippet = '';
-                        c = '';
-                        while (source_row && source_row < '!') {
-                            source_row = source_row.slice(1);
-                        }
                         if (source_row) {
-                            if (xmode === 'html') {
-                                return it('(error)', source_row.charAt(0));
-                            } else {
-                                stop_at('unexpected_a',
-                                    line, character, source_row.charAt(0));
-                            }
+                            stop_at('unexpected_a', line, character,
+                                source_row.charAt(0));
                         }
                     } else {
 
@@ -2073,7 +2064,9 @@ klass:              do {
                                     from
                                 );
                             }
-                            return prereg ? regexp() : it('(punctuator)', snippet);
+                            return prereg
+                                ? regexp()
+                                : it('(punctuator)', snippet);
 
 //      punctuator
 
@@ -2170,8 +2163,9 @@ klass:              do {
                 warn('adsafe_a', token, name);
             }
             if (typeof global_funct[name] !== 'string') {
-                token.writeable = typeof predefined[name] === 'boolean' ?
-                    predefined[name] : true;
+                token.writeable = typeof predefined[name] === 'boolean'
+                    ? predefined[name]
+                    : true;
                 token.funct = funct;
                 global_scope[name] = token;
             }
@@ -2252,6 +2246,10 @@ klass:              do {
                     dent.open = false;
                 }
                 var_mode = null;
+            }
+            if (next_token.id === '?' && indent.mode === ':' &&
+                    token.line !== next_token.line) {
+                indent.at -= option.indent;
             }
             if (indent.open) {
 
@@ -2537,12 +2535,12 @@ klass:              do {
 
 
     function step_in(mode) {
-        var open, was;
+        var open;
         if (typeof mode === 'number') {
             indent = {
                 at: +mode,
                 open: true,
-                was: was
+                was: indent
             };
         } else if (!indent) {
             indent = {
@@ -2551,16 +2549,15 @@ klass:              do {
                 open: true
             };
         } else {
-            was = indent;
             open = mode === 'var' ||
                 (next_token.line !== token.line && mode !== 'statement');
             indent = {
-                at: (open || mode === 'control' ?
-                    was.at + option.indent : was.at) +
-                    (was.wrap ? option.indent : 0),
+                at: (open || mode === 'control'
+                    ? indent.at + option.indent
+                    : indent.at) + (indent.wrap ? option.indent : 0),
                 mode: mode,
                 open: open,
-                was: was
+                was: indent
             };
             if (mode === 'var' && open) {
                 var_mode = indent;
@@ -2848,25 +2845,27 @@ klass:              do {
     function prefix(s, f, type) {
         var x = symbol(s, 150);
         reserve_name(x);
-        x.nud = (typeof f === 'function') ? f : function () {
-            if (s === 'typeof') {
-                one_space();
-            } else {
-                no_space_only();
-            }
-            this.first = expression(150);
-            this.arity = 'prefix';
-            if (this.id === '++' || this.id === '--') {
-                if (!option.plusplus) {
-                    warn('unexpected_a', this);
-                } else if ((!this.first.identifier || this.first.reserved) &&
-                        this.first.id !== '.' && this.first.id !== '[') {
-                    warn('bad_operand', this);
+        x.nud = typeof f === 'function'
+            ? f
+            : function () {
+                if (s === 'typeof') {
+                    one_space();
+                } else {
+                    no_space_only();
                 }
-            }
-            this.type = type;
-            return this;
-        };
+                this.first = expression(150);
+                this.arity = 'prefix';
+                if (this.id === '++' || this.id === '--') {
+                    if (!option.plusplus) {
+                        warn('unexpected_a', this);
+                    } else if ((!this.first.identifier || this.first.reserved) &&
+                            this.first.id !== '.' && this.first.id !== '[') {
+                        warn('bad_operand', this);
+                    }
+                }
+                this.type = type;
+                return this;
+            };
         return x;
     }
 
@@ -3112,8 +3111,9 @@ klass:              do {
     function identifier() {
         var i = optional_identifier();
         if (!i) {
-            stop(token.id === 'function' && next_token.id === '(' ?
-                'name_function' : 'expected_identifier_a');
+            stop(token.id === 'function' && next_token.id === '('
+                ? 'name_function'
+                : 'expected_identifier_a');
         }
         return i;
     }
@@ -3384,7 +3384,9 @@ klass:              do {
                     case 'unused':
                     case 'var':
                         site[name] = 'closure';
-                        funct[name] = site === global_funct ? 'global' : 'outer';
+                        funct[name] = site === global_funct
+                            ? 'global'
+                            : 'outer';
                         break;
                     case 'unparam':
                         site[name] = 'parameter';
@@ -3470,11 +3472,14 @@ klass:              do {
     constant('undefined', '');
 
     infix('?', 30, function (left, that) {
+        step_in('?');
         that.first = expected_condition(expected_relation(left));
         that.second = expression(0);
         spaces();
+        step_out();
         var colon = next_token;
         advance(':');
+        step_in(':');
         spaces();
         that.third = expression(10);
         that.arity = 'ternary';
@@ -3483,6 +3488,7 @@ klass:              do {
         } else if (are_similar(that.first, that.second)) {
             warn('use_or', that);
         }
+        step_out();
         return that;
     });
 
@@ -4410,8 +4416,9 @@ klass:              do {
             one_space();
             advance('else');
             one_space();
-            this['else'] = next_token.id === 'if' || next_token.id === 'switch' ?
-                statement(true) : block(true);
+            this['else'] = next_token.id === 'if' || next_token.id === 'switch'
+                ? statement(true)
+                : block(true);
             if (this['else'].disrupt && this.block.disrupt) {
                 this.disrupt = true;
             }
@@ -4677,15 +4684,13 @@ klass:              do {
                     switch (filter.id) {
                     case '===':
                     case '!==':
-                        ok = filter.first.id === '[' ? (
-                            filter.first.first.string === this.second.string &&
-                            filter.first.second.string === this.first.string
-                        ) : (
-                            filter.first.id === 'typeof' &&
-                            filter.first.first.id === '[' &&
-                            filter.first.first.first.string === this.second.string &&
-                            filter.first.first.second.string === this.first.string
-                        );
+                        ok = filter.first.id === '['
+                            ? filter.first.first.string === this.second.string &&
+                                filter.first.second.string === this.first.string
+                            : filter.first.id === 'typeof' &&
+                                filter.first.first.id === '[' &&
+                                filter.first.first.first.string === this.second.string &&
+                                filter.first.first.second.string === this.first.string;
                         break;
                     case '(':
                         ok = filter.first.id === '.' && ((
@@ -4852,208 +4857,211 @@ klass:              do {
 
 // Type inference
 
-    function get_type(one) {
-        var type;
-        if (typeof one === 'string') {
-            return one;
-        } else if (one.type) {
-            return one.type;
-        } else if (one.id === '.') {
-            type = property_type[one.second.string];
-            return typeof type === 'string' ? type : '';
-        } else {
-            return ((one.identifier && scope[one.string]) || one).type;
-        }
-    }
+//     function get_type(one) {
+//         var type;
+//         if (typeof one === 'string') {
+//             return one;
+//         } else if (one.type) {
+//             return one.type;
+//         } else if (one.id === '.') {
+//             type = property_type[one.second.string];
+//             return typeof type === 'string' ? type : '';
+//         } else {
+//             return ((one.identifier && scope[one.string]) || one).type;
+//         }
+//     }
 
 
-    function match_type(one_type, two_type, one, two) {
-        if (one_type === two_type) {
-            return true;
-        } else {
-            if (!funct.confusion && !two.warn) {
-                if (typeof one !== 'string') {
-                    if (one.id === '.') {
-                        one_type = '.' + one.second.string + ': ' + one_type;
-                    } else {
-                        one_type = one.string + ': ' + one_type;
-                    }
-                }
-                if (two.id === '.') {
-                    two_type = '.' + two.second.string + ': ' + one_type;
-                } else {
-                    two_type = two.string + ': ' + one_type;
-                }
-                warn('type_confusion_a_b', two, one_type, two_type);
-                two.warn = true;
-            }
-            return false;
-        }
-    }
+//     function match_type(one_type, two_type, one, two) {
+//         if (one_type === two_type) {
+//             return true;
+//         } else {
+//             if (!funct.confusion && !two.warn) {
+//                 if (typeof one !== 'string') {
+//                     if (one.id === '.') {
+//                         one_type = '.' + one.second.string + ': ' + one_type;
+//                     } else {
+//                         one_type = one.string + ': ' + one_type;
+//                     }
+//                 }
+//                 if (two.id === '.') {
+//                     two_type = '.' + two.second.string + ': ' + one_type;
+//                 } else {
+//                     two_type = two.string + ': ' + one_type;
+//                 }
+//                 warn('type_confusion_a_b', two, one_type, two_type);
+//                 two.warn = true;
+//             }
+//             return false;
+//         }
+//     }
 
 
-    function conform(one, two) {
+//     function conform(one, two) {
+//
+// // The conform function takes a type string and a token, or two tokens.
+//
+//         var one_type = typeof one === 'string' ? one : one.type,
+//             two_type = two.type,
+//             two_thing;
+//
+// // If both tokens already have a type, and if they match, then we are done.
+// // Once a token has a type, it is locked. Neither token will change, but if
+// // they do not match, there will be a warning.
+//
+//         if (one_type) {
+//             if (two_type) {
+//                 match_type(one_type, two_type, one, two);
+//             } else {
+//
+// // two does not have a type, so look deeper. If two is a variable or property,
+// // then use its type if it has one, and make the deep type one's type if it
+// // doesn't. If the type was *, or if there was a mismatch, don't change the
+// // deep type.
+//
+//                 two_thing = two.id === '(identifier)'
+//                     ? scope[two.string]
+//                     : two.id === '.'
+//                     ? property_type[two.second.string]
+//                     : null;
+//                 if (two_thing) {
+//                     two_type = two_thing.type;
+//                     if (two_type) {
+//                         if (two_type !== '*') {
+//                             if (!match_type(one_type, two_type, one, two)) {
+//                                 return '';
+//                             }
+//                         }
+//                     } else {
+//                         two_thing.type = one_type;
+//                     }
+//                 }
+//
+// // In any case, we give two a type.
+//
+//                 two.type = one_type;
+//                 type_state_change = true;
+//                 return one_type;
+//             }
+//
+// // one does not have a type, but two does, so do the old switcheroo.
+//
+//         } else {
+//             if (two_type) {
+//                 return conform(two, one);
+//
+// // Neither token has a type yet. So we have to look deeper to see if either
+// // is a variable or property.
+//
+//             } else {
+//                 if (one.id === '(identifier)') {
+//                     one_type = scope[one.string].type;
+//                     if (one_type && one_type !== '*') {
+//                         one.type = one_type;
+//                         return conform(one, two);
+//                     }
+//                 } else if (one.id === '.') {
+//                     one_type = property_type[one.second.string];
+//                     if (one_type && one_type !== '*') {
+//                         one.type = scope[one.string].type;
+//                         return conform(one, two);
+//                     }
+//                 }
+//                 if (two.id === '(identifier)') {
+//                     two_type = scope[two.string].type;
+//                     if (two_type && two_type !== '*') {
+//                         two.type = two_type;
+//                         return conform(two, one);
+//                     }
+//                 } else if (two.id === '.') {
+//                     two_type = property_type[two.second.string];
+//                     if (two_type && two_type !== '*') {
+//                         two.type = scope[two.string].type;
+//                         return conform(two, one);
+//                     }
+//                 }
+//             }
+//         }
+//
+// // Return a falsy string if we were unable to determine the type of either token.
+//
+//         return '';
+//     }
 
-// The conform function takes a type string and a token, or two tokens.
-
-        var one_type = typeof one === 'string' ? one : one.type,
-            two_type = two.type,
-            two_thing;
-
-// If both tokens already have a type, and if they match, then we are done.
-// Once a token has a type, it is locked. Neither token will change, but if
-// they do not match, there will be a warning.
-
-        if (one_type) {
-            if (two_type) {
-                match_type(one_type, two_type, one, two);
-            } else {
-
-// two does not have a type, so look deeper. If two is a variable or property,
-// then use its type if it has one, and make the deep type one's type if it
-// doesn't. If the type was *, or if there was a mismatch, don't change the
-// deep type.
-
-                two_thing = two.id === '(identifier)' ? scope[two.string] :
-                    two.id === '.' ? property_type[two.second.string] : null;
-                if (two_thing) {
-                    two_type = two_thing.type;
-                    if (two_type) {
-                        if (two_type !== '*') {
-                            if (!match_type(one_type, two_type, one, two)) {
-                                return '';
-                            }
-                        }
-                    } else {
-                        two_thing.type = one_type;
-                    }
-                }
-
-// In any case, we give two a type.
-
-                two.type = one_type;
-                type_state_change = true;
-                return one_type;
-            }
-
-// one does not have a type, but two does, so do the old switcheroo.
-
-        } else {
-            if (two_type) {
-                return conform(two, one);
-
-// Neither token has a type yet. So we have to look deeper to see if either
-// is a variable or property.
-
-            } else {
-                if (one.id === '(identifier)') {
-                    one_type = scope[one.string].type;
-                    if (one_type && one_type !== '*') {
-                        one.type = one_type;
-                        return conform(one, two);
-                    }
-                } else if (one.id === '.') {
-                    one_type = property_type[one.second.string];
-                    if (one_type && one_type !== '*') {
-                        one.type = scope[one.string].type;
-                        return conform(one, two);
-                    }
-                }
-                if (two.id === '(identifier)') {
-                    two_type = scope[two.string].type;
-                    if (two_type && two_type !== '*') {
-                        two.type = two_type;
-                        return conform(two, one);
-                    }
-                } else if (two.id === '.') {
-                    two_type = property_type[two.second.string];
-                    if (two_type && two_type !== '*') {
-                        two.type = scope[two.string].type;
-                        return conform(two, one);
-                    }
-                }
-            }
-        }
-
-// Return a falsy string if we were unable to determine the type of either token.
-
-        return '';
-    }
-
-    function conform_array(type, array) {
-        array.forEach(function (item) {
-            return conform(type, item);
-        }, type);
-    }
-
-
-    function infer(node) {
-        if (Array.isArray(node)) {
-            node.forEach(infer);
-        } else {
-            switch (node.arity) {
-            case 'statement':
-                infer_statement[node.id](node);
-                break;
-            case 'infix':
-                infer(node.first);
-                infer(node.second);
-                switch (node.id) {
-                case '(':
-                    conform('function', node.first);
-                    break;
-                default:
-                    stop('unfinished');
-                }
-                break;
-            case 'number':
-            case 'string':
-            case 'boolean':
-                break;
-            default:
-                stop('unfinished');
-            }
-        }
-    }
+//     function conform_array(type, array) {
+//         array.forEach(function (item) {
+//             return conform(type, item);
+//         }, type);
+//     }
 
 
-    infer_statement = {
-        'var': function (node) {
-            var i, item, list = node.first;
-            for (i = 0; i < list.length; i += 1) {
-                item = list[i];
-                if (item.id === '=') {
-                    infer(item.second);
-                    conform(item.first, item.second);
-                    conform(item.first, item);
-                }
-            }
-        },
-        'for': function (node) {
-            infer(node.first);
-            infer(node.second);
-            if (node.forin) {
-                conform('string', node.first);
-                conform('object', node.second);
-            } else {
-                infer(node.third);
-                conform_array('number', node.first);
-                conform('boolean', node.second);
-                conform_array('number', node.third);
-            }
-            infer(node.block);
-        }
-    };
+//     function infer(node) {
+//         if (Array.isArray(node)) {
+//             node.forEach(infer);
+//         } else {
+//             switch (node.arity) {
+//             case 'statement':
+//                 infer_statement[node.id](node);
+//                 break;
+//             case 'infix':
+//                 infer(node.first);
+//                 infer(node.second);
+//                 switch (node.id) {
+//                 case '(':
+//                     conform('function', node.first);
+//                     break;
+//                 default:
+//                     stop('unfinished');
+//                 }
+//                 break;
+//             case 'number':
+//             case 'string':
+//             case 'boolean':
+//                 break;
+//             default:
+//                 stop('unfinished');
+//             }
+//         }
+//     }
 
 
-    function infer_types(node) {
-        do {
-            funct = global_funct;
-            scope = global_scope;
-            type_state_change = false;
-            infer(node);
-        } while (type_state_change);
-    }
+//     infer_statement = {
+//         'var': function (node) {
+//             var i, item, list = node.first;
+//             for (i = 0; i < list.length; i += 1) {
+//                 item = list[i];
+//                 if (item.id === '=') {
+//                     infer(item.second);
+//                     conform(item.first, item.second);
+//                     conform(item.first, item);
+//                 }
+//             }
+//         },
+//         'for': function (node) {
+//             infer(node.first);
+//             infer(node.second);
+//             if (node.forin) {
+//                 conform('string', node.first);
+//                 conform('object', node.second);
+//             } else {
+//                 infer(node.third);
+//                 conform_array('number', node.first);
+//                 conform('boolean', node.second);
+//                 conform_array('number', node.third);
+//             }
+//             infer(node.block);
+//         }
+//     };
+
+
+//     function infer_types(node) {
+//         do {
+//             funct = global_funct;
+//             scope = global_scope;
+//             type_state_change = false;
+//             infer(node);
+//         } while (type_state_change);
+//     }
 
 
 // Parse JSON
@@ -5867,8 +5875,9 @@ klass:              do {
 
     function style_selector() {
         if (next_token.identifier) {
-            if (!Object.prototype.hasOwnProperty.call(html_tag, option.cap ?
-                    next_token.string.toLowerCase() : next_token.string)) {
+            if (!Object.prototype.hasOwnProperty.call(html_tag, option.cap
+                    ? next_token.string.toLowerCase()
+                    : next_token.string)) {
                 warn('expected_tagname_a');
             }
             advance();
@@ -6145,7 +6154,9 @@ klass:              do {
             stop(
                 bundle.unrecognized_tag_a,
                 next_token,
-                name === name.toLowerCase() ? name : name + ' (capitalization error)'
+                name === name.toLowerCase()
+                    ? name
+                    : name + ' (capitalization error)'
             );
         }
         if (stack.length > 0) {
@@ -6779,13 +6790,15 @@ klass:              do {
                     warning = data.errors[i];
                     if (warning) {
                         evidence = warning.evidence || '';
-                        output.push('<p>Problem' + (isFinite(warning.line) ?
-                            ' at line ' + String(warning.line) + ' character ' +
-                            String(warning.character) : '') +
+                        output.push('<p>Problem' + (isFinite(warning.line)
+                            ? ' at line ' + String(warning.line) +
+                                ' character ' + String(warning.character)
+                            : '') +
                             ': ' + warning.reason.entityify() +
                             '</p><p class=evidence>' +
-                            (evidence && (evidence.length > 80 ? evidence.slice(0, 77) + '...' :
-                            evidence).entityify()) + '</p>');
+                            (evidence && (evidence.length > 80
+                                ? evidence.slice(0, 77) + '...'
+                                : evidence).entityify()) + '</p>');
                     }
                 }
             }
@@ -6868,8 +6881,9 @@ klass:              do {
                         for (i = 0; i < keys.length; i += 1) {
                             key = keys[i];
                             if (typeof standard_property_type[key] !== 'string') {
-                                name = ix.test(key) ? key :
-                                    '\'' + key.entityify().replace(nx, sanitize) + '\'';
+                                name = ix.test(key)
+                                    ? key
+                                    : '\'' + key.entityify().replace(nx, sanitize) + '\'';
                                 if (data.member[key] === 1) {
                                     name = '<i>' + name + '</i>';
                                     italics += 1;
@@ -6895,8 +6909,9 @@ klass:              do {
                                 type = '';
                             }
                             if (standard_property_type[key] !== type) {
-                                name = ix.test(key) ? key :
-                                    '\'' + key.entityify().replace(nx, sanitize) + '\'';
+                                name = ix.test(key)
+                                    ? key
+                                    : '\'' + key.entityify().replace(nx, sanitize) + '\'';
                                 length += name.length + 2;
                                 if (data.member[key] === 1) {
                                     name = '<i>' + name + '</i>';
@@ -6928,7 +6943,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-08-15';
+    itself.edition = '2011-09-15';
 
     return itself;
 
