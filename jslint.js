@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-09-15
+// 2011-09-16
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -891,7 +891,7 @@ var JSLINT = (function () {
         ids,            // HTML ids
         in_block,
         indent,
-        infer_statement,// Inference rules for statements
+//         infer_statement,// Inference rules for statements
         is_type = array_to_object([
             '*', 'array', 'boolean', 'function', 'number', 'object',
             'regexp', 'string'
@@ -1073,7 +1073,7 @@ var JSLINT = (function () {
         syntax = {},
         tab,
         token,
-        type_state_change,
+//         type_state_change,
         urls,
         var_mode,
         warnings,
@@ -2000,8 +2000,14 @@ klass:              do {
                     snippet = match(rx[xmode] || tx);
                     if (!snippet) {
                         if (source_row) {
-                            stop_at('unexpected_a', line, character,
-                                source_row.charAt(0));
+                            if (source_row.charAt(0) === ' ') {
+                                warn_at('unexpected_a', line, character, ' ');
+                                character += 1;
+                                source_row = '';
+                            } else {
+                                stop_at('unexpected_a', line, character,
+                                    source_row.charAt(0));
+                            }
                         }
                     } else {
 
@@ -6943,7 +6949,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-09-15';
+    itself.edition = '2011-09-16';
 
     return itself;
 
