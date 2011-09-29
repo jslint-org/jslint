@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-09-16
+// 2011-09-29
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -1455,7 +1455,7 @@ var JSLINT = (function () {
             id = the_token.id;
             prereg = id && (
                 ('(,=:[!&|?{};'.indexOf(id.charAt(id.length - 1)) >= 0) ||
-                id === 'return'
+                id === 'return' || id === 'case'
             );
             return the_token;
         }
@@ -6949,7 +6949,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-09-16';
+    itself.edition = '2011-09-29';
 
     return itself;
 
