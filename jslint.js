@@ -195,7 +195,7 @@
 // For example:
 
 /*jslint
-    evil: true, nomen: true, regexp: true
+    evil: true, nomen: true, regexp: true, commonjs: true
 */
 
 // The properties directive declares an exclusive list of property names.
