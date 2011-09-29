@@ -6957,5 +6957,5 @@ klass:              do {
 
 // CommonJS wrapper
 if (typeof exports !== "undefined") {
-	exports.JSLINT = JSLINT;
+    exports.JSLINT = JSLINT;
 }
