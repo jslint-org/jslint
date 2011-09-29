@@ -158,6 +158,7 @@
 //     adsafe     true, if ADsafe rules should be enforced
 //     bitwise    true, if bitwise operators should be allowed
 //     browser    true, if the standard browser globals should be predefined
+//     commonjs   true, if the standard commonjs globals should be predefined
 //     cap        true, if upper case HTML should be allowed
 //     confusion  true, if types can be used inconsistently
 //     'continue' true, if the continuation statement should be tolerated
@@ -253,7 +254,7 @@
     'caption-side': array, ceil: string, center: object, charAt: *,
     charCodeAt: *, character, cite: object, clear: array, clip: array, closure,
     cm: boolean, code: object, col: object, colgroup: object, color,
-    combine_var: string, command: object, concat: string,
+    combine_var: string, command: object, commonjs: boolean, concat: string,
     conditional_assignment: string, confusing_a: string,
     confusing_regexp: string, confusion: boolean, constructor: string,
     constructor_name_a: string, content: array, continue, control_a: string,
@@ -310,6 +311,7 @@
     isAlpha: function, isArray: function boolean, isDigit: function,
     isExtensible: string, isFrozen: string, isNaN: string,
     isPrototypeOf: string, isSealed: string, join: *, jslint: function boolean,
+    JSLINT: function boolean,
     json: boolean, kbd: object, keygen: object, keys: *, label: object,
     label_a_b: string, labeled: boolean, lang: string, lastIndex: string,
     lastIndexOf: *, lbp: number, leading_decimal_a: string, led: function,
@@ -461,6 +463,13 @@ var JSLINT = (function () {
             'history', 'Image', 'localStorage', 'location', 'name', 'navigator',
             'Option', 'parent', 'screen', 'sessionStorage', 'setInterval',
             'setTimeout', 'Storage', 'window', 'XMLHttpRequest'
+        ], false),
+
+// commonjs contains a set of global names that are commonly provided by a
+// CommonJS environment.
+
+        commonjs = array_to_object([
+            'require', 'module', 'exports'
         ], false),
 
 // bundle contains the text messages.
@@ -1278,6 +1287,10 @@ var JSLINT = (function () {
             if (option.browser) {
                 add_to_predefined(browser);
                 option.browser = false;
+            }
+            if (option.commonjs) {
+                add_to_predefined(commonjs);
+                option.commonjs = false;
             }
             if (option.windows) {
                 add_to_predefined(windows);
@@ -6949,13 +6962,13 @@ klass:              do {
     };
     itself.jslint = itself;
 
+    // CommonJS module export
+    if (typeof exports !== "undefined") {
+        exports.JSLINT = itself;
+    }
+
     itself.edition = '2011-09-29';
 
     return itself;
 
 }());
-
-// CommonJS wrapper
-if (typeof exports !== "undefined") {
-    exports.JSLINT = JSLINT;
-}
