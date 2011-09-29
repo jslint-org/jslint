@@ -6954,3 +6954,8 @@ klass:              do {
     return itself;
 
 }());
+
+// CommonJS wrapper
+if (typeof exports !== "undefined") {
+	exports.JSLINT = JSLINT;
+}
