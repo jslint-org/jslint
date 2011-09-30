@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-09-29
+// 2011-09-30
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -412,8 +412,11 @@ var JSLINT = (function () {
     'use strict';
 
     function array_to_object(array, value) {
-        var i, object = {};
-        for (i = 0; i < array.length; i += 1) {
+
+// Make an object from an array of keys and a common value.
+
+        var i, length = array.length, object = {};
+        for (i = 0; i < length; i += 1) {
             object[array[i]] = value;
         }
         return object;
@@ -1512,8 +1515,8 @@ var JSLINT = (function () {
                     if (c === '\n' || c === '\r') {
                         break;
                     }
-                    warn_at('control_a',
-                        line, character + pos, source_row.slice(0, pos));
+                    warn_at('control_a', line, character + pos,
+                        source_row.slice(0, pos));
                 } else if (c === xquote) {
                     warn_at('bad_html', line, character + pos);
                 } else if (c === '<') {
@@ -1671,15 +1674,9 @@ var JSLINT = (function () {
                 case '\\':
                     c = source_row.charAt(length);
                     if (c < ' ') {
-                        warn_at('control_a',
-                            line, from + length, String(c));
+                        warn_at('control_a', line, from + length, String(c));
                     } else if (c === '<') {
-                        warn_at(
-                            bundle.unexpected_a,
-                            line,
-                            from + length,
-                            '\\'
-                        );
+                        warn_at(bundle.unexpected_a, line, from + length, '\\');
                     }
                     length += 1;
                     break;
@@ -1712,8 +1709,7 @@ var JSLINT = (function () {
                     break;
                 case ')':
                     if (depth === 0) {
-                        warn_at('unescaped_a',
-                            line, from + length, ')');
+                        warn_at('unescaped_a', line, from + length, ')');
                     } else {
                         depth -= 1;
                     }
@@ -1725,8 +1721,7 @@ var JSLINT = (function () {
                         pos += 1;
                     }
                     if (pos > 1) {
-                        warn_at('use_braces',
-                            line, from + length, pos);
+                        warn_at('use_braces', line, from + length, pos);
                     }
                     break;
                 case '[':
@@ -2001,7 +1996,10 @@ klass:              do {
                     if (!snippet) {
                         if (source_row) {
                             if (source_row.charAt(0) === ' ') {
-                                warn_at('unexpected_a', line, character, ' ');
+                                if (!option.white) {
+                                    warn_at('unexpected_a', line, character,
+                                        '(space)');
+                                }
                                 character += 1;
                                 source_row = '';
                             } else {
@@ -6949,7 +6947,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-09-29';
+    itself.edition = '2011-09-30';
 
     return itself;
 
