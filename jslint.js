@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-10-01
+// 2011-10-07
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -1827,8 +1827,8 @@ klass:              do {
                         length += 1;
                         c = source_row.charAt(length);
                         if (c < '0' || c > '9') {
-                            warn_at(bundle.expected_number_a,
-                                line, from + length, c);
+                            warn_at(bundle.expected_number_a, line,
+                                from + length, c);
                         }
                         length += 1;
                         low = +c;
@@ -5156,7 +5156,7 @@ klass:              do {
                         comma();
                     }
                     number = next_token.number;
-                    if (next_token.id !== '(string)' || number < 0) {
+                    if (next_token.id !== '(number)' || number < 0) {
                         warn('expected_positive_a', next_token);
                         advance();
                     } else {
@@ -5176,7 +5176,7 @@ klass:              do {
                 if (value === 'rgba') {
                     comma();
                     number = next_token.number;
-                    if (next_token.id !== '(string)' || number < 0 || number > 1) {
+                    if (next_token.id !== '(number)' || number < 0 || number > 1) {
                         warn('expected_fraction_a', next_token);
                     }
                     advance();
@@ -6906,7 +6906,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-10-01';
+    itself.edition = '2011-10-07';
 
     return itself;
 
