@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-10-07
+// 2011-10-11
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -3677,7 +3677,7 @@ klass:              do {
         no_space_only();
         this.first = expected_condition(expression(150));
         this.arity = 'prefix';
-        if (bang[this.first.id] === true) {
+        if (bang[this.first.id] === true || this.first.assign) {
             warn('confusing_a', this);
         }
         return this;
@@ -6906,7 +6906,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-10-07';
+    itself.edition = '2011-10-11';
 
     return itself;
 
