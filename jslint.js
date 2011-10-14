@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-10-11
+// 2011-10-13
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -4611,79 +4611,87 @@ klass:              do {
         funct['(breakage)'] += 1;
         funct['(loopage)'] += 1;
         advance('(');
-        step_in('control');
-        spaces(this, paren);
-        no_space();
-        if (next_token.id === 'var') {
-            stop('move_var');
-        }
-        edge();
-        if (peek(0).id === 'in') {
-            this.forin = true;
-            value = next_token;
-            switch (funct[value.string]) {
-            case 'unused':
-                funct[value.string] = 'var';
-                break;
-            case 'closure':
-            case 'var':
-                break;
-            default:
-                warn('bad_in_a', value);
-            }
-            advance();
-            advance('in');
-            this.first = value;
-            this.second = expression(20);
-            step_out(')', paren);
+        if (next_token.id === ';') {
+            no_space();
+            advance(';');
+            no_space();
+            advance(';');
+            no_space();
+            advance(')');
             blok = block(true);
-            if (!option.forin) {
-                if (blok.length === 1 && typeof blok[0] === 'object' &&
-                        blok[0].string === 'if' && !blok[0]['else']) {
-                    filter = blok[0].first;
-                    while (filter.id === '&&') {
-                        filter = filter.first;
-                    }
-                    switch (filter.id) {
-                    case '===':
-                    case '!==':
-                        ok = filter.first.id === '['
-                            ? filter.first.first.string === this.second.string &&
-                                filter.first.second.string === this.first.string
-                            : filter.first.id === 'typeof' &&
-                                filter.first.first.id === '[' &&
-                                filter.first.first.first.string === this.second.string &&
-                                filter.first.first.second.string === this.first.string;
-                        break;
-                    case '(':
-                        ok = filter.first.id === '.' && ((
-                            filter.first.first.string === this.second.string &&
-                            filter.first.second.string === 'hasOwnProperty' &&
-                            filter.second[0].string === this.first.string
-                        ) || (
-                            filter.first.first.string === 'ADSAFE' &&
-                            filter.first.second.string === 'has' &&
-                            filter.second[0].string === this.second.string &&
-                            filter.second[1].string === this.first.string
-                        ) || (
-                            filter.first.first.id === '.' &&
-                            filter.first.first.first.id === '.' &&
-                            filter.first.first.first.first.string === 'Object' &&
-                            filter.first.first.first.second.string === 'prototype' &&
-                            filter.first.first.second.string === 'hasOwnProperty' &&
-                            filter.first.second.string === 'call' &&
-                            filter.second[0].string === this.second.string &&
-                            filter.second[1].string === this.first.string
-                        ));
-                        break;
-                    }
-                }
-                if (!ok) {
-                    warn('for_if', this);
-                }
-            }
         } else {
-            if (next_token.id !== ';') {
+            step_in('control');
+            spaces(this, paren);
+            no_space();
+            if (next_token.id === 'var') {
+                stop('move_var');
+            }
+            edge();
+            if (peek(0).id === 'in') {
+                this.forin = true;
+                value = next_token;
+                switch (funct[value.string]) {
+                case 'unused':
+                    funct[value.string] = 'var';
+                    break;
+                case 'closure':
+                case 'var':
+                    break;
+                default:
+                    warn('bad_in_a', value);
+                }
+                advance();
+                advance('in');
+                this.first = value;
+                this.second = expression(20);
+                step_out(')', paren);
+                blok = block(true);
+                if (!option.forin) {
+                    if (blok.length === 1 && typeof blok[0] === 'object' &&
+                            blok[0].string === 'if' && !blok[0]['else']) {
+                        filter = blok[0].first;
+                        while (filter.id === '&&') {
+                            filter = filter.first;
+                        }
+                        switch (filter.id) {
+                        case '===':
+                        case '!==':
+                            ok = filter.first.id === '['
+                                ? filter.first.first.string === this.second.string &&
+                                    filter.first.second.string === this.first.string
+                                : filter.first.id === 'typeof' &&
+                                    filter.first.first.id === '[' &&
+                                    filter.first.first.first.string === this.second.string &&
+                                    filter.first.first.second.string === this.first.string;
+                            break;
+                        case '(':
+                            ok = filter.first.id === '.' && ((
+                                filter.first.first.string === this.second.string &&
+                                filter.first.second.string === 'hasOwnProperty' &&
+                                filter.second[0].string === this.first.string
+                            ) || (
+                                filter.first.first.string === 'ADSAFE' &&
+                                filter.first.second.string === 'has' &&
+                                filter.second[0].string === this.second.string &&
+                                filter.second[1].string === this.first.string
+                            ) || (
+                                filter.first.first.id === '.' &&
+                                filter.first.first.first.id === '.' &&
+                                filter.first.first.first.first.string === 'Object' &&
+                                filter.first.first.first.second.string === 'prototype' &&
+                                filter.first.first.second.string === 'hasOwnProperty' &&
+                                filter.first.second.string === 'call' &&
+                                filter.second[0].string === this.second.string &&
+                                filter.second[1].string === this.first.string
+                            ));
+                            break;
+                        }
+                    }
+                    if (!ok) {
+                        warn('for_if', this);
+                    }
+                }
+            } else {
                 edge();
                 this.first = [];
                 for (;;) {
@@ -4693,20 +4701,16 @@ klass:              do {
                     }
                     comma();
                 }
-            }
-            semicolon();
-            if (next_token.id !== ';') {
+                semicolon();
                 edge();
                 this.second = expected_relation(expression(0));
                 if (this.second.id !== 'true') {
                     expected_condition(this.second, bundle.unexpected_a);
                 }
-            }
-            semicolon(token);
-            if (next_token.id === ';') {
-                stop('expected_a_b', next_token, ')', ';');
-            }
-            if (next_token.id !== ')') {
+                semicolon(token);
+                if (next_token.id === ';') {
+                    stop('expected_a_b', next_token, ')', ';');
+                }
                 this.third = [];
                 edge();
                 for (;;) {
@@ -4716,11 +4720,11 @@ klass:              do {
                     }
                     comma();
                 }
+                no_space();
+                step_out(')', paren);
+                one_space();
+                blok = block(true);
             }
-            no_space();
-            step_out(')', paren);
-            one_space();
-            blok = block(true);
         }
         if (blok.disrupt) {
             warn('strange_loop', prev_token);
@@ -6906,7 +6910,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-10-11';
+    itself.edition = '2011-10-13';
 
     return itself;
 
