@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-10-13
+// 2011-10-17
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -4199,10 +4199,10 @@ klass:              do {
                 }
                 comma();
                 set = next_token;
-                set.string = '';
                 spaces();
                 edge();
                 advance('set');
+                set.string = '';
                 one_space_only();
                 j = property_name();
                 if (i !== j) {
@@ -6910,7 +6910,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-10-13';
+    itself.edition = '2011-10-17';
 
     return itself;
 
