@@ -1,5 +1,5 @@
 // init_ui.js
-// 2011-10-01
+// 2011-10-19
 
 // This is the web browser companion to fulljslint.js. It is an ADsafe
 // lib file that implements a web ui by adding behavior to the widget's
@@ -80,8 +80,11 @@ ADSAFE.lib("init_ui", function (lib) {
             var title = event.target.getTitle();
             if (title) {
                 ADSAFE.set(option, title,
-                    ADSAFE.get(option, title) === true ? false :
-                    ADSAFE.get(option, title) === false ? undefined : true);
+                    ADSAFE.get(option, title) === true
+                        ? false
+                        : ADSAFE.get(option, title) === false
+                            ? undefined
+                            : true);
             }
             show_jslint_control();
         }
@@ -114,12 +117,12 @@ ADSAFE.lib("init_ui", function (lib) {
                 maxerr: 50
             };
         } else {
-            option.indent =
-                typeof option.indent === 'number' && option.indent >= 0 ?
-                option.indent : 4;
-            option.maxerr =
-                typeof option.maxerr === 'number' && option.maxerr >= 0 ?
-                option.maxerr : 50;
+            option.indent = typeof option.indent === 'number' && option.indent >= 0
+                ? option.indent
+                : 4;
+            option.maxerr = typeof option.maxerr === 'number' && option.maxerr >= 0
+                ? option.maxerr
+                : 50;
         }
         show_options();
 
