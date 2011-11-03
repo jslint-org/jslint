@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-10-23
+// 2011-11-03
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -3009,10 +3009,12 @@ klass:              do {
                 if (!left.first || left.first.string === 'arguments') {
                     warn('bad_assignment', that);
                 }
-            } else if (left.identifier && !left.reserved) {
-                if (funct[left.string] === 'exception') {
+            } else if (left.identifier) {
+                if (!left.reserved && funct[left.string] === 'exception') {
                     warn('assign_exception', left);
                 }
+            } else {
+                warn('bad_assignment', that);
             }
             that.second = expression(19);
             if (that.id === '=' && are_similar(that.first, that.second)) {
@@ -6913,7 +6915,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-10-23';
+    itself.edition = '2011-11-02';
 
     return itself;
 
