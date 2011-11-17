@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-11-03
+// 2011-11-16
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -3732,6 +3732,7 @@ klass:              do {
                     break;
                 case 'Date':
                 case 'RegExp':
+                case 'this':
                     break;
                 default:
                     if (c.id !== 'function') {
@@ -6915,7 +6916,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-11-02';
+    itself.edition = '2011-11-16';
 
     return itself;
 
