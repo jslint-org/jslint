@@ -1,5 +1,5 @@
 // init_ui.js
-// 2011-10-19
+// 2011-12-08
 
 // This is the web browser companion to fulljslint.js. It is an ADsafe
 // lib file that implements a web ui by adding behavior to the widget's
@@ -43,7 +43,9 @@ ADSAFE.lib("init_ui", function (lib) {
                 var name = bunch.getTitle(),
                     value = ADSAFE.get(option, name);
                 if (typeof value === 'boolean') {
-                    a.push(name + ': ' + value);
+                    if (name !== 'adsafe' && name !== 'safe') {
+                        a.push(name + ': ' + value);
+                    }
                     bunch.style('backgroundColor', value ? 'black' : 'white');
                 } else {
                     bunch.style('backgroundColor', 'gainsboro');

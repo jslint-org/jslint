@@ -518,7 +518,8 @@ options are selected with several checkboxes and two fields. </p>
     <td>ADsafe</td>
     <td><code>adsafe</code></td>
     <td><code>true</code> if <a href="http://www.ADsafe.org/">AD<span style="color: blue;">safe</span></a>
-      rules should be enforced. See <a href="http://www.ADsafe.org/">http://www.ADsafe.org/</a>. The <code>/*jslint*/</code> directive cannot be used to turn this option off.</td>
+      rules should be enforced. See <a href="http://www.ADsafe.org/">http://www.ADsafe.org/</a>.  <code>adsafe</code> is used with the <code>option</code> object, but not
+      with the <code>/*jslint */</code> comment. </td>
   </tr>
   <tr>
     <td>Tolerate bitwise operators </td>
@@ -662,7 +663,8 @@ options are selected with several checkboxes and two fields. </p>
     <td><code>safe</code></td>
     <td><code>true</code> if the safe subset rules are enforced. These rules
       are used by <a href="http://www.ADsafe.org/">ADsafe</a>. It enforces
-      the safe subset rules but not the widget structure rules.</td>
+      the safe subset rules but not the widget structure rules.  <code>safe</code> is used with the <code>option</code> object, but not
+      with the <code>/*jslint */</code> comment. </td>
   </tr>
   <tr>
     <td> Tolerate missing&nbsp;<code>'use strict'</code>&nbsp;pragma </td>

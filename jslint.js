@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-11-16
+// 2011-12-08
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -155,7 +155,6 @@
 // The jslint directive is a special comment that can set one or more options.
 // The current option set is
 
-//     adsafe     true, if ADsafe rules should be enforced
 //     bitwise    true, if bitwise operators should be allowed
 //     browser    true, if the standard browser globals should be predefined
 //     cap        true, if upper case HTML should be allowed
@@ -183,7 +182,6 @@
 //     rhino      true, if the Rhino environment globals should be predefined
 //     undef      true, if variables can be declared out of order
 //     unparam    true, if unused parameters should be tolerated
-//     safe       true, if use of some browser features should be restricted
 //     sloppy     true, if the 'use strict'; pragma is optional
 //     sub        true, if all forms of subscript notation are tolerated
 //     vars       true, if multiple var statements per function should be allowed
@@ -2387,15 +2385,6 @@ klass:              do {
                     option[name] = false;
                 } else {
                     stop('unexpected_a');
-                }
-                switch (name) {
-                case 'adsafe':
-                    option.safe = true;
-                    do_safe();
-                    break;
-                case 'safe':
-                    do_safe();
-                    break;
                 }
             }
             advance();
@@ -6916,8 +6905,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-11-16';
+    itself.edition = '2011-12-08';
 
     return itself;
-
 }());
