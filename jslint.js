@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-12-09
+// 2011-12-19
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -6230,9 +6230,10 @@ klass:              do {
                         if (script[0].second.length !== 2 ||
                                 aint(script[0].second[1], 'id', 'function') ||
                                 !script[0].second[1].first ||
-                                script[0].second[1].first.length !== 2 ||
                                 aint(script[0].second[1].first[0], 'string', 'dom') ||
-                                aint(script[0].second[1].first[1], 'string', 'lib')) {
+                                script[0].second[1].first.length > 2 ||
+                                (script[0].second[1].first.length === 2 &&
+                                aint(script[0].second[1].first[1], 'string', 'lib'))) {
                             stop('adsafe_go', next_token);
                         }
                         adsafe_went = true;
@@ -6938,7 +6939,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-12-09';
+    itself.edition = '2011-12-19';
 
     return itself;
 }());
