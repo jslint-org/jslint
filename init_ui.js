@@ -17,7 +17,7 @@
 
 
 ADSAFE.lib("init_ui", function (lib) {
-    "use strict";
+    'use strict';
 
     return function (dom) {
         var table = dom.q('#JSLINT_TABLE'),
@@ -71,7 +71,9 @@ ADSAFE.lib("init_ui", function (lib) {
             indent.value(String(option.indent));
             maxlen.value(String(option.maxlen || ''));
             maxerr.value(String(option.maxerr));
-            predefined.value(ADSAFE.isArray(option.predef) ? option.predef.join(',') : '');
+            predefined.value(ADSAFE.isArray(option.predef)
+                ? option.predef.join(',')
+                : '');
             show_jslint_control();
         }
 
@@ -85,8 +87,8 @@ ADSAFE.lib("init_ui", function (lib) {
                     ADSAFE.get(option, title) === true
                         ? false
                         : ADSAFE.get(option, title) === false
-                            ? undefined
-                            : true);
+                        ? undefined
+                        : true);
             }
             show_jslint_control();
         }
