@@ -3,7 +3,7 @@ JSLint, The JavaScript Code Quality Tool
 Douglas Crockford
 douglas@crockford.com
 
-2011-04-17
+2011-12-21
 
 jslint.js contains the fully commented JSLINT function.
 
@@ -18,7 +18,7 @@ and the JSLINT function.
 
 init_ui.js hooks the HTML ui components to ADsafe.
 
-lint.html describes JSLint's usage.
+lint.html describes JSLint's usage. Please read it.
 
 Direct questions and comments to http://tech.groups.yahoo.com/group/jslint_com/.
 
