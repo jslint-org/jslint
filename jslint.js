@@ -1,5 +1,5 @@
 // jslint.js
-// 2011-12-21
+// 2012-01-10
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -155,6 +155,7 @@
 // The jslint directive is a special comment that can set one or more options.
 // The current option set is
 
+//     anon       true, if the space may be omitted in anonymous function declarations
 //     bitwise    true, if bitwise operators should be allowed
 //     browser    true, if the standard browser globals should be predefined
 //     cap        true, if upper case HTML should be allowed
@@ -223,7 +224,7 @@
     adsafe_name_a: string, adsafe_placement: string, adsafe_prefix_a: string,
     adsafe_script: string, adsafe_source: string, adsafe_subscript_a: string,
     adsafe_tag: string, all: boolean, already_defined: string, and: string,
-    applet: object, apply: string, approved: array, area: object,
+    anon, applet: object, apply: string, approved: array, area: object,
     arity: string, article: object, aside: object, assign: boolean,
     assign_exception: string, assignment_function_expression: string,
     at: number, attribute_case_a: string, audio: object, autocomplete: string,
@@ -426,6 +427,7 @@ var JSLINT = (function () {
         adsafe_top,     // At the top of the widget script.
         adsafe_went,    // ADSAFE.go has been called.
         allowed_option = {
+            anon      : true,
             bitwise   : true,
             browser   : true,
             cap       : true,
@@ -4305,7 +4307,9 @@ klass:              do {
     });
 
     prefix('function', function () {
-        one_space();
+        if (!option.anon) {
+            one_space();
+        }
         var id = optional_identifier();
         if (id) {
             no_space();
@@ -6867,7 +6871,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2011-12-21';
+    itself.edition = '2012-01-10';
 
     return itself;
 }());
