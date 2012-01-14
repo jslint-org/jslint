@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-01-10
+// 2012-01-13
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -2251,7 +2251,7 @@ klass:              do {
                 if (next_token.edge) {
                     if (next_token.edge === 'label') {
                         expected_at(1);
-                    } else if (next_token.edge === 'case') {
+                    } else if (next_token.edge === 'case' || indent.mode === 'statement') {
                         expected_at(indent.at - option.indent);
                     } else if (indent.mode !== 'array' || next_token.line !== token.line) {
                         expected_at(indent.at);
@@ -2529,6 +2529,12 @@ klass:              do {
                 open: true,
                 was: indent
             };
+        } else if (mode === 'statement') {
+            indent = {
+                at: indent.at,
+                open: true,
+                was: indent
+            };
         } else if (!indent) {
             indent = {
                 at: 1,
@@ -2536,8 +2542,7 @@ klass:              do {
                 open: true
             };
         } else {
-            open = mode === 'var' ||
-                (next_token.line !== token.line && mode !== 'statement');
+            open = mode === 'var' || next_token.line !== token.line;
             indent = {
                 at: (open || mode === 'control'
                     ? indent.at + option.indent
@@ -3141,7 +3146,9 @@ klass:              do {
 
 // Parse the statement.
 
-        edge();
+        if (token.id !== 'else') {
+            edge();
+        }
         step_in('statement');
         the_statement = expression(0, true);
         if (the_statement) {
@@ -6871,7 +6878,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2012-01-10';
+    itself.edition = '2012-01-13';
 
     return itself;
 }());
