@@ -623,7 +623,7 @@ var JSLINT = (function () {
             infix_in: "Unexpected 'in'. Compare with undefined, or use the " +
                 "hasOwnProperty method instead.",
             insecure_a: "Insecure '{a}'.",
-            isNaN: "Use the isNaN function to compare with NaN.",
+            isnan: "Use the isNaN function to compare with NaN.",
             label_a_b: "Label '{a}' on '{b}' statement.",
             lang: "lang is deprecated.",
             leading_decimal_a: "A leading decimal point can be confused with a dot: '.{a}'.",
