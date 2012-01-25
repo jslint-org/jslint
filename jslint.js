@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-01-13
+// 2012-01-25
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -2984,7 +2984,7 @@ klass:              do {
             break;
         default:
             if (node.id  === 'NaN') {
-                warn('isnan', node);
+                warn('isNaN', node);
             }
         }
         return node;
@@ -6878,7 +6878,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2012-01-13';
+    itself.edition = '2012-01-25';
 
     return itself;
 }());
