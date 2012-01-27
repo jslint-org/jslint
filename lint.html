@@ -232,23 +232,6 @@ effect as this comment:</p>
 <p>An expression statement is expected to be an assignment or a function/method
   call or <code>delete</code>. All other expression statements are considered
   to be errors.</p>
-<h2 id="confusion">Type Confusion</h2>
-<p>JSLint can do type inference. It can report cases were variables and properties are
-used to house multiple types. The warning is <code>Type confusion:</code> {a} <code>and</code> {b}<code>.</code> where the {a} and {b} will be
-replaced with the names of types.</p>
-<p> It is usually easy to see what caused the
-    warning. In some cases, it can be very puzzling. In the puzzling cases, try
-    initializing your vars with typed values. For example, if you expect that <code>n</code> will
-    contain numbers, then write</p>
-<pre>var n = 0;</pre>
-<p>That should produce clearer warnings. </p>
-<p>Type confusion is not necessarily an error, particularly in a language that
-    provides as much type freedom as this one does. But some inconsistencies are
-    errors, so type discipline might be something to consider adding to your
-    programming style. Also, the fastest JavaScript engines will slow down in the
-    presence of type confusion.
-
-    To turn off these warnings, turn on the  <i>Tolerate type confusion</i> <a href="#options">option</a>. </p>
 <h2 id=forin><code>for</code> <code>in</code></h2>
 <p>The <code>for</code> <code>in</code> statement allows for looping through
   the names of all of the properties of an object. <a href="http://yuiblog.com/blog/2006/09/26/for-in-intrigue/">Unfortunately,
@@ -404,9 +387,6 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
   instead). </p>
 <p><code>JSLint</code> does not expect to see <code>new Array</code> (use <code>[]</code>
   instead).</p>
-<h2 id=type>Type Inference</h2>
-<p>Type inference is being added to JSLint. The goal is to ultimately make JSLint more helpful in spotting type inconsistencies and confusions. If you do not want this service, then select the <code>confusion</code> <a href="#options">option</a>.</p>
-
 <h2 id=properties>Properties</h2>
 <p>Since JavaScript is a loosely-typed, dynamic-object language, it is not
   possible to determine at compile time if property names are spelled correctly.
@@ -421,10 +401,9 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
   <code>JSLint</code> will check the spelling of all property names against
   the list. That way, you can have <code>JSLint</code> look for misspellings
   for you. The directive respects function scope.</p>
-<p>JSLint allows the property names to be annotated with types: <code>array</code>, <code>boolean</code>, <code>function</code>, <code>number</code>, <code>object</code>, <code>regexp</code>, <code>string</code>, or <code>*</code> (a wildcard allowing any type). A function type can be followed by another type, indicating a function's return type.</p>
 <p>For example,</p>
 <pre>/*properties
-    charAt: function string, slice: function *
+    charAt, slice *
 */</pre>
 
 <h2 id=unsafe>Unsafe Characters</h2>
@@ -536,12 +515,6 @@ options are selected with several checkboxes and two fields. </p>
     <td>Tolerate HTML case </td>
     <td><code>cap</code></td>
     <td><code>true</code> if uppercase HTML should be allowed.</td>
-  </tr>
-  <tr>
-    <td>Tolerate type confusion<br>
-    </td>
-    <td><code>confusion</code></td>
-    <td><code>true</code> if variables and properties are allowed to contain more than one type of value.</td>
   </tr>
   <tr>
     <td>Tolerate <code>continue</code></td>
