@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-01-26
+// 2012-01-29
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -277,7 +277,7 @@
     move_var, n, name, name_function, nav, nested_comment, newcap, node,
     noframes, nomen, noscript, not, not_a_constructor, not_a_defined,
     not_a_function, not_a_label, not_a_scope, not_greater, now, nud, number,
-    object, ol, on, opacity, open, optgroup, option, outer, outline,
+    object, octal_a, ol, on, opacity, open, optgroup, option, outer, outline,
     'outline-color', 'outline-style', 'outline-width', output, overflow,
     'overflow-x', 'overflow-y', p, padding, 'padding-bottom', 'padding-left',
     'padding-right', 'padding-top', 'page-break-after', 'page-break-before',
@@ -563,6 +563,7 @@ var JSLINT = (function () {
             not_a_label: "'{a}' is not a label.",
             not_a_scope: "'{a}' is out of scope.",
             not_greater: "'{a}' should not be greater than '{b}'.",
+            octal_a: "Don't use octal: '{a}'. Use '\\u....' instead.",
             parameter_a_get_b: "Unexpected parameter '{a}' in get {b} function.",
             parameter_set_a: "Expected parameter (value) in set {a} function.",
             radix: "Missing radix parameter.",
@@ -1387,9 +1388,11 @@ var JSLINT = (function () {
                             hex(2);
                             break;
                         default:
-                            c = descapes[c];
-                            if (typeof c !== 'string') {
-                                warn_at('unexpected_a', line, character, '\\');
+                            if (typeof descapes[c] !== 'string') {
+                                warn_at(c >= '0' && c <= '7' ? 'octal_a' : 'unexpected_a',
+                                    line, character, '\\' + c);
+                            } else {
+                                c = descapes[c];
                             }
                         }
                     }
@@ -2225,7 +2228,7 @@ klass:              do {
             if (next_token.id === ':') {
                 for (;;) {
                     advance();
-                    if (next_token.id === ',' || next_token.id === '*/' || next_token.id === '(end)') {
+                    if (next_token.id !== '(string)' && !next_token.identifier) {
                         break;
                     }
                 }
@@ -6361,7 +6364,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2012-01-26';
+    itself.edition = '2012-01-29';
 
     return itself;
 }());
