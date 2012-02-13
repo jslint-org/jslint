@@ -4073,8 +4073,17 @@ klass:              do {
         if (funct['(loopage)']) {
             warn('function_loop');
         }
-        if (next_token.id === '.' || next_token.id === '[') {
-            warn('unexpected_a');
+        switch (next_token.id) {
+        case ';':
+        case '(':
+        case ')':
+        case ',':
+        case ']':
+        case '}':
+        case ':':
+            break;
+        default:
+            stop('unexpected_a');
         }
         this.arity = 'function';
         return this;
