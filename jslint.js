@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-02-14
+// 2012-02-16
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -202,8 +202,8 @@
 // For example:
 
 /*properties
-    '\b', '\t', '\n', '\f', '\r', '!=', '!==', '"', '%', '\'', '(begin)',
-    '(breakage)', '(context)', '(error)', '(identifier)', '(line)',
+    '\b', '\t', '\n', '\f', '\r', '!=', '!==', '"', '%', '\'', '(arguments)',
+    '(begin)', '(breakage)', '(context)', '(error)', '(identifier)', '(line)',
     '(loopage)', '(name)', '(params)', '(scope)', '(token)', '(vars)',
     '(verb)', '*', '+', '-', '/', '<', '<=', '==', '===', '>',
     '>=', ADSAFE, Array, Date, E, Function, LN10, LN2, LOG10E, LOG2E,
@@ -281,9 +281,9 @@
     'outline-color', 'outline-style', 'outline-width', output, overflow,
     'overflow-x', 'overflow-y', p, padding, 'padding-bottom', 'padding-left',
     'padding-right', 'padding-top', 'page-break-after', 'page-break-before',
-    param, parameter_a_get_b, parameter_set_a, params, paren, parent, parse,
-    passfail, pc, plusplus, pop, position, postscript, pre, predef,
-    preventExtensions, print, progress, projection, properties,
+    param, parameter_a_get_b, parameter_arguments_a, parameter_set_a, params,
+    paren, parent, parse, passfail, pc, plusplus, pop, position, postscript,
+    pre, predef, preventExtensions, print, progress, projection, properties,
     propertyIsEnumerable, prototype, pt, push, px, q, quote, quotes, r, radix,
     range, raw, read_only, reason, redefinition_a, reduce, reduceRight, regexp,
     replace, report, reserved, reserved_a, reverse, rhino, right, rp, rt, ruby,
@@ -564,6 +564,7 @@ var JSLINT = (function () {
             not_a_scope: "'{a}' is out of scope.",
             not_greater: "'{a}' should not be greater than '{b}'.",
             octal_a: "Don't use octal: '{a}'. Use '\\u....' instead.",
+            parameter_arguments_a: "Do not mutate parameter '{a}' when using 'arguments'.",
             parameter_a_get_b: "Unexpected parameter '{a}' in get {b} function.",
             parameter_set_a: "Expected parameter (value) in set {a} function.",
             radix: "Missing radix parameter.",
@@ -2786,6 +2787,11 @@ klass:              do {
                 } else {
                     stop('read_only');
                 }
+                funct['(params)'].forEach(function (value) {
+                    if (value.string === left.string) {
+                        value.assign = true;
+                    }
+                });
             } else if (option.safe) {
                 l = left;
                 do {
@@ -3207,6 +3213,7 @@ klass:              do {
         } else if (option.safe) {
             warn('adsafe_a', x);
         }
+        funct['(arguments)'] = true;
     });
     reservevar('eval', function (x) {
         if (option.safe) {
@@ -3809,7 +3816,7 @@ klass:              do {
         if (next_token.id === ')') {
             no_space();
             step_out(')', paren);
-            return;
+            return params;
         }
         for (;;) {
             edge();
@@ -3852,6 +3859,13 @@ klass:              do {
         func.first = funct['(params)'] = function_params();
         one_space();
         func.block = block(false);
+        if (funct['(arguments)']) {
+            func.first.forEach(function (value) {
+                if (value.assign) {
+                    warn('parameter_arguments_a', value, value.string);
+                }
+            });
+        }
         funct      = old_funct;
         option     = old_option;
         scope      = old_scope;
@@ -6387,7 +6401,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2012-02-14';
+    itself.edition = '2012-02-16';
 
     return itself;
 }());
