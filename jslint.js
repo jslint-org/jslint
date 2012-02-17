@@ -3357,7 +3357,7 @@ klass:              do {
         }
         var right = expression(130);
         if ((right.id === '(number)' && right.number === 0) || right.id === '(string)') {
-            warn('unexpected_a', left);
+            warn('unexpected_a', right);
         }
         if (left.id === right.id && left.id === '(number)') {
             left.number -= right.number;
