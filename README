@@ -3,15 +3,18 @@ JSLint, The JavaScript Code Quality Tool
 Douglas Crockford
 douglas@crockford.com
 
-2011-12-21
+2012-02-21
 
-jslint.js contains the fully commented JSLINT function.
+jslint.js contains the fully commented global JSLINT function.
 
 jslint.html runs the JSLINT function in a web page. The page also depends
 on adsafe.js [www.ADsafe.org] and json2.js [www.JSON.org] (which are not
 included in this project) and intercept.js and init_ui.js (which are). The
 js files should all be minified, and all except init_ui.js are concatenated
 together to form web_jslint.js.
+
+adsafe.js       https://github.com/douglascrockford/ADsafe
+json2.js        https://github.com/douglascrockford/JSON-js
 
 intercept.js augments ADsafe, giving widgets access to the clock, cookies,
 and the JSLINT function.
