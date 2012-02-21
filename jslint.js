@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-02-17
+// 2012-02-19
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -924,9 +924,8 @@ var JSLINT = (function () {
 
 // unsafe comment or string
         ax = /@cc|<\/?|script|\]\s*\]|<\s*!|&lt/i,
-// carriage return, or carriage return linefeed
-        crx = /\r/g,
-        crlfx = /\r\n/g,
+// linefeed, carriage return, or carriage return linefeed
+        crlfx = /\n|\r\n?/,
 // unsafe characters that are silently deleted by one or more browsers
         cx = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
 // query characters for ids
@@ -1684,10 +1683,7 @@ klass:              do {
         return {
             init: function (source) {
                 if (typeof source === 'string') {
-                    lines = source
-                        .replace(crlfx, '\n')
-                        .replace(crx, '\n')
-                        .split('\n');
+                    lines = source.split(crlfx);
                 } else {
                     lines = source;
                 }
@@ -6389,7 +6385,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2012-02-17';
+    itself.edition = '2012-02-19';
 
     return itself;
 }());
