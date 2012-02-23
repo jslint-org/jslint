@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-02-19
+// 2012-02-23
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -286,15 +286,16 @@
     time, title, toLowerCase, toString, toUpperCase, token, too_long, too_many,
     top, tr, trailing_decimal_a, tree, tt, tty, tv, type, u, ul, unclosed,
     unclosed_comment, unclosed_regexp, undef, undefined, unescaped_a,
-    unexpected_a, unexpected_char_a_b, unexpected_comment, unexpected_property_a,
-    unexpected_space_a_b, 'unicode-bidi', unnecessary_initialize,
-    unnecessary_use, unparam, unreachable_a_b, unrecognized_style_attribute_a,
-    unrecognized_tag_a, unsafe, unused, url, urls, use_array, use_braces,
-    use_charAt, use_object, use_or, use_param, used_before_a, var, var_a_not,
-    vars, 'vertical-align', video, visibility, was, weird_assignment,
-    weird_condition, weird_new, weird_program, weird_relation, weird_ternary,
-    white, 'white-space', widget, width, windows, 'word-spacing', 'word-wrap',
-    wrap, wrap_immediate, wrap_regexp, write_is_wrong, writeable, 'z-index'
+    unexpected_a, unexpected_char_a_b, unexpected_comment, unexpected_else,
+    unexpected_property_a, unexpected_space_a_b, 'unicode-bidi',
+    unnecessary_initialize, unnecessary_use, unparam, unreachable_a_b,
+    unrecognized_style_attribute_a, unrecognized_tag_a, unsafe, unused, url,
+    urls, use_array, use_braces, use_charAt, use_object, use_or, use_param,
+    used_before_a, var, var_a_not, vars, 'vertical-align', video, visibility,
+    was, weird_assignment, weird_condition, weird_new, weird_program,
+    weird_relation, weird_ternary, white, 'white-space', widget, width, windows,
+    'word-spacing', 'word-wrap', wrap, wrap_immediate, wrap_regexp,
+    write_is_wrong, writeable, 'z-index'
 */
 
 // The global directive is used to declare global variables that can
@@ -573,6 +574,7 @@ var JSLINT = (function () {
             unexpected_a: "Unexpected '{a}'.",
             unexpected_char_a_b: "Unexpected character '{a}' in {b}.",
             unexpected_comment: "Unexpected comment.",
+            unexpected_else: "Unexpected 'else' after 'return'.",
             unexpected_property_a: "Unexpected /*property*/ '{a}'.",
             unexpected_space_a_b: "Unexpected space between '{a}' and '{b}'.",
             unnecessary_initialize: "It is not necessary to initialize '{a}' " +
@@ -1178,9 +1180,8 @@ var JSLINT = (function () {
         if (it[name] !== expected) {
             warn('expected_a_b', it, expected, it[name]);
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
 
@@ -2406,9 +2407,8 @@ klass:              do {
             option.newcap = false;
             option.undef = false;
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
 
@@ -2456,7 +2456,8 @@ klass:              do {
         } else {
             if (a.id === '.' && b.id === '[' && b.arity === 'infix') {
                 return a.second.string === b.second.string && b.second.id === '(string)';
-            } else if (a.id === '[' && a.arity === 'infix' && b.id === '.') {
+            }
+            if (a.id === '[' && a.arity === 'infix' && b.id === '.') {
                 return a.second.string === b.second.string && a.second.id === '(string)';
             }
         }
@@ -2507,9 +2508,8 @@ klass:              do {
                     warn('leading_decimal_a', token, artifact());
                     advance();
                     return token;
-                } else {
-                    stop('expected_identifier_a', token, token.id);
                 }
+                stop('expected_identifier_a', token, token.id);
             }
             while (rbp < next_token.lbp) {
                 advance();
@@ -2661,11 +2661,10 @@ klass:              do {
             }
             if (typeof f === 'function') {
                 return f(left, this);
-            } else {
-                this.first = left;
-                this.second = expression(p);
-                return this;
             }
+            this.first = left;
+            this.second = expression(p);
+            return this;
         };
         return x;
     }
@@ -4514,6 +4513,9 @@ klass:              do {
             }
             this.first = expression(20);
         }
+        if (peek(0).id === '}' && peek(1).id === 'else') {
+            warn('unexpected_else', this);
+        }
         return this;
     });
 
@@ -4708,7 +4710,8 @@ klass:              do {
                 }
                 advance(')', paren);
                 return true;
-            } else if (css_colorData[next_token.string] === true) {
+            }
+            if (css_colorData[next_token.string] === true) {
                 advance();
                 return true;
             }
@@ -5209,23 +5212,22 @@ klass:              do {
             }
             advance();
             return css_any;
+        }
+        if (!next_token.identifier) {
+            warn('expected_style_attribute');
         } else {
-            if (!next_token.identifier) {
-                warn('expected_style_attribute');
+            if (Object.prototype.hasOwnProperty.call(css_attribute_data,
+                    next_token.string)) {
+                v = css_attribute_data[next_token.string];
             } else {
-                if (Object.prototype.hasOwnProperty.call(css_attribute_data,
-                        next_token.string)) {
-                    v = css_attribute_data[next_token.string];
-                } else {
-                    v = css_any;
-                    if (!option.css) {
-                        warn('unrecognized_style_attribute_a');
-                    }
+                v = css_any;
+                if (!option.css) {
+                    warn('unrecognized_style_attribute_a');
                 }
             }
-            advance();
-            return v;
         }
+        advance();
+        return v;
     }
 
 
@@ -5309,12 +5311,11 @@ klass:              do {
                 }
             }
             return;
-        } else {
-            if (next_token.identifier &&
-                    (next_token.string === 'odd' || next_token.string === 'even')) {
-                advance();
-                return;
-            }
+        }
+        if (next_token.identifier &&
+                (next_token.string === 'odd' || next_token.string === 'even')) {
+            advance();
+            return;
         }
         warn('unexpected_a');
     }
@@ -6385,7 +6386,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2012-02-19';
+    itself.edition = '2012-02-23';
 
     return itself;
 }());
