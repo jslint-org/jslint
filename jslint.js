@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-03-06
+// 2012-03-07
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -394,10 +394,10 @@ var JSLINT = (function () {
 // web browser environment.
 
         browser = array_to_object([
-            'clearInterval', 'clearTimeout', 'document', 'event', 'frames',
-            'history', 'Image', 'localStorage', 'location', 'name', 'navigator',
-            'Option', 'parent', 'screen', 'sessionStorage', 'setInterval',
-            'setTimeout', 'Storage', 'window', 'XMLHttpRequest'
+            'clearInterval', 'clearTimeout', 'document', 'event', 'FormData',
+            'frames', 'history', 'Image', 'localStorage', 'location', 'name',
+            'navigator', 'Option', 'parent', 'screen', 'sessionStorage',
+            'setInterval', 'setTimeout', 'Storage', 'window', 'XMLHttpRequest'
         ], false),
 
 // bundle contains the text messages.
@@ -6387,7 +6387,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2012-03-06';
+    itself.edition = '2012-03-07';
 
     return itself;
 }());
