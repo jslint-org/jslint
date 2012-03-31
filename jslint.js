@@ -1272,6 +1272,7 @@ var JSLINT = (function () {
                 character += length;
                 return first;
             }
+            return null;
         }
 
         function string(x) {
@@ -1452,7 +1453,7 @@ var JSLINT = (function () {
                 switch (c) {
                 case '':
                     stop_at('unclosed_regexp', line, from);
-                    return;
+                    return undefined;
                 case '/':
                     if (depth > 0) {
                         warn_at('unescaped_a', line, from + length, '/');
@@ -2850,6 +2851,7 @@ klass:              do {
             }
             return token.string;
         }
+        return null;
     }
 
 
@@ -2873,7 +2875,7 @@ klass:              do {
         if (next_token.id === ';') {
             warn('unexpected_a');
             semicolon();
-            return;
+            return undefined;
         }
 
 // Is this a labeled statement?
@@ -4649,6 +4651,7 @@ klass:              do {
             advance();
             return true;
         }
+        return false;
     }
 
 
@@ -4661,6 +4664,7 @@ klass:              do {
             advance('(number)');
             return true;
         }
+        return false;
     }
 
 
@@ -4669,6 +4673,7 @@ klass:              do {
             advance();
             return true;
         }
+        return false;
     }
 
     function css_color() {
@@ -4775,6 +4780,7 @@ klass:              do {
                 advance();
                 return true;
             }
+            return false;
         } else {
             return css_length();
         }
@@ -4787,6 +4793,7 @@ klass:              do {
                 advance();
                 return true;
             }
+            return false;
         } else {
             return css_length();
         }
@@ -4817,6 +4824,7 @@ klass:              do {
             }
             comma();
         }
+        return false;
     }
 
 
