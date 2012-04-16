@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-03-29
+// 2012-04-15
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -2409,7 +2409,6 @@ klass:              do {
             advance();
             semicolon();
             strict_mode = true;
-            option.newcap = false;
             option.undef = false;
             return true;
         }
@@ -6394,7 +6393,7 @@ klass:              do {
     };
     itself.jslint = itself;
 
-    itself.edition = '2012-03-29';
+    itself.edition = '2012-04-15';
 
     return itself;
 }());
