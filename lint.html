@@ -155,12 +155,6 @@ effect as this comment:</p>
 <blockquote>
   <code>/*global defineClass: false, deserialize: false, gc: false, help: false, load: false, loadClass: false, print: false, quit: false, readFile: false, readUrl: false, runCommand: false, seal: false, serialize: false, spawn: false, sync: false, toint32: false, version: false */ </code>
 </blockquote>
-<p id=widget>Select the <i>Assume a Yahoo Widget</i> (<code>widget</code>)
-  <a href="#options">option</a> to predefine the global properties provided
-  by the Yahoo! Widgets environment. It has the same effect as this statement:</p>
-<blockquote>
-  <code>/*global alert: true, animator: true, appleScript: true, beep: true, bytesToUIString: true, Canvas: true, chooseColor: true, chooseFile: true, chooseFolder: true, closeWidget: true, COM: true, convertPathToHFS: true, convertPathToPlatform: true, CustomAnimation: true, escape: true, FadeAnimation: true, filesystem: true, Flash: true, focusWidget: true, form: true, FormField: true, Frame: true, HotKey: true, Image: true, include: true, isApplicationRunning: true, iTunes: true, konfabulatorVersion: true, log: true, md5: true, MenuItem: true, MoveAnimation: true, openURL: true, play: true, Point: true, popupMenu: true, preferenceGroups: true, preferences: true, print: true, prompt: true, random: true, Rectangle: true, reloadWidget: true, ResizeAnimation: true, resolvePath: true, resumeUpdates: true, RotateAnimation: true, runCommand: true, runCommandInBg: true, saveAs: true, savePreferences: true, screen: true, ScrollBar: true, showWidgetPreferences: true, sleep: true, speak: true, Style: true, suppressUpdates: true, system: true, tellWidget: true, Text: true, TextArea: true, Timer: true, unescape: true, updateNow: true, URL: true, Web: true, widget: true, Window: true, XMLDOM: true, XMLHttpRequest: true, yahooCheckLogin: true, yahooLogin: true, yahooLogout: true */</code>
-</blockquote>
 <p id=windows>Select the <i>Assume Windows</i> (<code>windows</code>)
   <a href="#options">option</a> to predefine the global properties provided by Microsoft Windows. It has the same effect as this statement:</p>
 <blockquote>
@@ -394,16 +388,15 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
 <p>At the bottom of its report, <code>JSLint</code> displays a <code>/*properties*/</code>
   comment. It contains all of the names and string literals that were used
   with dot notation, subscript notation, and object literals to name the
-  properties of objects. You can look through the list for misspellings. Property
-  names that were only used once are shown in italics. This is to make misspellings
+  properties of objects. You can look through the list for misspellings. This is to make misspellings
   easier to spot.</p>
-<p>You can copy the <code>/*properties*/</code> comment into your script file.
+<p>You can copy the <code>/*properties*/</code> comment into the top of your script file.
   <code>JSLint</code> will check the spelling of all property names against
   the list. That way, you can have <code>JSLint</code> look for misspellings
-  for you. The directive respects function scope.</p>
+  for you. </p>
 <p>For example,</p>
 <pre>/*properties
-    charAt, slice *
+    charAt, slice
 */</pre>
 
 <h2 id=unsafe>Unsafe Characters</h2>
@@ -680,15 +673,9 @@ options are selected with several checkboxes and two fields. </p>
     <td><code>true</code> if strict whitespace rules should be ignored.</td>
   </tr>
   <tr>
-    <td>Assume a Yahoo Widget </td>
-    <td><code>widget</code></td>
-    <td><code>true</code> if the <a href="http://widgets.yahoo.com/gallery/view.php?widget=37484">Yahoo
-      Widgets</a> globals should be predefined. <a href="#widget"><small>(more)</small></a></td>
-  </tr>
-  <tr>
-    <td>Assume Windows</td>
-    <td><code>windows</code></td>
-    <td><code>true</code> if the Windows globals should be predefined. <a href="#windows"><small>(more)</small></a></td>
+      <td>Assume Windows</td>
+      <td><code>windows</code></td>
+      <td><code>true</code> if the Windows globals should be predefined. <a href="#windows"><small>(more)</small></a></td>
   </tr>
   </tbody>
 </table>
@@ -700,7 +687,7 @@ options are selected with several checkboxes and two fields. </p>
 <ul>
   <li>The line number on which it starts.</li>
   <li>Its name. In the case of anonymous functions, <code>JSLint</code>
-    will 'guess' the name.</li>
+    will <code>'</code>guess<code>'</code> the name.</li>
   <li>The parameters.</li>
   <li><i>Closure</i>: The variables and parameters that are declared in
     the function that are used by its inner functions.</li>
@@ -733,7 +720,19 @@ options are selected with several checkboxes and two fields. </p>
 
 <p><a href="http://www.JSLint.com" target="_blank">Try it.</a> Paste your script
   into the window and click the
-  <a href="http://www.JSLint.com" target=jslint><input type="button" value="JSLint"></a>
+  <a href="http://www.JSLint.com" target=jslint><button style="
+    background-color: lightsteelblue;
+    border-radius: 16pt;
+    color: black;
+    cursor: pointer;
+    font-family: sans-serif;
+    font-size: 100%;
+    font-style: normal;
+    margin: 0pt;
+    padding-left: 2em;
+    padding-right: 2em;
+    text-align: center;
+  ">JSLint</button></a>
    button. The analysis is done by a script running on your machine.
   Your script is not sent over the network. You can set the <a href="#options">options</a> used. </p>
 <p>
