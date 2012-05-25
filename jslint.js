@@ -1116,6 +1116,9 @@ var JSLINT = (function () {
 
     function do_warn(message, offender, a, b, c, d) {
         var character, line, warning;
+        if (JSLINT.suppressed_messages[message] === true) {
+            return false;
+        }
         offender = offender || next_token;  // ~~
         line = offender.line || 0;
         character = offender.from || 0;
@@ -1157,7 +1160,9 @@ var JSLINT = (function () {
 
     function stop(message, offender, a, b, c, d) {
         var warning = do_warn(message, offender, a, b, c, d);
-        quit(bundle.stopping, warning.line, warning.character);
+        if (warning !== false) {
+            quit(bundle.stopping, warning.line, warning.character);
+        }
     }
 
     function stop_at(message, line, character, a, b, c, d) {
