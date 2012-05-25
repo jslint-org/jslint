@@ -1156,7 +1156,7 @@ var JSLINT = (function () {
     }
 
     function stop(message, offender, a, b, c, d) {
-        var warning = warn(message, offender, a, b, c, d);
+        var warning = do_warn(message, offender, a, b, c, d);
         quit(bundle.stopping, warning.line, warning.character);
     }
 
