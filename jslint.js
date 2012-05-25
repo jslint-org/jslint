@@ -1114,7 +1114,7 @@ var JSLINT = (function () {
         };
     }
 
-    function warn(message, offender, a, b, c, d) {
+    function do_warn(message, offender, a, b, c, d) {
         var character, line, warning;
         offender = offender || next_token;  // ~~
         line = offender.line || 0;
@@ -1142,6 +1142,10 @@ var JSLINT = (function () {
             quit(bundle.too_many, line, character);
         }
         return warning;
+    }
+
+    function warn(message, offender, a, b, c, d) {
+        return do_warn(message, offender, a, b, c, d);
     }
 
     function warn_at(message, line, character, a, b, c, d) {
