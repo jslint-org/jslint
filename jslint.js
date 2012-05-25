@@ -941,7 +941,7 @@ var JSLINT = (function () {
         sx = /^\s*([{}:#%.=,>+\[\]@()"';]|[*$\^~]=|[a-zA-Z_][a-zA-Z0-9_\-]*|[0-9]+|<\/|\/\*)/,
         ssx = /^\s*([@#!"'};:\-%.=,+\[\]()*_]|[a-zA-Z][a-zA-Z0-9._\-]*|\/\*?|\d+(?:\.\d+)?|<\/)/,
 // token
-        tx = /^\s*([(){}\[\]\?.,:;'"~#@`]|={1,3}|\/(\*(jslint|properties|property|members?|globals?)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<(?:[\/=!]|\!(\[|--)?|<=?)?|\!={0,2}|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+(?:[xX][0-9a-fA-F]+|\.[0-9]*)?(?:[eE][+\-]?[0-9]+)?)/,
+        tx = /^\s*([(){}\[\]\?.,:;'"~#@`]|={1,3}|\/(\*(jslint|properties|property|members?|globals?|suppress)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<(?:[\/=!]|\!(\[|--)?|<=?)?|\!={0,2}|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+(?:[xX][0-9a-fA-F]+|\.[0-9]*)?(?:[eE][+\-]?[0-9]+)?)/,
 // url badness
         ux = /&|\+|\u00AD|\.\.|\/\*|%[^;]|base64|url|expression|data|mailto|script/i,
 
@@ -2152,6 +2152,38 @@ klass:              do {
     }
 
 
+    function do_suppresses() {
+        var name, is_suppress;
+        for (;;) {
+            if (next_token.id !== '(string)' && !next_token.identifier) {
+                return;
+            }
+            name = next_token.string;
+            advance();
+            is_suppress = true;
+            if (next_token.id === ':') {
+                advance(':');
+                switch (next_token.id) {
+                case 'true':
+                    advance('true');
+                    break;
+                case 'false':
+                    is_suppress = false;
+                    advance('false');
+                    break;
+                default:
+                    stop('unexpected_a');
+                }
+            }
+            suppressed_messages[name] = is_suppress;
+            if (next_token.id !== ',') {
+                return;
+            }
+            advance(',');
+        }
+    }
+
+
     function do_jslint() {
         var name, value;
         while (next_token.id === '(string)' || next_token.identifier) {
@@ -2246,6 +2278,9 @@ klass:              do {
                 warn('adsafe_a', this);
             }
             do_globals();
+            break;
+        case '/*suppress':
+            do_suppresses();
             break;
         default:
             stop('unexpected_a', this);
@@ -3968,6 +4003,7 @@ klass:              do {
     stmt('/*members', directive);
     stmt('/*property', directive);
     stmt('/*properties', directive);
+    stmt('/*suppress', directive);
 
     stmt('var', function () {
 
