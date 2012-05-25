@@ -1145,7 +1145,7 @@ var JSLINT = (function () {
     }
 
     function warn(message, offender, a, b, c, d) {
-        return do_warn(message, offender, a, b, c, d);
+        do_warn(message, offender, a, b, c, d);
     }
 
     function warn_at(message, line, character, a, b, c, d) {
