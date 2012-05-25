@@ -887,6 +887,7 @@ var JSLINT = (function () {
         ], false),
 
         strict_mode,
+        suppressed_messages = {},
         syntax = {},
         tab,
         token,
@@ -1054,6 +1055,13 @@ var JSLINT = (function () {
     function add_to_predefined(group) {
         Object.keys(group).forEach(function (name) {
             predefined[name] = group[name];
+        });
+    }
+
+
+    function add_to_suppressed_messages(group) {
+        Object.keys(group).forEach(function (name) {
+            suppressed_messages[name] = group[name];
         });
     }
 
@@ -5998,7 +6006,7 @@ klass:              do {
 
     itself = function JSLint(the_source, the_option) {
 
-        var i, predef, tree;
+        var i, predef, suppress, tree;
         JSLINT.errors = [];
         JSLINT.tree = '';
         JSLINT.properties = '';
@@ -6017,6 +6025,16 @@ klass:              do {
                     }
                 } else if (typeof predef === 'object') {
                     add_to_predefined(predef);
+                }
+            }
+            suppress = option.suppress;
+            if (suppress) {
+                if (Array.isArray(suppress)) {
+                    for (i = 0; i < suppress.length; i += 1) {
+                        suppressed_messages[suppress[i]] = true;
+                    }
+                } else if (typeof suppress === 'object') {
+                    add_to_suppressed_messages(suppress);
                 }
             }
             do_safe();
