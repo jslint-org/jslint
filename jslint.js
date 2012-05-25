@@ -6446,6 +6446,8 @@ klass:              do {
         return output.join('\n');
     };
 
+    itself.suppressed_messages = suppressed_messages;
+
     itself.jslint = itself;
 
     itself.edition = '2012-05-09';
