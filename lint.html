@@ -109,8 +109,7 @@ a:active {color: red;
     margin: 1em; padding-left: 1em; padding-right: 1em;">
       The&nbsp;<a href="http://javascript.crockford.com/">JavaScript</a>&nbsp;Code Quality Tool
       <br><br>
-      Warning: JSLint will hurt your feelings.
-    </div>
+    Warning: <code>JSLint</code> will hurt your feelings. </div>
 <fieldset>
 <h1 id=what>What is <code>JSLint</code>?</h1>
 
@@ -150,7 +149,7 @@ at issuing warnings. <code>lint</code> is no longer needed.</p>
   Conventions for the JavaScript Programming Language</i></a>. </p>
 <p>JavaScript is a sloppy language, but inside it there is an elegant, better
   language. <code>JSLint</code> helps you to program in that better language
-  and to avoid most of the slop. JSLint will reject programs that browsers will accept because JSLint is concerned with the quality of your code and browsers are not. You should accept all of JSLint's advice.</p>
+  and to avoid most of the slop. <code>JSLint</code> will reject programs that browsers will accept because <code>JSLint</code> is concerned with the quality of your code and browsers are not. You should accept all of <code>JSLint</code>'s advice.</p>
 <p><code>JSLint</code> can operate on JavaScript source, HTML source, CSS source, or <a href="http://www.JSON.org/">JSON</a>
   text.</p>
 <h1 id=global>Global Variables</h1>
@@ -171,7 +170,7 @@ at issuing warnings. <code>lint</code> is no longer needed.</p>
 <p>The declaration should appear near the top of the file. It must appear before the use of the variables
   it declares. </p>
 <p>It is necessary to use a <code>var</code> statement to declare a variable before that variable is assigned to. </p>
-<p><code>JSLint</code> also recognizes a <code>/*global */</code> directive that can indicate to <code>JSLint</code> that variables used in this file were defined in other files. The
+<p><code>JSLint</code> also recognizes a <code>/*global*/</code> directive that can indicate to <code>JSLint</code> that variables used in this file were defined in other files. The
   directive can contain a comma separated list of names. Each name can optionally be followed by a colon and either <code>true</code> or <code>false</code>, <code>true</code> indicating that the variable may be assigned to by this file, and <code>false</code> indicating that assignment is not allowed (which is the default). The directive respects function scope.</p>
 <p id=browser>Some globals can be predefined for you. Select the <i>Assume
   a browser</i> (<code>browser</code>) <a href="#options">option</a> to
@@ -337,7 +336,7 @@ effect as this directive:</p>
 <h1 id=eqeq>== and !=</h1>
 <p>The <code>==</code> and <code>!=</code> operators do type coercion before
   comparing. This is bad because it causes <code>' \t\r\n' == 0</code> to
-  be <code>true</code>. This can mask type errors. JSLint cannot reliably determine if == is being used correctly, so it is best to not use <code>==</code> and != at all and to always use the more reliable <code>===</code> and <code>!==</code> operators instead. </p>
+  be <code>true</code>. This can mask type errors. <code>JSLint</code> cannot reliably determine if == is being used correctly, so it is best to not use <code>==</code> and != at all and to always use the more reliable <code>===</code> and <code>!==</code> operators instead. </p>
 <p align="left">If you only care that a value is <i>truthy</i> or <i>falsy</i>,
   then use the short form. Instead of </p>
 <blockquote><code>(foo != 0)</code></blockquote>
@@ -467,7 +466,7 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
   not attempt to determine that functions used with <code>new</code> are
   really constructors (<a href="#new">except by enforcing capitalization
   conventions</a>), or that property names are spelled correctly (<a href="#properties">except
-  for matching against the <code>/*properties */</code> directive</a>).</p>
+  for matching against the <code>/*properties*/</code> directive</a>).</p>
 <h1 id=html>HTML</h1>
 <p><code>JSLint</code> is able to handle HTML text. It can inspect the JavaScript content
   contained within <code>&lt;script&gt;</code>...<code>&lt;/script&gt;</code> tags. It
@@ -505,20 +504,20 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
 <p><code>JSLint</code> provides several options that control its operation and
   its sensitivity. In the <a href="http://www.JSLint.com/">web edition</a>, the
 options are selected with several checkboxes and two fields. </p>
-<p>It also provides assistance in constructing <code>/*jslint*/</code> and <code>/*proeprties*/</code> directives. </p>
+<p>It also provides assistance in constructing <code>/*jslint*/</code> and <code>/*properties*/</code> directives. </p>
 <p>When <code>JSLINT</code> is called as a function, it accepts an <code>option</code> object
   parameter that allows you to determine the subset of JavaScript that is
   acceptable to you. The web page version of <code>JSLint</code> at <a href="http://www.JSLint.com/">http://www.JSLint.com/</a>
   does this for you. </p>
-<p>Options can also be specified within a script with a <code>/*jslint */</code>
+<p>Options can also be specified within a script with a <code>/*jslint*/</code>
   directive:</p>
 <blockquote><code>/*jslint nomen: true, debug: true,
     evil: false, vars: true */</code></blockquote>
-<p>An option specification starts with <code>/*jslint</code>. Notice that
+<p>An option directive starts with <code>/*jslint</code>. Notice that
   there is no space before the <code>j</code>. The specification contains
   a sequence of name value pairs, where the names are <code>JSLint</code>
   options, and the values are <code>true</code> or <code>false</code>. The
-  <code>indent</code> <a href="#options">option</a> can take a number. A <code>/*jslint */</code>
+  <code>indent</code> <a href="#options">option</a> can take a number. A <code>/*jslint*/</code>
   directive takes precedence over the <code>option</code> object. The directive respects function scope.</p>
 <table>
   <tbody>
@@ -532,7 +531,7 @@ options are selected with several checkboxes and two fields. </p>
     <td><code>adsafe</code></td>
     <td><code>true</code> if <a href="http://www.ADsafe.org/">AD<span style="color: blue;">safe</span></a>
       rules should be enforced. See <a href="http://www.ADsafe.org/">http://www.ADsafe.org/</a>.  <code>adsafe</code> is used with the <code>option</code> object, but not
-      with the <code>/*jslint */</code> directive. </td>
+      with the <code>/*jslint*/</code> directive. </td>
   </tr>
   <tr>
     <td>Tolerate bitwise operators </td>
@@ -650,7 +649,7 @@ options are selected with several checkboxes and two fields. </p>
     <td>Predefined <small>( , separated)</small></td>
     <td><code>predef</code></td>
     <td>An array of strings, the names of predefined global variables, or an object whose keys are global variable names, and whose values are booleans that determine if each variable is assignable (also see <a href="#global">global</a>). <code>predef</code> is used with the <code>option</code> object, but not
-      with the <code>/*jslint */</code>  directive. You can also use the <code>var</code>
+      with the <code>/*jslint*/</code>  directive. You can also use the <code>var</code>
       statement to declare global variables in a script file.</td>
   </tr>
   <tr>
@@ -671,7 +670,7 @@ options are selected with several checkboxes and two fields. </p>
     <td><code>true</code> if the safe subset rules are enforced. These rules
       are used by <a href="http://www.ADsafe.org/">ADsafe</a>. It enforces
       the safe subset rules but not the widget structure rules.  <code>safe</code> is used with the <code>option</code> object, but not
-      with the <code>/*jslint */</code> directive. </td>
+      with the <code>/*jslint*/</code> directive. </td>
   </tr>
   <tr>
     <td> Tolerate missing&nbsp;<code>'use strict'</code>&nbsp;pragma </td>
@@ -777,7 +776,7 @@ options are selected with several checkboxes and two fields. </p>
    button. The analysis is done by a script running on your machine.
   Your script is not sent over the network. You can set the <a href="#options">options</a> used. </p>
 <p>
-  JSLint is written entirely in JavaScript, so it can run anywhere that JavaScript can run. See for example  <a href="http://tech.groups.yahoo.com/group/jslint_com/database?method=reportRows&tbl=1">http://tech.groups.yahoo.com/group/jslint_com/database?method=reportRows&amp;tbl=1</a>.</p>
+  <code>JSLint</code> is written entirely in JavaScript, so it can run anywhere that JavaScript can run. See for example <a href="http://tech.groups.yahoo.com/group/jslint_com/database?method=reportRows&tbl=1">http://tech.groups.yahoo.com/group/jslint_com/database?method=reportRows&amp;tbl=1</a>.</p>
 <h1 id=implementation>Implementation</h1>
 <p><code>JSLint</code> uses a <a href="http://javascript.crockford.com/tdop/tdop.html">Pratt
   Parser (Top Down Operator Precedence)</a>. It is written in JavaScript.
