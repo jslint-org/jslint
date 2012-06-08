@@ -566,7 +566,7 @@ var JSLINT = (function () {
             scanned_a_b: "{a} ({b}% scanned).",
             slash_equal: "A regular expression literal can be confused with '/='.",
             statement_block: "Expected to see a statement and instead saw a block.",
-            stopping: "Stopping. ",
+            stopping: "Stopping.",
             strange_loop: "Strange loop.",
             strict: "Strict violation.",
             subscript: "['{a}'] is better written in dot notation.",
