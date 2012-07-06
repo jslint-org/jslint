@@ -286,11 +286,11 @@
     properties_report, property, prototype, pt, push, px, q, quote, quotes, r,
     radix, range, raw, read_only, reason, redefinition_a, regexp, replace,
     report, reserved, reserved_a, rhino, right, rp, rt, ruby, safe, samp,
-    scanned_a_b, screen, script, search, second, section, select, shift,
-    slash_equal, slice, sloppy, small, sort, source, span, speech, split, src,
-    statement_block, stopping, strange_loop, strict, string, strong, stupid,
-    style, styleproperty, sub, subscript, substr, sup, supplant, sync_a, t,
-    table, 'table-layout', tag_a_in_b, tbody, td, test, 'text-align',
+    scanned_a_b, screen, script, search, second, section, select, set_after_get_a,
+    shift, slash_equal, slice, sloppy, small, sort, source, span, speech, split,
+    src, statement_block, stopping, strange_loop, strict, string, strong,
+    stupid, style, styleproperty, sub, subscript, substr, sup, supplant,
+    sync_a, t, table, 'table-layout', tag_a_in_b, tbody, td, test, 'text-align',
     'text-decoration', 'text-indent', 'text-shadow', 'text-transform', textarea,
     tfoot, th, thead, third, thru, time, title, toLowerCase, toString,
     toUpperCase, token, too_long, too_many, top, tr, trailing_decimal_a, tree,
@@ -564,6 +564,7 @@ var JSLINT = (function () {
             redefinition_a: "Redefinition of '{a}'.",
             reserved_a: "Reserved name '{a}'.",
             scanned_a_b: "{a} ({b}% scanned).",
+            set_after_get_a: "Setter should appear immediately after getter for '{a}'.",
             slash_equal: "A regular expression literal can be confused with '/='.",
             statement_block: "Expected to see a statement and instead saw a block.",
             stopping: "Stopping. ",
@@ -3856,15 +3857,12 @@ klass:              do {
 
 
     prefix('{', function () {
-        var get, i, j, name, p, set, seen = {};
+        var get, i, last, name, p, set, seenget = {}, seenset = {};
         this.arity = 'prefix';
         this.first = [];
         step_in();
         while (next_token.id !== '}') {
             indent.wrap = false;
-
-// JSLint recognizes the ES5 extension for get/set in object literals,
-// but requires that they be used in pairs.
 
             edge();
             if (next_token.string === 'get' && peek().id !== ':') {
@@ -3879,7 +3877,6 @@ klass:              do {
                 if (!i) {
                     stop('missing_property');
                 }
-                get.string = '';
                 do_function(get);
                 if (funct['(loopage)']) {
                     warn('function_loop', get);
@@ -3888,16 +3885,24 @@ klass:              do {
                 if (p && p.length) {
                     warn('parameter_a_get_b', p[0], p[0].string, i);
                 }
-                comma();
+                name.first = get;
+                if (seenget[i] === true) {
+                    warn('duplicate_a', next_token, i);
+                } else if (seenset[i] === true) {
+                    warn('set_after_get_a', next_token, i);
+                }
+                seenget[i] = true;
+            } else if (next_token.string === 'set' && peek().id !== ':') {
+                if (!option.es5) {
+                    warn('es5');
+                }
                 set = next_token;
-                spaces();
-                edge();
                 advance('set');
-                set.string = '';
                 one_space_only();
-                j = property_name();
-                if (i !== j) {
-                    stop('expected_a_b', token, i, j || next_token.string);
+                name = next_token;
+                i = property_name();
+                if (!i) {
+                    stop('missing_property');
                 }
                 do_function(set);
                 if (set.block.length === 0) {
@@ -3909,7 +3914,16 @@ klass:              do {
                 } else if (p[0].string !== 'value') {
                     stop('expected_a_b', p[0], 'value', p[0].string);
                 }
-                name.first = [get, set];
+                name.first = set;
+                if (seenset[i] === true) {
+                    warn('duplicate_a', next_token, i);
+                } else if (seenget[i] === true) {
+                    last = this.first[this.first.length - 1];
+                    if (last.string !== name.string) {
+                        warn('set_after_get_a', next_token, i);
+                    }
+                }
+                seenset[i] = true;
             } else {
                 name = next_token;
                 i = property_name();
@@ -3919,12 +3933,12 @@ klass:              do {
                 advance(':');
                 spaces();
                 name.first = expression(10);
+                if (seenget[i] === true || seenset[i] === true) {
+                    warn('duplicate_a', next_token, i);
+                }
+                seenget[i] = seenget[i] = true;
             }
             this.first.push(name);
-            if (seen[i] === true) {
-                warn('duplicate_a', next_token, i);
-            }
-            seen[i] = true;
             tally_property(i);
             if (next_token.id !== ',') {
                 break;
