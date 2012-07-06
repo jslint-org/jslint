@@ -286,11 +286,11 @@
     properties_report, property, prototype, pt, push, px, q, quote, quotes, r,
     radix, range, raw, read_only, reason, redefinition_a, regexp, replace,
     report, reserved, reserved_a, rhino, right, rp, rt, ruby, safe, samp,
-    scanned_a_b, screen, script, search, second, section, select, shift,
-    slash_equal, slice, sloppy, small, sort, source, span, speech, split, src,
-    statement_block, stopping, strange_loop, strict, string, strong, stupid,
-    style, styleproperty, sub, subscript, substr, sup, supplant, sync_a, t,
-    table, 'table-layout', tag_a_in_b, tbody, td, test, 'text-align',
+    scanned_a_b, screen, script, search, second, section, select, set_after_get_a,
+    shift, slash_equal, slice, sloppy, small, sort, source, span, speech, split,
+    src, statement_block, stopping, strange_loop, strict, string, strong,
+    stupid, style, styleproperty, sub, subscript, substr, sup, supplant,
+    sync_a, t, table, 'table-layout', tag_a_in_b, tbody, td, test, 'text-align',
     'text-decoration', 'text-indent', 'text-shadow', 'text-transform', textarea,
     tfoot, th, thead, third, thru, time, title, toLowerCase, toString,
     toUpperCase, token, too_long, too_many, top, tr, trailing_decimal_a, tree,
@@ -564,6 +564,7 @@ var JSLINT = (function () {
             redefinition_a: "Redefinition of '{a}'.",
             reserved_a: "Reserved name '{a}'.",
             scanned_a_b: "{a} ({b}% scanned).",
+            set_after_get_a: "Setter should appear immediately after getter for '{a}'.",
             slash_equal: "A regular expression literal can be confused with '/='.",
             statement_block: "Expected to see a statement and instead saw a block.",
             stopping: "Stopping. ",
@@ -3856,7 +3857,7 @@ klass:              do {
 
 
     prefix('{', function () {
-        var get, i, name, p, set, seenget = {}, seenset = {};
+        var get, i, last, name, p, set, seenget = {}, seenset = {};
         this.arity = 'prefix';
         this.first = [];
         step_in();
@@ -3876,7 +3877,6 @@ klass:              do {
                 if (!i) {
                     stop('missing_property');
                 }
-                get.string = '';
                 do_function(get);
                 if (funct['(loopage)']) {
                     warn('function_loop', get);
@@ -3888,6 +3888,8 @@ klass:              do {
                 name.first = get;
                 if (seenget[i] === true) {
                     warn('duplicate_a', next_token, i);
+                } else if (seenset[i] === true) {
+                    warn('set_after_get_a', next_token, i);
                 }
                 seenget[i] = true;
             } else if (next_token.string === 'set' && peek().id !== ':') {
@@ -3902,7 +3904,6 @@ klass:              do {
                 if (!i) {
                     stop('missing_property');
                 }
-                set.string = '';
                 do_function(set);
                 if (set.block.length === 0) {
                     warn('missing_a', token, 'throw');
@@ -3916,6 +3917,11 @@ klass:              do {
                 name.first = set;
                 if (seenset[i] === true) {
                     warn('duplicate_a', next_token, i);
+                } else if (seenget[i] === true) {
+                    last = this.first[this.first.length - 1];
+                    if (last.string !== name.string) {
+                        warn('set_after_get_a', next_token, i);
+                    }
                 }
                 seenset[i] = true;
             } else {
