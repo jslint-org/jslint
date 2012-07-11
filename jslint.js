@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-05-09
+// 2012-07-10
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -292,19 +292,19 @@
     style, styleproperty, sub, subscript, substr, sup, supplant, sync_a, t,
     table, 'table-layout', tag_a_in_b, tbody, td, test, 'text-align',
     'text-decoration', 'text-indent', 'text-shadow', 'text-transform', textarea,
-    tfoot, th, thead, third, thru, time, title, toLowerCase, toString,
-    toUpperCase, token, too_long, too_many, top, tr, trailing_decimal_a, tree,
-    tt, tty, tv, type, u, ul, unclosed, unclosed_comment, unclosed_regexp, undef,
-    undefined, unescaped_a, unexpected_a, unexpected_char_a_b,
-    unexpected_comment, unexpected_else, unexpected_label_a,
-    unexpected_property_a, unexpected_space_a_b, 'unicode-bidi',
-    unnecessary_initialize, unnecessary_use, unparam, unreachable_a_b,
-    unrecognized_style_attribute_a, unrecognized_tag_a, unsafe, unused, url,
-    urls, use_array, use_braces, use_charAt, use_object, use_or, use_param,
-    used_before_a, var, var_a_not, vars, 'vertical-align', video, visibility,
-    was, weird_assignment, weird_condition, weird_new, weird_program,
-    weird_relation, weird_ternary, white, 'white-space', width, windows,
-    'word-spacing', 'word-wrap', wrap, wrap_immediate, wrap_regexp,
+    tfoot, th, thead, third, thru, time, title, todo, todo_comment, toLowerCase,
+    toString, toUpperCase, token, too_long, too_many, top, tr,
+    trailing_decimal_a, tree, tt, tty, tv, type, u, ul, unclosed,
+    unclosed_comment, unclosed_regexp, undef, undefined, unescaped_a,
+    unexpected_a, unexpected_char_a_b, unexpected_comment, unexpected_else,
+    unexpected_label_a, unexpected_property_a, unexpected_space_a_b,
+    'unicode-bidi', unnecessary_initialize, unnecessary_use, unparam,
+    unreachable_a_b, unrecognized_style_attribute_a, unrecognized_tag_a, unsafe,
+    unused, url, urls, use_array, use_braces, use_charAt, use_object, use_or,
+    use_param, used_before_a, var, var_a_not, vars, 'vertical-align', video,
+    visibility, was, weird_assignment, weird_condition, weird_new,
+    weird_program, weird_relation, weird_ternary, white, 'white-space', width,
+    windows, 'word-spacing', 'word-wrap', wrap, wrap_immediate, wrap_regexp,
     write_is_wrong, writeable, 'z-index'
 */
 
@@ -516,12 +516,12 @@ var JSLINT = (function () {
             expected_type_a: "Expected a type, and instead saw {a}.",
             for_if: "The body of a for in should be wrapped in an if " +
                 "statement to filter unwanted properties from the prototype.",
-            function_block: "Function statements should not be placed in blocks. " +
+            function_block: "Function statements should not be placed in blocks." +
                 "Use a function expression or move the statement to the top of " +
                 "the outer function.",
             function_eval: "The Function constructor is eval.",
             function_loop: "Don't make functions within a loop.",
-            function_statement: "Function statements are not invocable. " +
+            function_statement: "Function statements are not invocable." +
                 "Wrap the whole function invocation in parens.",
             function_strict: "Use the function form of 'use strict'.",
             html_confusion_a: "HTML confusion in regular expression '<{a}'.",
@@ -566,12 +566,13 @@ var JSLINT = (function () {
             scanned_a_b: "{a} ({b}% scanned).",
             slash_equal: "A regular expression literal can be confused with '/='.",
             statement_block: "Expected to see a statement and instead saw a block.",
-            stopping: "Stopping. ",
+            stopping: "Stopping.",
             strange_loop: "Strange loop.",
             strict: "Strict violation.",
             subscript: "['{a}'] is better written in dot notation.",
             sync_a: "Unexpected sync method: '{a}'.",
             tag_a_in_b: "A '<{a}>' must be within '<{b}>'.",
+            todo_comment: "Unexpected TODO comment.",
             too_long: "Line too long.",
             too_many: "Too many errors.",
             trailing_decimal_a: "A trailing decimal point can be confused " +
@@ -939,6 +940,8 @@ var JSLINT = (function () {
 // style
         sx = /^\s*([{}:#%.=,>+\[\]@()"';]|[*$\^~]=|[a-zA-Z_][a-zA-Z0-9_\-]*|[0-9]+|<\/|\/\*)/,
         ssx = /^\s*([@#!"'};:\-%.=,+\[\]()*_]|[a-zA-Z][a-zA-Z0-9._\-]*|\/\*?|\d+(?:\.\d+)?|<\/)/,
+// comment todo
+        tox = /^\s*to\s*do/i,
 // token
         tx = /^\s*([(){}\[\]\?.,:;'"~#@`]|={1,3}|\/(\*(jslint|properties|property|members?|globals?)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<(?:[\/=!]|\!(\[|--)?|<=?)?|\!={0,2}|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+(?:[xX][0-9a-fA-F]+|\.[0-9]*)?(?:[eE][+\-]?[0-9]+)?)/,
 // url badness
@@ -1410,6 +1413,8 @@ var JSLINT = (function () {
                 warn_at('unexpected_a', line, character, '<\/');
             } else if (option.safe && ax.test(snippet)) {
                 warn_at('dangerous_comment', line, character);
+            } else if (!option.todo && tox.test(snippet)) {
+                warn_at('todo_comment', line, character);
             }
         }
 
@@ -6394,7 +6399,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2012-05-09';
+    itself.edition = '2012-07-10';
 
     return itself;
 }());
