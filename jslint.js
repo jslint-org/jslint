@@ -938,8 +938,11 @@ var JSLINT = (function () {
 // attributes characters
         qx = /[^a-zA-Z0-9+\-_\/. ]/,
 // style
-        sx = /^\s*([{}:#%.=,>+\[\]@()"';]|[*$\^~]=|[a-zA-Z_][a-zA-Z0-9_\-]*|[0-9]+|<\/|\/\*)/,
         ssx = /^\s*([@#!"'};:\-%.=,+\[\]()*_]|[a-zA-Z][a-zA-Z0-9._\-]*|\/\*?|\d+(?:\.\d+)?|<\/)/,
+        sx = /^\s*([{}:#%.=,>+\[\]@()"';]|[*$\^~]=|[a-zA-Z_][a-zA-Z0-9_\-]*|[0-9]+|<\/|\/\*)/,
+
+// sync
+        syx = /Sync$/,
 // comment todo
         tox = /^\s*to\s*do(?:\W|$)/i,
 // token
@@ -3635,7 +3638,7 @@ klass:              do {
         } else if (!option.evil && left && left.string === 'document' &&
                 (name === 'write' || name === 'writeln')) {
             warn('write_is_wrong', left);
-        } else if (!option.stupid && name.indexOf('Sync') > 0) {
+        } else if (!option.stupid && syx.test(name)) {
             warn('sync_a', token);
         } else if (option.adsafe) {
             if (!adsafe_top && left.string === 'ADSAFE') {
