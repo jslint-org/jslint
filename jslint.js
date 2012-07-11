@@ -944,7 +944,7 @@ var JSLINT = (function () {
 // sync
         syx = /Sync$/,
 // comment todo
-        tox = /^\s*to\s*do(?:\W|$)/i,
+        tox = /^\W*to\s*do(?:\W|$)/i,
 // token
         tx = /^\s*([(){}\[\]\?.,:;'"~#@`]|={1,3}|\/(\*(jslint|properties|property|members?|globals?)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<(?:[\/=!]|\!(\[|--)?|<=?)?|\!={0,2}|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+(?:[xX][0-9a-fA-F]+|\.[0-9]*)?(?:[eE][+\-]?[0-9]+)?)/,
 // url badness
