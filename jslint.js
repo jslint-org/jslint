@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-07-10
+// 2012-07-13
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -161,6 +161,12 @@
 // These directives respect function scope.
 
 // The jslint directive is a special comment that can set one or more options.
+// For example:
+
+/*jslint
+    evil: true, nomen: true, regexp: true, todo: true
+*/
+
 // The current option set is
 
 //     anon       true, if the space may be omitted in anonymous function declarations
@@ -193,15 +199,10 @@
 //     sloppy     true, if the 'use strict'; pragma is optional
 //     stupid     true, if really stupid practices are tolerated
 //     sub        true, if all forms of subscript notation are tolerated
+//     todo       true, if TODO comments are tolerated
 //     vars       true, if multiple var statements per function should be allowed
 //     white      true, if sloppy whitespace is tolerated
 //     windows    true, if MS Windows-specific globals should be predefined
-
-// For example:
-
-/*jslint
-    evil: true, nomen: true, regexp: true
-*/
 
 // The properties directive declares an exclusive list of property names.
 // Any properties named in the program that are not in the list will
@@ -367,6 +368,7 @@ var JSLINT = (function () {
             sloppy    : true,
             stupid    : true,
             sub       : true,
+            todo      : true,
             vars      : true,
             white     : true,
             windows   : true
@@ -6402,7 +6404,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2012-07-10';
+    itself.edition = '2012-07-13';
 
     return itself;
 }());
