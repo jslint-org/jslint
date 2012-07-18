@@ -143,10 +143,10 @@
 // You can request a properties report, which produces a list of the program's
 // properties in the form of a /*properties*/ declaration.
 
-//      var myPropertyReport = properties_report(JSLINT.property);
+//      var myPropertyReport = JSLINT.properties_report(JSLINT.property);
 
 // You can obtain the parse tree that JSLint constructed while parsing. The
-// latest tree is kept in JSLINT.tree. A nice stringication can be produced
+// latest tree is kept in JSLINT.tree. A nice stringification can be produced
 // with
 
 //     JSON.stringify(JSLINT.tree, [
