@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-07-13
+// 2012-07-18
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -299,14 +299,14 @@
     unclosed_comment, unclosed_regexp, undef, undefined, unescaped_a,
     unexpected_a, unexpected_char_a_b, unexpected_comment, unexpected_else,
     unexpected_label_a, unexpected_property_a, unexpected_space_a_b,
-    'unicode-bidi', unnecessary_initialize, unnecessary_use, unparam,
-    unreachable_a_b, unrecognized_style_attribute_a, unrecognized_tag_a, unsafe,
-    unused, url, urls, use_array, use_braces, use_charAt, use_object, use_or,
-    use_param, used_before_a, var, var_a_not, vars, 'vertical-align', video,
-    visibility, was, weird_assignment, weird_condition, weird_new,
-    weird_program, weird_relation, weird_ternary, white, 'white-space', width,
-    windows, 'word-spacing', 'word-wrap', wrap, wrap_immediate, wrap_regexp,
-    write_is_wrong, writeable, 'z-index'
+    unexpected_typeof_a, 'unicode-bidi', unnecessary_initialize,
+    unnecessary_use, unparam, unreachable_a_b, unrecognized_style_attribute_a,
+    unrecognized_tag_a, unsafe, unused, url, urls, use_array, use_braces,
+    use_charAt, use_object, use_or, use_param, used_before_a, var, var_a_not,
+    vars, 'vertical-align', video, visibility, was, weird_assignment,
+    weird_condition, weird_new, weird_program, weird_relation, weird_ternary,
+    white, 'white-space', width, windows, 'word-spacing', 'word-wrap', wrap,
+    wrap_immediate, wrap_regexp, write_is_wrong, writeable, 'z-index'
 */
 
 // The global directive is used to declare global variables that can
@@ -511,7 +511,7 @@ var JSLINT = (function () {
             expected_selector_a: "Expected a CSS selector, and instead saw {a}.",
             expected_small_a: "Expected a small positive integer and instead saw '{a}'",
             expected_space_a_b: "Expected exactly one space between '{a}' and '{b}'.",
-            expected_string_a: "Expected a string and instead saw {a}.",
+            expected_string_a: "Expected a string and instead saw '{a}'.",
             expected_style_attribute: "Excepted a style attribute, and instead saw '{a}'.",
             expected_style_pattern: "Expected a style pattern, and instead saw '{a}'.",
             expected_tagname_a: "Expected a tagName, and instead saw {a}.",
@@ -591,6 +591,7 @@ var JSLINT = (function () {
             unexpected_label_a: "Unexpected label '{a}'.",
             unexpected_property_a: "Unexpected /*property*/ '{a}'.",
             unexpected_space_a_b: "Unexpected space between '{a}' and '{b}'.",
+            unexpected_typeof_a: "Unexpected 'typeof'. Compare directly with '{a}'.",
             unnecessary_initialize: "It is not necessary to initialize '{a}' " +
                 "to 'undefined'.",
             unnecessary_use: "Unnecessary 'use strict'.",
@@ -2738,6 +2739,15 @@ klass:              do {
                     ((left.id === '(string)' || left.id === '(number)') &&
                     (right.id === '(string)' || right.id === '(number)'))) {
                 warn('weird_relation', that);
+            } else if (left.id === 'typeof') {
+                if (right.id !== '(string)') {
+                    warn("expected_string_a", right, right.id === '(number)'
+                        ? right.number
+                        : right.string);
+                } else if (right.string === 'undefined' ||
+                        right.string === 'null') {
+                    warn("unexpected_typeof_a", left, right.string);
+                }
             }
             that.first = left;
             that.second = check_relation(right);
@@ -2904,7 +2914,7 @@ klass:              do {
 
 // If this is an expression statement, determine if it is acceptable.
 // We do not like
-//      new Blah();
+//      new Blah;
 // statments. If it is to be used at all, new should only be used to make
 // objects, not side effects. The expression statements we do like do
 // assignment or invocation or delete.
@@ -2917,7 +2927,7 @@ klass:              do {
                         the_statement.id !== 'delete' &&
                         the_statement.id !== '++' &&
                         the_statement.id !== '--') {
-                    warn('assignment_function_expression', token);
+                    warn('assignment_function_expression', the_statement);
                 }
                 semicolon();
             }
@@ -6404,7 +6414,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2012-07-13';
+    itself.edition = '2012-07-18';
 
     return itself;
 }());
