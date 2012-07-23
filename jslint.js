@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-07-18
+// 2012-07-23
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -2694,7 +2694,10 @@ klass:              do {
             warn(message || bundle.weird_condition, node);
             break;
         case '(':
-            if (node.first.id === '.' && numbery[node.first.second.string] === true) {
+            if (node.first.id === 'new' ||
+                    (node.first.string === 'Boolean') ||
+                    (node.first.id === '.' &&
+                        numbery[node.first.second.string] === true)) {
                 warn(message || bundle.weird_condition, node);
             }
             break;
@@ -3537,7 +3540,7 @@ klass:              do {
     });
 
     infix('(', 160, function (left, that) {
-        var p;
+        var e, p;
         if (indent && indent.mode === 'expression') {
             no_space(prev_token, token);
         } else {
@@ -3574,7 +3577,11 @@ klass:              do {
             no_space();
             for (;;) {
                 edge();
-                p.push(expression(10));
+                e = expression(10);
+                if (left.string === 'Boolean' && (e.id === '!' || e.id === '~')) {
+                    warn('unexpected_a', e);
+                }
+                p.push(e);
                 if (next_token.id !== ',') {
                     break;
                 }
@@ -6414,7 +6421,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2012-07-18';
+    itself.edition = '2012-07-23';
 
     return itself;
 }());
