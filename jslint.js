@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-07-23
+// 2012-07-24
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -591,7 +591,8 @@ var JSLINT = (function () {
             unexpected_label_a: "Unexpected label '{a}'.",
             unexpected_property_a: "Unexpected /*property*/ '{a}'.",
             unexpected_space_a_b: "Unexpected space between '{a}' and '{b}'.",
-            unexpected_typeof_a: "Unexpected 'typeof'. Compare directly with '{a}'.",
+            unexpected_typeof_a: "Unexpected 'typeof'. " +
+                "Use '===' to compare directly with {a}.",
             unnecessary_initialize: "It is not necessary to initialize '{a}' " +
                 "to 'undefined'.",
             unnecessary_use: "Unnecessary 'use strict'.",
@@ -3579,7 +3580,7 @@ klass:              do {
                 edge();
                 e = expression(10);
                 if (left.string === 'Boolean' && (e.id === '!' || e.id === '~')) {
-                    warn('unexpected_a', e);
+                    warn('weird_condition', e);
                 }
                 p.push(e);
                 if (next_token.id !== ',') {
@@ -6421,7 +6422,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2012-07-23';
+    itself.edition = '2012-07-24';
 
     return itself;
 }());
