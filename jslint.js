@@ -6361,27 +6361,29 @@ klass:              do {
             output[0] = '';
         }
 
-        for (i = 0; i < data.functions.length; i += 1) {
-            the_function = data.functions[i];
-            names = [];
-            if (the_function.params) {
-                for (j = 0; j < the_function.params.length; j += 1) {
-                    names[j] = the_function.params[j].string;
+        if (data.functions) {
+            for (i = 0; i < data.functions.length; i += 1) {
+                the_function = data.functions[i];
+                names = [];
+                if (the_function.params) {
+                    for (j = 0; j < the_function.params.length; j += 1) {
+                        names[j] = the_function.params[j].string;
+                    }
                 }
+                output.push('<dl><address>line ' +
+                    String(the_function.line) + '</address>' +
+                    the_function.name.entityify() +
+                    '(' + names.join(', ') + ')');
+                detail('undefined', the_function['undefined']);
+                detail('unused', the_function.unused);
+                detail('closure', the_function.closure);
+                detail('variable', the_function['var']);
+                detail('exception', the_function.exception);
+                detail('outer', the_function.outer);
+                detail('global', the_function.global);
+                detail('label', the_function.label);
+                output.push('</dl>');
             }
-            output.push('<dl><address>line ' +
-                String(the_function.line) + '</address>' +
-                the_function.name.entityify() +
-                '(' + names.join(', ') + ')');
-            detail('undefined', the_function['undefined']);
-            detail('unused', the_function.unused);
-            detail('closure', the_function.closure);
-            detail('variable', the_function['var']);
-            detail('exception', the_function.exception);
-            detail('outer', the_function.outer);
-            detail('global', the_function.global);
-            detail('label', the_function.label);
-            output.push('</dl>');
         }
         return output.join('');
     };
