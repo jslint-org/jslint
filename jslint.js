@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-08-11
+// 2012-08-23
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -6281,6 +6281,9 @@ klass:              do {
     itself.error_report = function (data) {
         var evidence, i, output = [], snippets, warning;
         if (data.errors) {
+            if (data.json) {
+                output.push('<cite>JSON: bad.</cite><br>');
+            }
             for (i = 0; i < data.errors.length; i += 1) {
                 warning = data.errors[i];
                 if (warning) {
@@ -6326,20 +6329,17 @@ klass:              do {
             }
             output.push('</dl>');
         }
-        if (data.json) {
-            output.push('<p>JSON: bad.</p>');
-        }
         return output.join('');
     };
 
 
     itself.report = function (data) {
-        var dl, err, i, j, names, output = [], the_function;
+        var dl, i, j, names, output = [], the_function;
 
         function detail(h, value) {
             var comma_needed, singularity;
             if (Array.isArray(value)) {
-                output.push('<dt>' + h + '</dt><dd>');
+                output.push("<dt>" + h + "</dt><dd>");
                 value.sort().forEach(function (item) {
                     if (item !== singularity) {
                         singularity = item;
@@ -6347,29 +6347,31 @@ klass:              do {
                         comma_needed = true;
                     }
                 });
-                output.push('</dd>');
+                output.push("</dd>");
             } else if (value) {
-                output.push('<dt>' + h + '</dt><dd>', value, '</dd>');
+                output.push("<dt>" + h + "</dt><dd>", value, "</dd>");
             }
         }
 
         output.push('<dl>');
         if (data.urls) {
-            detail("url", data.urls);
+            detail('url', data.urls);
             dl = true;
         }
         if (data.globals) {
             detail('global', data.globals);
             dl = true;
         } else if (xmode === 'style') {
-            output.push('<p>CSS.</p>');
-        } else if (data.json && !err) {
-            output.push('<p>JSON: good.</p>');
+            output.push("<dt>CSS.</dt>");
+        } else if (data.json) {
+            if (!data.errors) {
+                output.push("<dt>JSON: good.</dt>");
+            }
         } else {
-            output.push('<div><i>No new global variables introduced.</i></div>');
+            output.push("<dt><i>No new global variables introduced.</i></dt>");
         }
         if (dl) {
-            output.push('</dl>');
+            output.push("</dl>");
         } else {
             output[0] = '';
         }
@@ -6437,7 +6439,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2012-08-11';
+    itself.edition = '2012-08-23';
 
     return itself;
 }());
