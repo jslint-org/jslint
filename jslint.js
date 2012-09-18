@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-09-17
+// 2012-09-18
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -2603,12 +2603,17 @@ klass:              do {
                     break;
                 case '+':
                 case '-':
-                    switch (this.first.id) {
-                    case '[':
-                    case '{':
-                    case '!':
-                        warn('unexpected_a', this.first);
-                        break;
+                    if (this.first.arity === 'prefix') {
+                        switch (this.first.id) {
+                        case '[':
+                        case '{':
+                        case '!':
+                        case '~':
+                        case '+':
+                        case '-':
+                            warn('unexpected_a', this.first);
+                            break;
+                        }
                     }
                     break;
                 }
@@ -6448,7 +6453,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2012-09-17';
+    itself.edition = '2012-09-18';
 
     return itself;
 }());
