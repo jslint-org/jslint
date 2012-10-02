@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-09-27
+// 2012-10-01
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -2435,7 +2435,8 @@ klass:              do {
             case 'prefix':
             case 'suffix':
             case undefined:
-                return a.id === b.id && are_similar(a.first, b.first);
+                return a.id === b.id && are_similar(a.first, b.first) &&
+                    a.id !== '{' && a.id !== '[';
             case 'infix':
                 return are_similar(a.first, b.first) &&
                     are_similar(a.second, b.second);
@@ -6447,7 +6448,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2012-09-27';
+    itself.edition = '2012-10-01';
 
     return itself;
 }());
