@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-10-01
+// 2012-10-03
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -4549,7 +4549,10 @@ klass:              do {
             if (next_token.id === '/' || next_token.id === '(regexp)') {
                 warn('wrap_regexp');
             }
-            this.first = expression(20);
+            this.first = expression(0);
+            if (this.first.assign) {
+                warn('unexpected_a', this.first);
+            }
         }
         if (peek(0).id === '}' && peek(1).id === 'else') {
             warn('unexpected_else', this);
@@ -6448,7 +6451,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2012-10-01';
+    itself.edition = '2012-10-03';
 
     return itself;
 }());
