@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-10-03
+// 2012-10-11
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -1735,7 +1735,7 @@ klass:              do {
                         if (i === 0) {
                             break;
                         } else if (i > 0) {
-                            character += 1;
+                            character += i;
                             source_row = source_row.slice(i);
                             break;
                         } else {
@@ -6451,7 +6451,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2012-10-03';
+    itself.edition = '2012-10-11';
 
     return itself;
 }());
