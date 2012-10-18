@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-10-11
+// 2012-10-18
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -3609,6 +3609,8 @@ klass:              do {
         if (typeof left === 'object') {
             if (left.string === 'parseInt' && p.length === 1) {
                 warn('radix', left);
+            } else if (left.string === 'String' && p.length >= 1 && p[0].id === '(string)') {
+                warn('unexpected_a', left);
             }
             if (!option.evil) {
                 if (left.string === 'eval' || left.string === 'Function' ||
@@ -3625,13 +3627,20 @@ klass:              do {
                     left.id !== '?') {
                 warn('bad_invocation', left);
             }
-            if (left.id === '.' && p.length > 0 &&
-                    left.first && left.first.first &&
-                    are_similar(p[0], left.first.first)) {
-                if (left.second.string === 'call' ||
-                        (left.second.string === 'apply' && (p.length === 1 ||
-                        (p[1].arity === 'prefix' && p[1].id === '[')))) {
-                    warn('unexpected_a', left.second);
+            if (left.id === '.') {
+                if (p.length > 0 &&
+                        left.first && left.first.first &&
+                        are_similar(p[0], left.first.first)) {
+                    if (left.second.string === 'call' ||
+                            (left.second.string === 'apply' && (p.length === 1 ||
+                            (p[1].arity === 'prefix' && p[1].id === '[')))) {
+                        warn('unexpected_a', left.second);
+                    }
+                }
+                if (left.second.string === 'toString') {
+                    if (left.first.id === '(string)' || left.first.id === '(number)') {
+                        warn('unexpected_a', left.second);
+                    }
                 }
             }
         }
@@ -6451,7 +6460,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2012-10-11';
+    itself.edition = '2012-10-18';
 
     return itself;
 }());
