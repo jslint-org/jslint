@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-10-18
+// 2012-11-13
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -256,8 +256,8 @@
     expected_percent_a, expected_positive_a, expected_pseudo_a,
     expected_selector_a, expected_small_a, expected_space_a_b, expected_string_a,
     expected_style_attribute, expected_style_pattern, expected_tagname_a,
-    expected_type_a, f, fieldset, figure, filter, first, flag, float, floor,
-    font, 'font-family', 'font-size', 'font-size-adjust', 'font-stretch',
+    expected_type_a, f, fieldset, figcaption, figure, filter, first, flag, float,
+    floor, font, 'font-family', 'font-size', 'font-size-adjust', 'font-stretch',
     'font-style', 'font-variant', 'font-weight', footer, forEach, for_if, forin,
     form, fragment, frame, frameset, from, fromCharCode, fud, funct, function,
     function_block, function_eval, function_loop, function_statement,
@@ -765,6 +765,7 @@ var JSLINT = (function () {
             em:       {},
             embed:    {},
             fieldset: {},
+            figcaption: {parent: ' figure '},
             figure:   {},
             font:     {},
             footer:   {},
@@ -6460,7 +6461,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2012-10-18';
+    itself.edition = '2012-11-13';
 
     return itself;
 }());
