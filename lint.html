@@ -485,9 +485,6 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
   string literals. You should always write<code> '&lt;\/' </code>instead.
   The extra backslash is ignored by the JavaScript compiler but not by the
   HTML parser. Tricks like this should not be necessary, and yet they are.</p>
-<p>There is a <code>cap</code> <a href="#options">option</a> that allows
-  use of uppercase tag names. There is also an <code>on</code> <a href="#options">option</a>
-  that allows the use of inline HTML event handlers.</p>
 <p>There is a <code>fragment</code> <a href="#options">option</a> that can
   inspect a well formed HTML fragment. If the <code>adsafe</code> <a href="#options">option</a>
   is also used, then the fragment must be a <code>&lt;div&gt;</code> that
@@ -543,11 +540,6 @@ options are selected with several checkboxes and two fields. </p>
     <td><code>browser</code></td>
     <td><code>true</code> if the standard browser globals should be predefined.
       <a href="#browser"><small>(more)</small></a> </td>
-  </tr>
-  <tr>
-    <td>Tolerate HTML case </td>
-    <td><code>cap</code></td>
-    <td><code>true</code> if uppercase HTML should be allowed.</td>
   </tr>
   <tr>
     <td>Tolerate <code>continue</code></td>
