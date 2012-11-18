@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-11-13
+// 2012-11-16
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -5701,18 +5701,9 @@ klass:              do {
         }
     }
 
-    function do_tag(name, attribute) {
-        var i, tag = html_tag[name], script, x;
+    function do_tag(tag, name, attribute) {
+        var i, script, x;
         src = false;
-        if (!tag) {
-            stop(
-                bundle.unrecognized_tag_a,
-                next_token,
-                name === name.toLowerCase()
-                    ? name
-                    : name + ' (capitalization error)'
-            );
-        }
         if (stack.length > 0) {
             if (name === 'html') {
                 stop('unexpected_a', token, name);
@@ -5722,7 +5713,7 @@ klass:              do {
                 if (x.indexOf(' ' + stack[stack.length - 1].name + ' ') < 0) {
                     stop('tag_a_in_b', token, name, x);
                 }
-            } else if (!option.adsafe && !option.fragment) {
+            } else if (x !== false && !option.adsafe && !option.fragment) {
                 i = stack.length;
                 do {
                     if (i <= 0) {
@@ -5859,7 +5850,7 @@ klass:              do {
 
     function html() {
         var attribute, attributes, is_empty, name, old_white = option.white,
-            quote, tag_name, tag, wmode;
+            quote, tag_name, tag, value, wmode;
         xmode = 'html';
         xquote = '';
         stack = null;
@@ -5882,9 +5873,13 @@ klass:              do {
                 }
                 tag = html_tag[name];
                 if (typeof tag !== 'object') {
-                    stop('unrecognized_tag_a', tag_name, name);
+                    tag = {parent: false};
+                    warn('unrecognized_tag_a', tag_name, name === name.toLowerCase()
+                        ? name
+                        : name + ' (capitalization error)');
+                } else {
+                    is_empty = tag.empty;
                 }
-                is_empty = tag.empty;
                 tag_name.type = name;
                 for (;;) {
                     if (next_token.id === '/') {
@@ -5939,7 +5934,7 @@ klass:              do {
                         xmode = 'html';
                         xquote = '';
                         advance(quote);
-                        tag = false;
+                        value = false;
                     } else if (attribute === 'style') {
                         xmode = 'scriptstring';
                         advance('=');
@@ -5954,11 +5949,11 @@ klass:              do {
                         xmode = 'html';
                         xquote = '';
                         advance(quote);
-                        tag = false;
+                        value = false;
                     } else {
                         if (next_token.id === '=') {
                             advance('=');
-                            tag = next_token.string;
+                            value = next_token.string;
                             if (!next_token.identifier &&
                                     next_token.id !== '"' &&
                                     next_token.id !== '\'' &&
@@ -5969,13 +5964,13 @@ klass:              do {
                             }
                             advance();
                         } else {
-                            tag = true;
+                            value = true;
                         }
                     }
-                    attributes[attribute] = tag;
-                    do_attribute(attribute, tag);
+                    attributes[attribute] = value;
+                    do_attribute(attribute, value);
                 }
-                do_tag(name, attributes);
+                do_tag(tag, name, attributes);
                 if (!is_empty) {
                     stack.push(tag_name);
                 }
@@ -6461,7 +6456,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2012-11-13';
+    itself.edition = '2012-11-16';
 
     return itself;
 }());
