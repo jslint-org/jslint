@@ -2857,12 +2857,12 @@ klass:              do {
     }
 
 
-    function optional_identifier() {
+    function optional_identifier(p) {
         if (next_token.identifier) {
             advance();
             if (option.safe && banned[token.string]) {
                 warn('adsafe_a', token);
-            } else if (token.reserved && !option.es5) {
+            } else if (token.reserved && (!p || !option.es5)) {
                 warn('expected_identifier_a_reserved', token);
             }
             return token.string;
