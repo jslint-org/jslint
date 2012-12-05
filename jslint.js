@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-11-17
+// 2012-12-04
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -2857,12 +2857,12 @@ klass:              do {
     }
 
 
-    function optional_identifier() {
+    function optional_identifier(variable) {
         if (next_token.identifier) {
             advance();
             if (option.safe && banned[token.string]) {
                 warn('adsafe_a', token);
-            } else if (token.reserved && !option.es5) {
+            } else if (token.reserved && (!option.es5 || variable)) {
                 warn('expected_identifier_a_reserved', token);
             }
             return token.string;
@@ -2870,8 +2870,8 @@ klass:              do {
     }
 
 
-    function identifier() {
-        var i = optional_identifier();
+    function identifier(variable) {
+        var i = optional_identifier(variable);
         if (!i) {
             stop(token.id === 'function' && next_token.id === '('
                 ? 'name_function'
@@ -3814,7 +3814,7 @@ klass:              do {
 
 
     function property_name() {
-        var id = optional_identifier(true);
+        var id = optional_identifier();
         if (!id) {
             if (next_token.id === '(string)') {
                 id = next_token.string;
@@ -4041,7 +4041,7 @@ klass:              do {
         step_in('var');
         for (;;) {
             name = next_token;
-            id = identifier();
+            id = identifier(true);
             add_label(name, 'becoming');
 
             if (next_token.id === '=') {
@@ -4089,7 +4089,7 @@ klass:              do {
         if (in_block) {
             warn('function_block', token);
         }
-        var name = next_token, id = identifier();
+        var name = next_token, id = identifier(true);
         add_label(name, 'unction');
         no_space();
         this.arity = 'statement';
@@ -4104,7 +4104,7 @@ klass:              do {
         if (!option.anon) {
             one_space();
         }
-        var id = optional_identifier();
+        var id = optional_identifier(true);
         if (id) {
             no_space();
         } else {
@@ -6449,7 +6449,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2012-11-17';
+    itself.edition = '2012-12-04';
 
     return itself;
 }());
