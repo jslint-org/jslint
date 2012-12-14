@@ -543,6 +543,7 @@ var JSLINT = (function () {
             missing_url: "Missing url.",
             missing_use_strict: "Missing 'use strict' statement.",
             mixed: "Mixed spaces and tabs.",
+            spaces_intead_of_tabs: "Use spaces instead of tabs.",
             move_invocation: "Move the invocation into the parens that " +
                 "contain the function.",
             move_var: "Move 'var' declarations to the top of the function.",
@@ -1198,6 +1199,10 @@ var JSLINT = (function () {
             at = source_row.search(/( \t|\t )/);
             if (at >= 0) {
                 warn_at('mixed', line, at + 1);
+            }
+            at = source_row.search(/\t/);
+            if (at >= 0) {
+                warn_at('spaces_intead_of_tabs', line, at + 1);
             }
             source_row = source_row.replace(/\t/g, tab);
             at = source_row.search(cx);
