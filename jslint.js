@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-12-04
+// 2012-12-14
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -272,7 +272,7 @@
     'margin-left', 'margin-right', 'margin-top', mark, 'marker-offset', match,
     'max-height', 'max-width', maxerr, maxlen, menu, message, meta, meter,
     'min-height', 'min-width', missing_a, missing_a_after_b, missing_option,
-    missing_property, missing_space_a_b, missing_url, missing_use_strict, mixed,
+    missing_property, missing_space_a_b, missing_url, missing_use_strict,
     mm, mode, move_invocation, move_var, n, name, name_function, nav,
     nested_comment, newcap, node, noframes, nomen, noscript, not,
     not_a_constructor, not_a_defined, not_a_function, not_a_label, not_a_scope,
@@ -301,8 +301,8 @@
     unexpected_typeof_a, 'unicode-bidi', unnecessary_initialize,
     unnecessary_use, unparam, unreachable_a_b, unrecognized_style_attribute_a,
     unrecognized_tag_a, unsafe, unused, url, urls, use_array, use_braces,
-    use_charAt, use_object, use_or, use_param, used_before_a, var, var_a_not,
-    vars, 'vertical-align', video, visibility, was, weird_assignment,
+    use_charAt, use_object, use_or, use_param, use_spaces, used_before_a, var,
+    var_a_not, vars, 'vertical-align', video, visibility, was, weird_assignment,
     weird_condition, weird_new, weird_program, weird_relation, weird_ternary,
     white, 'white-space', width, windows, 'word-spacing', 'word-wrap', wrap,
     wrap_immediate, wrap_regexp, write_is_wrong, writeable, 'z-index'
@@ -542,7 +542,6 @@ var JSLINT = (function () {
             missing_space_a_b: "Missing space between '{a}' and '{b}'.",
             missing_url: "Missing url.",
             missing_use_strict: "Missing 'use strict' statement.",
-            mixed: "Mixed spaces and tabs.",
             move_invocation: "Move the invocation into the parens that " +
                 "contain the function.",
             move_var: "Move 'var' declarations to the top of the function.",
@@ -605,6 +604,7 @@ var JSLINT = (function () {
             use_object: "Use the object literal notation {}.",
             use_or: "Use the || operator.",
             use_param: "Use a named parameter.",
+            use_spaces: "Use spaces, not tabs.",
             used_before_a: "'{a}' was used before it was defined.",
             var_a_not: "Variable {a} was not declared correctly.",
             weird_assignment: "Weird assignment.",
@@ -1195,11 +1195,10 @@ var JSLINT = (function () {
             character = 1;
             source_row = lines[line];
             line += 1;
-            at = source_row.search(/ \t/);
+            at = source_row.search(/\t/);
             if (at >= 0) {
-                warn_at('mixed', line, at + 1);
+                warn_at('use_spaces', line, at + 1);
             }
-            source_row = source_row.replace(/\t/g, tab);
             at = source_row.search(cx);
             if (at >= 0) {
                 warn_at('unsafe', line, at);
@@ -6449,7 +6448,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2012-12-04';
+    itself.edition = '2012-12-14';
 
     return itself;
 }());
