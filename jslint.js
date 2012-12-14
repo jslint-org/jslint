@@ -1195,7 +1195,7 @@ var JSLINT = (function () {
             character = 1;
             source_row = lines[line];
             line += 1;
-            at = source_row.search(/ \t/);
+            at = source_row.search(/( \t|\t )/);
             if (at >= 0) {
                 warn_at('mixed', line, at + 1);
             }
