@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-12-17
+// 2012-12-31
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -289,8 +289,8 @@
     scanned_a_b, screen, script, search, second, section, select, shift,
     slash_equal, slice, sloppy, small, sort, source, span, speech, split, src,
     statement_block, stopping, strange_loop, strict, string, strong, stupid,
-    style, styleproperty, sub, subscript, substr, sup, supplant, sync_a, t,
-    table, 'table-layout', tag_a_in_b, tbody, td, test, 'text-align',
+    style, styleproperty, sub, subscript, substr, summary, sup, supplant,
+    sync_a, t,table, 'table-layout', tag_a_in_b, tbody, td, test, 'text-align',
     'text-decoration', 'text-indent', 'text-shadow', 'text-transform', textarea,
     tfoot, th, thead, third, thru, time, title, todo, todo_comment, toLowerCase,
     toString, toUpperCase, token, too_long, too_many, top, tr,
@@ -825,6 +825,7 @@ var JSLINT = (function () {
             strong:   {},
             style:    {parent: ' head ', empty: true},
             sub:      {},
+            summary:  {parent: ' details '},
             sup:      {},
             table:    {},
             tbody:    {parent: ' table '},
@@ -6452,7 +6453,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2012-12-17';
+    itself.edition = '2012-12-31';
 
     return itself;
 }());
