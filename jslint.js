@@ -1,5 +1,5 @@
 // jslint.js
-// 2012-12-31
+// 2013-01-29
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -2769,6 +2769,15 @@ klass:              do {
                 } else if (right.string === 'undefined' ||
                         right.string === 'null') {
                     warn("unexpected_typeof_a", left, right.string);
+                }
+            } else if (right.id === 'typeof') {
+                if (left.id !== '(string)') {
+                    warn("expected_string_a", left, left.id === '(number)'
+                        ? left.number
+                        : left.string);
+                } else if (left.string === 'undefined' ||
+                        left.string === 'null') {
+                    warn("unexpected_typeof_a", right, left.string);
                 }
             }
             that.first = left;
@@ -6453,7 +6462,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2012-12-31';
+    itself.edition = '2013-01-29';
 
     return itself;
 }());
