@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-01-29
+// 2013-02-02
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -4264,6 +4264,7 @@ klass:              do {
         var cases = [],
             old_in_block = in_block,
             particular,
+            that = token,
             the_case = next_token,
             unbroken = true;
 
@@ -4287,6 +4288,9 @@ klass:              do {
         step_in();
         in_block = true;
         this.second = [];
+        if (that.from !== next_token.from) {
+            warn('expected_a_at_b_c', next_token, next_token.string, that.from, next_token.from);
+        }
         while (next_token.id === 'case') {
             the_case = next_token;
             cases.forEach(find_duplicate_case);
@@ -6462,7 +6466,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-01-29';
+    itself.edition = '2013-02-02';
 
     return itself;
 }());
