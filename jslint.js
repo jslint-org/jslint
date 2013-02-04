@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-02-02
+// 2013-02-03
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -5824,15 +5824,27 @@ klass:              do {
             switch (attribute.type) {
             case 'button':
             case 'checkbox':
+            case 'color':
+            case 'date':
+            case 'datetime-local':
+            case 'month':
+            case 'number':
             case 'radio':
+            case 'range':
             case 'reset':
             case 'submit':
+            case 'time':
+            case 'week':
                 break;
+            case 'email':
             case 'file':
             case 'hidden':
             case 'image':
             case 'password':
+            case 'search':
+            case 'tel':
             case 'text':
+            case 'url':
                 if (option.adsafe && attribute.autocomplete !== 'off') {
                     warn('adsafe_autocomplete');
                 }
@@ -6466,7 +6478,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-02-02';
+    itself.edition = '2013-02-03';
 
     return itself;
 }());
