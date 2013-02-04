@@ -5826,6 +5826,7 @@ klass:              do {
             case 'checkbox':
             case 'color':
             case 'date':
+            case 'datetime':
             case 'datetime-local':
             case 'month':
             case 'number':
