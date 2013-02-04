@@ -5833,6 +5833,19 @@ klass:              do {
             case 'image':
             case 'password':
             case 'text':
+            case 'datetime':
+            case 'datetime-local':
+            case 'date':
+            case 'month':
+            case 'time':
+            case 'week':
+            case 'number':
+            case 'range':
+            case 'email':
+            case 'url':
+            case 'search':
+            case 'tel':
+            case 'color':
                 if (option.adsafe && attribute.autocomplete !== 'off') {
                     warn('adsafe_autocomplete');
                 }
