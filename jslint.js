@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-02-05
+// 2013-02-11
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -4290,7 +4290,7 @@ klass:              do {
         step_in();
         in_block = true;
         this.second = [];
-        if (that.from !== next_token.from) {
+        if (that.from !== next_token.from && !option.white) {
             warn('expected_a_at_b_c', next_token, next_token.string, that.from, next_token.from);
         }
         while (next_token.id === 'case') {
@@ -6481,7 +6481,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-02-05';
+    itself.edition = '2013-02-11';
 
     return itself;
 }());
