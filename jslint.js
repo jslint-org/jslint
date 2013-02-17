@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-02-11
+// 2013-02-15
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -140,6 +140,11 @@
 
 //     var myErrorReport = JSLINT.error_report(data);
 
+// You can obtain an object containing all of the properties found in the
+// file. JSLINT.property contains an object containing a key for each
+// property used in the program, the value being the number of times that
+// property name was used in the file.
+
 // You can request a properties report, which produces a list of the program's
 // properties in the form of a /*properties*/ declaration.
 
@@ -154,8 +159,24 @@
 //         'second', 'third', 'block', 'else'
 //     ], 4));
 
-// JSLint provides three directives. They look like slashstar comments, and
-// allow for setting options, declaring global variables, and establishing a
+// You can request a context coloring table. It contains information that can be
+// applied to the file that was analyzed. Context coloring colors functions
+// based on their nesting level, and variables on the color of the functions
+// in which they are defined.
+
+//      var myColorization = JSLINT.color(data);
+
+// It returns an array containing objects of this form:
+
+//      {
+//          from: COLUMN,
+//          thru: COLUMN,
+//          line: ROW,
+//          level: 0 or higher
+//      }
+
+// JSLint provides three inline directives. They look like slashstar comments,
+// and allow for setting options, declaring global variables, and establishing a
 // set of allowed property names.
 
 // These directives respect function scope.
@@ -212,7 +233,7 @@
 /*properties
     '\b', '\t', '\n', '\f', '\r', '!', '!=', '!==', '"', '%', '\'',
     '(arguments)', '(begin)', '(breakage)', '(context)', '(error)',
-    '(identifier)', '(line)', '(loopage)', '(name)', '(params)', '(scope)',
+    '(identifier)', '(level)', '(line)', '(loopage)', '(name)', '(params)', '(scope)',
     '(token)', '(vars)', '(verb)', '*', '+', '-', '/', '<', '<=', '==', '===',
     '>', '>=', ADSAFE, Array, Date, Function, Object, '\\', a, a_label,
     a_not_allowed, a_not_defined, a_scope, abbr, acronym, address, adsafe,
@@ -266,8 +287,8 @@
     identifier_function, iframe, img, immed, implied_evil, in, indent, indexOf,
     infix_in, init, input, ins, insecure_a, isAlpha, isArray, isDigit, isNaN,
     join, jslint, json, kbd, keygen, keys, label, labeled, lang, lbp,
-    leading_decimal_a, led, left, legend, length, 'letter-spacing', li, lib,
-    line, 'line-height', link, 'list-style', 'list-style-image',
+    leading_decimal_a, led, left, legend, length, 'letter-spacing', level,
+    li, lib, line, 'line-height', link, 'list-style', 'list-style-image',
     'list-style-position', 'list-style-type', map, margin, 'margin-bottom',
     'margin-left', 'margin-right', 'margin-top', mark, 'marker-offset', match,
     'max-height', 'max-width', maxerr, maxlen, menu, message, meta, meter,
@@ -293,7 +314,7 @@
     sync_a, t,table, 'table-layout', tag_a_in_b, tbody, td, test, 'text-align',
     'text-decoration', 'text-indent', 'text-shadow', 'text-transform', textarea,
     tfoot, th, thead, third, thru, time, title, todo, todo_comment, toLowerCase,
-    toString, toUpperCase, token, too_long, too_many, top, tr,
+    toString, toUpperCase, token, tokens, too_long, too_many, top, tr,
     trailing_decimal_a, tree, tt, tty, tv, type, u, ul, unclosed,
     unclosed_comment, unclosed_regexp, undef, undefined, unescaped_a,
     unexpected_a, unexpected_char_a_b, unexpected_comment, unexpected_else,
@@ -895,6 +916,7 @@ var JSLINT = (function () {
         syntax = {},
         tab,
         token,
+        tokens,
         urls,
         var_mode,
         warnings,
@@ -1190,12 +1212,12 @@ var JSLINT = (function () {
 
         function next_line() {
             var at;
-            if (line >= lines.length) {
-                return false;
-            }
             character = 1;
             source_row = lines[line];
             line += 1;
+            if (source_row === undefined) {
+                return false;
+            }
             at = source_row.search(/\t/);
             if (at >= 0) {
                 if (option.white) {
@@ -1925,7 +1947,6 @@ klass:              do {
                 token.writeable = typeof predefined[name] === 'boolean'
                     ? predefined[name]
                     : true;
-                token.funct = funct;
                 global_scope[name] = token;
             }
             if (kind === 'becoming') {
@@ -1951,11 +1972,11 @@ klass:              do {
 
 // Add the symbol to the current function.
 
-                token.funct = funct;
                 token.writeable = true;
                 scope[name] = token;
             }
         }
+        token.funct = funct;
         funct[name] = kind;
     }
 
@@ -2079,6 +2100,8 @@ klass:              do {
         prev_token = token;
         token = next_token;
         next_token = lookahead.shift() || lex.token();
+        next_token.funct = funct;
+        tokens.push(next_token);
     }
 
 
@@ -2948,7 +2971,7 @@ klass:              do {
 // If this is an expression statement, determine if it is acceptable.
 // We do not like
 //      new Blah;
-// statments. If it is to be used at all, new should only be used to make
+// statements. If it is to be used at all, new should only be used to make
 // objects, not side effects. The expression statements we do like do
 // assignment or invocation or delete.
 
@@ -3129,6 +3152,7 @@ klass:              do {
                     warn('a_label', token, name);
                     break;
                 }
+                this.funct = funct;
 
 // If the name is already defined in the current
 // function, but not as outer, then there is a scope error.
@@ -3164,10 +3188,12 @@ klass:              do {
                         funct[name] = site === global_funct
                             ? 'global'
                             : 'outer';
+                        this.funct = site;
                         break;
                     case 'unparam':
                         site[name] = 'parameter';
                         funct[name] = 'outer';
+                        this.funct = site;
                         break;
                     case 'undef':
                         funct[name] = 'undef';
@@ -3851,9 +3877,26 @@ klass:              do {
     }
 
 
+
+    assignop('=');
+    assignop('+=', '+');
+    assignop('-=', '-');
+    assignop('*=', '*');
+    assignop('/=', '/').nud = function () {
+        stop('slash_equal');
+    };
+    assignop('%=', '%');
+    assignop('&=', '&');
+    assignop('|=', '|');
+    assignop('^=', '^');
+    assignop('<<=', '<<');
+    assignop('>>=', '>>');
+    assignop('>>>=', '>>>');
+
     function function_params() {
         var id, paren = next_token, params = [];
         advance('(');
+        token.funct = funct;
         step_in();
         no_space();
         if (next_token.id === ')') {
@@ -3876,8 +3919,6 @@ klass:              do {
         }
     }
 
-
-
     function do_function(func, name) {
         var old_funct      = funct,
             old_option     = option,
@@ -3889,12 +3930,15 @@ klass:              do {
             '(breakage)' : 0,
             '(loopage)'  : 0,
             '(scope)'    : scope,
-            '(token)'    : func
+            '(token)'    : func,
+            '(level)'    : old_funct['(level)'] + 1
         };
+        func.funct = funct;
         option = Object.create(old_option);
         scope = Object.create(old_scope);
         functions.push(funct);
         func.name = name;
+        func.funct = funct;
         if (name) {
             add_label(func, 'function', name);
         }
@@ -3913,23 +3957,6 @@ klass:              do {
         option     = old_option;
         scope      = old_scope;
     }
-
-
-    assignop('=');
-    assignop('+=', '+');
-    assignop('-=', '-');
-    assignop('*=', '*');
-    assignop('/=', '/').nud = function () {
-        stop('slash_equal');
-    };
-    assignop('%=', '%');
-    assignop('&=', '&');
-    assignop('|=', '|');
-    assignop('^=', '^');
-    assignop('<<=', '<<');
-    assignop('>>=', '>>');
-    assignop('>>>=', '>>>');
-
 
     prefix('{', function (that) {
         var get, i, j, name, p, set, seen = {};
@@ -4104,7 +4131,8 @@ klass:              do {
         if (in_block) {
             warn('function_block', token);
         }
-        var name = next_token, id = identifier(true);
+        var name = next_token,
+            id = identifier(true);
         add_label(name, 'unction');
         no_space();
         this.arity = 'statement';
@@ -6087,6 +6115,7 @@ klass:              do {
         JSLINT.properties = '';
         begin = prev_token = token = next_token =
             Object.create(syntax['(begin)']);
+        tokens = [];
         predefined = {};
         add_to_predefined(standard);
         property = {};
@@ -6126,7 +6155,8 @@ klass:              do {
         global_funct = funct = {
             '(scope)': scope,
             '(breakage)': 0,
-            '(loopage)': 0
+            '(loopage)': 0,
+            '(level)': 0
         };
         functions = [funct];
 
@@ -6308,6 +6338,7 @@ klass:              do {
             function_data.name = the_function['(name)'];
             function_data.params = the_function['(params)'];
             function_data.line = the_function['(line)'];
+            function_data.level = the_function['(level)'];
             data.functions.push(function_data);
         }
 
@@ -6317,6 +6348,7 @@ klass:              do {
         if (undef.length > 0) {
             data['undefined'] = undef;
         }
+        data.tokens = tokens;
         return data;
     };
 
@@ -6395,7 +6427,7 @@ klass:              do {
             }
         }
 
-        output.push('<dl>');
+        output.push('<dl class=level0>');
         if (data.urls) {
             detail('url', data.urls);
             dl = true;
@@ -6427,10 +6459,10 @@ klass:              do {
                         names[j] = the_function.params[j].string;
                     }
                 }
-                output.push('<dl><address>line ' +
-                    String(the_function.line) + '</address>' +
-                    the_function.name.entityify() +
-                    '(' + names.join(', ') + ')');
+                output.push('<dl class=level' + the_function.level +
+                    '><address>line ' + String(the_function.line) +
+                    '</address>' + the_function.name.entityify() + '(' +
+                    names.join(', ') + ')');
                 detail('undefined', the_function['undefined']);
                 detail('unused', the_function.unused);
                 detail('closure', the_function.closure);
@@ -6479,9 +6511,38 @@ klass:              do {
         return output.join('\n');
     };
 
+    itself.color = function (data) {
+        var from,
+            i = 1,
+            level,
+            line,
+            result = [],
+            thru,
+            token = data.tokens[0];
+        while (token && token.id !== '(end)') {
+            from = token.from;
+            line = token.line;
+            thru = token.thru;
+            level = token.funct['(level)'];
+            do {
+                thru = token.thru;
+                token = data.tokens[i];
+                i += 1;
+            } while (token && token.line === line && token.from - thru < 5 &&
+                    level === token.funct['(level)']);
+            result.push({
+                line: line,
+                level: level,
+                from: from,
+                thru: thru
+            });
+        }
+        return result;
+    };
+
     itself.jslint = itself;
 
-    itself.edition = '2013-02-11';
+    itself.edition = '2013-02-15';
 
     return itself;
 }());
