@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-02-15
+// 2013-02-18
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -185,7 +185,7 @@
 // For example:
 
 /*jslint
-    evil: true, nomen: true, regexp: true, todo: true
+    es5: true, evil: true, nomen: true, regexp: true, todo: true
 */
 
 // The current option set is
@@ -233,9 +233,9 @@
 /*properties
     '\b', '\t', '\n', '\f', '\r', '!', '!=', '!==', '"', '%', '\'',
     '(arguments)', '(begin)', '(breakage)', '(context)', '(error)',
-    '(identifier)', '(level)', '(line)', '(loopage)', '(name)', '(params)', '(scope)',
-    '(token)', '(vars)', '(verb)', '*', '+', '-', '/', '<', '<=', '==', '===',
-    '>', '>=', ADSAFE, Array, Date, Function, Object, '\\', a, a_label,
+    '(identifier)', '(level)', '(line)', '(loopage)', '(name)', '(params)',
+    '(scope)', '(token)', '(vars)', '(verb)', '*', '+', '-', '/', '<', '<=',
+    '==', '===', '>', '>=', ADSAFE, Array, Date, Object, '\\', a, a_label,
     a_not_allowed, a_not_defined, a_scope, abbr, acronym, address, adsafe,
     adsafe_a, adsafe_autocomplete, adsafe_bad_id, adsafe_div, adsafe_fragment,
     adsafe_go, adsafe_html, adsafe_id, adsafe_id_go, adsafe_lib,
@@ -246,55 +246,56 @@
     assignment_function_expression, at, attribute_case_a, audio, autocomplete,
     avoid_a, b, background, 'background-attachment', 'background-color',
     'background-image', 'background-position', 'background-repeat',
-    bad_assignment, bad_color_a, bad_constructor, bad_entity, bad_html, bad_id_a,
-    bad_in_a, bad_invocation, bad_name_a, bad_new, bad_number, bad_operand,
-    bad_style, bad_type, bad_url_a, bad_wrap, base, bdo, big, bitwise, block,
-    blockquote, body, border, 'border-bottom', 'border-bottom-color',
-    'border-bottom-left-radius', 'border-bottom-right-radius',
-    'border-bottom-style', 'border-bottom-width', 'border-collapse',
-    'border-color', 'border-left', 'border-left-color', 'border-left-style',
-    'border-left-width', 'border-radius', 'border-right', 'border-right-color',
-    'border-right-style', 'border-right-width', 'border-spacing', 'border-style',
-    'border-top', 'border-top-color', 'border-top-left-radius',
-    'border-top-right-radius', 'border-top-style', 'border-top-width',
-    'border-width', bottom, 'box-shadow', br, braille, browser, button, c, call,
-    canvas, caption, 'caption-side', center, charAt, charCodeAt, character,
-    cite, clear, clip, closure, cm, code, col, colgroup, color, combine_var,
-    command, conditional_assignment, confusing_a, confusing_regexp,
-    constructor_name_a, content, continue, control_a, 'counter-increment',
-    'counter-reset', create, css, cursor, d, dangerous_comment, dangling_a, data,
-    datalist, dd, debug, del, deleted, details, devel, dfn, dialog, dir,
-    direction, display, disrupt, div, dl, dt, duplicate_a, edge, edition, else,
-    em, embed, embossed, empty, 'empty-cells', empty_block, empty_case,
-    empty_class, entityify, eqeq, error_report, errors, es5, eval, evidence,
-    evil, ex, exception, exec, expected_a, expected_a_at_b_c, expected_a_b,
-    expected_a_b_from_c_d, expected_at_a, expected_attribute_a,
-    expected_attribute_value_a, expected_class_a, expected_fraction_a,
-    expected_id_a, expected_identifier_a, expected_identifier_a_reserved,
-    expected_lang_a, expected_linear_a, expected_media_a, expected_name_a,
-    expected_nonstandard_style_attribute, expected_number_a, expected_operator_a,
-    expected_percent_a, expected_positive_a, expected_pseudo_a,
-    expected_selector_a, expected_small_a, expected_space_a_b, expected_string_a,
+    bad_assignment, bad_color_a, bad_constructor, bad_entity, bad_html,
+    bad_id_a, bad_in_a, bad_invocation, bad_name_a, bad_new, bad_number,
+    bad_operand, bad_style, bad_type, bad_url_a, bad_wrap, base, bdo, big,
+    bitwise, block, blockquote, body, border, 'border-bottom',
+    'border-bottom-color', 'border-bottom-left-radius',
+    'border-bottom-right-radius', 'border-bottom-style', 'border-bottom-width',
+    'border-collapse', 'border-color', 'border-left', 'border-left-color',
+    'border-left-style', 'border-left-width', 'border-radius', 'border-right',
+    'border-right-color', 'border-right-style', 'border-right-width',
+    'border-spacing', 'border-style', 'border-top', 'border-top-color',
+    'border-top-left-radius', 'border-top-right-radius', 'border-top-style',
+    'border-top-width', 'border-width', bottom, 'box-shadow', br, braille,
+    browser, button, c, call, canvas, caption, 'caption-side', center, charAt,
+    charCodeAt, character, cite, clear, clip, closure, cm, code, col, colgroup,
+    color, combine_var, command, conditional_assignment, confusing_a,
+    confusing_regexp, constructor_name_a, content, continue, control_a,
+    'counter-increment', 'counter-reset', create, css, cursor, d,
+    dangerous_comment, dangling_a, data, datalist, dd, debug, del, deleted,
+    details, devel, dfn, dialog, dir, direction, display, disrupt, div, dl, dt,
+    duplicate_a, edge, edition, else, em, embed, embossed, empty, 'empty-cells',
+    empty_block, empty_case, empty_class, entityify, eqeq, error_report, errors,
+    es5, eval, evidence, evil, ex, exception, exec, expected_a,
+    expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d, expected_at_a,
+    expected_attribute_a, expected_attribute_value_a, expected_class_a,
+    expected_fraction_a, expected_id_a, expected_identifier_a,
+    expected_identifier_a_reserved, expected_lang_a, expected_linear_a,
+    expected_media_a, expected_name_a, expected_nonstandard_style_attribute,
+    expected_number_a, expected_operator_a, expected_percent_a,
+    expected_positive_a, expected_pseudo_a, expected_selector_a,
+    expected_small_a, expected_space_a_b, expected_string_a,
     expected_style_attribute, expected_style_pattern, expected_tagname_a,
-    expected_type_a, f, fieldset, figcaption, figure, filter, first, flag, float,
-    floor, font, 'font-family', 'font-size', 'font-size-adjust', 'font-stretch',
-    'font-style', 'font-variant', 'font-weight', footer, forEach, for_if, forin,
-    form, fragment, frame, frameset, from, fromCharCode, fud, funct, function,
-    function_block, function_eval, function_loop, function_statement,
-    function_strict, functions, global, globals, h1, h2, h3, h4, h5, h6,
-    handheld, hasOwnProperty, head, header, height, hgroup, hr,
+    expected_type_a, f, fieldset, figcaption, figure, filter, first, flag,
+    float, floor, font, 'font-family', 'font-size', 'font-size-adjust',
+    'font-stretch', 'font-style', 'font-variant', 'font-weight', footer,
+    forEach, for_if, forin, form, fragment, frame, frameset, from, fromCharCode,
+    fud, function, function_block, function_eval, function_loop,
+    function_statement, function_strict, functions, global, globals, h1, h2, h3,
+    h4, h5, h6, handheld, hasOwnProperty, head, header, height, hgroup, hr,
     'hta:application', html, html_confusion_a, html_handlers, i, id, identifier,
     identifier_function, iframe, img, immed, implied_evil, in, indent, indexOf,
     infix_in, init, input, ins, insecure_a, isAlpha, isArray, isDigit, isNaN,
     join, jslint, json, kbd, keygen, keys, label, labeled, lang, lbp,
-    leading_decimal_a, led, left, legend, length, 'letter-spacing', level,
-    li, lib, line, 'line-height', link, 'list-style', 'list-style-image',
+    leading_decimal_a, led, left, legend, length, 'letter-spacing', level, li,
+    lib, line, 'line-height', link, 'list-style', 'list-style-image',
     'list-style-position', 'list-style-type', map, margin, 'margin-bottom',
     'margin-left', 'margin-right', 'margin-top', mark, 'marker-offset', match,
     'max-height', 'max-width', maxerr, maxlen, menu, message, meta, meter,
     'min-height', 'min-width', missing_a, missing_a_after_b, missing_option,
-    missing_property, missing_space_a_b, missing_url, missing_use_strict,
-    mm, mode, move_invocation, move_var, n, name, name_function, nav,
+    missing_property, missing_space_a_b, missing_url, missing_use_strict, mm,
+    mode, move_invocation, move_var, n, name, name_function, nav,
     nested_comment, newcap, node, noframes, nomen, noscript, not,
     not_a_constructor, not_a_defined, not_a_function, not_a_label, not_a_scope,
     not_greater, nud, number, object, octal_a, ol, on, opacity, open, optgroup,
@@ -311,10 +312,10 @@
     slash_equal, slice, sloppy, small, sort, source, span, speech, split, src,
     statement_block, stopping, strange_loop, strict, string, strong, stupid,
     style, styleproperty, sub, subscript, substr, summary, sup, supplant,
-    sync_a, t,table, 'table-layout', tag_a_in_b, tbody, td, test, 'text-align',
+    sync_a, t, table, 'table-layout', tag_a_in_b, tbody, td, test, 'text-align',
     'text-decoration', 'text-indent', 'text-shadow', 'text-transform', textarea,
-    tfoot, th, thead, third, thru, time, title, todo, todo_comment, toLowerCase,
-    toString, toUpperCase, token, tokens, too_long, too_many, top, tr,
+    tfoot, th, thead, third, thru, time, title, toLowerCase, toString,
+    toUpperCase, todo, todo_comment, token, tokens, too_long, too_many, top, tr,
     trailing_decimal_a, tree, tt, tty, tv, type, u, ul, unclosed,
     unclosed_comment, unclosed_regexp, undef, undefined, unescaped_a,
     unexpected_a, unexpected_char_a_b, unexpected_comment, unexpected_else,
@@ -1976,7 +1977,7 @@ klass:              do {
                 scope[name] = token;
             }
         }
-        token.funct = funct;
+        token.function = funct;
         funct[name] = kind;
     }
 
@@ -2100,7 +2101,7 @@ klass:              do {
         prev_token = token;
         token = next_token;
         next_token = lookahead.shift() || lex.token();
-        next_token.funct = funct;
+        next_token.function = funct;
         tokens.push(next_token);
     }
 
@@ -2120,7 +2121,7 @@ klass:              do {
         }
         if (option.safe) {
             option.browser     =
-                option['continue'] =
+                option.continue =
                 option.css     =
                 option.debug   =
                 option.devel   =
@@ -2140,7 +2141,7 @@ klass:              do {
             delete predefined.Date;
             delete predefined.Function;
             delete predefined.Object;
-            delete predefined['eval'];
+            delete predefined.eval;
 
             add_to_predefined({
                 ADSAFE: false,
@@ -2840,7 +2841,7 @@ klass:              do {
                     l = l.first;
                 } while (l);
             }
-            if (left === syntax['function']) {
+            if (left === syntax.function) {
                 warn('identifier_function', token);
             }
             if (left.id === '.' || left.id === '[') {
@@ -3104,9 +3105,9 @@ klass:              do {
                 writeable = predefined[name];
                 if (typeof writeable === 'boolean') {
                     global_scope[name] = variable = {
-                        string:    name,
+                        string: name,
                         writeable: writeable,
-                        funct:     global_funct
+                        function: global_funct
                     };
                     global_funct[name] = 'var';
 
@@ -3120,13 +3121,13 @@ klass:              do {
                     scope[name] = variable = {
                         string: name,
                         writeable: true,
-                        funct: funct
+                        function: funct
                     };
                     funct[name] = 'undef';
                 }
 
             }
-            site = variable.funct;
+            site = variable.function;
 
 // The name is in scope and defined in the current function.
 
@@ -3152,7 +3153,7 @@ klass:              do {
                     warn('a_label', token, name);
                     break;
                 }
-                this.funct = funct;
+                this.function = funct;
 
 // If the name is already defined in the current
 // function, but not as outer, then there is a scope error.
@@ -3188,12 +3189,12 @@ klass:              do {
                         funct[name] = site === global_funct
                             ? 'global'
                             : 'outer';
-                        this.funct = site;
+                        this.function = site;
                         break;
                     case 'unparam':
                         site[name] = 'parameter';
                         funct[name] = 'outer';
-                        this.funct = site;
+                        this.function = site;
                         break;
                     case 'undef':
                         funct[name] = 'undef';
@@ -3896,7 +3897,7 @@ klass:              do {
     function function_params() {
         var id, paren = next_token, params = [];
         advance('(');
-        token.funct = funct;
+        token.function = funct;
         step_in();
         no_space();
         if (next_token.id === ')') {
@@ -3933,12 +3934,12 @@ klass:              do {
             '(token)'    : func,
             '(level)'    : old_funct['(level)'] + 1
         };
-        func.funct = funct;
+        func.function = funct;
         option = Object.create(old_option);
         scope = Object.create(old_scope);
         functions.push(funct);
         func.name = name;
-        func.funct = funct;
+        func.function = funct;
         if (name) {
             add_label(func, 'function', name);
         }
@@ -4195,10 +4196,10 @@ klass:              do {
             one_space();
             advance('else');
             one_space();
-            this['else'] = next_token.id === 'if' || next_token.id === 'switch'
+            this.else = next_token.id === 'if' || next_token.id === 'switch'
                 ? statement(true)
                 : block(true);
-            if (this['else'].disrupt && this.block.disrupt) {
+            if (this.else.disrupt && this.block.disrupt) {
                 this.disrupt = true;
             }
         }
@@ -4468,7 +4469,7 @@ klass:              do {
                 blok = block(true);
                 if (!option.forin) {
                     if (blok.length === 1 && typeof blok[0] === 'object' &&
-                            blok[0].string === 'if' && !blok[0]['else']) {
+                            blok[0].string === 'if' && !blok[0].else) {
                         filter = blok[0].first;
                         while (filter.id === '&&') {
                             filter = filter.first;
@@ -4565,7 +4566,7 @@ klass:              do {
             one_space_only();
             if (funct[label] !== 'label') {
                 warn('not_a_label', next_token);
-            } else if (scope[label].funct !== funct) {
+            } else if (scope[label].function !== funct) {
                 warn('not_a_scope', next_token);
             }
             this.first = next_token;
@@ -4575,7 +4576,7 @@ klass:              do {
     });
 
     disrupt_stmt('continue', function () {
-        if (!option['continue']) {
+        if (!option.continue) {
             warn('unexpected_a', this);
         }
         var label = next_token.string;
@@ -4587,7 +4588,7 @@ klass:              do {
             one_space_only();
             if (funct[label] !== 'label') {
                 warn('not_a_label', next_token);
-            } else if (scope[label].funct !== funct) {
+            } else if (scope[label].function !== funct) {
                 warn('not_a_scope', next_token);
             }
             this.first = next_token;
@@ -6346,7 +6347,7 @@ klass:              do {
             data.unused = unused;
         }
         if (undef.length > 0) {
-            data['undefined'] = undef;
+            data.undefined = undef;
         }
         data.tokens = tokens;
         return data;
@@ -6376,16 +6377,16 @@ klass:              do {
                 }
             }
         }
-        if (data.unused || data['undefined']) {
+        if (data.unused || data.undefined) {
             output.push('<dl>');
-            if (data['undefined']) {
+            if (data.undefined) {
                 output.push('<dt>undefined</dt><dd>');
                 snippets = [];
-                for (i = 0; i < data['undefined'].length; i += 1) {
-                    snippets[i] = '<code>' + data['undefined'][i].name +
+                for (i = 0; i < data.undefined.length; i += 1) {
+                    snippets[i] = '<code>' + data.undefined[i].name +
                         '</code>&nbsp;<address>' +
-                        data['undefined'][i]['function']  + ' ' +
-                        String(data['undefined'][i].line) + '</address>';
+                        data.undefined[i]['function']  + ' ' +
+                        String(data.undefined[i].line) + '</address>';
                 }
                 output.push(snippets.join(', '));
                 output.push('</dd>');
@@ -6395,7 +6396,7 @@ klass:              do {
                 snippets = [];
                 for (i = 0; i < data.unused.length; i += 1) {
                     snippets[i] = '<code>' + data.unused[i].name + '</code>&nbsp;<address>' +
-                        data.unused[i]['function']  + ' ' +
+                        data.unused[i].function  + ' ' +
                         String(data.unused[i].line) + '</address>';
                 }
                 output.push(snippets.join(', '));
@@ -6463,10 +6464,10 @@ klass:              do {
                     '><address>line ' + String(the_function.line) +
                     '</address>' + the_function.name.entityify() + '(' +
                     names.join(', ') + ')');
-                detail('undefined', the_function['undefined']);
+                detail('undefined', the_function.undefined);
                 detail('unused', the_function.unused);
                 detail('closure', the_function.closure);
-                detail('variable', the_function['var']);
+                detail('variable', the_function.var);
                 detail('exception', the_function.exception);
                 detail('outer', the_function.outer);
                 detail('global', the_function.global);
@@ -6499,7 +6500,7 @@ klass:              do {
                     ? key
                     : '\'' + key.replace(nx, sanitize) + '\'';
                 length += name.length + 2;
-                if (mem.length + name.length > 80) {
+                if (mem.length + name.length >= 80) {
                     output.push(mem);
                     mem = '    ';
                 }
@@ -6523,13 +6524,13 @@ klass:              do {
             from = token.from;
             line = token.line;
             thru = token.thru;
-            level = token.funct['(level)'];
+            level = token.function['(level)'];
             do {
                 thru = token.thru;
                 token = data.tokens[i];
                 i += 1;
             } while (token && token.line === line && token.from - thru < 5 &&
-                    level === token.funct['(level)']);
+                    level === token.function['(level)']);
             result.push({
                 line: line,
                 level: level,
@@ -6542,7 +6543,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-02-15';
+    itself.edition = '2013-02-18';
 
     return itself;
 }());
