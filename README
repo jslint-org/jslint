@@ -3,7 +3,7 @@ JSLint, The JavaScript Code Quality Tool
 Douglas Crockford
 douglas@crockford.com
 
-2012-02-21
+2013-02-19
 
 jslint.js contains the fully commented global JSLINT function.
 
@@ -26,7 +26,7 @@ lint.html describes JSLint's usage. Please read it.
 Direct questions and comments to http://tech.groups.yahoo.com/group/jslint_com/.
 
 JSLint can be run anywhere that JavaScript (or Java) can run. See for example
-http://tech.groups.yahoo.com/group/jslint_com/database?method=reportRows&tbl=1
+https://github.com/douglascrockford/JSLint/wiki/JSLINT
 
 The place to express yourself in programming is in the quality of your ideas,
 and the efficiency of execution. The role of style is the same as in
