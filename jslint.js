@@ -219,6 +219,7 @@
 //     sloppy     true, if the 'use strict'; pragma is optional
 //     stupid     true, if really stupid practices are tolerated
 //     sub        true, if all forms of subscript notation are tolerated
+//     tabs       true, if hard tabs (\t) instead of spaces should be used
 //     todo       true, if TODO comments are tolerated
 //     vars       true, if multiple var statements per function should be allowed
 //     white      true, if sloppy whitespace is tolerated
@@ -1223,7 +1224,7 @@ var JSLINT = (function () {
             if (at >= 0) {
                 if (option.white) {
                     source_row = source_row.replace(/\t/g, ' ');
-                } else {
+                } else if (!options.tab) {
                     warn_at('use_spaces', line, at + 1);
                 }
             }
