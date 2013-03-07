@@ -219,6 +219,7 @@
 //     sloppy     true, if the 'use strict'; pragma is optional
 //     stupid     true, if really stupid practices are tolerated
 //     sub        true, if all forms of subscript notation are tolerated
+//     unnamed    true, if unnamed parameters should be alllowed (e.g. arguments[0])
 //     todo       true, if TODO comments are tolerated
 //     vars       true, if multiple var statements per function should be allowed
 //     white      true, if sloppy whitespace is tolerated
@@ -388,6 +389,7 @@ var JSLINT = (function () {
             sloppy    : true,
             stupid    : true,
             sub       : true,
+            unnamed   : true,
             todo      : true,
             vars      : true,
             white     : true,
@@ -2133,6 +2135,7 @@ klass:              do {
                 option.rhino   =
                 option.sloppy  =
                 option.sub     =
+                option.unnamed =
                 option.undef   =
                 option.windows = false;
 
@@ -3792,7 +3795,7 @@ klass:              do {
         e = expression(0);
         switch (e.id) {
         case '(number)':
-            if (e.id === '(number)' && left.id === 'arguments') {
+            if (!option.unnamed && e.id === '(number)' && left.id === 'arguments') {
                 warn('use_param', left);
             }
             break;
