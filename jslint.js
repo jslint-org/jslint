@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-03-11
+// 2013-03-12
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -3193,17 +3193,13 @@ klass:              do {
                     case 'function':
                     case 'parameter':
                     case 'unction':
+                    case 'unparam':
                     case 'unused':
                     case 'var':
                         site[name] = 'closure';
                         funct[name] = site === global_funct
                             ? 'global'
                             : 'outer';
-                        this.function = site;
-                        break;
-                    case 'unparam':
-                        site[name] = 'parameter';
-                        funct[name] = 'outer';
                         this.function = site;
                         break;
                     case 'undef':
@@ -6553,7 +6549,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-03-11';
+    itself.edition = '2013-03-12';
 
     return itself;
 }());
