@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-02-18
+// 2013-03-11
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -231,18 +231,18 @@
 // For example:
 
 /*properties
-    '\b', '\t', '\n', '\f', '\r', '!', '!=', '!==', '"', '%', '\'',
+    '', '\b', '\t', '\n', '\f', '\r', '!', '!=', '!==', '"', '%', '\'',
     '(arguments)', '(begin)', '(breakage)', '(context)', '(error)',
     '(identifier)', '(level)', '(line)', '(loopage)', '(name)', '(params)',
     '(scope)', '(token)', '(vars)', '(verb)', '*', '+', '-', '/', '<', '<=',
-    '==', '===', '>', '>=', ADSAFE, Array, Date, Object, '\\', a, a_label,
-    a_not_allowed, a_not_defined, a_scope, abbr, acronym, address, adsafe,
-    adsafe_a, adsafe_autocomplete, adsafe_bad_id, adsafe_div, adsafe_fragment,
-    adsafe_go, adsafe_html, adsafe_id, adsafe_id_go, adsafe_lib,
-    adsafe_lib_second, adsafe_missing_id, adsafe_name_a, adsafe_placement,
-    adsafe_prefix_a, adsafe_script, adsafe_source, adsafe_subscript_a,
-    adsafe_tag, all, already_defined, and, anon, applet, apply, approved, area,
-    arity, article, aside, assign, assign_exception,
+    '==', '===', '>', '>=', ADSAFE, Array, Date, Function, Object, '\\', a,
+    a_label, a_not_allowed, a_not_defined, a_scope, abbr, acronym, address,
+    adsafe, adsafe_a, adsafe_autocomplete, adsafe_bad_id, adsafe_div,
+    adsafe_fragment, adsafe_go, adsafe_html, adsafe_id, adsafe_id_go,
+    adsafe_lib, adsafe_lib_second, adsafe_missing_id, adsafe_name_a,
+    adsafe_placement, adsafe_prefix_a, adsafe_script, adsafe_source,
+    adsafe_subscript_a, adsafe_tag, all, already_defined, and, anon, applet,
+    apply, approved, area, arity, article, aside, assign, assign_exception,
     assignment_function_expression, at, attribute_case_a, audio, autocomplete,
     avoid_a, b, background, 'background-attachment', 'background-color',
     'background-image', 'background-position', 'background-repeat',
@@ -318,16 +318,17 @@
     toUpperCase, todo, todo_comment, token, tokens, too_long, too_many, top, tr,
     trailing_decimal_a, tree, tt, tty, tv, type, u, ul, unclosed,
     unclosed_comment, unclosed_regexp, undef, undefined, unescaped_a,
-    unexpected_a, unexpected_char_a_b, unexpected_comment, unexpected_else,
-    unexpected_label_a, unexpected_property_a, unexpected_space_a_b,
-    unexpected_typeof_a, 'unicode-bidi', unnecessary_initialize,
-    unnecessary_use, unparam, unreachable_a_b, unrecognized_style_attribute_a,
-    unrecognized_tag_a, unsafe, unused, url, urls, use_array, use_braces,
-    use_charAt, use_object, use_or, use_param, use_spaces, used_before_a, var,
-    var_a_not, vars, 'vertical-align', video, visibility, was, weird_assignment,
-    weird_condition, weird_new, weird_program, weird_relation, weird_ternary,
-    white, 'white-space', width, windows, 'word-spacing', 'word-wrap', wrap,
-    wrap_immediate, wrap_regexp, write_is_wrong, writeable, 'z-index'
+    unexpected_a, unexpected_char_a, unexpected_char_a_b, unexpected_comment,
+    unexpected_else, unexpected_label_a, unexpected_property_a,
+    unexpected_space_a_b, unexpected_typeof_a, 'unicode-bidi',
+    unnecessary_initialize, unnecessary_use, unparam, unreachable_a_b,
+    unrecognized_style_attribute_a, unrecognized_tag_a, unsafe, unused, url,
+    urls, use_array, use_braces, use_charAt, use_object, use_or, use_param,
+    use_spaces, used_before_a, var, var_a_not, vars, 'vertical-align', video,
+    visibility, was, weird_assignment, weird_condition, weird_new,
+    weird_program, weird_relation, weird_ternary, white, 'white-space', width,
+    windows, 'word-spacing', 'word-wrap', wrap, wrap_immediate, wrap_regexp,
+    write_is_wrong, writeable, 'z-index'
 */
 
 // The global directive is used to declare global variables that can
@@ -604,6 +605,7 @@ var JSLINT = (function () {
             unclosed_regexp: "Unclosed regular expression.",
             unescaped_a: "Unescaped '{a}'.",
             unexpected_a: "Unexpected '{a}'.",
+            unexpected_char_a: "Unexpected character '{a}'.",
             unexpected_char_a_b: "Unexpected character '{a}' in {b}.",
             unexpected_comment: "Unexpected comment.",
             unexpected_else: "Unexpected 'else' after 'return'.",
@@ -967,7 +969,6 @@ var JSLINT = (function () {
 // style
         ssx = /^\s*([@#!"'};:\-%.=,+\[\]()*_]|[a-zA-Z][a-zA-Z0-9._\-]*|\/\*?|\d+(?:\.\d+)?|<\/)/,
         sx = /^\s*([{}:#%.=,>+\[\]@()"';]|[*$\^~]=|[a-zA-Z_][a-zA-Z0-9_\-]*|[0-9]+|<\/|\/\*)/,
-
 // sync
         syx = /Sync$/,
 // comment todo
@@ -978,6 +979,7 @@ var JSLINT = (function () {
         ux = /&|\+|\u00AD|\.\.|\/\*|%[^;]|base64|url|expression|data|mailto|script/i,
 
         rx = {
+            '': tx,
             outer: hx,
             html: hx,
             style: sx,
@@ -1289,6 +1291,16 @@ var JSLINT = (function () {
                 character += length;
                 return first;
             }
+            for (;;) {
+                c = source_row.charAt(0);
+                if (c !== ' ') {
+                    break;
+                }
+                source_row = source_row.slice(1);
+                character += 1;
+            }
+            stop_at('unexpected_char_a', line, character, c);
+
         }
 
         function string(x) {
@@ -1770,7 +1782,7 @@ klass:              do {
                             }
                         }
                     }
-                    snippet = match(rx[xmode] || tx);
+                    snippet = match(rx[xmode]);
                     if (!snippet) {
                         if (source_row) {
                             if (source_row.charAt(0) === ' ') {
@@ -2135,8 +2147,6 @@ klass:              do {
                 option.sub     =
                 option.undef   =
                 option.windows = false;
-
-
             delete predefined.Array;
             delete predefined.Date;
             delete predefined.Function;
@@ -6543,7 +6553,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-02-18';
+    itself.edition = '2013-03-11';
 
     return itself;
 }());
