@@ -193,6 +193,7 @@
 //     bitwise    true, if bitwise operators should be allowed
 //     browser    true, if the standard browser globals should be predefined
 //     'continue' true, if the continuation statement should be tolerated
+//     couch      true, if CouchDB globals should be predefined
 //     debug      true, if debugger statements should be allowed
 //     devel      true, if logging should be allowed (console, alert, etc.)
 //     eqeq       true, if == should be allowed
@@ -237,8 +238,8 @@
     bad_new, bad_number, bad_operand, bad_wrap, bitwise, block, browser, c,
     call, charAt, charCodeAt, character, closure, color, combine_var,
     conditional_assignment, confusing_a, confusing_regexp, constructor_name_a,
-    continue, control_a, create, d, dangling_a, data, debug, deleted, devel,
-    disrupt, duplicate_a, edge, edition, else, empty_block, empty_case,
+    continue, control_a, couch, create, d, dangling_a, data, debug, deleted,
+    devel, disrupt, duplicate_a, edge, edition, else, empty_block, empty_case,
     empty_class, entityify, eqeq, error_report, errors, es5, evidence, evil,
     exception, exec, expected_a, expected_a_at_b_c, expected_a_b,
     expected_a_b_from_c_d, expected_id_a, expected_identifier_a,
@@ -515,6 +516,10 @@ var JSLINT = (function () {
             'emit'
         ], false),
 
+        couch = array_to_object([
+            'emit'
+        ], false),
+
         descapes = {
             'b': '\b',
             't': '\t',
@@ -756,6 +761,10 @@ var JSLINT = (function () {
         if (option.browser) {
             add_to_predefined(browser);
             option.browser = false;
+        }
+        if (option.couch) {
+            add_to_predefined(couch);
+            option.couch = false;
         }
         if (option.windows) {
             add_to_predefined(windows);
