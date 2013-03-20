@@ -150,7 +150,7 @@ at issuing warnings. <code>lint</code> is no longer needed.</p>
 <p>JavaScript is a sloppy language, but inside it there is an elegant, better
   language. <code>JSLint</code> helps you to program in that better language
   and to avoid most of the slop. <code>JSLint</code> will reject programs that browsers will accept because <code>JSLint</code> is concerned with the quality of your code and browsers are not. You should accept all of <code>JSLint</code>'s advice.</p>
-<p><code>JSLint</code> can operate on JavaScript source, HTML source, CSS source, or <a href="http://www.JSON.org/">JSON</a>
+<p><code>JSLint</code> can operate on JavaScript source or <a href="http://www.JSON.org/">JSON</a>
   text.</p>
 <h1 id=global>Global Variables</h1>
 <p>JavaScript's <a href="http://yuiblog.com/blog/2006/06/01/global-domination/">biggest
@@ -467,35 +467,6 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
   really constructors (<a href="#new">except by enforcing capitalization
   conventions</a>), or that property names are spelled correctly (<a href="#properties">except
   for matching against the <code>/*properties*/</code> directive</a>).</p>
-<h1 id=html>HTML</h1>
-<p><code>JSLint</code> is able to handle HTML text. It can inspect the JavaScript content
-  contained within <code>&lt;script&gt;</code>...<code>&lt;/script&gt;</code> tags. It
-  also inspects the HTML content, looking for problems that are known to interfere
-  with JavaScript:</p>
-<ul>
-  <li>All tag names must be in lower case.</li>
-  <li>All tags that can take a close tag (such as <code>&lt;/p&gt;</code>)
-    must have a close tag.</li>
-  <li>All tags are correctly nested.</li>
-  <li>The entity <code>&amp;lt;</code> must be used for literal <code>'&lt;'</code>.</li>
-</ul>
-<p><code>JSLint</code> is less anal than the sycophantic conformity demanded
-  by XHTML, but more strict than the popular browsers. </p>
-<p><code>JSLint</code> also checks for the occurrence of<code> '&lt;/' </code>in
-  string literals. You should always write<code> '&lt;\/' </code>instead.
-  The extra backslash is ignored by the JavaScript compiler but not by the
-  HTML parser. Tricks like this should not be necessary, and yet they are.</p>
-<p>There is a <code>fragment</code> <a href="#options">option</a> that can
-  inspect a well formed HTML fragment. If the <code>adsafe</code> <a href="#options">option</a>
-  is also used, then the fragment must be a <code>&lt;div&gt;</code> that
-  conforms to the <a href="http://www.ADsafe.org/">ADsafe</a> widget rules.</p>
-<h1 id=css>CSS</h1>
-<p><code>JSLint</code> can inspect CSS files. It expects the first line
-  of a CSS file to be </p>
-<blockquote><code>@charset &quot;UTF-8&quot;;</code></blockquote>
-<p>This feature is experimental. Please report any problems or limitations.
-  There is a <code>css</code> <a href="#options">option</a> that will tolerate
-  some of the non-standard-but-customary workarounds. </p>
 
 <h1 id=options>Options</h1>
 <p><code>JSLint</code> provides several options that control its operation and
@@ -524,13 +495,6 @@ options are selected with several checkboxes and two fields. </p>
     <th>Meaning</th>
   </tr>
   <tr>
-    <td>ADsafe</td>
-    <td><code>adsafe</code></td>
-    <td><code>true</code> if <a href="http://www.ADsafe.org/">AD<span style="color: blue;">safe</span></a>
-      rules should be enforced. See <a href="http://www.ADsafe.org/">http://www.ADsafe.org/</a>.  <code>adsafe</code> is used with the <code>option</code> object, but not
-      with the <code>/*jslint*/</code> directive. </td>
-  </tr>
-  <tr>
     <td>Tolerate bitwise operators </td>
     <td><code>bitwise</code></td>
     <td><code>true</code> if bitwise operators should  be allowed. <a href="#bitwise"><small>(more)</small></a></td>
@@ -545,11 +509,6 @@ options are selected with several checkboxes and two fields. </p>
     <td>Tolerate <code>continue</code></td>
     <td><code>continue</code></td>
     <td><code>true</code> if the <code>continue</code> statement should be allowed.</td>
-  </tr>
-  <tr>
-    <td>Tolerate CSS workarounds</td>
-    <td><code>css</code></td>
-    <td><code>true</code> if CSS workarounds should be tolerated. <a href="#css"><small>(more)</small></a></td>
   </tr>
   <tr>
     <td>Tolerate debugger statements</td>
@@ -586,14 +545,9 @@ options are selected with several checkboxes and two fields. </p>
       statements should be allowed. <a href="#forin"><small>(more)</small></a></td>
   </tr>
   <tr>
-    <td>Tolerate HTML fragments </td>
-    <td><code>fragment</code></td>
-    <td><code>true</code> if HTML fragments should be allowed. <a href="#html"><small>(more)</small></a></td>
-  </tr>
-  <tr>
-      <td>Strict white space indentation</td>
-      <td><code>indent</code></td>
-      <td>The number of spaces used for indentation (default is 4).</td>
+    <td>Strict white space indentation</td>
+    <td><code>indent</code></td>
+    <td>The number of spaces used for indentation (default is 4).</td>
   </tr>
   <tr>
       <td>Maximum number of errors</td>
@@ -620,11 +574,6 @@ options are selected with several checkboxes and two fields. </p>
     <td>Tolerate dangling _ in identifiers </td>
     <td><code>nomen</code></td>
     <td><code>true</code> if names should not be checked for initial or trailing underbars.</td>
-  </tr>
-  <tr>
-    <td>Tolerate HTML event handlers </td>
-    <td><code>on</code></td>
-    <td><code>true</code> if HTML event handlers should be allowed. <a href="#html"><small>(more)</small></a></td>
   </tr>
   <tr>
     <td>Stop on first error </td>
@@ -655,14 +604,6 @@ options are selected with several checkboxes and two fields. </p>
     <td><code>rhino</code></td>
     <td><code>true</code> if the <a href="http://www.mozilla.org/rhino/">Rhino</a>
       environment globals should be predefined. <a href="#rhino"><small>(more)</small></a></td>
-  </tr>
-  <tr>
-    <td>Safe Subset </td>
-    <td><code>safe</code></td>
-    <td><code>true</code> if the safe subset rules are enforced. These rules
-      are used by <a href="http://www.ADsafe.org/">ADsafe</a>. It enforces
-      the safe subset rules but not the widget structure rules.  <code>safe</code> is used with the <code>option</code> object, but not
-      with the <code>/*jslint*/</code> directive. </td>
   </tr>
   <tr>
     <td> Tolerate missing&nbsp;<code>'use strict'</code>&nbsp;pragma </td>
