@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-03-18
+// 2013-03-19
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -304,6 +304,7 @@ var JSLINT = (function () {
             bitwise   : true,
             browser   : true,
             'continue': true,
+            couch     : true,
             debug     : true,
             devel     : true,
             eqeq      : true,
@@ -510,6 +511,9 @@ var JSLINT = (function () {
             write_is_wrong: "document.write can be a form of eval."
         },
         comments_off,
+        couch = array_to_object([
+            'emit'
+        ], false),
 
         descapes = {
             'b': '\b',
@@ -761,6 +765,10 @@ var JSLINT = (function () {
             add_to_predefined(node);
             option.node = false;
             node_js = true;
+        }
+        if (option.couch) {
+            add_to_predefined(couch);
+            option.couch = false;
         }
     }
 
@@ -4486,7 +4494,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-03-18';
+    itself.edition = '2013-03-19';
 
     return itself;
 }());
