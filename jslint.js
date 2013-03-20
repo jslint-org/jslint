@@ -204,6 +204,7 @@
 //     maxlen     the maximum length of a source line
 //     newcap     true, if constructor names capitalization is ignored
 //     node       true, if Node.js globals should be predefined
+//     nofuncname true, if functions may be absent of a name
 //     nomen      true, if names may have dangling _
 //     passfail   true, if the scan should stop on first error
 //     plusplus   true, if increment/decrement should be allowed
@@ -254,14 +255,14 @@
     match, maxerr, maxlen, message, missing_a, missing_a_after_b,
     missing_property, missing_space_a_b, missing_use_strict, mode,
     move_invocation, move_var, n, name, name_function, nested_comment, newcap,
-    node, nomen, not, not_a_constructor, not_a_defined, not_a_function,
-    not_a_label, not_a_scope, not_greater, nud, number, octal_a, open, outer,
-    parameter_a_get_b, parameter_arguments_a, parameter_set_a, params, paren,
-    passfail, plusplus, postscript, predef, properties, properties_report,
-    property, prototype, push, quote, r, radix, range, raw, read_only, reason,
-    regexp, replace, report, reserved, reserved_a, rhino, right, scanned_a_b,
-    search, second, shift, slash_equal, slice, sloppy, sort, split,
-    statement_block, stopping, strange_loop, strict, string, stupid, sub,
+    node, nofuncname, nomen, not, not_a_constructor, not_a_defined,
+    not_a_function, not_a_label, not_a_scope, not_greater, nud, number, octal_a,
+    open, outer, parameter_a_get_b, parameter_arguments_a, parameter_set_a,
+    params, paren, passfail, plusplus, postscript, predef, properties,
+    properties_report, property, prototype, push, quote, r, radix, range, raw,
+    read_only, reason, regexp, replace, report, reserved, reserved_a, rhino,
+    right, scanned_a_b, search, second, shift, slash_equal, slice, sloppy, sort,
+    split, statement_block, stopping, strange_loop, strict, string, stupid, sub,
     subscript, substr, supplant, sync_a, t, tag_a_in_b, test, third, thru,
     toString, todo, todo_comment, token, tokens, too_long, too_many,
     trailing_decimal_a, tree, unclosed, unclosed_comment, unclosed_regexp,
@@ -316,6 +317,7 @@ var JSLINT = (function () {
             maxlen    :  256,
             newcap    : true,
             node      : true,
+            nofuncname: true,
             nomen     : true,
             passfail  : true,
             plusplus  : true,
@@ -2374,9 +2376,14 @@ klass:              do {
     function identifier(variable) {
         var i = optional_identifier(variable);
         if (!i) {
-            stop(token.id === 'function' && next_token.id === '('
-                ? 'name_function'
-                : 'expected_identifier_a');
+            if (token.id === 'function' && next_token.id === '(') {
+                if (!option.nofuncname) {
+                    stop('name_function');
+                }
+            }
+            else {
+                stop('expected_identifier_a');
+            }
         }
         return i;
     }
@@ -3524,7 +3531,9 @@ klass:              do {
         var name = next_token,
             id = identifier(true);
         add_label(name, 'unction');
-        no_space();
+        if (!option.nofuncname) {
+            no_space();
+        }
         this.arity = 'statement';
         do_function(this, id);
         if (next_token.id === '(' && next_token.line === token.line) {
