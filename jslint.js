@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-03-27
+// 2013-03-28
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -511,6 +511,9 @@ var JSLINT = (function () {
                 "disambiguate the slash operator.",
             write_is_wrong: "document.write can be a form of eval."
         },
+        closure = array_to_object([
+            'goog'
+        ], false),
         comments,
         comments_off,
         couch = array_to_object([
@@ -746,30 +749,34 @@ var JSLINT = (function () {
 
 
     function assume() {
-        if (option.rhino) {
-            add_to_predefined(rhino);
-            option.rhino = false;
-        }
-        if (option.devel) {
-            add_to_predefined(devel);
-            option.devel = false;
-        }
         if (option.browser) {
             add_to_predefined(browser);
             option.browser = false;
         }
-        if (option.windows) {
-            add_to_predefined(windows);
-            option.windows = false;
+        if (option.closure) {
+            add_to_predefined(closure);
+            option.browser = false;
+        }
+        if (option.couch) {
+            add_to_predefined(couch);
+            option.couch = false;
+        }
+        if (option.devel) {
+            add_to_predefined(devel);
+            option.devel = false;
         }
         if (option.node) {
             add_to_predefined(node);
             option.node = false;
             node_js = true;
         }
-        if (option.couch) {
-            add_to_predefined(couch);
-            option.couch = false;
+        if (option.rhino) {
+            add_to_predefined(rhino);
+            option.rhino = false;
+        }
+        if (option.windows) {
+            add_to_predefined(windows);
+            option.windows = false;
         }
     }
 
@@ -2434,7 +2441,7 @@ klass:              do {
                         the_statement.id !== 'delete' &&
                         the_statement.id !== '++' &&
                         the_statement.id !== '--') {
-                            if (!option.closure || !preamble.comments) {
+                    if (!option.closure || !preamble.comments) {
                         warn('assignment_function_expression', preamble);
                     }
                 }
@@ -4490,7 +4497,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-03-27';
+    itself.edition = '2013-03-28';
 
     return itself;
 }());
