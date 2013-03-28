@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-03-26
+// 2013-03-27
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -236,7 +236,7 @@
     apply, arity, assign, assign_exception, assignment_function_expression, at,
     avoid_a, b, bad_assignment, bad_constructor, bad_in_a, bad_invocation,
     bad_new, bad_number, bad_operand, bad_wrap, bitwise, block, browser, c,
-    call, charAt, charCodeAt, character, closure, color, combine_var,
+    call, charAt, charCodeAt, character, closure, color, combine_var, comments,
     conditional_assignment, confusing_a, confusing_regexp, constructor_name_a,
     continue, control_a, couch, create, d, dangling_a, data, debug, deleted,
     devel, disrupt, duplicate_a, edge, edition, else, empty_block, empty_case,
@@ -244,25 +244,24 @@
     exception, exec, expected_a, expected_a_at_b_c, expected_a_b,
     expected_a_b_from_c_d, expected_id_a, expected_identifier_a,
     expected_identifier_a_reserved, expected_number_a, expected_operator_a,
-    expected_percent_a, expected_positive_a, expected_small_a,
-    expected_space_a_b, expected_string_a, f, filter, first, flag, floor,
-    forEach, for_if, forin, from, fromCharCode, fud, function, function_block,
-    function_eval, function_loop, function_statement, function_strict,
-    functions, global, globals, hasOwnProperty, id, identifier,
-    identifier_function, immed, implied_evil, indent, indexOf, infix_in, init,
-    insecure_a, isAlpha, isArray, isDigit, isNaN, join, jslint, json, keys,
-    label, labeled, lbp, leading_decimal_a, led, left, length, level, line,
-    match, maxerr, maxlen, message, missing_a, missing_a_after_b,
-    missing_property, missing_space_a_b, missing_use_strict, mode,
-    move_invocation, move_var, n, name, name_function, nested_comment, newcap,
-    node, nomen, not, not_a_constructor, not_a_defined, not_a_function,
-    not_a_label, not_a_scope, not_greater, nud, number, octal_a, open, outer,
-    parameter_a_get_b, parameter_arguments_a, parameter_set_a, params, paren,
-    passfail, plusplus, postscript, predef, properties, properties_report,
-    property, prototype, push, quote, r, radix, raw, read_only, reason,
-    regexp, replace, report, reserved, reserved_a, rhino, right, scanned_a_b,
-    search, second, shift, slash_equal, slice, sloppy, sort, split,
-    statement_block, stopping, strange_loop, strict, string, stupid, sub,
+    expected_positive_a, expected_small_a, expected_space_a_b,
+    expected_string_a, f, filter, first, flag, floor, forEach, for_if, forin,
+    from, fromCharCode, fud, function, function_block, function_eval,
+    function_loop, function_statement, function_strict, functions, global,
+    globals, hasOwnProperty, id, identifier, identifier_function, immed,
+    implied_evil, indent, indexOf, infix_in, init, insecure_a, isAlpha, isArray,
+    isDigit, isNaN, join, jslint, json, keys, label, labeled, lbp,
+    leading_decimal_a, led, left, length, level, line, match, maxerr, maxlen,
+    message, missing_a, missing_a_after_b, missing_property, missing_space_a_b,
+    missing_use_strict, mode, move_invocation, move_var, n, name, name_function,
+    nested_comment, newcap, node, nomen, not, not_a_constructor, not_a_defined,
+    not_a_function, not_a_label, not_a_scope, not_greater, nud, number, octal_a,
+    open, outer, parameter_a_get_b, parameter_arguments_a, parameter_set_a,
+    params, paren, passfail, plusplus, postscript, predef, properties,
+    properties_report, property, prototype, push, quote, r, radix, raw,
+    read_only, reason, regexp, replace, report, reserved, reserved_a, rhino,
+    right, scanned_a_b, search, second, shift, slash_equal, slice, sloppy, sort,
+    split, statement_block, stopping, strange_loop, strict, string, stupid, sub,
     subscript, substr, supplant, sync_a, t, tag_a_in_b, test, third, thru,
     toString, todo, todo_comment, token, tokens, too_long, too_many,
     trailing_decimal_a, tree, unclosed, unclosed_comment, unclosed_regexp,
@@ -3151,7 +3150,7 @@ klass:              do {
                 warn('bad_wrap', that);
             }
         } else if (!value.arity) {
-            if (!option.closure || that.comments) {
+            if (!option.closure || !that.comments) {
                 warn('unexpected_a', that);
             }
         }
@@ -3973,7 +3972,11 @@ klass:              do {
         }
         this.arity = 'statement';
         if (next_token.id !== ';' && next_token.line === token.line) {
-            one_space_only();
+            if (option.closure) {
+                spaces();
+            } else {
+                one_space_only();
+            }
             if (next_token.id === '/' || next_token.id === '(regexp)') {
                 warn('wrap_regexp');
             }
@@ -4487,7 +4490,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-03-26';
+    itself.edition = '2013-03-27';
 
     return itself;
 }());
