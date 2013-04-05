@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-03-28
+// 2013-04-04
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -259,14 +259,14 @@
     open, outer, parameter_a_get_b, parameter_arguments_a, parameter_set_a,
     params, paren, passfail, plusplus, postscript, predef, properties,
     properties_report, property, prototype, push, quote, r, radix, raw,
-    read_only, reason, regexp, replace, report, reserved, reserved_a, rhino,
-    right, scanned_a_b, search, second, shift, slash_equal, slice, sloppy, sort,
-    split, statement_block, stopping, strange_loop, strict, string, stupid, sub,
-    subscript, substr, supplant, sync_a, t, tag_a_in_b, test, third, thru,
-    toString, todo, todo_comment, token, tokens, too_long, too_many,
-    trailing_decimal_a, tree, unclosed, unclosed_comment, unclosed_regexp,
-    undef, undefined, unescaped_a, unexpected_a, unexpected_char_a,
-    unexpected_comment, unexpected_else, unexpected_label_a,
+    read_only, reason, regexp, relation, replace, report, reserved, reserved_a,
+    rhino, right, scanned_a_b, search, second, shift, slash_equal, slice,
+    sloppy, sort, split, statement_block, stopping, strange_loop, strict,
+    string, stupid, sub, subscript, substr, supplant, sync_a, t, tag_a_in_b,
+    test, third, thru, toString, todo, todo_comment, token, tokens, too_long,
+    too_many, trailing_decimal_a, tree, unclosed, unclosed_comment,
+    unclosed_regexp, undef, undefined, unescaped_a, unexpected_a,
+    unexpected_char_a, unexpected_comment, unexpected_else, unexpected_label_a,
     unexpected_property_a, unexpected_space_a_b, unexpected_typeof_a,
     unnecessary_initialize, unnecessary_use, unparam, unreachable_a_b, unsafe,
     unused, url, urls, use_array, use_braces, use_object, use_or, use_param,
@@ -755,7 +755,6 @@ var JSLINT = (function () {
         }
         if (option.closure) {
             add_to_predefined(closure);
-            option.browser = false;
         }
         if (option.couch) {
             add_to_predefined(couch);
@@ -2237,6 +2236,8 @@ klass:              do {
         default:
             if (node.id  === 'NaN') {
                 warn('isNaN', node);
+            } else if (node.relation) {
+                warn('weird_relation', node);
             }
         }
         return node;
@@ -2244,7 +2245,7 @@ klass:              do {
 
 
     function relation(s, eqeq) {
-        return infix(s, 100, function (left, that) {
+        var x = infix(s, 100, function (left, that) {
             check_relation(left);
             if (eqeq && !option.eqeq) {
                 warn('expected_a_b', that, eqeq, that.id);
@@ -2277,6 +2278,8 @@ klass:              do {
             that.second = check_relation(right);
             return that;
         });
+        x.relation = true;
+        return x;
     }
 
 
@@ -4497,7 +4500,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-03-28';
+    itself.edition = '2013-04-04';
 
     return itself;
 }());
