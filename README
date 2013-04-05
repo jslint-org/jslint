@@ -3,7 +3,7 @@ JSLint, The JavaScript Code Quality Tool
 Douglas Crockford
 douglas@crockford.com
 
-2013-02-19
+2013-04-05
 
 jslint.js contains the fully commented global JSLINT function.
 
@@ -23,7 +23,8 @@ init_ui.js hooks the HTML ui components to ADsafe.
 
 lint.html describes JSLint's usage. Please read it.
 
-Direct questions and comments to http://tech.groups.yahoo.com/group/jslint_com/.
+Please direct questions and comments to
+https://plus.google.com/communities/104441363299760713736.
 
 JSLint can be run anywhere that JavaScript (or Java) can run. See for example
 https://github.com/douglascrockford/JSLint/wiki/JSLINT
