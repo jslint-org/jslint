@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-04-04
+// 2013-04-06
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -3329,7 +3329,6 @@ klass:              do {
         scope = Object.create(old_scope);
         functions.push(funct);
         func.name = name;
-        func.function = funct;
         if (name) {
             add_label(func, 'function', name);
         }
@@ -3535,13 +3534,17 @@ klass:              do {
     });
 
     prefix('function', function (that) {
-        var id = optional_identifier(true);
+        var id = optional_identifier(true), name;
         if (id) {
+            name = token;
             no_space();
         } else {
             id = '';
         }
         do_function(that, id);
+        if (name) {
+            name.function = that.function;
+        }
         if (funct['(loopage)']) {
             warn('function_loop');
         }
@@ -4500,7 +4503,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-04-04';
+    itself.edition = '2013-04-06';
 
     return itself;
 }());
