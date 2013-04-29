@@ -641,11 +641,6 @@ options are selected with several checkboxes and two fields. </p>
     <td><code>true</code> if comments starting with <code>TODO</code> should be allowed.</td>
   </tr>
   <tr>
-    <td> Tolerate misordered definitions </td>
-    <td><code>undef</code></td>
-    <td><code>true</code> if variables and functions need not be declared before used. This is not available in strict mode.</td>
-  </tr>
-  <tr>
     <td> Tolerate unused parameters</td>
     <td><code>unparam</code></td>
     <td><code>true</code> if warnings should not be given for unused parameters.</td>
@@ -683,8 +678,6 @@ options are selected with several checkboxes and two fields. </p>
   <li><i>Variables</i>: The variables that are declared in the function
     that are used only by the function.</li>
   <li><i>Exceptions</i>: The variables that are declared by try statements.</li>
-  <li><i>Unused</i>: The variables that are declared in the function that
-    are not used. This may be an indication of an error.</li>
   <li><i>Outer</i>: Variables used by this function that are declared in
     another function.</li>
   <li><i>Global</i>: Global variables that are used by this function. Keep
