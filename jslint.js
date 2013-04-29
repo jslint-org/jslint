@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-04-09
+// 2013-04-29
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -83,12 +83,7 @@
 //                 name: STRING,
 //                 line: NUMBER,
 //                 last: NUMBER,
-//                 params: [
-//                     {
-//                         string: STRING
-//                     }
-//                 ],
-//                 closure: [
+//                 parameter: [
 //                     STRING
 //                 ],
 //                 var: [
@@ -97,13 +92,10 @@
 //                 exception: [
 //                     STRING
 //                 ],
+//                 closure: [
+//                     STRING
+//                 ],
 //                 outer: [
-//                     STRING
-//                 ],
-//                 unused: [
-//                     STRING
-//                 ],
-//                 undef: [
 //                     STRING
 //                 ],
 //                 global: [
@@ -114,24 +106,19 @@
 //                 ]
 //             }
 //         ],
-//         globals: [
+//         global: [
 //             STRING
 //         ],
 //         member: {
 //             STRING: NUMBER
 //         },
-//         urls: [
-//             STRING
-//         ],
 //         json: BOOLEAN
 //     }
-
-// Empty arrays will not be included.
 
 // You can request a Function Report, which shows all of the functions
 // and the parameters and vars that they use. This can be used to find
 // implied global variables and other problems. The report is in HTML and
-// can be inserted in an HTML <body>. It should be given the result of the
+// can be inserted into an HTML <body>. It should be given the result of the
 // JSLINT.data function.
 
 //     var myReport = JSLINT.report(data);
@@ -211,7 +198,6 @@
 //     properties true, if all property names must be declared with /*properties*/
 //     regexp     true, if the . should be allowed in regexp literals
 //     rhino      true, if the Rhino environment globals should be predefined
-//     undef      true, if variables can be declared out of order
 //     unparam    true, if unused parameters should be tolerated
 //     sloppy     true, if the 'use strict'; pragma is optional
 //     stupid     true, if really stupid practices are tolerated
@@ -228,52 +214,50 @@
 // For example:
 
 /*properties
-    '\b', '\t', '\n', '\f', '\r', '!', '!=', '!==', '"', '%', '\'',
-    '(arguments)', '(begin)', '(breakage)', '(context)', '(error)',
-    '(identifier)', '(level)', '(line)', '(loopage)', '(name)', '(params)',
-    '(scope)', '(token)', '(vars)', '(verb)', '*', '+', '-', '/', '<', '<=',
-    '==', '===', '>', '>=', '\\', a, a_label, a_scope, already_defined, and,
-    apply, arity, assign, assign_exception, assignment_function_expression, at,
-    avoid_a, b, bad_assignment, bad_constructor, bad_in_a, bad_invocation,
-    bad_new, bad_number, bad_operand, bad_wrap, bitwise, block, browser, c,
-    call, charAt, charCodeAt, character, closure, color, combine_var, comments,
-    conditional_assignment, confusing_a, confusing_regexp, constructor_name_a,
-    continue, control_a, couch, create, d, dangling_a, data, debug, deleted,
-    devel, disrupt, duplicate_a, edge, edition, else, empty_block, empty_case,
-    empty_class, entityify, eqeq, error_report, errors, es5, evidence, evil,
-    exception, exec, expected_a, expected_a_at_b_c, expected_a_b,
-    expected_a_b_from_c_d, expected_id_a, expected_identifier_a,
-    expected_identifier_a_reserved, expected_number_a, expected_operator_a,
-    expected_positive_a, expected_small_a, expected_space_a_b,
-    expected_string_a, f, filter, first, flag, floor, forEach, for_if, forin,
-    from, fromCharCode, fud, function, function_block, function_eval,
-    function_loop, function_statement, function_strict, functions, global,
-    globals, hasOwnProperty, id, identifier, identifier_function, immed,
-    implied_evil, indent, indexOf, infix_in, init, insecure_a, isAlpha, isArray,
-    isDigit, isNaN, join, jslint, json, keys, label, labeled, lbp,
-    leading_decimal_a, led, left, length, level, line, match, maxerr, maxlen,
-    message, missing_a, missing_a_after_b, missing_property, missing_space_a_b,
-    missing_use_strict, mode, move_invocation, move_var, n, name, name_function,
-    nested_comment, newcap, node, nomen, not, not_a_constructor, not_a_defined,
-    not_a_function, not_a_label, not_a_scope, not_greater, nud, number, octal_a,
-    open, outer, parameter_a_get_b, parameter_arguments_a, parameter_set_a,
+    '\b', '\t', '\n', '\f', '\r', '!', '!=', '!==', '"', '%', '\'', '(begin)',
+    '(error)', '(identifier)', '*', '+', '-', '/', '<', '<=', '==', '===', '>',
+    '>=', '\\', a, a_label, a_scope, already_defined, and, arguments, arity,
+    assign, assignment_function_expression, at, avoid_a, b, bad_assignment,
+    bad_constructor, bad_in_a, bad_invocation, bad_new, bad_number, bad_operand,
+    bad_wrap, bitwise, block, browser, c, call, charAt, charCodeAt, character,
+    closure, color, combine_var, comments, conditional_assignment, confusing_a,
+    confusing_regexp, constructor_name_a, continue, control_a, couch, create, d,
+    dangling_a, data, dead, debug, deleted, devel, disrupt, duplicate_a, edge,
+    edition, else, empty_block, empty_case, empty_class, entityify, eqeq,
+    error_report, errors, es5, evidence, evil, exception, exec, expected_a,
+    expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d, expected_id_a,
+    expected_identifier_a, expected_identifier_a_reserved, expected_number_a,
+    expected_operator_a, expected_positive_a, expected_small_a,
+    expected_space_a_b, expected_string_a, f, first, flag, floor, forEach,
+    for_if, forin, from, fromCharCode, fud, function, function_block,
+    function_eval, function_loop, function_statement, function_strict,
+    functions, global, hasOwnProperty, id, identifier, identifier_function,
+    immed, implied_evil, indent, indexOf, infix_in, init, insecure_a, isAlpha,
+    isArray, isDigit, isNaN, join, jslint, json, keys, kind, label, labeled,
+    lbp, leading_decimal_a, led, left, length, level, line, loopage, master,
+    match, maxerr, maxlen, message, missing_a, missing_a_after_b,
+    missing_property, missing_space_a_b, missing_use_strict, mode,
+    move_invocation, move_var, n, name, name_function, nested_comment, newcap,
+    node, nomen, not, not_a_constructor, not_a_defined, not_a_function,
+    not_a_label, not_a_scope, not_greater, nud, number, octal_a, open, outer,
+    parameter, parameter_a_get_b, parameter_arguments_a, parameter_set_a,
     params, paren, passfail, plusplus, postscript, predef, properties,
     properties_report, property, prototype, push, quote, r, radix, raw,
     read_only, reason, regexp, relation, replace, report, reserved, reserved_a,
-    rhino, right, scanned_a_b, search, second, shift, slash_equal, slice,
-    sloppy, sort, split, statement_block, stopping, strange_loop, strict,
-    string, stupid, sub, subscript, substr, supplant, sync_a, t, tag_a_in_b,
-    test, third, thru, toString, todo, todo_comment, token, tokens, too_long,
-    too_many, trailing_decimal_a, tree, unclosed, unclosed_comment,
-    unclosed_regexp, undef, undefined, unescaped_a, unexpected_a,
-    unexpected_char_a, unexpected_comment, unexpected_else, unexpected_label_a,
+    rhino, right, scanned_a_b, scope, search, second, shift, slash_equal, slice,
+    sloppy, sort, split, statement, statement_block, stopping, strange_loop,
+    strict, string, stupid, sub, subscript, substr, supplant, sync_a, t,
+    tag_a_in_b, test, third, thru, toString, todo, todo_comment, token, tokens,
+    too_long, too_many, trailing_decimal_a, tree, unclosed, unclosed_comment,
+    unclosed_regexp, unescaped_a, unexpected_a, unexpected_char_a,
+    unexpected_comment, unexpected_else, unexpected_label_a,
     unexpected_property_a, unexpected_space_a_b, unexpected_typeof_a,
-    unnecessary_initialize, unnecessary_use, unparam, unreachable_a_b, unsafe,
-    unused, url, urls, use_array, use_braces, use_object, use_or, use_param,
-    use_spaces, used_before_a, var, var_a_not, vars, was, weird_assignment,
-    weird_condition, weird_new, weird_program, weird_relation, weird_ternary,
-    white, windows, wrap, wrap_immediate, wrap_regexp, write_is_wrong,
-    writeable
+    uninitialized_a, unnecessary_initialize, unnecessary_use, unparam,
+    unreachable_a_b, unsafe, unused_a, url, use_array, use_braces, use_object,
+    use_or, use_param, use_spaces, used, used_before_a, var, var_a_not,
+    var_loop, vars, varstatement, was, weird_assignment, weird_condition,
+    weird_new, weird_program, weird_relation, weird_ternary, white, windows,
+    wrap, wrap_immediate, wrap_regexp, write_is_wrong, writeable
 */
 
 // The global directive is used to declare global variables that can
@@ -323,7 +307,6 @@ var JSLINT = (function () {
             properties: true,
             regexp    : true,
             rhino     : true,
-            undef     : true,
             unparam   : true,
             sloppy    : true,
             stupid    : true,
@@ -353,6 +336,7 @@ var JSLINT = (function () {
             '%'  : true
         },
         begin,          // The root token
+        block_var,     // vars defined in the current block
 
 // browser contains a set of global names that are commonly provided by a
 // web browser environment.
@@ -371,7 +355,6 @@ var JSLINT = (function () {
             a_scope: "'{a}' used out of scope.",
             already_defined: "'{a}' is already defined.",
             and: "The '&&' subexpression should be wrapped in parens.",
-            assign_exception: "Do not assign to the exception parameter.",
             assignment_function_expression: "Expected an assignment or " +
                 "function call and instead saw an expression.",
             avoid_a: "Avoid '{a}'.",
@@ -484,11 +467,13 @@ var JSLINT = (function () {
             unexpected_space_a_b: "Unexpected space between '{a}' and '{b}'.",
             unexpected_typeof_a: "Unexpected 'typeof'. " +
                 "Use '===' to compare directly with {a}.",
+            uninitialized_a: "Uninitialized '{a}'.",
             unnecessary_initialize: "It is not necessary to initialize '{a}' " +
                 "to 'undefined'.",
             unnecessary_use: "Unnecessary 'use strict'.",
             unreachable_a_b: "Unreachable '{a}' after '{b}'.",
             unsafe: "Unsafe character.",
+            unused_a: "Unused '{a}'.",
             url: "JavaScript URL.",
             use_array: "Use the array literal notation [].",
             use_braces: "Spaces are hard to count. Use {{a}}.",
@@ -498,15 +483,17 @@ var JSLINT = (function () {
             use_spaces: "Use spaces, not tabs.",
             used_before_a: "'{a}' was used before it was defined.",
             var_a_not: "Variable {a} was not declared correctly.",
+            var_loop: "Don't declare variables in a loop.",
             weird_assignment: "Weird assignment.",
             weird_condition: "Weird condition.",
             weird_new: "Weird construction. Delete 'new'.",
             weird_program: "Weird program.",
             weird_relation: "Weird relation.",
             weird_ternary: "Weird ternary.",
-            wrap_immediate: "Wrap an immediate function invocation in parentheses " +
-                "to assist the reader in understanding that the expression " +
-                "is the result of a function, and not the function itself.",
+            wrap_immediate: "Wrap an immediate function invocation in " +
+                "parentheses to assist the reader in understanding that the " +
+                "expression is the result of a function, and not the " +
+                "function itself.",
             wrap_regexp: "Wrap the /regexp/ literal in parens to " +
                 "disambiguate the slash operator.",
             write_is_wrong: "document.write can be a form of eval."
@@ -548,22 +535,14 @@ var JSLINT = (function () {
             '\\': '\\\\'
         },
 
-        funct,          // The current function, including the labels used in
-                        // the function, as well as (breakage),
-                        // (context), (loopage), (name), (params), (token),
-                        // (vars), (verb)
-
-        functionicity = [
-            'closure', 'exception', 'global', 'label', 'outer', 'undef',
-            'unused', 'var'
-        ],
+        funct,          // The current function
 
         functions,      // All of the functions
         global_funct,   // The global body
         global_scope,   // The global scope
-        in_block,
+        in_block,       // Where function statements are not allowed
         indent,
-        itself,         // JSLint itself
+        itself,         // JSLINT itself
         json_mode,
         lex,            // the tokenizer
         lines,
@@ -593,7 +572,6 @@ var JSLINT = (function () {
 
         scope,      // An object containing an object for each variable in scope
         semicolon_coda = array_to_object([';', '"', '\'', ')'], true),
-        stack,
 
 // standard contains the global names that are provided by the
 // ECMAScript standard.
@@ -608,10 +586,8 @@ var JSLINT = (function () {
 
         strict_mode,
         syntax = {},
-        tab,
         token,
         tokens,
-        urls,
         var_mode,
         warnings,
 
@@ -641,63 +617,6 @@ var JSLINT = (function () {
 // token
         tx = /^\s*([(){}\[\]\?.,:;'"~#@`]|={1,3}|\/(\*(jslint|properties|property|members?|globals?)?|=|\/)?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<(?:[\/=!]|\!(\[|--)?|<=?)?|\!(\!|==?)?|[a-zA-Z_$][a-zA-Z0-9_$]*|[0-9]+(?:[xX][0-9a-fA-F]+|\.[0-9]*)?(?:[eE][+\-]?[0-9]+)?)/;
 
-
-    function F() {}     // Used by Object.create
-
-// Provide critical ES5 functions to ES3.
-
-    if (typeof Array.prototype.filter !== 'function') {
-        Array.prototype.filter = function (f) {
-            var i, length = this.length, result = [], value;
-            for (i = 0; i < length; i += 1) {
-                try {
-                    value = this[i];
-                    if (f(value)) {
-                        result.push(value);
-                    }
-                } catch (ignore) {
-                }
-            }
-            return result;
-        };
-    }
-
-    if (typeof Array.prototype.forEach !== 'function') {
-        Array.prototype.forEach = function (f) {
-            var i, length = this.length;
-            for (i = 0; i < length; i += 1) {
-                try {
-                    f(this[i]);
-                } catch (ignore) {
-                }
-            }
-        };
-    }
-
-    if (typeof Array.isArray !== 'function') {
-        Array.isArray = function (o) {
-            return Object.prototype.toString.apply(o) === '[object Array]';
-        };
-    }
-
-    if (!Object.prototype.hasOwnProperty.call(Object, 'create')) {
-        Object.create = function (o) {
-            F.prototype = o;
-            return new F();
-        };
-    }
-
-    if (typeof Object.keys !== 'function') {
-        Object.keys = function (o) {
-            var array = [], key;
-            for (key in o) {
-                if (Object.prototype.hasOwnProperty.call(o, key)) {
-                    array.push(key);
-                }
-            }
-            return array;
-        };
-    }
 
     if (typeof String.prototype.entityify !== 'function') {
         String.prototype.entityify = function () {
@@ -820,7 +739,7 @@ var JSLINT = (function () {
             d: d
         };
         warning.reason = warning.raw.supplant(warning);
-        JSLINT.errors.push(warning);
+        itself.errors.push(warning);
         if (option.passfail) {
             quit(bundle.stopping, line, character);
         }
@@ -1095,7 +1014,6 @@ var JSLINT = (function () {
         function regexp() {
             var b,
                 bit,
-                captures = 0,
                 depth = 0,
                 flag = '',
                 high,
@@ -1164,8 +1082,6 @@ var JSLINT = (function () {
                             warn_at(bundle.expected_a_b, line, from + length,
                                 ':', source_row.charAt(length));
                         }
-                    } else {
-                        captures += 1;
                     }
                     break;
                 case '|':
@@ -1420,36 +1336,6 @@ klass:              do {
                                 : it('(punctuator)', snippet);
 
 //      punctuator
-
-                        case '<!--':
-                            length = line;
-//                            c = character;
-                            for (;;) {
-                                i = source_row.indexOf('--');
-                                if (i >= 0) {
-                                    break;
-                                }
-                                i = source_row.indexOf('<!');
-                                if (i >= 0) {
-                                    stop_at('nested_comment',
-                                        line, character + i);
-                                }
-                                if (!next_line()) {
-                                    stop_at('unclosed_comment', length, c);
-                                }
-                            }
-                            length = source_row.indexOf('<!');
-                            if (length >= 0 && length < i) {
-                                stop_at('nested_comment',
-                                    line, character + length);
-                            }
-                            character += i;
-                            if (source_row.charAt(i + 2) !== '>') {
-                                stop_at('expected_a', line, character, '-->');
-                            }
-                            character += 3;
-                            source_row = source_row.slice(i + 3);
-                            break;
                         default:
                             return it('(punctuator)', snippet);
                         }
@@ -1459,50 +1345,49 @@ klass:              do {
         };
     }());
 
+    function define(kind, token) {
 
-    function add_label(token, kind, name) {
+// Define a name.
 
-// Define the symbol in the current function in the current scope.
+        var name = token.string,
+            master = scope[name];       // The current definition of the name
 
-        name = name || token.string;
-        if (funct === global_funct) {
-            if (typeof global_funct[name] !== 'string') {
-                token.writeable = typeof predefined[name] === 'boolean'
-                    ? predefined[name]
-                    : true;
+// vars are created with a deadzone, so that the expression that initializes
+// the var cannot access the var. Functions are not writeable.
+
+        token.dead = false;
+        token.init = false;
+        token.kind = kind;
+        token.master = master;
+        token.used = 0;
+        token.writeable = false;
+
+// Global variables are a little weird. They can be defined multiple times.
+// Some predefined global vars are (or should) not be writeable.
+
+        if (kind === 'var' && funct === global_funct) {
+            if (!master) {
+                if (predefined[name] === false) {
+                    token.writeable = false;
+                }
                 global_scope[name] = token;
             }
-            if (kind === 'becoming') {
-                kind = 'var';
-            }
-
-// Ordinary variables.
-
         } else {
 
-// Warn if the variable already exists.
+// It is an error if the name has already been defined in this scope, except
+// when reusing an exception variable name.
 
-            if (typeof funct[name] === 'string') {
-                if (funct[name] === 'undef') {
-                    if (!option.undef) {
-                        warn('used_before_a', token, name);
-                    }
-                    kind = 'var';
-                } else {
+            if (master && master.function === funct) {
+                if (master.kind !== 'exception' || kind !== 'exception' || !master.dead) {
                     warn('already_defined', token, name);
                 }
-            } else {
-
-// Add the symbol to the current function.
-
-                token.writeable = true;
-                scope[name] = token;
+            }
+            scope[name] = token;
+            if (kind === 'var') {
+                block_var.push(name);
             }
         }
-        token.function = funct;
-        funct[name] = kind;
     }
-
 
     function peek(distance) {
 
@@ -1899,7 +1784,6 @@ klass:              do {
             advance();
             semicolon();
             strict_mode = true;
-            option.undef = false;
             return true;
         }
         return false;
@@ -1986,7 +1870,6 @@ klass:              do {
         advance();
         if (initial) {
             anonname = 'anonymous';
-            funct['(verb)'] = token.string;
         }
         if (initial === true && token.fud) {
             left = token.fud();
@@ -2282,40 +2165,31 @@ klass:              do {
         return x;
     }
 
+    function lvalue(that, s) {
+        var master;
+        if (that.identifier) {
+            master = scope[that.string];
+            if (scope[that.string].writeable !== true) {
+                warn('read_only', that);
+            }
+            master.used -= 1;
+            if (s === '=') {
+                master.init = true;
+            }
+        } else if (that.id === '.' || that.id === '[') {
+            if (!that.first || that.first.string === 'arguments') {
+                warn('bad_assignment', that);
+            }
+        } else {
+            warn('bad_assignment', that);
+        }
+    }
+
 
     function assignop(s, op) {
         var x = infix(s, 20, function (left, that) {
             that.first = left;
-            if (left.identifier) {
-                if (scope[left.string]) {
-                    if (scope[left.string].writeable === false) {
-                        warn('read_only', left);
-                    }
-                } else {
-                    stop('read_only');
-                }
-                if (funct['(params)']) {
-                    funct['(params)'].forEach(function (value) {
-                        if (value.string === left.string) {
-                            value.assign = true;
-                        }
-                    });
-                }
-            }
-            if (left === syntax.function) {
-                warn('identifier_function', token);
-            }
-            if (left.id === '.' || left.id === '[') {
-                if (!left.first || left.first.string === 'arguments') {
-                    warn('bad_assignment', that);
-                }
-            } else if (left.identifier) {
-                if (!left.reserved && funct[left.string] === 'exception') {
-                    warn('assign_exception', left);
-                }
-            } else {
-                warn('bad_assignment', that);
-            }
+            lvalue(left, s);
             that.second = expression(19);
             if (that.id === '=' && are_similar(that.first, that.second)) {
                 warn('weird_assignment', that);
@@ -2381,7 +2255,7 @@ klass:              do {
 
     function statement() {
 
-        var label, old_scope = scope, preamble, the_statement;
+        var label, preamble, the_statement;
 
 // We don't like the empty statement.
 
@@ -2398,14 +2272,14 @@ klass:              do {
             label = next_token;
             advance();
             advance(':');
-            scope = Object.create(old_scope);
-            add_label(label, 'label');
+            define('label', label);
             if (next_token.labeled !== true || funct === global_funct) {
                 stop('unexpected_label_a', label);
             } else if (jx.test(label.string + ':')) {
                 warn('url', label);
             }
             next_token.label = label;
+            label.init = true;
         }
 
 // Parse the statement.
@@ -2440,10 +2314,10 @@ klass:              do {
                     if (the_statement.first.id === 'new') {
                         warn('bad_new');
                     }
+                } else if (the_statement.id === '++' || the_statement.id === '--') {
+                    lvalue(the_statement.first);
                 } else if (!the_statement.assign &&
-                        the_statement.id !== 'delete' &&
-                        the_statement.id !== '++' &&
-                        the_statement.id !== '--') {
+                        the_statement.id !== 'delete') {
                     if (!option.closure || !preamble.comments) {
                         warn('assignment_function_expression', preamble);
                     }
@@ -2452,7 +2326,9 @@ klass:              do {
             }
         }
         step_out();
-        scope = old_scope;
+        if (label) {
+            label.dead = true;
+        }
         return the_statement;
     }
 
@@ -2493,44 +2369,44 @@ klass:              do {
     }
 
 
-    function block(ordinary) {
+    function block(kind) {
 
-// array block is array sequence of statements wrapped in braces.
-// ordinary is false for function bodies and try blocks.
-// ordinary is true for if statements, while, etc.
+// A block is a sequence of statements wrapped in braces.
 
         var array,
             curly = next_token,
+            old_block_var = block_var,
             old_in_block = in_block,
-            old_scope = scope,
             old_strict_mode = strict_mode;
 
-        in_block = ordinary;
-        scope = Object.create(scope);
-        if (next_token.id === '{') {
+        in_block = kind !== 'function' && kind !== 'try' && kind !== 'catch';
+        block_var = [];
+        if (curly.id === '{') {
             spaces();
             advance('{');
             step_in();
-            if (!ordinary && !use_strict() && !old_strict_mode &&
-                    !option.sloppy && funct['(context)'] === global_funct) {
+            if (kind === 'function' && !use_strict() && !old_strict_mode &&
+                    !option.sloppy && funct.level === 1) {
                 warn('missing_use_strict');
             }
             array = statements();
             strict_mode = old_strict_mode;
             step_out('}', curly);
-        } else if (!ordinary) {
-            stop('expected_a_b', next_token, '{', artifact());
+        } else if (in_block) {
+            stop('expected_a_b', curly, '{', artifact());
         } else {
-            warn('expected_a_b', next_token, '{', artifact());
+            warn('expected_a_b', curly, '{', artifact());
             array = [statement()];
             array.disrupt = array[0].disrupt;
         }
-        funct['(verb)'] = null;
-        scope = old_scope;
-        in_block = old_in_block;
-        if (ordinary && array.length === 0) {
-            warn('empty_block');
+        if (kind !== 'catch' && array.length === 0) {
+            warn('empty_block', curly);
         }
+        block_var.forEach(function (name) {
+            scope[name].dead = true;
+        });
+        block_var = old_block_var;
+        in_block = old_in_block;
         return array;
     }
 
@@ -2555,111 +2431,51 @@ klass:              do {
         identifier: true,
         nud: function () {
             var name = this.string,
-                variable = scope[name],
-                site,
+                master = scope[name],
                 writeable;
 
-// If the variable is not in scope, then we may have an undeclared variable.
+// If the master is not in scope, then we may have an undeclared variable.
 // Check the predefined list. If it was predefined, create the global
 // variable.
 
-            if (typeof variable !== 'object') {
+            if (!master) {
                 writeable = predefined[name];
                 if (typeof writeable === 'boolean') {
-                    global_scope[name] = variable = {
+                    global_scope[name] = master = {
+                        dead: false,
+                        function: global_funct,
+                        kind: 'var',
                         string: name,
-                        writeable: writeable,
-                        function: global_funct
+                        writeable: writeable
                     };
-                    global_funct[name] = 'var';
 
 // But if the variable is not in scope, and is not predefined, and if we are not
 // in the global scope, then we have an undefined variable error.
 
                 } else {
-                    if (!option.undef) {
-                        warn('used_before_a', token);
-                    }
-                    scope[name] = variable = {
-                        string: name,
-                        writeable: true,
-                        function: funct
-                    };
-                    funct[name] = 'undef';
+                    warn('used_before_a', token);
                 }
-
-            }
-            site = variable.function;
-
-// The name is in scope and defined in the current function.
-
-            if (funct === site) {
-
-//      Change 'unused' to 'var', and reject labels.
-
-                switch (funct[name]) {
-                case 'becoming':
-                    warn('unexpected_a', token);
-                    funct[name] = 'var';
-                    break;
-                case 'unused':
-                    funct[name] = 'var';
-                    break;
-                case 'unparam':
-                    funct[name] = 'parameter';
-                    break;
-                case 'unction':
-                    funct[name] = 'function';
-                    break;
-                case 'label':
-                    warn('a_label', token, name);
-                    break;
-                }
-                this.function = funct;
-
-// If the name is already defined in the current
-// function, but not as outer, then there is a scope error.
-
             } else {
-                switch (funct[name]) {
-                case 'closure':
-                case 'function':
-                case 'var':
-                case 'unused':
-                    warn('a_scope', token, name);
-                    break;
-                case 'label':
-                    warn('a_label', token, name);
-                    break;
-                case 'outer':
-                case 'global':
-                    break;
-                default:
+                this.master = master;
+            }
 
-// If the name is defined in an outer function, make an outer entry, and if
-// it was unused, make it var.
+// Annotate uses that cross scope boundaries.
 
-                    switch (site[name]) {
-                    case 'becoming':
-                    case 'closure':
-                    case 'function':
-                    case 'parameter':
-                    case 'unction':
-                    case 'unparam':
-                    case 'unused':
-                    case 'var':
-                        site[name] = 'closure';
-                        funct[name] = site === global_funct
-                            ? 'global'
-                            : 'outer';
-                        this.function = site;
-                        break;
-                    case 'undef':
-                        funct[name] = 'undef';
-                        break;
-                    case 'label':
-                        warn('a_label', token, name);
-                        break;
+            if (master) {
+                if (master.kind === 'label') {
+                    warn('a_label', this);
+                } else {
+                    if (master.dead === true || master.dead === funct) {
+                        warn('a_scope', this);
+                    }
+                    master.used += 1;
+                    if (master.function !== funct) {
+                        if (master.function === global_funct) {
+                            funct.global.push(name);
+                        } else {
+                            master.function.closure.push(name);
+                            funct.outer.push(name);
+                        }
                     }
                 }
             }
@@ -2673,7 +2489,6 @@ klass:              do {
 // Build the syntax table by declaring the syntactic elements.
 
     type('(array)', 'array');
-    type('(color)', 'color');
     type('(function)', 'function');
     type('(number)', 'number', return_this);
     type('(object)', 'object');
@@ -2684,10 +2499,6 @@ klass:              do {
     ultimate('(begin)');
     ultimate('(end)');
     ultimate('(error)');
-    postscript(symbol('</'));
-    symbol('<!');
-    symbol('<!--');
-    symbol('-->');
     postscript(symbol('}'));
     symbol(')');
     symbol(']');
@@ -2709,7 +2520,7 @@ klass:              do {
         if (strict_mode && funct === global_funct) {
             warn('strict', x);
         }
-        funct['(arguments)'] = true;
+        funct.arguments = true;
     });
     reservevar('eval');
     constant('false', 'boolean');
@@ -2717,9 +2528,7 @@ klass:              do {
     constant('NaN', 'number');
     constant('null', '');
     reservevar('this', function (x) {
-        if (strict_mode && funct['(token)'] &&
-                (funct['(token)'].arity === 'statement' &&
-                funct['(name)'].charAt(0) > 'Z')) {
+        if (strict_mode && funct.statement && funct.name.charAt(0) > 'Z') {
             warn('strict', x);
         }
     });
@@ -3284,68 +3093,72 @@ klass:              do {
     assignop('>>=', '>>');
     assignop('>>>=', '>>>');
 
-    function function_params() {
-        var id, paren = next_token, params = [];
+    function function_parameters() {
+        var id, parameters = [], paren = next_token;
         advance('(');
         token.function = funct;
         step_in();
         no_space();
-        if (next_token.id === ')') {
-            no_space();
-            step_out(')', paren);
-            return params;
-        }
-        for (;;) {
-            edge();
-            id = identifier();
-            params.push(token);
-            add_label(token, option.unparam ? 'parameter' : 'unparam');
-            if (next_token.id === ',') {
+        if (next_token.id !== ')') {
+            for (;;) {
+                edge();
+                id = identifier();
+                define('parameter', token);
+                parameters.push(id);
+                token.init = true;
+                token.writeable = true;
+                if (next_token.id !== ',') {
+                    break;
+                }
                 comma();
-            } else {
-                no_space();
-                step_out(')', paren);
-                return params;
             }
         }
+        no_space();
+        step_out(')', paren);
+        return parameters;
     }
 
     function do_function(func, name) {
-        var old_funct      = funct,
-            old_option     = option,
-            old_scope      = scope;
+        var old_funct = funct,
+            old_option = option,
+            old_scope = scope;
+        scope = Object.create(old_scope);
         funct = {
-            '(name)'     : name || '\'' + (anonname || '').replace(nx, sanitize) + '\'',
-            '(line)'     : next_token.line,
-            '(context)'  : old_funct,
-            '(breakage)' : 0,
-            '(loopage)'  : 0,
-            '(scope)'    : scope,
-            '(token)'    : func,
-            '(level)'    : old_funct['(level)'] + 1
+            closure: [],
+            global: [],
+            level: old_funct.level + 1,
+            line: next_token.line,
+            loopage: 0,
+            name: name || '\'' + (anonname || '').replace(nx, sanitize) + '\'',
+            outer: [],
+            scope: scope
         };
+        funct.parameter = function_parameters();
         func.function = funct;
         option = Object.create(old_option);
-        scope = Object.create(old_scope);
         functions.push(funct);
-        func.name = name;
         if (name) {
-            add_label(func, 'function', name);
+            func.name = name;
+            func.string = name;
+            define('function', func);
+            func.init = true;
+            func.used += 1;
         }
         func.writeable = false;
-        func.first = funct['(params)'] = function_params();
         one_space();
-        func.block = block(false);
-        if (funct['(arguments)']) {
-            func.first.forEach(function (value) {
-                if (value.assign) {
-                    warn('parameter_arguments_a', value, value.string);
-                }
-            });
-        }
-        funct      = old_funct;
-        option     = old_option;
-        scope      = old_scope;
+        func.block = block('function');
+        Object.keys(scope).forEach(function (name) {
+            var master = scope[name];
+            if (!master.used && master.kind !== 'exception' &&
+                    (master.kind !== 'parameter' || !option.unparam)) {
+                warn('unused_a', master);
+            } else if (!master.init) {
+                warn('uninitialized_a', master);
+            }
+        });
+        funct = old_funct;
+        option = old_option;
+        scope = old_scope;
     }
 
     prefix('{', function (that) {
@@ -3373,7 +3186,7 @@ klass:              do {
                 }
                 get.string = '';
                 do_function(get);
-                if (funct['(loopage)']) {
+                if (funct.loopage) {
                     warn('function_loop', get);
                 }
                 p = get.first;
@@ -3463,10 +3276,13 @@ klass:              do {
 
         var assign, id, name;
 
-        if (funct['(vars)'] && !option.vars) {
+        if (funct.loopage) {
+            warn('var_loop');
+        } else if (funct.varstatement && !option.vars) {
             warn('combine_var');
-        } else if (funct !== global_funct) {
-            funct['(vars)'] = true;
+        }
+        if (funct !== global_funct) {
+            funct.varstatement = true;
         }
         this.arity = 'statement';
         this.first = [];
@@ -3474,8 +3290,8 @@ klass:              do {
         for (;;) {
             name = next_token;
             id = identifier(true);
-            add_label(name, 'becoming');
-
+            define('var', name);
+            name.dead = funct;
             if (next_token.id === '=') {
                 assign = next_token;
                 assign.first = name;
@@ -3490,13 +3306,13 @@ klass:              do {
                 }
                 assign.second = expression(0);
                 assign.arity = 'infix';
+                name.init = true;
                 this.first.push(assign);
             } else {
                 this.first.push(name);
             }
-            if (funct[id] === 'becoming') {
-                funct[id] = 'unused';
-            }
+            name.dead = false;
+            name.writeable = true;
             if (next_token.id !== ',') {
                 break;
             }
@@ -3523,7 +3339,9 @@ klass:              do {
         }
         var name = next_token,
             id = identifier(true);
-        add_label(name, 'unction');
+        define('var', name);
+        name.init = true;
+        name.statement = true;
         no_space();
         this.arity = 'statement';
         do_function(this, id);
@@ -3545,8 +3363,8 @@ klass:              do {
         if (name) {
             name.function = that.function;
         }
-        if (funct['(loopage)']) {
-            warn('function_loop');
+        if (funct.loopage) {
+            warn('function_loop', that);
         }
         switch (next_token.id) {
         case ';':
@@ -3581,14 +3399,14 @@ klass:              do {
         no_space();
         step_out(')', paren);
         one_space();
-        this.block = block(true);
+        this.block = block('if');
         if (next_token.id === 'else') {
             one_space();
             advance('else');
             one_space();
             this.else = next_token.id === 'if' || next_token.id === 'switch'
                 ? statement(true)
-                : block(true);
+                : block('else');
             if (this.else.disrupt && this.block.disrupt) {
                 this.disrupt = true;
             }
@@ -3603,10 +3421,10 @@ klass:              do {
 // try.third    The finally clause
 // try.block    The try block
 
-        var exception_variable, old_scope, paren;
+        var exception_variable, paren;
         one_space();
         this.arity = 'statement';
-        this.block = block(false);
+        this.block = block('try');
         if (next_token.id === 'catch') {
             one_space();
             advance('catch');
@@ -3616,27 +3434,31 @@ klass:              do {
             step_in('control');
             no_space();
             edge();
-            old_scope = scope;
-            scope = Object.create(old_scope);
-            exception_variable = next_token.string;
-            this.first = exception_variable;
-            if (!next_token.identifier) {
-                warn('expected_identifier_a', next_token);
-            } else {
-                add_label(next_token, 'exception');
-            }
-            advance();
+            exception_variable = next_token;
+            this.first = identifier();
+            define('exception', exception_variable);
+            exception_variable.init = true;
             no_space();
             step_out(')', paren);
             one_space();
-            this.second = block(false);
-            scope = old_scope;
+            this.second = block('catch');
+            if (this.second.length) {
+                if (this.first === 'ignore') {
+                    warn('unexpected_a', exception_variable);
+                }
+            } else {
+                if (this.first !== 'ignore') {
+                    warn('expected_a_b', exception_variable, 'ignore',
+                        exception_variable.string);
+                }
+            }
+            exception_variable.dead = true;
         }
         if (next_token.id === 'finally') {
             one_space();
             advance('finally');
             one_space();
-            this.third = block(false);
+            this.third = block('finally');
         } else if (!this.second) {
             stop('expected_a_b', next_token, 'catch', artifact());
         }
@@ -3646,8 +3468,7 @@ klass:              do {
     labeled_stmt('while', function () {
         one_space();
         var paren = next_token;
-        funct['(breakage)'] += 1;
-        funct['(loopage)'] += 1;
+        funct.loopage += 1;
         advance('(');
         step_in('control');
         no_space();
@@ -3660,12 +3481,11 @@ klass:              do {
         no_space();
         step_out(')', paren);
         one_space();
-        this.block = block(true);
+        this.block = block('while');
         if (this.block.disrupt) {
             warn('strange_loop', prev_token);
         }
-        funct['(breakage)'] -= 1;
-        funct['(loopage)'] -= 1;
+        funct.loopage -= 1;
         return this;
     });
 
@@ -3692,7 +3512,6 @@ klass:              do {
             }
         }
 
-        funct['(breakage)'] += 1;
         one_space();
         advance('(');
         no_space();
@@ -3772,7 +3591,6 @@ klass:              do {
             }
             this.second.push(the_case);
         }
-        funct['(breakage)'] -= 1;
         spaces();
         step_out('}', this);
         in_block = old_in_block;
@@ -3788,11 +3606,10 @@ klass:              do {
     });
 
     labeled_stmt('do', function () {
-        funct['(breakage)'] += 1;
-        funct['(loopage)'] += 1;
+        funct.loopage += 1;
         one_space();
         this.arity = 'statement';
-        this.block = block(true);
+        this.block = block('do');
         if (this.block.disrupt) {
             warn('strange_loop', prev_token);
         }
@@ -3807,17 +3624,15 @@ klass:              do {
         this.first = expected_condition(expected_relation(expression(0)), bundle.unexpected_a);
         no_space();
         step_out(')', paren);
-        funct['(breakage)'] -= 1;
-        funct['(loopage)'] -= 1;
+        funct.loopage -= 1;
         return this;
     });
 
     labeled_stmt('for', function () {
 
-        var blok, filter, ok = false, paren = next_token, value;
+        var blok, filter, master, ok = false, paren = next_token, value;
         this.arity = 'statement';
-        funct['(breakage)'] += 1;
-        funct['(loopage)'] += 1;
+        funct.loopage += 1;
         advance('(');
         if (next_token.id === ';') {
             no_space();
@@ -3826,7 +3641,7 @@ klass:              do {
             advance(';');
             no_space();
             advance(')');
-            blok = block(true);
+            blok = block('for');
         } else {
             step_in('control');
             spaces(this, paren);
@@ -3837,23 +3652,19 @@ klass:              do {
             edge();
             if (peek(0).id === 'in') {
                 this.forin = true;
-                value = next_token;
-                switch (funct[value.string]) {
-                case 'unused':
-                    funct[value.string] = 'var';
-                    break;
-                case 'closure':
-                case 'var':
-                    break;
-                default:
+                value = expression(1000);
+                master = value.master;
+                if (master.kind !== 'var' || master.function !== funct ||
+                        !master.writeable || master.dead) {
                     warn('bad_in_a', value);
                 }
-                advance();
-                advance('in');
+                master.init = true;
+                master.used -= 1;
                 this.first = value;
+                advance('in');
                 this.second = expression(20);
                 step_out(')', paren);
-                blok = block(true);
+                blok = block('for');
                 if (!option.forin) {
                     if (blok.length === 1 && typeof blok[0] === 'object' &&
                             blok[0].string === 'if' && !blok[0].else) {
@@ -3926,57 +3737,47 @@ klass:              do {
                 no_space();
                 step_out(')', paren);
                 one_space();
-                blok = block(true);
+                blok = block('for');
             }
         }
         if (blok.disrupt) {
             warn('strange_loop', prev_token);
         }
         this.block = blok;
-        funct['(breakage)'] -= 1;
-        funct['(loopage)'] -= 1;
+        funct.loopage -= 1;
         return this;
     });
 
-    disrupt_stmt('break', function () {
-        var label = next_token.string;
-        this.arity = 'statement';
-        if (funct['(breakage)'] === 0) {
-            warn('unexpected_a', this);
-        }
+    function optional_label(that) {
+        var label = next_token.string,
+            master;
+        that.arity = 'statement';
         if (next_token.identifier && token.line === next_token.line) {
             one_space_only();
-            if (funct[label] !== 'label') {
+            master = scope[label];
+            if (!master || master.kind !== 'label') {
                 warn('not_a_label', next_token);
-            } else if (scope[label].function !== funct) {
+            } else if (master.dead || master.function !== funct) {
                 warn('not_a_scope', next_token);
+            } else {
+                master.used += 1;
             }
-            this.first = next_token;
+            that.first = next_token;
             advance();
         }
-        return this;
+        return that;
+
+    }
+
+    disrupt_stmt('break', function () {
+        return optional_label(this);
     });
 
     disrupt_stmt('continue', function () {
         if (!option.continue) {
             warn('unexpected_a', this);
         }
-        var label = next_token.string;
-        this.arity = 'statement';
-        if (funct['(breakage)'] === 0) {
-            warn('unexpected_a', this);
-        }
-        if (next_token.identifier && token.line === next_token.line) {
-            one_space_only();
-            if (funct[label] !== 'label') {
-                warn('not_a_label', next_token);
-            } else if (scope[label].function !== funct) {
-                warn('not_a_scope', next_token);
-            }
-            this.first = next_token;
-            advance();
-        }
-        return this;
+        return optional_label(this);
     });
 
     disrupt_stmt('return', function () {
@@ -4127,9 +3928,9 @@ klass:              do {
     itself = function JSLint(the_source, the_option) {
 
         var i, predef, tree;
-        JSLINT.errors = [];
-        JSLINT.tree = '';
-        JSLINT.properties = '';
+        itself.errors = [];
+        itself.tree = '';
+        itself.properties = '';
         begin = prev_token = token = next_token =
             Object.create(syntax['(begin)']);
         tokens = [];
@@ -4153,18 +3954,14 @@ klass:              do {
         }
         option.indent = +option.indent || 4;
         option.maxerr = +option.maxerr || 50;
-        tab = '';
-        for (i = 0; i < option.indent; i += 1) {
-            tab += ' ';
-        }
-        global_scope = scope = {};
+        global_scope = scope = Object.create(null);
         global_funct = funct = {
-            '(scope)': scope,
-            '(breakage)': 0,
-            '(loopage)': 0,
-            '(level)': 0
+            scope: scope,
+            loopage: 0,
+            level: 0
         };
         functions = [funct];
+        block_var = [];
 
         comments = [];
         comments_off = false;
@@ -4174,9 +3971,7 @@ klass:              do {
         lookahead = [];
         node_js = false;
         prereg = true;
-        stack = null;
         strict_mode = false;
-        urls = [];
         var_mode = null;
         warnings = 0;
         lex.init(the_source);
@@ -4218,105 +4013,81 @@ klass:              do {
             itself.property = property;
         } catch (e) {
             if (e) {        // ~~
-                JSLINT.errors.push({
+                itself.errors.push({
                     reason    : e.message,
                     line      : e.line || next_token.line,
                     character : e.character || next_token.from
                 }, null);
             }
         }
-        return JSLINT.errors.length === 0;
+        return itself.errors.length === 0;
     };
 
+    function unique(array) {
+        array = array.sort();
+        var i, length = 0, previous, value;
+        for (i = 0; i < array.length; i += 1) {
+            value = array[i];
+            if (value !== previous) {
+                array[length] = value;
+                previous = value;
+                length += 1;
+            }
+        }
+        array.length = length;
+        return array;
+    }
 
 // Data summary.
 
     itself.data = function () {
         var data = {functions: []},
             function_data,
-            globals,
             i,
-            j,
-            kind,
-            name,
-            the_function,
-            undef = [],
-            unused = [];
-        if (itself.errors.length) {
-            data.errors = itself.errors;
-        }
+            scope,
+            the_function;
+        data.errors = itself.errors;
+        data.json = json_mode;
+        data.global = unique(Object.keys(global_scope));
 
-        if (json_mode) {
-            data.json = true;
-        }
-
-        if (urls.length > 0) {
-            data.urls = urls;
-        }
-
-        globals = Object.keys(global_scope).filter(function (value) {
-            return value.charAt(0) !== '(' && typeof standard[value] !== 'boolean';
-        });
-        if (globals.length > 0) {
-            data.globals = globals;
+        function selects(name) {
+            var kind = scope[name].kind;
+            switch (kind) {
+            case 'var':
+            case 'exception':
+            case 'label':
+                function_data[kind].push(name);
+                break;
+            }
         }
 
         for (i = 1; i < functions.length; i += 1) {
             the_function = functions[i];
-            function_data = {};
-            for (j = 0; j < functionicity.length; j += 1) {
-                function_data[functionicity[j]] = [];
-            }
-            for (name in the_function) {
-                if (Object.prototype.hasOwnProperty.call(the_function, name)) {
-                    if (name.charAt(0) !== '(') {
-                        kind = the_function[name];
-                        if (kind === 'unction' || kind === 'unparam') {
-                            kind = 'unused';
-                        }
-                        if (Array.isArray(function_data[kind])) {
-                            function_data[kind].push(name);
-                            if (kind === 'unused') {
-                                unused.push({
-                                    name: name,
-                                    line: the_function['(line)'],
-                                    'function': the_function['(name)']
-                                });
-                            } else if (kind === 'undef') {
-                                undef.push({
-                                    name: name,
-                                    line: the_function['(line)'],
-                                    'function': the_function['(name)']
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-            for (j = 0; j < functionicity.length; j += 1) {
-                if (function_data[functionicity[j]].length === 0) {
-                    delete function_data[functionicity[j]];
-                }
-            }
-            function_data.name = the_function['(name)'];
-            function_data.params = the_function['(params)'];
-            function_data.line = the_function['(line)'];
-            function_data.level = the_function['(level)'];
+            function_data = {
+                name: the_function.name,
+                line: the_function.line,
+                level: the_function.level,
+                parameter: the_function.parameter,
+                var: [],
+                exception: [],
+                closure: unique(the_function.closure),
+                outer: unique(the_function.outer),
+                global: unique(the_function.global),
+                label: []
+            };
+            scope = the_function.scope;
+            Object.keys(scope).forEach(selects);
+            function_data.var.sort();
+            function_data.exception.sort();
+            function_data.label.sort();
             data.functions.push(function_data);
-        }
-
-        if (unused.length > 0) {
-            data.unused = unused;
-        }
-        if (undef.length > 0) {
-            data.undefined = undef;
         }
         data.tokens = tokens;
         return data;
     };
 
     itself.error_report = function (data) {
-        var evidence, i, output = [], snippets, warning;
+        var evidence, i, output = [], warning;
         if (data.errors) {
             if (data.json) {
                 output.push('<cite>JSON: bad.</cite><br>');
@@ -4339,33 +4110,6 @@ klass:              do {
                 }
             }
         }
-        if (data.unused || data.undefined) {
-            output.push('<dl>');
-            if (data.undefined) {
-                output.push('<dt>undefined</dt><dd>');
-                snippets = [];
-                for (i = 0; i < data.undefined.length; i += 1) {
-                    snippets[i] = '<code>' + data.undefined[i].name +
-                        '</code>&nbsp;<address>' +
-                        data.undefined[i]['function']  + ' ' +
-                        String(data.undefined[i].line) + '</address>';
-                }
-                output.push(snippets.join(', '));
-                output.push('</dd>');
-            }
-            if (data.unused) {
-                output.push('<dt>unused</dt><dd>');
-                snippets = [];
-                for (i = 0; i < data.unused.length; i += 1) {
-                    snippets[i] = '<code>' + data.unused[i].name + '</code>&nbsp;<address>' +
-                        data.unused[i].function  + ' ' +
-                        String(data.unused[i].line) + '</address>';
-                }
-                output.push(snippets.join(', '));
-                output.push('</dd>');
-            }
-            output.push('</dl>');
-        }
         return output.join('');
     };
 
@@ -4373,30 +4117,21 @@ klass:              do {
     itself.report = function (data) {
         var dl, i, j, names, output = [], the_function;
 
-        function detail(h, value) {
-            var comma_needed, singularity;
-            if (Array.isArray(value)) {
+        function detail(h, array) {
+            var comma_needed = false;
+            if (array.length) {
                 output.push("<dt>" + h + "</dt><dd>");
-                value.sort().forEach(function (item) {
-                    if (item !== singularity) {
-                        singularity = item;
-                        output.push((comma_needed ? ', ' : '') + singularity);
-                        comma_needed = true;
-                    }
+                array.forEach(function (item) {
+                    output.push((comma_needed ? ', ' : '') + item);
+                    comma_needed = true;
                 });
                 output.push("</dd>");
-            } else if (value) {
-                output.push("<dt>" + h + "</dt><dd>", value, "</dd>");
             }
         }
 
         output.push('<dl class=level0>');
-        if (data.urls) {
-            detail('url', data.urls);
-            dl = true;
-        }
-        if (data.globals) {
-            detail('global', data.globals);
+        if (data.global.length) {
+            detail('global', data.global);
             dl = true;
         } else if (data.json) {
             if (!data.errors) {
@@ -4424,11 +4159,10 @@ klass:              do {
                     '><address>line ' + String(the_function.line) +
                     '</address>' + the_function.name.entityify() + '(' +
                     names.join(', ') + ')');
-                detail('undefined', the_function.undefined);
-                detail('unused', the_function.unused);
-                detail('closure', the_function.closure);
+                detail('parameter', the_function.parameter);
                 detail('variable', the_function.var);
                 detail('exception', the_function.exception);
+                detail('closure', the_function.closure);
                 detail('outer', the_function.outer);
                 detail('global', the_function.global);
                 detail('label', the_function.label);
@@ -4445,7 +4179,6 @@ klass:              do {
         var i,
             key,
             keys = Object.keys(property).sort(),
-            length,
             mem = '    ',
             name,
             not_first = false,
@@ -4459,7 +4192,6 @@ klass:              do {
                 name = ix.test(key)
                     ? key
                     : '\'' + key.replace(nx, sanitize) + '\'';
-                length += name.length + 2;
                 if (mem.length + name.length >= 80) {
                     output.push(mem);
                     mem = '    ';
@@ -4484,13 +4216,13 @@ klass:              do {
             from = token.from;
             line = token.line;
             thru = token.thru;
-            level = token.function['(level)'];
+            level = token.function.level;
             do {
                 thru = token.thru;
                 token = data.tokens[i];
                 i += 1;
             } while (token && token.line === line && token.from - thru < 5 &&
-                    level === token.function['(level)']);
+                    level === token.function.level);
             result.push({
                 line: line,
                 level: level,
@@ -4503,7 +4235,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-04-09';
+    itself.edition = '2013-04-29';
 
     return itself;
 }());
