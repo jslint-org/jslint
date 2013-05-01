@@ -276,7 +276,7 @@ var JSLINT = (function () {
 
 // Make an object from an array of keys and a common value.
 
-        var i, length = array.length, object = {};
+        var i, length = array.length, object = Object.create(null);
         for (i = 0; i < length; i += 1) {
             object[array[i]] = value;
         }
@@ -383,7 +383,6 @@ var JSLINT = (function () {
             empty_class: "Empty class.",
             es5: "This is an ES5 feature.",
             evil: "eval is evil.",
-            expected_a: "Expected '{a}'.",
             expected_a_b: "Expected '{a}' and instead saw '{b}'.",
             expected_a_b_from_c_d: "Expected '{a}' to match '{b}' from line " +
                 "{c} and instead saw '{d}'.",
@@ -477,7 +476,7 @@ var JSLINT = (function () {
             url: "JavaScript URL.",
             use_array: "Use the array literal notation [].",
             use_braces: "Spaces are hard to count. Use {{a}}.",
-            use_object: "Use the object literal notation {}.",
+            use_object: "Use the object literal notation {} or Object.create(null).",
             use_or: "Use the || operator.",
             use_param: "Use a named parameter.",
             use_spaces: "Use spaces, not tabs.",
@@ -585,7 +584,7 @@ var JSLINT = (function () {
         ], false),
 
         strict_mode,
-        syntax = {},
+        syntax = Object.create(null),
         token,
         tokens,
         var_mode,
@@ -705,7 +704,7 @@ var JSLINT = (function () {
         if (!tok) {
             tok = next_token;
         }
-        return tok.number || tok.string;
+        return tok.id === '(number)' ? tok.number : tok.string;
     }
 
     function quit(message, line, character) {
@@ -731,9 +730,7 @@ var JSLINT = (function () {
             evidence: lines[line - 1] || '',
             line: line,
             character: character,
-            a: a || (offender.id === '(number)'
-                ? String(offender.number)
-                : offender.string),
+            a: a || artifact(offender),
             b: b,
             c: c,
             d: d
@@ -898,7 +895,7 @@ var JSLINT = (function () {
             }
 
             if (json_mode && x !== '"') {
-                warn_at('expected_a', line, character, '"');
+                warn_at('expected_a_b', line, character, '"', x);
             }
 
             for (;;) {
@@ -2415,7 +2412,7 @@ klass:              do {
         if (option.properties && typeof property[name] !== 'number') {
             warn('unexpected_property_a', token, name);
         }
-        if (typeof property[name] === 'number') {
+        if (property[name]) {
             property[name] += 1;
         } else {
             property[name] = 1;
@@ -3162,7 +3159,7 @@ klass:              do {
     }
 
     prefix('{', function (that) {
-        var get, i, j, name, p, set, seen = {};
+        var get, i, j, name, p, set, seen = Object.create(null);
         that.first = [];
         step_in();
         while (next_token.id !== '}') {
@@ -3841,7 +3838,7 @@ klass:              do {
     function json_value() {
 
         function json_object() {
-            var brace = next_token, object = {};
+            var brace = next_token, object = Object.create(null);
             advance('{');
             if (next_token.id !== '}') {
                 while (next_token.id !== '(end)') {
@@ -3934,9 +3931,9 @@ klass:              do {
         begin = prev_token = token = next_token =
             Object.create(syntax['(begin)']);
         tokens = [];
-        predefined = {};
+        predefined = Object.create(null);
         add_to_predefined(standard);
-        property = {};
+        property = Object.create(null);
         if (the_option) {
             option = Object.create(the_option);
             predef = option.predef;
@@ -3950,7 +3947,7 @@ klass:              do {
                 }
             }
         } else {
-            option = {};
+            option = Object.create(null);
         }
         option.indent = +option.indent || 4;
         option.maxerr = +option.maxerr || 50;
