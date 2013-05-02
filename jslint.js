@@ -177,6 +177,7 @@
 
 // The current option set is
 
+//     ass        true, if assignment expressions should be allowed
 //     bitwise    true, if bitwise operators should be allowed
 //     browser    true, if the standard browser globals should be predefined
 //     closure    true, if Google Closure idioms should be tolerated
@@ -215,30 +216,30 @@
 
 /*properties
     '\b', '\t', '\n', '\f', '\r', '!', '!=', '!==', '"', '%', '\'', '(begin)',
-    '(error)', '(identifier)', '*', '+', '-', '/', '<', '<=', '==', '===', '>',
-    '>=', '\\', a, a_label, a_scope, already_defined, and, arguments, arity,
-    assign, assignment_function_expression, at, avoid_a, b, bad_assignment,
-    bad_constructor, bad_in_a, bad_invocation, bad_new, bad_number, bad_operand,
-    bad_wrap, bitwise, block, browser, c, call, charAt, charCodeAt, character,
-    closure, color, combine_var, comments, conditional_assignment, confusing_a,
-    confusing_regexp, constructor_name_a, continue, control_a, couch, create, d,
-    dangling_a, data, dead, debug, deleted, devel, disrupt, duplicate_a, edge,
-    edition, else, empty_block, empty_case, empty_class, entityify, eqeq,
-    error_report, errors, es5, evidence, evil, exception, exec, expected_a,
-    expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d, expected_id_a,
-    expected_identifier_a, expected_identifier_a_reserved, expected_number_a,
-    expected_operator_a, expected_positive_a, expected_small_a,
-    expected_space_a_b, expected_string_a, f, first, flag, floor, forEach,
-    for_if, forin, from, fromCharCode, fud, function, function_block,
-    function_eval, function_loop, function_statement, function_strict,
-    functions, global, hasOwnProperty, id, identifier, identifier_function,
-    immed, implied_evil, indent, indexOf, infix_in, init, insecure_a, isAlpha,
-    isArray, isDigit, isNaN, join, jslint, json, keys, kind, label, labeled,
-    lbp, leading_decimal_a, led, left, length, level, line, loopage, master,
-    match, maxerr, maxlen, message, missing_a, missing_a_after_b,
-    missing_property, missing_space_a_b, missing_use_strict, mode,
-    move_invocation, move_var, n, name, name_function, nested_comment, newcap,
-    node, nomen, not, not_a_constructor, not_a_defined, not_a_function,
+    '(error)', '*', '+', '-', '/', '<', '<=', '==', '===', '>', '>=', '\\', a,
+    a_label, a_scope, already_defined, and, arguments, arity, ass, assign,
+    assignment_expression, assignment_function_expression, at, avoid_a, b,
+    bad_assignment, bad_constructor, bad_in_a, bad_invocation, bad_new,
+    bad_number, bad_operand, bad_wrap, bitwise, block, browser, c, call, charAt,
+    charCodeAt, character, closure, color, combine_var, comments,
+    conditional_assignment, confusing_a, confusing_regexp, constructor_name_a,
+    continue, control_a, couch, create, d, dangling_a, data, dead, debug,
+    deleted, devel, disrupt, duplicate_a, edge, edition, else, empty_block,
+    empty_case, empty_class, entityify, eqeq, error_report, errors, es5,
+    evidence, evil, exception, exec, expected_a_at_b_c, expected_a_b,
+    expected_a_b_from_c_d, expected_id_a, expected_identifier_a,
+    expected_identifier_a_reserved, expected_number_a, expected_operator_a,
+    expected_positive_a, expected_small_a, expected_space_a_b,
+    expected_string_a, f, first, flag, floor, forEach, for_if, forin, from,
+    fromCharCode, fud, function, function_block, function_eval, function_loop,
+    function_statement, function_strict, functions, global, hasOwnProperty, id,
+    identifier, identifier_function, immed, implied_evil, indent, indexOf,
+    infix_in, init, insecure_a, isAlpha, isArray, isDigit, isNaN, join, jslint,
+    json, keys, kind, label, labeled, lbp, leading_decimal_a, led, left, length,
+    level, line, loopage, master, match, maxerr, maxlen, message, missing_a,
+    missing_a_after_b, missing_property, missing_space_a_b, missing_use_strict,
+    mode, move_invocation, move_var, n, name, name_function, nested_comment,
+    newcap, node, nomen, not, not_a_constructor, not_a_defined, not_a_function,
     not_a_label, not_a_scope, not_greater, nud, number, octal_a, open, outer,
     parameter, parameter_a_get_b, parameter_arguments_a, parameter_set_a,
     params, paren, passfail, plusplus, postscript, predef, properties,
@@ -255,9 +256,10 @@
     uninitialized_a, unnecessary_initialize, unnecessary_use, unparam,
     unreachable_a_b, unsafe, unused_a, url, use_array, use_braces, use_object,
     use_or, use_param, use_spaces, used, used_before_a, var, var_a_not,
-    var_loop, vars, varstatement, warn, was, weird_assignment, weird_condition,
-    weird_new, weird_program, weird_relation, weird_ternary, white, windows,
-    wrap, wrap_immediate, wrap_regexp, write_is_wrong, writeable
+    var_loop, vars, varstatement, warn, warning, was, weird_assignment,
+    weird_condition, weird_new, weird_program, weird_relation, weird_ternary,
+    white, windows, wrap, wrap_immediate, wrap_regexp, write_is_wrong,
+    writeable
 */
 
 // The global directive is used to declare global variables that can
@@ -285,6 +287,7 @@ var JSLINT = (function () {
 
 
     var allowed_option = {
+            ass       : true,
             bitwise   : true,
             browser   : true,
             closure   : true,
@@ -355,6 +358,7 @@ var JSLINT = (function () {
             a_scope: "'{a}' used out of scope.",
             already_defined: "'{a}' is already defined.",
             and: "The '&&' subexpression should be wrapped in parens.",
+            assignment_expression: "Unexpected assignment expression.",
             assignment_function_expression: "Expected an assignment or " +
                 "function call and instead saw an expression.",
             avoid_a: "Avoid '{a}'.",
@@ -721,7 +725,7 @@ var JSLINT = (function () {
     }
 
     function warn(message, line, character, a, b, c, d) {
-        var warning = {
+        var warning = {         // ~~
             id: '(error)',
             raw: bundle[message] || message,
             evidence: lines[line - 1] || '',
@@ -1861,11 +1865,15 @@ klass:              do {
             }
             while (rbp < next_token.lbp) {
                 advance();
-                if (token.led) {
-                    left = token.led(left);
-                } else {
-                    token.stop('expected_operator_a', artifact(token));
-                }
+                left = token.led(left);
+            }
+        }
+        if (left && left.assign && !initial) {
+            if (!option.ass) {
+                left.warn('assignment_expression');
+            }
+            if (left.id !== '=' && left.first.master) {
+                left.first.master.used = true;
             }
         }
         return left;
@@ -1879,8 +1887,10 @@ klass:              do {
             this.stop('expected_operator_a');
         },
         warn: function (message, a, b, c, d) {
-            return warn(message, this.line || 0, this.from || 0,
-                a || artifact(this), b, c, d);
+            if (!this.warning) {
+                this.warning = warn(message, this.line || 0, this.from || 0,
+                    a || artifact(this), b, c, d);
+            }
         },
         stop: function (message, a, b, c, d) {
             var warning = this.warn(message, a, b, c, d);
@@ -2156,12 +2166,14 @@ klass:              do {
         var master;
         if (that.identifier) {
             master = scope[that.string];
-            if (scope[that.string].writeable !== true) {
-                that.warn('read_only');
-            }
-            master.used -= 1;
-            if (s === '=') {
-                master.init = true;
+            if (master) {
+                if (scope[that.string].writeable !== true) {
+                    that.warn('read_only');
+                }
+                master.used -= 1;
+                if (s === '=') {
+                    master.init = true;
+                }
             }
         } else if (that.id === '.' || that.id === '[') {
             if (!that.first || that.first.string === 'arguments') {
@@ -2175,11 +2187,21 @@ klass:              do {
 
     function assignop(s, op) {
         var x = infix(s, 20, function (left, that) {
+            var next;
             that.first = left;
             lvalue(left, s);
-            that.second = expression(19);
+            that.second = expression(20);
             if (that.id === '=' && are_similar(that.first, that.second)) {
                 that.warn('weird_assignment');
+            }
+            next = that;
+            while (next_token.id === '=') {
+                lvalue(next.second, '=');
+                next_token.first = next.second;
+                next.second = next_token;
+                next = next_token;
+                advance('=');
+                next.second = expression(20);
             }
             return that;
         });
