@@ -551,9 +551,9 @@ var JSLINT = (function () {
         lines,
         lookahead,
         node = array_to_object([
-            'Buffer', 'clearInterval', 'clearTimeout', 'console', 'exports',
-            'global', 'module', 'process', 'querystring', 'require',
-            'setInterval', 'setTimeout', '__dirname', '__filename'
+            'Buffer', 'clearImmediate', 'clearInterval', 'clearTimeout', 'console',
+            'exports', 'global', 'module', 'process', 'querystring', 'require',
+            'setImmediate', 'setInterval', 'setTimeout', '__dirname', '__filename'
         ], false),
         node_js,
         numbery = array_to_object(['indexOf', 'lastIndexOf', 'search'], true),
