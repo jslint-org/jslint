@@ -82,7 +82,7 @@
 //             {
 //                 name: STRING,
 //                 line: NUMBER,
-//                 last: NUMBER,
+//                 level: NUMBER,
 //                 parameter: [
 //                     STRING
 //                 ],
