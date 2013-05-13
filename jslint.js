@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-05-06
+// 2013-05-12
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -691,6 +691,7 @@ var JSLINT = (function () {
         if (option.node) {
             add_to_predefined(node);
             option.node = false;
+            option.es5 = true;
             node_js = true;
         }
         if (option.rhino) {
@@ -4243,7 +4244,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-05-06';
+    itself.edition = '2013-05-12';
 
     return itself;
 }());
