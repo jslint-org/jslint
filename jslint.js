@@ -507,7 +507,8 @@ var JSLINT = (function () {
         comments,
         comments_off,
         couch = array_to_object([
-            'emit'
+            'emit', 'getRow', 'isArray', 'log', 'provides', 'registerType',
+            'require', 'send', 'start', 'sum', 'toJSON'
         ], false),
 
         descapes = {
@@ -683,6 +684,7 @@ var JSLINT = (function () {
         if (option.couch) {
             add_to_predefined(couch);
             option.couch = false;
+            option.es5 = true;
         }
         if (option.devel) {
             add_to_predefined(devel);

@@ -190,7 +190,19 @@ effect as this directive:</p>
     (<code>node</code>) <a href="#options">option</a> to predefine globals that are used in the Node.js environment<code></code>. It has the same
     effect as this
   directive:</p>
-<blockquote><code>/*global Buffer: false, clearInterval: false, clearTimeout: false, console: false, exports: false, global: false, module: false, process: false, querystring: false, require: false, setInterval: false, setTimeout: false, __filename: false, __dirname: false */</code></blockquote>
+<blockquote>
+  <code>/*jslint es5: true */</code>
+</blockquote>
+<blockquote><code>/*global Buffer: false, clearInterval: false, clearTimeout: false, console: false, exports: false, global: false, module: false, process: false, querystring: false, require: false, setInterval: false, setTimeout: false, __filename: false, __dirname: false */</code>
+</blockquote>
+<p id=windows>Select the <i>Assume Couch</i> (<code>couch</code>)
+  <a href="#options">option</a> to predefine the global properties provided by Couch DB. It has the same effect as this directive:</p>
+<blockquote>
+  <code>/*jslint es5: true */</code>
+</blockquote>
+<blockquote>
+  <code>/*global emit: false, getRow: false, isArray: false, log: false, provides: false, registerType: false, require: false, send: false, start: false, sum: false, toJSON: false */</code>
+</blockquote>
 <p id=rhino>Select the <i>Assume Rhino</i> (<code>rhino</code>) <a href="#options">option</a>
     to predefine the global properties provided by the Rhino environment.
   It has the same effect as this directive:</p>
@@ -511,7 +523,7 @@ options are selected with several checkboxes and two fields. </p>
       <a href="#browser"><small>(more)</small></a> </td>
   </tr>
   <tr>
-    <td>Tolerate Google Closure idioms</td>
+    <td>Tolerate <a href="https://developers.google.com/closure/">Google Closure</a> idioms</td>
     <td><code>closure</code></td>
     <td><code>true</code> if Google Closure annotations should be allowed.</td>
   </tr>
@@ -523,7 +535,7 @@ options are selected with several checkboxes and two fields. </p>
   <tr>
     <td>Assume <a href="http://couchdb.apache.org/">CouchDB</a></td>
     <td><code>couch</code></td>
-    <td><code>true</code> if <code>emit</code> should be predefined.</td>
+    <td><code>true</code> if Couch DB globals should be predefined.</td>
   </tr>
   <tr>
     <td>Tolerate debugger statements</td>
@@ -581,7 +593,7 @@ options are selected with several checkboxes and two fields. </p>
       functions is optional. <a href="#new"><small>(more)</small></a></td>
   </tr>
   <tr>
-    <td>Assume Node.js</td>
+    <td>Assume <a href="http://nodejs.org/">Node.js</a></td>
     <td><code>node</code></td>
     <td><code>true</code> if Node.js globals should be predefined. <a href="#node"><small>(more)</small></a></td>
   </tr>
@@ -602,7 +614,7 @@ options are selected with several checkboxes and two fields. </p>
        be allowed. <a href="#inc"><small>(more)</small></a></td>
   </tr>
   <tr>
-    <td>Predefined <small>( , separated)</small></td>
+    <td>Predefined</td>
     <td><code>predef</code></td>
     <td>An array of strings, the names of predefined global variables, or an object whose keys are global variable names, and whose values are booleans that determine if each variable is assignable (also see <a href="#global">global</a>). <code>predef</code> is used with the <code>option</code> object, but not
       with the <code>/*jslint*/</code>  directive. You can also use the <code>var</code>
@@ -615,7 +627,7 @@ options are selected with several checkboxes and two fields. </p>
       literals. They match more material than might be expected, allowing attackers to confuse applications. These forms should not be used when validating in secure applications. </td>
   </tr>
   <tr>
-    <td>Assume Rhino </td>
+    <td>Assume <a href="https://developer.mozilla.org/en-US/docs/Rhino">Rhino</a></td>
     <td><code>rhino</code></td>
     <td><code>true</code> if the <a href="http://www.mozilla.org/rhino/">Rhino</a>
       environment globals should be predefined. <a href="#rhino"><small>(more)</small></a></td>
