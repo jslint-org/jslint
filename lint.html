@@ -195,7 +195,7 @@ effect as this directive:</p>
 </blockquote>
 <blockquote><code>/*global Buffer: false, clearInterval: false, clearTimeout: false, console: false, exports: false, global: false, module: false, process: false, querystring: false, require: false, setInterval: false, setTimeout: false, __filename: false, __dirname: false */</code>
 </blockquote>
-<p id=windows>Select the <i>Assume Couch</i> (<code>couch</code>)
+<p id=couch>Select the <i>Assume Couch</i> (<code>couch</code>)
   <a href="#options">option</a> to predefine the global properties provided by Couch DB. It has the same effect as this directive:</p>
 <blockquote>
   <code>/*jslint es5: true */</code>
@@ -208,11 +208,6 @@ effect as this directive:</p>
   It has the same effect as this directive:</p>
 <blockquote>
   <code>/*global defineClass: false, deserialize: false, gc: false, help: false, load: false, loadClass: false, print: false, quit: false, readFile: false, readUrl: false, runCommand: false, seal: false, serialize: false, spawn: false, sync: false, toint32: false, version: false */ </code>
-</blockquote>
-<p id=windows>Select the <i>Assume Windows</i> (<code>windows</code>)
-  <a href="#options">option</a> to predefine the global properties provided by Microsoft Windows. It has the same effect as this directive:</p>
-<blockquote>
-    <code>/*global ActiveXObject: false, CScript: false, Debug: false, Enumerator: false, System: false, VBArray: false, WScript: false, WSH: false */</code>
 </blockquote>
 <h1 id=semicolon>Semicolon</h1>
 <p>JavaScript uses a C-like syntax which requires the use of semicolons to delimit certain
@@ -672,11 +667,6 @@ options are selected with several checkboxes and two fields. </p>
     <td> Tolerate messy white space</td>
     <td><code>white</code></td>
     <td><code>true</code> if strict whitespace rules should be ignored.</td>
-  </tr>
-  <tr>
-      <td>Assume Windows</td>
-      <td><code>windows</code></td>
-      <td><code>true</code> if the Windows globals should be predefined. <a href="#windows"><small>(more)</small></a></td>
   </tr>
   </tbody>
 </table>

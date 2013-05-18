@@ -206,7 +206,6 @@
 //     todo       true, if TODO comments are tolerated
 //     vars       true, if multiple var statements per function should be allowed
 //     white      true, if sloppy whitespace is tolerated
-//     windows    true, if MS Windows-specific globals should be predefined
 
 // The properties directive declares an exclusive list of property names.
 // Any properties named in the program that are not in the list will
@@ -258,8 +257,7 @@
     use_or, use_param, use_spaces, used, used_before_a, var, var_a_not,
     var_loop, vars, varstatement, warn, warning, was, weird_assignment,
     weird_condition, weird_new, weird_program, weird_relation, weird_ternary,
-    white, windows, wrap, wrap_immediate, wrap_regexp, write_is_wrong,
-    writeable
+    white, wrap, wrap_immediate, wrap_regexp, write_is_wrong, writeable
 */
 
 // The global directive is used to declare global variables that can
@@ -316,8 +314,7 @@ var JSLINT = (function () {
             sub       : true,
             todo      : true,
             vars      : true,
-            white     : true,
-            windows   : true
+            white     : true
         },
         anonname,       // The guessed name for anonymous functions.
 
@@ -597,11 +594,6 @@ var JSLINT = (function () {
         var_mode,
         warnings,
 
-        windows = array_to_object([
-            'ActiveXObject', 'CScript', 'Debug', 'Enumerator', 'System',
-            'VBArray', 'WScript', 'WSH'
-        ], false),
-
 // Regular expressions. Some of these are stupidly long.
 
 // carriage return, carriage return linefeed, or linefeed
@@ -699,10 +691,6 @@ var JSLINT = (function () {
         if (option.rhino) {
             add_to_predefined(rhino);
             option.rhino = false;
-        }
-        if (option.windows) {
-            add_to_predefined(windows);
-            option.windows = false;
         }
     }
 
