@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-05-12
+// 2013-05-16
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -221,7 +221,7 @@
     assignment_expression, assignment_function_expression, at, avoid_a, b,
     bad_assignment, bad_constructor, bad_in_a, bad_invocation, bad_new,
     bad_number, bad_operand, bad_wrap, bitwise, block, browser, c, call, charAt,
-    charCodeAt, character, closure, color, combine_var, comments,
+    charCodeAt, character, closure, code, color, combine_var, comments,
     conditional_assignment, confusing_a, confusing_regexp, constructor_name_a,
     continue, control_a, couch, create, d, dangling_a, data, dead, debug,
     deleted, devel, disrupt, duplicate_a, edge, edition, else, empty_block,
@@ -611,7 +611,7 @@ var JSLINT = (function () {
 // identifier
         ix = /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/,
 // javascript url
-        jx = /^(?:javascript|jscript|ecmascript|vbscript|mocha|livescript)\s*:/i,
+        jx = /^(?:javascript|jscript|ecmascript|vbscript)\s*:/i,
 // star slash
         lx = /\*\/|\/\*/,
 // characters in strings that need escapement
@@ -722,16 +722,17 @@ var JSLINT = (function () {
             line: line,
             character: character,
             message: bundle.scanned_a_b.supplant({
-                a: message,
+                a: bundle[message] || message,
                 b: Math.floor((line / lines.length) * 100)
             })
         };
     }
 
-    function warn(message, line, character, a, b, c, d) {
+    function warn(code, line, character, a, b, c, d) {
         var warning = {         // ~~
             id: '(error)',
-            raw: bundle[message] || message,
+            raw: bundle[code] || code,
+            code: code,
             evidence: lines[line - 1] || '',
             line: line,
             character: character,
@@ -743,18 +744,18 @@ var JSLINT = (function () {
         warning.reason = warning.raw.supplant(warning);
         itself.errors.push(warning);
         if (option.passfail) {
-            quit(bundle.stopping, line, character);
+            quit('stopping', line, character);
         }
         warnings += 1;
         if (warnings >= option.maxerr) {
-            quit(bundle.too_many, line, character);
+            quit('too_many', line, character);
         }
         return warning;
     }
 
-    function stop(message, line, character, a, b, c, d) {
-        var warning = warn(message, line, character, a, b, c, d);
-        quit(bundle.stopping, warning.line, warning.character);
+    function stop(code, line, character, a, b, c, d) {
+        var warning = warn(code, line, character, a, b, c, d);
+        quit('stopping', warning.line, warning.character);
     }
 
     function expected_at(at) {
@@ -1050,7 +1051,7 @@ var JSLINT = (function () {
                     if (c < ' ') {
                         warn('control_a', line, from + length, String(c));
                     } else if (c === '<') {
-                        warn(bundle.unexpected_a, line, from + length, '\\');
+                        warn('unexpected_a', line, from + length, '\\');
                     }
                     length += 1;
                     break;
@@ -1066,7 +1067,7 @@ var JSLINT = (function () {
                             length += 1;
                             break;
                         default:
-                            warn(bundle.expected_a_b, line, from + length,
+                            warn('expected_a_b', line, from + length,
                                 ':', source_row.charAt(length));
                         }
                     }
@@ -1131,9 +1132,9 @@ klass:              do {
                         case '\\':
                             c = source_row.charAt(length);
                             if (c < ' ') {
-                                warn(bundle.control_a, line, from + length, String(c));
+                                warn('control_a', line, from + length, String(c));
                             } else if (c === '<') {
-                                warn(bundle.unexpected_a, line, from + length, '\\');
+                                warn('unexpected_a', line, from + length, '\\');
                             }
                             length += 1;
                             bit = true;
@@ -1175,7 +1176,7 @@ klass:              do {
                         length += 1;
                         c = source_row.charAt(length);
                         if (c < '0' || c > '9') {
-                            warn(bundle.expected_number_a, line,
+                            warn('expected_number_a', line,
                                 from + length, c);
                         }
                         length += 1;
@@ -1207,7 +1208,7 @@ klass:              do {
                             }
                         }
                         if (source_row.charAt(length) !== '}') {
-                            warn(bundle.expected_a_b, line, from + length,
+                            warn('expected_a_b', line, from + length,
                                 '}', c);
                         } else {
                             length += 1;
@@ -1216,7 +1217,7 @@ klass:              do {
                             length += 1;
                         }
                         if (low > high) {
-                            warn(bundle.not_greater, line, from + length,
+                            warn('not_greater', line, from + length,
                                 low, high);
                         }
                         break;
@@ -1312,7 +1313,7 @@ klass:              do {
 //      /
                         case '/':
                             if (token.id === '/=') {
-                                stop(bundle.slash_equal, line, from);
+                                stop('slash_equal', line, from);
                             }
                             return prereg
                                 ? regexp()
@@ -1890,15 +1891,16 @@ klass:              do {
         led: function () {
             this.stop('expected_operator_a');
         },
-        warn: function (message, a, b, c, d) {
+        warn: function (code, a, b, c, d) {
             if (!this.warning) {
-                this.warning = warn(message, this.line || 0, this.from || 0,
+                this.warning = warn(code, this.line || 0, this.from || 0,
                     a || artifact(this), b, c, d);
             }
         },
-        stop: function (message, a, b, c, d) {
-            var warning = this.warn(message, a, b, c, d);
-            return quit(bundle.stopping, warning.line, warning.character);
+        stop: function (code, a, b, c, d) {
+            this.warning = undefined;
+            this.warn(code, a, b, c, d);
+            return quit('stopping', this.line, this.character);
         },
         lbp: 0
     };
@@ -2063,7 +2065,7 @@ klass:              do {
 
     function expected_relation(node, message) {
         if (node.assign) {
-            node.warn(message || bundle.conditional_assignment);
+            node.warn(message || 'conditional_assignment');
         }
         return node;
     }
@@ -2073,7 +2075,7 @@ klass:              do {
         case '[':
         case '-':
             if (node.arity !== 'infix') {
-                node.warn(message || bundle.weird_condition);
+                node.warn(message || 'weird_condition');
             }
             break;
         case 'false':
@@ -2090,14 +2092,14 @@ klass:              do {
         case '{':
         case '?':
         case '~':
-            node.warn(message || bundle.weird_condition);
+            node.warn(message || 'weird_condition');
             break;
         case '(':
             if (node.first.id === 'new' ||
                     (node.first.string === 'Boolean') ||
                     (node.first.id === '.' &&
                         numbery[node.first.second.string] === true)) {
-                node.warn(message || bundle.weird_condition);
+                node.warn(message || 'weird_condition');
             }
             break;
         }
@@ -3487,7 +3489,7 @@ klass:              do {
         this.arity = 'statement';
         this.first = expected_relation(expression(0));
         if (this.first.id !== 'true') {
-            expected_condition(this.first, bundle.unexpected_a);
+            expected_condition(this.first, 'unexpected_a');
         }
         no_space();
         step_out(')', paren);
@@ -3632,7 +3634,7 @@ klass:              do {
         step_in();
         no_space();
         edge();
-        this.first = expected_condition(expected_relation(expression(0)), bundle.unexpected_a);
+        this.first = expected_condition(expected_relation(expression(0)), 'unexpected_a');
         no_space();
         step_out(')', paren);
         funct.loopage -= 1;
@@ -3730,7 +3732,7 @@ klass:              do {
                 edge();
                 this.second = expected_relation(expression(0));
                 if (this.second.id !== 'true') {
-                    expected_condition(this.second, bundle.unexpected_a);
+                    expected_condition(this.second, 'unexpected_a');
                 }
                 semicolon(token);
                 if (next_token.id === ';') {
@@ -4246,7 +4248,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-05-12';
+    itself.edition = '2013-05-16';
 
     return itself;
 }());
