@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-05-16
+// 2013-05-26
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -461,7 +461,7 @@ var JSLINT = (function () {
             unexpected_a: "Unexpected '{a}'.",
             unexpected_char_a: "Unexpected character '{a}'.",
             unexpected_comment: "Unexpected comment.",
-            unexpected_else: "Unexpected 'else' after 'return'.",
+            unexpected_else: "Unexpected 'else' after disruption.",
             unexpected_label_a: "Unexpected label '{a}'.",
             unexpected_property_a: "Unexpected /*property*/ '{a}'.",
             unexpected_space_a_b: "Unexpected space between '{a}' and '{b}'.",
@@ -1804,13 +1804,12 @@ klass:              do {
             default:
                 return true;
             }
-        } else {
-            if (a.id === '.' && b.id === '[' && b.arity === 'infix') {
-                return a.second.string === b.second.string && b.second.id === '(string)';
-            }
-            if (a.id === '[' && a.arity === 'infix' && b.id === '.') {
-                return a.second.string === b.second.string && a.second.id === '(string)';
-            }
+        }
+        if (a.id === '.' && b.id === '[' && b.arity === 'infix') {
+            return a.second.string === b.second.string && b.second.id === '(string)';
+        }
+        if (a.id === '[' && a.arity === 'infix' && b.id === '.') {
+            return a.second.string === b.second.string && a.second.id === '(string)';
         }
         return false;
     }
@@ -3402,6 +3401,9 @@ klass:              do {
         one_space();
         this.block = block('if');
         if (next_token.id === 'else') {
+            if (this.block.disrupt) {
+                next_token.warn('unexpected_else');
+            }
             one_space();
             advance('else');
             one_space();
@@ -3799,9 +3801,6 @@ klass:              do {
             if (this.first.assign) {
                 this.first.warn('unexpected_a');
             }
-        }
-        if (peek(0).id === '}' && peek(1).id === 'else') {
-            this.warn('unexpected_else');
         }
         return this;
     });
@@ -4236,7 +4235,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-05-16';
+    itself.edition = '2013-05-26';
 
     return itself;
 }());
