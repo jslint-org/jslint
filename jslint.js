@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-05-26
+// 2013-05-28
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -250,14 +250,15 @@
     sync_a, t, tag_a_in_b, test, third, thru, toString, todo, todo_comment,
     token, tokens, too_long, too_many, trailing_decimal_a, tree, unclosed,
     unclosed_comment, unclosed_regexp, unescaped_a, unexpected_a,
-    unexpected_char_a, unexpected_comment, unexpected_else, unexpected_label_a,
+    unexpected_char_a, unexpected_comment, unexpected_label_a,
     unexpected_property_a, unexpected_space_a_b, unexpected_typeof_a,
-    uninitialized_a, unnecessary_initialize, unnecessary_use, unparam,
-    unreachable_a_b, unsafe, unused_a, url, use_array, use_braces, use_object,
-    use_or, use_param, use_spaces, used, used_before_a, var, var_a_not,
-    var_loop, vars, varstatement, warn, warning, was, weird_assignment,
-    weird_condition, weird_new, weird_program, weird_relation, weird_ternary,
-    white, wrap, wrap_immediate, wrap_regexp, write_is_wrong, writeable
+    uninitialized_a, unnecessary_else, unnecessary_initialize, unnecessary_use,
+    unparam, unreachable_a_b, unsafe, unused_a, url, use_array, use_braces,
+    use_object, use_or, use_param, use_spaces, used, used_before_a, var,
+    var_a_not, var_loop, vars, varstatement, warn, warning, was,
+    weird_assignment, weird_condition, weird_new, weird_program, weird_relation,
+    weird_ternary, white, wrap, wrap_immediate, wrap_regexp, write_is_wrong,
+    writeable
 */
 
 // The global directive is used to declare global variables that can
@@ -461,13 +462,13 @@ var JSLINT = (function () {
             unexpected_a: "Unexpected '{a}'.",
             unexpected_char_a: "Unexpected character '{a}'.",
             unexpected_comment: "Unexpected comment.",
-            unexpected_else: "Unexpected 'else' after disruption.",
             unexpected_label_a: "Unexpected label '{a}'.",
             unexpected_property_a: "Unexpected /*property*/ '{a}'.",
             unexpected_space_a_b: "Unexpected space between '{a}' and '{b}'.",
             unexpected_typeof_a: "Unexpected 'typeof'. " +
                 "Use '===' to compare directly with {a}.",
             uninitialized_a: "Uninitialized '{a}'.",
+            unnecessary_else: "Unnecessary 'else' after disruption.",
             unnecessary_initialize: "It is not necessary to initialize '{a}' " +
                 "to 'undefined'.",
             unnecessary_use: "Unnecessary 'use strict'.",
@@ -3402,7 +3403,7 @@ klass:              do {
         this.block = block('if');
         if (next_token.id === 'else') {
             if (this.block.disrupt) {
-                next_token.warn('unexpected_else');
+                next_token.warn('unnecessary_else');
             }
             one_space();
             advance('else');
@@ -4235,7 +4236,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-05-26';
+    itself.edition = '2013-05-28';
 
     return itself;
 }());
