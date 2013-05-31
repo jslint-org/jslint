@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-05-28
+// 2013-05-29
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -3670,39 +3670,46 @@ klass:              do {
                 step_out(')', paren);
                 blok = block('for');
                 if (!option.forin) {
-                    if (blok.length === 1 && typeof blok[0] === 'object' &&
-                            blok[0].string === 'if' && !blok[0].else) {
-                        filter = blok[0].first;
-                        while (filter.id === '&&') {
-                            filter = filter.first;
-                        }
-                        switch (filter.id) {
-                        case '===':
-                        case '!==':
-                            ok = filter.first.id === '['
-                                ? filter.first.first.string === this.second.string &&
-                                    filter.first.second.string === this.first.string
-                                : filter.first.id === 'typeof' &&
-                                    filter.first.first.id === '[' &&
-                                    filter.first.first.first.string === this.second.string &&
-                                    filter.first.first.second.string === this.first.string;
-                            break;
-                        case '(':
-                            ok = filter.first.id === '.' && ((
-                                filter.first.first.string === this.second.string &&
-                                filter.first.second.string === 'hasOwnProperty' &&
-                                filter.second[0].string === this.first.string
-                            ) || (
-                                filter.first.first.id === '.' &&
-                                filter.first.first.first.id === '.' &&
-                                filter.first.first.first.first.string === 'Object' &&
-                                filter.first.first.first.second.string === 'prototype' &&
-                                filter.first.first.second.string === 'hasOwnProperty' &&
-                                filter.first.second.string === 'call' &&
-                                filter.second[0].string === this.second.string &&
-                                filter.second[1].string === this.first.string
-                            ));
-                            break;
+                    if (blok.length === 1 && typeof blok[0] === 'object') {
+                        if (blok[0].id === 'if' && !blok[0].else) {
+                            filter = blok[0].first;
+                            while (filter.id === '&&') {
+                                filter = filter.first;
+                            }
+                            switch (filter.id) {
+                            case '===':
+                            case '!==':
+                                ok = filter.first.id === '['
+                                    ? are_similar(filter.first.first, this.second) &&
+                                        are_similar(filter.first.second, this.first)
+                                    : filter.first.id === 'typeof' &&
+                                        filter.first.first.id === '[' &&
+                                        are_similar(filter.first.first.first, this.second) &&
+                                        are_similar(filter.first.first.second, this.first);
+                                break;
+                            case '(':
+                                ok = filter.first.id === '.' && ((
+                                    are_similar(filter.first.first, this.second) &&
+                                    filter.first.second.string === 'hasOwnProperty' &&
+                                    are_similar(filter.second[0], this.first.string)
+                                ) || (
+                                    filter.first.first.id === '.' &&
+                                    filter.first.first.first.first.string === 'Object' &&
+                                    filter.first.first.first.id === '.' &&
+                                    filter.first.first.first.second.string === 'prototype' &&
+                                    filter.first.first.second.string === 'hasOwnProperty' &&
+                                    filter.first.second.string === 'call' &&
+                                    are_similar(filter.second[0], this.second) &&
+                                    are_similar(filter.second[1], this.first)
+                                ));
+                                break;
+                            }
+                        } else if (blok[0].id === 'switch') {
+                            ok = blok[0].id === 'switch' &&
+                                blok[0].first.id === 'typeof' &&
+                                blok[0].first.first.id === '[' &&
+                                are_similar(blok[0].first.first.first, this.second) &&
+                                are_similar(blok[0].first.first.second, this.first);
                         }
                     }
                     if (!ok) {
@@ -4236,7 +4243,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-05-28';
+    itself.edition = '2013-05-29';
 
     return itself;
 }());
