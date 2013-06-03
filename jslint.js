@@ -1785,17 +1785,12 @@ klass:              do {
         if (a.id === '(number)' && b.id === '(number)') {
             return a.number === b.number;
         }
-        if (a.arity === 'function' || b.arity === 'function') {
-            return false;
-        }
-        if (a.identifier && b.identifier) {
-            return a.string === b.string;
-        }
         if (a.arity === b.arity && a.string === b.string) {
             switch (a.arity) {
+            case undefined:
+                return a.string === b.string;
             case 'prefix':
             case 'suffix':
-            case undefined:
                 return a.id === b.id && are_similar(a.first, b.first) &&
                     a.id !== '{' && a.id !== '[';
             case 'infix':
