@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-05-31
+// 2013-07-01
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -3356,6 +3356,7 @@ klass:              do {
             no_space();
         } else {
             id = '';
+            one_space();
         }
         do_function(that, id);
         if (name) {
@@ -4240,7 +4241,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-05-31';
+    itself.edition = '2013-07-01';
 
     return itself;
 }());
