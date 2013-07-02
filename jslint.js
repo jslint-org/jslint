@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-07-01
+// 2013-07-02
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -3008,7 +3008,7 @@ klass:              do {
         switch (e.id) {
         case '(number)':
             if (e.id === '(number)' && left.id === 'arguments') {
-                left.warn('use_param', left);
+                left.warn('use_param');
             }
             break;
         case '(string)':
@@ -4241,7 +4241,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-07-01';
+    itself.edition = '2013-07-02';
 
     return itself;
 }());
