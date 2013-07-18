@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-07-02
+// 2013-07-17
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -3692,6 +3692,7 @@ klass:              do {
                                     are_similar(filter.second[0], this.first)
                                 ) || (
                                     filter.first.first.id === '.' &&
+                                    filter.first.first.first.first &&
                                     filter.first.first.first.first.string === 'Object' &&
                                     filter.first.first.first.id === '.' &&
                                     filter.first.first.first.second.string === 'prototype' &&
@@ -4241,7 +4242,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-07-02';
+    itself.edition = '2013-07-17';
 
     return itself;
 }());
