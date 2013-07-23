@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-07-17
+// 2013-07-22
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -2867,7 +2867,7 @@ klass:              do {
             if (left.string.match(/^[A-Z]([A-Z0-9_$]*[a-z][A-Za-z0-9_$]*)?$/)) {
                 if (left.string !== 'Number' && left.string !== 'String' &&
                         left.string !== 'Boolean' && left.string !== 'Date') {
-                    if (left.string === 'Math' || left.string === 'JSON') {
+                    if (left.string === 'Math') {
                         left.warn('not_a_function');
                     } else if (left.string === 'Object') {
                         token.warn('use_object');
@@ -2875,6 +2875,8 @@ klass:              do {
                         left.warn('missing_a', 'new');
                     }
                 }
+            } else if (left.string === 'JSON') {
+                left.warn('not_a_function');
             }
         } else if (left.id === '.') {
             if (left.second.string === 'split' &&
@@ -4242,7 +4244,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-07-17';
+    itself.edition = '2013-07-22';
 
     return itself;
 }());
