@@ -2867,7 +2867,7 @@ klass:              do {
             if (left.string.match(/^[A-Z]([A-Z0-9_$]*[a-z][A-Za-z0-9_$]*)?$/)) {
                 if (left.string !== 'Number' && left.string !== 'String' &&
                         left.string !== 'Boolean' && left.string !== 'Date') {
-                    if (left.string === 'Math' || left.string === 'JSON') {
+                    if (left.string === 'Math') {
                         left.warn('not_a_function');
                     } else if (left.string === 'Object') {
                         token.warn('use_object');
@@ -2875,6 +2875,8 @@ klass:              do {
                         left.warn('missing_a', 'new');
                     }
                 }
+            } else if (left.string === 'JSON') {
+                left.warn('not_a_function');
             }
         } else if (left.id === '.') {
             if (left.second.string === 'split' &&
