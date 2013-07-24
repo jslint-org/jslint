@@ -861,17 +861,17 @@ var JSLINT = (function () {
         }
 
         function string(x) {
-            var c, pos = 0, r = '', result;
+            var ch, at = 0, r = '', result;
 
             function hex(n) {
-                var i = parseInt(source_row.substr(pos + 1, n), 16);
-                pos += n;
+                var i = parseInt(source_row.substr(at + 1, n), 16);
+                at += n;
                 if (i >= 32 && i <= 126 &&
                         i !== 34 && i !== 92 && i !== 39) {
                     warn('unexpected_a', line, character, '\\');
                 }
                 character += n;
-                c = String.fromCharCode(i);
+                ch = String.fromCharCode(i);
             }
 
             if (json_mode && x !== '"') {
@@ -879,37 +879,37 @@ var JSLINT = (function () {
             }
 
             for (;;) {
-                while (pos >= source_row.length) {
-                    pos = 0;
+                while (at >= source_row.length) {
+                    at = 0;
                     if (!next_line()) {
                         stop('unclosed', line - 1, from);
                     }
                 }
-                c = source_row.charAt(pos);
-                if (c === x) {
+                ch = source_row.charAt(at);
+                if (ch === x) {
                     character += 1;
-                    source_row = source_row.slice(pos + 1);
+                    source_row = source_row.slice(at + 1);
                     result = it('(string)', r);
                     result.quote = x;
                     return result;
                 }
-                if (c < ' ') {
-                    if (c === '\n' || c === '\r') {
+                if (ch < ' ') {
+                    if (ch === '\n' || ch === '\r') {
                         break;
                     }
-                    warn('control_a', line, character + pos,
-                        source_row.slice(0, pos));
-                } else if (c === '\\') {
-                    pos += 1;
+                    warn('control_a', line, character + at,
+                        source_row.slice(0, at));
+                } else if (ch === '\\') {
+                    at += 1;
                     character += 1;
-                    c = source_row.charAt(pos);
-                    switch (c) {
+                    ch = source_row.charAt(at);
+                    switch (ch) {
                     case '':
                         if (!option.es5) {
                             warn('es5', line, character);
                         }
                         next_line();
-                        pos = -1;
+                        at = -1;
                         break;
                     case '\'':
                         if (json_mode) {
@@ -923,7 +923,7 @@ var JSLINT = (function () {
                         if (json_mode) {
                             warn('unexpected_a', line, character, '\\v');
                         }
-                        c = '\v';
+                        ch = '\v';
                         break;
                     case 'x':
                         if (json_mode) {
@@ -932,17 +932,17 @@ var JSLINT = (function () {
                         hex(2);
                         break;
                     default:
-                        if (typeof descapes[c] !== 'string') {
-                            warn(c >= '0' && c <= '7' ? 'octal_a' : 'unexpected_a',
-                                line, character, '\\' + c);
+                        if (typeof descapes[ch] !== 'string') {
+                            warn(ch >= '0' && ch <= '7' ? 'octal_a' : 'unexpected_a',
+                                line, character, '\\' + ch);
                         } else {
-                            c = descapes[c];
+                            ch = descapes[ch];
                         }
                     }
                 }
-                r += c;
+                r += ch;
                 character += 1;
-                pos += 1;
+                at += 1;
             }
         }
 
@@ -989,45 +989,45 @@ var JSLINT = (function () {
         }
 
         function regexp() {
-            var b,
+            var at = 0,
+                b,
                 bit,
                 depth = 0,
                 flag = '',
                 high,
                 letter,
-                length = 0,
                 low,
                 potential,
                 quote,
                 result;
             for (;;) {
                 b = true;
-                c = source_row.charAt(length);
-                length += 1;
+                c = source_row.charAt(at);
+                at += 1;
                 switch (c) {
                 case '':
                     stop('unclosed_regexp', line, from);
                     return;
                 case '/':
                     if (depth > 0) {
-                        warn('unescaped_a', line, from + length, '/');
+                        warn('unescaped_a', line, from + at, '/');
                     }
-                    c = source_row.slice(0, length - 1);
+                    c = source_row.slice(0, at - 1);
                     potential = Object.create(regexp_flag);
                     for (;;) {
-                        letter = source_row.charAt(length);
+                        letter = source_row.charAt(at);
                         if (potential[letter] !== true) {
                             break;
                         }
                         potential[letter] = false;
-                        length += 1;
+                        at += 1;
                         flag += letter;
                     }
-                    if (source_row.charAt(length).isAlpha()) {
-                        stop('unexpected_a', line, from, source_row.charAt(length));
+                    if (source_row.charAt(at).isAlpha()) {
+                        stop('unexpected_a', line, from, source_row.charAt(at));
                     }
-                    character += length;
-                    source_row = source_row.slice(length);
+                    character += at;
+                    source_row = source_row.slice(at);
                     quote = source_row.charAt(0);
                     if (quote === '/' || quote === '*') {
                         stop('confusing_regexp', line, from);
@@ -1036,28 +1036,28 @@ var JSLINT = (function () {
                     result.flag = flag;
                     return result;
                 case '\\':
-                    c = source_row.charAt(length);
+                    c = source_row.charAt(at);
                     if (c < ' ') {
-                        warn('control_a', line, from + length, String(c));
+                        warn('control_a', line, from + at, String(c));
                     } else if (c === '<') {
-                        warn('unexpected_a', line, from + length, '\\');
+                        warn('unexpected_a', line, from + at, '\\');
                     }
-                    length += 1;
+                    at += 1;
                     break;
                 case '(':
                     depth += 1;
                     b = false;
-                    if (source_row.charAt(length) === '?') {
-                        length += 1;
-                        switch (source_row.charAt(length)) {
+                    if (source_row.charAt(at) === '?') {
+                        at += 1;
+                        switch (source_row.charAt(at)) {
                         case ':':
                         case '=':
                         case '!':
-                            length += 1;
+                            at += 1;
                             break;
                         default:
-                            warn('expected_a_b', line, from + length,
-                                ':', source_row.charAt(length));
+                            warn('expected_a_b', line, from + at,
+                                ':', source_row.charAt(at));
                         }
                     }
                     break;
@@ -1066,70 +1066,70 @@ var JSLINT = (function () {
                     break;
                 case ')':
                     if (depth === 0) {
-                        warn('unescaped_a', line, from + length, ')');
+                        warn('unescaped_a', line, from + at, ')');
                     } else {
                         depth -= 1;
                     }
                     break;
                 case ' ':
                     pos = 1;
-                    while (source_row.charAt(length) === ' ') {
-                        length += 1;
+                    while (source_row.charAt(at) === ' ') {
+                        at += 1;
                         pos += 1;
                     }
                     if (pos > 1) {
-                        warn('use_braces', line, from + length, pos);
+                        warn('use_braces', line, from + at, pos);
                     }
                     break;
                 case '[':
-                    c = source_row.charAt(length);
+                    c = source_row.charAt(at);
                     if (c === '^') {
-                        length += 1;
+                        at += 1;
                         if (!option.regexp) {
-                            warn('insecure_a', line, from + length, c);
-                        } else if (source_row.charAt(length) === ']') {
-                            stop('unescaped_a', line, from + length, '^');
+                            warn('insecure_a', line, from + at, c);
+                        } else if (source_row.charAt(at) === ']') {
+                            stop('unescaped_a', line, from + at, '^');
                         }
                     }
                     bit = false;
                     if (c === ']') {
-                        warn('empty_class', line, from + length - 1);
+                        warn('empty_class', line, from + at - 1);
                         bit = true;
                     }
 klass:              do {
-                        c = source_row.charAt(length);
-                        length += 1;
+                        c = source_row.charAt(at);
+                        at += 1;
                         switch (c) {
                         case '[':
                         case '^':
-                            warn('unescaped_a', line, from + length, c);
+                            warn('unescaped_a', line, from + at, c);
                             bit = true;
                             break;
                         case '-':
                             if (bit) {
                                 bit = false;
                             } else {
-                                warn('unescaped_a', line, from + length, '-');
+                                warn('unescaped_a', line, from + at, '-');
                                 bit = true;
                             }
                             break;
                         case ']':
                             if (!bit) {
-                                warn('unescaped_a', line, from + length - 1, '-');
+                                warn('unescaped_a', line, from + at - 1, '-');
                             }
                             break klass;
                         case '\\':
-                            c = source_row.charAt(length);
+                            c = source_row.charAt(at);
                             if (c < ' ') {
-                                warn('control_a', line, from + length, String(c));
+                                warn('control_a', line, from + at, String(c));
                             } else if (c === '<') {
-                                warn('unexpected_a', line, from + length, '\\');
+                                warn('unexpected_a', line, from + at, '\\');
                             }
-                            length += 1;
+                            at += 1;
                             bit = true;
                             break;
                         case '/':
-                            warn('unescaped_a', line, from + length - 1, '/');
+                            warn('unescaped_a', line, from + at - 1, '/');
                             bit = true;
                             break;
                         default:
@@ -1139,7 +1139,7 @@ klass:              do {
                     break;
                 case '.':
                     if (!option.regexp) {
-                        warn('insecure_a', line, from + length, c);
+                        warn('insecure_a', line, from + at, c);
                     }
                     break;
                 case ']':
@@ -1148,74 +1148,74 @@ klass:              do {
                 case '}':
                 case '+':
                 case '*':
-                    warn('unescaped_a', line, from + length, c);
+                    warn('unescaped_a', line, from + at, c);
                     break;
                 }
                 if (b) {
-                    switch (source_row.charAt(length)) {
+                    switch (source_row.charAt(at)) {
                     case '?':
                     case '+':
                     case '*':
-                        length += 1;
-                        if (source_row.charAt(length) === '?') {
-                            length += 1;
+                        at += 1;
+                        if (source_row.charAt(at) === '?') {
+                            at += 1;
                         }
                         break;
                     case '{':
-                        length += 1;
-                        c = source_row.charAt(length);
+                        at += 1;
+                        c = source_row.charAt(at);
                         if (c < '0' || c > '9') {
                             warn('expected_number_a', line,
-                                from + length, c);
+                                from + at, c);
                         }
-                        length += 1;
+                        at += 1;
                         low = +c;
                         for (;;) {
-                            c = source_row.charAt(length);
+                            c = source_row.charAt(at);
                             if (c < '0' || c > '9') {
                                 break;
                             }
-                            length += 1;
+                            at += 1;
                             low = +c + (low * 10);
                         }
                         high = low;
                         if (c === ',') {
-                            length += 1;
+                            at += 1;
                             high = Infinity;
-                            c = source_row.charAt(length);
+                            c = source_row.charAt(at);
                             if (c >= '0' && c <= '9') {
-                                length += 1;
+                                at += 1;
                                 high = +c;
                                 for (;;) {
-                                    c = source_row.charAt(length);
+                                    c = source_row.charAt(at);
                                     if (c < '0' || c > '9') {
                                         break;
                                     }
-                                    length += 1;
+                                    at += 1;
                                     high = +c + (high * 10);
                                 }
                             }
                         }
-                        if (source_row.charAt(length) !== '}') {
-                            warn('expected_a_b', line, from + length,
+                        if (source_row.charAt(at) !== '}') {
+                            warn('expected_a_b', line, from + at,
                                 '}', c);
                         } else {
-                            length += 1;
+                            at += 1;
                         }
-                        if (source_row.charAt(length) === '?') {
-                            length += 1;
+                        if (source_row.charAt(at) === '?') {
+                            at += 1;
                         }
                         if (low > high) {
-                            warn('not_greater', line, from + length,
+                            warn('not_greater', line, from + at,
                                 low, high);
                         }
                         break;
                     }
                 }
             }
-            c = source_row.slice(0, length - 1);
-            character += length;
-            source_row = source_row.slice(length);
+            c = source_row.slice(0, at - 1);
+            character += at;
+            source_row = source_row.slice(at);
             return it('(regexp)', c);
         }
 
@@ -1236,7 +1236,7 @@ klass:              do {
 // token -- this is called by advance to get the next token.
 
             token: function () {
-                var c, i, snippet;
+                var first, i, snippet;
 
                 for (;;) {
                     while (!source_row) {
@@ -1249,14 +1249,14 @@ klass:              do {
 
 //      identifier
 
-                        c = snippet.charAt(0);
-                        if (c.isAlpha() || c === '_' || c === '$') {
+                        first = snippet.charAt(0);
+                        if (first.isAlpha() || first === '_' || first === '$') {
                             return it('(identifier)', snippet);
                         }
 
 //      number
 
-                        if (c.isDigit()) {
+                        if (first.isDigit()) {
                             return number(snippet);
                         }
                         switch (snippet) {
@@ -1350,9 +1350,16 @@ klass:              do {
 // It is an error if the name has already been defined in this scope, except
 // when reusing an exception variable name.
 
-            if (master && master.function === funct) {
-                if (master.kind !== 'exception' || kind !== 'exception' || !master.dead) {
-                    token.warn('already_defined', name);
+            if (master) {
+                if (master.function === funct) {
+                    if (master.kind !== 'exception' || kind !== 'exception' ||
+                            !master.dead) {
+                        token.warn('already_defined', name);
+                    }
+                } else if (master.function !== global_funct) {
+                    if (kind === 'var') {
+                        token.warn('already_defined', name);
+                    }
                 }
             }
             scope[name] = token;
@@ -4053,14 +4060,14 @@ klass:              do {
         var data = {functions: []},
             function_data,
             i,
-            scope,
-            the_function;
+            the_function,
+            the_scope;
         data.errors = itself.errors;
         data.json = json_mode;
         data.global = unique(Object.keys(global_scope));
 
         function selects(name) {
-            var kind = scope[name].kind;
+            var kind = the_scope[name].kind;
             switch (kind) {
             case 'var':
             case 'exception':
@@ -4084,8 +4091,8 @@ klass:              do {
                 global: unique(the_function.global),
                 label: []
             };
-            scope = the_function.scope;
-            Object.keys(scope).forEach(selects);
+            the_scope = the_function.scope;
+            Object.keys(the_scope).forEach(selects);
             function_data.var.sort();
             function_data.exception.sort();
             function_data.label.sort();
@@ -4220,18 +4227,19 @@ klass:              do {
             line,
             result = [],
             thru,
-            token = data.tokens[0];
-        while (token && token.id !== '(end)') {
-            from = token.from;
-            line = token.line;
-            thru = token.thru;
-            level = token.function.level;
+            data_token = data.tokens[0];
+        while (data_token && data_token.id !== '(end)') {
+            from = data_token.from;
+            line = data_token.line;
+            thru = data_token.thru;
+            level = data_token.function.level;
             do {
-                thru = token.thru;
-                token = data.tokens[i];
+                thru = data_token.thru;
+                data_token = data.tokens[i];
                 i += 1;
-            } while (token && token.line === line && token.from - thru < 5 &&
-                    level === token.function.level);
+            } while (data_token && data_token.line === line &&
+                    data_token.from - thru < 5 &&
+                    level === data_token.function.level);
             result.push({
                 line: line,
                 level: level,
