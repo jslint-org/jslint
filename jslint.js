@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-07-22
+// 2013-07-24
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -243,13 +243,13 @@
     parameter, parameter_a_get_b, parameter_arguments_a, parameter_set_a,
     params, paren, passfail, plusplus, postscript, predef, properties,
     properties_report, property, prototype, push, quote, r, radix, raw,
-    read_only, reason, regexp, relation, replace, report, reserved, reserved_a,
-    rhino, right, scanned_a_b, scope, search, second, shift, slash_equal, slice,
-    sloppy, sort, split, statement, statement_block, stop, stopping,
-    strange_loop, strict, string, stupid, sub, subscript, substr, supplant,
-    sync_a, t, tag_a_in_b, test, third, thru, toString, todo, todo_comment,
-    token, tokens, too_long, too_many, trailing_decimal_a, tree, unclosed,
-    unclosed_comment, unclosed_regexp, unescaped_a, unexpected_a,
+    read_only, reason, redefinition_a_b, regexp, relation, replace, report,
+    reserved, reserved_a, rhino, right, scanned_a_b, scope, search, second,
+    shift, slash_equal, slice, sloppy, sort, split, statement, statement_block,
+    stop, stopping, strange_loop, strict, string, stupid, sub, subscript,
+    substr, supplant, sync_a, t, tag_a_in_b, test, third, thru, toString, todo,
+    todo_comment, token, tokens, too_long, too_many, trailing_decimal_a, tree,
+    unclosed, unclosed_comment, unclosed_regexp, unescaped_a, unexpected_a,
     unexpected_char_a, unexpected_comment, unexpected_label_a,
     unexpected_property_a, unexpected_space_a_b, unexpected_typeof_a,
     uninitialized_a, unnecessary_else, unnecessary_initialize, unnecessary_use,
@@ -440,6 +440,7 @@ var JSLINT = (function () {
             parameter_set_a: "Expected parameter (value) in set {a} function.",
             radix: "Missing radix parameter.",
             read_only: "Read only.",
+            redefinition_a_b: "Redefinition of '{a}' from line {b}.",
             reserved_a: "Reserved name '{a}'.",
             scanned_a_b: "{a} ({b}% scanned).",
             slash_equal: "A regular expression literal can be confused with '/='.",
@@ -1358,7 +1359,7 @@ klass:              do {
                     }
                 } else if (master.function !== global_funct) {
                     if (kind === 'var') {
-                        token.warn('already_defined', name);
+                        token.warn('redefinition_a_b', name, master.line);
                     }
                 }
             }
@@ -4252,7 +4253,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-07-22';
+    itself.edition = '2013-07-24';
 
     return itself;
 }());
