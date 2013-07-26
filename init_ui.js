@@ -195,6 +195,49 @@ ADSAFE.lib("init_ui", function (lib) {
             show_jslint_directive();
         }
 
+        function link_errors_to_source() {
+            var citeErrorBunch = errors_div.q('>cite'),
+                sourceLines = source_str.getValue().split(/\n/),
+                // TODO Please note ADSAFE does not provide access to
+                // methods needed for setting caret in textarea.
+                source_node = source_str.___nodes___[0],
+                getOffsetFromLineChar = function(line, char) {
+                    var line0 = line - 1,
+                        char0 = char - 1,
+                        offset = 0,
+                        i;
+                    for (i = 0; i < line0; i += 1) {
+                        offset += sourceLines[i].length + 1;
+                    }
+                    offset += char0;
+                    return offset;
+                },
+                makeErrorSelector = function(i) {
+                    var err = JSLINT.errors[i],
+                        offset = getOffsetFromLineChar(err.line, err.character),
+                        closeToBottom = err.line - source_node.rows;
+                    // TODO Please note this event listener does not need the event argument.
+                    return function() {
+                        // TODO Please note this calculation needs to be adjusted for 1-based line numbers.
+                        var firstVisibleLine = Math.ceil(source_node.scrollTop * source_node.rows / source_node.clientHeight) + 1;
+                        source_node.setSelectionRange(offset, offset);
+                        // source_node.setSelectionRange(offset, offset+1);
+                        if (err.line < firstVisibleLine) {
+                            source_node.scrollTop = 0;
+                            if (err.line > source_node.rows) {
+                                source_node.scrollByLines(closeToBottom);
+                            }
+                        }
+                        if (err.line > firstVisibleLine + source_node.rows) {
+                            source_node.scrollTop = 0;
+                            source_node.scrollByLines(closeToBottom);
+                        }
+                    };
+                },
+                citeErrorIndex = 0;
+                citeErrorBunch.each(function(ce) { ce.on('click', makeErrorSelector(citeErrorIndex++)); });
+        };
+
 
 // Restore the options from a JSON cookie.
 
@@ -208,6 +251,7 @@ ADSAFE.lib("init_ui", function (lib) {
             if (lib.jslint(source_str.getValue(), option,
                     errors_div, report_div, properties_str, edition)) {
                 errors.style('display', 'block');
+                link_errors_to_source();
             }
             report.style('display', 'block');
             if (properties_str.getValue().length > 21) {
