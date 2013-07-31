@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-07-24
+// 2013-07-31
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -4174,8 +4174,7 @@ klass:              do {
                 }
                 output.push('<dl class=level' + the_function.level +
                     '><address>line ' + String(the_function.line) +
-                    '</address>' + the_function.name.entityify() + '(' +
-                    names.join(', ') + ')');
+                    '</address>' + the_function.name.entityify());
                 detail('parameter', the_function.parameter);
                 detail('variable', the_function.var);
                 detail('exception', the_function.exception);
@@ -4253,7 +4252,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-07-24';
+    itself.edition = '2013-07-31';
 
     return itself;
 }());
