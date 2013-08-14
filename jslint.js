@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-07-31
+// 2013-08-13
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -3197,9 +3197,8 @@ klass:              do {
                 if (funct.loopage) {
                     get.warn('function_loop');
                 }
-                p = get.first;
-                if (p && p.length) {
-                    p[0].warn('parameter_a_get_b', p[0].string, i);
+                if (get.function.parameter.length) {
+                    get.warn('parameter_a_get_b', get.function.parameter[0], i);
                 }
                 comma();
                 set = next_token;
@@ -3216,11 +3215,11 @@ klass:              do {
                 if (set.block.length === 0) {
                     token.warn('missing_a', 'throw');
                 }
-                p = set.first;
-                if (!p || p.length !== 1) {
+                if (set.function.parameter.length === 0) {
                     set.stop('parameter_set_a', 'value');
-                } else if (p[0].string !== 'value') {
-                    p[0].stop('expected_a_b', 'value', p[0].string);
+                } else if (set.function.parameter[0] !== 'value') {
+                    set.stop('expected_a_b', 'value',
+                        set.function.parameter[0]);
                 }
                 name.first = [get, set];
             } else {
@@ -4252,7 +4251,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-07-31';
+    itself.edition = '2013-08-13';
 
     return itself;
 }());
