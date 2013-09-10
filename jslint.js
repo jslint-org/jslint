@@ -346,7 +346,7 @@ var JSLINT = (function () {
             'clearInterval', 'clearTimeout', 'document', 'event', 'FormData',
             'frames', 'history', 'Image', 'localStorage', 'location', 'name',
             'navigator', 'Option', 'parent', 'screen', 'sessionStorage',
-            'setInterval', 'setTimeout', 'Storage', 'window', 'XMLHttpRequest'
+            'setInterval', 'setTimeout', 'Storage', 'window', 'XMLDocument', 'XMLHttpRequest'
         ], false),
 
 // bundle contains the text messages.
