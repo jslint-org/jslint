@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-08-26
+// 2013-09-20
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -584,9 +584,11 @@ var JSLINT = (function () {
         standard = array_to_object([
             'Array', 'Boolean', 'Date', 'decodeURI', 'decodeURIComponent',
             'encodeURI', 'encodeURIComponent', 'Error', 'eval', 'EvalError',
-            'Function', 'isFinite', 'isNaN', 'JSON', 'Math', 'Number',
-            'Object', 'parseInt', 'parseFloat', 'RangeError', 'ReferenceError',
-            'RegExp', 'String', 'SyntaxError', 'TypeError', 'URIError'
+            'Function', 'isFinite', 'isNaN', 'JSON', 'Map', 'Math', 'Number',
+            'Object', 'parseInt', 'parseFloat', 'Promise', 'Proxy',
+            'RangeError', 'ReferenceError', 'Reflect', 'RegExp', 'Set',
+            'String', 'Symbol', 'SyntaxError', 'System', 'TypeError',
+            'URIError', 'WeakMap', 'WeakSet'
         ], false),
 
         strict_mode,
@@ -4252,7 +4254,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-08-26';
+    itself.edition = '2013-09-20';
 
     return itself;
 }());
