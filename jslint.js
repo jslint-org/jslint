@@ -172,7 +172,7 @@
 // For example:
 
 /*jslint
-    es5: true, evil: true, nomen: true, regexp: true, todo: true
+    evil: true, nomen: true, regexp: true, todo: true
 */
 
 // The current option set is
@@ -185,7 +185,6 @@
 //     debug      true, if debugger statements should be allowed
 //     devel      true, if logging should be allowed (console, alert, etc.)
 //     eqeq       true, if == should be allowed
-//     es5        true, if ES5 syntax should be allowed
 //     evil       true, if eval should be allowed
 //     forin      true, if for in statements need not filter
 //     indent     the indentation factor
@@ -224,7 +223,7 @@
     conditional_assignment, confusing_a, confusing_regexp, constructor_name_a,
     continue, control_a, couch, create, d, dangling_a, data, dead, debug,
     deleted, devel, disrupt, duplicate_a, edge, edition, else, empty_block,
-    empty_case, empty_class, entityify, eqeq, error_report, errors, es5,
+    empty_case, empty_class, entityify, eqeq, error_report, errors,
     evidence, evil, exception, exec, expected_a_at_b_c, expected_a_b,
     expected_a_b_from_c_d, expected_id_a, expected_identifier_a,
     expected_identifier_a_reserved, expected_number_a, expected_operator_a,
@@ -295,7 +294,6 @@ var JSLINT = (function () {
             debug     : true,
             devel     : true,
             eqeq      : true,
-            es5       : true,
             evil      : true,
             forin     : true,
             indent    :   10,
@@ -383,7 +381,6 @@ var JSLINT = (function () {
             empty_block: "Empty block.",
             empty_case: "Empty case.",
             empty_class: "Empty class.",
-            es5: "This is an ES5 feature.",
             evil: "eval is evil.",
             expected_a_b: "Expected '{a}' and instead saw '{b}'.",
             expected_a_b_from_c_d: "Expected '{a}' to match '{b}' from line " +
@@ -680,7 +677,6 @@ var JSLINT = (function () {
         if (option.couch) {
             add_to_predefined(couch);
             option.couch = false;
-            option.es5 = true;
         }
         if (option.devel) {
             add_to_predefined(devel);
@@ -689,7 +685,6 @@ var JSLINT = (function () {
         if (option.node) {
             add_to_predefined(node);
             option.node = false;
-            option.es5 = true;
             node_js = true;
         }
         if (option.rhino) {
@@ -908,9 +903,7 @@ var JSLINT = (function () {
                     ch = source_row.charAt(at);
                     switch (ch) {
                     case '':
-                        if (!option.es5) {
-                            warn('es5', line, character);
-                        }
+                        warn('unexpected_a', line, character, '\\');
                         next_line();
                         at = -1;
                         break;
@@ -2244,7 +2237,7 @@ klass:              do {
     function optional_identifier(variable) {
         if (next_token.identifier) {
             advance();
-            if (token.reserved && (!option.es5 || variable)) {
+            if (token.reserved && variable) {
                 token.warn('expected_identifier_a_reserved');
             }
             return token.string;
@@ -2591,11 +2584,7 @@ klass:              do {
 
     prefix('void', function (that) {
         that.first = expression(0);
-        if (option.es5 || strict_mode) {
-            that.warn('expected_a_b', 'undefined', 'void');
-        } else if (that.first.number !== 0) {
-            that.first.warn('expected_a_b', '0', artifact(that.first));
-        }
+        that.warn('expected_a_b', 'undefined', 'void');
         return that;
     });
 
@@ -3059,7 +3048,7 @@ klass:              do {
             that.first.push(expression(10));
             if (next_token.id === ',') {
                 comma();
-                if (next_token.id === ']' && !option.es5) {
+                if (next_token.id === ']') {
                     token.warn('unexpected_a');
                     break;
                 }
@@ -3183,9 +3172,6 @@ klass:              do {
 
             edge();
             if (next_token.string === 'get' && peek().id !== ':') {
-                if (!option.es5) {
-                    next_token.warn('es5');
-                }
                 get = next_token;
                 advance('get');
                 one_space_only();
@@ -3250,7 +3236,7 @@ klass:              do {
                 }
                 next_token.warn('unexpected_a');
             }
-            if (next_token.id === '}' && !option.es5) {
+            if (next_token.id === '}') {
                 token.warn('unexpected_a');
             }
         }
