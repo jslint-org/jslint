@@ -187,19 +187,11 @@ effect as this directive:</p>
 <blockquote><code>/*global alert: false, confirm: false, console: false, Debug: false, opera: false, prompt: false, WSH: false */</code></blockquote>
 <p id=node>Select the
     <em>Assume Node.js</em>
-    (<code>node</code>) <a href="#options">option</a> to predefine globals that are used in the Node.js environment<code></code>. It has the same
-    effect as this
-  directive:</p>
-<blockquote>
-  <code>/*jslint es5: true */</code>
-</blockquote>
+    (<code>node</code>) <a href="#options">option</a> to predefine globals that are used in the Node.js environment<code></code>. </p>
 <blockquote><code>/*global Buffer: false, clearInterval: false, clearTimeout: false, console: false, exports: false, global: false, module: false, process: false, querystring: false, require: false, setInterval: false, setTimeout: false, __filename: false, __dirname: false */</code>
 </blockquote>
 <p id=couch>Select the <i>Assume Couch</i> (<code>couch</code>)
   <a href="#options">option</a> to predefine the global properties provided by Couch DB. It has the same effect as this directive:</p>
-<blockquote>
-  <code>/*jslint es5: true */</code>
-</blockquote>
 <blockquote>
   <code>/*global emit: false, getRow: false, isArray: false, log: false, provides: false, registerType: false, require: false, send: false, start: false, sum: false, toJSON: false */</code>
 </blockquote>
@@ -550,12 +542,6 @@ options are selected with several checkboxes and two fields. </p>
       <td><code>true</code> if the <code>==</code> and <code>!=</code> operators should be tolerated. <small>(<a href="#eqeq">more</a>)</small></td>
   </tr>
   <tr>
-      <td>Tolerate ES5 syntax</td>
-      <td><code>es5</code></td>
-      <td><code>true</code> if ES5 syntax should be allowed.
-       It is likely that programs using this option will produce syntax errors on ES3 systems.</td>
-  </tr>
-  <tr>
     <td>Tolerate <code>eval</code> </td>
     <td><code>evil</code></td>
     <td><code>true</code> if <code>eval</code> should be allowed. <a href="#evil"><small>(more)</small></a></td>
@@ -630,8 +616,8 @@ options are selected with several checkboxes and two fields. </p>
   <tr>
     <td> Tolerate missing&nbsp;<code>'use strict'</code>&nbsp;pragma </td>
     <td><code>sloppy</code></td>
-    <td><code>true</code> if the ES5 <code><a href="http://www.yuiblog.com/blog/2010/12/14/strict-mode-is-coming-to-town/">'use strict';</a></code> pragma
-      is not required. Do not use this pragma unless you know what you are doing.</td>
+    <td><code>true</code> if the <code><a href="http://www.yuiblog.com/blog/2010/12/14/strict-mode-is-coming-to-town/">'use strict';</a></code> pragma
+      is not required.</td>
   </tr>
   <tr>
     <td>Tolerate stupidity<br>
