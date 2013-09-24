@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-09-20
+// 2013-09-22
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -1329,7 +1329,7 @@ klass:              do {
         token.kind = kind;
         token.master = master;
         token.used = 0;
-        token.writeable = false;
+        token.writeable = true;
 
 // Global variables are a little weird. They can be defined multiple times.
 // Some predefined global vars are (or should) not be writeable.
@@ -3288,6 +3288,9 @@ klass:              do {
             define('var', name);
             name.dead = funct;
             if (next_token.id === '=') {
+                if (funct === global_funct && !name.writeable) {
+                    name.warn('read_only');
+                }
                 assign = next_token;
                 assign.first = name;
                 spaces();
@@ -3335,6 +3338,9 @@ klass:              do {
         var name = next_token,
             id = identifier(true);
         define('var', name);
+        if (!name.writeable) {
+            name.warn('read_only');
+        }
         name.init = true;
         name.statement = true;
         no_space();
@@ -4240,7 +4246,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-09-20';
+    itself.edition = '2013-09-22';
 
     return itself;
 }());
