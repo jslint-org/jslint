@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-09-22
+// 2013-11-13
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -2798,7 +2798,7 @@ klass:              do {
                         if (next_token.id !== ')') {
                             n = expression(0);
                             p.second = [n];
-                            if (n.id !== '(number)' || next_token.id === ',') {
+                            if (n.id === '(string)' || next_token.id === ',') {
                                 p.warn('use_array');
                             }
                             while (next_token.id === ',') {
@@ -4246,7 +4246,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-09-22';
+    itself.edition = '2013-11-13';
 
     return itself;
 }());
