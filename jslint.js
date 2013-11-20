@@ -4250,3 +4250,11 @@ klass:              do {
 
     return itself;
 }());
+
+// If CommonJS is available then export the JSLINT function. This then
+// allows JSLint to be loaded via CommonJS modules e.g.:
+// jslint = require("jslint.js").JSLINT;
+
+if (exports !== undefined) {
+    exports.JSLINT = JSLINT;
+}
