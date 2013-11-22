@@ -222,9 +222,9 @@
     c, call, charAt, charCodeAt, character, closure, code, color, combine_var,
     comments, conditional_assignment, confusing_a, confusing_regexp,
     constructor_name_a, continue, control_a, couch, create, d, dangling_a, data,
-    dead, debug, deleted, devel, disrupt, duplicate_a, edge, edition, else,
-    empty_block, empty_case, empty_class, entityify, eqeq, error_report, errors,
-    evidence, evil, exception, exec, expected_a_at_b_c, expected_a_b,
+    dead, debug, deleted, devel, disrupt, duplicate_a, edge, edition, elif,
+    else, empty_block, empty_case, empty_class, entityify, eqeq, error_report,
+    errors, evidence, evil, exception, exec, expected_a_at_b_c, expected_a_b,
     expected_a_b_from_c_d, expected_id_a, expected_identifier_a,
     expected_identifier_a_reserved, expected_number_a, expected_operator_a,
     expected_positive_a, expected_small_a, expected_space_a_b,
@@ -253,11 +253,11 @@
     unexpected_property_a, unexpected_space_a_b, unexpected_typeof_a,
     uninitialized_a, unnecessary_else, unnecessary_initialize, unnecessary_use,
     unparam, unreachable_a_b, unsafe, unused_a, url, use_array, use_braces,
-    use_object, use_or, use_param, use_spaces, used, used_before_a, var,
-    var_a_not, var_loop, vars, varstatement, warn, warning, was,
-    weird_assignment, weird_condition, weird_new, weird_program, weird_relation,
-    weird_ternary, white, wrap, wrap_immediate, wrap_regexp, write_is_wrong,
-    writeable
+    use_nested_if, use_object, use_or, use_param, use_spaces, used,
+    used_before_a, var, var_a_not, var_loop, vars, varstatement, warn, warning,
+    was, weird_assignment, weird_condition, weird_new, weird_program,
+    weird_relation, weird_ternary, white, wrap, wrap_immediate, wrap_regexp,
+    write_is_wrong, writeable
 */
 
 // The global directive is used to declare global variables that can
@@ -476,6 +476,7 @@ var JSLINT = (function () {
             url: "JavaScript URL.",
             use_array: "Use the array literal notation [].",
             use_braces: "Spaces are hard to count. Use {{a}}.",
+            use_nested_if: "Expected 'else { if' and instead saw 'else if'.",
             use_object: "Use the object literal notation {} or Object.create(null).",
             use_or: "Use the || operator.",
             use_param: "Use a named parameter.",
@@ -3420,14 +3421,17 @@ klass:              do {
         this.block = block('if');
         if (next_token.id === 'else') {
             if (this.block.disrupt) {
-                next_token.warn('unnecessary_else');
+                next_token.warn(this.elif ? 'use_nested_if' : 'unnecessary_else');
             }
             one_space();
             advance('else');
             one_space();
-            this.else = next_token.id === 'if' || next_token.id === 'switch'
-                ? statement(true)
-                : block('else');
+            if (next_token.id === 'if') {
+                next_token.elif = true;
+                this.else = statement(true);
+            } else {
+                this.else = block('else');
+            }
             if (this.else.disrupt && this.block.disrupt) {
                 this.disrupt = true;
             }
