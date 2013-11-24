@@ -4209,7 +4209,7 @@ klass:              do {
         var i,
             key,
             keys = Object.keys(property).sort(),
-            mem = '    ',
+            mem = '   ',
             name,
             not_first = false,
             output = ['/*properties'];
@@ -4224,7 +4224,7 @@ klass:              do {
                     : '\'' + key.replace(nx, sanitize) + '\'';
                 if (mem.length + name.length >= 80) {
                     output.push(mem);
-                    mem = '   ';
+                    mem = '    ';
                 } else {
                     mem += ' ';
                 }
