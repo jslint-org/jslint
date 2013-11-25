@@ -277,12 +277,15 @@ effect as this directive:</p>
   wrapped in an <code>if</code> statement that does filtering. It can select
   for a particular type or range of values, or it can exclude functions,
   or it can exclude properties from the prototype. For example,</p>
-<blockquote><code>for (name in object) {
+<blockquote>
+  <code>for (name in object) {
     if (object.hasOwnProperty(name)) {
-        ....
+    ....
     }
+    
+    }</code></blockquote>
+    <p>In most cases, the <code>for</code> statement should be avoided completely. You should rely on methods like <code>Object.keys</code> and <code>Array.prototype.forEach</code> instead.</p>
 
-}</code></blockquote>
 
 <h1 id=switch><code>switch</code></h1>
 <p>A <a href="http://yuiblog.com/blog/2007/04/25/id-rather-switch-than-fight/">common
@@ -307,7 +310,7 @@ effect as this directive:</p>
   as a <code>var</code>.</p>
 <p><code>JSLint</code> does not expect that a var will be defined in a block.
   This is because JavaScript blocks do not have block scope. This can have
-  unexpected consequences. Define all variables at the top of the function.</p>
+  unexpected consequences. Define all variables at the top of the function. It is easier to comply with this convention is if you use one <code>var</code> statement per function.</p>
 
 <h1 id=with><code>with</code></h1>
 
@@ -335,7 +338,7 @@ effect as this directive:</p>
 <h1 id=eqeq>== and !=</h1>
 <p>The <code>==</code> and <code>!=</code> operators do type coercion before
   comparing. This is bad because it causes <code>' \t\r\n' == 0</code> to
-  be <code>true</code>. This can mask type errors. <code>JSLint</code> cannot reliably determine if == is being used correctly, so it is best to not use <code>==</code> and != at all and to always use the more reliable <code>===</code> and <code>!==</code> operators instead. </p>
+  be <code>true</code>. This can mask type errors. <code>JSLint</code> cannot reliably determine if <code>==</code> is being used correctly, so it is best to not use <code>==</code> and <code>!=</code> at all and to always use the more reliable <code>===</code> and <code>!==</code> operators instead. </p>
 <p align="left">If you only care that a value is <i>truthy</i> or <i>falsy</i>,
   then use the short form. Instead of </p>
 <blockquote><code>(foo != 0)</code></blockquote>
@@ -365,7 +368,7 @@ effect as this directive:</p>
 
 <p><code>JSLint</code> expects that <code>+</code> will not be followed by
 <code>+</code> or <code>++</code>, and that <code>-</code> will not be followed
-by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code> into <code>++</code>, an error that is difficult to see. Use parens to avoid confusion..</p>
+by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code> into <code>++</code>, an error that is difficult to see. Use parens to avoid confusion.</p>
 <h1 id=inc><code>++</code> and <code>--</code></h1>
 <p>The <code>++</code> <small>(increment)</small> and <code>--</code> <small>(decrement)</small>
   operators have been known to contribute to bad code by encouraging excessive
@@ -420,8 +423,6 @@ by <code>-</code> or <code>--</code>. A misplaced space can turn <code>+ +</code
   <code>new String</code>, <code>new Boolean</code>. </p>
 <p><code>JSLint</code> does not expect to see <code>new Object</code>. Use <code>{}</code>
   instead. </p>
-<p><code>JSLint</code> does not expect to see <code>new Array</code>. Use <code>[]</code>
-  instead.</p>
 <h1 id=properties>Properties</h1>
 <p>Since JavaScript is a loosely-typed, dynamic-object language, it is not
   possible to determine at compile time if property names are spelled correctly.
@@ -623,7 +624,7 @@ options are selected with several checkboxes and two fields. </p>
     <td>Tolerate stupidity<br>
     </td>
     <td><code>stupid</code></td>
-    <td><code>true</code> if blocking (<code>'...Sync'</code>) methods can be used.</td>
+    <td><code>true</code> if blocking (<code>-Sync</code>) methods can be used.</td>
   </tr>
   <tr>
     <td>Tolerate inefficient subscripting<br>
