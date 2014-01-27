@@ -1,5 +1,5 @@
 // jslint.js
-// 2013-11-23
+// 2014-01-26
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -3671,6 +3671,9 @@ klass:              do {
                 this.forin = true;
                 value = expression(1000);
                 master = value.master;
+                if (!master) {
+                    value.stop('bad_in_a');
+                }
                 if (master.kind !== 'var' || master.function !== funct ||
                         !master.writeable || master.dead) {
                     value.warn('bad_in_a');
@@ -4268,7 +4271,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2013-11-23';
+    itself.edition = '2014-01-26';
 
     return itself;
 }());
