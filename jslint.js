@@ -1,5 +1,5 @@
 // jslint.js
-// 2014-01-26
+// 2014-02-06
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -2419,7 +2419,7 @@ klass:              do {
             array = [statement()];
             array.disrupt = array[0].disrupt;
         }
-        if (kind !== 'catch' && array.length === 0) {
+        if (kind !== 'catch' && array.length === 0 && !option.debug) {
             curly.warn('empty_block');
         }
         block_var.forEach(function (name) {
@@ -4271,7 +4271,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2014-01-26';
+    itself.edition = '2014-02-06';
 
     return itself;
 }());
