@@ -1,5 +1,5 @@
 // jslint.js
-// 2014-02-06
+// 2014-04-08
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -550,7 +550,7 @@ var JSLINT = (function () {
         lookahead,
         node = array_to_object([
             'Buffer', 'clearImmediate', 'clearInterval', 'clearTimeout',
-            'console', 'exports', 'global', 'module', 'process', 'querystring',
+            'console', 'exports', 'global', 'module', 'process',
             'require', 'setImmediate', 'setInterval', 'setTimeout',
             '__dirname', '__filename'
         ], false),
@@ -4271,7 +4271,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2014-02-06';
+    itself.edition = '2014-04-08';
 
     return itself;
 }());
