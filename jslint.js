@@ -747,7 +747,7 @@ var JSLINT = (function () {
     }
 
     function expected_at(at) {
-        if (!option.white && next_token.from !== at) {
+        if (next_token.from !== at) {
             next_token.warn('expected_a_at_b_c', '', at, next_token.from);
         }
     }
@@ -843,9 +843,7 @@ var JSLINT = (function () {
             }
             for (;;) {
                 if (!source_row) {
-                    if (!option.white) {
-                        warn('unexpected_char_a', line, character - 1, '(space)');
-                    }
+                    warn('unexpected_char_a', line, character - 1, '(space)');
                     return;
                 }
                 c = source_row.charAt(0);
@@ -1681,7 +1679,7 @@ klass:              do {
     function one_space(left, right) {
         left = left || token;
         right = right || next_token;
-        if (right.id !== '(end)' && !option.white &&
+        if (right.id !== '(end)' &&
                 (token.line !== right.line ||
                 token.thru + 1 !== right.from)) {
             right.warn('expected_space_a_b', artifact(token), artifact(right));
@@ -1692,7 +1690,7 @@ klass:              do {
         left = left || token;
         right = right || next_token;
         if (right.id !== '(end)' && (left.line !== right.line ||
-                (!option.white && left.thru + 1 !== right.from))) {
+                left.thru + 1 !== right.from)) {
             right.warn('expected_space_a_b', artifact(left), artifact(right));
         }
     }
@@ -1700,8 +1698,7 @@ klass:              do {
     function no_space(left, right) {
         left = left || token;
         right = right || next_token;
-        if ((!option.white) &&
-                left.thru !== right.from && left.line === right.line) {
+        if (left.thru !== right.from && left.line === right.line) {
             right.warn('unexpected_space_a_b', artifact(left), artifact(right));
         }
     }
@@ -1710,18 +1707,16 @@ klass:              do {
         left = left || token;
         right = right || next_token;
         if (right.id !== '(end)' && (left.line !== right.line ||
-                (!option.white && left.thru !== right.from))) {
+                left.thru !== right.from)) {
             right.warn('unexpected_space_a_b', artifact(left), artifact(right));
         }
     }
 
     function spaces(left, right) {
-        if (!option.white) {
-            left = left || token;
-            right = right || next_token;
-            if (left.thru === right.from && left.line === right.line) {
-                right.warn('missing_space_a_b', artifact(left), artifact(right));
-            }
+        left = left || token;
+        right = right || next_token;
+        if (left.thru === right.from && left.line === right.line) {
+            right.warn('missing_space_a_b', artifact(left), artifact(right));
         }
     }
 
@@ -1729,9 +1724,7 @@ klass:              do {
         if (next_token.id !== ',') {
             warn('expected_a_b', token.line, token.thru, ',', artifact());
         } else {
-            if (!option.white) {
-                no_space_only();
-            }
+            no_space_only();
             advance(',');
             spaces();
         }
@@ -1742,9 +1735,7 @@ klass:              do {
         if (next_token.id !== ';') {
             warn('expected_a_b', token.line, token.thru, ';', artifact());
         } else {
-            if (!option.white) {
-                no_space_only();
-            }
+            no_space_only();
             advance(';');
             if (semicolon_coda[next_token.id] !== true) {
                 spaces();
@@ -3549,7 +3540,7 @@ klass:              do {
         step_in();
         in_block = true;
         this.second = [];
-        if (that.from !== next_token.from && !option.white) {
+        if (that.from !== next_token.from) {
             next_token.warn('expected_a_at_b_c', next_token.string, that.from, next_token.from);
         }
         while (next_token.id === 'case') {
