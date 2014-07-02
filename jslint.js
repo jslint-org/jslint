@@ -248,16 +248,16 @@
     stop, stopping, strange_loop, strict, string, stupid, sub, subscript,
     substr, supplant, sync_a, t, tag_a_in_b, test, third, thru, toString, todo,
     todo_comment, token, tokens, too_long, too_many, trailing_decimal_a, tree,
-    unclosed, unclosed_comment, unclosed_regexp, unescaped_a, unexpected_a,
-    unexpected_char_a, unexpected_comment, unexpected_label_a,
-    unexpected_property_a, unexpected_space_a_b, unexpected_typeof_a,
-    uninitialized_a, unnecessary_else, unnecessary_initialize, unnecessary_use,
-    unparam, unreachable_a_b, unsafe, unused_a, url, use_array, use_braces,
-    use_nested_if, use_object, use_or, use_param, use_spaces, used,
-    used_before_a, var, var_a_not, var_loop, vars, varstatement, warn, warning,
-    was, weird_assignment, weird_condition, weird_new, weird_program,
-    weird_relation, weird_ternary, white, wrap, wrap_immediate, wrap_regexp,
-    write_is_wrong, writeable
+    unclosed, unclosed_comment, unclosed_regexp, unconditional_loop,
+    unescaped_a, unexpected_a, unexpected_char_a, unexpected_comment,
+    unexpected_label_a, unexpected_property_a, unexpected_space_a_b,
+    unexpected_typeof_a, uninitialized_a, unnecessary_else,
+    unnecessary_initialize, unnecessary_use, unparam, unreachable_a_b, unsafe,
+    unused_a, url, use_array, use_braces, use_nested_if, use_object, use_or,
+    use_param, use_spaces, used, used_before_a, var, var_a_not, var_loop, vars,
+    varstatement, warn, warning, was, weird_assignment, weird_condition,
+    weird_new, weird_program, weird_relation, weird_ternary, white, wrap,
+    wrap_immediate, wrap_regexp, write_is_wrong, writeable
 */
 
 // The global directive is used to declare global variables that can
@@ -456,6 +456,8 @@ var JSLINT = (function () {
             unclosed: "Unclosed string.",
             unclosed_comment: "Unclosed comment.",
             unclosed_regexp: "Unclosed regular expression.",
+            unconditional_loop: "The unconditional loop should start with " +
+                "for (;;).",
             unescaped_a: "Unescaped '{a}'.",
             unexpected_a: "Unexpected '{a}'.",
             unexpected_char_a: "Unexpected character '{a}'.",
@@ -3500,7 +3502,9 @@ klass:              do {
         edge();
         this.arity = 'statement';
         this.first = expected_relation(expression(0));
-        if (this.first.id !== 'true') {
+        if (this.first.id === 'true') {
+            this.first.warn('unconditional_loop');
+        } else {
             expected_condition(this.first, 'unexpected_a');
         }
         no_space();
