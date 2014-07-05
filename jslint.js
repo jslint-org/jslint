@@ -1,5 +1,5 @@
 // jslint.js
-// 2014-04-21
+// 2014-07-04
 
 // Copyright (c) 2002 Douglas Crockford  (www.JSLint.com)
 
@@ -3008,6 +3008,8 @@ klass:              do {
             left.warn('write_is_wrong');
         } else if (!option.stupid && syx.test(name)) {
             token.warn('sync_a');
+        } else if (left && left.id === '{') {
+            that.warn('unexpected_a');
         }
         if (!option.evil && (name === 'eval' || name === 'execScript')) {
             next_token.warn('evil');
@@ -4272,7 +4274,7 @@ klass:              do {
 
     itself.jslint = itself;
 
-    itself.edition = '2014-04-08';
+    itself.edition = '2014-07-04';
 
     return itself;
 }());
