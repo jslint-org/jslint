@@ -244,20 +244,20 @@
     properties_report, property, prototype, push, quote, r, radix, raw,
     read_only, reason, redefinition_a_b, regexp, relation, replace, report,
     reserved, reserved_a, rhino, right, scanned_a_b, scope, search, second,
-    shift, slash_equal, slice, sloppy, sort, split, statement, statement_block,
-    stop, stopping, strange_loop, strict, string, stupid, sub, subscript,
-    substr, supplant, sync_a, t, tag_a_in_b, test, third, thru, toString, todo,
-    todo_comment, token, tokens, too_long, too_many, trailing_decimal_a, tree,
-    unclosed, unclosed_comment, unclosed_regexp, unescaped_a, unexpected_a,
-    unexpected_char_a, unexpected_comment, unexpected_label_a,
-    unexpected_property_a, unexpected_space_a_b, unexpected_typeof_a,
-    uninitialized_a, unnecessary_else, unnecessary_initialize, unnecessary_use,
-    unparam, unreachable_a_b, unsafe, unused_a, url, use_array, use_braces,
-    use_nested_if, use_object, use_or, use_param, use_spaces, used,
-    used_before_a, var, var_a_not, var_loop, vars, varstatement, warn, warning,
-    was, weird_assignment, weird_condition, weird_new, weird_program,
-    weird_relation, weird_ternary, white, wrap, wrap_immediate, wrap_regexp,
-    write_is_wrong, writeable
+    shift, slash_equal, slice, sloppy, some, sort, split, statement,
+    statement_block, stop, stopping, strange_loop, strict, string, stupid, sub,
+    subscript, substr, supplant, sync_a, t, tag_a_in_b, test, third, thru,
+    toString, todo, todo_comment, token, tokens, too_long, too_many,
+    trailing_decimal_a, tree, unclosed, unclosed_comment, unclosed_regexp,
+    unescaped_a, unexpected_a, unexpected_char_a, unexpected_comment,
+    unexpected_label_a, unexpected_property_a, unexpected_space_a_b,
+    unexpected_typeof_a, uninitialized_a, unnecessary_else,
+    unnecessary_initialize, unnecessary_use, unparam, unreachable_a_b, unsafe,
+    unused_a, url, use_array, use_braces, use_nested_if, use_object, use_or,
+    use_param, use_spaces, used, used_before_a, var, var_a_not, var_loop, vars,
+    varstatement, warn, warning, was, weird_assignment, weird_condition,
+    weird_new, weird_program, weird_relation, weird_ternary, white, wrap,
+    wrap_immediate, wrap_regexp, write_is_wrong, writeable
 */
 
 // The global directive is used to declare global variables that can
@@ -604,6 +604,8 @@ var JSLINT = (function () {
         cx = /[\u0000-\u0008\u000a-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
 // identifier
         ix = /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/,
+// start of jsdoc comment
+        jsdocx = /^\*([^\/]|$)/,
 // javascript url
         jx = /^(?:javascript|jscript|ecmascript|vbscript)\s*:/i,
 // star slash
@@ -1233,7 +1235,7 @@ klass:              do {
 // token -- this is called by advance to get the next token.
 
             token: function () {
-                var first, i, snippet;
+                var first, i, snippet, comment_type;
 
                 for (;;) {
                     while (!source_row) {
@@ -1274,6 +1276,11 @@ klass:              do {
 //      /* comment
 
                         case '/*':
+                            comment_type = '/*';
+                            if (jsdocx.test(source_row)) {
+                                comment_type = '/**';
+                                source_row = source_row.slice(1);
+                            }
                             for (;;) {
                                 i = source_row.search(lx);
                                 if (i >= 0) {
@@ -1286,7 +1293,7 @@ klass:              do {
                                     stop('unclosed_comment', line, character);
                                 }
                             }
-                            comment(source_row.slice(0, i), '/*');
+                            comment(source_row.slice(0, i), comment_type);
                             character += i + 2;
                             if (source_row.charAt(i) === '/') {
                                 stop('nested_comment', line, character);
@@ -2271,6 +2278,15 @@ klass:              do {
     }
 
 
+    function closure_jsdoc(node) {
+        return option.closure &&
+            !!node.comments &&
+            node.comments.some(function (comment) {
+                return comment.id === '/**';
+            });
+    }
+
+
     function statement() {
 
         var label, preamble, the_statement;
@@ -2338,7 +2354,7 @@ klass:              do {
                     lvalue(the_statement.first);
                 } else if (!the_statement.assign &&
                         the_statement.id !== 'delete') {
-                    if (!option.closure || !preamble.comments) {
+                    if (!closure_jsdoc(preamble)) {
                         preamble.warn('assignment_function_expression');
                     }
                 }
@@ -2984,7 +3000,7 @@ klass:              do {
                 that.warn('bad_wrap');
             }
         } else if (!value.arity) {
-            if (!option.closure || !that.comments) {
+            if (!closure_jsdoc(that)) {
                 that.warn('unexpected_a');
             }
         }
