@@ -2974,7 +2974,9 @@ klass:              do {
         if (value.id === 'function') {
             switch (next_token.id) {
             case '(':
-                next_token.warn('move_invocation');
+                if (!option.closure || !that.comments) {
+                    next_token.warn('move_invocation');
+                }
                 break;
             case '.':
             case '[':
