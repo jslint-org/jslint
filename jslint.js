@@ -3123,6 +3123,9 @@ klass:              do {
             for (;;) {
                 edge();
                 id = identifier();
+                if (token.reserved) {
+                    token.warn('expected_identifier_a_reserved');
+                }
                 define('parameter', token);
                 parameters.push(id);
                 token.init = true;
