@@ -191,7 +191,7 @@ effect as this directive:</p>
 <blockquote><code>/*global Buffer: false, clearInterval: false, clearTimeout: false, console: false, exports: false, global: false, module: false, process: false, querystring: false, require: false, setInterval: false, setTimeout: false, __filename: false, __dirname: false */</code>
 </blockquote>
 <p id=couch>Select the <i>Assume Couch</i> (<code>couch</code>)
-  <a href="#options">option</a> to predefine the global properties provided by Couch DB. It has the same effect as this directive:</p>
+  <a href="#options">option</a> to predefine the global properties provided by CouchDB. It has the same effect as this directive:</p>
 <blockquote>
   <code>/*global emit: false, getRow: false, isArray: false, log: false, provides: false, registerType: false, require: false, send: false, start: false, sum: false, toJSON: false */</code>
 </blockquote>
@@ -310,7 +310,7 @@ effect as this directive:</p>
   as a <code>var</code>.</p>
 <p><code>JSLint</code> does not expect that a var will be defined in a block.
   This is because JavaScript blocks do not have block scope. This can have
-  unexpected consequences. Define all variables at the top of the function. It is easier to comply with this convention is if you use one <code>var</code> statement per function.</p>
+  unexpected consequences. Define all variables at the top of the function. It is easier to comply with this convention if you use one <code>var</code> statement per function.</p>
 
 <h1 id=with><code>with</code></h1>
 
@@ -523,7 +523,7 @@ options are selected with several checkboxes and two fields. </p>
   <tr>
     <td>Assume <a href="http://couchdb.apache.org/">CouchDB</a></td>
     <td><code>couch</code></td>
-    <td><code>true</code> if Couch DB globals should be predefined.</td>
+    <td><code>true</code> if CouchDB globals should be predefined.</td>
   </tr>
   <tr>
     <td>Tolerate debugger statements</td>
