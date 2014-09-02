@@ -1523,31 +1523,33 @@ klass:              do {
 
 
     function do_jslint() {
-        var name, value;
+        var name, allowed, value;
         while (next_token.id === '(string)' || next_token.identifier) {
             name = next_token.string;
-            if (!allowed_option[name]) {
-                next_token.stop('unexpected_a');
+            allowed = allowed_option[name];
+            if (!allowed) {
+                next_token.warn('unexpected_a');
             }
             advance();
             if (next_token.id !== ':') {
                 next_token.stop('expected_a_b', ':', artifact());
             }
             advance(':');
-            if (typeof allowed_option[name] === 'number') {
+            if (typeof allowed === 'number') {
                 value = next_token.number;
-                if (value > allowed_option[name] || value <= 0 ||
+                if (value > allowed || value <= 0 ||
                         Math.floor(value) !== value) {
-                    next_token.stop('expected_small_a');
+                    next_token.warn('expected_small_a');
+                } else {
+                    option[name] = value;
                 }
-                option[name] = value;
-            } else {
+            } else if (typeof allowed === 'boolean') {
                 if (next_token.id === 'true') {
                     option[name] = true;
                 } else if (next_token.id === 'false') {
                     option[name] = false;
                 } else {
-                    next_token.stop('unexpected_a');
+                    next_token.warn('unexpected_a');
                 }
             }
             advance();
