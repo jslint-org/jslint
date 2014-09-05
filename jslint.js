@@ -3175,7 +3175,8 @@ klass:              do {
         Object.keys(scope).forEach(function (name) {
             var master = scope[name];
             if (!master.used && master.kind !== 'exception' &&
-                    (master.kind !== 'parameter' || !option.unparam)) {
+                (master.kind !== 'parameter' || !option.unparam) &&
+		name.charAt(0) != '_') {
                 master.warn('unused_a');
             } else if (!master.init) {
                 master.warn('uninitialized_a');
