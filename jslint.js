@@ -3648,7 +3648,10 @@ klass:              do {
         step_in();
         no_space();
         edge();
-        this.first = expected_condition(expected_relation(expression(0)), 'unexpected_a');
+        this.first = expected_relation(expression(0));
+        if (this.first.id !== 'false') {
+            this.first = expected_condition(this.first, 'unexpected_a');
+        }
         no_space();
         step_out(')', paren);
         funct.loopage -= 1;
