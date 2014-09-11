@@ -13,7 +13,7 @@
 
 // And it provides access to the syntax tree that JSLint constructed.
 
-/*jslint nomen: true, unparam: true */
+/*jslint nomen: true, undersc: true, unparam: true */
 
 /*global ADSAFE, document, JSLINT */
 

@@ -172,7 +172,7 @@
 // For example:
 
 /*jslint
-    evil: true, nomen: true, regexp: true, todo: true
+    evil: true, nomen: true, undersc: true, regexp: true, todo: true
 */
 
 // The current option set is
@@ -193,6 +193,7 @@
 //     newcap     true, if constructor names capitalization is ignored
 //     node       true, if Node.js globals should be predefined
 //     nomen      true, if names may have dangling _
+//     undersc    true, if names may have _ (false requires camelCase)
 //     passfail   true, if the scan should stop on first error
 //     plusplus   true, if increment/decrement should be allowed
 //     properties true, if all property names must be declared with /*properties*/
@@ -221,7 +222,7 @@
     bad_number, bad_operand, bad_wrap, bitwise, block, break, breakage, browser,
     c, call, charAt, charCodeAt, character, closure, code, color, combine_var,
     comments, conditional_assignment, confusing_a, confusing_regexp,
-    constructor_name_a, continue, control_a, couch, create, d, dangling_a, data,
+    constructor_name_a, continue, control_a, couch, create, d, dangling_a, underscore_a, data,
     dead, debug, deleted, devel, disrupt, duplicate_a, edge, edition, elif,
     else, empty_block, empty_case, empty_class, entityify, eqeq, error_report,
     errors, evidence, evil, exception, exec, expected_a_at_b_c, expected_a_b,
@@ -237,7 +238,7 @@
     level, line, loopage, master, match, maxerr, maxlen, message, missing_a,
     missing_a_after_b, missing_property, missing_space_a_b, missing_use_strict,
     mode, move_invocation, move_var, n, name, name_function, nested_comment,
-    newcap, node, nomen, not, not_a_constructor, not_a_defined, not_a_function,
+    newcap, node, nomen, undersc, not, not_a_constructor, not_a_defined, not_a_function,
     not_a_label, not_a_scope, not_greater, nud, number, octal_a, open, outer,
     parameter, parameter_a_get_b, parameter_arguments_a, parameter_set_a,
     params, paren, passfail, plusplus, pop, postscript, predef, properties,
@@ -302,6 +303,7 @@ var JSLINT = (function () {
             newcap    : true,
             node      : true,
             nomen     : true,
+            undersc   : true,
             passfail  : true,
             plusplus  : true,
             properties: true,
@@ -376,6 +378,7 @@ var JSLINT = (function () {
                 "an uppercase letter.",
             control_a: "Unexpected control character '{a}'.",
             dangling_a: "Unexpected dangling '_' in '{a}'.",
+            underscore_a: "Unexpected '_' in '{a}'.",
             deleted: "Only properties should be deleted.",
             duplicate_a: "Duplicate '{a}'.",
             empty_block: "Empty block.",
@@ -808,6 +811,9 @@ var JSLINT = (function () {
                         (value.charAt(0) === '_' ||
                         value.charAt(value.length - 1) === '_')) {
                     warn('dangling_a', line, from, value);
+                } else if (!option.undersc &&
+                        (value.indexOf('_') !== -1)) {
+                    warn('underscore_a', line, from, value);
                 }
             }
             if (type === '(number)') {
