@@ -2414,7 +2414,7 @@ klass:              do {
             array = statements();
             strict_mode = old_strict_mode;
             step_out('}', curly);
-        } else if (in_block) {
+        } else if (!in_block) {
             curly.stop('expected_a_b', '{', artifact());
         } else {
             curly.warn('expected_a_b', '{', artifact());
@@ -2669,13 +2669,13 @@ klass:              do {
         return that;
     });
     prefix('+');
-    prefix('+++', function () {
+    prefix('+++', function (that) {
         token.warn('confusing_a');
         this.first = expression(150);
         this.arity = 'prefix';
         return this;
     });
-    infix('+++', 130, function (left) {
+    infix('+++', 130, function (left, that) {
         token.warn('confusing_a');
         this.first = left;
         this.second = expression(130);
@@ -2699,13 +2699,13 @@ klass:              do {
         return that;
     });
     prefix('-');
-    prefix('---', function () {
+    prefix('---', function (that) {
         token.warn('confusing_a');
         this.first = expression(150);
         this.arity = 'prefix';
         return this;
     });
-    infix('---', 130, function (left) {
+    infix('---', 130, function (left, that) {
         token.warn('confusing_a');
         this.first = left;
         this.second = expression(130);
