@@ -558,7 +558,10 @@ var JSLINT = (function () {
         numbery = array_to_object(['indexOf', 'lastIndexOf', 'search'], true),
         next_token,
         option,
-        predefined,     // Global variables defined by option
+        assume_predefined,   // Prototype of predefined; globals assumed by
+                             // options like devel, browser, node...
+        predefined,          // Standard global variables, those defined by
+                             // option and those defined by /*globals directive
         prereg,
         prev_token,
         property,
@@ -667,31 +670,38 @@ var JSLINT = (function () {
     }
 
 
+    function remove_from_assume_predefined(group) {
+        Object.keys(group).forEach(function (name) {
+            assume_predefined[name] = undefined;
+        });
+    }
+
+
+    function maybe_add_to_assume_predefined(group, value) {
+        if (!value) {
+            return;
+        }
+        Object.keys(group).forEach(function (name) {
+            assume_predefined[name] = group[name];
+        });
+    }
+
+
     function assume() {
-        if (option.browser) {
-            add_to_predefined(browser);
-            option.browser = false;
-        }
-        if (option.closure) {
-            add_to_predefined(closure);
-        }
-        if (option.couch) {
-            add_to_predefined(couch);
-            option.couch = false;
-        }
-        if (option.devel) {
-            add_to_predefined(devel);
-            option.devel = false;
-        }
-        if (option.node) {
-            add_to_predefined(node);
-            option.node = false;
-            node_js = true;
-        }
-        if (option.rhino) {
-            add_to_predefined(rhino);
-            option.rhino = false;
-        }
+        // Unset first to avoid side-effects due to order.
+        remove_from_assume_predefined(browser);
+        remove_from_assume_predefined(closure);
+        remove_from_assume_predefined(couch);
+        remove_from_assume_predefined(devel);
+        remove_from_assume_predefined(node);
+        remove_from_assume_predefined(rhino);
+        maybe_add_to_assume_predefined(browser, option.browser);
+        maybe_add_to_assume_predefined(closure, option.closure);
+        maybe_add_to_assume_predefined(couch, option.couch);
+        maybe_add_to_assume_predefined(devel, option.devel);
+        maybe_add_to_assume_predefined(node, option.node);
+        node_js = option.node ? true : undefined;
+        maybe_add_to_assume_predefined(rhino, option.rhino);
     }
 
 
@@ -3978,7 +3988,8 @@ klass:              do {
         begin = prev_token = token = next_token =
             Object.create(syntax['(begin)']);
         tokens = [];
-        predefined = Object.create(null);
+        assume_predefined = Object.create(null);
+        predefined = Object.create(assume_predefined);
         add_to_predefined(standard);
         property = Object.create(null);
         if (the_option) {
