@@ -805,6 +805,8 @@ var JSLINT = (function () {
                 if (value === '__iterator__' || value === '__proto__') {
                     stop('reserved_a', line, from, value);
                 } else if (!option.nomen &&
+                        !(node_js &&
+                        (value === '__dirname' || value === '__filename')) &&
                         (value.charAt(0) === '_' ||
                         value.charAt(value.length - 1) === '_')) {
                     warn('dangling_a', line, from, value);
