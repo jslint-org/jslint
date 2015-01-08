@@ -3071,10 +3071,6 @@ klass:              do {
             that.first.push(expression(10));
             if (next_token.id === ',') {
                 comma();
-                if (next_token.id === ']') {
-                    token.warn('unexpected_a');
-                    break;
-                }
             } else {
                 break;
             }
@@ -3261,9 +3257,6 @@ klass:              do {
                     break;
                 }
                 next_token.warn('unexpected_a');
-            }
-            if (next_token.id === '}') {
-                token.warn('unexpected_a');
             }
         }
         step_out('}', that);
