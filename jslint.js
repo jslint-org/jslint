@@ -4282,6 +4282,8 @@ klass:              do {
 
     itself.jslint = itself;
 
+    itself.allowed_option = allowed_option;
+
     itself.edition = '2014-07-08';
 
     return itself;
