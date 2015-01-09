@@ -549,10 +549,13 @@ var JSLINT = (function () {
         lines,
         lookahead,
         node = array_to_object([
-            'Buffer', 'clearImmediate', 'clearInterval', 'clearTimeout',
-            'console', 'exports', 'global', 'module', 'process',
-            'require', 'setImmediate', 'setInterval', 'setTimeout',
-            '__dirname', '__filename'
+            'ArrayBuffer', 'Buffer', 'clearImmediate', 'clearInterval',
+            'clearTimeout', 'console', 'DataView', 'exports', 'Float32Array',
+            'Float64Array', 'global', 'GLOBAL', 'Int16Array', 'Int32Array',
+            'Int8Array', 'module', 'process', 'require', 'root',
+            'setImmediate', 'setInterval', 'setTimeout', 'Uint16Array',
+            'Uint32Array', 'Uint8Array', 'Uint8ClampedArray', '__dirname',
+            '__filename'
         ], false),
         node_js,
         numbery = array_to_object(['indexOf', 'lastIndexOf', 'search'], true),
