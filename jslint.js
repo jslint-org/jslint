@@ -216,17 +216,17 @@
 /*properties
     '\b', '\t', '\n', '\f', '\r', '!', '!=', '!==', '"', '%', '\'', '(begin)',
     '(error)', '*', '+', '-', '/', '<', '<=', '==', '===', '>', '>=', '\\', a,
-    a_label, a_scope, already_defined, and, apply, arguments, arity, ass,
-    assign, assignment_expression, assignment_function_expression, at, avoid_a,
-    b, bad_assignment, bad_constructor, bad_in_a, bad_invocation, bad_new,
-    bad_number, bad_operand, bad_wrap, bitwise, block, break, breakage, browser,
-    c, call, charAt, charCodeAt, character, closure, code, color, combine_var,
-    comments, conditional_assignment, confusing_a, confusing_regexp,
-    constructor_name_a, continue, control_a, couch, create, d, dangling_a, data,
-    dead, debug, deleted, devel, disrupt, duplicate_a, edge, edition, elif,
-    else, empty_block, empty_case, empty_class, entityify, eqeq, error_report,
-    errors, evidence, evil, exception, exec, expected_a_at_b_c, expected_a_b,
-    expected_a_b_from_c_d, expected_id_a, expected_identifier_a,
+    a_label, a_scope, already_defined, and, allowed_option, apply, arguments,
+    arity, ass, assign, assignment_expression, assignment_function_expression,
+    at, avoid_a, b, bad_assignment, bad_constructor, bad_in_a, bad_invocation,
+    bad_new, bad_number, bad_operand, bad_wrap, bitwise, block, break, breakage,
+    browser, c, call, charAt, charCodeAt, character, closure, code, color,
+    combine_var, comments, conditional_assignment, confusing_a,
+    confusing_regexp, constructor_name_a, continue, control_a, couch, create, d,
+    dangling_a, data, dead, debug, deleted, devel, disrupt, duplicate_a, edge,
+    edition, elif, else, empty_block, empty_case, empty_class, entityify, eqeq,
+    error_report, errors, evidence, evil, exception, exec, expected_a_at_b_c,
+    expected_a_b, expected_a_b_from_c_d, expected_id_a, expected_identifier_a,
     expected_identifier_a_reserved, expected_number_a, expected_operator_a,
     expected_positive_a, expected_small_a, expected_space_a_b,
     expected_string_a, f, first, flag, floor, forEach, for_if, forin, from,
@@ -4284,6 +4284,8 @@ klass:              do {
     itself.jslint = itself;
 
     itself.edition = '2014-07-08';
+
+    itself.allowed_option = allowed_option;
 
     return itself;
 }());
