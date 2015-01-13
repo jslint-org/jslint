@@ -182,6 +182,7 @@
 //     browser    true, if the standard browser globals should be predefined
 //     closure    true, if Google Closure idioms should be tolerated
 //     continue   true, if the continuation statement should be tolerated
+//     couch      true, if CouchDB globals should be predefined
 //     debug      true, if debugger statements should be allowed
 //     devel      true, if logging should be allowed (console, alert, etc.)
 //     eqeq       true, if == should be allowed
