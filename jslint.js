@@ -205,6 +205,7 @@
 //     todo       true, if TODO comments are tolerated
 //     vars       true, if multiple var statements per function should be allowed
 //     white      true, if sloppy whitespace is tolerated
+//     in         true, if use of the 'in' operator is tolerated
 
 // The properties directive declares an exclusive list of property names.
 // Any properties named in the program that are not in the list will
@@ -232,7 +233,7 @@
     fromCharCode, fud, function, function_block, function_eval, function_loop,
     function_statement, function_strict, functions, global, hasOwnProperty, id,
     identifier, identifier_function, immed, implied_evil, indent, indexOf,
-    infix_in, init, insecure_a, isAlpha, isArray, isDigit, isNaN, join, jslint,
+    infix_in, in, init, insecure_a, isAlpha, isArray, isDigit, isNaN, join, jslint,
     json, keys, kind, label, labeled, lbp, leading_decimal_a, led, left, length,
     level, line, loopage, master, match, maxerr, maxlen, message, missing_a,
     missing_a_after_b, missing_property, missing_space_a_b, missing_use_strict,
@@ -313,7 +314,8 @@ var JSLINT = (function () {
             sub       : true,
             todo      : true,
             vars      : true,
-            white     : true
+            white     : true,
+            in        : true
         },
         anonname,       // The guessed name for anonymous functions.
 
@@ -2624,7 +2626,9 @@ klass:              do {
     bitwise('>>>', 120);
 
     infix('in', 120, function (left, that) {
-        that.warn('infix_in');
+        if (!option.in) {
+            that.warn('infix_in');
+        }
         that.left = left;
         that.right = expression(130);
         return that;
