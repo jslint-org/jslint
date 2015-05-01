@@ -1,66 +1,153 @@
 <!DOCTYPE html>
-<html>
-<head>
-<title>JSLint, The JavaScript Code Quality Tool</title>
-<link rel="icon" type="image/gif" href="http://www.JSLint.com/favicon.gif">
+<html><head>
+<meta charset="utf-8">
+<meta name="description" content="JSLint, The JavaScript Code Quality Tool.
+This file allows JSLint to be run from a web browser. It can accept a source
+program and analyze it without sending it over the network.">
+<meta name="author" content="Douglas Crockford">
+<meta name="date" content="2015-05-01">
+<title>JSLint: The JavaScript Code Quality Tool</title>
+<link rel="stylesheet" type="text/css" 
+    href="http://fonts.googleapis.com/css?family=Patua+One">
+<link rel="icon" type="image/gif" href="favicon.gif">
 <style>
 body {
-    background-color: #EFEADF;
+    background-color: cornsilk;
+    font-family: 'Patua One', serif;
     margin: 0;
     padding: 0;
 }
-div#JSLINT_ fieldset {
-    background-color: #E3D8CB;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.35),
-          inset 0 0 10px rgba(169, 84, 84, 0.75);
+
+#JSLINT_ fieldset {
+    background-color: lightgray;
+    border: 0;
     clear: both;
-    margin: 1.5%;
+    margin-bottom: 1em;
+    margin-left: 3%;
+    margin-right: 3%;
+    margin-top: 1em;
     padding: 0;
-    width: 97%;
+    width: auto;
 }
-div#JSLINT_ fieldset h1 {
-    background-color: slategray;
+#JSLINT_  legend {
+    background-color: gray;
+    border: 0;
     color: white;
-    font-family: sans-serif;
     font-size: 100%;
     font-style: normal;
-    margin: 0pt;
-    padding: 0.35em;
+    font-weight: normal;
+    margin: 0;
+    padding-bottom: 0.25em;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0.25em;
     text-align: center;
+    width: 100%;
 }
-div#JSLINT_ button {
+#JSLINT_ button {
     background-color: lightsteelblue;
+    border: 0;
     color: black;
     cursor: pointer;
-    font-family: sans-serif;
+    font-family: 'Patua One', serif;
     font-size: 100%;
     font-style: normal;
-    margin: 0pt;
-    padding: 0.35em;
+    margin-left: 1em;
+    margin-right: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
     text-align: center;
 }
-div#JSLINT_ button:hover {
-    background-color: cornflowerblue;
+#JSLINT_ button:hover {
+    background-color: lightskyblue;
+    border: 0;
 }
 
-div#JSLINT_ button:active {
+#JSLINT_ button:active {
+    background-color: steelblue;
+    border: 0;
     color: white;
 }
-button#JSLINT_BUTTON {
-    border-radius: 16pt;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.35);
-    width: 50%;
-}
 
-div#JSLINT_ fieldset>button {
-    float: right;
+#JSLINT_ button:disabled {
+    background-color: silver;
     border: 0;
-    border-left: 1pt solid gray;
-    padding-left: 2em;
-    padding-right: 2em;
+    color: white;
 }
 
-div#JSLINT_ address {
+s {
+    display: inline-block;
+    font-style: normal;
+    padding-left: 0.1em;
+    text-decoration: none;
+}
+
+s::before {
+    content: "J";
+    font-family: 'Patua One', cursive;
+    text-decoration: none;
+}
+
+s::after {
+    content: "SLint";
+    font-family: 'Patua One', serif;
+    text-decoration: underline;
+}
+
+big {
+    font-size: 50pt;    
+    font-style: normal;
+    font-weight: normal;
+
+}
+ins {
+    color: gray;
+    font-family: "Trebuchet MS", sans-serif;
+    font-size: 200%;
+    font-weight: bold;
+    text-decoration: none;   
+    text-transform: uppercase;
+}
+
+#JSLINT_ input[type="text"] {
+    border: 1px solid black;
+    margin-bottom: 0.2em;
+    padding-right: 0.5em;
+    text-align: right;
+    width: 3em;
+}
+
+#JSLINT_ textarea {
+    background-color: white;
+    border: 1pt solid black;
+    font-family: monospace;
+    font-size: 90%;
+    margin: 2%;
+    overflow: auto;
+    padding-left: 0.5em;
+    white-space: pre;
+    width: 95%;
+}
+#JSLINT_ textarea[readonly] {
+    background-color: oldlace;
+    border: 0;
+    white-space: pre;
+}
+#JSLINT_GLOBAL {
+    min-width: fill-available;
+    white-space: normal;
+}
+#JSLINT_ label {
+    font-family: sans-serif;
+    font-size: 90%;
+    padding-left: 0.25em;
+}
+#JSLINT_OPTIONS>div {
+    float: left;
+    margin: 0.5em;
+}
+
+#JSLINT_ address {
     color: dimgray;
     display: block;
     float: right;
@@ -68,290 +155,207 @@ div#JSLINT_ address {
     font-size: 90%;
     margin-left: 1em;
 }
-div#JSLINT_ dl {
-    background-color: #F3E8DB;
-    font-family: monospace;
-    margin-left: 1em;
-    margin-right: 1em;
-    margin-bottom: 0;
+#JSLINT_ dl {
+    background-color: cornsilk;
+    margin: 1em;
+    padding-bottom: 2pt;
     padding-left: 0;
     padding-right: 1em;
 }
-div#JSLINT_ dt {
+#JSLINT_ dfn {
     display: block;
+    font-family: monospace;
+    font-size: 100%;
+    font-style: normal;
+    font-weight: normal;
+    margin-bottom: 2pt;
+}
+#JSLINT_ dt {
+    display: block;
+    float: left;
     font-family: serif;
-    font-size: 80%;
+    font-size: 75%;
     font-style: italic;
-    margin-left: 2em;
+    margin: 0;
+    width: 4.5em;
+    text-align: right;
 }
-div#JSLINT_ dd {
+#JSLINT_ dd {
     display: block;
     font-family: monospace;
-    margin-left: 4em;
-    overflow-x: hidden;
+    margin-left: 5em;
+    margin-bottom: 2pt;
 }
-div#JSLINT_ textarea {
-    background-color: white;
-    border: solid 1px #E7DECC;
-    clear: both;
-    font-family: monospace;
-    margin: 2%;
-    width: 95%;
-    padding-left: 0.5em;
-}
-div#JSLINT_ textarea[readonly] {
-    background-color: #F3E8DB;
-}
-div#JSLINT_ label {
-    font-family: sans-serif;
-    font-size: 90%;
-    padding-left: 0.25em;
-}
-div#JSLINT_ fieldset#JSLINT_ERRORS>h1 {
+#JSLINT_WARNINGS>legend {
     background-color: indianred;
 }
-div#JSLINT_ fieldset#JSLINT_ERRORS>div {
+#JSLINT_WARNINGS>div {
+    background-color: mistyrose;
     padding-bottom: 1em;
     padding-top: 1em;
 }
-div#JSLINT_ fieldset#JSLINT_ERRORS cite {
-    background-color: #F3E8DB;
+#JSLINT_WARNINGS cite {
     display: block;
     font-family: serif;
+    font-size: 100%;
     font-style: normal;
-    margin-left: 1em;
-    margin-right: 1em;
+    margin-bottom: 4pt;
+    margin-left: 20pt;
+    margin-right: 20pt;
+    margin-top: 4pt;
     overflow-x: hidden;
-    padding-left: 1em;
-    padding-right: 1em;
 }
-div#JSLINT_ fieldset#JSLINT_ERRORS pre {
-    margin-left: 1em;
-    overflow: hidden;
+#JSLINT_WARNINGS samp {
+    background-color: lavenderblush;
+    display: block;
+    font-family: monospace;
+    font-size: 100%;
+    font-style: normal;
+    padding: 4pt;
+    margin-bottom: 0;
+    margin-left: 16pt;
+    margin-right: 16pt;
+    margin-top: 0;
+    white-space: pre-wrap;
 }
-div#JSLINT_ fieldset#JSLINT_ERRORS dl address {
+
+#JSLINT_WARNINGS dl address {
     display: inline;
     float: none;
     font-size: 80%;
     margin: 0;
 }
-div#JSLINT_ fieldset#JSLINT_REPORT>div {
-    padding-bottom: 1em;
+
+#JSLINT_REPORT>div {
+    margin-bottom: 1em;
+    margin-top: 1em;
 }
 
-div#JSLINT_ fieldset#JSLINT_OPTIONS>div {
-    float: left;
-    padding: 1em;
-}
-
-div#JSLINT_ fieldset#JSLINT_OPTIONS input[type="text"] {
-    padding-right: 0.5em;
-    text-align: right;
-    width: 4em;
-}
-
-div#JSLINT_ dl.level0 {
+#JSLINT_ dl.level0 {
     background-color: white;
     padding-left: 0;
 }
 
-div#JSLINT_ dl.level1 {
-    background-color: #ffff80;  /* yellow */
+#JSLINT_ dl.level1 {
+    background-color: #ffffe0;  /* yellow */
     padding-left: 2em;
 }
 
-div#JSLINT_ dl.level2 {
-    background-color: #cdfacd;  /* green */
+#JSLINT_ dl.level2 {
+    background-color: #e0ffe0;  /* green */
     padding-left: 4em;
 }
 
-div#JSLINT_ dl.level3 {
-    background-color: #d8d8ff;  /* blue */
+#JSLINT_ dl.level3 {
+    background-color: #e0e0ff;  /* blue */
     padding-left: 6em;
 }
 
-div#JSLINT_ dl.level4 {
-    background-color: #e7c7ff;  /* purple */
+#JSLINT_ dl.level4 {
+    background-color: #ffe0ff;  /* purple */
     padding-left: 8em;
 }
 
-div#JSLINT_ dl.level5 {
-    background-color: #ffcdcd;  /* red */
+#JSLINT_ dl.level5 {
+    background-color: #ffe0e0;  /* red */
     padding-left: 10em;
 }
 
-div#JSLINT_ dl.level6 {
+#JSLINT_ dl.level6 {
     background-color: #ffe390;  /* orange */
     padding-left: 12em;
 }
 
-div#JSLINT_ dl.level7 {
-    background-color: #cdcdcd;  /* gray */
+#JSLINT_ dl.level7 {
+    background-color: #e0e0e0;  /* gray */
     padding-left: 14em;
 }
 
-div#JSLINT_ dl.level8 {
+#JSLINT_ dl.level8 {
     padding-left: 16em;
 }
-
-.tristate {
-    font-family: sans-serif;
-    font-size: 75%;
-}
-.tristate [title] {
-    height: 2em;
-    line-height: 2em;
-    padding: 0.25em;
-}
-.tristate button, .tristate var {
-    cursor: pointer;
-    display: inline-block;
-    height: 2em;
-    vertical-align: middle;
-}
-.tristate button {
-    border-color: #B7C3D0 #547598 #547598 #B7C3D0;
-    border-radius: 5px 0px 0px 5px;
-    border-style: solid;
-    border-width: 1px;
-    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.37);
-    width: 2em;
-}
-.tristate var {
-    background-color: transparent;
-    border: 1pt solid silver;
-    border-radius: 0 3px 3px 0;
-    color: gray;
-    font-family: serif;
-    padding-left: 0.5em;
-    width: 3.5em;
-}
-.tristate var.true {
-    background-color: white;
-    border-color: #9D968C #C5BFB3 #C5BFB3 #6F6A61;
-    box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.2);
-    color: black;
-}
-.tristate var.false {
-    background-color: silver;
-    border-color: #9D968C #C5BFB3 #C5BFB3 #6F6A61;
-    box-shadow: inset 1px 1px 5px rgba(0, 0, 0, 0.2);
-    color: black;
-}
-
 </style>
+<script src="jslint.js"></script>
+<script src="adsafe.js"></script>
+<script src="report.js"></script>
 </head>
-<body>
-  <div style="background: url(title.png) no-repeat scroll 0 0;
-    background-color: #C8BEAC; height: 3in; left: 0; position: absolute;
-    top: 0; width: 100%; z-index: -1;">
-  </div><div style="float: left; height: 0.75in; width: 5in;">&nbsp;</div>
-  <script src="web_jslint.js">
-  // json2.js+jslint.js+adsafe.js+intercept.js
-  </script>
-<div id="JSLINT_">
-  <div style="background-color: #C8BEAC; float:right; margin: 1em; padding-left: 1em; padding-right: 1em;">
-    <a href="http://www.JSLint.com/lint.html">Read the instructions.</a><br>
-    <a href="#JSLINT_OPTIONS">Set the options.</a><br>
-    <a href="http://www.amazon.com/exec/obidos/ASIN/0596517742/wrrrldwideweb"
-      target="_blank">Enjoy&nbsp;<i>The Good Parts</i>.</a><br>
-    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RDLHY5MSG3LZW">Donate.</a>
+<body><div id="JSLINT_">
+  <div style="float: left; margin-bottom: 1em; margin-left: 2em;">
+    <big><s></s> </big> <ins> BETA</ins>
   </div>
-    <div style="background-color: #C8BEAC; float: right; font-family: sans-serif;
-    margin: 1em; padding-left: 1em; padding-right: 1em;">
-      The&nbsp;<a href="http://javascript.crockford.com/">JavaScript</a>&nbsp;Code Quality Tool<br>
-      <br><div id=JSLINT_EDITION></div>
+  <ul style="float: right; margin: 1em; padding-right: 1em;">
+    <li><a href="help.html">Read the instructions.</a></li>
+    <li><a href="http://www.amazon.com/exec/obidos/ASIN/0596517742/wrrrldwideweb"
+      target="_blank">Enjoy&nbsp;<i>The Good Parts</i>.</a></li>
+    <li><a href="http://old.jslint.com/">The Old Version.</a></li>
+  </ul>
+  <fieldset id=JSLINT_SOURCE><legend>Source</legend>
+      <textarea rows="18" placeholder="// Paste JavaScript source or JSON text here."></textarea>
+  </fieldset>
+  <div style="text-align: center;">
+      <button name=JSLint><s></s></button>
+      <button name=clear>clear</button> 
+  </div>
+  <fieldset id=JSLINT_WARNINGS style="display: none;"><legend>Warnings</legend><div></div>
+  </fieldset>
+  <fieldset id=JSLINT_REPORT style="display: none;">
+    <legend>Function Report</legend>
+    <div></div>
+  </fieldset>
+  <fieldset id=JSLINT_PROPERTY style="display: none;">
+    <legend>Property Directive</legend>
+    <textarea rows="8" readonly=true></textarea>
+  </fieldset>
+  <div id=JSLINT_AUX style="display: none; text-align: center;">
+      <button name=select id=JSLINT_SELECT>select property</button>
+      <button name=JSLint><s></s></button>
+      <button name=clear>clear</button> 
+      <button name=options>clear options</button> 
+  </div>
+  <fieldset id=JSLINT_OPTIONS><legend>Options</legend>
+    <div>Assume...
+      <div><label><input title=devel type=checkbox> in development</label></div>
+      <div><label><input title=es6 type=checkbox> ES6</label></div>
+      <div><label><input title=browser type=checkbox> a browser</label></div>
+      <div><label><input title=couch type=checkbox> CouchDB</label></div>
+      <div><label><input title=node type=checkbox> Node.js</label></div>
     </div>
-    <fieldset id=JSLINT_SOURCE><button>clear</button><h1>Source</h1>
-        <textarea rows="24" placeholder="// Paste quality code here"></textarea>
-    </fieldset>
-    <center><button id=JSLINT_BUTTON>JSLint</button></center>
-    <fieldset id=JSLINT_ERRORS style="display: none;"><button>clear</button><h1>Errors</h1><div></div>
-    </fieldset>
-    <fieldset id=JSLINT_REPORT style="display: none;"><button>clear</button><h1>Function
-        Report</h1><div></div>
-    </fieldset>
-    <fieldset id=JSLINT_PROPERTIES style="display: none;"><button>select</button><h1>Properties
-        Directive</h1><textarea rows="8" readonly=true ></textarea>
-    </fieldset>
-    <fieldset id=JSLINT_OPTIONS><button>clear options</button><h1>Options</h1>
-        <div class=tristate>Assume...
-          <div title=browser><button></button><var></var> a browser</div>
-          <div title=couch><button></button><var></var> CouchDB</div>
-          <div title=devel><button></button><var></var> console,alert,&nbsp;...</div>
-          <div title=node><button></button><var></var> Node.js</div>
-          <div title=rhino><button></button><var></var> Rhino</div>
-          <br>
-          <div title=passfail><button></button><var></var> Stop on first error</div>
-        </div>
-        <div class=tristate>Tolerate...
-          <div title=ass><button></button><var></var> assignment expressions</div>
-          <div title=bitwise><button></button><var></var> bitwise operators</div>
-          <div title=closure><button></button><var></var> Google Closure</div>
-          <div title=continue><button></button><var></var> continue</div>
-          <div title=debug><button></button><var></var> debugger statements</div>
-          <div title=eqeq><button></button><var></var> ==&nbsp;and&nbsp;!=</div>
-        </div>
-        <div class=tristate>Tolerate...
-          <div title=evil><button></button><var></var> eval </div>
-          <div title=forin><button></button><var></var> <a href="http://yuiblog.com/blog/2006/09/26/for-in-intrigue/">unfiltered</a> for  in </div>
-          <div title=newcap><button></button><var></var> uncapitalized constructors</div>
-          <div title=nomen><button></button><var></var> dangling _ in identifiers</div>
-          <div title=plusplus><button></button><var></var> ++&nbsp;and&nbsp;-- </div>
-          <div title=regexp><button></button><var></var> .&nbsp;and&nbsp;[^ ... ]&nbsp;in&nbsp;/RegExp/</div>
-          <div title=unparam><button></button><var></var> unused parameters</div>
-        </div>
-        <div class=tristate>Tolerate...
-          <div title=sloppy><button></button><var></var> missing&nbsp;'use strict'&nbsp;pragma</div>
-          <div title=stupid><button></button><var></var> stupidity</div>
-          <div title=sub><button></button><var></var> inefficient subscripting</div>
-          <div title=todo><button></button><var></var> TODO comments</div>
-          <div title=vars><button></button><var></var> many var statements per function</div>
-          <div title=white><button></button><var></var> messy white space</div>
-        </div>
-        <div>
-            <input id=JSLINT_INDENT type=text title=indent value="" autocomplete=off>
-            <label for=JSLINT_INDENT title=indent>Indentation
-            </label>
-            <br>
-            <input id=JSLINT_MAXLEN type=text title=maxlen value="" autocomplete=off>
-            <label for=JSLINT_MAXLEN title=maxlen>Maximum line length
-            </label>
-            <br>
-            <input id=JSLINT_MAXERR type=text title=maxerr value="" autocomplete=off>
-            <label for=JSLINT_MAXERR title=maxerr>Maximum number of errors
-            </label>
-        </div>
-        <textarea id=JSLINT_PREDEF title=predef placeholder="predefine global variables here"></textarea>
-    </fieldset>
-    <fieldset id=JSLINT_JSLINT><button>select</button><h1>JSLint Directive</h1>
-        <textarea rows=2 readonly=true placeholder="Computed /*jslint */ directive"></textarea>
-    </fieldset>
-    <script>
+    <div>Tolerate...
+      <div><label><input title=bitwise type=checkbox> bitwise operators</label></div>
+      <div><label><input title=eval type=checkbox> eval</label></div>
+      <div><label><input title=for type=checkbox> for statement</label></div>
+      <div><label><input title=this type=checkbox> this</label></div>
+      <div><label><input title=white type=checkbox> messy white space</label></div>
+    </div>
+    <div>Number...
+      <div><label><input type=text title=maxlen> Maximum line length</label></div>
+      <div><label><input type=text title=maxerr> Maximum number of warnings</label></div>
+    </div>
+    <div>Fudge...
+      <div><label><input title=fudge type=checkbox> First line number is 1</label></div>
+    </div>
+    <div>Global variables...
+      <textarea id=JSLINT_GLOBAL title=global placeholder="imported globals here"></textarea>
+    </div>
+  </fieldset>
+  <script>
     ADSAFE.id("JSLINT_");
-    </script>
-
-    <script src="init_ui.js"></script>
-
-    <script>
+  </script>
+  <script src="browser.js"></script>
+  <script>
     ADSAFE.go("JSLINT_", function (dom, lib) {
         'use strict';
-        lib.init_ui(dom);
+        lib.browser_ui(dom);
     });
-    </script>
+  </script>
 </div>
 <center>
-<p> Copyright 2002&nbsp;<a href="http://www.JSLint.com/lint.html">Douglas
-  Crockford.</a>&nbsp;<a target="_blank" href="http://www.crockford.com/">All
-  Rights Reserved Wrrrldwide and Beyond!</a> <br>
-  <a href="http://javascript.crockford.com/code.html" target="_blank">Code
-  Conventions for the JavaScript Programming Language.</a><br>
-  <a href="https://plus.google.com/communities/104441363299760713736" target="_blank">Join
-  the JSLint Community.</a> </p>
-<a href="http://www.JSLint.com/"><img src="jslintpill.gif" width="36" height="17" border="0"></a>
-<a href="https://github.com/douglascrockford/JSLint"><img src="github.gif" width="39" height="16" border="0"></a>
-<a href="http://www.ADsafe.org/"><img src="adsafepill.gif" width="36" height="17" border="0"></a>
-<a href="http://www.JSON.org/"><img src="jsonpill.gif" width="36" height="17" border="0"></a>
-<a href="http://www.1and1.com/?k_id=10219574"><img src="1and1pill.gif" width="36" height="17" border="0"></a>
-</center></body>
-</html>
+<a href="http://www.JSLint.com/"><img src="image/jslintpill.gif" width="36" height="17" border="0"></a>
+<a href="https://github.com/douglascrockford/JSLint"><img src="image/github.gif" width="39" height="16" border="0"></a>
+<a href="https://plus.google.com/communities/104441363299760713736"><img src="image/gpill.gif" width="36" height="17" border="0"></a>
+<a href="http://www.JSON.org/"><img src="image/jsonpill.gif" width="36" height="17" border="0"></a>
+<a href="http://www.ADsafe.org/"><img src="image/adsafepill.gif" width="36" height="17" border="0"></a>
+<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RDLHY5MSG3LZW"><img src="image/pppill.gif" width="36" height="17" border="0"></a>
+<a href="http://www.1and1.com/?k_id=10219574"><img src="image/1and1pill.gif" width="36" height="17" border="0"></a>
+</center>
+</body></html>
