@@ -1,5 +1,5 @@
 // report.js
-// 2015-05-01
+// 2015-05-02
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Generate JSLint HTML reports.
@@ -35,8 +35,8 @@ var REPORT = (function () {
 // Produce the HTML Error Report.        
     
             var fudge = data.option.fudge 
-                ? 1 
-                : 0,
+                    ? 1 
+                    : 0,
                 output = [];
             if (data.stop) {
                 output.push("<center>J<u>SLint</u> was unable to finish.</center>");
@@ -62,17 +62,17 @@ var REPORT = (function () {
 // Produce the HTML Function Report.        
     
             var fudge = data.option.fudge 
-                ? 1 
-                : 0, 
+                    ? 1 
+                    : 0, 
                 mode = data.module
-                ? "module"
-                : "global",
+                    ? "module"
+                    : "global",
                 output = [];
 
             if (data.json) {
                 return data.warnings.length === 0
-                ? "<center>JSON: good.</center>"
-                : "<center>JSON: bad.</center>";
+                    ? "<center>JSON: good.</center>"
+                    : "<center>JSON: bad.</center>";
             } 
             
             function detail(title, array) {
@@ -111,10 +111,10 @@ var REPORT = (function () {
                         "</address><dfn>", 
                         (
                             the_function.name === "=>"
-                            ? entityify(the_function.signature) + " =>"
-                            : typeof the_function.name === 'string'
-                                ? '«' + entityify(the_function.name) + '»'
-                                : "<b>" + entityify(the_function.name.id) + "</b>"
+                                ? entityify(the_function.signature) + " =>"
+                                : typeof the_function.name === 'string'
+                                    ? '«' + entityify(the_function.name) + '»'
+                                    : "<b>" + entityify(the_function.name.id) + "</b>"
                         ) + entityify(the_function.signature),
                         "</dfn>"
                     );

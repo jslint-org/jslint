@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-05-01
+// 2015-05-02
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -383,6 +383,8 @@ var jslint = (function JSLint() {
         rx_bits = /^([01]+)(.*)$/,
 // mega
         rx_mega = /`|\$\{/,
+// colons
+        rx_colons = /^(.*)\?(\:*)$/,
 // JSON number
         rx_JSON_number = /^-?\d+(?:\.\d*)?(?:e[\-+]?\d+)?$/i;
 
@@ -395,8 +397,8 @@ var jslint = (function JSLint() {
         return string.replace(rx_supplant, function (found, filling) {
             var replacement = object[filling];
             return replacement !== undefined
-            ? replacement
-            : found;
+                ? replacement
+                : found;
         });
     }
 
@@ -439,8 +441,8 @@ var jslint = (function JSLint() {
             the_token = next_token;
         }
         return the_token.id === '(string)' || the_token.id === '(number)'
-        ? String(the_token.value)
-        : the_token.id;
+            ? String(the_token.value)
+            : the_token.id;
     }
 
     function artifact_line(the_token) {
@@ -489,8 +491,8 @@ var jslint = (function JSLint() {
         warning.message = supplant(bundle[code] || code, warning);
         warnings.push(warning);
         return warnings.length === option.maxerr
-        ? stop_at('too_many', line, column)
-        : warning;
+            ? stop_at('too_many', line, column)
+            : warning;
     }
 
     function stop_at(code, line, column, a, b, c, d) {
@@ -554,8 +556,8 @@ var jslint = (function JSLint() {
 // carriage return/linefeed.
 
         lines = Array.isArray(source)
-        ? source
-        : source.split(rx_crlf);
+            ? source
+            : source.split(rx_crlf);
         tokens = [];
 
         var char,                   // a popular character
@@ -602,12 +604,12 @@ var jslint = (function JSLint() {
             }
             return source_line;
         }
-        
+
 // Most tokens, including the identifiers, operators, and punctuators, can be
 // found with a regular expression. Regular expressions cannot correctly match
 // regular expression literals, so we will match those the hard way. String
 // literals and number literals can be matched by regular expressions, but they
-// don't provide good warnings. The functions snip, next_char, prev_char, 
+// don't provide good warnings. The functions snip, next_char, prev_char,
 // some_digits, and escape help in the parsing of literals.
 
         function snip() {
@@ -681,6 +683,7 @@ var jslint = (function JSLint() {
             case '\'':
             case '"':
             case '/':
+            case ':':
             case 'b':
             case 'f':
             case 'n':
@@ -1202,10 +1205,10 @@ var jslint = (function JSLint() {
                 source_line = next_line();
                 from = 0;
                 return source_line === undefined
-                ? mega_mode
-                    ? stop_at('unclosed_mega', mega_line, mega_from)
-                    : make('(end)')
-                : lex();
+                    ? mega_mode
+                        ? stop_at('unclosed_mega', mega_line, mega_from)
+                        : make('(end)')
+                    : lex();
             }
             from = column;
             result = source_line.match(rx_token);
@@ -1287,8 +1290,8 @@ var jslint = (function JSLint() {
                     if (at < 0) {
                         snippet += source_line + '\n';
                         return next_line() === undefined
-                        ? stop_at('unclosed_mega', mega_line, mega_from)
-                        : part();
+                            ? stop_at('unclosed_mega', mega_line, mega_from)
+                            : part();
                     }
 
 // if either ` or ${ was found, then the preceding joins the snippet to become
@@ -1499,8 +1502,8 @@ var jslint = (function JSLint() {
         var cadet = tokens[token_nr];
         token_nr += 1;
         return cadet.id === '(comment)'
-        ? dispense()
-        : cadet;
+            ? dispense()
+            : cadet;
     }
 
     function lookahead() {
@@ -1529,15 +1532,15 @@ var jslint = (function JSLint() {
 
         if (id !== undefined && next_token.id !== id) {
             return match === undefined
-            ? stop('expected_a_b', next_token, id, artifact())
-            : stop(
-                'expected_a_b_from_c_d',
-                next_token,
-                id,
-                artifact(match),
-                artifact_line(match),
-                artifact(next_token)
-            );
+                ? stop('expected_a_b', next_token, id, artifact())
+                : stop(
+                    'expected_a_b_from_c_d',
+                    next_token,
+                    id,
+                    artifact(match),
+                    artifact_line(match),
+                    artifact(next_token)
+                );
         }
 
 // Promote the tokens, skipping comments.
@@ -1904,8 +1907,8 @@ var jslint = (function JSLint() {
                     'expected_a_before_b',
                     next_token,
                     next_token.id === '`'
-                    ? '\''
-                    : 'use strict',
+                        ? '\''
+                        : 'use strict',
                     artifact(next_token)
                 );
             }
@@ -2026,13 +2029,13 @@ var jslint = (function JSLint() {
 
         var the_symbol = symbol(id);
         the_symbol.nud = typeof value === 'function'
-        ? value
-        : function () {
-            if (value !== undefined) {
-                token.value = value;
-            }
-            return token;
-        };
+            ? value
+            : function () {
+                if (value !== undefined) {
+                    token.value = value;
+                }
+                return token;
+            };
         the_symbol.type = type;
         the_symbol.value = value;
         return the_symbol;
@@ -2734,8 +2737,8 @@ var jslint = (function JSLint() {
                     warn('expected_a_before_b', name, 'set', artifact(name));
                 }
                 seen[id] = extra === 'get'
-                ? 'get'
-                : true;
+                    ? 'get'
+                    : true;
                 if (name.identifier) {
                     switch (next_token.id) {
                     case '}':
@@ -2809,8 +2812,8 @@ var jslint = (function JSLint() {
                 the_label.dead
             ) {
                 warn(the_label !== undefined && the_label.dead
-                ? 'out_of_scope_a'
-                : 'not_label_a');
+                    ? 'out_of_scope_a'
+                    : 'not_label_a');
             } else {
                 the_label.used += 1;
             }
@@ -3058,8 +3061,8 @@ var jslint = (function JSLint() {
             advance('else');
             the_else = token;
             the_if.else = next_token.id === 'if'
-            ? statement()
-            : block();
+                ? statement()
+                : block();
             if (the_if.block.disrupt === true) {
                 if (the_if.else.disrupt === true) {
                     the_if.disrupt = true;
@@ -3730,8 +3733,8 @@ var jslint = (function JSLint() {
             } else {
                 if (open) {
                     var at = free
-                    ? margin
-                    : margin + 8;
+                        ? margin
+                        : margin + 8;
                     if (right.from < at) {
                         expected_at(at);
                     }
@@ -3767,8 +3770,8 @@ var jslint = (function JSLint() {
             } else {
                 if (open) {
                     var at = free
-                    ? margin
-                    : margin + 8;
+                        ? margin
+                        : margin + 8;
                     if (right.from < at) {
                         expected_at(at);
                     }
@@ -3778,6 +3781,17 @@ var jslint = (function JSLint() {
                     }
                 }
             }
+        }
+
+        function unqmark() {
+
+// Undo the effects of dangling nested ternary operators.
+
+            var level = qmark.length;
+            if (level > 0) {
+                margin -= level * 4;
+            }
+            qmark = '';
         }
 
         stack = [];
@@ -3804,20 +3818,21 @@ var jslint = (function JSLint() {
                             open: open,
                             qmark: qmark
                         });
+                        qmark = '';
                         closer = new_closer;
                         if (left.line !== right.line) {
                             free = (closer === ')' && left.free) || closer === ']';
                             open = true;
                             margin += 4;
-                            qmark = '';
                             if (right.role === 'label') {
                                 if (right.from !== 0) {
                                     expected_at(0);
                                 }
+                            } else if (right.switch) {
+                                unqmark();
+                                at_margin(-4);
                             } else {
-                                at_margin(right.switch
-                                ? -4
-                                : 0);
+                                at_margin(0);
                             }
                         } else {
                             if (right.statement || right.role === 'label') {
@@ -3869,44 +3884,31 @@ var jslint = (function JSLint() {
 
 
                         if (right.switch) {
+                            unqmark();
                             at_margin(-4);
                         } else if (right.role === 'label') {
                             if (right.from !== 0) {
                                 expected_at(0);
                             }
                         } else if (left.id === ',') {
+                            unqmark();
                             if (!open || (free && left.line === right.line)) {
                                 one_space();
                             } else {
                                 at_margin(0);
                             }
-                            qmark = '';
-                            
+
 // If right is a ternary operator, line it up on the margin. Use qmark to
 // deal with nested ternary operators.
-                            
+
                         } else if (right.arity === 'ternary') {
                             if (right.id === '?') {
-                                if (qmark === '') {
-                                    qmark = '?';
-                                } else {
-                                    margin += 4;
-                                    qmark += '?';
-                                }
+                                margin += 4;
+                                qmark += '?';
                             } else {
-                                (function recur () {
-                                    if (qmark === '?') {
-                                        qmark = ':';
-                                    } else {
-                                        if (qmark.slice(-1) === '?') {
-                                            qmark = qmark.slice(0, -1) + ':';
-                                        } else {
-                                            qmark = qmark.slice(0, -1);
-                                            margin -= 4;
-                                            return recur();
-                                        }
-                                    }
-                                }());
+                                var result = qmark.match(rx_colons);
+                                qmark = result[1] + ':';
+                                margin -= 4 * result[2].length;
                             }
                             at_margin(0);
                         } else if (
@@ -3929,6 +3931,7 @@ var jslint = (function JSLint() {
                                 at_margin(8);
                             }
                         } else if (left.id === ';') {
+                            unqmark();
                             if (open) {
                                 at_margin(0);
                             } else {
@@ -4036,8 +4039,8 @@ var jslint = (function JSLint() {
             early_stop = true;
             export_mode = true;
             fudge = option.fudge
-            ? 1
-            : 0;
+                ? 1
+                : 0;
             functions = [];
             global = {
                 id: '(global)',
@@ -4136,7 +4139,7 @@ var jslint = (function JSLint() {
             warnings: warnings.sort(function (a, b) {
                 return a.line - b.line || a.column - b.column;
             }),
-            edition: "2015-05-01 BETA"
+            edition: "2015-05-02 BETA"
         };
     };
 }());
