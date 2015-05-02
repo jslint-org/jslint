@@ -3880,31 +3880,35 @@ var jslint = (function JSLint() {
                             } else {
                                 at_margin(0);
                             }
+                            qmark = '';
+                            
+// If right is a ternary operator, line it up on the margin. Use qmark to
+// deal with nested ternary operators.
+                            
                         } else if (right.arity === 'ternary') {
                             if (right.id === '?') {
                                 if (qmark === '') {
                                     qmark = '?';
-                                } else if (qmark.slice(-1) === '?') {
+                                } else {
                                     margin += 4;
                                     qmark += '?';
-                                } else {
-                                    qmark.slice(0, -1);
                                 }
-                                at_margin(0);
                             } else {
-                                if (qmark === '?') {
-                                    qmark = '';
-                                } else if (qmark === '??:') {
-                                    margin -= 4;
-                                    qmark = '';
-                                } else if (qmark.slice(-1) === '?') {
-                                    qmark += ':';
-                                } else {
-                                    margin -= 4;
-                                    qmark = qmark.slice(0, -2) + ':';
-                                }
-                                at_margin(0);
+                                (function recur () {
+                                    if (qmark === '?') {
+                                        qmark = ':';
+                                    } else {
+                                        if (qmark.slice(-1) === '?') {
+                                            qmark = qmark.slice(0, -1) + ':';
+                                        } else {
+                                            qmark = qmark.slice(0, -1);
+                                            margin -= 4;
+                                            return recur();
+                                        }
+                                    }
+                                }());
                             }
+                            at_margin(0);
                         } else if (
                             left.id === '...' ||
                             right.id === ',' ||
