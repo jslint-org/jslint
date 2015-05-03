@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-05-02
+// 2015-05-03
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -383,8 +383,9 @@ var jslint = (function JSLint() {
         rx_bits = /^([01]+)(.*)$/,
 // mega
         rx_mega = /`|\$\{/,
-// colons
-        rx_colons = /^(.*)\?(\:*)$/,
+// indentation
+        rx_colons = /^(.*)\?([:.]*)$/,
+        rx_dot = /\.$/,
 // JSON number
         rx_JSON_number = /^-?\d+(?:\.\d*)?(?:e[\-+]?\d+)?$/i;
 
@@ -3685,6 +3686,7 @@ var jslint = (function JSLint() {
             nr_comments_skipped = 0,
             open = true,
             qmark = '',
+            result,
             right;
 
         function at_margin(fit) {
@@ -3906,7 +3908,7 @@ var jslint = (function JSLint() {
                                 margin += 4;
                                 qmark += '?';
                             } else {
-                                var result = qmark.match(rx_colons);
+                                result = qmark.match(rx_colons);
                                 qmark = result[1] + ':';
                                 margin -= 4 * result[2].length;
                             }
@@ -3928,7 +3930,11 @@ var jslint = (function JSLint() {
                             if (left.line === right.line) {
                                 no_space();
                             } else {
-                                at_margin(8);
+                                if (!rx_dot.test(qmark)) {
+                                    qmark += '.';
+                                    margin += 4;
+                                }
+                                at_margin(0);
                             }
                         } else if (left.id === ';') {
                             unqmark();
@@ -4139,7 +4145,7 @@ var jslint = (function JSLint() {
             warnings: warnings.sort(function (a, b) {
                 return a.line - b.line || a.column - b.column;
             }),
-            edition: "2015-05-02 BETA"
+            edition: "2015-05-03 BETA"
         };
     };
 }());

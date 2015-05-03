@@ -1,5 +1,5 @@
 // report.js
-// 2015-05-02
+// 2015-05-03
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Generate JSLint HTML reports.
@@ -23,9 +23,9 @@ var REPORT = (function () {
 // Replace & < > with less destructive entities.        
     
         return String(string)
-                .replace(rx_amp, '&amp;')
-                .replace(rx_lt, '&lt;')
-                .replace(rx_gt, '&gt;');
+            .replace(rx_amp, '&amp;')
+            .replace(rx_lt, '&lt;')
+            .replace(rx_gt, '&gt;');
     }
     
     return {
