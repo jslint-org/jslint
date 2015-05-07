@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-05-06
+// 2015-05-07
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1630,7 +1630,7 @@ var jslint = (function JSLint() {
         }
     }
 
-// Parsing of JavaScript is considerably more complicated:
+// Now we parse JavaScript.
 
     function enroll(name, role, readonly) {
 
@@ -1648,18 +1648,31 @@ var jslint = (function JSLint() {
 
 // Has the name been enrolled in an outer context?
 
-            var earlier = functionage.context[id];
-            if (earlier !== undefined) {
-                if (earlier.role === 'variable' && id === 'ignore') {
-                    warn('unexpected_a', name);
+            var earlier;
+            stack.forEach(function (value) {
+                var item = value.context[id];
+                if (item !== undefined) {
+                    earlier = item;
                 }
-                if (role !== 'exception' || id !== 'ignore') {
-                    warn(
-                        'redefinition_a_b',
-                        name,
-                        name.id,
-                        earlier.line + fudge
-                    );
+            });
+            if (earlier) {
+                if (id === 'ignore') {
+                    if (earlier.role === 'variable') {
+                        warn('unexpected_a', name);
+                    }
+                } else {
+                    if (
+                        (role !== 'exception' || earlier.role !== 'exception') &&
+                        role !== 'parameter' &&
+                        role !== 'function'
+                    ) {
+                        warn(
+                            'redefinition_a_b',
+                            name,
+                            name.id,
+                            earlier.line + fudge
+                        );
+                    }
                 }
             }
         }
@@ -2608,7 +2621,7 @@ var jslint = (function JSLint() {
         functions.push(the_function);
         functionage = the_function;
         if (the_function.arity !== 'statement' && name) {
-            enroll(name, 'variable', true);
+            enroll(name, 'function', true);
             name.dead = false;
             name.init = true;
             name.used = 1;
@@ -3621,7 +3634,7 @@ var jslint = (function JSLint() {
         }
         return pop_block();
     }
-    
+
     function is_weird(thing) {
         return (
             thing.id === '(regexp)' ||
@@ -3631,14 +3644,14 @@ var jslint = (function JSLint() {
             (thing.id === '[' && thing.arity === 'unary')
         );
     }
-    
+
     function are_similar(a, b) {
         if (a === b) {
             return true;
         }
         if (Array.isArray(a)) {
             return (
-                Array.isArray(b) && 
+                Array.isArray(b) &&
                 a.length === b.length &&
                 a.every(function (value, index) {
                     return are_similar(value, b[index]);
@@ -3670,7 +3683,7 @@ var jslint = (function JSLint() {
         }
         if (a.arity === b.arity && a.id === b.id) {
             if (a.id === '.') {
-                return are_similar(a.expression, b.expression) && 
+                return are_similar(a.expression, b.expression) &&
                         are_similar(a.name, b.name);
             }
             switch (a.arity) {
@@ -3697,17 +3710,17 @@ var jslint = (function JSLint() {
     postaction('binary', function (thing) {
         if (relationop[thing.id]) {
             if (
-                is_weird(thing.expression[0]) || 
+                is_weird(thing.expression[0]) ||
                 is_weird(thing.expression[1]) ||
-                are_similar(thing.expression[0], thing.expression[1]) || 
+                are_similar(thing.expression[0], thing.expression[1]) ||
                 (
-                    thing.expression[0].constant === true && 
+                    thing.expression[0].constant === true &&
                     thing.expression[1].constant === true
                 )
             ) {
                 warn('weird_relation_a', thing);
             }
-        } 
+        }
         switch (thing.id) {
         case '=>':
         case '(':
@@ -3715,7 +3728,7 @@ var jslint = (function JSLint() {
             break;
         default:
             if (
-                thing.expression[0].constant === true && 
+                thing.expression[0].constant === true &&
                 thing.expression[1].constant === true
             ) {
                 thing.constant = true;
@@ -3724,8 +3737,8 @@ var jslint = (function JSLint() {
     });
     postaction('binary', '&&', function (thing) {
         if (
-            is_weird(thing.expression[0]) || 
-            are_similar(thing.expression[0], thing.expression[1]) || 
+            is_weird(thing.expression[0]) ||
+            are_similar(thing.expression[0], thing.expression[1]) ||
             thing.expression[0].constant === true ||
             thing.expression[1].constant === true
         ) {
@@ -3734,8 +3747,8 @@ var jslint = (function JSLint() {
     });
     postaction('binary', '||', function (thing) {
         if (
-            is_weird(thing.expression[0]) || 
-            are_similar(thing.expression[0], thing.expression[1]) || 
+            is_weird(thing.expression[0]) ||
+            are_similar(thing.expression[0], thing.expression[1]) ||
             thing.expression[0].constant === true
         ) {
             warn('weird_condition_a', thing);
@@ -3791,7 +3804,7 @@ var jslint = (function JSLint() {
         } else if (are_similar(thing.expression[0], thing.expression[2])) {
             warn('expected_a_b', thing, '&&', '?');
         } else if (
-            thing.expression[1].id === 'true' && 
+            thing.expression[1].id === 'true' &&
             thing.expression[2].id === 'false'
         ) {
             warn('expected_a_b', thing, '!!', '?');
@@ -4320,7 +4333,7 @@ var jslint = (function JSLint() {
             warnings: warnings.sort(function (a, b) {
                 return a.line - b.line || a.column - b.column;
             }),
-            edition: "2015-05-06 BETA"
+            edition: "2015-05-07 BETA"
         };
     };
 }());
