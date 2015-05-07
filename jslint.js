@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-05-03
+// 2015-05-06
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -86,9 +86,9 @@
     a, and, arity, b, bad_assignment_a, bad_character_number_a, bad_get,
     bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
     body, browser, c, calls, catch, charAt, charCodeAt, closer, closure, code,
-    column, concat, context, couch, create, d, dead, devel, directive, disrupt,
-    dot, duplicate_a, edition, ellipsis, else, empty_block, es6, eval,
-    expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d,
+    column, concat, constant, context, couch, create, d, dead, devel,
+    directive, disrupt, dot, duplicate_a, edition, ellipsis, else, empty_block,
+    es6, eval, every, expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d,
     expected_a_before_b, expected_digits_after_a, expected_four_digits,
     expected_identifier_a, expected_line_break_a_b, expected_regexp_factor_a,
     expected_space_a_b, expected_string_a, expected_type_string_a, expression,
@@ -109,8 +109,9 @@
     unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
     unexpected_typeof_a, uninitialized_a, unreachable_a,
     unregistered_property_a, unsafe, unused_a, use_spaces, used, value,
-    var_loop, var_switch, variable, warning, warnings, weird_loop, white,
-    wrap_immediate, wrap_regexp, wrapped, writable, y
+    var_loop, var_switch, variable, warning, warnings, weird_condition_a,
+    weird_expression_a, weird_loop, weird_relation_a, white, wrap_immediate,
+    wrap_regexp, wrapped, writable, y
 */
 
 var jslint = (function JSLint() {
@@ -345,6 +346,9 @@ var jslint = (function JSLint() {
         var_switch: "Don't declare variables in a switch.",
         wrap_regexp: "Wrap this regexp in parens to avoid confusion.",
         weird_loop: "Weird loop.",
+        weird_condition_a: "Weird condition '{a}'.",
+        weird_expression_a: "Weird expression '{a}'.",
+        weird_relation_a: "Weird relation '{a}'.",
         wrap_immediate: "Wrap an immediate function invocation in " +
                 "parentheses to assist the reader in understanding that the " +
                 "expression is the result of a function, and not the " +
@@ -690,6 +694,7 @@ var jslint = (function JSLint() {
             case 'n':
             case 'r':
             case 't':
+            case ' ':
                 break;
             case 'u':
                 if (next_char('u') === '{') {
@@ -2032,6 +2037,7 @@ var jslint = (function JSLint() {
         the_symbol.nud = typeof value === 'function'
             ? value
             : function () {
+                token.constant = true;
                 if (value !== undefined) {
                     token.value = value;
                 }
@@ -2195,7 +2201,7 @@ var jslint = (function JSLint() {
         return token;
     });
     constant('true', 'boolean', true);
-    constant('undefined', 'undefined', undefined);
+    constant('undefined', 'undefined');
 
     assignment('=');
     assignment('+=');
@@ -2343,6 +2349,8 @@ var jslint = (function JSLint() {
         ) {
             warn('subscript_a', the_subscript);
             survey(the_subscript);
+        } else if (the_subscript.id === '`') {
+            warn('unexpected_a', the_subscript);
         }
         left_check(left, the_token);
         the_token.expression = [left, the_subscript];
@@ -3613,11 +3621,135 @@ var jslint = (function JSLint() {
         }
         return pop_block();
     }
+    
+    function is_weird(thing) {
+        return (
+            thing.id === '(regexp)' ||
+            thing.id === '{' ||
+            thing.id === '=>' ||
+            thing.id === 'function' ||
+            (thing.id === '[' && thing.arity === 'unary')
+        );
+    }
+    
+    function are_similar(a, b) {
+        if (a === b) {
+            return true;
+        }
+        if (Array.isArray(a)) {
+            return (
+                Array.isArray(b) && 
+                a.length === b.length &&
+                a.every(function (value, index) {
+                    return are_similar(value, b[index]);
+                })
+            );
+        }
+        if (Array.isArray(b)) {
+            return false;
+        }
+        if (a.id === '(number)' && b.id === '(number)') {
+            return a.value === b.value;
+        }
+        var a_string, b_string;
+        if (a.id === '(string)') {
+            a_string = a.value;
+        } else if (a.id === '`' && a.constant) {
+            a_string = a.value[0];
+        }
+        if (b.id === '(string)') {
+            b_string = b.value;
+        } else if (b.id === '`' && b.constant) {
+            b_string = b.value[0];
+        }
+        if (typeof a_string === 'string') {
+            return a_string === b_string;
+        }
+        if (is_weird(a) || is_weird(b)) {
+            return false;
+        }
+        if (a.arity === b.arity && a.id === b.id) {
+            if (a.id === '.') {
+                return are_similar(a.expression, b.expression) && 
+                        are_similar(a.name, b.name);
+            }
+            switch (a.arity) {
+            case 'unary':
+                return are_similar(a.expression, b.expression);
+            case 'binary':
+                return are_similar(a.expression[0], b.expression[0]) &&
+                        are_similar(a.expression[1], b.expression[1]);
+            case 'ternary':
+                return are_similar(a.expression[0], b.expression[0]) &&
+                        are_similar(a.expression[1], b.expression[1]) &&
+                        are_similar(a.expression[2], b.expression[2]);
+            case 'function':
+            case 'regexp':
+                return false;
+            default:
+                return true;
+            }
+        }
+        return false;
+    }
 
+
+    postaction('binary', function (thing) {
+        if (relationop[thing.id]) {
+            if (
+                is_weird(thing.expression[0]) || 
+                is_weird(thing.expression[1]) ||
+                are_similar(thing.expression[0], thing.expression[1]) || 
+                (
+                    thing.expression[0].constant === true && 
+                    thing.expression[1].constant === true
+                )
+            ) {
+                warn('weird_relation_a', thing);
+            }
+        } 
+        switch (thing.id) {
+        case '=>':
+        case '(':
+        case '.':
+            break;
+        default:
+            if (
+                thing.expression[0].constant === true && 
+                thing.expression[1].constant === true
+            ) {
+                thing.constant = true;
+            }
+        }
+    });
+    postaction('binary', '&&', function (thing) {
+        if (
+            is_weird(thing.expression[0]) || 
+            are_similar(thing.expression[0], thing.expression[1]) || 
+            thing.expression[0].constant === true ||
+            thing.expression[1].constant === true
+        ) {
+            warn('weird_condition_a', thing);
+        }
+    });
+    postaction('binary', '||', function (thing) {
+        if (
+            is_weird(thing.expression[0]) || 
+            are_similar(thing.expression[0], thing.expression[1]) || 
+            thing.expression[0].constant === true
+        ) {
+            warn('weird_condition_a', thing);
+        }
+    });
     postaction('binary', '=>', postaction_function);
     postaction('binary', '(', function (thing) {
         if (!thing.wrapped && thing.expression[0].id === 'function') {
             warn('wrap_immediate', thing);
+        }
+    });
+    postaction('binary', '[', function (thing) {
+        if (is_weird(thing.expression[1])) {
+            warn('weird_expression_a', thing.expression[1]);
         }
     });
     postaction('statement', '{', pop_block);
@@ -3647,6 +3779,49 @@ var jslint = (function JSLint() {
         }
     });
     postaction('statement', 'var', action_var);
+    postaction('ternary', function (thing) {
+        if (
+            is_weird(thing.expression[0]) ||
+            thing.expression[0].constant === true ||
+            are_similar(thing.expression[1], thing.expression[2])
+        ) {
+            warn('unexpected_a', thing);
+        } else if (are_similar(thing.expression[0], thing.expression[1])) {
+            warn('expected_a_b', thing, '||', '?');
+        } else if (are_similar(thing.expression[0], thing.expression[2])) {
+            warn('expected_a_b', thing, '&&', '?');
+        } else if (
+            thing.expression[1].id === 'true' && 
+            thing.expression[2].id === 'false'
+        ) {
+            warn('expected_a_b', thing, '!!', '?');
+        } else if (
+            thing.expression[1].id === 'false' &&
+            thing.expression[2].id === 'true'
+        ) {
+            warn('expected_a_b', thing, '!', '?');
+        }
+    });
+    postaction('unary', function (thing) {
+        switch (thing.id) {
+        case '[':
+        case '{':
+        case 'function':
+        case 'new':
+            break;
+        case '`':
+            if (thing.expression.every(function (thing) {
+                return thing.constant;
+            })) {
+                thing.constant = true;
+            }
+            break;
+        default:
+            if (thing.expression.constant === true) {
+                thing.constant = true;
+            }
+        }
+    });
     postaction('unary', 'function', postaction_function);
 
     function delve(the_function) {
@@ -4145,7 +4320,7 @@ var jslint = (function JSLint() {
             warnings: warnings.sort(function (a, b) {
                 return a.line - b.line || a.column - b.column;
             }),
-            edition: "2015-05-03 BETA"
+            edition: "2015-05-06 BETA"
         };
     };
 }());
