@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="description" content="JSLint is implemented in JavaScript as function jslint. This file
+	contains information on using the jslint function to analyze your programs.">
+<meta name="author" content="Douglas Crockford">
+<meta name="date" content="2015-03-14">
+<link rel="stylesheet" type="text/css" 
+    href="http://fonts.googleapis.com/css?family=Patua+One">
+<link rel="icon" type="image/gif" href="favicon.gif">
+<title>JSLint: jslint function</title>
+<style>
+body {
+	background-color: cornsilk;
+	font-family: Palatino, serif;
+	font-size: 100%;
+	margin: 0;
+	padding: 0;
+}
+h1 {
+	background-color: gray;
+	color: white;
+	font-family: 'Patua One', serif;
+	font-size: 100%;
+	font-style: normal;
+	font-weight: normal;
+	margin-bottom: 1em;
+	margin-left: 12%;
+	margin-right: 12%;
+	margin-top: 1em;
+	padding-bottom: 0.25em;
+	padding-left: 0;
+	padding-right: 0;
+	padding-top: 0.25em;
+	text-align: center;
+}
+th {
+	background-color: gray;
+	color: white;
+}
+td {
+	background-color: white;
+}
+button {
+	background-color: lightsteelblue;
+	border: 0;
+	color: black;
+	cursor: pointer;
+	font-family: 'Patua One', serif;
+	font-size: 100%;
+	font-style: normal;
+	margin-bottom: 0;
+	margin-left: 0.25em;
+	margin-right: 0.25em;
+	margin-top: 0;
+	padding-left: 1em;
+	padding-right: 1em;
+	text-align: center;
+}
+s {
+	display: inline-block;
+	font-style: normal;
+	padding-left: 0.1em;
+	text-decoration: none;
+}
+s::before {
+ content: "J";
+ font-family: 'Patua One', cursive;
+ text-decoration: none;
+}
+s::after {
+ content: "SLint";
+ font-family: 'Patua One', serif;
+ text-decoration: underline;
+}
+big {
+	font-size: 50pt;
+	font-style: normal;
+	font-weight: normal;
+	margin-left: 0.125em;
+	margin-top: -0.2em;
+}
+ins {
+	color: gray;
+	font-family: "Trebuchet MS", sans-serif;
+	font-size: 200%;
+	font-weight: bold;
+	text-decoration: none;
+}
+code, pre {
+	font-family: Consolas, monospace;
+	font-size: 100%;
+	font-style: normal;
+	font-weight: normal;
+}
+small {
+	font-style: italic;
+}
+p {
+	margin-bottom: 1em;
+	margin-left: 12%;
+	margin-right: 12%;
+	margin-top: 1em;
+	text-align: justify;
+}
+blockquote {
+	margin-bottom: 1em;
+	margin-left: 18%;
+	margin-right: 18%;
+	margin-top: 1em;
+}
+blockquote div {
+	margin-left: 2.2em;
+}
+pre {
+	margin-bottom: 1em;
+	margin-left: 18%;
+	margin-right: 12%;
+	margin-top: 1em;
+}
+ul {
+	list-style-type: square;
+	margin-left: 12%;
+	margin-right: 12%;
+}
+table {
+	border: 0;
+	margin: 1em;
+    max-width: 76%;
+}
+th, td {
+	border: black solid 1pt;
+	padding-left: 10px;
+	padding-right: 10px;
+	vertical-align: top;
+}
+a:link {
+	color: darkblue;
+}
+a:visited {
+	color: purple;
+}
+a:hover {
+	color: blue;
+	text-decoration: underline;
+}
+a:active {
+	color: red;
+}
+</style>
+</head>
+<body>
+<div style="float: left; margin-bottom: 1em; margin-left: 2em;"> 
+    <big><s></s> </big> <ins>The <code>jslint</code> Function</ins> </div>
+<ul style="float: right; margin: 1em; padding-right: 1em;">
+    <li><a href="#try">Try it.</a></li>
+    <li><a href="http://www.amazon.com/exec/obidos/ASIN/0596517742/wrrrldwideweb"
+      target="_blank">Enjoy&nbsp;<i>The&nbsp;Good&nbsp;Parts</i>.</a></li>
+</ul>
+<br clear=all>
+<h1 id=jslint><s></s></h1>
+<p><s></s> is delivered as a set of files:</p>
+<center><table align="center">
+<tr><th>Filename</th><th>Content</th></tr>
+<tr>
+    <td><code>browser.js</code></td>
+<td>Browser based UI, uses <code><a href="https://github.com/douglascrockford/ADsafe">adsafe.js</a></code> for DOM manipulation.</td></tr>
+<tr><td><code>function.html</code></td>
+<td>This page that you are looking at right now.</td></tr>
+<tr><td><code>help.html</code></td>
+<td>Using JSLint as a single page JSLint application.</td></tr>
+<tr><td><code>jslint.html</code></td>
+    <td>Single page JSLint application that uses the <code>js</code> files.</td></tr>
+<tr><td><code>jslint.js</code></td>
+<td>The <code>jslint</code> function.</td></tr>
+<tr><td><code>report.js</code></td>
+<td>The <code>REPORT</code> object, containing report generator functions for HTML.</td></tr>
+</table></center>
+<h1><code>function jslint</code></h1>
+<p>The <code>jslint</code> function is written in ES5 JavaScript. It has no dependence on other files.</p>
+<p>The <code>jslint</code> function has three arguments:</p>
+<center><table>
+<tr>
+    <th>Parameter name</th>
+    <th>Type</th>
+    <th>Volition</th><th>Description</th></tr>
+<tr><td><code>source</code></td><td><code>string</code> or <code>array</code></td><td>required</td><td>This is the source of the program to be analyzed. It can be either a string containing <code>\n</code>, <code>\r</code>, or <code>\r\n</code> line breaks, or an array of strings, one element per line.</td></tr>
+<tr><td><code>option_object</code></td><td><code>object</code></td><td>optional</td><td>This object contains the chosen options for this analysis. The keys are the names of the options described on the <a href="help.html">help page</a>. The values are either the boolean <code>true</code> or a small number.</td></tr>
+<tr><td><code>global_array</code></td><td><code>array</code></td><td>optional</td>
+<td>This is an array of strings. Each string names one global variable that may be used by the program. Listing names here will silence warnings about the names. It will not introduce the names into the runtime environment.</td></tr>
+</table></center>
+<p>The <code>jslint</code> function will not modify any of its arguments.</p>
+<p>The <code>jslint</code> function will return a result object contain the following properties:</p>
+<center><table>
+<tr>
+    <th>Property name</th>
+    <th>Type</th>
+<th>Content</th></tr>
+<tr><td><code>edition</code></td><td>string</td>
+<td>This indicates the verison of <s></s> that produced the result.</td></tr>
+<tr><td><code>functions</code></td><td>array</td>
+<td>This is an array of function objects.</td></tr>
+<tr><td><code>global</code></td><td>object</td>
+<td>This is the global object, a body that contains the outermost statements and variables.</td></tr>
+<tr><td><code>id</code></td><td>string</td>
+<td><code>(JSLint)</code></td></tr>
+<tr><td><code>imports</code></td><td>array</td>
+<td>This contains all of the strings named in <code>import</code> statements.</td></tr>
+<tr><td><code>json</code></td><td>boolean</td>
+<td>This is <code>true</code> if the source was a <a href="http://www.JSON.org/">JSON</a> text. </td></tr>
+<tr><td><code>lines</code></td><td>array</td>
+<td>This is an array of strings, one for each line of text in the source.</td></tr>
+<tr><td><code>module</code></td><td>boolean</td>
+<td>This is <code>true</code> if the file contains an <code>import</code> or <code>export</code>.</td></tr>
+<tr><td><code>ok</code></td><td>boolean</td>
+<td>This is <code>true</code> if no warnings were found.</td></tr>
+<tr><td><code>option</code></td><td>object</td>
+<td>This is the option object that was passed in, or an empty substitute.</td></tr>
+<tr><td><code>property</code></td><td>object</td>
+<td>The names are the names of properties used in the source. The values are the number of times each name occurred.</td></tr>
+<tr><td><code>stop</code></td><td>boolean</td>
+<td>This is <code>true</code> if <s></s> was not able to process the entire file.</td></tr>
+<tr><td><code>tokens</code></td><td>array</td>
+<td>This is an array of all of the token objects in source order.</td></tr>
+<tr><td><code>tree</code></td><td>array</td>
+<td>This is an array of the token objects that represent the outermost statements. Those will be linked to other tokens, forming an abstract parse tree.</td></tr>
+<tr><td><code>warnings</code></td><td>array</td>
+<td>This is an array of warning objects.</td></tr>
+</table>
+    <h1>Tokens</h1>
+    <p>A source file is composed of tokens. Each identifier, each operator, each punctuator, each literal, and each comment is a token. The whitespace between the tokens is not.</p>
+    <p>An object is made for each token. The properties in each token will vary according to the type of the token. More properties will be added to the tokens during the analysis to indicate the token's purpose or relationship with other tokens. The tokens will be woven together to form a tree. </p>
+    <table>
+        <tr>
+            <th scope="col">Property name</th>
+            <th scope="col">Type</th>
+            <th scope="col">Description</th>
+            <th scope="col">Where</th>
+        </tr>
+        <tr>
+            <td><code>arity</code></td>
+            <td>string</td>
+            <td><code>unary</code>, <code>binary</code>, <code>ternary</code>, <code>assignment</code>, <code>statement</code>, <code>variable</code>, <code>pre</code>, <code>post</code></td>
+            <td>non-literals</td>
+        </tr>
+        <tr>
+            <td><code>block</code></td>
+            <td>token or array of tokens</td>
+            <td>This is the contents of a block or compound statement. Each token represents a statement.</td>
+            <td>statement</td>
+        </tr>
+        <tr>
+            <td><code>body</code></td>
+            <td>boolean</td>
+            <td><code>true</code> if the block is a function body.</td>
+            <td>block</td>
+        </tr>
+        <tr>
+            <td><code>catch</code></td>
+            <td>token</td>
+            <td>The <code>catch</code> clause.</td>
+            <td>try</td>
+        </tr>
+        <tr>
+            <td><code>closure</code></td>
+            <td>boolean</td>
+            <td><code>true</code> if accessed by inner functions</td>
+            <td>variable</td>
+        </tr>
+        <tr>
+            <td><code>constant</code></td>
+            <td>boolean</td>
+            <td><code>true</code> if the thing is a compile-time constant</td>
+            <td>token</td>
+        </tr>
+        <tr>
+            <td><code>context</code></td>
+            <td>object</td>
+            <td>The container of variables, parameters, labels, and exception variables declared in a function.</td>
+            <td>function</td>
+        </tr>
+        <tr>
+            <td><code>directive</code></td>
+            <td>boolean</td>
+            <td><code>jslint</code>, <code>global</code>, <code>property</code></td>
+            <td>comment</td>
+        </tr>
+        <tr>
+            <td><code>disrupt</code></td>
+            <td>boolean</td>
+            <td><code>true</code> if a disruptive statement, or a block ending with a distruption. An <code>if</code> will disrupt if both of its branches disrupt.</td>
+            <td>statement</td>
+        </tr>
+        <tr>
+            <td><code>dot</code></td>
+            <td>boolean</td>
+            <td><code>true</code> if the previous token was a dot.</td>
+            <td>identifier</td>
+        </tr>
+        <tr>
+            <td><code>ellipsis</code></td>
+            <td>boolean</td>
+            <td><code>true</code> if the parameter or argument is preceded by the ellipsis.</td>
+            <td>token</td>
+        </tr>
+        <tr>
+            <td><code>else</code></td>
+            <td>array of tokens</td>
+            <td>Alternate block in 
+                <code>if</code> (<code>else</code>), 
+                <code>switch</code> (<code>default</code>), 
+                <code>try</code> (<code>finally</code>)</td>
+            <td>statement</td>
+        </tr>
+        <tr>
+            <td><code>expression</code></td>
+            <td>token or array of tokens</td>
+            <td>One or more expressions.</td>
+            <td>operator or statement</td>
+        </tr>
+        <tr>
+            <td><code>extra</code></td>
+            <td>string</td>
+            <td><code>get</code>, <code>set</code></td>
+            <td>properties</td>
+        </tr>
+        <tr>
+            <td><code>flag</code></td>
+            <td>object</td>
+            <td>An object containing the properties <code>g</code>, <code>i</code>, <code>m</code>, <code>u</code>, or <code>y</code>.</td>
+            <td>regexp</td>
+        </tr>
+        <tr>
+            <td><code>from</code></td>
+            <td>number</td>
+            <td>The starting position of the token within its line of source code. A token at the extreme left margin has a <code>from</code> of 0.</td>
+            <td>token</td>
+        </tr>
+        <tr>
+            <td><code>function</code></td>
+            <td>token</td>
+            <td>The function in which the variable was declared.</td>
+            <td>variable</td>
+        </tr>
+        <tr>
+            <td><code>id</code></td>
+            <td>string</td>
+            <td>The <code>id</code> of the token. For most tokens, this is the token text itself. <br>
+            For comments, <code>id</code> is <code>'(comment)'</code>.<br>For number literals, <code>id</code> is <code>'(number)'</code>. <br>
+            For regular expression literals, <code>id</code> is <code>'(regexp)'</code>.<br>For string literals, <code>id</code> is <code>'(string)'</code>. <br>
+            The end of the file has an <code>id</code> of <code>'(end)'</code>.<br>
+            The global object has an <code>id</code> of <code>'(global)'</code>.</td>
+            <td>token</td>
+        </tr>
+        <tr>
+            <td><code>identifier</code></td>
+            <td>boolean</td>
+            <td><code>true</code> if the token is an identifier.</td>
+            <td>token</td>
+        </tr>
+        <tr>
+            <td><code>import</code></td>
+            <td>string</td>
+            <td>The <code>import</code> <code>from</code> string literal.</td>
+            <td>import</td>
+        </tr>
+        <tr>
+            <td><code>inc</code></td>
+            <td>token</td>
+            <td>The increment clause of a <code>for</code> statement.</td>
+            <td>for</td>
+        </tr>
+        <tr>
+            <td><code>initial</code></td>
+            <td>token</td>
+            <td>The initialization clause of a <code>for</code> statement.</td>
+            <td>for</td>
+        </tr>
+        <tr>
+            <td><code>label</code></td>
+            <td>token</td>
+            <td>The label of a statement, or the name of a property in an object literal.</td>
+            <td>statement or object literal</td>
+        </tr>
+        <tr>
+            <td><code>level</code></td>
+            <td>number</td>
+            <td>The function nesting level. The global context is 0. The outermost functions are 1. Their inner functions are 2.</td>
+            <td>function</td>
+        </tr>
+        <tr>
+            <td><code>line</code></td>
+            <td>number</td>
+            <td>The line number on which the token was found. A token on the first line will have a                <code>line</code> of 0. If the token spans multiple lines (such as a long comment) <code>line</code> will be the number of the last line it occupied. </td>
+            <td>token</td>
+        </tr>
+        <tr>
+            <td><code>name</code></td>
+            <td>token or string</td>
+            <td>The name of a function</td>
+            <td>function</td>
+        </tr>
+        <tr>
+            <td><code>names</code></td>
+            <td>token or array of tokens</td>
+            <td>Parameters or variables on the left of <code>=</code>.</td>
+            <td><code>=</code> or <code>(</code></td>
+        </tr>
+        <tr>
+            <td><code>new</code></td>
+            <td>boolean</td>
+            <td><code>true</code> if this token was preceded by <code>new</code>.</td>
+            <td>token</td>
+        </tr>
+        <tr>
+            <td><code>parameters</code></td>
+            <td>array of tokens</td>
+            <td>The parameter list.</td>
+            <td>function</td>
+        </tr>
+        <tr>
+            <td><code>quote</code></td>
+            <td>string</td>
+            <td>The quote character.</td>
+            <td>string literal</td>
+        </tr>
+        <tr>
+            <td><code>role</code></td>
+            <td>string</td>
+            <td><code>variable</code>, <code>parameter</code>, <code>exception</code>, <code>label</code></td>
+            <td>identifier</td>
+        </tr>
+        <tr>
+            <td><code>statement</code></td>
+            <td>boolean</td>
+            <td><code>true</code> if the token is the first token of a statement.</td>
+            <td>token</td>
+        </tr>
+        <tr>
+            <td><code>strict</code></td>
+            <td>boolean</td>
+            <td><code>true</code> if it contained the <code>'use strict'</code> pragma.</td>
+            <td>block</td>
+        </tr>
+        <tr>
+            <td><code>thru</code></td>
+            <td>number</td>
+            <td>The ending position of the token within its line of source code. It is usually <code>from</code> plus the length of the token.</td>
+            <td>token</td>
+        </tr>
+        <tr>
+            <td><code>value</code></td>
+            <td>string or array of strings</td>
+            <td>The text of the token. For a long comment or megastring, this could be an array of strings.</td>
+            <td>literals</td>
+        </tr>
+        <tr>
+            <td><code>variable</code></td>
+            <td>token</td>
+            <td>This links a variable to its definition.</td>
+            <td>variable</td>
+        </tr>
+        <tr>
+            <td><code>warning</code></td>
+            <td>object</td>
+            <td>A warning object triggered by this token.</td>
+            <td>token</td>
+        </tr>
+        <tr>
+            <td><code>wrapped</code></td>
+            <td>boolean</td>
+            <td><code>true</code> if the expression was wrapped in parens.</td>
+            <td>expression</td>
+        </tr>
+        <tr>
+            <td><code>writable</code></td>
+            <td>boolean</td>
+            <td><code>true</code> if the variable can be assigned to.</td>
+            <td>variable</td>
+        </tr>
+    </table>
+    <h1>Reports</h1>
+    <p>The <code>REPORT</code> object contains three functions that all take a result from the <code>jslint</code> function as input.  <code>report.js</code> has no other dependence on other files.</p>
+    <table>
+        <tr>
+            <th scope="col">Function name</th>
+            <th scope="col">Description</th>
+        </tr>
+        <tr>
+            <td><code>error</code></td>
+            <td>This function takes a result and returns an HTML text fragment from the warnings that are found.</td>
+        </tr>
+        <tr>
+            <td><code>function</code></td>
+            <td>This function takes a result and returns an HTML text fragment detailing the declarations of every function.</td>
+        </tr>
+        <tr>
+            <td><code>property</code></td>
+            <td>This function takes a result and returns a <s></s> property directive. This directive could be pasted into a file.</td>
+        </tr>
+    </table>
+    <p>&nbsp;</p>
+</center>
+
+<center>
+    <a href="http://www.JSLint.com/"><img src="image/jslintpill.gif" width="36" height="17" border="0"></a> 
+    <a href="https://github.com/douglascrockford/JSLint"><img src="image/github.gif" width="39" height="16" border="0"></a> 
+    <a href="https://plus.google.com/communities/104441363299760713736"><img src="image/gpill.gif" width="36" height="17" border="0"></a> 
+    <a href="http://www.JSON.org/"><img src="image/jsonpill.gif" width="36" height="17" border="0"></a> 
+    <a href="http://www.ADsafe.org/"><img src="image/adsafepill.gif" width="36" height="17" border="0"></a> 
+    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=RDLHY5MSG3LZW"><img src="image/pppill.gif" width="36" height="17" border="0"></a> 
+    <a href="http://www.1and1.com/?k_id=10219574"><img src="image/1and1pill.gif" width="36" height="17" border="0"></a>
+</center>
+</body>
+</html>
