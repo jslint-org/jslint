@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-05-07
+// 2015-05-08
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1646,46 +1646,58 @@ var jslint = (function JSLint() {
             warn('reserved_a', name);
         } else {
 
+// Has the name been enrolled in this context?
+
+            var earlier = functionage.context[id];
+            if (earlier) {
+                warn(
+                    'redefinition_a_b',
+                    name,
+                    name.id,
+                    earlier.line + fudge
+                );
+
 // Has the name been enrolled in an outer context?
 
-            var earlier;
-            stack.forEach(function (value) {
-                var item = value.context[id];
-                if (item !== undefined) {
-                    earlier = item;
-                }
-            });
-            if (earlier) {
-                if (id === 'ignore') {
-                    if (earlier.role === 'variable') {
-                        warn('unexpected_a', name);
+            } else {
+                stack.forEach(function (value) {
+                    var item = value.context[id];
+                    if (item !== undefined) {
+                        earlier = item;
                     }
-                } else {
-                    if (
-                        (role !== 'exception' || earlier.role !== 'exception') &&
-                        role !== 'parameter' &&
-                        role !== 'function'
-                    ) {
-                        warn(
-                            'redefinition_a_b',
-                            name,
-                            name.id,
-                            earlier.line + fudge
-                        );
+                });
+                if (earlier) {
+                    if (id === 'ignore') {
+                        if (earlier.role === 'variable') {
+                            warn('unexpected_a', name);
+                        }
+                    } else {
+                        if (
+                            (role !== 'exception' || earlier.role !== 'exception') &&
+                            role !== 'parameter' &&
+                            role !== 'function'
+                        ) {
+                            warn(
+                                'redefinition_a_b',
+                                name,
+                                name.id,
+                                earlier.line + fudge
+                            );
+                        }
                     }
                 }
-            }
-        }
 
 // Enroll it.
 
-        functionage.context[id] = name;
-        name.dead = true;
-        name.function = functionage;
-        name.init = false;
-        name.role = role;
-        name.used = 0;
-        name.writable = !readonly;
+                functionage.context[id] = name;
+                name.dead = true;
+                name.function = functionage;
+                name.init = false;
+                name.role = role;
+                name.used = 0;
+                name.writable = !readonly;
+            }
+        }
     }
 
     function expression(rbp, initial) {
@@ -4342,7 +4354,7 @@ var jslint = (function JSLint() {
             warnings: warnings.sort(function (a, b) {
                 return a.line - b.line || a.column - b.column;
             }),
-            edition: "2015-05-07 BETA"
+            edition: "2015-05-08 BETA"
         };
     };
 }());
