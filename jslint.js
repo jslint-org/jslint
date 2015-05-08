@@ -3334,7 +3334,7 @@ var jslint = (function JSLint() {
                 switch (thing.arity) {
                 case 'post':
                 case 'pre':
-                    warn('unexpected_expression_a', thing);
+                    warn('unexpected_a', thing);
                     break;
                 case 'statement':
                 case 'assignment':
@@ -3610,17 +3610,26 @@ var jslint = (function JSLint() {
         warn('bad_assignment_a', name);
     }
 
-    postaction('assignment', '=', function (thing) {
+    postaction('assignment', function (thing) {
 
 // Assignment using = sets the init property of a variable. No other assignment
 // operator can do this. A = token keeps that variable (or array of variables
 // in case of destructuring) in its name property.
 
-        if (thing.names !== undefined) {
-            if (Array.isArray(thing.names)) {
-                thing.names.forEach(init_variable);
-            } else {
-                init_variable(thing.names);
+        if (thing.id === '=') {
+            if (thing.names !== undefined) {
+                if (Array.isArray(thing.names)) {
+                    thing.names.forEach(init_variable);
+                } else {
+                    init_variable(thing.names);
+                }
+            }
+        } else {
+            var lvalue = thing.expression[0];
+            if (lvalue.arity === 'variable') {
+                if (lvalue.variable.writable !== true) {
+                    warn('bad_assignment_a', lvalue);
+                }
             }
         }
     });
