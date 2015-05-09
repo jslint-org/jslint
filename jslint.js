@@ -1612,6 +1612,8 @@ var jslint = (function JSLint() {
         case 'true':
         case 'false':
         case 'null':
+            advance();
+            break;
         case '(number)':
             if (!rx_JSON_number.test(next_token.value)) {
                 warn('unexpected_a');
