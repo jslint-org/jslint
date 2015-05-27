@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-05-08
+// 2015-05-26
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -107,11 +107,11 @@
     unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
     unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
     unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
-    unexpected_typeof_a, uninitialized_a, unreachable_a,
-    unregistered_property_a, unsafe, unused_a, use_spaces, used, value,
-    var_loop, var_switch, variable, warning, warnings, weird_condition_a,
-    weird_expression_a, weird_loop, weird_relation_a, white, wrap_immediate,
-    wrap_regexp, wrapped, writable, y
+    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
+    unreachable_a, unregistered_property_a, unsafe, unused_a, use_spaces, used,
+    value, var_loop, var_switch, variable, warning, warnings,
+    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
+    wrap_immediate, wrap_regexp, wrapped, writable, y
 */
 
 var jslint = (function JSLint() {
@@ -330,11 +330,11 @@ var jslint = (function JSLint() {
         unexpected_comment: "Unexpected comment.",
         unexpected_directive_a: "When using modules, don't use directive '/*{a}'.",
         unexpected_expression_a: "Unexpected expression '{a}' in statement position.",
-
-        unexpected_statement_a: "Unexpected statement '{a}' in expression position.",
         unexpected_label_a: "Unexpected label '{a}'.",
         unexpected_parens: "Don't wrap function literals in parens.",
         unexpected_space_a_b: "Unexpected space between '{a}' and '{b}'.",
+        unexpected_statement_a: "Unexpected statement '{a}' in expression position.",
+        unexpected_trailing_space: "Unexpected trailing space.",
         unexpected_typeof_a: "Unexpected 'typeof'. Use '===' to compare directly with {a}.",
         uninitialized_a: "Uninitialized '{a}'.",
         unreachable_a: "Unreachable '{a}'.",
@@ -605,6 +605,12 @@ var jslint = (function JSLint() {
                 }
                 if (option.maxlen && option.maxlen < source_line.length) {
                     warn_at('too_long', line, source_line.length);
+                } else if (!option.white && source_line.slice(-1) === ' ') {
+                    warn_at(
+                        'unexpected_trailing_space',
+                        line,
+                        source_line.length - 1
+                    );
                 }
             }
             return source_line;
@@ -4356,7 +4362,7 @@ var jslint = (function JSLint() {
             warnings: warnings.sort(function (a, b) {
                 return a.line - b.line || a.column - b.column;
             }),
-            edition: "2015-05-08 BETA"
+            edition: "2015-05-26 BETA"
         };
     };
 }());
