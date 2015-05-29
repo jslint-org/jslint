@@ -7,7 +7,7 @@
 /*property
     closure, column, context, edition, error, filter, forEach, fudge, function,
     functions, global, id, imports, isArray, join, json, keys, length, level,
-    line, lines, message, module, name, names, option, parameters, property, 
+    line, lines, message, module, name, names, option, parameters, property,
     push, replace, role, signature, sort, stop, warnings
 */
 
@@ -17,25 +17,25 @@ var REPORT = (function () {
     var rx_amp = /&/g,
         rx_gt = />/g,
         rx_lt = /</g;
-    
+
     function entityify(string) {
-        
-// Replace & < > with less destructive entities.        
-    
+
+// Replace & < > with less destructive entities.
+
         return String(string)
             .replace(rx_amp, '&amp;')
             .replace(rx_lt, '&lt;')
             .replace(rx_gt, '&gt;');
     }
-    
+
     return {
 
         error: function error_report(data) {
 
-// Produce the HTML Error Report.        
-    
-            var fudge = data.option.fudge 
-                    ? 1 
+// Produce the HTML Error Report.
+
+            var fudge = data.option.fudge
+                    ? 1
                     : 0,
                 output = [];
             if (data.stop) {
@@ -43,9 +43,9 @@ var REPORT = (function () {
             }
             data.warnings.forEach(function (warning) {
                 output.push(
-                    "<cite><address>line ", 
+                    "<cite><address>line ",
                     entityify(warning.line + fudge),
-                    " column ", 
+                    " column ",
                     entityify(warning.column + fudge),
                     "</address>",
                     entityify(warning.message),
@@ -58,12 +58,12 @@ var REPORT = (function () {
         },
 
         function: function function_report(data) {
-    
-// Produce the HTML Function Report.        
-    
-            var fudge = data.option.fudge 
-                    ? 1 
-                    : 0, 
+
+// Produce the HTML Function Report.
+
+            var fudge = data.option.fudge
+                    ? 1
+                    : 0,
                 mode = data.module
                     ? "module"
                     : "global",
@@ -73,12 +73,12 @@ var REPORT = (function () {
                 return data.warnings.length === 0
                     ? "<center>JSON: good.</center>"
                     : "<center>JSON: bad.</center>";
-            } 
-            
+            }
+
             function detail(title, array) {
                 if (Array.isArray(array) && array.length > 0) {
                     output.push(
-                        "<dt>", 
+                        "<dt>",
                         entityify(title),
                         "</dt><dd>",
                         array.join(", "),
@@ -98,17 +98,17 @@ var REPORT = (function () {
                 detail("imports", imports);
                 output.push("</dl>");
             }
-            
+
             if (data.functions.length > 0) {
                 data.functions.forEach(function (the_function) {
                     var context = the_function.context,
                         list = Object.keys(context);
                     output.push(
-                        "<dl class=level", 
+                        "<dl class=level",
                         entityify(the_function.level),
-                        "><address>line ", 
+                        "><address>line ",
                         entityify(the_function.line + fudge),
-                        "</address><dfn>", 
+                        "</address><dfn>",
                         (
                             the_function.name === "=>"
                                 ? entityify(the_function.signature) + " =>"
@@ -130,14 +130,14 @@ var REPORT = (function () {
                             }
                         });
                         detail(
-                            "parameter", 
+                            "parameter",
                             params.sort()
                         );
                     }
                     list.sort();
                     detail("variable", list.filter(function (id) {
                         var the_variable = context[id];
-                        return the_variable.role === 'variable' && 
+                        return the_variable.role === 'variable' &&
                                 the_variable.function === the_function;
                     }));
                     detail("exception", list.filter(function (id) {
@@ -163,23 +163,23 @@ var REPORT = (function () {
                 });
             }
             output.push(
-                "<center>J<u>SLint</u> edition ", 
-                entityify(data.edition), 
+                "<center>J<u>SLint</u> edition ",
+                entityify(data.edition),
                 "</center>"
             );
             return output.join("");
         },
 
         property: function property_directive(data) {
-    
-// Produce the /*property*/ directive.        
-    
+
+// Produce the /*property*/ directive.
+
             var not_first = false,
                 output = ["/*property"],
                 length = 1111,
                 properties = Object.keys(data.property);
-                
-            if (properties.length > 0) {        
+
+            if (properties.length > 0) {
                 properties.sort().forEach(function (key) {
                     if (not_first) {
                         output.push(",");

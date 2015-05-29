@@ -2,8 +2,8 @@
 // 2015-05-01
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
-/*global 
-    ADSAFE, document, REPORT, jslint 
+/*global
+    ADSAFE, document, REPORT, jslint
 */
 
 /*property
@@ -17,19 +17,19 @@
 
 ADSAFE.lib("browser_ui", function () {
     'use strict';
-    
+
     var rx_separator = /[\s,;'"]+/;
-    
+
     function setHTML(bunch, html) {
         bunch.___nodes___[0].innerHTML = html;
     }
 
     return function (dom) {
-        
+
 // This function is the entry point to this web module.
 
-// First get handles to some of the page features.        
-        
+// First get handles to some of the page features.
+
         var warnings = dom.q('#JSLINT_WARNINGS'),
             warnings_div = warnings.q('>div'),
             options = dom.q('#JSLINT_OPTIONS'),
@@ -54,7 +54,7 @@ ADSAFE.lib("browser_ui", function () {
             source_textarea.value('');
             source_textarea.focus();
         }
-        
+
         function clear_options() {
             options.q('input_checkbox').check(false);
             options.q('input_text').value('');
@@ -62,9 +62,9 @@ ADSAFE.lib("browser_ui", function () {
         }
 
         function call_jslint() {
-            
-// First build the option object.            
-            
+
+// First build the option object.
+
             var option = Object.create(null);
             options.q('input_checkbox:checked').each(function (node) {
                 option[node.getTitle()] = true;
@@ -75,19 +75,19 @@ ADSAFE.lib("browser_ui", function () {
                     option[node.getTitle()] = value;
                 }
             });
-            
-// Call JSLint with the source text, the options, and the predefined globals.          
-            
+
+// Call JSLint with the source text, the options, and the predefined globals.
+
             var source_string = source_textarea.getValue();
             var global_string = global.getValue();
             var result = jslint(
-                source_string, 
-                option, 
-                global_string === '' 
+                source_string,
+                option,
+                global_string === ''
                     ? undefined
                     : global_string.split(rx_separator)
             );
-            
+
 // Generate the reports.
 
             var error_html = REPORT.error(result);
@@ -97,8 +97,8 @@ ADSAFE.lib("browser_ui", function () {
 // Display the reports.
 
             setHTML(warnings_div, error_html);
-            warnings.style('display', error_html.length === 0 
-                ? 'none' 
+            warnings.style('display', error_html.length === 0
+                ? 'none'
                 : 'block');
             setHTML(report_div, function_html);
             report_field.style('display', 'block');
@@ -113,16 +113,16 @@ ADSAFE.lib("browser_ui", function () {
             aux.style('display', 'block');
             source_textarea.select();
         }
-        
+
         function select_property_directive() {
             property_textarea.select();
         }
-        
-// Lay in the click handlers.        
+
+// Lay in the click handlers.
 
         dom.q('button').each(function (button) {
             switch (button.getName()) {
-            case 'JSLint': 
+            case 'JSLint':
                 button.on('click', call_jslint);
                 break;
             case 'clear':
