@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-05-28
+// 2015-05-29
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -167,8 +167,8 @@ var jslint = (function JSLint() {
         eval: true,
         for: true,
         fudge: true,
-        maxerr: 1000,
-        maxlen: 256,
+        maxerr: 10000,
+        maxlen: 10000,
         node: [
             'Buffer', 'clearImmediate', 'clearInterval', 'clearTimeout',
             'console', 'exports', 'global', 'module', 'process',
@@ -289,10 +289,10 @@ var jslint = (function JSLint() {
         duplicate_a: "Duplicate '{a}'.",
         empty_block: "Empty block.",
         es6: "Unexpected ES6 feature.",
-        expected_a_b: "Expected '{a}' and instead saw '{b}'.",
-        expected_a_before_b: "Expected '{a}' before '{b}'.",
-        expected_a_b_from_c_d: "Expected '{a}' to match '{b}' from line {c} and instead saw '{d}'.",
         expected_a_at_b_c: "Expected '{a}' at column {b}, not column {c}.",
+        expected_a_b: "Expected '{a}' and instead saw '{b}'.",
+        expected_a_b_from_c_d: "Expected '{a}' to match '{b}' from line {c} and instead saw '{d}'.",
+        expected_a_before_b: "Expected '{a}' before '{b}'.",
         expected_digits_after_a: "Expected digits after '{a}'.",
         expected_four_digits: "Expected four digits after '\\u'.",
         expected_identifier_a: "Expected an identifier and instead saw '{a}'.",
@@ -344,15 +344,15 @@ var jslint = (function JSLint() {
         use_spaces: "Use spaces, not tabs.",
         var_loop: "Don't declare variables in a loop.",
         var_switch: "Don't declare variables in a switch.",
-        wrap_regexp: "Wrap this regexp in parens to avoid confusion.",
-        weird_loop: "Weird loop.",
         weird_condition_a: "Weird condition '{a}'.",
         weird_expression_a: "Weird expression '{a}'.",
+        weird_loop: "Weird loop.",
         weird_relation_a: "Weird relation '{a}'.",
         wrap_immediate: "Wrap an immediate function invocation in " +
                 "parentheses to assist the reader in understanding that the " +
                 "expression is the result of a function, and not the " +
-                "function itself."
+                "function itself.",
+        wrap_regexp: "Wrap this regexp in parens to avoid confusion."
     };
 
 // Regular expression literals:
@@ -495,7 +495,7 @@ var jslint = (function JSLint() {
         }
         warning.message = supplant(bundle[code] || code, warning);
         warnings.push(warning);
-        return warnings.length === option.maxerr
+        return typeof option.maxerr === 'number' && warnings.length === option.maxerr
             ? stop_at('too_many', line, column)
             : warning;
     }
@@ -4369,7 +4369,7 @@ var jslint = (function JSLint() {
             warnings: warnings.sort(function (a, b) {
                 return a.line - b.line || a.column - b.column;
             }),
-            edition: "2015-05-28 BETA"
+            edition: "2015-05-29 BETA"
         };
     };
 }());
