@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-05-29
+// 2015-05-30
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -716,7 +716,7 @@ var jslint = (function JSLint() {
                     return;
                 }
                 back_char();
-                if (some_digits(rx_hexs, true) !== 4) {
+                if (some_digits(rx_hexs, true) < 4) {
                     warn_at('expected_four_digits', line, column - 1);
                 }
                 break;
@@ -4369,7 +4369,7 @@ var jslint = (function JSLint() {
             warnings: warnings.sort(function (a, b) {
                 return a.line - b.line || a.column - b.column;
             }),
-            edition: "2015-05-29 BETA"
+            edition: "2015-05-30 BETA"
         };
     };
 }());
