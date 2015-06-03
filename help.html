@@ -382,7 +382,7 @@ value to determine if it is present.</p>
             <td>Tolerate <code>for</code> statement</td>
             <td><code>for</code></td>
             <td><code>true</code> if the <code>for</code> statement should be 
-                allowed.</td>
+                allowed. It is almost always better to use the array methods instead.</td>
         </tr>
         <tr>
             <td>Fudge the line and column numbers</td>
@@ -396,13 +396,14 @@ value to determine if it is present.</p>
         <tr>
             <td>Maximum number of errors</td>
             <td><code>maxerr</code></td>
-            <td>The maximum number of warnings reported.</td>
+            <td>The maximum number of warnings reported. 
+            (The default is unlimited)</td>
         </tr>
         <tr>
             <td>Maximum line length</td>
             <td><code>maxlen</code></td>
             <td>The maximum number of characters in a line. 
-                (default is unlimited)</td>
+                (The default is unlimited)</td>
         </tr>
         <tr>
             <td>Assume <a href="http://nodejs.org/">Node.js</a></td>
@@ -432,7 +433,7 @@ It adds the
 </table>
 <p>For example:</p>
 <pre>/*jslint
-    es6, node, maxerr: 10
+    es6, maxerr: 10, node
 */</pre>
 
 <h1 id=properties><code>/*property*/</code></h1>
@@ -443,7 +444,7 @@ It adds the
 <p>The list can also be used to evade some of <s></s>'s naming rules.</p>
 <p><s></s> can build the <code>/*property*/</code> list for you. At the bottom 
     of its report, <s></s> displays a <code>/*property*/</code> directive. It 
-    contains all of the namesthat were used with dot 
+    contains all of the names that were used with dot 
     notation, subscript notation, and object literals to name the properties of 
     objects. You can look through the list for misspellings. You can copy the 
     <code>/*property*/</code></code> directive to the top of your  script file. 
@@ -682,8 +683,7 @@ and <code>function</code>.</p>
   current indentation. Those 8 spaces do not change the current indentation. 
   It is 8 to avoid confusion with ordinary indentation.</p>
 <p>The word <code>function</code> is always followed with one space.</p>
-<p>Clauses (<code>else</code>, <code>case</code>, <code>default</code>, 
-    <code>catch</code>, <code>finally</code>) are not statements and so should 
+<p>Clauses (<code>case</code>, <code>catch</code>, <code>default</code>, <code>else</code>, <code>finally</code>) are not statements and so should 
     not be indented like statements.</p>
 <p>Spaces are used to make things that are not invocations look less like 
     invocations.</p>
