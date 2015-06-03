@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-05-30
+// 2015-06-02
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -3726,7 +3726,8 @@ var jslint = (function JSLint() {
             case 'unary':
                 return are_similar(a.expression, b.expression);
             case 'binary':
-                return are_similar(a.expression[0], b.expression[0]) &&
+                return a.id !== '(' &&
+                        are_similar(a.expression[0], b.expression[0]) &&
                         are_similar(a.expression[1], b.expression[1]);
             case 'ternary':
                 return are_similar(a.expression[0], b.expression[0]) &&
@@ -4263,6 +4264,7 @@ var jslint = (function JSLint() {
         try {
             warnings = [];
             option = option_object || empty();
+            anon = "anonymous";
             block_stack = [];
             declared_globals = empty();
             directive_mode = true;
@@ -4369,7 +4371,7 @@ var jslint = (function JSLint() {
             warnings: warnings.sort(function (a, b) {
                 return a.line - b.line || a.column - b.column;
             }),
-            edition: "2015-05-30 BETA"
+            edition: "2015-06-02 BETA"
         };
     };
 }());
