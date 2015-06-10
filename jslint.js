@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-06-02
+// 2015-06-08
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -380,7 +380,7 @@ var jslint = (function JSLint() {
         rx_directive = /^(jslint|property|global)\s*(.*)$/,
         rx_directive_part = /^([a-zA-Z$_][a-zA-Z0-9$_]*)\s*(?::\s*(true|false|[0-9]+)\s*)?(?:,\s*)?(.*)$/,
 // token (sorry it is so long)
-        rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\]\?,:;'"~`]|=(?:==?|>)?|\.+|\/[*\/]?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<<?=?|!={0,2}|(0|[1-9][0-9]*))(.*)$/,
+        rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\]\?,:;'"~`]|=(?:==?|>)?|\.+|\/[*\/]?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|[\^%]=?|&[&=]?|\|[\|=]?|>{1,3}=?|<<?=?|!={0,2}|(0|[1-9][0-9]*))(.*)$/,
         rx_digits = /^([0-9]+)(.*)$/,
         rx_hexs = /^([0-9a-fA-F]+)(.*)$/,
         rx_octals = /^([0-7]+)(.*)$/,
@@ -695,6 +695,7 @@ var jslint = (function JSLint() {
             case '"':
             case '/':
             case ':':
+            case '|':
             case 'b':
             case 'f':
             case 'n':
@@ -940,6 +941,7 @@ var jslint = (function JSLint() {
                 case '/':
                 case '^':
                 case '-':
+                case '|':
                 case '':
                     return false;
                 case '`':
@@ -4371,7 +4373,7 @@ var jslint = (function JSLint() {
             warnings: warnings.sort(function (a, b) {
                 return a.line - b.line || a.column - b.column;
             }),
-            edition: "2015-06-02 BETA"
+            edition: "2015-06-08 BETA"
         };
     };
 }());
