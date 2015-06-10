@@ -4373,7 +4373,7 @@ var jslint = (function JSLint() {
             warnings: warnings.sort(function (a, b) {
                 return a.line - b.line || a.column - b.column;
             }),
-            edition: "2015-06-08 BETA"
+            edition: "2015-06-08"
         };
     };
 }());
