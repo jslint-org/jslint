@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-06-08
+// 2015-06-10
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -951,7 +951,7 @@ var jslint = (function JSLint() {
                     next_char();
                     return true;
                 case ' ':
-                    warn_at('expected_a_b', line, column, '\\s', ' ');
+                    warn_at('expected_a_before_b', line, column, '\\', ' ');
                     next_char();
                     return true;
                 default:
@@ -1040,7 +1040,7 @@ var jslint = (function JSLint() {
                         }
                         break;
                     case ' ':
-                        warn_at('expected_a_b', line, column, '\\s', ' ');
+                        warn_at('expected_a_before_b', line, column, '\\', ' ');
                         break;
                     }
                     next_char();
@@ -4373,7 +4373,7 @@ var jslint = (function JSLint() {
             warnings: warnings.sort(function (a, b) {
                 return a.line - b.line || a.column - b.column;
             }),
-            edition: "2015-06-08"
+            edition: "2015-06-10"
         };
     };
 }());
