@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-06-10
+// 2015-06-11
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -2653,6 +2653,7 @@ var jslint = (function JSLint() {
 
         advance('(');
         token.free = false;
+        token.arity = 'function';
         var pl = parameter_list();
         functionage.parameters = pl[0];
         functionage.signature = pl[1];
@@ -4148,7 +4149,8 @@ var jslint = (function JSLint() {
                             (right.arity === 'binary' && (
                                 right.id === '(' ||
                                 right.id === '['
-                            ))
+                            )) ||
+                            (right.arity === 'function' && left.id !== 'function')
                         ) {
                             no_space_only();
                         } else if (left.id === '.') {
@@ -4373,7 +4375,7 @@ var jslint = (function JSLint() {
             warnings: warnings.sort(function (a, b) {
                 return a.line - b.line || a.column - b.column;
             }),
-            edition: "2015-06-10"
+            edition: "2015-06-11"
         };
     };
 }());
