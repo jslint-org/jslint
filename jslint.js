@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-06-14
+// 2015-06-15
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1833,6 +1833,7 @@ var jslint = (function JSLint() {
             case 'while':
                 enroll(the_label, 'label', true);
                 the_label.init = true;
+                the_label.dead = false;
                 the_statement = statement();
                 the_statement.label = the_label;
                 the_statement.statement = true;
@@ -1851,22 +1852,26 @@ var jslint = (function JSLint() {
         if (the_symbol !== undefined && the_symbol.fud !== undefined) {
             the_symbol.disrupt = false;
             the_symbol.statement = true;
-            return the_symbol.fud();
-        }
+            the_statement = the_symbol.fud();
+        } else {
 
 // It is an expression statement.
 
-        the_statement = expression(0, true);
-        if (
-            the_statement.wrapped &&
-            (
-                the_statement.id !== '(' ||
-                the_statement.expression[0].id !== 'function'
-            )
-        ) {
-            warn('unexpected_a', first);
+            the_statement = expression(0, true);
+            if (
+                the_statement.wrapped &&
+                (
+                    the_statement.id !== '(' ||
+                    the_statement.expression[0].id !== 'function'
+                )
+            ) {
+                warn('unexpected_a', first);
+            }
+            semicolon();
         }
-        semicolon();
+        if (the_label !== undefined) {
+            the_label.dead = true;
+        }
         return the_statement;
     }
 
@@ -3165,8 +3170,10 @@ var jslint = (function JSLint() {
         return the_return;
     });
     stmt('switch', function () {
-        var stmts,
+        var last,
+            stmts,
             the_cases = [],
+            the_disrupt = true,
             the_switch = token;
         not_top_level(the_switch);
         functionage.switch += 1;
@@ -3192,7 +3199,12 @@ var jslint = (function JSLint() {
             stmts = statements();
             the_case.block = stmts;
             the_cases.push(the_case);
-            if (!stmts[stmts.length - 1].disrupt) {
+            last = stmts[stmts.length - 1];
+            if (last.disrupt) {
+                if (last.id === 'break' && last.label === undefined) {
+                    the_disrupt = false;
+                }
+            } else {
                 warn(
                     'expected_a_before_b',
                     next_token,
@@ -3209,9 +3221,20 @@ var jslint = (function JSLint() {
             token.switch = true;
             advance(':');
             the_switch.else = statements();
+            if (the_switch.else.length < 1) {
+                warn('unexpected_a');
+                the_disrupt = false;
+            } else {
+                the_disrupt =
+                        the_disrupt &&
+                        the_switch.else[the_switch.else.length - 1].disrupt;
+            }
+        } else {
+            the_disrupt = false;
         }
         advance('}', the_switch);
         functionage.switch -= 1;
+        the_switch.disrupt = the_disrupt;
         return the_switch;
     });
     stmt('throw', function () {
@@ -4370,7 +4393,7 @@ var jslint = (function JSLint() {
             warnings: warnings.sort(function (a, b) {
                 return a.line - b.line || a.column - b.column;
             }),
-            edition: "2015-06-14"
+            edition: "2015-06-15"
         };
     };
 }());
