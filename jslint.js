@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-06-11
+// 2015-06-14
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -3923,7 +3923,7 @@ var jslint = (function JSLint() {
                     'expected_a_at_b_c',
                     right,
                     artifact(right),
-                    margin + fit,
+                    fudge + margin + fit,
                     artifact_column(right)
                 );
             }
@@ -4375,7 +4375,7 @@ var jslint = (function JSLint() {
             warnings: warnings.sort(function (a, b) {
                 return a.line - b.line || a.column - b.column;
             }),
-            edition: "2015-06-11"
+            edition: "2015-06-14"
         };
     };
 }());
