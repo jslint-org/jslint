@@ -3917,26 +3917,21 @@ var jslint = (function JSLint() {
             result,
             right;
 
-        function at_margin(fit) {
-            if (right.from !== margin + fit) {
-                warn(
-                    'expected_a_at_b_c',
-                    right,
-                    artifact(right),
-                    fudge + margin + fit,
-                    artifact_column(right)
-                );
-            }
-        }
-
         function expected_at(at) {
             warn(
                 'expected_a_at_b_c',
                 right,
                 artifact(right),
-                at,
+                fudge + at,
                 artifact_column(right)
             );
+        }
+
+        function at_margin(fit) {
+            var at = margin + fit;
+            if (right.from !== at) {
+                return expected_at(at);
+            }
         }
 
         function no_space_only() {
