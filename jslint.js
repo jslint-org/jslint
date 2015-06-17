@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-06-16
+// 2015-06-17
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -695,6 +695,7 @@ var jslint = (function JSLint() {
             case '"':
             case '/':
             case ':':
+            case '=':
             case '|':
             case 'b':
             case 'f':
@@ -4378,7 +4379,7 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-06-16",
+            edition: "2015-06-17",
             functions: functions,
             global: global,
             id: "(JSLint)",
