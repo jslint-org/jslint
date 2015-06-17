@@ -106,10 +106,10 @@
     unclosed_string, undeclared_a, unexpected_a, unexpected_a_after_b,
     unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
     unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
-    unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
-    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
-    unreachable_a, unregistered_property_a, unsafe, unused_a, use_spaces, used,
-    value, var_loop, var_switch, variable, warning, warnings,
+    unexpected_parens, unexpected_quotes, unexpected_space_a_b,
+    unexpected_statement_a, unexpected_trailing_space, unexpected_typeof_a,
+    uninitialized_a, unreachable_a, unregistered_property_a, unsafe, unused_a,
+    use_spaces, used, value, var_loop, var_switch, variable, warning, warnings,
     weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
     wrap_immediate, wrap_regexp, wrapped, writable, y
 */
@@ -331,6 +331,7 @@ var jslint = (function JSLint() {
         unexpected_directive_a: "When using modules, don't use directive '/*{a}'.",
         unexpected_expression_a: "Unexpected expression '{a}' in statement position.",
         unexpected_label_a: "Unexpected label '{a}'.",
+        unexpected_quotes: "Identifiers do not need to be quoted.",
         unexpected_parens: "Don't wrap function literals in parens.",
         unexpected_space_a_b: "Unexpected space between '{a}' and '{b}'.",
         unexpected_statement_a: "Unexpected statement '{a}' in expression position.",
@@ -366,6 +367,7 @@ var jslint = (function JSLint() {
 // identifier
         rx_identifier = /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/,
         rx_bad_property = /^_|\$|Sync$|_$/,
+        rx_alphanum = /[a-zA-Z0-9]/,
 // star slash
         rx_star_slash = /\*\//,
 // slash star
@@ -1482,8 +1484,13 @@ var jslint = (function JSLint() {
             if (!rx_identifier.test(id)) {
                 return id;
             }
-        } else if (!name.identifier) {
-            return stop('expected_identifier_a', name);
+            if (rx_alphanum.test(id)) {
+                warn('unexpected_quotes', name);
+            }
+        } else {
+            if (!name.identifier) {
+                return stop('expected_identifier_a', name);
+            }
         }
 
 // If we have seen this name before, increment its count.
@@ -1501,7 +1508,7 @@ var jslint = (function JSLint() {
                     warn('unregistered_property_a', name);
                 }
             } else {
-                if (rx_bad_property.test(id)) {
+                if (name.identifier && rx_bad_property.test(id)) {
                     warn('bad_property_a', name);
                 }
             }
