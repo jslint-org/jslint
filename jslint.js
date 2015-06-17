@@ -3247,11 +3247,15 @@ var jslint = (function JSLint() {
         return the_throw;
     });
     stmt('try', function () {
-        var the_try = token,
-            the_catch;
+        var clause = false,
+            the_catch,
+            the_disrupt,
+            the_try = token;
         the_try.block = block();
+        the_disrupt = the_try.block.disrupt;
         if (next_token.id === 'catch') {
             var ignored = 'ignore';
+            clause = true;
             the_catch = next_token;
             the_try.catch = the_catch;
             advance('catch');
@@ -3267,10 +3271,19 @@ var jslint = (function JSLint() {
             advance();
             advance(')');
             the_catch.block = block(ignored);
+            if (the_catch.block.disrupt !== true) {
+                the_disrupt = false;
+            }
         }
         if (next_token.id === 'finally') {
+            clause = true;
             advance('finally');
             the_try.else = block();
+            the_disrupt = the_try.else.disrupt;
+        }
+        the_try.disrupt = the_disrupt;
+        if (!clause) {
+            warn('expected_a_before_b', next_token, 'catch', artifact(next_token));
         }
         return the_try;
     });
