@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-06-17
+// 2015-06-18
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -106,7 +106,7 @@
     unclosed_string, undeclared_a, unexpected_a, unexpected_a_after_b,
     unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
     unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
-    unexpected_parens, unexpected_quotes, unexpected_space_a_b,
+    unexpected_parens, unexpected_quotes_a, unexpected_space_a_b,
     unexpected_statement_a, unexpected_trailing_space, unexpected_typeof_a,
     uninitialized_a, unreachable_a, unregistered_property_a, unsafe, unused_a,
     use_spaces, used, value, var_loop, var_switch, variable, warning, warnings,
@@ -331,7 +331,7 @@ var jslint = (function JSLint() {
         unexpected_directive_a: "When using modules, don't use directive '/*{a}'.",
         unexpected_expression_a: "Unexpected expression '{a}' in statement position.",
         unexpected_label_a: "Unexpected label '{a}'.",
-        unexpected_quotes: "Identifiers do not need to be quoted.",
+        unexpected_quotes_a: "Quotes are not needed around '{a}'.",
         unexpected_parens: "Don't wrap function literals in parens.",
         unexpected_space_a_b: "Unexpected space between '{a}' and '{b}'.",
         unexpected_statement_a: "Unexpected statement '{a}' in expression position.",
@@ -1485,7 +1485,9 @@ var jslint = (function JSLint() {
                 return id;
             }
             if (rx_alphanum.test(id)) {
-                warn('unexpected_quotes', name);
+                warn('unexpected_quotes_a', name);
+            } else {
+                return id;
             }
         } else {
             if (!name.identifier) {
@@ -4399,7 +4401,7 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-06-17",
+            edition: "2015-06-18",
             functions: functions,
             global: global,
             id: "(JSLint)",
