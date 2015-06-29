@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-06-22
+// 2015-06-28
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -497,7 +497,8 @@ var jslint = (function JSLint() {
         }
         warning.message = supplant(bundle[code] || code, warning);
         warnings.push(warning);
-        return typeof option.maxerr === 'number' && warnings.length === option.maxerr
+        return typeof option.maxerr === 'number' &&
+                warnings.length === option.maxerr
             ? stop_at('too_many', line, column)
             : warning;
     }
@@ -3544,6 +3545,18 @@ var jslint = (function JSLint() {
         if (!option.bitwise && bitwiseop[thing.id] === true) {
             warn('unexpected_a', thing);
         }
+        if (
+            thing.id !== '&&' &&
+            thing.id !== '||' &&
+            thing.id !== '=' &&
+            Array.isArray(thing.expression) &&
+            thing.expression.length === 2 && (
+                relationop[thing.expression[0].id] === true ||
+                relationop[thing.expression[1].id] === true
+            )
+        ) {
+            warn('unexpected_a', thing);
+        }
     }
 
     function pop_block() {
@@ -4404,7 +4417,7 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-06-22",
+            edition: "2015-06-28",
             functions: functions,
             global: global,
             id: "(JSLint)",
