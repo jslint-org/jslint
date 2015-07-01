@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-06-28
+// 2015-06-30
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -3594,24 +3594,23 @@ var jslint = (function JSLint() {
     preaction('binary', bitwise_check);
     preaction('binary', function (thing) {
         if (relationop[thing.id] === true) {
-            if (
-                thing.expression[0].id === 'NaN' ||
-                thing.expression[1].id === 'NaN'
-            ) {
+            var left = thing.expression[0],
+                right = thing.expression[1];
+            if (left.id === 'NaN' || right.id === 'NaN') {
                 warn('isNaN', thing);
-            } else if (thing.expression[0].id === 'typeof') {
-                if (thing.expression[1].id !== '(string)') {
-                    if (thing.expression[1].id !== 'typeof') {
-                        warn('expected_string_a', expression[1]);
+            } else if (left.id === 'typeof') {
+                if (right.id !== '(string)') {
+                    if (right.id !== 'typeof') {
+                        warn('expected_string_a', right);
                     }
                 } else {
-                    var value = thing.expression[1].value;
+                    var value = right.value;
                     if (value === 'symbol') {
                         if (!option.es6) {
-                            warn('es6', thing.expression[1], value);
+                            warn('es6', right, value);
                         }
                     } else if (value === 'null' || value === 'undefined') {
-                        warn('unexpected_typeof_a', thing.expression[1], value);
+                        warn('unexpected_typeof_a', right, value);
                     } else if (
                         value !== 'boolean' &&
                         value !== 'function' &&
@@ -3619,7 +3618,7 @@ var jslint = (function JSLint() {
                         value !== 'object' &&
                         value !== 'string'
                     ) {
-                        warn('expected_type_string_a', expression[1], value);
+                        warn('expected_type_string_a', right, value);
                     }
                 }
             }
@@ -4417,7 +4416,7 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-06-28",
+            edition: "2015-06-30",
             functions: functions,
             global: global,
             id: "(JSLint)",
