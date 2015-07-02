@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-06-30
+// 2015-07-01
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -4055,12 +4055,9 @@ var jslint = (function JSLint() {
                     );
                 }
             } else {
-                if (open) {
-                    var at = free
-                        ? margin
-                        : margin + 8;
-                    if (right.from < at) {
-                        expected_at(at);
+                if (free) {
+                    if (right.from < margin) {
+                        expected_at(margin);
                     }
                 } else {
                     if (right.from !== margin + 8) {
@@ -4108,7 +4105,7 @@ var jslint = (function JSLint() {
                         qmark = '';
                         closer = new_closer;
                         if (left.line !== right.line) {
-                            free = (closer === ')' && left.free) || closer === ']';
+                            free = closer === ')' && left.free;
                             open = true;
                             margin += 4;
                             if (right.role === 'label') {
@@ -4179,7 +4176,10 @@ var jslint = (function JSLint() {
                             }
                         } else if (left.id === ',') {
                             unqmark();
-                            if (!open || (free && left.line === right.line)) {
+                            if (!open || (
+                                (free || closer === ']') &&
+                                left.line === right.line
+                            )) {
                                 one_space();
                             } else {
                                 at_margin(0);
@@ -4416,7 +4416,7 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-06-30",
+            edition: "2015-07-01",
             functions: functions,
             global: global,
             id: "(JSLint)",
