@@ -281,6 +281,7 @@ var jslint = (function JSLint() {
         and: "The '&&' subexpression should be wrapped in parens.",
         bad_assignment_a: "Bad assignment to '{a}'.",
         bad_character_number_a: "Bad character code: '{a}'",
+        bad_directive_a: "Bad directive '{a}'.",
         bad_get: "A get function takes no parameters.",
         bad_module_name_a: "Bad module name '{a}'.",
         bad_option_a: "Bad option '{a}'.",
