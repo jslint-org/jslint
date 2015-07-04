@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-07-01
+// 2015-07-02
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -2222,7 +2222,6 @@ var jslint = (function JSLint() {
     symbol('static');
     symbol('super');
     symbol('void');
-    symbol('with');
     symbol('yield');
 
     constant('(number)', 'number');
@@ -3314,6 +3313,9 @@ var jslint = (function JSLint() {
         }
         functionage.loop -= 1;
         return the_while;
+    });
+    stmt('with', function () {
+        stop('unexpected_a', token);
     });
 
     ternary('?', ':');
@@ -4418,7 +4420,7 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-07-01",
+            edition: "2015-07-02",
             functions: functions,
             global: global,
             id: "(JSLint)",
