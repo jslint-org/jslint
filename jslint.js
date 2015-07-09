@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-07-02
+// 2015-07-08
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -101,18 +101,18 @@
     names, nested_comment, new, node, not_label_a, nud, ok, open, option,
     out_of_scope_a, parameters, pop, property, push, qmark, quote,
     redefinition_a_b, replace, reserved_a, role, search, signature,
-    slash_equal, slice, sort, split, statement, stop, stopping, strict,
-    subscript_a, switch, test, this, thru, toString, todo_comment, tokens,
-    too_long, too_many, tree, type, u, unclosed_comment, unclosed_mega,
-    unclosed_string, undeclared_a, unexpected_a, unexpected_a_after_b,
-    unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
-    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
-    unexpected_parens, unexpected_quotes_a, unexpected_space_a_b,
-    unexpected_statement_a, unexpected_trailing_space, unexpected_typeof_a,
-    uninitialized_a, unreachable_a, unregistered_property_a, unsafe, unused_a,
-    use_spaces, used, value, var_loop, var_switch, variable, warning, warnings,
-    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
-    wrap_immediate, wrap_regexp, wrapped, writable, y
+    slash_equal, slice, sort, split, statement, stop, strict, subscript_a,
+    switch, test, this, thru, toString, todo_comment, tokens, too_long,
+    too_many, tree, type, u, unclosed_comment, unclosed_mega, unclosed_string,
+    undeclared_a, unexpected_a, unexpected_a_after_b, unexpected_at_top_level_a,
+    unexpected_char_a, unexpected_comment, unexpected_directive_a,
+    unexpected_expression_a, unexpected_label_a, unexpected_parens,
+    unexpected_quotes_a, unexpected_space_a_b, unexpected_statement_a,
+    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
+    unreachable_a, unregistered_property_a, unsafe, unused_a, use_spaces, used,
+    value, var_loop, var_switch, variable, warning, warnings, weird_condition_a,
+    weird_expression_a, weird_loop, weird_relation_a, white, wrap_immediate,
+    wrap_regexp, wrapped, writable, y
 */
 
 var jslint = (function JSLint() {
@@ -316,7 +316,6 @@ var jslint = (function JSLint() {
         redefinition_a_b: "Redefinition of '{a}' from line {b}.",
         reserved_a: "Reserved name '{a}'.",
         slash_equal: "A regular expression literal can be confused with '/='.",
-        stopping: "Stopping.",
         subscript_a: "['{a}'] is better written in dot notation.",
         todo_comment: "Unexpected TODO comment.",
         too_long: "Line too long.",
@@ -509,8 +508,7 @@ var jslint = (function JSLint() {
 
 // Same as warn_at, except that it stops the analysis.
 
-        warn_at(code, line, column, a, b, c, d);
-        throw warn_at('stopping', line, column);
+        throw warn_at(code, line, column, a, b, c, d);
     }
 
     function warn(code, the_token, a, b, c, d) {
@@ -546,9 +544,7 @@ var jslint = (function JSLint() {
             the_token = next_token;
         }
         the_token.warning = undefined;
-        warn(code, the_token, a, b, c, d);
-        the_token.warning = undefined;
-        throw warn('stopping', the_token, a, b, c, d);
+        throw warn(code, the_token, a, b, c, d);
     }
 
 // Tokenize:
@@ -4420,7 +4416,7 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-07-02",
+            edition: "2015-07-08",
             functions: functions,
             global: global,
             id: "(JSLint)",
