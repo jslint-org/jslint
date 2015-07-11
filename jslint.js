@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-07-08
+// 2015-07-10
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -3546,6 +3546,7 @@ var jslint = (function JSLint() {
             warn('unexpected_a', thing);
         }
         if (
+            thing.id !== '(' &&
             thing.id !== '&&' &&
             thing.id !== '||' &&
             thing.id !== '=' &&
@@ -4416,7 +4417,7 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-07-08",
+            edition: "2015-07-10",
             functions: functions,
             global: global,
             id: "(JSLint)",
