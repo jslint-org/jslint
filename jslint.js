@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-07-22
+// 2015-07-31
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -104,15 +104,15 @@
     slash_equal, slice, sort, split, statement, stop, strict, subscript_a,
     switch, test, this, thru, toString, todo_comment, tokens, too_long,
     too_many, tree, type, u, unclosed_comment, unclosed_mega, unclosed_string,
-    undeclared_a, unexpected_a, unexpected_a_after_b, unexpected_at_top_level_a,
-    unexpected_char_a, unexpected_comment, unexpected_directive_a,
-    unexpected_expression_a, unexpected_label_a, unexpected_parens,
-    unexpected_quotes_a, unexpected_space_a_b, unexpected_statement_a,
-    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
-    unreachable_a, unregistered_property_a, unsafe, unused_a, use_spaces, used,
-    value, var_loop, var_switch, variable, warning, warnings, weird_condition_a,
-    weird_expression_a, weird_loop, weird_relation_a, white, wrap_immediate,
-    wrap_regexp, wrapped, writable, y
+    undeclared_a, unexpected_a, unexpected_a_after_b,
+    unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
+    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
+    unexpected_parens, unexpected_quotes_a, unexpected_space_a_b,
+    unexpected_statement_a, unexpected_trailing_space, unexpected_typeof_a,
+    uninitialized_a, unreachable_a, unregistered_property_a, unsafe, unused_a,
+    use_spaces, used, value, var_loop, var_switch, variable, warning, warnings,
+    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
+    wrap_immediate, wrap_regexp, wrapped, writable, y
 */
 
 var jslint = (function JSLint() {
@@ -147,7 +147,7 @@ var jslint = (function JSLint() {
         browser: [
             'Audio', 'clearInterval', 'clearTimeout', 'document', 'event',
             'FormData', 'frames', 'history', 'Image', 'localStorage',
-            'location', 'name', 'navigator', 'Option', 'parent', 'screen',
+            'location', 'name', 'navigator', 'Option', 'screen',
             'sessionStorage', 'setInterval', 'setTimeout', 'Storage',
             'XMLHttpRequest'
         ],
@@ -4417,7 +4417,7 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-07-22",
+            edition: "2015-07-31",
             functions: functions,
             global: global,
             id: "(JSLint)",
