@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-07-31
+// 2015-08-13
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -3827,7 +3827,11 @@ var jslint = (function JSLint() {
         switch (thing.id) {
         case '=>':
         case '(':
+            break;
         case '.':
+            if (thing.expression.id === 'RegExp') {
+                warn('weird_expression_a', thing);
+            }
             break;
         default:
             if (
@@ -3864,6 +3868,9 @@ var jslint = (function JSLint() {
         }
     });
     postaction('binary', '[', function (thing) {
+        if (thing.expression[0].id === 'RegExp') {
+            warn('weird_expression_a', thing);
+        }
         if (is_weird(thing.expression[1])) {
             warn('weird_expression_a', thing.expression[1]);
         }
@@ -4417,7 +4424,7 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-07-31",
+            edition: "2015-08-13",
             functions: functions,
             global: global,
             id: "(JSLint)",
