@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-08-17
+// 2015-08-18
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -4219,7 +4219,7 @@ var jslint = (function JSLint() {
                         ) {
                             no_space_only();
                         } else if (left.id === '.') {
-                            no_space();
+                            no_space_only();
                         } else if (right.id === '.') {
                             if (left.line === right.line) {
                                 no_space();
@@ -4424,7 +4424,7 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-08-17",
+            edition: "2015-08-18",
             functions: functions,
             global: global,
             id: "(JSLint)",
