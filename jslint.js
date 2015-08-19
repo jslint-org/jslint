@@ -2814,6 +2814,9 @@ var jslint = (function JSLint() {
                         value = name;
                         break;
                     case '(':
+                        if (!option.es6 && typeof extra !== 'string') {
+                            warn('es6');
+                        }
                         value = do_function({
                             arity: 'unary',
                             from: name.from,
