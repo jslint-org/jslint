@@ -101,7 +101,7 @@
     module, naked_block, name, names, nested_comment, new, node, not_label_a,
     nud, ok, open, option, out_of_scope_a, parameters, pop, property, push,
     qmark, quote, redefinition_a_b, replace, reserved_a, role, search,
-    signature, slash_equal, slice, sort, split, statement, stop, strict,
+    signature, slash_equal, slice, some, sort, split, statement, stop, strict,
     subscript_a, switch, test, this, thru, toString, todo_comment, tokens,
     too_long, too_many, tree, type, u, unclosed_comment, unclosed_mega,
     unclosed_string, undeclared_a, unexpected_a, unexpected_a_after_b,
@@ -1798,6 +1798,78 @@ var jslint = (function JSLint() {
         return the_value;
     }
 
+    function is_weird(thing) {
+        return (
+            thing.id === '(regexp)' ||
+            thing.id === '{' ||
+            thing.id === '=>' ||
+            thing.id === 'function' ||
+            (thing.id === '[' && thing.arity === 'unary')
+        );
+    }
+
+    function are_similar(a, b) {
+        if (a === b) {
+            return true;
+        }
+        if (Array.isArray(a)) {
+            return (
+                Array.isArray(b) &&
+                a.length === b.length &&
+                a.every(function (value, index) {
+                    return are_similar(value, b[index]);
+                })
+            );
+        }
+        if (Array.isArray(b)) {
+            return false;
+        }
+        if (a.id === '(number)' && b.id === '(number)') {
+            return a.value === b.value;
+        }
+        var a_string, b_string;
+        if (a.id === '(string)') {
+            a_string = a.value;
+        } else if (a.id === '`' && a.constant) {
+            a_string = a.value[0];
+        }
+        if (b.id === '(string)') {
+            b_string = b.value;
+        } else if (b.id === '`' && b.constant) {
+            b_string = b.value[0];
+        }
+        if (typeof a_string === 'string') {
+            return a_string === b_string;
+        }
+        if (is_weird(a) || is_weird(b)) {
+            return false;
+        }
+        if (a.arity === b.arity && a.id === b.id) {
+            if (a.id === '.') {
+                return are_similar(a.expression, b.expression) &&
+                        are_similar(a.name, b.name);
+            }
+            switch (a.arity) {
+            case 'unary':
+                return are_similar(a.expression, b.expression);
+            case 'binary':
+                return a.id !== '(' &&
+                        are_similar(a.expression[0], b.expression[0]) &&
+                        are_similar(a.expression[1], b.expression[1]);
+            case 'ternary':
+                return are_similar(a.expression[0], b.expression[0]) &&
+                        are_similar(a.expression[1], b.expression[1]) &&
+                        are_similar(a.expression[2], b.expression[2]);
+            case 'function':
+            case 'regexp':
+                return false;
+            default:
+                return true;
+            }
+        }
+        return false;
+    }
+
     function semicolon() {
 
 // Try to match a semicolon.
@@ -3179,7 +3251,8 @@ var jslint = (function JSLint() {
         return the_return;
     });
     stmt('switch', function () {
-        var last,
+        var dups = [],
+            last,
             stmts,
             the_cases = [],
             the_disrupt = true,
@@ -3199,7 +3272,14 @@ var jslint = (function JSLint() {
             (function minor() {
                 advance('case');
                 token.switch = true;
-                the_case.expression.push(expression(0));
+                var exp = expression(0);
+                if (dups.some(function (thing) {
+                    return are_similar(thing, exp);
+                })) {
+                    warn('unexpected_a', exp);
+                }
+                dups.push(exp);
+                the_case.expression.push(exp);
                 advance(':');
                 if (next_token.id === 'case') {
                     return minor();
@@ -3229,6 +3309,7 @@ var jslint = (function JSLint() {
                 return major();
             }
         }());
+        dups = undefined;
         if (next_token.id === 'default') {
             advance('default');
             token.switch = true;
@@ -3737,79 +3818,6 @@ var jslint = (function JSLint() {
         }
         return pop_block();
     }
-
-    function is_weird(thing) {
-        return (
-            thing.id === '(regexp)' ||
-            thing.id === '{' ||
-            thing.id === '=>' ||
-            thing.id === 'function' ||
-            (thing.id === '[' && thing.arity === 'unary')
-        );
-    }
-
-    function are_similar(a, b) {
-        if (a === b) {
-            return true;
-        }
-        if (Array.isArray(a)) {
-            return (
-                Array.isArray(b) &&
-                a.length === b.length &&
-                a.every(function (value, index) {
-                    return are_similar(value, b[index]);
-                })
-            );
-        }
-        if (Array.isArray(b)) {
-            return false;
-        }
-        if (a.id === '(number)' && b.id === '(number)') {
-            return a.value === b.value;
-        }
-        var a_string, b_string;
-        if (a.id === '(string)') {
-            a_string = a.value;
-        } else if (a.id === '`' && a.constant) {
-            a_string = a.value[0];
-        }
-        if (b.id === '(string)') {
-            b_string = b.value;
-        } else if (b.id === '`' && b.constant) {
-            b_string = b.value[0];
-        }
-        if (typeof a_string === 'string') {
-            return a_string === b_string;
-        }
-        if (is_weird(a) || is_weird(b)) {
-            return false;
-        }
-        if (a.arity === b.arity && a.id === b.id) {
-            if (a.id === '.') {
-                return are_similar(a.expression, b.expression) &&
-                        are_similar(a.name, b.name);
-            }
-            switch (a.arity) {
-            case 'unary':
-                return are_similar(a.expression, b.expression);
-            case 'binary':
-                return a.id !== '(' &&
-                        are_similar(a.expression[0], b.expression[0]) &&
-                        are_similar(a.expression[1], b.expression[1]);
-            case 'ternary':
-                return are_similar(a.expression[0], b.expression[0]) &&
-                        are_similar(a.expression[1], b.expression[1]) &&
-                        are_similar(a.expression[2], b.expression[2]);
-            case 'function':
-            case 'regexp':
-                return false;
-            default:
-                return true;
-            }
-        }
-        return false;
-    }
-
 
     postaction('binary', function (thing) {
         if (relationop[thing.id]) {
