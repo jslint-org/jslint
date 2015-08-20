@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-08-19
+// 2015-08-20
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -301,6 +301,7 @@ var jslint = (function JSLint() {
         expected_line_break_a_b: "Expected a line break between '{a}' and '{b}'.",
         expected_regexp_factor_a: "Expected a regexp factor and instead saw '{a}'.",
         expected_space_a_b: "Expected one space between '{a}' and '{b}'.",
+        expected_statements_a: "Expected statements before '{a}'.",
         expected_string_a: "Expected a string and instead saw '{a}'.",
         expected_type_string_a: "Expected a type string and instead saw '{a}'.",
         function_in_loop: "Don't make functions within a loop.",
@@ -3209,6 +3210,10 @@ var jslint = (function JSLint() {
                 }
             }());
             stmts = statements();
+            if (stmts.length < 1) {
+                warn('expected_statements_a');
+                return;
+            }
             the_case.block = stmts;
             the_cases.push(the_case);
             last = stmts[stmts.length - 1];
@@ -3234,7 +3239,7 @@ var jslint = (function JSLint() {
             advance(':');
             the_switch.else = statements();
             if (the_switch.else.length < 1) {
-                warn('unexpected_a');
+                warn('expected_statements_a');
                 the_disrupt = false;
             } else {
                 the_disrupt =
@@ -4424,7 +4429,7 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-08-19",
+            edition: "2015-08-20",
             functions: functions,
             global: global,
             id: "(JSLint)",
