@@ -92,19 +92,19 @@
     expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
     expected_digits_after_a, expected_four_digits, expected_identifier_a,
     expected_line_break_a_b, expected_regexp_factor_a, expected_space_a_b,
-    expected_string_a, expected_type_string_a, expression, extra, flag, for,
-    forEach, free, from, fud, fudge, function, function_in_loop, functions, g,
-    global, i, id, identifier, import, imports, inc, indexOf, infix_in, init,
-    initial, isArray, isNaN, join, json, keys, label, label_a, lbp, led,
-    length, level, line, lines, live, loop, m, margin, match, maxerr, maxlen,
-    message, misplaced_a, misplaced_directive_a, module, naked_block, name,
-    names, nested_comment, new, node, not_label_a, nud, ok, open, option,
-    out_of_scope_a, parameters, pop, property, push, qmark, quote,
-    redefinition_a_b, replace, reserved_a, role, search, signature,
-    slash_equal, slice, sort, split, statement, stop, strict, subscript_a,
-    switch, test, this, thru, toString, todo_comment, tokens, too_long,
-    too_many, tree, type, u, unclosed_comment, unclosed_mega, unclosed_string,
-    undeclared_a, unexpected_a, unexpected_a_after_b,
+    expected_statements_a, expected_string_a, expected_type_string_a,
+    expression, extra, flag, for, forEach, free, from, fud, fudge, function,
+    function_in_loop, functions, g, global, i, id, identifier, import, imports,
+    inc, indexOf, infix_in, init, initial, isArray, isNaN, join, json, keys,
+    label, label_a, lbp, led, length, level, line, lines, live, loop, m,
+    margin, match, maxerr, maxlen, message, misplaced_a, misplaced_directive_a,
+    module, naked_block, name, names, nested_comment, new, node, not_label_a,
+    nud, ok, open, option, out_of_scope_a, parameters, pop, property, push,
+    qmark, quote, redefinition_a_b, replace, reserved_a, role, search,
+    signature, slash_equal, slice, sort, split, statement, stop, strict,
+    subscript_a, switch, test, this, thru, toString, todo_comment, tokens,
+    too_long, too_many, tree, type, u, unclosed_comment, unclosed_mega,
+    unclosed_string, undeclared_a, unexpected_a, unexpected_a_after_b,
     unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
     unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
     unexpected_parens, unexpected_quotes_a, unexpected_space_a_b,
@@ -874,9 +874,6 @@ var jslint = (function JSLint() {
 // include directives and notices of incompletion.
 
             var the_comment = make('(comment)', snippet);
-            if (json_mode) {
-                warn('unexpected_comment', the_comment);
-            }
             if (Array.isArray(snippet)) {
                 snippet = snippet.join(' ');
             }
@@ -1266,18 +1263,11 @@ var jslint = (function JSLint() {
 
             switch (snippet) {
 
-// The token is a single quote string.
+// The token is a single or double quote string.
 
             case '\'':
-                if (json_mode) {
-                    warn_at('unexpected_a', line, column, '\'');
-                }
-                return string('\'');
-
-// The token is a double quote string.
-
             case '"':
-                return string('"');
+                return string(snippet);
 
 // The token is a megastring. We don't allow any kind if mega nesting.
 
@@ -1525,7 +1515,7 @@ var jslint = (function JSLint() {
 
         var cadet = tokens[token_nr];
         token_nr += 1;
-        return cadet.id === '(comment)'
+        return cadet.id === '(comment)' && !json_mode
             ? dispense()
             : cadet;
     }
@@ -1586,6 +1576,9 @@ var jslint = (function JSLint() {
             advance('{');
             if (next_token.id !== '}') {
                 (function next() {
+                    if (next_token.quote !== '"') {
+                        warn('unexpected_a', next_token, next_token.quote);
+                    }
                     advance('(string)');
                     if (object[token.value] !== undefined) {
                         warn('duplicate_a', token);
@@ -1639,6 +1632,9 @@ var jslint = (function JSLint() {
             advance();
             break;
         case '(string)':
+            if (next_token.quote !== '"') {
+                warn('unexpected_a', next_token, next_token.quote);
+            }
             advance();
             break;
         case '-':
