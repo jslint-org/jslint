@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-08-21
+// 2015-08-22
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -188,32 +188,34 @@ var jslint = (function JSLint() {
         '!==': true,
         '%': true,
         '%=': true,
-        '^': true,
-        '^=': true,
         '&': true,
         '&=': true,
         '&&': true,
         '*': true,
         '*=': true,
-        '-=': true,
         '+=': true,
-        '=': true,
-        '=>': true,
-        '==': true,
-        '===': true,
-        '|': true,
-        '|=': true,
-        '||': true,
+        '-=': true,
+        '/': true,
+        '/=': true,
         '<': true,
         '<=': true,
         '<<': true,
         '<<=': true,
+        '=': true,
+        '==': true,
+        '===': true,
+        '=>': true,
         '>': true,
         '>=': true,
         '>>': true,
         '>>=': true,
         '>>>': true,
-        '>>>=': true
+        '>>>=': true,
+        '^': true,
+        '^=': true,
+        '|': true,
+        '|=': true,
+        '||': true
     };
 
     var bitwiseop = {
@@ -4221,6 +4223,7 @@ var jslint = (function JSLint() {
                             }
                             at_margin(0);
                         } else if (
+                            left.id === '.' ||
                             left.id === '...' ||
                             right.id === ',' ||
                             right.id === ';' ||
@@ -4231,8 +4234,6 @@ var jslint = (function JSLint() {
                             )) ||
                             (right.arity === 'function' && left.id !== 'function')
                         ) {
-                            no_space_only();
-                        } else if (left.id === '.') {
                             no_space_only();
                         } else if (right.id === '.') {
                             if (left.line === right.line) {
@@ -4438,7 +4439,7 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-08-21",
+            edition: "2015-08-22",
             functions: functions,
             global: global,
             id: "(JSLint)",
