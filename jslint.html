@@ -5,21 +5,22 @@
 This file allows JSLint to be run from a web browser. It can accept a source
 program and analyze it without sending it over the network.">
 <meta name="author" content="Douglas Crockford">
-<meta name="date" content="2015-05-01">
+<meta name="date" content="2015-08-23">
 <title>JSLint: The JavaScript Code Quality Tool</title>
-<link rel="stylesheet" type="text/css" 
+<link rel="stylesheet" type="text/css"
     href="http://fonts.googleapis.com/css?family=Patua+One">
 <link rel="icon" type="image/gif" href="favicon.gif">
 <style>
 body {
-    background-color: whitesmoke;
+    background-color: #f7f1f0;
+    color: black;
     font-family: 'Patua One', serif;
     margin: 0;
     padding: 0;
 }
 
 #JSLINT_ fieldset {
-    background-color: lightgray;
+    background-color: #b6b5ba;
     border: 0;
     clear: both;
     margin-bottom: 1em;
@@ -30,7 +31,7 @@ body {
     width: auto;
 }
 #JSLINT_  legend {
-    background-color: gray;
+    background-color: #aea79d;
     border: 0;
     color: white;
     font-size: 100%;
@@ -45,9 +46,9 @@ body {
     width: 100%;
 }
 #JSLINT_ button {
-    background-color: lightsteelblue;
+    background-color: #69565c;
     border: 0;
-    color: black;
+    color: white;
     cursor: pointer;
     font-family: 'Patua One', serif;
     font-size: 100%;
@@ -59,20 +60,28 @@ body {
     text-align: center;
 }
 #JSLINT_ button:hover {
-    background-color: lightskyblue;
+    background-color: #aea79d;
+    color: white;
     border: 0;
 }
 
 #JSLINT_ button:active {
-    background-color: steelblue;
     border: 0;
-    color: white;
+    color: black;
 }
 
 #JSLINT_ button:disabled {
-    background-color: silver;
+    background-color: gray;
     border: 0;
-    color: white;
+    color: gainsboro;
+}
+
+a:visited {
+    color: #69565c;
+}
+
+a:link {
+    color: black;
 }
 
 s {
@@ -95,7 +104,8 @@ s::after {
 }
 
 big {
-    font-size: 50pt;    
+    color: black;
+    font-size: 50pt;
     font-style: normal;
     font-weight: normal;
 
@@ -105,21 +115,33 @@ ins {
     font-family: "Trebuchet MS", sans-serif;
     font-size: 200%;
     font-weight: bold;
-    text-decoration: none;   
+    text-decoration: none;
     text-transform: uppercase;
 }
 
-#JSLINT_ input[type="text"] {
-    border: 1px solid black;
+#JSLINT_ input[type="checkbox"] {
+    border: 0;
     margin-bottom: 0.2em;
     padding-right: 0.5em;
     text-align: right;
     width: 3em;
 }
 
+#JSLINT_ input[type="text"] {
+    background-color: #e2dad8;
+    border: 0;
+    color: black;
+    margin-bottom: 0.2em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    text-align: right;
+    width: 3em;
+}
+
 #JSLINT_ textarea {
-    background-color: white;
-    border: 1pt solid black;
+    background-color: #e2dad8;
+    border: 0;
+    color: black;
     font-family: monospace;
     font-size: 90%;
     margin: 2%;
@@ -128,11 +150,18 @@ ins {
     white-space: pre;
     width: 95%;
 }
+
 #JSLINT_ textarea[readonly] {
-    background-color: oldlace;
+    background-color: honeydew;
     border: 0;
     white-space: pre;
 }
+
+#JSLINT_ textarea::selection {
+    background-color: yellow;
+    color: black;
+}
+
 #JSLINT_GLOBAL {
     min-width: fill-available;
     white-space: normal;
@@ -148,7 +177,7 @@ ins {
 }
 
 #JSLINT_ address {
-    color: dimgray;
+    color: black;
     display: block;
     float: right;
     font-family: serif;
@@ -157,12 +186,15 @@ ins {
 }
 #JSLINT_ dl {
     background-color: cornsilk;
-    margin: 1em;
+    color: white;
+    margin: 0;
     padding-bottom: 2pt;
     padding-left: 0;
     padding-right: 1em;
+    padding-top: 2pt;
 }
 #JSLINT_ dfn {
+    color: black;
     display: block;
     font-family: monospace;
     font-size: 100%;
@@ -171,6 +203,7 @@ ins {
     margin-bottom: 2pt;
 }
 #JSLINT_ dt {
+    color: black;
     display: block;
     float: left;
     font-family: serif;
@@ -181,20 +214,21 @@ ins {
     text-align: right;
 }
 #JSLINT_ dd {
+    color: black;
     display: block;
     font-family: monospace;
     margin-left: 5em;
-    margin-bottom: 2pt;
+    padding-bottom: 2pt;
 }
 #JSLINT_WARNINGS>legend {
     background-color: indianred;
 }
 #JSLINT_WARNINGS>div {
-    background-color: mistyrose;
-    padding-bottom: 1em;
-    padding-top: 1em;
+    background-color: pink;
+    padding: 1em;
 }
 #JSLINT_WARNINGS cite {
+    color: black;
     display: block;
     font-family: serif;
     font-size: 100%;
@@ -207,6 +241,7 @@ ins {
 }
 #JSLINT_WARNINGS samp {
     background-color: lavenderblush;
+    color: black;
     display: block;
     font-family: monospace;
     font-size: 100%;
@@ -219,7 +254,13 @@ ins {
     white-space: pre-wrap;
 }
 
+#JSLINT_REPORT center {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
 #JSLINT_WARNINGS dl address {
+    color: black;
     display: inline;
     float: none;
     font-size: 80%;
@@ -227,51 +268,59 @@ ins {
 }
 
 #JSLINT_REPORT>div {
-    margin-bottom: 1em;
-    margin-top: 1em;
+    padding: 1em;
 }
 
 #JSLINT_ dl.level0 {
+    color: black;
     background-color: white;
     padding-left: 0;
 }
 
 #JSLINT_ dl.level1 {
+    color: black;
     background-color: #ffffe0;  /* yellow */
     padding-left: 2em;
 }
 
 #JSLINT_ dl.level2 {
+    color: black;
     background-color: #e0ffe0;  /* green */
     padding-left: 4em;
 }
 
 #JSLINT_ dl.level3 {
+    color: black;
     background-color: #e0e0ff;  /* blue */
     padding-left: 6em;
 }
 
 #JSLINT_ dl.level4 {
     background-color: #ffe0ff;  /* purple */
-    padding-left: 8em;
+        color: black;
+        padding-left: 8em;
 }
 
 #JSLINT_ dl.level5 {
     background-color: #ffe0e0;  /* red */
+    color: black;
     padding-left: 10em;
 }
 
 #JSLINT_ dl.level6 {
     background-color: #ffe390;  /* orange */
+    color: black;
     padding-left: 12em;
 }
 
 #JSLINT_ dl.level7 {
     background-color: #e0e0e0;  /* gray */
+    color: black;
     padding-left: 14em;
 }
 
 #JSLINT_ dl.level8 {
+    color: black;
     padding-left: 16em;
 }
 </style>
@@ -292,7 +341,7 @@ ins {
   </fieldset>
   <div style="text-align: center;">
       <button name=JSLint><s></s></button>
-      <button name=clear>clear</button> 
+      <button name=clear>clear</button>
   </div>
   <fieldset id=JSLINT_WARNINGS style="display: none;"><legend>Warnings</legend><div></div>
   </fieldset>
@@ -307,8 +356,8 @@ ins {
   <div id=JSLINT_AUX style="display: none; text-align: center;">
       <button name=select id=JSLINT_SELECT>select property</button>
       <button name=JSLint><s></s></button>
-      <button name=clear>clear</button> 
-      <button name=options>clear options</button> 
+      <button name=clear>clear</button>
+      <button name=options>clear options</button>
   </div>
   <fieldset id=JSLINT_OPTIONS><legend>Options</legend>
     <div>Assume...
