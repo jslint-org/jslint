@@ -483,8 +483,8 @@ var jslint = (function JSLint() {
 
         var warning = {         // ~~
             name: 'JSLintError',
-            column: column,
-            line: line,
+            column: column + fudge,
+            line: line + fudge,
             code: code
         };
         if (a !== undefined) {
