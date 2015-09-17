@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-08-22
+// 2015-09-16
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -821,11 +821,15 @@ var jslint = (function JSLint() {
                     allowed = allowed_option[name];
                     switch (typeof allowed) {
                     case 'boolean':
+                    case 'object':
                         switch (value) {
                         case 'true':
                         case '':
                         case undefined:
                             option[name] = true;
+                            if (Array.isArray(allowed)) {
+                                populate(declared_globals, allowed, false);
+                            }
                             break;
                         case 'false':
                             option[name] = false;
@@ -840,10 +844,6 @@ var jslint = (function JSLint() {
                         } else {
                             warn('bad_option_a', the_comment, name + ':' + value);
                         }
-                        break;
-                    case 'object':
-                        option[name] = true;
-                        populate(declared_globals, allowed, false);
                         break;
                     default:
                         warn('bad_option_a', the_comment, name);
@@ -4439,7 +4439,7 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-08-22",
+            edition: "2015-09-16",
             functions: functions,
             global: global,
             id: "(JSLint)",
