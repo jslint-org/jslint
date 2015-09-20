@@ -1,5 +1,5 @@
 // report.js
-// 2015-06-11
+// 2015-09-19
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Generate JSLint HTML reports.
@@ -113,8 +113,10 @@ var REPORT = (function () {
                             ? entityify(the_function.signature) + " =>"
                             : (
                                 typeof the_function.name === 'string'
-                                    ? '«' + entityify(the_function.name) + '»'
-                                    : "<b>" + entityify(the_function.name.id) + "</b>"
+                                    ? "<b>«" + entityify(the_function.name)
+                                        + "»</b>"
+                                    : "<b>" + entityify(the_function.name.id)
+                                        + "</b>"
                             ) + entityify(the_function.signature),
                         "</dfn>"
                     );
