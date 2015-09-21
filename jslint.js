@@ -146,10 +146,9 @@ var jslint = (function JSLint() {
         bitwise: true,
         browser: [
             'Audio', 'clearInterval', 'clearTimeout', 'document', 'event',
-            'FormData', 'frames', 'history', 'Image', 'localStorage',
-            'location', 'name', 'navigator', 'Option', 'screen',
-            'sessionStorage', 'setInterval', 'setTimeout', 'Storage',
-            'XMLHttpRequest'
+            'FormData', 'history', 'Image', 'localStorage', 'location', 'name', 
+            'navigator', 'Option', 'screen', 'sessionStorage', 'setInterval', 
+            'setTimeout', 'Storage', 'XMLHttpRequest'
         ],
         couch: [
             'emit', 'getRow', 'isArray', 'log', 'provides', 'registerType',
