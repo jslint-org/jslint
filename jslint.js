@@ -146,8 +146,8 @@ var jslint = (function JSLint() {
         bitwise: true,
         browser: [
             'Audio', 'clearInterval', 'clearTimeout', 'document', 'event',
-            'FormData', 'history', 'Image', 'localStorage', 'location', 'name', 
-            'navigator', 'Option', 'screen', 'sessionStorage', 'setInterval', 
+            'FormData', 'history', 'Image', 'localStorage', 'location', 'name',
+            'navigator', 'Option', 'screen', 'sessionStorage', 'setInterval',
             'setTimeout', 'Storage', 'XMLHttpRequest'
         ],
         couch: [
@@ -2884,8 +2884,7 @@ var jslint = (function JSLint() {
                         } else if (extra !== true) {
                             advance(':');
                         }
-                        name.arity = 'variable';
-                        value = name;
+                        value = expression(Infinity, true);
                         break;
                     case '(':
                         if (!option.es6 && typeof extra !== 'string') {
