@@ -1657,8 +1657,8 @@ var jslint = (function JSLint() {
     function enroll(name, role, readonly) {
 
 // Enroll a name into the current function context. The role can be exception,
-// label, parameter, or variable. We look for variable redefinition because it
-// causes confusion.
+// function, label, parameter, or variable. We look for variable redefinition
+// because it causes confusion.
 
         var id = name.id;
 
