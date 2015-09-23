@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-09-21
+// 2015-09-22
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1942,13 +1942,7 @@ var jslint = (function JSLint() {
 // It is an expression statement.
 
             the_statement = expression(0, true);
-            if (
-                the_statement.wrapped &&
-                (
-                    the_statement.id !== '(' ||
-                    the_statement.expression[0].id !== 'function'
-                )
-            ) {
+            if (the_statement.wrapped && the_statement.id !== '(') {
                 warn('unexpected_a', first);
             }
             semicolon();
@@ -4221,6 +4215,8 @@ var jslint = (function JSLint() {
                                 margin -= 4 * result[2].length;
                             }
                             at_margin(0);
+                        } else if (right.arity === 'binary' && right.id === '(' && free) {
+                            no_space();
                         } else if (
                             left.id === '.' ||
                             left.id === '...' ||
@@ -4438,7 +4434,7 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-09-21",
+            edition: "2015-09-22",
             functions: functions,
             global: global,
             id: "(JSLint)",
