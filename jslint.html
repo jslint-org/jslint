@@ -119,19 +119,12 @@ ins {
     text-transform: uppercase;
 }
 
-#JSLINT_ input[type="checkbox"] {
-    border: 0;
-    margin-bottom: 0.2em;
-    padding-right: 0.5em;
-    text-align: right;
-    width: 3em;
-}
-
 #JSLINT_ input[type="text"] {
     background-color: white;
     border: 0;
     color: black;
     margin-bottom: 0.2em;
+    margin-right: 0.5em;
     padding-left: 0.5em;
     padding-right: 0.5em;
     text-align: right;
@@ -361,25 +354,25 @@ ins {
   </div>
   <fieldset id=JSLINT_OPTIONS><legend>Options</legend>
     <div>Assume...
-      <div><label><input title=devel type=checkbox> in development</label></div>
-      <div><label><input title=es6 type=checkbox> ES6</label></div>
-      <div><label><input title=browser type=checkbox> a browser</label></div>
-      <div><label><input title=couch type=checkbox> CouchDB</label></div>
-      <div><label><input title=node type=checkbox> Node.js</label></div>
+      <div><label><input title=devel type=checkbox>in development</label></div>
+      <div><label><input title=es6 type=checkbox>ES6</label></div>
+      <div><label><input title=browser type=checkbox>a browser</label></div>
+      <div><label><input title=couch type=checkbox>CouchDB</label></div>
+      <div><label><input title=node type=checkbox>Node.js</label></div>
     </div>
     <div>Tolerate...
-      <div><label><input title=bitwise type=checkbox> bitwise operators</label></div>
-      <div><label><input title=eval type=checkbox> eval</label></div>
-      <div><label><input title=for type=checkbox> for statement</label></div>
-      <div><label><input title=this type=checkbox> this</label></div>
-      <div><label><input title=white type=checkbox> messy white space</label></div>
+      <div><label><input title=bitwise type=checkbox>bitwise operators</label></div>
+      <div><label><input title=eval type=checkbox>eval</label></div>
+      <div><label><input title=for type=checkbox>for statement</label></div>
+      <div><label><input title=this type=checkbox>this</label></div>
+      <div><label><input title=white type=checkbox>messy white space</label></div>
     </div>
     <div>Number...
-      <div><label><input type=text title=maxlen> Maximum line length</label></div>
-      <div><label><input type=text title=maxerr> Maximum number of warnings</label></div>
+      <div><label><input type=text title=maxlen>Maximum line length</label></div>
+      <div><label><input type=text title=maxerr>Maximum number of warnings</label></div>
     </div>
     <div>Fudge...
-      <div><label><input title=fudge type=checkbox> First line number is 1</label></div>
+      <div><label><input title=fudge type=checkbox>First line number is 1</label></div>
     </div>
     <div>Global variables...
       <textarea id=JSLINT_GLOBAL title=global placeholder="imported globals here"></textarea>
