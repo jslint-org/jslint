@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-09-23
+// 2015-09-22
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -418,6 +418,7 @@ var jslint = (function JSLint() {
         declared_globals,   // The object containing the global declarations.
         directive_mode,     // true if directives are still allowed.
         early_stop,         // true if JSLint cannot finish.
+        export_mode,        // true if an export statement was seen.
         fudge,              // true if the natural numbers start with 1.
         functionage,        // The current function.
         functions,          // The array containing all of the functions.
@@ -3133,8 +3134,12 @@ var jslint = (function JSLint() {
         if (typeof module_mode === 'object') {
             warn('unexpected_directive_a', module_mode, module_mode.directive);
         }
-        module_mode = true;
         advance('default');
+        if (export_mode) {
+            warn('duplicate_a', token);
+        }
+        module_mode = true;
+        export_mode = true;
         the_export.expression = expression(0);
         semicolon();
         return the_export;
@@ -4344,6 +4349,7 @@ var jslint = (function JSLint() {
             declared_globals = empty();
             directive_mode = true;
             early_stop = true;
+            export_mode = false;
             fudge = option.fudge
                 ? 1
                 : 0;
@@ -4429,7 +4435,7 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-09-23",
+            edition: "2015-09-22",
             functions: functions,
             global: global,
             id: "(JSLint)",
