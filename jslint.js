@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-09-22
+// 2015-10-02
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -352,6 +352,7 @@ var jslint = (function JSLint() {
         weird_expression_a: "Weird expression '{a}'.",
         weird_loop: "Weird loop.",
         weird_relation_a: "Weird relation '{a}'.",
+        wrap_assignment: "Don't wrap assignment statements in parens.",
         wrap_immediate: "Wrap an immediate function invocation in " +
                 "parentheses to assist the reader in understanding that the " +
                 "expression is the result of a function, and not the " +
@@ -2771,6 +2772,9 @@ var jslint = (function JSLint() {
     prefix('function', do_function);
 
     function fart(pl) {
+        if (next_token.id === ';') {
+            stop('wrap_assignment', token);
+        }
         advance('=>');
         var the_arrow = token;
         the_arrow.arity = 'binary';
@@ -4435,7 +4439,7 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-09-22",
+            edition: "2015-10-02",
             functions: functions,
             global: global,
             id: "(JSLint)",
