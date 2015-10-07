@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-10-02
+// 2015-10-06
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -112,7 +112,7 @@
     uninitialized_a, unreachable_a, unregistered_property_a, unsafe, unused_a,
     use_spaces, used, value, var_loop, var_switch, variable, warning, warnings,
     weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
-    wrap_immediate, wrap_regexp, wrapped, writable, y
+    wrap_assignment, wrap_immediate, wrap_regexp, wrapped, writable, y
 */
 
 var jslint = (function JSLint() {
@@ -2411,7 +2411,18 @@ var jslint = (function JSLint() {
         }
         if (next_token.id !== ')') {
             (function next() {
+                var ellipsis;
+                if (next_token.id === '...') {
+                    if (!option.es6) {
+                        warn('es6');
+                    }
+                    ellipsis = true;
+                    advance('...');
+                }
                 the_argument = expression(10);
+                if (ellipsis) {
+                    the_argument.ellipsis = true;
+                }
                 the_paren.expression.push(the_argument);
                 if (next_token.id === ',') {
                     advance(',');
@@ -4439,7 +4450,7 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-10-02",
+            edition: "2015-10-06",
             functions: functions,
             global: global,
             id: "(JSLint)",
