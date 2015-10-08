@@ -1,5 +1,5 @@
 // browser.js
-// 2015-05-01
+// 2015-10-08
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 /*global
@@ -83,7 +83,7 @@ ADSAFE.lib("browser_ui", function () {
             var result = jslint(
                 source_string,
                 option,
-                global_string === ''
+                (global_string === '')
                     ? undefined
                     : global_string.split(rx_separator)
             );
@@ -97,7 +97,7 @@ ADSAFE.lib("browser_ui", function () {
 // Display the reports.
 
             setHTML(warnings_div, error_html);
-            warnings.style('display', error_html.length === 0
+            warnings.style('display', (error_html.length === 0)
                 ? 'none'
                 : 'block');
             setHTML(report_div, function_html);

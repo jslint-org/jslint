@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-10-06
+// 2015-10-08
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -112,7 +112,8 @@
     uninitialized_a, unreachable_a, unregistered_property_a, unsafe, unused_a,
     use_spaces, used, value, var_loop, var_switch, variable, warning, warnings,
     weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
-    wrap_assignment, wrap_immediate, wrap_regexp, wrapped, writable, y
+    wrap_assignment, wrap_condition, wrap_immediate, wrap_regexp, wrapped,
+    writable, y
 */
 
 var jslint = (function JSLint() {
@@ -353,6 +354,7 @@ var jslint = (function JSLint() {
         weird_loop: "Weird loop.",
         weird_relation_a: "Weird relation '{a}'.",
         wrap_assignment: "Don't wrap assignment statements in parens.",
+        wrap_condition: "Wrap the condition in parens.",
         wrap_immediate: "Wrap an immediate function invocation in " +
                 "parentheses to assist the reader in understanding that the " +
                 "expression is the result of a function, and not the " +
@@ -407,7 +409,7 @@ var jslint = (function JSLint() {
     function supplant(string, object) {
         return string.replace(rx_supplant, function (found, filling) {
             var replacement = object[filling];
-            return replacement !== undefined
+            return (replacement !== undefined)
                 ? replacement
                 : found;
         });
@@ -451,7 +453,7 @@ var jslint = (function JSLint() {
         if (the_token === undefined) {
             the_token = next_token;
         }
-        return the_token.id === '(string)' || the_token.id === '(number)'
+        return (the_token.id === '(string)' || the_token.id === '(number)')
             ? String(the_token.value)
             : the_token.id;
     }
@@ -501,8 +503,8 @@ var jslint = (function JSLint() {
         }
         warning.message = supplant(bundle[code] || code, warning);
         warnings.push(warning);
-        return typeof option.maxerr === 'number' &&
-                warnings.length === option.maxerr
+        return (typeof option.maxerr === 'number' &&
+                warnings.length === option.maxerr)
             ? stop_at('too_many', line, column)
             : warning;
     }
@@ -564,7 +566,7 @@ var jslint = (function JSLint() {
 // If the source is not an array, then it is split into lines at the
 // carriage return/linefeed.
 
-        lines = Array.isArray(source)
+        lines = (Array.isArray(source))
             ? source
             : source.split(rx_crlf);
         tokens = [];
@@ -1220,8 +1222,8 @@ var jslint = (function JSLint() {
             if (!source_line) {
                 source_line = next_line();
                 from = 0;
-                return source_line === undefined
-                    ? mega_mode
+                return (source_line === undefined)
+                    ? (mega_mode)
                         ? stop_at('unclosed_mega', mega_line, mega_from)
                         : make('(end)')
                     : lex();
@@ -1298,7 +1300,7 @@ var jslint = (function JSLint() {
 
                     if (at < 0) {
                         snippet += source_line + '\n';
-                        return next_line() === undefined
+                        return (next_line() === undefined)
                             ? stop_at('unclosed_mega', mega_line, mega_from)
                             : part();
                     }
@@ -1552,7 +1554,7 @@ var jslint = (function JSLint() {
 // Attempt to match next_token with an expected id.
 
         if (id !== undefined && next_token.id !== id) {
-            return match === undefined
+            return (match === undefined)
                 ? stop('expected_a_b', next_token, id, artifact())
                 : stop(
                     'expected_a_b_from_c_d',
@@ -2031,7 +2033,7 @@ var jslint = (function JSLint() {
                 warn(
                     'expected_a_before_b',
                     next_token,
-                    next_token.id === '`'
+                    (next_token.id === '`')
                         ? '\''
                         : 'use strict',
                     artifact(next_token)
@@ -2153,7 +2155,7 @@ var jslint = (function JSLint() {
 // Make a constant symbol.
 
         var the_symbol = symbol(id);
-        the_symbol.nud = typeof value === 'function'
+        the_symbol.nud = (typeof value === 'function')
             ? value
             : function () {
                 token.constant = true;
@@ -2883,7 +2885,7 @@ var jslint = (function JSLint() {
                 } else if (seen[id] === 'get' && extra !== 'set') {
                     warn('expected_a_before_b', name, 'set', artifact(name));
                 }
-                seen[id] = extra === 'get'
+                seen[id] = (extra === 'get')
                     ? 'get'
                     : true;
                 if (name.identifier) {
@@ -2957,7 +2959,7 @@ var jslint = (function JSLint() {
                 the_label.role !== 'label' ||
                 the_label.dead
             ) {
-                warn(the_label !== undefined && the_label.dead
+                warn((the_label !== undefined && the_label.dead)
                     ? 'out_of_scope_a'
                     : 'not_label_a');
             } else {
@@ -3214,7 +3216,7 @@ var jslint = (function JSLint() {
         if (next_token.id === 'else') {
             advance('else');
             the_else = token;
-            the_if.else = next_token.id === 'if'
+            the_if.else = (next_token.id === 'if')
                 ? statement()
                 : block();
             if (the_if.block.disrupt === true) {
@@ -3948,6 +3950,11 @@ var jslint = (function JSLint() {
             thing.expression[2].id === 'true'
         ) {
             warn('expected_a_b', thing, '!', '?');
+        } else if (thing.expression[0].wrapped !== true && (
+            thing.expression[0].id === '||' ||
+            thing.expression[0].id === '&&'
+        )) {
+            warn('wrap_condition', thing.expression[0]);
         }
     });
     postaction('unary', function (thing) {
@@ -4052,7 +4059,7 @@ var jslint = (function JSLint() {
                 }
             } else {
                 if (open) {
-                    var at = free
+                    var at = (free)
                         ? margin
                         : margin + 8;
                     if (right.from < at) {
@@ -4365,7 +4372,7 @@ var jslint = (function JSLint() {
             directive_mode = true;
             early_stop = true;
             export_mode = false;
-            fudge = option.fudge
+            fudge = (option.fudge)
                 ? 1
                 : 0;
             functions = [];
@@ -4450,7 +4457,7 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-10-06",
+            edition: "2015-10-08",
             functions: functions,
             global: global,
             id: "(JSLint)",

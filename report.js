@@ -1,5 +1,5 @@
 // report.js
-// 2015-09-19
+// 2015-10-08
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Generate JSLint HTML reports.
@@ -34,9 +34,7 @@ var REPORT = (function () {
 
 // Produce the HTML Error Report.
 
-            var fudge = data.option.fudge
-                    ? 1
-                    : 0,
+            var fudge = +!!data.option.fudge,
                 output = [];
             if (data.stop) {
                 output.push("<center>J<u>SLint</u> was unable to finish.</center>");
@@ -61,16 +59,14 @@ var REPORT = (function () {
 
 // Produce the HTML Function Report.
 
-            var fudge = data.option.fudge
-                    ? 1
-                    : 0,
-                mode = data.module
+            var fudge = +!!data.option.fudge,
+                mode = (data.module)
                     ? "module"
                     : "global",
                 output = [];
 
             if (data.json) {
-                return data.warnings.length === 0
+                return (data.warnings.length === 0)
                     ? "<center>JSON: good.</center>"
                     : "<center>JSON: bad.</center>";
             }
@@ -109,10 +105,10 @@ var REPORT = (function () {
                         "><address>line ",
                         entityify(the_function.line + fudge),
                         "</address><dfn>",
-                        the_function.name === "=>"
+                        (the_function.name === "=>")
                             ? entityify(the_function.signature) + " =>"
                             : (
-                                typeof the_function.name === 'string'
+                                (typeof the_function.name === 'string')
                                     ? "<b>«" + entityify(the_function.name)
                                         + "»</b>"
                                     : "<b>" + entityify(the_function.name.id)
