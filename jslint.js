@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-10-22
+// 2015-10-28
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -112,8 +112,8 @@
     uninitialized_a, unreachable_a, unregistered_property_a, unsafe, unused_a,
     use_spaces, used, value, var_loop, var_switch, variable, warning, warnings,
     weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
-    wrap_assignment, wrap_condition, wrap_immediate, wrap_regexp, wrapped,
-    writable, y
+    wrap_assignment, wrap_condition, wrap_immediate, wrap_regexp, wrap_unary,
+    wrapped, writable, y
 */
 
 var jslint = (function JSLint() {
@@ -358,7 +358,8 @@ var jslint = (function JSLint() {
                 "parentheses to assist the reader in understanding that the " +
                 "expression is the result of a function, and not the " +
                 "function itself.",
-        wrap_regexp: "Wrap this regexp in parens to avoid confusion."
+        wrap_regexp: "Wrap this regexp in parens to avoid confusion.",
+        wrap_unary: "Wrap the unary expression in parens."
     };
 
 // Regular expression literals:
@@ -3831,6 +3832,7 @@ var jslint = (function JSLint() {
     }
 
     postaction('binary', function (thing) {
+        var right;
         if (relationop[thing.id]) {
             if (
                 is_weird(thing.expression[0]) ||
@@ -3845,6 +3847,17 @@ var jslint = (function JSLint() {
             }
         }
         switch (thing.id) {
+        case '+':
+        case '-':
+            right = thing.expression[1];
+            if (
+                right.id === thing.id &&
+                right.arity === 'unary' &&
+                !right.wrapped
+            ) {
+                warn('wrap_unary', right);
+            }
+            break;
         case '=>':
         case '(':
             break;
@@ -4450,7 +4463,7 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-10-22",
+            edition: "2015-10-28",
             functions: functions,
             global: global,
             id: "(JSLint)",
