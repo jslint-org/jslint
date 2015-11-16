@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-10-29
+// 2015-11-16
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -4496,3 +4496,5 @@ var jslint = (function JSLint() {
         };
     };
 }());
+
+/*node module.exports = jslint;*/
