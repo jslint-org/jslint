@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-11-16
+// 2015-12-02
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -266,10 +266,10 @@ var jslint = (function JSLint() {
 // These are the globals that are provided by the ES5 language standard.
 
         'Array', 'Boolean', 'Date', 'decodeURI', 'decodeURIComponent',
-        'encodeURI', 'encodeURIComponent', 'Error', 'EvalError', 'Function',
-        'isFinite', 'isNaN', 'JSON', 'Math', 'Number', 'Object', 'parseInt',
-        'parseFloat', 'RangeError', 'ReferenceError', 'RegExp', 'String',
-        'SyntaxError', 'TypeError', 'URIError'
+        'encodeURI', 'encodeURIComponent', 'Error', 'EvalError', 'isFinite',
+        'isNaN', 'JSON', 'Math', 'Number', 'Object', 'parseInt', 'parseFloat',
+        'RangeError', 'ReferenceError', 'RegExp', 'String', 'SyntaxError',
+        'TypeError', 'URIError'
     ];
 
     var bundle = {
@@ -2301,6 +2301,14 @@ var jslint = (function JSLint() {
         return token;
     });
     constant('false', 'boolean', false);
+    constant('Function', 'function', function () {
+        if (!option.eval) {
+            warn('unexpected_a', token);
+        } else if (next_token.id !== '(') {
+            warn('expected_a_before_b', next_token, '(', artifact());
+        }
+        return token;
+    });
     constant('ignore', 'undefined', function () {
         warn('unexpected_a', token);
         return token;
@@ -4476,7 +4484,7 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-10-29",
+            edition: "2015-12-02",
             functions: functions,
             global: global,
             id: "(JSLint)",
