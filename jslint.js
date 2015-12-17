@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-12-05
+// 2015-12-16
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -418,6 +418,7 @@ var jslint = (function JSLint() {
         blockage,           // The current block.
         block_stack,        // The stack of blocks.
         declared_globals,   // The object containing the global declarations.
+        directives,         // The directive comments.
         directive_mode,     // true if directives are still allowed.
         early_stop,         // true if JSLint cannot finish.
         export_mode,        // true if an export statement was seen.
@@ -806,7 +807,7 @@ var jslint = (function JSLint() {
             return the_token;
         }
 
-        function directive(the_comment, body) {
+        function parse_directive(the_comment, body) {
 
 // JSLint recognizes three directives that can be encoded in comments. This
 // function processes one item, and calls itself recursively to process the
@@ -864,7 +865,7 @@ var jslint = (function JSLint() {
                     module_mode = the_comment;
                     break;
                 }
-                return directive(the_comment, result[3]);
+                return parse_directive(the_comment, result[3]);
             }
             if (body) {
                 return stop('bad_directive_a', the_comment, body);
@@ -889,8 +890,9 @@ var jslint = (function JSLint() {
                     warn_at('misplaced_directive_a', line, from, result[1]);
                 } else {
                     the_comment.directive = result[1];
-                    directive(the_comment, result[2]);
+                    parse_directive(the_comment, result[2]);
                 }
+                directives.push(the_comment);
             }
             return the_comment;
         }
@@ -4400,6 +4402,7 @@ var jslint = (function JSLint() {
             block_stack = [];
             declared_globals = empty();
             directive_mode = true;
+            directives = [];
             early_stop = true;
             export_mode = false;
             fudge = (option.fudge)
@@ -4487,7 +4490,8 @@ var jslint = (function JSLint() {
             }
         }
         return {
-            edition: "2015-12-05",
+            directives: directives,
+            edition: "2015-12-16",
             functions: functions,
             global: global,
             id: "(JSLint)",

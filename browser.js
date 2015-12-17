@@ -1,9 +1,13 @@
 // browser.js
-// 2015-10-08
+// 2015-12-16
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
+/*jslint
+    browser
+*/
+
 /*global
-    ADSAFE, document, REPORT, jslint
+    ADSAFE, REPORT, jslint
 */
 
 /*property
