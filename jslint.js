@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-12-16
+// 2015-12-17
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -87,30 +87,31 @@
     bad_directive_a, bad_get, bad_module_name_a, bad_option_a, bad_property_a,
     bad_set, bitwise, block, body, browser, c, calls, catch, charAt,
     charCodeAt, closer, closure, code, column, concat, constant, context,
-    couch, create, d, dead, devel, directive, disrupt, dot, duplicate_a,
-    edition, ellipsis, else, empty_block, es6, eval, every, expected_a_at_b_c,
-    expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
-    expected_digits_after_a, expected_four_digits, expected_identifier_a,
-    expected_line_break_a_b, expected_regexp_factor_a, expected_space_a_b,
-    expected_statements_a, expected_string_a, expected_type_string_a,
-    expression, extra, flag, for, forEach, free, from, fud, fudge, function,
-    function_in_loop, functions, g, global, i, id, identifier, import, imports,
-    inc, indexOf, infix_in, init, initial, isArray, isNaN, join, json, keys,
-    label, label_a, lbp, led, length, level, line, lines, live, loop, m,
-    margin, match, maxerr, maxlen, message, misplaced_a, misplaced_directive_a,
-    module, naked_block, name, names, nested_comment, new, node, not_label_a,
-    nud, ok, open, option, out_of_scope_a, parameters, pop, property, push,
-    qmark, quote, redefinition_a_b, replace, reserved_a, role, search,
-    signature, slash_equal, slice, some, sort, split, statement, stop, strict,
+    couch, create, d, dead, devel, directive, directives, disrupt, dot,
+    duplicate_a, edition, ellipsis, else, empty_block, es6, eval, every,
+    expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d,
+    expected_a_before_b, expected_digits_after_a, expected_four_digits,
+    expected_identifier_a, expected_line_break_a_b, expected_regexp_factor_a,
+    expected_space_a_b, expected_statements_a, expected_string_a,
+    expected_type_string_a, expression, extra, flag, for, forEach, free, from,
+    fud, fudge, function, function_in_loop, functions, g, global, i, id,
+    identifier, import, imports, inc, indexOf, infix_in, init, initial,
+    isArray, isNaN, join, json, keys, label, label_a, lbp, led, length, level,
+    line, lines, live, loop, m, margin, match, maxerr, maxlen, message,
+    misplaced_a, misplaced_directive_a, module, naked_block, name, names,
+    nested_comment, new, node, not_label_a, nud, ok, open, option,
+    out_of_scope_a, parameters, pop, property, push, qmark, quote,
+    redefinition_a_b, replace, reserved_a, role, search, signature,
+    slash_equal, slice, some, sort, split, statement, stop, strict,
     subscript_a, switch, test, this, thru, toString, todo_comment, tokens,
     too_long, too_many, tree, type, u, unclosed_comment, unclosed_mega,
     unclosed_string, undeclared_a, unexpected_a, unexpected_a_after_b,
     unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
     unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
-    unexpected_parens, unexpected_space_a_b,
-    unexpected_statement_a, unexpected_trailing_space, unexpected_typeof_a,
-    uninitialized_a, unreachable_a, unregistered_property_a, unsafe, unused_a,
-    use_spaces, used, value, var_loop, var_switch, variable, warning, warnings,
+    unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
+    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
+    unreachable_a, unregistered_property_a, unsafe, unused_a, use_spaces, used,
+    value, var_loop, var_switch, variable, warning, warnings,
     weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
     wrap_assignment, wrap_condition, wrap_immediate, wrap_regexp, wrap_unary,
     wrapped, writable, y
@@ -292,7 +293,7 @@ var jslint = (function JSLint() {
         bad_set: "A set function takes one parameter.",
         duplicate_a: "Duplicate '{a}'.",
         empty_block: "Empty block.",
-        es6: "Unexpected ES6 feature.",
+        es6: "Unexpected ES6 feature '{a}'.",
         expected_a_at_b_c: "Expected '{a}' at column {b}, not column {c}.",
         expected_a_b: "Expected '{a}' and instead saw '{b}'.",
         expected_a_b_from_c_d: "Expected '{a}' to match '{b}' from line {c} and instead saw '{d}'.",
@@ -716,11 +717,12 @@ var jslint = (function JSLint() {
                         warn_at('too_many_digits', line, column - 1);
                     }
                     if (!option.es6) {
-                        warn_at('es6', line, column);
+                        warn_at('es6', line, column, 'u{');
                     }
                     if (next_char() !== '}') {
                         stop_at('expected_a_before_b', line, column, '}', char);
                     }
+                    next_char();
                     return;
                 }
                 back_char();
@@ -902,7 +904,6 @@ var jslint = (function JSLint() {
 // Parse a regular expression literal.
 
             var result,
-                u_mode = false,
                 value;
 
             function quantifier() {
@@ -1093,13 +1094,21 @@ var jslint = (function JSLint() {
                     g: true,
                     i: true,
                     m: true,
-                    u: u_mode,
-                    y: option.es6
+                    u: 6,
+                    y: 6
                 },
                 flag = empty();
             (function make_flag() {
                 if (is_letter(char)) {
-                    if (allowed[char] !== true) {
+                    switch (allowed[char]) {
+                    case true:
+                        break;
+                    case 6:
+                        if (!option.es6) {
+                            warn_at('es6', line, column, char);
+                        }
+                        break;
+                    default:
                         warn_at('unexpected_a', line, column, char);
                     }
                     allowed[char] = false;
@@ -1108,9 +1117,6 @@ var jslint = (function JSLint() {
                     return make_flag();
                 }
             }());
-            if (u_mode && !flag.u) {
-                warn_at('expected_a_before_b', line, column, 'u', char);
-            }
             back_char();
             if (char === '/' || char === '*') {
                 return stop_at('unexpected_a', line, from, char);
@@ -4491,7 +4497,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2015-12-16",
+            edition: "2015-12-17",
             functions: functions,
             global: global,
             id: "(JSLint)",
