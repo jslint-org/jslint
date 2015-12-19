@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-12-17
+// 2015-12-18
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -98,8 +98,8 @@
     identifier, import, imports, inc, indexOf, infix_in, init, initial,
     isArray, isNaN, join, json, keys, label, label_a, lbp, led, length, level,
     line, lines, live, loop, m, margin, match, maxerr, maxlen, message,
-    misplaced_a, misplaced_directive_a, module, naked_block, name, names,
-    nested_comment, new, node, not_label_a, nud, ok, open, option,
+    misplaced_a, misplaced_directive_a, missing_browser, module, naked_block,
+    name, names, nested_comment, new, node, not_label_a, nud, ok, open, option,
     out_of_scope_a, parameters, pop, property, push, qmark, quote,
     redefinition_a_b, replace, reserved_a, role, search, signature,
     slash_equal, slice, some, sort, split, statement, stop, strict,
@@ -313,6 +313,7 @@ var jslint = (function JSLint() {
         label_a: "'{a}' is a statement label.",
         misplaced_a: "Place '{a}' at the outermost level.",
         misplaced_directive_a: "Place the '/*{a}*/' directive before the first statement.",
+        missing_browser: "/*global*/ requires the Assume a browser option.",
         naked_block: "Naked block.",
         nested_comment: "Nested comment.",
         not_label_a: "'{a}' is not a label.",
@@ -4489,6 +4490,13 @@ var jslint = (function JSLint() {
                     whitage();
                 }
             }
+            if (!option.browser) {
+                directives.forEach(function (comment) {
+                    if (comment.directive === 'global') {
+                        warn('missing_browser', comment);
+                    }
+                });
+            }
             early_stop = false;
         } catch (e) {
             if (e.name !== 'JSLintError') {
@@ -4497,7 +4505,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2015-12-17",
+            edition: "2015-12-18",
             functions: functions,
             global: global,
             id: "(JSLint)",

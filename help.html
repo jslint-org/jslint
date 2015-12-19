@@ -280,20 +280,19 @@ a:active {
 <p>The <code>/*global*/</code> directive is used to specify a set of globals
     (usually functions and objects containing functions) that are available to
     this file. This was commonly used in browsers to link source files together
-    before ES6 modules appeared. Each of the names listed will indicate a
-    read-only global variable. The names are separated by
-    <code>,</code>&nbsp;<small>comma</small>. This directive should not be used
+before ES6 modules appeared. Use of global variables is strongly discouraged, but unfortunately web browsers require their use. The <code>/*global*/</code> directive can only be used when the <a href="#browser">Assume a browser</a> option is selected.
+<p>Each of the names listed will indicate a
+    read-only global variable. The names are separated by <code>,</code>&nbsp;<small>comma</small>. This directive should not be used
     if <code>import</code> or <code>export</code> is used. This directive inhibits
     warnings, but it does not declare the names in the execution environment.
 <p>For example:
 <blockquote><code>/*global</code>
-<div><code>ADSAFE, document, REPORT, jslint</code></div>
+<div><code>ADSAFE,  report, jslint</code></div>
 <code>*/</code></blockquote>
-<p>instructs <s></s> to not give warnings about the global variables <code>ADsafe</code>,
-<code>document</code>, <code>REPORT</code>, and <code>jslint</code>. However, if any of those names
+<p>instructs <s></s> to not give warnings about the global variables <code>ADsafe</code>, <code>report</code>, and <code>jslint</code>. However, if any of those names
 are expected to be supplied by other files and those other files fail to do so, then execution errors
 will result. It is usually better to use top-level variable declarations instead:
-<pre>     var ADSAFE, document, REPORT, jslint; </pre>
+<pre>     var ADSAFE, report, jslint; </pre>
 <p>Using <code>var</code> in this way allows comparing a global variable to the <code>undefined</code>
 value to determine if it is present.</p>
 <h1><code>/*jslint*/</code></h1>
@@ -318,7 +317,7 @@ value to determine if it is present.</p>
                 is selected. </td>
         </tr>
         <tr>
-            <td>Assume a browser </td>
+            <td id="browser">Assume a browser </td>
             <td><code>browser</code></td>
             <td><code>true</code> if the standard browser globals should be
                 predefined. This option will reject the use of <code>import</code>
