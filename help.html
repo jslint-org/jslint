@@ -6,7 +6,7 @@
     formation in JavaScript programs. JSLint recommends using only the good
     parts of The ECMAScript Programming Language Standard, Sixth Edition [ES6].">
 <meta name="author" content="Douglas Crockford">
-<meta name="date" content="2015-09-21">
+<meta name="date" content="2015-12-22">
 <link rel="stylesheet" type="text/css"
     href="http://fonts.googleapis.com/css?family=Patua+One">
 <link rel="icon" type="image/gif" href="favicon.gif">
@@ -410,14 +410,12 @@ value to determine if it is present.</p>
             <td><code>node</code></td>
             <td><code>true</code> if Node.js globals should be predefined. It will
     predefine globals that are used in the Node.js environment<code></code>.</p>
-It adds the
-    same globals as this directive:
+It adds the same globals as this directive:
 <blockquote><code>/*global </code>
-    <div><code>Buffer, clearInterval, clearTimeout, console, exports, global,
-        module, process, querystring, require, setInterval, setTimeout, __dirname</code><code>,
-        __filename</code></div>
-    <code> */</code></blockquote>
-</td>
+    <div><code>Buffer, clearImmediate, clearInterval, clearTimeout, console,
+        exports, global, module, process, querystring, require, setImmediate,
+        setInterval, setTimeout, __dirname, __filename</code></div>
+    <code>*/</code></blockquote></td>
         </tr>
         <tr>
             <td>Tolerate <code>this</code><br></td>
