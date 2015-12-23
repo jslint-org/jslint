@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-12-18
+// 2015-12-22
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -173,7 +173,7 @@ var jslint = (function JSLint() {
         maxlen: 10000,
         node: [
             'Buffer', 'clearImmediate', 'clearInterval', 'clearTimeout',
-            'console', 'exports', 'global', 'module', 'process',
+            'console', 'exports', 'global', 'module', 'process', 'querystring',
             'require', 'setImmediate', 'setInterval', 'setTimeout',
             '__dirname', '__filename'
         ],
@@ -4505,7 +4505,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2015-12-18",
+            edition: "2015-12-22",
             functions: functions,
             global: global,
             id: "(JSLint)",
