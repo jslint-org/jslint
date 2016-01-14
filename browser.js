@@ -1,5 +1,5 @@
 // browser.js
-// 2015-12-16
+// 2016-01-13
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 /*jslint
@@ -34,18 +34,18 @@ ADSAFE.lib("browser_ui", function () {
 
 // First get handles to some of the page features.
 
-        var warnings = dom.q('#JSLINT_WARNINGS'),
-            warnings_div = warnings.q('>div'),
-            options = dom.q('#JSLINT_OPTIONS'),
-            global = dom.q('#JSLINT_GLOBAL'),
-            property = dom.q('#JSLINT_PROPERTY'),
-            property_textarea = property.q('>textarea'),
-            report_field = dom.q('#JSLINT_REPORT'),
-            report_div = report_field.q('>div'),
-            select = dom.q('#JSLINT_SELECT'),
-            source = dom.q('#JSLINT_SOURCE'),
-            source_textarea = source.q('>textarea'),
-            aux = dom.q('#JSLINT_AUX');
+        var warnings = dom.q('#JSLINT_WARNINGS');
+        var warnings_div = warnings.q('>div');
+        var options = dom.q('#JSLINT_OPTIONS');
+        var global = dom.q('#JSLINT_GLOBAL');
+        var property = dom.q('#JSLINT_PROPERTY');
+        var property_textarea = property.q('>textarea');
+        var report_field = dom.q('#JSLINT_REPORT');
+        var report_div = report_field.q('>div');
+        var select = dom.q('#JSLINT_SELECT');
+        var source = dom.q('#JSLINT_SOURCE');
+        var source_textarea = source.q('>textarea');
+        var aux = dom.q('#JSLINT_AUX');
 
         function clear() {
             warnings.style('display', 'none');

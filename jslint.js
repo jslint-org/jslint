@@ -1,5 +1,5 @@
 // jslint.js
-// 2016=01-13
+// 2016-01-13
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
