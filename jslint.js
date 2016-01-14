@@ -1,5 +1,5 @@
 // jslint.js
-// 2015-12-26
+// 2016=01-13
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -367,40 +367,40 @@ var jslint = (function JSLint() {
 // Regular expression literals:
 
 // supplant {variables}
-    var rx_supplant = /\{([^{}]*)\}/g,
+    var rx_supplant = /\{([^{}]*)\}/g;
 // carriage return, carriage return linefeed, or linefeed
-        rx_crlf = /\n|\r\n?/,
+    var rx_crlf = /\n|\r\n?/;
 // unsafe characters that are silently deleted by one or more browsers
-        rx_unsafe = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/,
+    var rx_unsafe = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/;
 // identifier
-        rx_identifier = /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/,
-        rx_bad_property = /^_|\$|Sync$|_$/,
+    var rx_identifier = /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/;
+    var rx_bad_property = /^_|\$|Sync$|_$/;
 // star slash
-        rx_star_slash = /\*\//,
+    var rx_star_slash = /\*\//;
 // slash star
-        rx_slash_star = /\/\*/,
+    var rx_slash_star = /\/\*/;
 // slash star or ending slash
-        rx_slash_star_or_slash = /\/\*|\/$/,
+    var rx_slash_star_or_slash = /\/\*|\/$/;
 // uncompleted work comment
-        rx_todo = /\b(?:todo|TO\s?DO|HACK)\b/,
+    var rx_todo = /\b(?:todo|TO\s?DO|HACK)\b/;
 // tab
-        rx_tab = /\t/g,
+    var rx_tab = /\t/g;
 // directive
-        rx_directive = /^(jslint|property|global)\s*(.*)$/,
-        rx_directive_part = /^([a-zA-Z$_][a-zA-Z0-9$_]*)\s*(?::\s*(true|false|[0-9]+)\s*)?(?:,\s*)?(.*)$/,
+    var rx_directive = /^(jslint|property|global)\s*(.*)$/;
+    var rx_directive_part = /^([a-zA-Z$_][a-zA-Z0-9$_]*)\s*(?::\s*(true|false|[0-9]+)\s*)?(?:,\s*)?(.*)$/;
 // token (sorry it is so long)
-        rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\]\?,:;'"~`]|=(?:==?|>)?|\.+|\/[=*\/]?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|[\^%]=?|&[&=]?|\|[\|=]?|>{1,3}=?|<<?=?|!={0,2}|(0|[1-9][0-9]*))(.*)$/,
-        rx_digits = /^([0-9]+)(.*)$/,
-        rx_hexs = /^([0-9a-fA-F]+)(.*)$/,
-        rx_octals = /^([0-7]+)(.*)$/,
-        rx_bits = /^([01]+)(.*)$/,
+    var rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\]\?,:;'"~`]|=(?:==?|>)?|\.+|\/[=*\/]?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|[\^%]=?|&[&=]?|\|[\|=]?|>{1,3}=?|<<?=?|!={0,2}|(0|[1-9][0-9]*))(.*)$/;
+    var rx_digits = /^([0-9]+)(.*)$/;
+    var rx_hexs = /^([0-9a-fA-F]+)(.*)$/;
+    var rx_octals = /^([0-7]+)(.*)$/;
+    var rx_bits = /^([01]+)(.*)$/;
 // mega
-        rx_mega = /`|\$\{/,
+    var rx_mega = /`|\$\{/;
 // indentation
-        rx_colons = /^(.*)\?([:.]*)$/,
-        rx_dot = /\.$/,
+    var rx_colons = /^(.*)\?([:.]*)$/;
+    var rx_dot = /\.$/;
 // JSON number
-        rx_JSON_number = /^-?\d+(?:\.\d*)?(?:e[\-+]?\d+)?$/i;
+    var rx_JSON_number = /^-?\d+(?:\.\d*)?(?:e[\-+]?\d+)?$/i;
 
     function is_letter(string) {
         return (string >= 'a' && string <= 'z\uffff') ||
@@ -416,35 +416,35 @@ var jslint = (function JSLint() {
         });
     }
 
-    var anon = "anonymous", // The guessed name for anonymous functions.
-        blockage,           // The current block.
-        block_stack,        // The stack of blocks.
-        declared_globals,   // The object containing the global declarations.
-        directives,         // The directive comments.
-        directive_mode,     // true if directives are still allowed.
-        early_stop,         // true if JSLint cannot finish.
-        export_mode,        // true if an export statement was seen.
-        fudge,              // true if the natural numbers start with 1.
-        functionage,        // The current function.
-        functions,          // The array containing all of the functions.
-        global,             // The global object, the outermost context.
-        imports,            // The array collecting all import-from strings.
-        json_mode,          // true if parsing JSON.
-        lines,              // The array containing source lines.
-        module_mode,        // true if import or export was used.
-        next_token,         // The next token to be examined in the parse.
-        option,             // The options parameter.
-        property,           // The object containing the tallied property names.
-        mega_mode,          // true if currently parsing a megastring literal.
-        stack,              // The stack of functions.
-        syntax,             // The object containing the parser.
-        token,              // The current token being examined in the parse.
-        token_nr,           // The number of the next token.
-        tokens,             // The array of tokens.
-        tenure,             // The predefined property registry.
-        tree,               // The abstract parse tree.
-        var_mode,           // true if using var, false if using let.
-        warnings;           // The array collecting all generated warnings.
+    var anon = "anonymous"; // The guessed name for anonymous functions.
+    var blockage;           // The current block.
+    var block_stack;        // The stack of blocks.
+    var declared_globals;   // The object containing the global declarations.
+    var directives;         // The directive comments.
+    var directive_mode;     // true if directives are still allowed.
+    var early_stop;         // true if JSLint cannot finish.
+    var export_mode;        // true if an export statement was seen.
+    var fudge;              // true if the natural numbers start with 1.
+    var functionage;        // The current function.
+    var functions;          // The array containing all of the functions.
+    var global;             // The global object; the outermost context.
+    var imports;            // The array collecting all import-from strings.
+    var json_mode;          // true if parsing JSON.
+    var lines;              // The array containing source lines.
+    var module_mode;        // true if import or export was used.
+    var next_token;         // The next token to be examined in the parse.
+    var option;             // The options parameter.
+    var property;           // The object containing the tallied property names.
+    var mega_mode;          // true if currently parsing a megastring literal.
+    var stack;              // The stack of functions.
+    var syntax;             // The object containing the parser.
+    var token;              // The current token being examined in the parse.
+    var token_nr;           // The number of the next token.
+    var tokens;             // The array of tokens.
+    var tenure;             // The predefined property registry.
+    var tree;               // The abstract parse tree.
+    var var_mode;           // true if using var; false if using let.
+    var warnings;           // The array collecting all generated warnings.
 
 // Error reportage functions:
 
@@ -573,16 +573,16 @@ var jslint = (function JSLint() {
             : source.split(rx_crlf);
         tokens = [];
 
-        var char,                   // a popular character
-            column = 0,             // the column number of the next character
-            from,                   // the starting column number of the token
-            line = -1,              // the line number of the next character
-            previous = global,      // the previous token including comments
-            prior = global,         // the previous token excluding comments
-            mega_from,              // the starting column of megastring
-            mega_line,              // the starting line of megastring
-            snippet,                // a piece of string
-            source_line;            // the current line source string
+        var char;                   // a popular character
+        var column = 0;             // the column number of the next character
+        var from;                   // the starting column number of the token
+        var line = -1;              // the line number of the next character
+        var previous = global;      // the previous token including comments
+        var prior = global;         // the previous token excluding comments
+        var mega_from;              // the starting column of megastring
+        var mega_line;              // the starting line of megastring
+        var snippet;                // a piece of string
+        var source_line;            // the current line source string
 
         function next_line() {
 
@@ -904,8 +904,8 @@ var jslint = (function JSLint() {
 
 // Parse a regular expression literal.
 
-            var result,
-                value;
+            var result;
+            var value;
 
             function quantifier() {
 
@@ -1092,13 +1092,13 @@ var jslint = (function JSLint() {
 // Process dangling flag letters.
 
             var allowed = {
-                    g: true,
-                    i: true,
-                    m: true,
-                    u: 6,
-                    y: 6
-                },
-                flag = empty();
+                g: true,
+                i: true,
+                m: true,
+                u: 6,
+                y: 6
+            };
+            var flag = empty();
             (function make_flag() {
                 if (is_letter(char)) {
                     switch (allowed[char]) {
@@ -1221,12 +1221,12 @@ var jslint = (function JSLint() {
         }
 
         function lex() {
-            var array,
-                i = 0,
-                j = 0,
-                last,
-                result,
-                the_token;
+            var array;
+            var i = 0;
+            var j = 0;
+            var last;
+            var result;
+            var the_token;
             if (!source_line) {
                 source_line = next_line();
                 from = 0;
@@ -1536,8 +1536,8 @@ var jslint = (function JSLint() {
 
 // Look ahead one token without advancing.
 
-        var old_token_nr = token_nr,
-            cadet = dispense(true);
+        var old_token_nr = token_nr;
+        var cadet = dispense(true);
         token_nr = old_token_nr;
         return cadet;
     }
@@ -1583,8 +1583,8 @@ var jslint = (function JSLint() {
     function json_value() {
 
         function json_object() {
-            var brace = next_token,
-                object = empty();
+            var brace = next_token;
+            var object = empty();
             advance('{');
             if (next_token.id !== '}') {
                 (function next() {
@@ -1741,7 +1741,8 @@ var jslint = (function JSLint() {
 // process leds (infix operators) until the bind powers cause it to stop. It
 // returns the expression's parse tree.
 
-        var left, the_symbol;
+        var left;
+        var the_symbol;
 
 // Statements will have already advanced, so advance now only if the token is
 // not the first of a statement,
@@ -1777,8 +1778,8 @@ var jslint = (function JSLint() {
 
 // Parse the condition part of a do, if, while.
 
-        var the_paren = next_token,
-            the_value;
+        var the_paren = next_token;
+        var the_value;
         the_paren.free = true;
         advance('(');
         the_value = expression(0);
@@ -1838,7 +1839,8 @@ var jslint = (function JSLint() {
         if (a.id === '(number)' && b.id === '(number)') {
             return a.value === b.value;
         }
-        var a_string, b_string;
+        var a_string;
+        var b_string;
         if (a.id === '(string)') {
             a_string = a.value;
         } else if (a.id === '`' && a.constant) {
@@ -1905,10 +1907,10 @@ var jslint = (function JSLint() {
 // have use for one. A statement can be one of the standard statements, or
 // an assignment expression, or an invocation expression.
 
-        var first,
-            the_label,
-            the_statement,
-            the_symbol;
+        var first;
+        var the_label;
+        var the_statement;
+        var the_symbol;
         advance();
         if (token.identifier && next_token.id === ':') {
             the_label = token;
@@ -2012,7 +2014,8 @@ var jslint = (function JSLint() {
 //          'naked'     No advance.
 //          undefined   Not special.
 
-        var stmts, the_block;
+        var stmts;
+        var the_block;
         if (special !== 'naked') {
             advance('{');
         }
@@ -2122,8 +2125,8 @@ var jslint = (function JSLint() {
 
         var the_symbol = symbol(id, 20);
         the_symbol.led = function (left) {
-            var the_token = token,
-                right;
+            var the_token = token;
+            var right;
             the_token.arity = 'assignment';
             right = expression(20 - 1);
             if (id === '=' && left.arity === 'variable') {
@@ -2253,8 +2256,8 @@ var jslint = (function JSLint() {
 
         var the_symbol = symbol(id1, 30);
         the_symbol.led = function (left) {
-            var the_token = token,
-                second = expression(20);
+            var the_token = token;
+            var second = expression(20);
             advance(id2);
             token.arity = 'ternary';
             the_token.arity = 'ternary';
@@ -2373,8 +2376,8 @@ var jslint = (function JSLint() {
     infix('/', 140);
     infix('%', 140);
     infix('(', 160, function (left) {
-        var the_paren = token,
-            the_argument;
+        var the_paren = token;
+        var the_argument;
         if (left.id !== 'function') {
             left_check(left, the_paren);
         }
@@ -2460,8 +2463,8 @@ var jslint = (function JSLint() {
         return the_paren;
     });
     infix('.', 170, function (left) {
-        var the_token = token,
-            name = next_token;
+        var the_token = token;
+        var name = next_token;
         if (
             (left.id !== '(string)' || name.id !== 'indexOf') &&
             (left.id !== '[' || (
@@ -2487,8 +2490,8 @@ var jslint = (function JSLint() {
         return the_token;
     });
     infix('[', 170, function (left) {
-        var the_token = token,
-            the_subscript = expression(0);
+        var the_token = token;
+        var the_subscript = expression(0);
         if (
             the_subscript.id === '(string)' &&
             rx_identifier.test(the_subscript.value)
@@ -2552,8 +2555,8 @@ var jslint = (function JSLint() {
         the_token.expression = [];
         if (next_token.id !== ']') {
             (function next() {
-                var element,
-                    ellipsis = false;
+                var element;
+                var ellipsis = false;
                 if (next_token.id === '...') {
                     ellipsis = true;
                     if (!option.es6) {
@@ -2599,8 +2602,8 @@ var jslint = (function JSLint() {
     });
 
     function parameter(list, signature) {
-        var ellipsis = false,
-            param;
+        var ellipsis = false;
+        var param;
         if (next_token.id === '{') {
             if (!option.es6) {
                 warn('es6');
@@ -2704,7 +2707,8 @@ var jslint = (function JSLint() {
     }
 
     function parameter_list() {
-        var list = [], signature = ['('];
+        var list = [];
+        var signature = ['('];
         if (next_token.id !== ')' && next_token.id !== '(end)') {
             parameter(list, signature);
         }
@@ -2854,9 +2858,9 @@ var jslint = (function JSLint() {
     }
 
     prefix('(', function () {
-        var the_paren = token,
-            the_value,
-            cadet = lookahead().id;
+        var the_paren = token;
+        var the_value;
+        var cadet = lookahead().id;
 
 // We can distinguish between a parameter list for => and a wrapped expression
 // with one token of lookahead.
@@ -2887,15 +2891,15 @@ var jslint = (function JSLint() {
     });
     prefix('`', do_tick);
     prefix('{', function () {
-        var the_brace = token,
-            seen = empty();
+        var the_brace = token;
+        var seen = empty();
         the_brace.expression = [];
         if (next_token.id !== '}') {
             (function member() {
-                var extra = true,
-                    id,
-                    name = next_token,
-                    value;
+                var extra = true;
+                var id;
+                var name = next_token;
+                var value;
                 advance();
                 if (
                     (name.id === 'get' || name.id === 'set') &&
@@ -2972,8 +2976,8 @@ var jslint = (function JSLint() {
         return block('naked');
     });
     stmt('break', function () {
-        var the_break = token,
-            the_label;
+        var the_break = token;
+        var the_label;
         if (functionage.loop < 1 && functionage.switch < 1) {
             warn('unexpected_a', the_break);
         }
@@ -2999,8 +3003,8 @@ var jslint = (function JSLint() {
     });
 
     function do_var() {
-        var the_statement = token,
-            is_const = the_statement.id === 'const';
+        var the_statement = token;
+        var is_const = the_statement.id === 'const';
         the_statement.names = [];
 
 // A program may use var or let, but not both, and let and const require
@@ -3143,8 +3147,8 @@ var jslint = (function JSLint() {
         return the_debug;
     });
     stmt('delete', function () {
-        var the_token = token,
-            the_value = expression(0);
+        var the_token = token;
+        var the_value = expression(0);
         if (
             (the_value.id !== '.' && the_value.id !== '[') ||
             the_value.arity !== 'binary'
@@ -3188,8 +3192,8 @@ var jslint = (function JSLint() {
         return the_export;
     });
     stmt('for', function () {
-        var first,
-            the_for = token;
+        var first;
+        var the_for = token;
         if (!option.for) {
             warn('unexpected_a', the_for);
         }
@@ -3235,8 +3239,8 @@ var jslint = (function JSLint() {
     });
     stmt('function', do_function);
     stmt('if', function () {
-        var the_else,
-            the_if = token;
+        var the_else;
+        var the_if = token;
         the_if.expression = condition();
         the_if.block = block();
         if (next_token.id === 'else') {
@@ -3295,12 +3299,12 @@ var jslint = (function JSLint() {
         return the_return;
     });
     stmt('switch', function () {
-        var dups = [],
-            last,
-            stmts,
-            the_cases = [],
-            the_disrupt = true,
-            the_switch = token;
+        var dups = [];
+        var last;
+        var stmts;
+        var the_cases = [];
+        var the_disrupt = true;
+        var the_switch = token;
         not_top_level(the_switch);
         functionage.switch += 1;
         advance('(');
@@ -3383,10 +3387,10 @@ var jslint = (function JSLint() {
         return the_throw;
     });
     stmt('try', function () {
-        var clause = false,
-            the_catch,
-            the_disrupt,
-            the_try = token;
+        var clause = false;
+        var the_catch;
+        var the_disrupt;
+        var the_try = token;
         the_try.block = block();
         the_disrupt = the_try.block.disrupt;
         if (next_token.id === 'catch') {
@@ -3450,8 +3454,8 @@ var jslint = (function JSLint() {
 // the tree is traversed.
 
         return function (arity, id, task) {
-            var a_set = when[arity],
-                i_set;
+            var a_set = when[arity];
+            var i_set;
 
 // The id parameter is optional. If excluded, the task will be applied to all
 // ids.
@@ -3493,8 +3497,8 @@ var jslint = (function JSLint() {
 // Given a task set that was built by an action function, run all of the
 // relevant tasks on the token.
 
-            var a_set = when[the_token.arity],
-                i_set;
+            var a_set = when[the_token.arity];
+            var i_set;
 
 // If there are tasks associated with the token's arity...
 
@@ -3521,12 +3525,12 @@ var jslint = (function JSLint() {
         };
     }
 
-    var posts = empty(),
-        pres = empty(),
-        preaction = action(pres),
-        postaction = action(posts),
-        preamble = amble(pres),
-        postamble = amble(posts);
+    var posts = empty();
+    var pres = empty();
+    var preaction = action(pres);
+    var postaction = action(posts);
+    var preamble = amble(pres);
+    var postamble = amble(posts);
 
     function walk_expression(thing) {
         if (thing) {
@@ -3721,8 +3725,8 @@ var jslint = (function JSLint() {
     preaction('binary', bitwise_check);
     preaction('binary', function (thing) {
         if (relationop[thing.id] === true) {
-            var left = thing.expression[0],
-                right = thing.expression[1];
+            var left = thing.expression[0];
+            var right = thing.expression[1];
             if (left.id === 'NaN' || right.id === 'NaN') {
                 warn('isNaN', thing);
             } else if (left.id === 'typeof') {
@@ -4050,15 +4054,15 @@ var jslint = (function JSLint() {
 // Go through the token list, looking at usage of whitespace.
 
     function whitage() {
-        var closer = '(end)',
-            free = false,
-            left = global,
-            margin = 0,
-            nr_comments_skipped = 0,
-            open = true,
-            qmark = '',
-            result,
-            right;
+        var closer = '(end)';
+        var free = false;
+        var left = global;
+        var margin = 0;
+        var nr_comments_skipped = 0;
+        var open = true;
+        var qmark = '';
+        var result;
+        var right;
 
         function expected_at(at) {
             warn(
@@ -4507,7 +4511,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2015-12-26",
+            edition: "2016-01-13",
             functions: functions,
             global: global,
             id: "(JSLint)",
