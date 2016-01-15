@@ -292,7 +292,9 @@ before ES6 modules appeared. Use of global variables is strongly discouraged, bu
 <p>instructs <s></s> to not give warnings about the global variables <code>ADsafe</code>, <code>report</code>, and <code>jslint</code>. However, if any of those names
 are expected to be supplied by other files and those other files fail to do so, then execution errors
 will result. It is usually better to use top-level variable declarations instead:
-<pre>     var ADSAFE, report, jslint; </pre>
+<pre>    var ADSAFE;
+    var report;
+    var jslint; </pre>
 <p>Using <code>var</code> in this way allows comparing a global variable to the <code>undefined</code>
 value to determine if it is present.</p>
 <h1><code>/*jslint*/</code></h1>
@@ -406,6 +408,11 @@ value to determine if it is present.</p>
                 (The default is unlimited)</td>
         </tr>
         <tr>
+            <td>Tolerate multiple variables declarations per statement</td>
+            <td><code>multivar</code></td>
+            <td><code>true</code> if a <code>var</code>, <code>let</code>, or <code>const</code> statement can declare two or more variables in a single statement.</td>
+        </tr>
+        <tr>
             <td>Assume <a href="http://nodejs.org/">Node.js</a></td>
             <td><code>node</code></td>
             <td><code>true</code> if Node.js globals should be predefined. It will
@@ -476,7 +483,7 @@ It adds the same globals as this directive:
     before it is used. It should not be used outside of the block in which it is
     declared. A variable should not have the same name as a variable or
     parameter in an outer function. Do not mix <code>var</code> and
-    <code>let</code>.</p>
+    <code>let</code>. Declare one name per statement.</p>
 <h1 id=eq><code>= == ===</code></h1>
 <p><span style="font-variant: small-caps;">Fortran</span> made a terrible
     mistake in using the equality operator as its assignment operator. That
@@ -670,7 +677,8 @@ and <code>function</code>.</p>
 <code>(</code>&nbsp;<small>left paren</small>. The matching closing
     token will be the first token on a line, restoring the previous
     indentation.</p>
-<p>The ternary operator can be visually confusing, so <code>?</code>&nbsp;<small>question mark</small> and <code>:</code>&nbsp;<small>colon</small>  always begin a line and increase the indentation by 4 spaces.</p>
+<p>The ternary operator can be visually confusing, so
+    <code>?</code>&nbsp;<small>question mark</small> and <code>:</code>&nbsp;<small>colon</small>  always begin a line and increase the indentation by 4 spaces.</p>
 <p>If <code>.</code> <small>period</small> is the first character on a line, the indentation is increased by 4 spaces.</p>
 <p>A <code>var</code>, <code>let</code>, or <code>const</code> statement will
     also cause an indentation if it declares two or more variables, and if the
