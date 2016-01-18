@@ -506,9 +506,10 @@ var jslint = (function JSLint() {
         }
         warning.message = supplant(bundle[code] || code, warning);
         warnings.push(warning);
-        return (typeof option.maxerr === 'number' &&
-                warnings.length === option.maxerr)
-            ? stop_at('too_many', line, column)
+        return (
+            typeof option.maxerr === 'number' &&
+            warnings.length === option.maxerr
+        )   ? stop_at('too_many', line, column)
             : warning;
     }
 
@@ -819,9 +820,9 @@ var jslint = (function JSLint() {
 
             var result = body.match(rx_directive_part);
             if (result) {
-                var allowed,
-                    name = result[1],
-                    value = result[2];
+                var allowed;
+                var name = result[1];
+                var value = result[2];
                 switch (the_comment.directive) {
                 case 'jslint':
                     allowed = allowed_option[name];
