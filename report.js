@@ -1,5 +1,5 @@
 // report.js
-// 2015-10-08
+// 2016-01-27
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Generate JSLint HTML reports.
@@ -14,9 +14,9 @@
 var REPORT = (function () {
     'use strict';
 
-    var rx_amp = /&/g,
-        rx_gt = />/g,
-        rx_lt = /</g;
+    var rx_amp = /&/g;
+    var rx_gt = />/g;
+    var rx_lt = /</g;
 
     function entityify(string) {
 
@@ -34,8 +34,8 @@ var REPORT = (function () {
 
 // Produce the HTML Error Report.
 
-            var fudge = +!!data.option.fudge,
-                output = [];
+            var fudge = +!!data.option.fudge;
+            var output = [];
             if (data.stop) {
                 output.push("<center>J<u>SLint</u> was unable to finish.</center>");
             }
@@ -59,11 +59,11 @@ var REPORT = (function () {
 
 // Produce the HTML Function Report.
 
-            var fudge = +!!data.option.fudge,
-                mode = (data.module)
-                    ? "module"
-                    : "global",
-                output = [];
+            var fudge = +!!data.option.fudge;
+            var mode = (data.module)
+                ? "module"
+                : "global";
+            var output = [];
 
             if (data.json) {
                 return (data.warnings.length === 0)
@@ -86,8 +86,8 @@ var REPORT = (function () {
             if (data.functions.length === 0) {
                 output.push("<center>There are no functions.</center>");
             }
-            var global = Object.keys(data.global.context).sort(),
-                imports = data.imports.sort();
+            var global = Object.keys(data.global.context).sort();
+            var imports = data.imports.sort();
             if (global.length + imports.length > 0) {
                 output.push("<dl class=level0>");
                 detail(mode, global);
@@ -97,8 +97,8 @@ var REPORT = (function () {
 
             if (data.functions.length > 0) {
                 data.functions.forEach(function (the_function) {
-                    var context = the_function.context,
-                        list = Object.keys(context);
+                    var context = the_function.context;
+                    var list = Object.keys(context);
                     output.push(
                         "<dl class=level",
                         entityify(the_function.level),
@@ -172,10 +172,10 @@ var REPORT = (function () {
 
 // Produce the /*property*/ directive.
 
-            var not_first = false,
-                output = ["/*property"],
-                length = 1111,
-                properties = Object.keys(data.property);
+            var not_first = false;
+            var output = ["/*property"];
+            var length = 1111;
+            var properties = Object.keys(data.property);
 
             if (properties.length > 0) {
                 properties.sort().forEach(function (key) {
