@@ -1,5 +1,5 @@
 // browser.js
-// 2016-01-13
+// 2016-02-07
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 /*jslint
@@ -20,7 +20,7 @@
 // interacting with the browser and generating the reports.
 
 ADSAFE.lib("browser_ui", function () {
-    'use strict';
+    "use strict";
 
     var rx_separator = /[\s,;'"]+/;
 
@@ -34,35 +34,35 @@ ADSAFE.lib("browser_ui", function () {
 
 // First get handles to some of the page features.
 
-        var warnings = dom.q('#JSLINT_WARNINGS');
-        var warnings_div = warnings.q('>div');
-        var options = dom.q('#JSLINT_OPTIONS');
-        var global = dom.q('#JSLINT_GLOBAL');
-        var property = dom.q('#JSLINT_PROPERTY');
-        var property_textarea = property.q('>textarea');
-        var report_field = dom.q('#JSLINT_REPORT');
-        var report_div = report_field.q('>div');
-        var select = dom.q('#JSLINT_SELECT');
-        var source = dom.q('#JSLINT_SOURCE');
-        var source_textarea = source.q('>textarea');
-        var aux = dom.q('#JSLINT_AUX');
+        var warnings = dom.q("#JSLINT_WARNINGS");
+        var warnings_div = warnings.q(">div");
+        var options = dom.q("#JSLINT_OPTIONS");
+        var global = dom.q("#JSLINT_GLOBAL");
+        var property = dom.q("#JSLINT_PROPERTY");
+        var property_textarea = property.q(">textarea");
+        var report_field = dom.q("#JSLINT_REPORT");
+        var report_div = report_field.q(">div");
+        var select = dom.q("#JSLINT_SELECT");
+        var source = dom.q("#JSLINT_SOURCE");
+        var source_textarea = source.q(">textarea");
+        var aux = dom.q("#JSLINT_AUX");
 
         function clear() {
-            warnings.style('display', 'none');
-            report_field.style('display', 'none');
-            property.style('display', 'none');
-            aux.style('display', 'none');
-            warnings_div.value('');
-            report_div.value('');
-            property_textarea.value('');
-            source_textarea.value('');
+            warnings.style("display", "none");
+            report_field.style("display", "none");
+            property.style("display", "none");
+            aux.style("display", "none");
+            warnings_div.value("");
+            report_div.value("");
+            property_textarea.value("");
+            source_textarea.value("");
             source_textarea.focus();
         }
 
         function clear_options() {
-            options.q('input_checkbox').check(false);
-            options.q('input_text').value('');
-            global.value('');
+            options.q("input_checkbox").check(false);
+            options.q("input_text").value("");
+            global.value("");
         }
 
         function call_jslint() {
@@ -70,10 +70,10 @@ ADSAFE.lib("browser_ui", function () {
 // First build the option object.
 
             var option = Object.create(null);
-            options.q('input_checkbox:checked').each(function (node) {
+            options.q("input_checkbox:checked").each(function (node) {
                 option[node.getTitle()] = true;
             });
-            options.q('input_text').each(function (node) {
+            options.q("input_text").each(function (node) {
                 var value = +node.getValue();
                 if (isFinite(value) && value > 0) {
                     option[node.getTitle()] = value;
@@ -87,7 +87,7 @@ ADSAFE.lib("browser_ui", function () {
             var result = jslint(
                 source_string,
                 option,
-                (global_string === '')
+                (global_string === "")
                     ? undefined
                     : global_string.split(rx_separator)
             );
@@ -101,20 +101,20 @@ ADSAFE.lib("browser_ui", function () {
 // Display the reports.
 
             setHTML(warnings_div, error_html);
-            warnings.style('display', (error_html.length === 0)
-                ? 'none'
-                : 'block');
+            warnings.style("display", (error_html.length === 0)
+                ? "none"
+                : "block");
             setHTML(report_div, function_html);
-            report_field.style('display', 'block');
+            report_field.style("display", "block");
             if (property_text) {
                 property_textarea.value(property_text);
-                property.style('display', 'block');
+                property.style("display", "block");
                 select.enable(true);
             } else {
-                property.style('display', 'none');
+                property.style("display", "none");
                 select.enable(false);
             }
-            aux.style('display', 'block');
+            aux.style("display", "block");
             source_textarea.select();
         }
 
@@ -124,19 +124,19 @@ ADSAFE.lib("browser_ui", function () {
 
 // Lay in the click handlers.
 
-        dom.q('button').each(function (button) {
+        dom.q("button").each(function (button) {
             switch (button.getName()) {
-            case 'JSLint':
-                button.on('click', call_jslint);
+            case "JSLint":
+                button.on("click", call_jslint);
                 break;
-            case 'clear':
-                button.on('click', clear);
+            case "clear":
+                button.on("click", clear);
                 break;
-            case 'options':
-                button.on('click', clear_options);
+            case "options":
+                button.on("click", clear_options);
                 break;
-            case 'select':
-                button.on('click', select_property_directive);
+            case "select":
+                button.on("click", select_property_directive);
                 break;
             }
         });

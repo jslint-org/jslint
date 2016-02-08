@@ -1,5 +1,5 @@
 // report.js
-// 2016-01-27
+// 2016-02-07
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Generate JSLint HTML reports.
@@ -12,7 +12,7 @@
 */
 
 var REPORT = (function () {
-    'use strict';
+    "use strict";
 
     var rx_amp = /&/g;
     var rx_gt = />/g;
@@ -23,9 +23,9 @@ var REPORT = (function () {
 // Replace & < > with less destructive entities.
 
         return String(string)
-            .replace(rx_amp, '&amp;')
-            .replace(rx_lt, '&lt;')
-            .replace(rx_gt, '&gt;');
+            .replace(rx_amp, "&amp;")
+            .replace(rx_lt, "&lt;")
+            .replace(rx_gt, "&gt;");
     }
 
     return {
@@ -48,7 +48,7 @@ var REPORT = (function () {
                     "</address>",
                     entityify(warning.message),
                     "</cite><samp>",
-                    entityify(data.lines[warning.line] || ''),
+                    entityify(data.lines[warning.line] || ""),
                     "</samp>"
                 );
             });
@@ -108,7 +108,7 @@ var REPORT = (function () {
                         (the_function.name === "=>")
                             ? entityify(the_function.signature) + " =>"
                             : (
-                                (typeof the_function.name === 'string')
+                                (typeof the_function.name === "string")
                                     ? "<b>«" + entityify(the_function.name)
                                         + "»</b>"
                                     : "<b>" + entityify(the_function.name.id)
@@ -119,10 +119,10 @@ var REPORT = (function () {
                     if (Array.isArray(the_function.parameters)) {
                         var params = [];
                         the_function.parameters.forEach(function extract(name) {
-                            if (name.id === '{' || name.id === '[') {
+                            if (name.id === "{" || name.id === "[") {
                                 name.names.forEach(extract);
                             } else {
-                                if (name.id !== 'ignore') {
+                                if (name.id !== "ignore") {
                                     params.push(name.id);
                                 }
                             }
@@ -135,11 +135,11 @@ var REPORT = (function () {
                     list.sort();
                     detail("variable", list.filter(function (id) {
                         var the_variable = context[id];
-                        return the_variable.role === 'variable' &&
+                        return the_variable.role === "variable" &&
                                 the_variable.function === the_function;
                     }));
                     detail("exception", list.filter(function (id) {
-                        return context[id].role === 'exception';
+                        return context[id].role === "exception";
                     }));
                     detail("closure", list.filter(function (id) {
                         var the_variable = context[id];
@@ -149,13 +149,13 @@ var REPORT = (function () {
                     detail("outer", list.filter(function (id) {
                         var the_variable = context[id];
                         return the_variable.function !== the_function &&
-                                the_variable.function.id !== '(global)';
+                                the_variable.function.id !== "(global)";
                     }));
                     detail(mode, list.filter(function (id) {
-                        return context[id].function.id === '(global)';
+                        return context[id].function.id === "(global)";
                     }));
                     detail("label", list.filter(function (id) {
-                        return context[id].role === 'label';
+                        return context[id].role === "label";
                     }));
                     output.push("</dl>");
                 });
@@ -192,7 +192,7 @@ var REPORT = (function () {
                     length += key.length;
                 });
                 output.push("\n*/\n");
-                return output.join('');
+                return output.join("");
             }
         }
     };
