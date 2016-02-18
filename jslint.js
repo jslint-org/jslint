@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-02-07
+// 2016-02-17
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -2043,7 +2043,7 @@ var jslint = (function JSLint() {
                     next_token,
                     (next_token.id === "`")
                         ? "\""
-                        : "use strict",
+                        : " \"use strict\"; ",
                     artifact(next_token)
                 );
             }
@@ -2884,6 +2884,10 @@ var jslint = (function JSLint() {
         advance(")", the_paren);
         if (next_token.id === "=>") {
             if (the_value.arity !== "variable") {
+                if (the_value.id === "{" || the_value.id === "[") {
+                    warn("expected_a_before_b", the_paren, "function", "(");
+                    return stop("expected_a_b", next_token, "{", "=>");
+                }
                 return stop("expected_identifier_a", the_value);
             }
             the_paren.expression = [the_value];
@@ -4522,7 +4526,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-02-07",
+            edition: "2016-02-17",
             functions: functions,
             global: global,
             id: "(JSLint)",
