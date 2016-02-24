@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-02-17
+// 2016-02-23
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -387,7 +387,7 @@ var jslint = (function JSLint() {
 // tab
     var rx_tab = /\t/g;
 // directive
-    var rx_directive = /^(jslint|property|global)\s*(.*)$/;
+    var rx_directive = /^(jslint|property|global)\s+(.*)$/;
     var rx_directive_part = /^([a-zA-Z$_][a-zA-Z0-9$_]*)\s*(?::\s*(true|false|[0-9]+)\s*)?(?:,\s*)?(.*)$/;
 // token (sorry it is so long)
     var rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\]\?,:;'"~`]|=(?:==?|>)?|\.+|\/[=*\/]?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|[\^%]=?|&[&=]?|\|[\|=]?|>{1,3}=?|<<?=?|!={0,2}|(0|[1-9][0-9]*))(.*)$/;
@@ -2041,9 +2041,7 @@ var jslint = (function JSLint() {
                 warn(
                     "expected_a_before_b",
                     next_token,
-                    (next_token.id === "`")
-                        ? "\""
-                        : " \"use strict\"; ",
+                    " \"use strict\"; ",
                     artifact(next_token)
                 );
             }
@@ -4526,7 +4524,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-02-17",
+            edition: "2016-02-23",
             functions: functions,
             global: global,
             id: "(JSLint)",
