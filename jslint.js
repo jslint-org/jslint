@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-02-25
+// 2016-02-26
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -554,7 +554,7 @@ var jslint = (function JSLint() {
         if (the_token === undefined) {
             the_token = next_token;
         }
-        the_token.warning = undefined;
+        delete the_token.warning;
         throw warn(code, the_token, a, b, c, d);
     }
 
@@ -2163,6 +2163,7 @@ var jslint = (function JSLint() {
 // Make a constant symbol.
 
         var the_symbol = symbol(id);
+        the_symbol.constant = true;
         the_symbol.nud = (typeof value === "function")
             ? value
             : function () {
@@ -3810,7 +3811,7 @@ var jslint = (function JSLint() {
         if (thing.expression.new) {
             thing.new = true;
         }
-    })
+    });
     preaction("statement", "{", function (thing) {
         block_stack.push(blockage);
         blockage = thing;
@@ -3856,6 +3857,7 @@ var jslint = (function JSLint() {
 // operator can do this. A = token keeps that variable (or array of variables
 // in case of destructuring) in its name property.
 
+        var lvalue = thing.expression[0];
         if (thing.id === "=") {
             if (thing.names !== undefined) {
                 if (Array.isArray(thing.names)) {
@@ -3863,13 +3865,39 @@ var jslint = (function JSLint() {
                 } else {
                     init_variable(thing.names);
                 }
+            } else {
+                if (
+                    lvalue.id === "." &&
+                    thing.expression[1].id === "undefined"
+                ) {
+                    warn(
+                        "expected_a_b",
+                        lvalue.expression,
+                        "delete",
+                        "undefined"
+                    );
+                }
             }
         } else {
-            var lvalue = thing.expression[0];
             if (lvalue.arity === "variable") {
                 if (!lvalue.variable || lvalue.variable.writable !== true) {
                     warn("bad_assignment_a", lvalue);
                 }
+            }
+            var right = syntax[thing.expression[1].id];
+            if (
+                right !== undefined &&
+                (
+                    right.id === "function" ||
+                    right.id === "=>" ||
+                    (
+                        right.constant &&
+                        right.id !== "(number)" &&
+                        (right.id !== "(string)" || thing.id !== "+=")
+                    )
+                )
+            ) {
+                warn("unexpected_a", thing.expression[1]);
             }
         }
     });
@@ -4544,7 +4572,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-02-25",
+            edition: "2016-02-26",
             functions: functions,
             global: global,
             id: "(JSLint)",
