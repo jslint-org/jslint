@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-02-23
+// 2016-02-25
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -402,6 +402,8 @@ var jslint = (function JSLint() {
     var rx_dot = /\.$/;
 // JSON number
     var rx_JSON_number = /^-?\d+(?:\.\d*)?(?:e[\-+]?\d+)?$/i;
+// initial cap
+    var rx_cap = /^[A-Z]/;
 
     function is_letter(string) {
         return (string >= "a" && string <= "z\uffff") ||
@@ -3804,6 +3806,11 @@ var jslint = (function JSLint() {
     preaction("binary", "instanceof", function (thing) {
         warn("unexpected_a", thing);
     });
+    preaction("binary", ".", function (thing) {
+        if (thing.expression.new) {
+            thing.new = true;
+        }
+    })
     preaction("statement", "{", function (thing) {
         block_stack.push(blockage);
         blockage = thing;
@@ -3945,8 +3952,21 @@ var jslint = (function JSLint() {
     });
     postaction("binary", "=>", postaction_function);
     postaction("binary", "(", function (thing) {
-        if (!thing.wrapped && thing.expression[0].id === "function") {
-            warn("wrap_immediate", thing);
+        var left = thing.expression[0];
+        if (left.id === "function") {
+            if (!thing.wrapped) {
+                warn("wrap_immediate", thing);
+            }
+        } else if (left.id === ".") {
+            if (rx_cap.test(left.name.id)) {
+                if (!left.expression.new) {
+                    warn("expected_a_b", left, "new", left.id);
+                }
+            } else {
+                if (left.expression.new) {
+                    warn("unexpected_a", left.expression, "new");
+                }
+            }
         }
     });
     postaction("binary", "[", function (thing) {
@@ -4524,7 +4544,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-02-23",
+            edition: "2016-02-25",
             functions: functions,
             global: global,
             id: "(JSLint)",
