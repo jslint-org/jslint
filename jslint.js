@@ -1285,7 +1285,7 @@ var jslint = (function JSLint() {
             case "'":
                 return string(snippet);
 
-// The token is a megastring. We don't allow any kind if mega nesting.
+// The token is a megastring. We don't allow any kind of mega nesting.
 
             case "`":
                 if (mega_mode) {
