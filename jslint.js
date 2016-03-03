@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-02-26
+// 2016-03-03
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -760,7 +760,7 @@ var jslint = (function JSLint() {
 
 // Directives must appear before the first statement.
 
-            if (id !== "(comment)") {
+            if (id !== "(comment)" && id !== ";") {
                 directive_mode = false;
             }
 
@@ -4143,7 +4143,9 @@ var jslint = (function JSLint() {
         }
 
         function no_space_only() {
-            if (left.line !== right.line || left.thru !== right.from) {
+            if (left.id !== "(global)" && (
+                left.line !== right.line || left.thru !== right.from
+            )) {
                 warn(
                     "unexpected_space_a_b",
                     right,
@@ -4572,7 +4574,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-02-26",
+            edition: "2016-03-03",
             functions: functions,
             global: global,
             id: "(JSLint)",
