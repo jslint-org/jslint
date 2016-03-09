@@ -4595,4 +4595,4 @@ var jslint = (function JSLint() {
     };
 }());
 
-/*node module.exports = jslint;*/
+module.exports = jslint;
