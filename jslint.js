@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-03-03
+// 2016-03-20
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -3986,13 +3986,22 @@ var jslint = (function JSLint() {
                 warn("wrap_immediate", thing);
             }
         } else if (left.id === ".") {
-            if (rx_cap.test(left.name.id)) {
-                if (!left.expression.new) {
-                    warn("expected_a_b", left, "new", left.id);
-                }
-            } else {
-                if (left.expression.new) {
+            var newflag = left.expression.new === true;
+            var flip = false;
+            if (left.expression.id === "Date" && left.name.id === "UTC") {
+                newflag = !newflag;
+                flip = true;
+            }
+            if (rx_cap.test(left.name.id) !== newflag) {
+                if (flip) {
                     warn("unexpected_a", left.expression, "new");
+                } else {
+                    warn(
+                        "expected_a_before_b",
+                        left.expression,
+                        "new",
+                        left.expression.id
+                    );
                 }
             }
         }
@@ -4235,7 +4244,7 @@ var jslint = (function JSLint() {
 
 // If left is an opener and right is not the closer, then push the previous
 // state. If the token following the opener is on the next line, then this is
-// an open form. If the tokens are on different lines, then it is a closed for.
+// an open form. If the tokens are on different lines, then it is a closed form.
 // Open form is more readable, with each item (statement, argument, parameter,
 // etc) starting on its own line. Closed form is more compact. Statement blocks
 // are always in open form.
@@ -4292,7 +4301,7 @@ var jslint = (function JSLint() {
                     }
                 } else {
 
-// If right is a closer, then pop the previous state,
+// If right is a closer, then pop the previous state.
 
                     if (right.id === closer) {
                         var previous = stack.pop();
@@ -4346,7 +4355,11 @@ var jslint = (function JSLint() {
                                 margin -= 4 * result[2].length;
                             }
                             at_margin(0);
-                        } else if (right.arity === "binary" && right.id === "(" && free) {
+                        } else if (
+                            right.arity === "binary" &&
+                            right.id === "(" &&
+                            free
+                        ) {
                             no_space();
                         } else if (
                             left.id === "." ||
@@ -4574,7 +4587,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-03-03",
+            edition: "2016-03-20",
             functions: functions,
             global: global,
             id: "(JSLint)",
