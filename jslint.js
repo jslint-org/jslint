@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-03-25
+// 2016-04-06
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -3991,13 +3991,12 @@ var jslint = (function JSLint() {
             }
         } else if (left.id === ".") {
             var newflag = left.expression.new === true;
-            var flip = false;
+            var cack = newflag;
             if (left.expression.id === "Date" && left.name.id === "UTC") {
-                newflag = !newflag;
-                flip = true;
+                cack = !cack;
             }
-            if (rx_cap.test(left.name.id) !== newflag) {
-                if (flip) {
+            if (rx_cap.test(left.name.id) !== cack) {
+                if (newflag) {
                     warn("unexpected_a", left.expression, "new");
                 } else {
                     warn(
@@ -4591,7 +4590,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-03-25",
+            edition: "2016-04-06",
             functions: functions,
             global: global,
             id: "(JSLint)",
