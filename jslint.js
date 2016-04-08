@@ -844,14 +844,22 @@ var jslint = (function JSLint() {
                             option[name] = false;
                             break;
                         default:
-                            warn("bad_option_a", the_comment, name + ":" + value);
+                            warn(
+                                "bad_option_a",
+                                the_comment,
+                                name + ":" + value
+                            );
                         }
                         break;
                     case "number":
                         if (isFinite(+value)) {
                             option[name] = +value;
                         } else {
-                            warn("bad_option_a", the_comment, name + ":" + value);
+                            warn(
+                                "bad_option_a",
+                                the_comment,
+                                name + ":" + value
+                            );
                         }
                         break;
                     default:
@@ -979,7 +987,12 @@ var jslint = (function JSLint() {
                     if (char === "-") {
                         next_char("-");
                         if (!subklass()) {
-                            return stop_at("unexpected_a", line, column - 1, "-");
+                            return stop_at(
+                                "unexpected_a",
+                                line,
+                                column - 1,
+                                "-"
+                            );
                         }
                     }
                     return range();
@@ -1250,7 +1263,12 @@ var jslint = (function JSLint() {
 // result[5] rest
 
             if (!result) {
-                return stop_at("unexpected_char_a", line, column, source_line.charAt(0));
+                return stop_at(
+                    "unexpected_char_a",
+                    line,
+                    column,
+                    source_line.charAt(0)
+                );
             }
 
             snippet = result[1];
@@ -1870,13 +1888,17 @@ var jslint = (function JSLint() {
             case "unary":
                 return are_similar(a.expression, b.expression);
             case "binary":
-                return a.id !== "(" &&
-                        are_similar(a.expression[0], b.expression[0]) &&
-                        are_similar(a.expression[1], b.expression[1]);
+                return (
+                    a.id !== "(" &&
+                    are_similar(a.expression[0], b.expression[0]) &&
+                    are_similar(a.expression[1], b.expression[1])
+                );
             case "ternary":
-                return are_similar(a.expression[0], b.expression[0]) &&
-                        are_similar(a.expression[1], b.expression[1]) &&
-                        are_similar(a.expression[2], b.expression[2]);
+                return (
+                    are_similar(a.expression[0], b.expression[0]) &&
+                    are_similar(a.expression[1], b.expression[1]) &&
+                    are_similar(a.expression[2], b.expression[2])
+                );
             case "function":
             case "regexp":
                 return false;
@@ -2802,7 +2824,10 @@ var jslint = (function JSLint() {
 // The function's body is a block.
 
         the_function.block = block("body");
-        if (the_function.arity === "statement" && next_token.line === token.line) {
+        if (
+            the_function.arity === "statement" &&
+            next_token.line === token.line
+        ) {
             return stop("unexpected_a", next_token);
         }
         if (next_token.id === "." || next_token.id === "[") {
@@ -3437,7 +3462,12 @@ var jslint = (function JSLint() {
         }
         the_try.disrupt = the_disrupt;
         if (!clause) {
-            warn("expected_a_before_b", next_token, "catch", artifact(next_token));
+            warn(
+                "expected_a_before_b",
+                next_token,
+                "catch",
+                artifact(next_token)
+            );
         }
         return the_try;
     });
@@ -4374,7 +4404,10 @@ var jslint = (function JSLint() {
                                 right.id === "(" ||
                                 right.id === "["
                             )) ||
-                            (right.arity === "function" && left.id !== "function")
+                            (
+                                right.arity === "function" &&
+                                left.id !== "function"
+                            )
                         ) {
                             no_space_only();
                         } else if (right.id === ".") {
