@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-04-08
+// 2016-04-23
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1303,7 +1303,7 @@ var jslint = (function JSLint() {
             case "'":
                 return string(snippet);
 
-// The token is a megastring. We don't allow any kind if mega nesting.
+// The token is a megastring. We don't allow any kind of mega nesting.
 
             case "`":
                 if (mega_mode) {
@@ -4624,7 +4624,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-04-08",
+            edition: "2016-04-23",
             functions: functions,
             global: global,
             id: "(JSLint)",
