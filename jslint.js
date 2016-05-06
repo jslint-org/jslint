@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-04-23
+// 2016-05-05
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -2406,52 +2406,10 @@ var jslint = (function JSLint() {
         if (left.id !== "function") {
             left_check(left, the_paren);
         }
-        the_paren.expression = [left];
-        if (left.identifier) {
-            if (left.new) {
-                if (
-                    left.id.charAt(0) > "Z" ||
-                    left.id === "Boolean" ||
-                    left.id === "Number" ||
-                    left.id === "String" ||
-                    (left.id === "Symbol" && option.es6)
-                ) {
-                    warn("unexpected_a", left, "new");
-                } else if (left.id === "Function") {
-                    if (!option.eval) {
-                        warn("unexpected_a", left, "new Function");
-                    }
-                } else if (left.id === "Array") {
-                    warn("expected_a_b", left, "[]", "new Array");
-                } else if (left.id === "Object") {
-                    warn(
-                        "expected_a_b",
-                        left,
-                        "Object.create(null)",
-                        "new Object"
-                    );
-                }
-            } else {
-                if (
-                    left.id.charAt(0) >= "A" &&
-                    left.id.charAt(0) <= "Z" &&
-                    left.id !== "Boolean" &&
-                    left.id !== "Number" &&
-                    left.id !== "String" &&
-                    left.id !== "Symbol"
-                ) {
-                    warn(
-                        "expected_a_before_b",
-                        left,
-                        "new",
-                        artifact(left)
-                    );
-                }
-                if (functionage.arity === "statement") {
-                    functionage.name.calls[left.id] = left;
-                }
-            }
+        if (functionage.arity === "statement" && left.identifier) {
+            functionage.name.calls[left.id] = left;
         }
+        the_paren.expression = [left];
         if (next_token.id !== ")") {
             (function next() {
                 var ellipsis;
@@ -2611,10 +2569,17 @@ var jslint = (function JSLint() {
     });
     prefix("new", function () {
         var the_new = token;
-        next_token.new = true;
-        the_new.expression = expression(150);
+        var right = expression(150);
+        var ori;
+        the_new.expression = right;
         if (the_new.expression.id !== "(") {
             warn("expected_a_before_b", next_token, "()", artifact(next_token));
+        } else {
+            right.new = true;
+            ori = right.expression[0];
+            if (ori.identifier !== true && ori.id !== ".") {
+                warn("unexpected_a", the_new);
+            }
         }
         return the_new;
     });
@@ -4016,12 +3981,53 @@ var jslint = (function JSLint() {
     postaction("binary", "=>", postaction_function);
     postaction("binary", "(", function (thing) {
         var left = thing.expression[0];
+        var newflag = thing.new === true;
         if (left.id === "function") {
             if (!thing.wrapped) {
                 warn("wrap_immediate", thing);
             }
+        } else if (left.identifier) {
+            if (newflag) {
+                if (
+                    left.id.charAt(0) > "Z" ||
+                    left.id === "Boolean" ||
+                    left.id === "Number" ||
+                    left.id === "String" ||
+                    (left.id === "Symbol" && option.es6)
+                ) {
+                    warn("unexpected_a", left, "new");
+                } else if (left.id === "Function") {
+                    if (!option.eval) {
+                        warn("unexpected_a", left, "new Function");
+                    }
+                } else if (left.id === "Array") {
+                    warn("expected_a_b", left, "[]", "new Array");
+                } else if (left.id === "Object") {
+                    warn(
+                        "expected_a_b",
+                        left,
+                        "Object.create(null)",
+                        "new Object"
+                    );
+                }
+            } else {
+                if (
+                    left.id.charAt(0) >= "A" &&
+                    left.id.charAt(0) <= "Z" &&
+                    left.id !== "Boolean" &&
+                    left.id !== "Number" &&
+                    left.id !== "String" &&
+                    left.id !== "Symbol"
+                ) {
+                    warn(
+                        "expected_a_before_b",
+                        left,
+                        "new",
+                        artifact(left)
+                    );
+                }
+            }
         } else if (left.id === ".") {
-            var newflag = left.expression.new === true;
             var cack = newflag;
             if (left.expression.id === "Date" && left.name.id === "UTC") {
                 cack = !cack;
@@ -4034,7 +4040,7 @@ var jslint = (function JSLint() {
                         "expected_a_before_b",
                         left.expression,
                         "new",
-                        left.expression.id
+                        left.name.id
                     );
                 }
             }
@@ -4624,7 +4630,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-04-23",
+            edition: "2016-05-05",
             functions: functions,
             global: global,
             id: "(JSLint)",
