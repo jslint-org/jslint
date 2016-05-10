@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-05-05
+// 2016-05-08
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -90,14 +90,14 @@
     couch, create, d, dead, devel, directive, directives, disrupt, dot,
     duplicate_a, edition, ellipsis, else, empty_block, es6, eval, every,
     expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d,
-    expected_a_before_b, expected_digits_after_a, expected_four_digits,
-    expected_identifier_a, expected_line_break_a_b, expected_regexp_factor_a,
-    expected_space_a_b, expected_statements_a, expected_string_a,
-    expected_type_string_a, expression, extra, flag, for, forEach, free, from,
-    fud, fudge, function, function_in_loop, functions, g, global, i, id,
-    identifier, import, imports, inc, indexOf, infix_in, init, initial,
-    isArray, isNaN, join, json, keys, label, label_a, lbp, led, length, level,
-    line, lines, live, loop, m, margin, match, maxerr, maxlen, message,
+    expected_a_before_b, expected_a_with_b, expected_digits_after_a,
+    expected_four_digits, expected_identifier_a, expected_line_break_a_b,
+    expected_regexp_factor_a, expected_space_a_b, expected_statements_a,
+    expected_string_a, expected_type_string_a, expression, extra, flag, for,
+    forEach, free, from, fud, fudge, function, function_in_loop, functions, g,
+    global, i, id, identifier, import, imports, inc, indexOf, infix_in, init,
+    initial, isArray, isNaN, join, json, keys, label, label_a, lbp, led, length,
+    level, line, lines, live, loop, m, margin, match, maxerr, maxlen, message,
     misplaced_a, misplaced_directive_a, missing_browser, module, multivar,
     naked_block, name, names, nested_comment, new, node, not_label_a, nud, ok,
     open, option, out_of_scope_a, parameters, pop, property, push, qmark,
@@ -113,8 +113,8 @@
     unreachable_a, unregistered_property_a, unsafe, unused_a, use_spaces, used,
     value, var_loop, var_switch, variable, warning, warnings,
     weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
-    wrap_assignment, wrap_condition, wrap_immediate, wrap_regexp, wrap_unary,
-    wrapped, writable, y
+    wrap_assignment, wrap_condition, wrap_immediate, wrap_new, wrap_regexp,
+    wrap_unary, wrapped, writable, y
 */
 
 var jslint = (function JSLint() {
@@ -299,6 +299,7 @@ var jslint = (function JSLint() {
         expected_a_b: "Expected '{a}' and instead saw '{b}'.",
         expected_a_b_from_c_d: "Expected '{a}' to match '{b}' from line {c} and instead saw '{d}'.",
         expected_a_before_b: "Expected '{a}' before '{b}'.",
+        expected_a_with_b: "Expected '{a}' with '{b}'.",
         expected_digits_after_a: "Expected digits after '{a}'.",
         expected_four_digits: "Expected four digits after '\\u'.",
         expected_identifier_a: "Expected an identifier and instead saw '{a}'.",
@@ -361,6 +362,7 @@ var jslint = (function JSLint() {
                 "parentheses to assist the reader in understanding that the " +
                 "expression is the result of a function, and not the " +
                 "function itself.",
+        wrap_new: "Wrap the 'new' expression in parens.",
         wrap_regexp: "Wrap this regexp in parens to avoid confusion.",
         wrap_unary: "Wrap the unary expression in parens."
     };
@@ -2569,18 +2571,9 @@ var jslint = (function JSLint() {
     });
     prefix("new", function () {
         var the_new = token;
-        var right = expression(150);
-        var ori;
+        var right = expression(140);
+        right.new = true;
         the_new.expression = right;
-        if (the_new.expression.id !== "(") {
-            warn("expected_a_before_b", next_token, "()", artifact(next_token));
-        } else {
-            right.new = true;
-            ori = right.expression[0];
-            if (ori.identifier !== true && ori.id !== ".") {
-                warn("unexpected_a", the_new);
-            }
-        }
         return the_new;
     });
     prefix("typeof");
@@ -3832,6 +3825,45 @@ var jslint = (function JSLint() {
     preaction("statement", "function", preaction_function);
     preaction("unary", "~", bitwise_check);
     preaction("unary", "function", preaction_function);
+    preaction("unary", "new", function (thing) {
+        var par = true;
+        var right = thing.expression;
+        if (right.id !== "(") {
+            right = thing;
+            par = false;
+        } else {
+            var x = right.expression[0];
+            if (x.id === "." && x.name.id === "getTime") {
+                var y = x.expression;
+                if (
+                    y.id === "(" &&
+                    y.expression[0].id === "Date" &&
+                    y.expression.length === 1
+                ) {
+                    stop("expected_a_b", thing, "Date.now()", "new Date().getTime()");
+                }
+            }
+        }
+        while (true) {
+            right = right.expression;
+            if (Array.isArray(right)) {
+                right = right[0];
+            }
+            if (right.identifier) {
+                break;
+            }
+            if (right.id === "(") {
+                stop("wrap_new", thing);
+                break;
+            }
+            if (right.id !== ".") {
+                warn("weird_expression_a", right);
+            }
+        }
+        if (!par) {
+            warn("expected_a_with_b", thing, "()", "new");
+        }
+    });
     preaction("variable", function (thing) {
         var the_variable = lookup(thing);
         if (the_variable !== undefined) {
@@ -4630,7 +4662,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-05-05",
+            edition: "2016-05-08",
             functions: functions,
             global: global,
             id: "(JSLint)",
