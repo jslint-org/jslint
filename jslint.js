@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-05-08
+// 2016-05-09
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -2571,8 +2571,10 @@ var jslint = (function JSLint() {
     });
     prefix("new", function () {
         var the_new = token;
-        var right = expression(140);
-        right.new = true;
+        var right = expression(160);
+        if (next_token.id !== "(") {
+            warn("expected_a_before_b", next_token, "()", artifact(next_token));
+        }
         the_new.expression = right;
         return the_new;
     });
@@ -3825,45 +3827,6 @@ var jslint = (function JSLint() {
     preaction("statement", "function", preaction_function);
     preaction("unary", "~", bitwise_check);
     preaction("unary", "function", preaction_function);
-    preaction("unary", "new", function (thing) {
-        var par = true;
-        var right = thing.expression;
-        if (right.id !== "(") {
-            right = thing;
-            par = false;
-        } else {
-            var x = right.expression[0];
-            if (x.id === "." && x.name.id === "getTime") {
-                var y = x.expression;
-                if (
-                    y.id === "(" &&
-                    y.expression[0].id === "Date" &&
-                    y.expression.length === 1
-                ) {
-                    stop("expected_a_b", thing, "Date.now()", "new Date().getTime()");
-                }
-            }
-        }
-        while (true) {
-            right = right.expression;
-            if (Array.isArray(right)) {
-                right = right[0];
-            }
-            if (right.identifier) {
-                break;
-            }
-            if (right.id === "(") {
-                stop("wrap_new", thing);
-                break;
-            }
-            if (right.id !== ".") {
-                warn("weird_expression_a", right);
-            }
-        }
-        if (!par) {
-            warn("expected_a_with_b", thing, "()", "new");
-        }
-    });
     preaction("variable", function (thing) {
         var the_variable = lookup(thing);
         if (the_variable !== undefined) {
@@ -4013,13 +3976,17 @@ var jslint = (function JSLint() {
     postaction("binary", "=>", postaction_function);
     postaction("binary", "(", function (thing) {
         var left = thing.expression[0];
-        var newflag = thing.new === true;
+        var the_new;
+        if (left.id === "new") {
+            the_new = left;
+            left = left.expression;
+        }
         if (left.id === "function") {
             if (!thing.wrapped) {
                 warn("wrap_immediate", thing);
             }
         } else if (left.identifier) {
-            if (newflag) {
+            if (the_new !== undefined) {
                 if (
                     left.id.charAt(0) > "Z" ||
                     left.id === "Boolean" ||
@@ -4027,7 +3994,7 @@ var jslint = (function JSLint() {
                     left.id === "String" ||
                     (left.id === "Symbol" && option.es6)
                 ) {
-                    warn("unexpected_a", left, "new");
+                    warn("unexpected_a", the_new);
                 } else if (left.id === "Function") {
                     if (!option.eval) {
                         warn("unexpected_a", left, "new Function");
@@ -4060,13 +4027,13 @@ var jslint = (function JSLint() {
                 }
             }
         } else if (left.id === ".") {
-            var cack = newflag;
+            var cack = the_new !== undefined;
             if (left.expression.id === "Date" && left.name.id === "UTC") {
                 cack = !cack;
             }
             if (rx_cap.test(left.name.id) !== cack) {
-                if (newflag) {
-                    warn("unexpected_a", left.expression, "new");
+                if (the_new !== undefined) {
+                    warn("unexpected_a", the_new);
                 } else {
                     warn(
                         "expected_a_before_b",
@@ -4662,7 +4629,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-05-08",
+            edition: "2016-05-09",
             functions: functions,
             global: global,
             id: "(JSLint)",
