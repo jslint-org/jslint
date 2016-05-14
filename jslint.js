@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-05-10
+// 2016-05-13
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -2048,7 +2048,6 @@ var jslint = (function JSLint() {
         the_block.body = special === "body";
 
 // All top level function bodies should include the "use strict" pragma unless
-// the whole file is strict.
 
         if (the_block.body && stack.length <= 1 && !global.strict) {
             if (
@@ -2059,7 +2058,7 @@ var jslint = (function JSLint() {
                 functionage.strict = true;
                 advance("(string)");
                 advance(";");
-            } else {
+            } else if (!module_mode) {
                 warn(
                     "expected_a_before_b",
                     next_token,
@@ -4642,7 +4641,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-05-10",
+            edition: "2016-05-13",
             functions: functions,
             global: global,
             id: "(JSLint)",
