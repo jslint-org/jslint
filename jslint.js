@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-05-13
+// 2016-05-15
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -99,18 +99,18 @@
     length, level, line, lines, live, loop, m, margin, match, maxerr, maxlen,
     message, misplaced_a, misplaced_directive_a, missing_browser, module,
     multivar, naked_block, name, names, nested_comment, new, node, not_label_a,
-    nud, ok, open, option, out_of_scope_a, parameters, pop, property, push,
-    qmark, quote, redefinition_a_b, replace, reserved_a, role, search,
-    signature, slice, some, sort, split, statement, stop, strict, subscript_a,
-    switch, test, this, thru, toString, todo_comment, tokens, too_long,
-    too_many, too_many_digits, tree, type, u, unclosed_comment, unclosed_mega,
-    unclosed_string, undeclared_a, unexpected_a, unexpected_a_after_b,
-    unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
-    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
-    unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
-    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
-    unreachable_a, unregistered_property_a, unsafe, unused_a, use_spaces, used,
-    value, var_loop, var_switch, variable, warning, warnings,
+    nud, number_isNaN, ok, open, option, out_of_scope_a, parameters, pop,
+    property, push, qmark, quote, redefinition_a_b, replace, reserved_a, role,
+    search, signature, slice, some, sort, split, statement, stop, strict,
+    subscript_a, switch, test, this, thru, toString, todo_comment, tokens,
+    too_long, too_many, too_many_digits, tree, type, u, unclosed_comment,
+    unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
+    unexpected_a_after_b, unexpected_at_top_level_a, unexpected_char_a,
+    unexpected_comment, unexpected_directive_a, unexpected_expression_a,
+    unexpected_label_a, unexpected_parens, unexpected_space_a_b,
+    unexpected_statement_a, unexpected_trailing_space, unexpected_typeof_a,
+    uninitialized_a, unreachable_a, unregistered_property_a, unsafe, unused_a,
+    use_spaces, used, value, var_loop, var_switch, variable, warning, warnings,
     weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
     wrap_assignment, wrap_condition, wrap_immediate, wrap_regexp, wrap_unary,
     wrapped, writable, y
@@ -268,7 +268,7 @@ var jslint = (function JSLint() {
 
         "Array", "Boolean", "Date", "decodeURI", "decodeURIComponent",
         "encodeURI", "encodeURIComponent", "Error", "EvalError", "isFinite",
-        "isNaN", "JSON", "Math", "Number", "Object", "parseInt", "parseFloat",
+        "JSON", "Math", "Number", "Object", "parseInt", "parseFloat",
         "RangeError", "ReferenceError", "RegExp", "String", "SyntaxError",
         "TypeError", "URIError"
     ];
@@ -316,6 +316,7 @@ var jslint = (function JSLint() {
         naked_block: "Naked block.",
         nested_comment: "Nested comment.",
         not_label_a: "'{a}' is not a label.",
+        number_isNaN: "Use Number.isNaN function to compare with NaN.",
         out_of_scope_a: "'{a}' is out of scope.",
         redefinition_a_b: "Redefinition of '{a}' from line {b}.",
         reserved_a: "Reserved name '{a}'.",
@@ -1615,7 +1616,7 @@ var jslint = (function JSLint() {
                     if (object[token.value] !== undefined) {
                         warn("duplicate_a", token);
                     } else if (token.value === "__proto__") {
-                        warn("bad_property_name_a", token);
+                        warn("bad_property_a", token);
                     } else {
                         object[token.value] = token;
                     }
@@ -2048,6 +2049,7 @@ var jslint = (function JSLint() {
         the_block.body = special === "body";
 
 // All top level function bodies should include the "use strict" pragma unless
+// the whole file is strict or the file is a module.
 
         if (the_block.body && stack.length <= 1 && !global.strict) {
             if (
@@ -2350,6 +2352,12 @@ var jslint = (function JSLint() {
         return token;
     });
     constant("Infinity", "number", Infinity);
+    constant("isNaN", "function", function () {
+        if (option.es6) {
+            warn("expected_a_b", token, "Number.isNaN", "isNaN");
+        }
+        return token;
+    });
     constant("NaN", "number", NaN);
     constant("null", "null", null);
     constant("this", "object", function () {
@@ -3728,7 +3736,11 @@ var jslint = (function JSLint() {
             var left = thing.expression[0];
             var right = thing.expression[1];
             if (left.id === "NaN" || right.id === "NaN") {
-                warn("isNaN", thing);
+                if (option.es6) {
+                    warn("number_isNaN", thing);
+                } else {
+                    warn("isNaN", thing);
+                }
             } else if (left.id === "typeof") {
                 if (right.id !== "(string)") {
                     if (right.id !== "typeof") {
@@ -4641,7 +4653,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-05-13",
+            edition: "2016-05-15",
             functions: functions,
             global: global,
             id: "(JSLint)",
