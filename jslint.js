@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-05-15
+// 2016-05-17
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -374,6 +374,7 @@ var jslint = (function JSLint() {
     var rx_unsafe = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/;
 // identifier
     var rx_identifier = /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/;
+    var rx_module = /^[a-zA-Z0-9_$:.@\/]+$/;
     var rx_bad_property = /^_|\$|Sync$|_$/;
 // star slash
     var rx_star_slash = /\*\//;
@@ -3260,26 +3261,47 @@ var jslint = (function JSLint() {
     });
     stmt("import", function () {
         var the_import = token;
+        var name;
         if (!option.es6) {
             warn("es6", the_import);
         } else if (typeof module_mode === "object") {
             warn("unexpected_directive_a", module_mode, module_mode.directive);
         }
         module_mode = true;
-        if (!next_token.identifier) {
-            return stop("expected_identifier_a");
+        if (next_token.identifier) {
+            name = next_token;
+            advance();
+            if (name.id === "ignore") {
+                warn("unexpected_a", name);
+            }
+            enroll(name, "variable", true);
+            the_import.name = name;
+        } else {
+            var names = [];
+            advance("{");
+            while (true) {
+                if (!next_token.identifier) {
+                    stop("bad_identifier_a");
+                }
+                name = next_token;
+                advance();
+                if (name.id === "ignore") {
+                    warn("unexpected_a", name);
+                }
+                enroll(name, "variable", true);
+                names.push(name);
+                if (next_token.id !== ",") {
+                    break;
+                }
+                advance(",");
+            }
+            advance("}");
+            the_import.name = names;
         }
-        var name = next_token;
-        advance();
-        if (name.id === "ignore") {
-            warn("unexpected_a", name);
-        }
-        enroll(name, "variable", true);
         advance("from");
         advance("(string)");
         the_import.import = token;
-        the_import.name = name;
-        if (!rx_identifier.test(token.value)) {
+        if (!rx_module.test(token.value)) {
             warn("bad_module_name_a", token);
         }
         imports.push(token.value);
@@ -4086,9 +4108,17 @@ var jslint = (function JSLint() {
     postaction("statement", "function", postaction_function);
     postaction("statement", "import", function (the_thing) {
         var name = the_thing.name;
-        name.init = true;
-        name.dead = false;
-        blockage.live.push(name);
+        if (Array.isArray(name)) {
+            name.forEach(function (name) {
+                name.dead = false;
+                name.init = true;
+                blockage.live.push(name);
+            });
+        } else {
+            name.dead = false;
+            name.init = true;
+            blockage.live.push(name);
+        }
         return top_level_only(the_thing);
     });
     postaction("statement", "let", action_var);
@@ -4653,7 +4683,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-05-15",
+            edition: "2016-05-17",
             functions: functions,
             global: global,
             id: "(JSLint)",
