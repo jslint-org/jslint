@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-05-17
+// 2016-05-18
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -374,7 +374,6 @@ var jslint = (function JSLint() {
     var rx_unsafe = /[\u0000-\u001f\u007f-\u009f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/;
 // identifier
     var rx_identifier = /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/;
-    var rx_module = /^[a-zA-Z0-9_$:.@\/]+$/;
     var rx_bad_property = /^_|\$|Sync$|_$/;
 // star slash
     var rx_star_slash = /\*\//;
@@ -4683,7 +4682,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-05-17",
+            edition: "2016-05-18",
             functions: functions,
             global: global,
             id: "(JSLint)",
