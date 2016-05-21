@@ -549,7 +549,7 @@ var jslint = (function JSLint() {
 
 // Similar to warn and stop_at. If the token already had a warning, that
 // warning will be replaced with this new one. It is likely that the stopping
-// warning will be the most meaningful.
+// warning will be the more meaningful.
 
         if (the_token === undefined) {
             the_token = next_token;
