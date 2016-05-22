@@ -1,5 +1,5 @@
 // report.js
-// 2016-02-07
+// 2016-05-20
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Generate JSLint HTML reports.
@@ -41,9 +41,9 @@ var REPORT = (function () {
             }
             data.warnings.forEach(function (warning) {
                 output.push(
-                    "<cite><address>line ",
+                    "<cite><address>",
                     entityify(warning.line + fudge),
-                    " column ",
+                    ".",
                     entityify(warning.column + fudge),
                     "</address>",
                     entityify(warning.message),
@@ -102,7 +102,7 @@ var REPORT = (function () {
                     output.push(
                         "<dl class=level",
                         entityify(the_function.level),
-                        "><address>line ",
+                        "><address>",
                         entityify(the_function.line + fudge),
                         "</address><dfn>",
                         (the_function.name === "=>")
