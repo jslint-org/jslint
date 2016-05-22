@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-05-18
+// 2016-05-21
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1508,10 +1508,15 @@ var jslint = (function JSLint() {
             if (!rx_identifier.test(id)) {
                 return id;
             }
-        } else {
-            if (!name.identifier) {
-                return stop("expected_identifier_a", name);
+        } else if (id === "`") {
+            if (name.value.length === 1) {
+                id = name.value[0].value;
+                if (!rx_identifier.test(id)) {
+                    return id;
+                }
             }
+        } else if (!name.identifier) {
+            return stop("expected_identifier_a", name);
         }
 
 // If we have seen this name before, increment its count.
@@ -2481,14 +2486,11 @@ var jslint = (function JSLint() {
     infix("[", 170, function (left) {
         var the_token = token;
         var the_subscript = expression(0);
-        if (
-            the_subscript.id === "(string)" &&
-            rx_identifier.test(the_subscript.value)
-        ) {
-            warn("subscript_a", the_subscript);
-            survey(the_subscript);
-        } else if (the_subscript.id === "`") {
-            warn("unexpected_a", the_subscript);
+        if (the_subscript.id === "(string)" || the_subscript.id === "`") {
+            var name = survey(the_subscript);
+            if (rx_identifier.test(name)) {
+                warn("subscript_a", the_subscript, name);
+            }
         }
         left_check(left, the_token);
         the_token.expression = [left, the_subscript];
@@ -4683,7 +4685,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-05-18",
+            edition: "2016-05-21",
             functions: functions,
             global: global,
             id: "(JSLint)",
