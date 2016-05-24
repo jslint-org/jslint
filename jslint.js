@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-05-23
+// 2016-05-24
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -2066,7 +2066,7 @@ var jslint = (function JSLint() {
                 functionage.strict = true;
                 advance("(string)");
                 advance(";");
-            } else if (!module_mode) {
+            } else if (module_mode !== true) {
                 warn(
                     "expected_a_before_b",
                     next_token,
@@ -4687,7 +4687,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-05-23",
+            edition: "2016-05-24",
             functions: functions,
             global: global,
             id: "(JSLint)",
