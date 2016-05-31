@@ -56,6 +56,21 @@ if (configFilePath !== null) {
         process.exit(1);
     }
 
+    // note, this is a custom field(made up by me :P)
+    // bypass the ignored files in the given 'ignore' Array.
+    // be sure that it should be an `Array`!!
+    if (configObj.ignore) {
+        for (var i=0; i<configObj.ignore.length; i++) {
+            // this file need to be ignored.
+            if (jsFilePath.indexOf(configObj.ignore[i]) === 0) {
+                // console.log("This file has been ignored, check your
+                // .jslint.conf for more details.");
+                process.exit(0);
+            }
+        }
+    }
+
+
     try {
         // file path based on current working directory
         jsFileText = fs.readFileSync(jsFilePath, "utf-8");
