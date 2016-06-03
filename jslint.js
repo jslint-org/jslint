@@ -2699,6 +2699,7 @@ var jslint = (function JSLint() {
                         param.ellipsis = true;
                     } else {
                         if (next_token.id === "=") {
+                            complex = true;
                             if (!option.es6) {
                                 warn("es6");
                             }
