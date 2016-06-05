@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-06-03
+// 2016-06-04
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -86,7 +86,7 @@
     a, and, arity, b, bad_assignment_a, bad_directive_a, bad_get,
     bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
     body, browser, c, calls, catch, charAt, charCodeAt, closer, closure, code,
-    column, concat, constant, context, couch, create, d, dead, devel,
+    column, complex, concat, constant, context, couch, create, d, dead, devel,
     directive, directives, disrupt, dot, duplicate_a, edition, ellipsis, else,
     empty_block, es6, eval, every, expected_a_at_b_c, expected_a_b,
     expected_a_b_from_c_d, expected_a_before_b, expected_digits_after_a,
@@ -110,8 +110,8 @@
     unexpected_expression_a, unexpected_label_a, unexpected_parens,
     unexpected_space_a_b, unexpected_statement_a, unexpected_trailing_space,
     unexpected_typeof_a, uninitialized_a, unreachable_a,
-    unregistered_property_a, unsafe, unused_a, use_spaces, used, value,
-    var_loop, var_switch, variable, warning, warnings, weird_condition_a,
+    unregistered_property_a, unsafe, unused_a, use_spaces, use_strict, used,
+    value, var_loop, var_switch, variable, warning, warnings, weird_condition_a,
     weird_expression_a, weird_loop, weird_relation_a, white, wrap_assignment,
     wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary,
     wrapped, writable, y
@@ -349,6 +349,7 @@ var jslint = (function JSLint() {
         unsafe: "Unsafe character '{a}'.",
         unused_a: "Unused '{a}'.",
         use_spaces: "Use spaces, not tabs.",
+        use_strict: "This function needs a 'use strict' pragma.",
         var_loop: "Don't declare variables in a loop.",
         var_switch: "Don't declare variables in a switch.",
         weird_condition_a: "Weird condition '{a}'.",
@@ -2044,7 +2045,6 @@ var jslint = (function JSLint() {
 
 // Parse a block, a sequence of statements wrapped in braces.
 //  special "body"      The block is a function body.
-//          "strict"    The block is a function body with complex parameters.
 //          "ignore"    No warning on an empty block.
 //          "naked"     No advance.
 //          undefined   An ordinary block.
@@ -2056,33 +2056,21 @@ var jslint = (function JSLint() {
         }
         the_block = token;
         the_block.arity = "statement";
-        the_block.body = special === "body" || special === "strict";
+        the_block.body = special === "body";
 
 // All top level function bodies should include the "use strict" pragma unless
-// the whole file is strict or the file is a module.
+// the whole file is strict or the file is a module or the function parameters
+// use es6 syntax.
 
         if (
             special === "body" &&
-            stack.length <= 1 &&
-            !global.strict &&
-            !module_mode
+            stack.length === 1 &&
+            next_token.value === "use strict"
         ) {
-            if (
-                next_token.id === "(string)" ||
-                next_token.value === "use strict"
-            ) {
-                next_token.statement = true;
-                functionage.strict = true;
-                advance("(string)");
-                advance(";");
-            } else if (module_mode !== true) {
-                warn(
-                    "expected_a_before_b",
-                    next_token,
-                    " \"use strict\"; ",
-                    artifact(next_token)
-                );
-            }
+            the_block.strict = next_token;
+            next_token.statement = true;
+            advance("(string)");
+            advance(";");
         }
         stmts = statements();
         the_block.block = stmts;
@@ -2107,8 +2095,8 @@ var jslint = (function JSLint() {
 
         if (
             the_thing.id !== "." &&
-            (the_thing.id !== "[" || the_thing.arity !== "binary") &&
-            the_thing.arity !== "variable"
+            the_thing.arity !== "variable" &&
+            (the_thing.id !== "[" || the_thing.arity !== "binary")
         ) {
             warn("bad_assignment_a", the_thing);
             return false;
@@ -2791,6 +2779,7 @@ var jslint = (function JSLint() {
         var pl = parameter_list();
         functionage.parameters = pl[0];
         functionage.signature = pl[1];
+        functionage.complex = pl[2];
         functionage.parameters.forEach(function enroll_parameter(name) {
             if (name.identifier) {
                 enroll(name, "parameter", false);
@@ -2801,9 +2790,7 @@ var jslint = (function JSLint() {
 
 // The function's body is a block.
 
-        the_function.block = block(pl[2]
-            ? "strict"
-            : "body");
+        the_function.block = block("body");
         if (
             the_function.arity === "statement" &&
             next_token.line === token.line
@@ -2849,6 +2836,7 @@ var jslint = (function JSLint() {
         functionage = the_arrow;
         the_arrow.parameters = pl[0];
         the_arrow.signature = pl[1];
+        the_arrow.complex = true;
         the_arrow.parameters.forEach(function (name) {
             enroll(name, "parameter", true);
         });
@@ -3624,7 +3612,10 @@ var jslint = (function JSLint() {
                     }
                     break;
                 default:
-                    warn(thing.value === "use strict"
+                    warn((
+                        thing.id === "(string)" &&
+                        thing.value === "use strict"
+                    )
                         ? "unexpected_a"
                         : "unexpected_expression_a", thing);
                 }
@@ -3696,6 +3687,21 @@ var jslint = (function JSLint() {
     function preaction_function(thing) {
         if (thing.arity === "statement" && blockage.body !== true) {
             warn("unexpected_a", thing);
+        }
+        if (thing.level === 1) {
+            if (
+                module_mode === true ||
+                global.strict !== undefined ||
+                thing.complex
+            ) {
+                if (thing.block.strict !== undefined) {
+                    warn("unexpected_a", thing.block.strict);
+                }
+            } else {
+                if (thing.block.strict === undefined) {
+                    warn("use_strict", thing);
+                }
+            }
         }
         stack.push(functionage);
         block_stack.push(blockage);
@@ -4677,12 +4683,11 @@ var jslint = (function JSLint() {
 // If we are not in a browser, then the file form of strict pragma may be used.
 
                     if (
-                        next_token.id === "(string)" &&
                         next_token.value === "use strict"
                     ) {
+                        global.strict = next_token;
                         advance("(string)");
                         advance(";");
-                        global.strict = true;
                     }
                 }
                 tree = statements();
@@ -4709,7 +4714,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-06-03",
+            edition: "2016-06-04",
             functions: functions,
             global: global,
             id: "(JSLint)",
