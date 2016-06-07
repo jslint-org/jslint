@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-06-05
+// 2016-06-06
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -449,7 +449,6 @@ var jslint = (function JSLint() {
     var tokens;             // The array of tokens.
     var tenure;             // The predefined property registry.
     var tree;               // The abstract parse tree.
-    var vandelay;           // Export
     var var_mode;           // true if using var; false if using let.
     var warnings;           // The array collecting all generated warnings.
 
@@ -3178,7 +3177,6 @@ var jslint = (function JSLint() {
     });
     stmt("export", function () {
         var the_export = token;
-        vandelay = the_export;
         if (!option.es6) {
             warn("es6", the_export);
         }
@@ -3599,9 +3597,7 @@ var jslint = (function JSLint() {
                 thing.forEach(walk_statement);
             } else {
                 preamble(thing);
-                if (thing.id !== "export") {
-                    walk_expression(thing.expression);
-                }
+                walk_expression(thing.expression);
                 switch (thing.arity) {
                 case "statement":
                 case "assignment":
@@ -4646,7 +4642,6 @@ var jslint = (function JSLint() {
             tenure = undefined;
             token = global;
             token_nr = 0;
-            vandelay = undefined;
             var_mode = undefined;
             populate(declared_globals, standard, false);
             if (global_array !== undefined) {
@@ -4691,9 +4686,6 @@ var jslint = (function JSLint() {
                 advance("(end)");
                 functionage = global;
                 walk_statement(tree);
-                if (vandelay !== undefined) {
-                    walk_expression(vandelay.expression);
-                }
                 if (module_mode && global.strict !== undefined) {
                     warn("unexpected_a", global.strict);
                 }
@@ -4717,7 +4709,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-06-05",
+            edition: "2016-06-06",
             functions: functions,
             global: global,
             id: "(JSLint)",
