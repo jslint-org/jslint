@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-06-06
+// 2016-06-07
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,7 +22,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// jslint is a function that takes 3 arguments:
+// jslint(source, option_object, global_array) is a function that takes 3
+// arguments. The second two arguments are optional.
 
 //      source          A text to analyze, a string or an array of strings.
 //      option_object   An object whose keys correspond to option names.
@@ -2688,7 +2689,7 @@ var jslint = (function JSLint() {
                         if (next_token.id === "=") {
                             complex = true;
                             if (!option.es6) {
-                                warn("es6");
+                                stop("unexpected_a");
                             }
                             advance("=");
                             param.expression = expression(0);
@@ -4709,7 +4710,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-06-06",
+            edition: "2016-06-07",
             functions: functions,
             global: global,
             id: "(JSLint)",
