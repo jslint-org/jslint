@@ -134,20 +134,9 @@ ins {
 #JSLINT_ textarea {
     background-color: white;
     border: 0;
-    color: black;
     font-family: monospace;
     font-size: 90%;
-    margin: 2%;
-    overflow: auto;
-    padding-left: 0.5em;
-    white-space: pre;
-    width: 95%;
-}
-
-#JSLINT_ textarea[readonly] {
-    background-color: honeydew;
-    border: 0;
-    white-space: pre;
+    resize: none;
 }
 
 #JSLINT_ textarea::selection {
@@ -155,9 +144,44 @@ ins {
     color: black;
 }
 
+#JSLINT_NUMBER {
+    color: darkgray;
+    display: inline-block;
+    height: 4in;
+    margin: 2%;
+    margin-right: 0;
+    overflow: hidden;
+    padding-right: 0.5%;
+    text-align: right;
+    white-space: pre;
+    width: 4%;
+}
+
+#JSLINT_SOURCE {
+    color: black;
+    display: inline-block;
+    height: 4in;
+    margin: 2%;
+    margin-left: 0;
+    margin-right: 0;
+    overflow: auto;
+    padding-left: 0.5%;
+    white-space: pre;
+    width: 91%;
+}
+
+#JSLINT_PROPERTY {
+    background-color: honeydew;
+    border: 0;
+    margin: 2%;
+    padding: 0.5%;
+    white-space: pre;
+    width: 95%;
+}
+
 #JSLINT_GLOBAL {
-    min-width: fill-available;
     white-space: normal;
+    width: 95%;
 }
 #JSLINT_ label {
     font-family: sans-serif;
@@ -333,8 +357,10 @@ ins {
     <li><a href="help.html">Read the instructions.</a></li>
     <li><a href="http://www.amazon.com/exec/obidos/ASIN/0596517742/wrrrldwideweb" target="_blank">Enjoy&nbsp;<i>The Good Parts</i>.</a></li>
   </ul>
-  <fieldset id=JSLINT_SOURCE><legend>Source</legend>
-      <textarea rows="18" placeholder="// Paste JavaScript source or JSON text here."></textarea>
+  <fieldset><legend>Source</legend>
+      <textarea id="JSLINT_NUMBER" rows="18" readonly=true></textarea><textarea
+      id="JSLINT_SOURCE" rows="18" autofocus
+      placeholder="// Paste JavaScript source or JSON text here."></textarea>
   </fieldset>
   <div style="text-align: center;">
       <button name=JSLint><s></s></button>
@@ -346,9 +372,9 @@ ins {
     <legend>Function Report</legend>
     <div></div>
   </fieldset>
-  <fieldset id=JSLINT_PROPERTY style="display: none;">
+  <fieldset id=JSLINT_PROPERTYFIELDSET style="display: none;">
     <legend>Property Directive</legend>
-    <textarea rows="8" readonly=true></textarea>
+    <textarea id=JSLINT_PROPERTY rows="8" readonly=true></textarea>
   </fieldset>
   <div id=JSLINT_AUX style="display: none; text-align: center;">
       <button name=select id=JSLINT_SELECT>select property</button>
@@ -377,7 +403,7 @@ ins {
       <div><label><input type=text title=maxerr>Maximum warnings</label></div>
     </div>
     <div>Fudge...
-      <div><label><input title=fudge type=checkbox>First line number is 1</label></div>
+      <div><label><input id="JSLINT_FUDGE" title=fudge type=checkbox>First line number is 1</label></div>
     </div>
     <div>Global variables...
       <textarea id=JSLINT_GLOBAL title=global placeholder="imported globals here"></textarea>

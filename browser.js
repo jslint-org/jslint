@@ -1,9 +1,9 @@
 // browser.js
-// 2016-02-07
+// 2016-06-08
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 /*jslint
-    browser
+    browser, for
 */
 
 /*global
@@ -11,9 +11,9 @@
 */
 
 /*property
-    ___nodes___, check, create, each, enable, error, focus, function, getName,
-    getTitle, getValue, innerHTML, length, lib, on, property, q, select, split,
-    style, value
+    ___nodes___, check, create, each, enable, error, focus, function, getCheck,
+    getName, getTitle, getValue, innerHTML, length, lib, lines, on, onscroll,
+    property, q, scrollTop, select, split, style, value
 */
 
 // This is the web script companion file for JSLint. It includes code for
@@ -28,41 +28,83 @@ ADSAFE.lib("browser_ui", function () {
         bunch.___nodes___[0].innerHTML = html;
     }
 
+    function setScrollTop(bunch, number) {
+        bunch.___nodes___[0].scrollTop = number;
+    }
+
+    function getScrollTop(bunch) {
+        return bunch.___nodes___[0].scrollTop;
+    }
+
+    function onscroll(bunch, handler) {
+        bunch.___nodes___[0].onscroll = handler;
+    }
+
     return function (dom) {
 
 // This function is the entry point to this web module.
 
 // First get handles to some of the page features.
 
+        var number_number = 0;
         var warnings = dom.q("#JSLINT_WARNINGS");
         var warnings_div = warnings.q(">div");
         var options = dom.q("#JSLINT_OPTIONS");
         var global = dom.q("#JSLINT_GLOBAL");
+        var property_fieldset = dom.q("#JSLINT_PROPERTYFIELDSET");
         var property = dom.q("#JSLINT_PROPERTY");
-        var property_textarea = property.q(">textarea");
         var report_field = dom.q("#JSLINT_REPORT");
         var report_div = report_field.q(">div");
         var select = dom.q("#JSLINT_SELECT");
         var source = dom.q("#JSLINT_SOURCE");
-        var source_textarea = source.q(">textarea");
+        var number = dom.q("#JSLINT_NUMBER");
+        var fudge = dom.q("#JSLINT_FUDGE");
         var aux = dom.q("#JSLINT_AUX");
 
         function clear() {
             warnings.style("display", "none");
             report_field.style("display", "none");
-            property.style("display", "none");
+            property_fieldset.style("display", "none");
             aux.style("display", "none");
             warnings_div.value("");
             report_div.value("");
-            property_textarea.value("");
-            source_textarea.value("");
-            source_textarea.focus();
+            property.value("");
+            source.value("");
+            number.value("");
+            source.focus();
         }
 
         function clear_options() {
             options.q("input_checkbox").check(false);
             options.q("input_text").value("");
             global.value("");
+        }
+
+        function clear_number() {
+            number.value("");
+            number_number = 0;
+        }
+
+        function mark_scroll() {
+            var ss = getScrollTop(source);
+            setScrollTop(number, ss);
+            var sn = getScrollTop(number);
+            if (ss !== sn) {
+                setScrollTop(source, sn)
+            }
+        }
+
+        function show_numbers(n) {
+            if (n > 0) {
+                var text = "";
+                var i;
+                for (i = +(fudge.getCheck()); i <= n; i += 1) {
+                    text += i + "\n";
+                }
+                number.value(text);
+                mark_scroll();
+                number_number = n;
+            }
         }
 
         function call_jslint() {
@@ -82,15 +124,18 @@ ADSAFE.lib("browser_ui", function () {
 
 // Call JSLint with the source text, the options, and the predefined globals.
 
-            var source_string = source_textarea.getValue();
             var global_string = global.getValue();
             var result = jslint(
-                source_string,
+                source.getValue(),
                 option,
                 (global_string === "")
                     ? undefined
                     : global_string.split(rx_separator)
             );
+
+// Adjust the line numbers.
+
+            show_numbers(result.lines.length);
 
 // Generate the reports.
 
@@ -107,19 +152,20 @@ ADSAFE.lib("browser_ui", function () {
             setHTML(report_div, function_html);
             report_field.style("display", "block");
             if (property_text) {
-                property_textarea.value(property_text);
-                property.style("display", "block");
+                property.value(property_text);
+                property_fieldset.style("display", "block");
+                setScrollTop(property, 0);
                 select.enable(true);
             } else {
-                property.style("display", "none");
+                property_fieldset.style("display", "none");
                 select.enable(false);
             }
             aux.style("display", "block");
-            source_textarea.select();
+            source.select();
         }
 
         function select_property_directive() {
-            property_textarea.select();
+            property.select();
         }
 
 // Lay in the click handlers.
@@ -140,7 +186,17 @@ ADSAFE.lib("browser_ui", function () {
                 break;
             }
         });
-        source_textarea.select();
+        source.on("change", function (ignore) {
+            clear_number();
+        });
+        fudge.on("change", function (ignore) {
+            show_numbers(number_number);
+        });
+        onscroll(source, function (ignore) {
+            mark_scroll();
+        });
+        source.select();
+        clear_number();
     };
 });
 
