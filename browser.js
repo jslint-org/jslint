@@ -1,5 +1,5 @@
 // browser.js
-// 2016-06-09
+// 2016-06-10
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 /*jslint
@@ -86,11 +86,13 @@ ADSAFE.lib("browser_ui", function () {
         }
 
         function mark_scroll() {
-            var ss = getScrollTop(source);
-            setScrollTop(number, ss);
-            var sn = getScrollTop(number);
-            if (ss !== sn) {
-                setScrollTop(source, sn);
+            if (number_number > 0) {
+                var ss = getScrollTop(source);
+                setScrollTop(number, ss);
+                var sn = getScrollTop(number);
+                if (ss !== sn) {
+                    setScrollTop(source, sn);
+                }
             }
         }
 
