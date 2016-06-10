@@ -322,7 +322,7 @@ value to determine if it is present.</p>
             <td><code>true</code> if the standard browser globals should be
                 predefined. This option will reject the use of <code>import</code>
                 and <code>export</code>. This option also
-    disallows the file form of the <code>'use strict'</code> pragma. It does not
+    disallows the file form of the <code>&quot;use strict&quot;</code> pragma. It does not
     supply <code>self</code> or <code>window</code>; you will have to request
     these aliases of the dreaded global object yourself. It adds the
     same globals as this directive:
@@ -421,6 +421,11 @@ It adds the same globals as this directive:
         exports, global, module, process, querystring, require, setImmediate,
         setInterval, setTimeout, __dirname, __filename</code></div>
     <code>*/</code></blockquote></td>
+        </tr>
+        <tr>
+            <td>Tolerate single quote strings</td>
+            <td><code>single</code></td>
+            <td><code>true</code> if <code>'</code><small>single quote</small> should be allowed to enclose string literals. </td>
         </tr>
         <tr>
             <td>Tolerate <code>this</code><br></td>
