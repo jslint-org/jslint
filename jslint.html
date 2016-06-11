@@ -12,11 +12,21 @@ program and analyze it without sending it over the network.">
 <link rel="icon" type="image/gif" href="favicon.gif">
 <style>
 body {
-    background-color: seashell;
+    background-color: antiquewhite;
     color: black;
-    font-family: 'Patua One', serif;
+    font-family: 'Patua One', monospace;
     margin: 0;
     padding: 0;
+}
+
+#JSLINT_TITLE {
+    color: darkslategray;
+    float: left;
+    font-family: 'Patua One', monospace;
+    font-size: 48pt;
+    margin: 0;
+    padding: 0;
+    transform: rotate(-17deg);
 }
 
 #JSLINT_ fieldset {
@@ -84,41 +94,6 @@ a:link {
     color: black;
 }
 
-s {
-    display: inline-block;
-    font-style: normal;
-    padding-left: 0.1em;
-    text-decoration: none;
-}
-
-s::before {
-    content: "J";
-    font-family: 'Patua One', cursive;
-    text-decoration: none;
-}
-
-s::after {
-    content: "SLint";
-    font-family: 'Patua One', serif;
-    text-decoration: underline;
-}
-
-big {
-    color: black;
-    font-size: 50pt;
-    font-style: normal;
-    font-weight: normal;
-
-}
-ins {
-    color: gray;
-    font-family: "Trebuchet MS", sans-serif;
-    font-size: 200%;
-    font-weight: bold;
-    text-decoration: none;
-    text-transform: uppercase;
-}
-
 #JSLINT_ input[type="text"] {
     background-color: white;
     border: 0;
@@ -132,6 +107,7 @@ ins {
 }
 
 #JSLINT_ textarea {
+    border: 0;
     background-color: white;
     border: 0;
     font-family: monospace;
@@ -349,9 +325,9 @@ ins {
 <script src="adsafe.js"></script>
 <script src="report.js"></script>
 </head>
-<body><div id="JSLINT_">
+<body><div id="JSLINT_TITLE">J<u>SLint</u></div>
+<div id="JSLINT_">
   <div style="float: left; margin-bottom: 1em; margin-left: 2em;">
-    <big><s></s>&nbsp;</big>
   </div>
   <ul style="float: right; margin: 1em; padding-right: 1em;">
     <li><a href="help.html">Read the instructions.</a></li>
@@ -363,7 +339,7 @@ ins {
       placeholder="// Paste JavaScript source or JSON text here."></textarea>
   </fieldset>
   <div style="text-align: center;">
-      <button name=JSLint><s></s></button>
+      <button name=JSLint>J<u>SLint</u></button>
       <button name=clear>clear</button>
   </div>
   <fieldset id=JSLINT_WARNINGS style="display: none;"><legend>Warnings</legend><div></div>
@@ -378,7 +354,7 @@ ins {
   </fieldset>
   <div id=JSLINT_AUX style="display: none; text-align: center;">
       <button name=select id=JSLINT_SELECT>select property</button>
-      <button name=JSLint><s></s></button>
+      <button name=JSLint>J<u>SLint</u></button>
       <button name=clear>clear</button>
       <button name=options>clear options</button>
   </div>
