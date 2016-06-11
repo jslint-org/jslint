@@ -1,5 +1,5 @@
 // browser.js
-// 2016-06-10
+// 2016-06-11
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 /*jslint
@@ -70,7 +70,6 @@ ADSAFE.lib("browser_ui", function () {
             report_div.value("");
             property.value("");
             source.value("");
-            number.value("");
             source.focus();
         }
 
@@ -80,18 +79,13 @@ ADSAFE.lib("browser_ui", function () {
             global.value("");
         }
 
-        function clear_number() {
-            number.value("");
-            number_number = 0;
-        }
-
         function mark_scroll() {
             if (number_number > 0) {
                 var ss = getScrollTop(source);
                 setScrollTop(number, ss);
                 var sn = getScrollTop(number);
-                if (ss !== sn) {
-                    setScrollTop(source, sn);
+                if (ss > sn) {
+                    show_numbers(number_number * 4);
                 }
             }
         }
@@ -104,8 +98,8 @@ ADSAFE.lib("browser_ui", function () {
                     text += i + "\n";
                 }
                 number.value(text);
-                mark_scroll();
                 number_number = n;
+                mark_scroll();
             }
         }
 
@@ -134,10 +128,6 @@ ADSAFE.lib("browser_ui", function () {
                     ? undefined
                     : global_string.split(rx_separator)
             );
-
-// Adjust the line numbers.
-
-            show_numbers(result.lines.length);
 
 // Generate the reports.
 
@@ -188,17 +178,14 @@ ADSAFE.lib("browser_ui", function () {
                 break;
             }
         });
-        source.on("change", function (ignore) {
-            clear_number();
-        });
         fudge.on("change", function (ignore) {
-            show_numbers(number_number);
+            show_numbers(number_number + 1);
         });
         onscroll(source, function (ignore) {
             mark_scroll();
         });
         source.select();
-        clear_number();
+        show_numbers(1000);
     };
 });
 
