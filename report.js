@@ -34,6 +34,9 @@ var REPORT = (function () {
 
 // Produce the HTML Error Report.
 
+// <cite><address>LINE_NUMBER</address>MESSAGE</cite>
+// <samp>EVIDENCE</samp>
+
             var fudge = +!!data.option.fudge;
             var output = [];
             if (data.stop) {
@@ -58,6 +61,10 @@ var REPORT = (function () {
         function: function function_report(data) {
 
 // Produce the HTML Function Report.
+
+// <dl class=LEVEL><address>LINE_NUMBER</address>FUNCTION_NAME_AND_SIGNATURE
+//     <dt>DETAIL</dt><dd>NAMES</dd>
+// </dl>
 
             var fudge = +!!data.option.fudge;
             var mode = (data.module)
