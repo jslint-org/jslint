@@ -22,7 +22,7 @@ body {
 #JSLINT_TITLE {
     color: darkslategray;
     float: left;
-    font-family: 'Patua One', monospace;
+    font-family: "Patua One", monospace;
     font-size: 48pt;
     margin: 0;
     padding: 0;
@@ -32,7 +32,7 @@ body {
 h1 {
 	background-color: darkslategray;
 	color: white;
-	font-family: 'Patua One', serif;
+	font-family: "Patua One", serif;
 	font-size: 100%;
 	font-style: normal;
 	font-weight: normal;
@@ -58,7 +58,7 @@ button {
 	border: 0;
 	color: black;
 	cursor: pointer;
-	font-family: 'Patua One', serif;
+	font-family: "Patua One", serif;
 	font-size: 100%;
 	font-style: normal;
 	margin-bottom: 0;
@@ -71,7 +71,7 @@ button {
 }
 s {
 	display: inline-block;
-    font-family: 'Patua One', cursive;
+    font-family: "Patua One", cursive;
 	font-style: normal;
 	text-decoration: none;
 }
@@ -138,7 +138,7 @@ th, td {
 }
 a:link {
 	color: darkblue;
-    font-family: 'Patua One', cursive;
+    font-family: "Patua One", cursive;
 }
 a:visited {
 	color: purple;
@@ -203,9 +203,10 @@ for DOM manipulation.</td></tr>
     <a href="help.html">help page</a>. The values are either the boolean
     <code>true</code> or a small number.</td></tr>
 <tr><td><code>global_array</code></td><td><code>array</code></td><td>optional</td>
-<td>This is an array of strings. Each string names one global variable that may
-    be used by the program. Listing names here will silence warnings about the
-    names. It will not introduce the names into the runtime environment.</td></tr>
+    <td>This is an array of strings. Each string names one global variable that
+        may be used by the program. Listing names here will silence warnings
+        about the names. It will not introduce the names into the runtime
+        environment.</td></tr>
 </table></center>
 <p>The <code>jslint</code> function will not modify any of its arguments.</p>
 <p>The <code>jslint</code> function will return a result object contain the
@@ -218,37 +219,43 @@ for DOM manipulation.</td></tr>
 <tr>
     <td><code>directives</code></td>
     <td>array</td>
-<td>An array of comments containing directives.</td></tr>
+    <td>An array of comments containing directives.</td></tr>
 <tr><td><code>edition</code></td><td>string</td>
-<td>The verison of <code>jslint</code> that produced the result.</td></tr>
+    <td>The verison of <code>jslint</code> that produced the result.</td></tr>
 <tr><td><code>functions</code></td><td>array</td>
-<td>An array of function objects.</td></tr>
+    <td>An array of function objects.</td></tr>
 <tr><td><code>global</code></td><td>object</td>
-<td>The global object, a body that contains the outermost statements and variables.</td></tr>
+    <td>The global object, a body that contains the outermost statements and
+        variables.</td></tr>
 <tr><td><code>id</code></td><td>string</td>
-<td><code>(JSLint)</code></td></tr>
+    <td><code>(JSLint)</code></td></tr>
 <tr><td><code>imports</code></td><td>array</td>
-<td>All of the strings named in <code>import</code> statements.</td></tr>
+    <td>All of the strings named in <code>import</code> statements.</td></tr>
 <tr><td><code>json</code></td><td>boolean</td>
-<td><code>true</code> if the source was a <a href="http://www.JSON.org/">JSON</a> text. </td></tr>
+    <td><code>true</code> if the source was a
+        <a href="http://www.JSON.org/">JSON</a> text.</td></tr>
 <tr><td><code>lines</code></td><td>array</td>
-<td>An array of strings, one for each line of text in the source.</td></tr>
+    <td>An array of strings, one for each line of text in the source.</td></tr>
 <tr><td><code>module</code></td><td>boolean</td>
-<td><code>true</code> if the file contains an <code>import</code> or <code>export</code>.</td></tr>
+    <td><code>true</code> if the file contains an <code>import</code> or
+        <code>export</code>.</td></tr>
 <tr><td><code>ok</code></td><td>boolean</td>
-<td><code>true</code> if no warnings were found.</td></tr>
+    <td><code>true</code> if no warnings were found.</td></tr>
 <tr><td><code>option</code></td><td>object</td>
-<td>The option object that was passed in, or an empty substitute.</td></tr>
+    <td>The option object that was passed in, or an empty substitute.</td></tr>
 <tr><td><code>property</code></td><td>object</td>
-<td>The names are the names of properties used in the source. The values are the number of times each name occurred.</td></tr>
+    <td>The names are the names of properties used in the source. The values are
+        the number of times each name occurred.</td></tr>
 <tr><td><code>stop</code></td><td>boolean</td>
-<td><code>true</code> if <s>J<u>SLint</u></s> was not able to process the entire file.</td></tr>
+    <td><code>true</code> if <s>J<u>SLint</u></s> was not able to process the
+        entire file.</td></tr>
 <tr><td><code>tokens</code></td><td>array</td>
 <td>All of the token objects in source order.</td></tr>
 <tr><td><code>tree</code></td><td>array</td>
-<td>The token objects that represent the outermost statements. Those will be linked to other tokens, forming an abstract parse tree.</td></tr>
+<td>The token objects that represent the outermost statements. Those will be
+    linked to other tokens, forming an abstract parse tree.</td></tr>
 <tr><td><code>warnings</code></td><td>array</td>
-<td>The warning objects.</td></tr>
+    <td>The warning objects.</td></tr>
 </table>
 <h1>Tokens</h1>
     <p>A source file is composed of tokens. Each identifier, each operator, each
@@ -394,13 +401,13 @@ for DOM manipulation.</td></tr>
             <td>string</td>
             <td>The <code>id</code> of the token. For most tokens, this is the
                 token text itself. <br>
-            For comments, <code>id</code> is <code>'(comment)'</code>.<br>For
-            number literals, <code>id</code> is <code>'(number)'</code>. <br>
+            For comments, <code>id</code> is <code>"(comment)"</code>.<br>For
+            number literals, <code>id</code> is <code>"(number)"</code>. <br>
             For regular expression literals, <code>id</code> is
-            <code>'(regexp)'</code>.<br>For string literals, <code>id</code> is
-            <code>'(string)'</code>.<br>
-            The end of the file has an <code>id</code> of <code>'(end)'</code>.<br>
-            The global object has an <code>id</code> of <code>'(global)'</code>.</td>
+            <code>"(regexp)"</code>.<br>For string literals, <code>id</code> is
+            <code>"(string)"</code>.<br>
+            The end of the file has an <code>id</code> of <code>"(end)"</code>.<br>
+            The global object has an <code>id</code> of <code>"(global)"</code>.</td>
             <td>token</td>
         </tr>
         <tr>
@@ -490,7 +497,7 @@ for DOM manipulation.</td></tr>
         <tr>
             <td><code>strict</code></td>
             <td>token</td>
-            <td>The <code>'use strict'</code> pragma.</td>
+            <td>The <code>"use strict"</code> pragma.</td>
             <td>block</td>
         </tr>
         <tr>
