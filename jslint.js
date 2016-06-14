@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-06-09
+// 2016-06-13
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -2770,7 +2770,7 @@ var jslint = (function JSLint() {
         stack.push(functionage);
         functions.push(the_function);
         functionage = the_function;
-        if (the_function.arity !== "statement" && name) {
+        if (the_function.arity !== "statement" && typeof name === "object") {
             enroll(name, "function", true);
             name.dead = false;
             name.init = true;
@@ -2902,7 +2902,7 @@ var jslint = (function JSLint() {
         the_brace.expression = [];
         if (next_token.id !== "}") {
             (function member() {
-                var extra = true;
+                var extra;
                 var id;
                 var name = next_token;
                 var value;
@@ -2911,27 +2911,31 @@ var jslint = (function JSLint() {
                     (name.id === "get" || name.id === "set") &&
                     next_token.identifier
                 ) {
-                    extra = name.id;
+                    extra = name.id + " " + next_token.id;
                     name = next_token;
                     advance();
+                    id = survey(name);
+                    if (seen[extra] === true || seen[id] === true) {
+                        warn("duplicate_a", name);
+                    }
+                    seen[id] = false;
+                    seen[extra] = true;
+                } else {
+                    id = survey(name);
+                    if (typeof seen[id] === "boolean") {
+                        warn("duplicate_a", name);
+                    }
+                    seen[id] = true;
                 }
-                id = survey(name);
-                if (seen[id] === true) {
-                    warn("duplicate_a", name);
-                } else if (seen[id] === "get" && extra !== "set") {
-                    warn("expected_a_before_b", name, "set", artifact(name));
-                }
-                seen[id] = (extra === "get")
-                    ? "get"
-                    : true;
                 if (name.identifier) {
                     switch (next_token.id) {
                     case "}":
                     case ",":
                         if (!option.es6) {
                             warn("es6");
-                        } else if (extra !== true) {
-                            advance(":");
+                        }
+                        if (typeof extra === "string") {
+                            advance("(");
                         }
                         value = expression(Infinity, true);
                         break;
@@ -2944,11 +2948,16 @@ var jslint = (function JSLint() {
                             from: name.from,
                             id: "function",
                             line: name.line,
-                            name: name,
+                            name: (typeof extra === "string")
+                                ? extra
+                                : id,
                             thru: name.from
-                        }, name);
+                        });
                         break;
                     default:
+                        if (typeof extra === "string") {
+                            advance("(");
+                        }
                         advance(":");
                         value = expression(0);
                     }
@@ -4716,7 +4725,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-06-09",
+            edition: "2016-06-13",
             functions: functions,
             global: global,
             id: "(JSLint)",
