@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-06-13
+// 2016-06-19
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -89,7 +89,7 @@
     body, browser, c, calls, catch, charAt, charCodeAt, closer, closure, code,
     column, complex, concat, constant, context, couch, create, d, dead, devel,
     directive, directives, disrupt, dot, duplicate_a, edition, ellipsis, else,
-    empty_block, es6, eval, every, expected_a_at_b_c, expected_a_b,
+    empty_block, es6, escape_mega, eval, every, expected_a_at_b_c, expected_a_b,
     expected_a_b_from_c_d, expected_a_before_b, expected_digits_after_a,
     expected_four_digits, expected_identifier_a, expected_line_break_a_b,
     expected_regexp_factor_a, expected_space_a_b, expected_statements_a,
@@ -296,6 +296,7 @@ var jslint = (function JSLint() {
         duplicate_a: "Duplicate '{a}'.",
         empty_block: "Empty block.",
         es6: "Unexpected ES6 feature '{a}'.",
+        escape_mega: "Unexpected escapement in mega literal.",
         expected_a_at_b_c: "Expected '{a}' at column {b}, not column {c}.",
         expected_a_b: "Expected '{a}' and instead saw '{b}'.",
         expected_a_b_from_c_d: "Expected '{a}' to match '{b}' from line {c} and instead saw '{d}'.",
@@ -401,7 +402,7 @@ var jslint = (function JSLint() {
     var rx_octals = /^([0-7]+)(.*)$/;
     var rx_bits = /^([01]+)(.*)$/;
 // mega
-    var rx_mega = /`|\$\{/;
+    var rx_mega = /[`\\]|\$\{/;
 // indentation
     var rx_colons = /^(.*)\?([:.]*)$/;
     var rx_dot = /\.$/;
@@ -1351,6 +1352,9 @@ var jslint = (function JSLint() {
                     snippet += source_line.slice(0, at);
                     column += at;
                     source_line = source_line.slice(at);
+                    if (source_line.charAt(0) === "\\") {
+                        stop_at("escape_mega", line, at);
+                    }
                     make("(string)", snippet).quote = "`";
                     snippet = "";
 
@@ -4725,7 +4729,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-06-13",
+            edition: "2016-06-19",
             functions: functions,
             global: global,
             id: "(JSLint)",
