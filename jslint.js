@@ -1022,6 +1022,7 @@ var jslint = (function JSLint() {
                 if (char === "^") {
                     next_char("^");
                 }
+                (function classy() {
                     ranges();
                     if (char !== "]" && char !== "") {
                         warn_at(
@@ -1032,6 +1033,7 @@ var jslint = (function JSLint() {
                             char
                         );
                         next_char();
+                        return classy();
                     }
                 }());
                 next_char("]");
