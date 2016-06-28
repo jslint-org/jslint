@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-06-24
+// 2016-06-27
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -994,7 +994,7 @@ var jslint = (function JSLint() {
                 }
             }
 
-            function range() {
+            function ranges() {
 
 // Match a range of subclasses.
 
@@ -1010,7 +1010,7 @@ var jslint = (function JSLint() {
                             );
                         }
                     }
-                    return range();
+                    return ranges();
                 }
             }
 
@@ -1022,14 +1022,18 @@ var jslint = (function JSLint() {
                 if (char === "^") {
                     next_char("^");
                 }
-                while (true) {
-                    range();
-                    if (char === "]" || char === "") {
-                        break;
+                    ranges();
+                    if (char !== "]" && char !== "") {
+                        warn_at(
+                            "expected_a_before_b",
+                            line,
+                            column,
+                            "\\",
+                            char
+                        );
+                        next_char();
                     }
-                    warn_at("expected_a_before_b", line, column, "\\", char);
-                    next_char();
-                }
+                }());
                 next_char("]");
             }
 
@@ -4745,7 +4749,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-06-24",
+            edition: "2016-06-27",
             functions: functions,
             global: global,
             id: "(JSLint)",
