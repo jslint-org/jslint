@@ -34,6 +34,7 @@
 // of valuable information. It can be used to generate reports. The object
 // contains:
 
+//      directives: an array of directive comment tokens.
 //      edition: the version of JSLint that did the analysis.
 //      functions: an array of objects that represent all of the functions
 //              declared in the file.
