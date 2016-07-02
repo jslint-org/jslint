@@ -4404,7 +4404,7 @@ var jslint = (function JSLint() {
 
 // If left is an opener and right is not the closer, then push the previous
 // state. If the token following the opener is on the next line, then this is
-// an open form. If the tokens are on different lines, then it is a closed form.
+// an open form. If the tokens are on the same line, then it is a closed form.
 // Open form is more readable, with each item (statement, argument, parameter,
 // etc) starting on its own line. Closed form is more compact. Statement blocks
 // are always in open form.
@@ -4481,7 +4481,7 @@ var jslint = (function JSLint() {
 // right will determine the space between them.
 
 // If left is , or ; or right is a statement then if open, right must go at the
-// margin, or if closed, a space before.
+// margin, or if closed, a space between.
 
 
                         if (right.switch) {
