@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-06-27
+// 2016-07-12
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -101,7 +101,7 @@
     label, label_a, lbp, led, length, level, line, lines, live, loop, m,
     margin, match, maxerr, maxlen, message, misplaced_a, misplaced_directive_a,
     missing_browser, module, multivar, naked_block, name, names,
-    nested_comment, new, node, not_label_a, nud, number_isNaN, ok, open,
+    nested_comment, new, node, not_label_a, nr, nud, number_isNaN, ok, open,
     option, out_of_scope_a, parameters, pop, property, push, qmark, quote,
     redefinition_a_b, replace, reserved_a, role, search, signature, single,
     slice, some, sort, split, statement, stop, strict, subscript_a, switch,
@@ -337,7 +337,7 @@ var jslint = (function JSLint() {
         undeclared_a: "Undeclared '{a}'.",
         unexpected_a: "Unexpected '{a}'.",
         unexpected_a_after_b: "Unexpected '{a}' after '{b}'.",
-        unexpected_at_top_level_a: "Unexpected '{a}' at top level.",
+        unexpected_at_top_level_a: "Expected '{a}' to be in a function.",
         unexpected_char_a: "Unexpected character '{a}'.",
         unexpected_comment: "Unexpected comment.",
         unexpected_directive_a: "When using modules, don't use directive '/*{a}'.",
@@ -589,6 +589,7 @@ var jslint = (function JSLint() {
         var column = 0;             // the column number of the next character
         var from;                   // the starting column number of the token
         var line = -1;              // the line number of the next character
+        var nr = 0;                 // the next token number
         var previous = global;      // the previous token including comments
         var prior = global;         // the previous token excluding comments
         var mega_from;              // the starting column of megastring
@@ -766,13 +767,15 @@ var jslint = (function JSLint() {
 // Make the token object and append it to the tokens list.
 
             var the_token = {
+                from: from,
                 id: id,
                 identifier: !!identifier,
-                from: from,
-                thru: column,
-                line: line
+                line: line,
+                nr: nr,
+                thru: column
             };
-            tokens.push(the_token);
+            tokens[nr] = the_token;
+            nr += 1;
 
 // Directives must appear before the first statement.
 
@@ -4752,7 +4755,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-06-27",
+            edition: "2016-07-12",
             functions: functions,
             global: global,
             id: "(JSLint)",
