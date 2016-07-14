@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-07-12
+// 2016-07-13
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -4315,9 +4315,13 @@ var jslint = (function JSLint() {
         }
 
         function no_space_only() {
-            if (left.id !== "(global)" && (
-                left.line !== right.line || left.thru !== right.from
-            )) {
+            if (
+                left.id !== "(global)" &&
+                left.nr + 1 === right.nr && (
+                    left.line !== right.line ||
+                    left.thru !== right.from
+                )
+            ) {
                 warn(
                     "unexpected_space_a_b",
                     right,
@@ -4755,7 +4759,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-07-12",
+            edition: "2016-07-13",
             functions: functions,
             global: global,
             id: "(JSLint)",
