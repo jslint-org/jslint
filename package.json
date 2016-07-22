@@ -10,5 +10,7 @@
   },
   "author": "Dylan Mao",
   "license": "MIT",
-  "devDependencies": {}
+  "devDependencies": {
+    "minimatch": "^3.0.2"
+  }
 }
