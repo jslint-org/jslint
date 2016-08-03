@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-07-13
+// 2016-08-03
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -97,8 +97,8 @@
     expected_statements_a, expected_string_a, expected_type_string_a,
     expression, extra, flag, for, forEach, free, from, fud, fudge, function,
     function_in_loop, functions, g, global, i, id, identifier, import, imports,
-    inc, indexOf, infix_in, init, initial, isArray, isNaN, join, json, keys,
-    label, label_a, lbp, led, length, level, line, lines, live, loop, m,
+    indent, inc, indexOf, infix_in, init, initial, isArray, isNaN, join, json,
+    keys, label, label_a, lbp, led, length, level, line, lines, live, loop, m,
     margin, match, maxerr, maxlen, message, misplaced_a, misplaced_directive_a,
     missing_browser, module, multivar, naked_block, name, names,
     nested_comment, new, node, not_label_a, nr, nud, number_isNaN, ok, open,
@@ -171,6 +171,7 @@ var jslint = (function JSLint() {
         eval: true,
         for: true,
         fudge: true,
+        indent: 4,
         maxerr: 10000,
         maxlen: 10000,
         multivar: true,
@@ -440,6 +441,7 @@ var jslint = (function JSLint() {
     var functions;          // The array containing all of the functions.
     var global;             // The global object; the outermost context.
     var imports;            // The array collecting all import-from strings.
+    var indent;             // The number of spaces per level of indentation.
     var json_mode;          // true if parsing JSON.
     var lines;              // The array containing source lines.
     var module_mode;        // true if import or export was used.
@@ -4345,13 +4347,13 @@ var jslint = (function JSLint() {
                 if (open) {
                     var at = (free)
                         ? margin
-                        : margin + 8;
+                        : margin + (2 * indent);
                     if (right.from < at) {
                         expected_at(at);
                     }
                 } else {
-                    if (right.from !== margin + 8) {
-                        expected_at(margin + 8);
+                    if (right.from !== margin + (2 * indent)) {
+                        expected_at(margin + (2 * indent));
                     }
                 }
             }
@@ -4384,8 +4386,8 @@ var jslint = (function JSLint() {
                         expected_at(margin);
                     }
                 } else {
-                    if (right.from !== margin + 8) {
-                        expected_at(margin + 8);
+                    if (right.from !== margin + (2 * indent)) {
+                        expected_at(margin + (2 * indent));
                     }
                 }
             }
@@ -4397,7 +4399,7 @@ var jslint = (function JSLint() {
 
             var level = qmark.length;
             if (level > 0) {
-                margin -= level * 4;
+                margin -= level * indent;
             }
             qmark = "";
         }
@@ -4431,14 +4433,14 @@ var jslint = (function JSLint() {
                         if (left.line !== right.line) {
                             free = closer === ")" && left.free;
                             open = true;
-                            margin += 4;
+                            margin += indent;
                             if (right.role === "label") {
                                 if (right.from !== 0) {
                                     expected_at(0);
                                 }
                             } else if (right.switch) {
                                 unqmark();
-                                at_margin(-4);
+                                at_margin(-indent);
                             } else {
                                 at_margin(0);
                             }
@@ -4493,7 +4495,7 @@ var jslint = (function JSLint() {
 
                         if (right.switch) {
                             unqmark();
-                            at_margin(-4);
+                            at_margin(-indent);
                         } else if (right.role === "label") {
                             if (right.from !== 0) {
                                 expected_at(0);
@@ -4514,12 +4516,12 @@ var jslint = (function JSLint() {
 
                         } else if (right.arity === "ternary") {
                             if (right.id === "?") {
-                                margin += 4;
+                                margin += indent;
                                 qmark += "?";
                             } else {
                                 result = qmark.match(rx_colons);
                                 qmark = result[1] + ":";
-                                margin -= 4 * result[2].length;
+                                margin -= indent * result[2].length;
                             }
                             at_margin(0);
                         } else if (
@@ -4550,7 +4552,7 @@ var jslint = (function JSLint() {
                             } else {
                                 if (!rx_dot.test(qmark)) {
                                     qmark += ".";
-                                    margin += 4;
+                                    margin += indent;
                                 }
                                 at_margin(0);
                             }
@@ -4598,7 +4600,7 @@ var jslint = (function JSLint() {
                             open = left.open;
                             qmark = "";
                             if (open) {
-                                margin = margin + 4;
+                                margin = margin + indent;
                                 at_margin(0);
                             } else {
                                 one_space_only();
@@ -4706,6 +4708,9 @@ var jslint = (function JSLint() {
                 }
             });
             tokenize(source);
+            indent = ((option.indent > 0) && ((option.indent % 1) === 0))
+                ? option.indent
+                : allowed_option.indent;
             advance();
             if (tokens[0].id === "{" || tokens[0].id === "[") {
                 json_mode = true;
