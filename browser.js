@@ -1,5 +1,5 @@
 // browser.js
-// 2016-06-11
+// 2016-08-08
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 /*jslint
@@ -22,6 +22,7 @@
 ADSAFE.lib("browser_ui", function () {
     "use strict";
 
+    var rx_crlf = /\n|\r\n?/;
     var rx_separator = /[\s,;'"]+/;
 
     function setHTML(bunch, html) {
@@ -46,7 +47,6 @@ ADSAFE.lib("browser_ui", function () {
 
 // First get handles to some of the page features.
 
-        var number_number = 0;
         var warnings = dom.q("#JSLINT_WARNINGS");
         var warnings_div = warnings.q(">div");
         var options = dom.q("#JSLINT_OPTIONS");
@@ -66,11 +66,12 @@ ADSAFE.lib("browser_ui", function () {
             report_field.style("display", "none");
             property_fieldset.style("display", "none");
             aux.style("display", "none");
-            warnings_div.value("");
-            report_div.value("");
+            number.value("");
             property.value("");
+            report_div.value("");
             source.value("");
             source.focus();
+            warnings_div.value("");
         }
 
         function clear_options() {
@@ -79,27 +80,24 @@ ADSAFE.lib("browser_ui", function () {
             global.value("");
         }
 
-        function mark_scroll() {
-            if (number_number > 0) {
-                var ss = getScrollTop(source);
-                setScrollTop(number, ss);
-                var sn = getScrollTop(number);
-                if (ss > sn) {
-                    show_numbers(number_number * 4);
-                }
+        function show_numbers() {
+            var f = +(fudge.getCheck());
+            var n = source.getValue().split(rx_crlf).length + f;
+            var text = "";
+            var i;
+            for (i = f; i <= n; i += 1) {
+                text += i + "\n";
             }
+            number.value(text);
         }
 
-        function show_numbers(n) {
-            if (n > 0) {
-                var text = "";
-                var i;
-                for (i = +(fudge.getCheck()); i <= n; i += 1) {
-                    text += i + "\n";
-                }
-                number.value(text);
-                number_number = n;
-                mark_scroll();
+        function mark_scroll() {
+            var ss = getScrollTop(source);
+            setScrollTop(number, ss);
+            var sn = getScrollTop(number);
+            if (ss > sn) {
+                show_numbers();
+                setScrollTop(number, ss);
             }
         }
 
@@ -179,13 +177,14 @@ ADSAFE.lib("browser_ui", function () {
             }
         });
         fudge.on("change", function (ignore) {
-            show_numbers(number_number + 1);
+            show_numbers();
+        });
+        source.on("change", function (ignore) {
+            show_numbers();
         });
         onscroll(source, function (ignore) {
             mark_scroll();
         });
         source.select();
-        show_numbers(1000);
     };
 });
-
