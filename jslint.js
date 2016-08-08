@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-07-13
+// 2016-08-08
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -95,18 +95,18 @@
     expected_digits_after_a, expected_four_digits, expected_identifier_a,
     expected_line_break_a_b, expected_regexp_factor_a, expected_space_a_b,
     expected_statements_a, expected_string_a, expected_type_string_a,
-    expression, extra, flag, for, forEach, free, from, fud, fudge, function,
-    function_in_loop, functions, g, global, i, id, identifier, import, imports,
-    inc, indexOf, infix_in, init, initial, isArray, isNaN, join, json, keys,
-    label, label_a, lbp, led, length, level, line, lines, live, loop, m,
-    margin, match, maxerr, maxlen, message, misplaced_a, misplaced_directive_a,
-    missing_browser, module, multivar, naked_block, name, names,
-    nested_comment, new, node, not_label_a, nr, nud, number_isNaN, ok, open,
-    option, out_of_scope_a, parameters, pop, property, push, qmark, quote,
-    redefinition_a_b, replace, reserved_a, role, search, signature, single,
-    slice, some, sort, split, statement, stop, strict, subscript_a, switch,
-    test, this, thru, toString, todo_comment, tokens, too_long, too_many,
-    too_many_digits, tree, type, u, unclosed_comment, unclosed_mega,
+    expression, extra, finally, flag, for, forEach, free, from, fud, fudge,
+    function, function_in_loop, functions, g, global, i, id, identifier,
+    import, imports, inc, indexOf, infix_in, init, initial, isArray, isNaN,
+    join, json, keys, label, label_a, lbp, led, length, level, line, lines,
+    live, loop, m, margin, match, maxerr, maxlen, message, misplaced_a,
+    misplaced_directive_a, missing_browser, module, multivar, naked_block,
+    name, names, nested_comment, new, node, not_label_a, nr, nud, number_isNaN,
+    ok, open, option, out_of_scope_a, parameters, pop, property, push, qmark,
+    quote, redefinition_a_b, replace, reserved_a, role, search, signature,
+    single, slice, some, sort, split, statement, stop, strict, subscript_a,
+    switch, test, this, thru, toString, todo_comment, tokens, too_long,
+    too_many, too_many_digits, tree, type, u, unclosed_comment, unclosed_mega,
     unclosed_string, undeclared_a, unexpected_a, unexpected_a_after_b,
     unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
     unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
@@ -2792,6 +2792,7 @@ var jslint = (function JSLint() {
 // depth of loops and switches.
 
         the_function.context = empty();
+        the_function.finally = 0;
         the_function.loop = 0;
         the_function.switch = 0;
 
@@ -2863,6 +2864,7 @@ var jslint = (function JSLint() {
 // of loops and switches.
 
         the_arrow.context = empty();
+        the_arrow.finally = 0;
         the_arrow.loop = 0;
         the_arrow.switch = 0;
 
@@ -3023,7 +3025,10 @@ var jslint = (function JSLint() {
     stmt("break", function () {
         var the_break = token;
         var the_label;
-        if (functionage.loop < 1 && functionage.switch < 1) {
+        if (
+            (functionage.loop < 1 && functionage.switch < 1) ||
+            functionage.finally > 0
+        ) {
             warn("unexpected_a", the_break);
         }
         the_break.disrupt = true;
@@ -3177,7 +3182,7 @@ var jslint = (function JSLint() {
     stmt("const", do_var);
     stmt("continue", function () {
         var the_continue = token;
-        if (functionage.loop < 1) {
+        if (functionage.loop < 1 || functionage.finally > 0) {
             warn("unexpected_a", the_continue);
         }
         not_top_level(the_continue);
@@ -3362,6 +3367,9 @@ var jslint = (function JSLint() {
     stmt("return", function () {
         var the_return = token;
         not_top_level(the_return);
+        if (functionage.finally > 0) {
+            warn("unexpected_a", the_return);
+        }
         the_return.disrupt = true;
         if (next_token.id !== ";" && the_return.line === next_token.line) {
             the_return.expression = expression(10);
@@ -3377,6 +3385,9 @@ var jslint = (function JSLint() {
         var the_disrupt = true;
         var the_switch = token;
         not_top_level(the_switch);
+        if (functionage.finally > 0) {
+            warn("unexpected_a", the_switch);
+        }
         functionage.switch += 1;
         advance("(");
         token.free = true;
@@ -3491,10 +3502,12 @@ var jslint = (function JSLint() {
             }
         }
         if (next_token.id === "finally") {
+            functionage.finally += 1;
             clause = true;
             advance("finally");
             the_try.else = block();
             the_disrupt = the_try.else.disrupt;
+            functionage.finally -= 1;
         }
         the_try.disrupt = the_disrupt;
         if (!clause) {
@@ -3997,6 +4010,7 @@ var jslint = (function JSLint() {
     });
 
     function postaction_function(thing) {
+        delete functionage.finally;
         delete functionage.loop;
         delete functionage.switch;
         functionage = stack.pop();
@@ -4759,7 +4773,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-07-13",
+            edition: "2016-08-08",
             functions: functions,
             global: global,
             id: "(JSLint)",
