@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-08-08
+// 2016-08-09
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -106,17 +106,17 @@
     quote, redefinition_a_b, replace, reserved_a, role, search, signature,
     single, slice, some, sort, split, statement, stop, strict, subscript_a,
     switch, test, this, thru, toString, todo_comment, tokens, too_long,
-    too_many, too_many_digits, tree, type, u, unclosed_comment, unclosed_mega,
-    unclosed_string, undeclared_a, unexpected_a, unexpected_a_after_b,
-    unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
-    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
-    unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
-    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
-    unreachable_a, unregistered_property_a, unsafe, unused_a, use_spaces,
-    use_strict, used, value, var_loop, var_switch, variable, warning, warnings,
-    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
-    wrap_assignment, wrap_condition, wrap_immediate, wrap_parameter,
-    wrap_regexp, wrap_unary, wrapped, writable, y
+    too_many, too_many_digits, tree, try, type, u, unclosed_comment,
+    unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
+    unexpected_a_after_b, unexpected_at_top_level_a, unexpected_char_a,
+    unexpected_comment, unexpected_directive_a, unexpected_expression_a,
+    unexpected_label_a, unexpected_parens, unexpected_space_a_b,
+    unexpected_statement_a, unexpected_trailing_space, unexpected_typeof_a,
+    uninitialized_a, unreachable_a, unregistered_property_a, unsafe, unused_a,
+    use_spaces, use_strict, used, value, var_loop, var_switch, variable,
+    warning, warnings, weird_condition_a, weird_expression_a, weird_loop,
+    weird_relation_a, white, wrap_assignment, wrap_condition, wrap_immediate,
+    wrap_parameter, wrap_regexp, wrap_unary, wrapped, writable, y
 */
 
 var jslint = (function JSLint() {
@@ -2795,6 +2795,7 @@ var jslint = (function JSLint() {
         the_function.finally = 0;
         the_function.loop = 0;
         the_function.switch = 0;
+        the_function.try = 0;
 
 // Push the current function context and establish a new one.
 
@@ -2867,6 +2868,7 @@ var jslint = (function JSLint() {
         the_arrow.finally = 0;
         the_arrow.loop = 0;
         the_arrow.switch = 0;
+        the_arrow.try = 0;
 
 // Push the current function context and establish a new one.
 
@@ -3477,6 +3479,10 @@ var jslint = (function JSLint() {
         var the_catch;
         var the_disrupt;
         var the_try = token;
+        if (functionage.try > 0) {
+            warn("unexpected_a", the_try);
+        }
+        functionage.try += 1;
         the_try.block = block();
         the_disrupt = the_try.block.disrupt;
         if (next_token.id === "catch") {
@@ -3518,6 +3524,7 @@ var jslint = (function JSLint() {
                 artifact(next_token)
             );
         }
+        functionage.try -= 1;
         return the_try;
     });
     stmt("var", do_var);
@@ -4013,6 +4020,7 @@ var jslint = (function JSLint() {
         delete functionage.finally;
         delete functionage.loop;
         delete functionage.switch;
+        delete functionage.try;
         functionage = stack.pop();
         if (thing.wrapped) {
             warn("unexpected_parens", thing);
@@ -4773,7 +4781,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-08-08",
+            edition: "2016-08-09",
             functions: functions,
             global: global,
             id: "(JSLint)",
