@@ -2852,45 +2852,45 @@ var jslint = (function JSLint() {
             stop("wrap_assignment", token);
         }
         advance("=>");
-        var the_arrow = token;
-        the_arrow.arity = "binary";
-        the_arrow.name = "=>";
-        the_arrow.level = functionage.level + 1;
-        functions.push(the_arrow);
+        var the_fart = token;
+        the_fart.arity = "binary";
+        the_fart.name = "=>";
+        the_fart.level = functionage.level + 1;
+        functions.push(the_fart);
         if (functionage.loop > 0) {
-            warn("function_in_loop", the_arrow);
+            warn("function_in_loop", the_fart);
         }
 
 // Give the function properties storing its names and for observing the depth
 // of loops and switches.
 
-        the_arrow.context = empty();
-        the_arrow.finally = 0;
-        the_arrow.loop = 0;
-        the_arrow.switch = 0;
-        the_arrow.try = 0;
+        the_fart.context = empty();
+        the_fart.finally = 0;
+        the_fart.loop = 0;
+        the_fart.switch = 0;
+        the_fart.try = 0;
 
 // Push the current function context and establish a new one.
 
         stack.push(functionage);
-        functionage = the_arrow;
-        the_arrow.parameters = pl[0];
-        the_arrow.signature = pl[1];
-        the_arrow.complex = true;
-        the_arrow.parameters.forEach(function (name) {
+        functionage = the_fart;
+        the_fart.parameters = pl[0];
+        the_fart.signature = pl[1];
+        the_fart.complex = true;
+        the_fart.parameters.forEach(function (name) {
             enroll(name, "parameter", true);
         });
         if (!option.es6) {
-            warn("es6", the_arrow);
+            warn("es6", the_fart);
         }
         if (next_token.id === "{") {
-            warn("expected_a_b", the_arrow, "function", "=>");
-            the_arrow.block = block("body");
+            warn("expected_a_b", the_fart, "function", "=>");
+            the_fart.block = block("body");
         } else {
-            the_arrow.expression = expression(0);
+            the_fart.expression = expression(0);
         }
         functionage = stack.pop();
-        return the_arrow;
+        return the_fart;
     }
 
     prefix("(", function () {
