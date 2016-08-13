@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-08-09
+// 2016-08-12
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -3475,7 +3475,6 @@ var jslint = (function JSLint() {
         return the_throw;
     });
     stmt("try", function () {
-        var clause = false;
         var the_catch;
         var the_disrupt;
         var the_try = token;
@@ -3487,7 +3486,6 @@ var jslint = (function JSLint() {
         the_disrupt = the_try.block.disrupt;
         if (next_token.id === "catch") {
             var ignored = "ignore";
-            clause = true;
             the_catch = next_token;
             the_try.catch = the_catch;
             advance("catch");
@@ -3506,24 +3504,23 @@ var jslint = (function JSLint() {
             if (the_catch.block.disrupt !== true) {
                 the_disrupt = false;
             }
-        }
-        if (next_token.id === "finally") {
-            functionage.finally += 1;
-            clause = true;
-            advance("finally");
-            the_try.else = block();
-            the_disrupt = the_try.else.disrupt;
-            functionage.finally -= 1;
-        }
-        the_try.disrupt = the_disrupt;
-        if (!clause) {
+        } else {
             warn(
                 "expected_a_before_b",
                 next_token,
                 "catch",
                 artifact(next_token)
             );
+
         }
+        if (next_token.id === "finally") {
+            functionage.finally += 1;
+            advance("finally");
+            the_try.else = block();
+            the_disrupt = the_try.else.disrupt;
+            functionage.finally -= 1;
+        }
+        the_try.disrupt = the_disrupt;
         functionage.try -= 1;
         return the_try;
     });
@@ -4781,7 +4778,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-08-09",
+            edition: "2016-08-12",
             functions: functions,
             global: global,
             id: "(JSLint)",
