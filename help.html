@@ -275,9 +275,9 @@ a:active {
 <p>The <var>value</var> (usually a function or object) will be exported from
     this file.</p>
 <h1 id=global>Directives</h1>
-<p><s>J<u>SLint</u></s> provides three directives that may be inserted into a
+<p><s>J<u>SLint</u></s> provides three directives that may be placed in a
     file to manage <s>J<u>SLint</u></s>'s behavior. Use of these directives is
-    optional. If they are used, they should be placed into a source file before
+    optional. If they are used, they should be placed in a source file before
     the first statement. They are written in the form of a comment, where the
     directive name is placed immediately after the opening of the comment before
     any whitespace. The three directives are <code>global</code>,
@@ -309,7 +309,7 @@ a:active {
     var report;
     var jslint; </pre>
 <p>Using <code>var</code> in this way allows comparing a global variable to the
-    <code>undefined</code> value to determine if it is present.</p>
+    <code>undefined</code> value to determine whether it is has been used in the global context.</p>
 <h1><code>/*jslint*/</code></h1>
 <p>The <code>/*jslint*/</code> directive allows for the control of several
     options. These options can also be set from the
@@ -735,7 +735,7 @@ a:active {
     invocations.</p>
 <p>Tabs and spaces should not be mixed. We should pick just one in order to
     avoid the problems that come from having both. Personal preference is an
-    extremely unreliable criteria. Neither offers a powerful advantage over the
+    extremely unreliable criterion. Neither offers a powerful advantage over the
     other. Fifty years ago, tab had the advantage of consuming less memory, but
     Moore's Law has eliminated that advantage. Space has one clear advantage
     over tab: there is no reliable standard for how many spaces a tab
