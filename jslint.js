@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-08-28
+// 2016-08-29
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -113,10 +113,11 @@
     unexpected_label_a, unexpected_parens, unexpected_space_a_b,
     unexpected_statement_a, unexpected_trailing_space, unexpected_typeof_a,
     uninitialized_a, unreachable_a, unregistered_property_a, unsafe, unused_a,
-    use_spaces, use_strict, used, value, var_loop, var_switch, variable,
-    warning, warnings, weird_condition_a, weird_expression_a, weird_loop,
-    weird_relation_a, white, wrap_assignment, wrap_condition, wrap_immediate,
-    wrap_parameter, wrap_regexp, wrap_unary, wrapped, writable, y
+    use_double, use_spaces, use_strict, used, value, var_loop, var_switch,
+    variable, warning, warnings, weird_condition_a, weird_expression_a,
+    weird_loop, weird_relation_a, white, wrap_assignment, wrap_condition,
+    wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary, wrapped, writable,
+    y
 */
 
 var jslint = (function JSLint() {
@@ -353,6 +354,7 @@ var jslint = (function JSLint() {
         unregistered_property_a: "Unregistered property name '{a}'.",
         unsafe: "Unsafe character '{a}'.",
         unused_a: "Unused '{a}'.",
+        use_double: "Use double quotes, not single quotes.",
         use_spaces: "Use spaces, not tabs.",
         use_strict: "This function needs a 'use strict' pragma.",
         var_loop: "Don't declare variables in a loop.",
@@ -398,7 +400,7 @@ var jslint = (function JSLint() {
     var rx_directive = /^(jslint|property|global)\s+(.*)$/;
     var rx_directive_part = /^([a-zA-Z$_][a-zA-Z0-9$_]*)\s*(?::\s*(true|false|[0-9]+)\s*)?(?:,\s*)?(.*)$/;
 // token (sorry it is so long)
-    var rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\]?,:;'"~`]|=(?:==?|>)?|\.+|\/[=*\/]?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|[\^%]=?|&[&=]?|\|[\|=]?|>{1,3}=?|<<?=?|!={0,2}|(0|[1-9][0-9]*))(.*)$/;
+    var rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\]?,:;'"~`]|=(?:==?|>)?|\.+|\/[=*\/]?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<<?=?|!={0,2}|(0|[1-9][0-9]*))(.*)$/;
     var rx_digits = /^([0-9]+)(.*)$/;
     var rx_hexs = /^([0-9a-fA-F]+)(.*)$/;
     var rx_octals = /^([0-7]+)(.*)$/;
@@ -587,6 +589,7 @@ var jslint = (function JSLint() {
 
         var char;                   // a popular character
         var column = 0;             // the column number of the next character
+        var first;                  // the first token
         var from;                   // the starting column number of the token
         var line = -1;              // the line number of the next character
         var nr = 0;                 // the next token number
@@ -720,21 +723,18 @@ var jslint = (function JSLint() {
         function escape(extra) {
             switch (next_char("\\")) {
             case "\\":
-            case "\"":
-            case "'":
             case "/":
-            case ":":
-            case "=":
-            case "|":
             case "b":
             case "f":
             case "n":
             case "r":
             case "t":
-            case " ":
                 break;
             case "u":
                 if (next_char("u") === "{") {
+                    if (json_mode) {
+                        warn_at("unexpected_a", line, column - 1, char);
+                    }
                     if (some_digits(rx_hexs) > 5) {
                         warn_at("too_many_digits", line, column - 1);
                     }
@@ -979,7 +979,6 @@ var jslint = (function JSLint() {
                 case "/":
                 case "^":
                 case "-":
-                case "|":
                 case "":
                     return false;
                 case "`":
@@ -1074,7 +1073,7 @@ var jslint = (function JSLint() {
                         klass();
                         return true;
                     case "\\":
-                        escape("BbDdSsWw^${}[]().-|*+?");
+                        escape("BbDdSsWw^${}[]():.-|*+?");
                         return true;
                     case "(":
                         group();
@@ -1193,7 +1192,7 @@ var jslint = (function JSLint() {
                     the_token.quote = quote;
                     return the_token;
                 case "\\":
-                    escape();
+                    escape(quote);
                     break;
                 case "":
                     return stop_at("unclosed_string", line, column);
@@ -1336,7 +1335,7 @@ var jslint = (function JSLint() {
 
             case "'":
                 if (!option.single) {
-                    warn_at("expected_a_b", line, column, "\"", "'");
+                    warn_at("use_double", line, column);
                 }
                 return string(snippet);
 
@@ -1512,6 +1511,9 @@ var jslint = (function JSLint() {
             }
             return make(snippet);
         }
+
+        first = lex();
+        json_mode = first.id === "{" || first.id === "[";
 
 // This is the only loop in JSLint. It will turn into a recursive call to lex
 // when ES6 has been finished and widely deployed and adopted.
@@ -4726,8 +4728,7 @@ var jslint = (function JSLint() {
             });
             tokenize(source);
             advance();
-            if (tokens[0].id === "{" || tokens[0].id === "[") {
-                json_mode = true;
+            if (json_mode) {
                 tree = json_value();
                 advance("(end)");
             } else {
@@ -4778,7 +4779,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-08-28",
+            edition: "2016-08-29",
             functions: functions,
             global: global,
             id: "(JSLint)",
