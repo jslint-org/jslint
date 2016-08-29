@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-08-12
+// 2016-08-28
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -398,7 +398,7 @@ var jslint = (function JSLint() {
     var rx_directive = /^(jslint|property|global)\s+(.*)$/;
     var rx_directive_part = /^([a-zA-Z$_][a-zA-Z0-9$_]*)\s*(?::\s*(true|false|[0-9]+)\s*)?(?:,\s*)?(.*)$/;
 // token (sorry it is so long)
-    var rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\]\?,:;'"~`]|=(?:==?|>)?|\.+|\/[=*\/]?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|[\^%]=?|&[&=]?|\|[\|=]?|>{1,3}=?|<<?=?|!={0,2}|(0|[1-9][0-9]*))(.*)$/;
+    var rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\]?,:;'"~`]|=(?:==?|>)?|\.+|\/[=*\/]?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|[\^%]=?|&[&=]?|\|[\|=]?|>{1,3}=?|<<?=?|!={0,2}|(0|[1-9][0-9]*))(.*)$/;
     var rx_digits = /^([0-9]+)(.*)$/;
     var rx_hexs = /^([0-9a-fA-F]+)(.*)$/;
     var rx_octals = /^([0-7]+)(.*)$/;
@@ -755,7 +755,7 @@ var jslint = (function JSLint() {
             case "":
                 return stop_at("unclosed_string", line, column);
             default:
-                if (extra && extra.indexOf(char) < 0) {
+                if (!extra || extra.indexOf(char) < 0) {
                     warn_at("unexpected_a_after_b", line, column, char, "\\");
                 }
             }
@@ -972,7 +972,7 @@ var jslint = (function JSLint() {
 
                 switch (char) {
                 case "\\":
-                    escape();
+                    escape("BbDdSsWw-[]^");
                     return true;
                 case "[":
                 case "]":
@@ -1074,7 +1074,7 @@ var jslint = (function JSLint() {
                         klass();
                         return true;
                     case "\\":
-                        escape("BbDdSsWw^${}[]().|*+?");
+                        escape("BbDdSsWw^${}[]().-|*+?");
                         return true;
                     case "(":
                         group();
@@ -4778,7 +4778,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-08-12",
+            edition: "2016-08-28",
             functions: functions,
             global: global,
             id: "(JSLint)",
