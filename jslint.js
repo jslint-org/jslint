@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-08-29
+// 2016-08-30
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -108,16 +108,16 @@
     switch, test, this, thru, toString, todo_comment, tokens, too_long,
     too_many, too_many_digits, tree, try, type, u, unclosed_comment,
     unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
-    unexpected_a_after_b, unexpected_at_top_level_a, unexpected_char_a,
-    unexpected_comment, unexpected_directive_a, unexpected_expression_a,
-    unexpected_label_a, unexpected_parens, unexpected_space_a_b,
-    unexpected_statement_a, unexpected_trailing_space, unexpected_typeof_a,
-    uninitialized_a, unreachable_a, unregistered_property_a, unsafe, unused_a,
-    use_double, use_spaces, use_strict, used, value, var_loop, var_switch,
-    variable, warning, warnings, weird_condition_a, weird_expression_a,
-    weird_loop, weird_relation_a, white, wrap_assignment, wrap_condition,
-    wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary, wrapped, writable,
-    y
+    unexpected_a_after_b, unexpected_a_before_b, unexpected_at_top_level_a,
+    unexpected_char_a, unexpected_comment, unexpected_directive_a,
+    unexpected_expression_a, unexpected_label_a, unexpected_parens,
+    unexpected_space_a_b, unexpected_statement_a, unexpected_trailing_space,
+    unexpected_typeof_a, uninitialized_a, unreachable_a,
+    unregistered_property_a, unsafe, unused_a, use_double, use_spaces,
+    use_strict, used, value, var_loop, var_switch, variable, warning, warnings,
+    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
+    wrap_assignment, wrap_condition, wrap_immediate, wrap_parameter,
+    wrap_regexp, wrap_unary, wrapped, writable, y
 */
 
 var jslint = (function JSLint() {
@@ -338,6 +338,7 @@ var jslint = (function JSLint() {
         undeclared_a: "Undeclared '{a}'.",
         unexpected_a: "Unexpected '{a}'.",
         unexpected_a_after_b: "Unexpected '{a}' after '{b}'.",
+        unexpected_a_before_b: "Unexpected '{a}' before '{b}'.",
         unexpected_at_top_level_a: "Expected '{a}' to be in a function.",
         unexpected_char_a: "Unexpected character '{a}'.",
         unexpected_comment: "Unexpected comment.",
@@ -756,7 +757,13 @@ var jslint = (function JSLint() {
                 return stop_at("unclosed_string", line, column);
             default:
                 if (!extra || extra.indexOf(char) < 0) {
-                    warn_at("unexpected_a_after_b", line, column, char, "\\");
+                    warn_at(
+                        "unexpected_a_before_b",
+                        line,
+                        column - 2,
+                        "\\",
+                        char
+                    );
                 }
             }
             next_char();
@@ -4779,7 +4786,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-08-29",
+            edition: "2016-08-30",
             functions: functions,
             global: global,
             id: "(JSLint)",
