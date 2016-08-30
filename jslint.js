@@ -1102,7 +1102,7 @@ var jslint = (function JSLint() {
                         }
                         break;
                     case " ":
-                        warn_at("expected_a_before_b", line, column, "\\", " ");
+                        warn_at("expected_a_b", line, column, "\\s", " ");
                         break;
                     }
                     next_char();
