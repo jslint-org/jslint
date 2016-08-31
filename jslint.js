@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-08-30
+// 2016-08-31
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -100,13 +100,13 @@
     import, imports, inc, indexOf, infix_in, init, initial, isArray, isNaN,
     join, json, keys, label, label_a, lbp, led, length, level, line, lines,
     live, loop, m, margin, match, maxerr, maxlen, message, misplaced_a,
-    misplaced_directive_a, missing_browser, module, multivar, naked_block,
-    name, names, nested_comment, new, node, not_label_a, nr, nud, number_isNaN,
-    ok, open, option, out_of_scope_a, parameters, pop, property, push, qmark,
-    quote, redefinition_a_b, replace, reserved_a, role, search, signature,
-    single, slice, some, sort, split, statement, stop, strict, subscript_a,
-    switch, test, this, thru, toString, todo_comment, tokens, too_long,
-    too_many, too_many_digits, tree, try, type, u, unclosed_comment,
+    misplaced_directive_a, missing_browser, missing_m, module, multivar,
+    naked_block, name, names, nested_comment, new, node, not_label_a, nr, nud,
+    number_isNaN, ok, open, option, out_of_scope_a, parameters, pop, property,
+    push, qmark, quote, redefinition_a_b, replace, reserved_a, role, search,
+    signature, single, slice, some, sort, split, statement, stop, strict,
+    subscript_a, switch, test, this, thru, toString, todo_comment, tokens,
+    too_long, too_many, too_many_digits, tree, try, type, u, unclosed_comment,
     unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
     unexpected_a_after_b, unexpected_a_before_b, unexpected_at_top_level_a,
     unexpected_char_a, unexpected_comment, unexpected_directive_a,
@@ -320,6 +320,7 @@ var jslint = (function JSLint() {
         misplaced_a: "Place '{a}' at the outermost level.",
         misplaced_directive_a: "Place the '/*{a}*/' directive before the first statement.",
         missing_browser: "/*global*/ requires the Assume a browser option.",
+        missing_m: "Expected 'm' flag on a multiline regular expression.",
         naked_block: "Naked block.",
         nested_comment: "Nested comment.",
         not_label_a: "'{a}' is not a label.",
@@ -386,7 +387,7 @@ var jslint = (function JSLint() {
 // identifier
     var rx_identifier = /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/;
     var rx_module = /^[a-zA-Z0-9_$:.@\-\/]+$/;
-    var rx_bad_property = /^_|\$|Sync$|_$/;
+    var rx_bad_property = /^_|\$|Sync\$|_$/;
 // star slash
     var rx_star_slash = /\*\//;
 // slash star
@@ -942,6 +943,7 @@ var jslint = (function JSLint() {
 
 // Parse a regular expression literal.
 
+            var multi_mode = false;
             var result;
             var value;
 
@@ -1080,7 +1082,7 @@ var jslint = (function JSLint() {
                         klass();
                         return true;
                     case "\\":
-                        escape("BbDdSsWw^${}[]():.-|*+?");
+                        escape("BbDdSsWw^${}[]():=!.-|*+?");
                         return true;
                     case "(":
                         group();
@@ -1098,11 +1100,27 @@ var jslint = (function JSLint() {
                         return false;
                     case "`":
                         if (mega_mode) {
-                            warn_at("unexpected_a", line, column, "`");
+                            warn_at("unexpected_a", line, column - 1, "`");
                         }
                         break;
                     case " ":
-                        warn_at("expected_a_b", line, column, "\\s", " ");
+                        warn_at(
+                            "expected_a_b",
+                            line,
+                            column - 1,
+                            "\\s",
+                            " "
+                        );
+                        break;
+                    case "$":
+                        if (source_line.charAt(0) !== "/") {
+                            multi_mode = true;
+                        }
+                        break;
+                    case "^":
+                        if (snippet !== "^") {
+                            multi_mode = true;
+                        }
                         break;
                     }
                     next_char();
@@ -1180,6 +1198,9 @@ var jslint = (function JSLint() {
             result = make("(regexp)", char);
             result.flag = flag;
             result.value = value;
+            if (multi_mode && !flag.m) {
+                warn_at("missing_m", line, column);
+            }
             return result;
         }
 
@@ -4786,7 +4807,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-08-30",
+            edition: "2016-08-31",
             functions: functions,
             global: global,
             id: "(JSLint)",
