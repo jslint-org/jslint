@@ -1,5 +1,5 @@
 // report.js
-// 2016-10-09
+// 2016-10-10
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Generate JSLint HTML reports.
@@ -95,10 +95,12 @@ var REPORT = (function () {
             }
             var global = Object.keys(data.global.context).sort();
             var froms = data.froms.sort();
-            if (global.length + froms.length > 0) {
+            var exports = Object.keys(data.exports).sort()
+            if (global.length + froms.length + exports.length > 0) {
                 output.push("<dl class=level0>");
                 detail(mode, global);
                 detail("import from", froms);
+                detail("export", exports);
                 output.push("</dl>");
             }
 
