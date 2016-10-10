@@ -161,7 +161,7 @@ var jslint = (function JSLint() {
             "require", "send", "start", "sum", "toJSON"
         ],
         devel: [
-            "alert", "confirm", "console", "Debug", "opera", "prompt", "WSH"
+            "alert", "confirm", "console", "prompt"
         ],
         es6: [
             "ArrayBuffer", "DataView", "Float32Array", "Float64Array",
