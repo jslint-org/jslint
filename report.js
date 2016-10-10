@@ -1,12 +1,12 @@
 // report.js
-// 2016-05-20
+// 2016-10-09
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Generate JSLint HTML reports.
 
 /*property
     closure, column, context, edition, error, filter, forEach, fudge, function,
-    functions, global, id, imports, isArray, join, json, keys, length, level,
+    functions, global, id, froms, isArray, join, json, keys, length, level,
     line, lines, message, module, name, names, option, parameters, property,
     push, replace, role, signature, sort, stop, warnings
 */
@@ -94,11 +94,11 @@ var REPORT = (function () {
                 output.push("<center>There are no functions.</center>");
             }
             var global = Object.keys(data.global.context).sort();
-            var imports = data.imports.sort();
-            if (global.length + imports.length > 0) {
+            var froms = data.froms.sort();
+            if (global.length + froms.length > 0) {
                 output.push("<dl class=level0>");
                 detail(mode, global);
-                detail("imports", imports);
+                detail("import from", froms);
                 output.push("</dl>");
             }
 

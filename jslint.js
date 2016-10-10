@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-08-31
+// 2016-10_09
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -36,12 +36,13 @@
 
 //      directives: an array of directive comment tokens.
 //      edition: the version of JSLint that did the analysis.
+//      exports: the names exported from the module.
+//      froms: an array of strings representing each of the imports.
 //      functions: an array of objects that represent all of the functions
 //              declared in the file.
 //      global: an object representing the global object. Its .context property
 //              is an object containing a property for each global variable.
 //      id: "(JSLint)"
-//      imports: an array of strings representing each of the imports.
 //      json: true if the file is a JSON text.
 //      lines: an array of strings, the source.
 //      module: true if an import or export statement was used.
@@ -88,36 +89,36 @@
     a, and, arity, b, bad_assignment_a, bad_directive_a, bad_get,
     bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
     body, browser, c, calls, catch, charAt, charCodeAt, closer, closure, code,
-    column, complex, concat, constant, context, couch, create, d, dead, devel,
-    directive, directives, disrupt, dot, duplicate_a, edition, ellipsis, else,
-    empty_block, es6, escape_mega, eval, every, expected_a, expected_a_at_b_c,
-    expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
-    expected_digits_after_a, expected_four_digits, expected_identifier_a,
-    expected_line_break_a_b, expected_regexp_factor_a, expected_space_a_b,
-    expected_statements_a, expected_string_a, expected_type_string_a,
-    expression, extra, finally, flag, for, forEach, free, from, fud, fudge,
-    function, function_in_loop, functions, g, global, i, id, identifier,
-    import, imports, inc, indexOf, infix_in, init, initial, isArray, isNaN,
-    join, json, keys, label, label_a, lbp, led, length, level, line, lines,
-    live, loop, m, margin, match, maxerr, maxlen, message, misplaced_a,
-    misplaced_directive_a, missing_browser, missing_m, module, multivar,
-    naked_block, name, names, nested_comment, new, node, not_label_a, nr, nud,
-    number_isNaN, ok, open, option, out_of_scope_a, parameters, pop, property,
-    push, qmark, quote, redefinition_a_b, replace, reserved_a, role, search,
-    signature, single, slice, some, sort, split, statement, stop, strict,
-    subscript_a, switch, test, this, thru, toString, todo_comment, tokens,
-    too_long, too_many, too_many_digits, tree, try, type, u, unclosed_comment,
-    unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
-    unexpected_a_after_b, unexpected_a_before_b, unexpected_at_top_level_a,
-    unexpected_char_a, unexpected_comment, unexpected_directive_a,
-    unexpected_expression_a, unexpected_label_a, unexpected_parens,
-    unexpected_space_a_b, unexpected_statement_a, unexpected_trailing_space,
-    unexpected_typeof_a, uninitialized_a, unreachable_a,
-    unregistered_property_a, unsafe, unused_a, use_double, use_spaces,
-    use_strict, used, value, var_loop, var_switch, variable, warning, warnings,
-    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
-    wrap_assignment, wrap_condition, wrap_immediate, wrap_parameter,
-    wrap_regexp, wrap_unary, wrapped, writable, y
+    column, complex, concat, constant, context, couch, create, d, dead,
+    default, devel, directive, directives, disrupt, dot, duplicate_a, edition,
+    ellipsis, else, empty_block, es6, escape_mega, eval, every, expected_a,
+    expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d,
+    expected_a_before_b, expected_digits_after_a, expected_four_digits,
+    expected_identifier_a, expected_line_break_a_b, expected_regexp_factor_a,
+    expected_space_a_b, expected_statements_a, expected_string_a,
+    expected_type_string_a, exports, expression, extra, finally, flag, for,
+    forEach, free, from, froms, fud, fudge, function, function_in_loop,
+    functions, g, global, i, id, identifier, import, inc, indexOf, infix_in,
+    init, initial, isArray, isNaN, join, json, keys, label, label_a, lbp, led,
+    length, level, line, lines, live, loop, m, margin, match, maxerr, maxlen,
+    message, misplaced_a, misplaced_directive_a, missing_browser, missing_m,
+    module, multivar, naked_block, name, names, nested_comment, new, node,
+    not_label_a, nr, nud, number_isNaN, ok, open, option, out_of_scope_a,
+    parameters, pop, property, push, qmark, quote, redefinition_a_b, replace,
+    reserved_a, role, search, signature, single, slice, some, sort, split,
+    statement, stop, strict, subscript_a, switch, test, this, thru, toString,
+    todo_comment, tokens, too_long, too_many, too_many_digits, tree, try, type,
+    u, unclosed_comment, unclosed_mega, unclosed_string, undeclared_a,
+    unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
+    unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
+    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
+    unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
+    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
+    unreachable_a, unregistered_property_a, unsafe, unused_a, use_double,
+    use_spaces, use_strict, used, value, var_loop, var_switch, variable,
+    warning, warnings, weird_condition_a, weird_expression_a, weird_loop,
+    weird_relation_a, white, wrap_assignment, wrap_condition, wrap_immediate,
+    wrap_parameter, wrap_regexp, wrap_unary, wrapped, writable, y
 */
 
 var jslint = (function JSLint() {
@@ -438,12 +439,12 @@ var jslint = (function JSLint() {
     var directives;         // The directive comments.
     var directive_mode;     // true if directives are still allowed.
     var early_stop;         // true if JSLint cannot finish.
-    var export_mode;        // true if an export statement was seen.
+    var exports;            // The exported names and values.
+    var froms;              // The array collecting all import-from strings.
     var fudge;              // true if the natural numbers start with 1.
     var functionage;        // The current function.
     var functions;          // The array containing all of the functions.
     var global;             // The global object; the outermost context.
-    var imports;            // The array collecting all import-from strings.
     var json_mode;          // true if parsing JSON.
     var lines;              // The array containing source lines.
     var module_mode;        // true if import or export was used.
@@ -3260,20 +3261,82 @@ var jslint = (function JSLint() {
     });
     stmt("export", function () {
         var the_export = token;
+        var the_id;
+        var the_name;
+        var the_thing;
+
+        function export_id() {
+            if (!next_token.identifier) {
+                stop("expected_identifier_a");
+            }
+            the_id = next_token.id;
+            the_name = global.context[the_id];
+            if (the_name === undefined) {
+                warn("unexpected_a");
+            } else {
+                the_name.used += 1;
+                if (exports[the_id] !== undefined) {
+                    warn("duplicate_a");
+                }
+                exports[the_id] = the_name;
+            }
+            advance();
+            the_export.expression.push(the_thing);
+        }
+
         if (!option.es6) {
             warn("es6", the_export);
         }
-        if (typeof module_mode === "object") {
-            warn("unexpected_directive_a", module_mode, module_mode.directive);
-        }
-        advance("default");
-        if (export_mode) {
-            warn("duplicate_a", token);
+        the_export.expression = [];
+        if (next_token.id === "default") {
+            if (exports.default !== undefined) {
+                warn("duplicate_a");
+            }
+            advance("default");
+            the_thing = expression();
+            if (the_thing.id !== "function") {
+                semicolon();
+            }
+            exports.default = the_thing;
+            the_export.expression.push(the_thing);
+        } else {
+            switch (next_token.id) {
+            case "function":
+                the_thing = statement();
+                the_name = the_thing.name;
+                the_id = the_name.id;
+                the_name.used += 1;
+                if (exports[the_id] !== undefined) {
+                    warn("duplicate_a", the_name);
+                }
+                exports[the_id] = the_thing;
+                the_export.expression.push(the_thing);
+                the_thing.statement = false;
+                the_thing.arity = "expression";
+                break;
+            case "var":
+            case "let":
+            case "const":
+                warn("unexpeted_a");
+                break;
+            case "{":
+                advance("{");
+                (function loop() {
+                    export_id();
+                    if (next_token.id === ",") {
+                        advance(",");
+                        return loop();
+                    }
+                }());
+                advance("}");
+                semicolon();
+                break;
+            default:
+                export_id();
+                semicolon();
+            }
         }
         module_mode = true;
-        export_mode = true;
-        the_export.expression = expression(0);
-        semicolon();
         return the_export;
     });
     stmt("for", function () {
@@ -3391,7 +3454,7 @@ var jslint = (function JSLint() {
         if (!rx_module.test(token.value)) {
             warn("bad_module_name_a", token);
         }
-        imports.push(token.value);
+        froms.push(token.value);
         semicolon();
         return the_import;
     });
@@ -4052,9 +4115,6 @@ var jslint = (function JSLint() {
         if (thing.wrapped) {
             warn("unexpected_parens", thing);
         }
-        if (typeof thing.name === "object") {
-            thing.name.used = 0;
-        }
         return pop_block();
     }
 
@@ -4712,7 +4772,8 @@ var jslint = (function JSLint() {
             directive_mode = true;
             directives = [];
             early_stop = true;
-            export_mode = false;
+            exports = empty();
+            froms = [];
             fudge = (option.fudge)
                 ? 1
                 : 0;
@@ -4731,7 +4792,6 @@ var jslint = (function JSLint() {
             };
             blockage = global;
             functionage = global;
-            imports = [];
             json_mode = false;
             mega_mode = false;
             module_mode = false;
@@ -4807,11 +4867,12 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-08-31",
+            edition: "2016-10-09",
+            exports: exports,
+            froms: froms,
             functions: functions,
             global: global,
             id: "(JSLint)",
-            imports: imports,
             json: json_mode,
             lines: lines,
             module: module_mode === true,
