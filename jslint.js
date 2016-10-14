@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-10_09
+// 2016-10-13
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1679,16 +1679,22 @@ var jslint = (function JSLint() {
 // Parsing of JSON is simple:
 
     function json_value() {
+        var negative;
 
         function json_object() {
             var brace = next_token;
             var object = empty();
+            var properties = [];
+            brace.expression = properties;
             advance("{");
             if (next_token.id !== "}") {
                 (function next() {
+                    var name;
+                    var value;
                     if (next_token.quote !== "\"") {
                         warn("unexpected_a", next_token, next_token.quote);
                     }
+                    name = next_token;
                     advance("(string)");
                     if (object[token.value] !== undefined) {
                         warn("duplicate_a", token);
@@ -1698,7 +1704,9 @@ var jslint = (function JSLint() {
                         object[token.value] = token;
                     }
                     advance(":");
-                    json_value();
+                    value = json_value();
+                    value.label = name;
+                    properties.push(value);
                     if (next_token.id === ",") {
                         advance(",");
                         return next();
@@ -1706,14 +1714,17 @@ var jslint = (function JSLint() {
                 }());
             }
             advance("}", brace);
+            return brace;
         }
 
         function json_array() {
             var bracket = next_token;
+            var elements = [];
+            bracket.expression = elements;
             advance("[");
             if (next_token.id !== "]") {
                 (function next() {
-                    json_value();
+                    elements.push(json_value());
                     if (next_token.id === ",") {
                         advance(",");
                         return next();
@@ -1721,36 +1732,38 @@ var jslint = (function JSLint() {
                 }());
             }
             advance("]", bracket);
+            return bracket;
         }
 
         switch (next_token.id) {
         case "{":
-            json_object();
-            break;
+            return json_object();
         case "[":
-            json_array();
-            break;
+            return json_array();
         case "true":
         case "false":
         case "null":
             advance();
-            break;
+            return token;
         case "(number)":
             if (!rx_JSON_number.test(next_token.value)) {
                 warn("unexpected_a");
             }
             advance();
-            break;
+            return token;
         case "(string)":
             if (next_token.quote !== "\"") {
                 warn("unexpected_a", next_token, next_token.quote);
             }
             advance();
-            break;
+            return token;
         case "-":
+            negative = next_token;
+            negative.arity = "unary";
             advance("-");
             advance("(number)");
-            break;
+            negative.expression = token;
+            return negative;
         default:
             stop("unexpected_a");
         }
@@ -4867,7 +4880,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-10-09",
+            edition: "2016-10-13",
             exports: exports,
             froms: froms,
             functions: functions,
