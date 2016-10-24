@@ -3325,7 +3325,7 @@ var jslint = (function JSLint() {
                 exports[the_id] = the_thing;
                 the_export.expression.push(the_thing);
                 the_thing.statement = false;
-                the_thing.arity = "expression";
+                the_thing.arity = "unary";
                 break;
             case "var":
             case "let":
