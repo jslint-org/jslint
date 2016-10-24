@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-10-13
+// 2016-10-24
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -359,7 +359,7 @@ var jslint = (function JSLint() {
         unused_a: "Unused '{a}'.",
         use_double: "Use double quotes, not single quotes.",
         use_spaces: "Use spaces, not tabs.",
-        use_strict: "This function needs a 'use strict' pragma.",
+        use_strict: "This function needs a \"use strict\" pragma.",
         var_loop: "Don't declare variables in a loop.",
         var_switch: "Don't declare variables in a switch.",
         weird_condition_a: "Weird condition '{a}'.",
@@ -4880,7 +4880,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-10-13",
+            edition: "2016-10-24",
             exports: exports,
             froms: froms,
             functions: functions,
