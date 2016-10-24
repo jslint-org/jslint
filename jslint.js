@@ -359,7 +359,7 @@ var jslint = (function JSLint() {
         unused_a: "Unused '{a}'.",
         use_double: "Use double quotes, not single quotes.",
         use_spaces: "Use spaces, not tabs.",
-        use_strict: "This function needs a 'use strict' pragma.",
+        use_strict: "This function needs a \"use strict\" pragma.",
         var_loop: "Don't declare variables in a loop.",
         var_switch: "Don't declare variables in a switch.",
         weird_condition_a: "Weird condition '{a}'.",
