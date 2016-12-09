@@ -4778,6 +4778,7 @@ var jslint = (function JSLint() {
     return function (source, option_object, global_array) {
         try {
             warnings = [];
+            option = Object.assign(empty(), option_object);
             anon = "anonymous";
             block_stack = [];
             declared_globals = empty();
