@@ -1,5 +1,5 @@
 // jslint.js
-// 2016-10-24
+// 2016-12-09
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -86,7 +86,7 @@
 // WARNING: JSLint will hurt your feelings.
 
 /*property
-    a, and, arity, b, bad_assignment_a, bad_directive_a, bad_get,
+    a, and, arity, assign, b, bad_assignment_a, bad_directive_a, bad_get,
     bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
     body, browser, c, calls, catch, charAt, charCodeAt, closer, closure, code,
     column, complex, concat, constant, context, couch, create, d, dead,
@@ -4778,7 +4778,6 @@ var jslint = (function JSLint() {
     return function (source, option_object, global_array) {
         try {
             warnings = [];
-            option = option_object || empty();
             anon = "anonymous";
             block_stack = [];
             declared_globals = empty();
@@ -4880,7 +4879,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2016-10-24",
+            edition: "2016-12-09",
             exports: exports,
             froms: froms,
             functions: functions,
