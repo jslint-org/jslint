@@ -3346,7 +3346,7 @@ var jslint = (function JSLint() {
                 break;
             default:
                 export_id();
-                if (the_name.writeable !== true) {
+                if (the_name.writable !== true) {
                     warn("unexpected_a", token);
                 }
                 semicolon();

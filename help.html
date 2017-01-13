@@ -157,7 +157,7 @@ a:active {
 </style>
 </head>
 <body>
-<div id="JSLINT_TITLE">J<u>SLint</u></div>
+<div id="title">J<u>SLint</u></div>
 <ul style="float: right; margin: 1em; padding-right: 1em;">
     <li><a href="#try">Try it.</a></li>
     <li><a href="http://www.amazon.com/exec/obidos/ASIN/0596517742/wrrrldwideweb"
@@ -174,7 +174,7 @@ a:active {
 <center>
     <i>Terre des Hommes</i> (1939)
 </center>
-<h1 id=what>Good Parts</h1>
+<h1 id=good>Good Parts</h1>
 <p>The Principle of the Good Parts is</p>
 <blockquote> If a feature is sometimes useful and sometimes dangerous and if
     there is a  better option then always use the better option. </blockquote>
@@ -221,7 +221,7 @@ a:active {
     reach ubiquity. Using the new features in enviroments that do not fully
     implement the new standard will result in failure. This is why
     <s>J<u>SLint</u></s> gives warnings when ES6 features are used. Some of
-    ES6's features are good, so <s>J<u>SLint</u></s> will recognize the good
+    ES6&rsquo;s features are good, so <s>J<u>SLint</u></s> will recognize the good
     parts of ES6 with the <code>es6</code> option. As implementations of the new
     standard become more stable and better understood, the set of features
     recognized by JSLint may increase. After the transition to ES6 is complete,
@@ -254,11 +254,11 @@ a:active {
     <li><code>0b</code>- and <code>0o</code>- number literals.</li>
 </ul>
 <p>The most important new feature of ES6 is proper tail calls. This has no
-    new syntax, so <s>J<u>SLint</u></s> doesn't see it. But it makes recursion
+    new syntax, so <s>J<u>SLint</u></s> doesn&rsquo;t see it. But it makes recursion
     much more attractive, which makes loops, particularly <code>for</code>
     loops, much less attractive.</p>
-<h1 id="import-export"><code>import export</code></h1>
-<p>The ES6 module feature will be an important improvement over JavaScript's
+<h1 id="import"><code>import export</code></h1>
+<p>The ES6 module feature will be an important improvement over JavaScript&rsquo;s
     global variables as a means of linking separate files together.
     <s>J<u>SLint</u></s> recognizes a small but essential subset of the module
     syntax.</p>
@@ -274,7 +274,7 @@ a:active {
 </blockquote>
 <h1 id=directives>Directives</h1>
 <p><s>J<u>SLint</u></s> provides three directives that may be placed in a
-    file to manage <s>J<u>SLint</u></s>'s behavior. Use of these directives is
+    file to manage <s>J<u>SLint</u></s>&rsquo;s behavior. Use of these directives is
     optional. If they are used, they should be placed in a source file before
     the first statement. They are written in the form of a comment, where the
     directive name is placed immediately after the opening of the comment before
@@ -320,12 +320,12 @@ a:active {
             <th>Meaning</th>
         </tr>
         <tr>
-            <td>Tolerate bitwise operators</td>
+            <td id="bitwise">Tolerate bitwise operators</td>
             <td><code>bitwise</code></td>
             <td><code>true</code> if bitwise operators should  be allowed. The
                 bitwise operators are rarely used in JavaScript programs, so it
-                is usually more likely that <code>&</code> is a mistyping of
-                <code>&&</code> than that it indicates a bitwise and.
+                is usually more likely that <code>&amp;</code> is a mistyping of
+                <code>&amp;&amp;</code> than that it indicates a bitwise and.
                 <s>J<u>SLint</u></s> will give warnings on the bitwise operators
                 unless this option is selected.</td>
         </tr>
@@ -348,7 +348,7 @@ a:active {
 </td>
         </tr>
         <tr>
-            <td>Assume <a href="http://couchdb.apache.org/">CouchDB</a></td>
+            <td id="couch">Assume <a href="http://couchdb.apache.org/">CouchDB</a></td>
             <td><code>couch</code></td>
             <td><code>true</code> if
                 <a href="http://couchdb.apache.org/">Couch DB</a>
@@ -360,7 +360,7 @@ a:active {
     <code> */</code></blockquote></td>
         </tr>
         <tr>
-            <td>Assume in development</td>
+            <td id="devel">Assume in development</td>
             <td><code>devel</code></td>
             <td><code>true</code> if browser globals that are useful in
                 development should be predefined, and if <code>debugger</code>
@@ -388,7 +388,7 @@ a:active {
     <code> */</code></blockquote></td>
         </tr>
         <tr>
-            <td>Tolerate <code>eval</code></td>
+            <td id="eval">Tolerate <code>eval</code></td>
             <td><code>eval</code></td>
             <td><code>true</code> if <code>eval</code> should be allowed. In the
                 past, the <code>eval</code> function was the most misused
@@ -402,7 +402,7 @@ a:active {
                 instead.</td>
         </tr>
         <tr>
-            <td>Fudge the line and column numbers</td>
+            <td id="fudge">Fudge the line and column numbers</td>
             <td><code>fudge</code></td>
             <td><code>true</code> if the origin of a text file is line 1 column
                 1. Programmers know that number systems start at zero.
@@ -412,7 +412,7 @@ a:active {
                 in its reports.</td>
         </tr>
         <tr>
-            <td>Maximum number of errors</td>
+            <td id="maxerr">Maximum number of errors</td>
             <td><code>maxerr</code></td>
             <td>The maximum number of warnings reported.
             (The default is unlimited)</td>
@@ -424,14 +424,14 @@ a:active {
                 (The default is unlimited)</td>
         </tr>
         <tr>
-            <td>Tolerate multiple variables declarations per statement</td>
+            <td id="multivar">Tolerate multiple variables declarations per statement</td>
             <td><code>multivar</code></td>
             <td><code>true</code> if a <code>var</code>, <code>let</code>, or
                 <code>const</code> statement can declare two or more variables
                 in a single statement.</td>
         </tr>
         <tr>
-            <td>Assume <a href="http://nodejs.org/">Node.js</a></td>
+            <td id="node">Assume <a href="http://nodejs.org/">Node.js</a></td>
             <td><code>node</code></td>
             <td><code>true</code> if Node.js globals should be predefined. It
                 will predefine globals that are used in the Node.js environment.
@@ -443,7 +443,7 @@ a:active {
     <code>*/</code></blockquote></td>
         </tr>
         <tr>
-            <td>Tolerate single quote strings</td>
+            <td id="single">Tolerate single quote strings</td>
             <td><code>single</code></td>
             <td><code>true</code> if <code>'</code><small>single quote</small>
                 should be allowed to enclose string literals. </td>
@@ -454,7 +454,7 @@ a:active {
             <td><code>true</code> if <code>this</code> should be allowed. </td>
         </tr>
         <tr>
-            <td>Tolerate whitespace mess</td>
+            <td id="white">Tolerate whitespace mess</td>
             <td><code>white</code></td>
             <td><code>true</code> if the whitespace rules should be ignored.</td>
         </tr>
@@ -465,12 +465,12 @@ a:active {
     es6, maxerr: 10, node
 */</pre>
 
-<h1 id=properties><code>/*property*/</code></h1>
+<h1 id=property><code>/*property*/</code></h1>
 <p>The <code>/*property*/</code> directive is used to declare a list  of
     property identifiers that are used in the file. Each property name in the
     program is looked up in this list. If a name is not found, that indicates an
     error, most likely a typing error.</p>
-<p>The list can also be used to evade some of <s>J<u>SLint</u></s>'s naming
+<p>The list can also be used to evade some of <s>J<u>SLint</u></s>&rsquo;s naming
     rules.</p>
 <p><s>J<u>SLint</u></s> can build the <code>/*property*/</code> list for you. At
     the bottom of its report, <s>J<u>SLint</u></s> displays a
@@ -531,7 +531,7 @@ a:active {
     work very well. Automatic semicolon insertion was added to make
     things easier for beginners. Unfortunately, it sometimes fails. Do not rely
     on it unless you are a beginner.</p>
-<p><s>J<u>SLint</u></s> expects that every statement be followed by
+<p><s>J<u>SLint</u></s> expects that every statement will be followed by
     <code>;</code> except for <code>for</code>, <code>function</code>,
     <code>if</code>, <code>switch</code>, <code>try</code>, and
     <code>while</code>. <s>J<u>SLint</u></s> does not expect to see unnecessary
@@ -574,7 +574,7 @@ a:active {
     an operator. It does not expect to see elided elements in array literals.  A
     comma should not appear after the last element of an array literal or object
     literal.</p>
-<h1 id=scope>Blocks</h1>
+<h1 id=blocks>Blocks</h1>
 <p><s>J<u>SLint</u></s> expects blocks with <code>function</code>,
     <code>if</code>, <code>switch</code>, <code>while</code>, <code>for</code>,
     <code>do</code>, and <code>try</code> statements and nowhere else.</p>
@@ -670,7 +670,7 @@ a:active {
     <s>J<u>SLint</u></s> looks for problems that may cause portability problems.
     It also attempts to resolve visual ambiguities by recommending explicit
     escapement.</p>
-<p>JavaScript's syntax for regular expression literals overloads the
+<p>JavaScript&rsquo;s syntax for regular expression literals overloads the
     <code>/</code>&nbsp;<small>slash</small> character. To avoid ambiguity,
     <s>J<u>SLint</u></s> expects that the character preceding a regular
     expression literal is a <code>(</code>&nbsp;<small>left paren</small> or
@@ -716,7 +716,7 @@ a:active {
     the indentation by 4 spaces.</p>
 <pre>return (the_token.id === "(string)" || the_token.id === "(number)")
     ? String(the_token.value)
-    : the_token.id;</pre>    
+    : the_token.id;</pre>
 <p>If <code>.</code> <small>period</small> is the first character on a line, the
     indentation is increased by 4 spaces.</p>
 <p>A <code>var</code>, <code>let</code>, or <code>const</code> statement will
@@ -761,7 +761,7 @@ a:active {
     report. It lists for each function:</p>
 <ul>
     <li>The line number on which it starts.</li>
-    <li>The function's name. In the case of anonymous functions,
+    <li>The function&rsquo;s name. In the case of anonymous functions,
         <s>J<u>SLint</u></s> will attempt to
         <code>«</code>guess<code>»</code> the name.</li>
     <li>The parameters.</li>
@@ -813,7 +813,7 @@ a:active {
 <p><s>J<u>SLint</u></s> will hurt your feelings. Side effects may include
     headache, irritability, dizziness, snarkiness, stomach pain, defensiveness,
     dry mouth, cleaner code, and a reduced error rate.</p>
-<h1 id=implementation>Further Reading</h1>
+<h1 id=reading>Further Reading</h1>
 <ul>
     <li><a href=function.html>The <code>jslint</code> function.</a></li>
 </ul>
