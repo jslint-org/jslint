@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-01-20
+// 2017-02-07
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1104,15 +1104,17 @@ var jslint = (function JSLint() {
                     case "(":
                         group();
                         return true;
+                    case "?":
+                    case "+":
+                    case "*":
+                    case "}":
+                    case "{":
+                        warn_at("expected_a_before_b", line, column - 1, "\\", char);
+                        break;
                     case "/":
                     case "|":
                     case "]":
                     case ")":
-                    case "}":
-                    case "{":
-                    case "?":
-                    case "+":
-                    case "*":
                     case "":
                         return false;
                     case "`":
@@ -4904,7 +4906,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-01-20",
+            edition: "2017-02-07",
             exports: exports,
             froms: froms,
             functions: functions,
