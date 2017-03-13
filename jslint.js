@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-02-07
+// 2017-03-12
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -105,11 +105,11 @@
     module, multivar, naked_block, name, names, nested_comment, new, node,
     not_label_a, nr, nud, number_isNaN, ok, open, option, out_of_scope_a,
     parameters, pop, property, push, qmark, quote, redefinition_a_b, replace,
-    reserved_a, role, search, signature, single, slice, some, sort, split,
-    statement, stop, strict, subscript_a, switch, test, this, thru, toString,
-    todo_comment, tokens, too_long, too_many, too_many_digits, tree, try, type,
-    u, unclosed_comment, unclosed_mega, unclosed_string, undeclared_a,
-    unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
+    reserved_a, right, role, search, signature, single, slice, some, sort,
+    split, statement, stop, strict, subscript_a, switch, test, this, thru,
+    toString, todo_comment, tokens, too_long, too_many, too_many_digits, tree,
+    try, type, u, unclosed_comment, unclosed_mega, unclosed_string,
+    undeclared_a, unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
     unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
     unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
     unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
@@ -4532,7 +4532,16 @@ var jslint = (function JSLint() {
                         expected_at(margin);
                     }
                 } else {
-                    if (right.from !== margin + 8) {
+                    if (!open) {
+                        var mislaid = stack[stack.length - 1].right;
+                        warn(
+                            "expected_a_at_b_c",
+                            mislaid,
+                            artifact(mislaid.id),
+                            margin + 4 + fudge,
+                            mislaid.from + fudge
+                        );
+                    } else if (right.from !== margin + 8) {
                         expected_at(margin + 8);
                     }
                 }
@@ -4572,7 +4581,8 @@ var jslint = (function JSLint() {
                             free: free,
                             margin: margin,
                             open: open,
-                            qmark: qmark
+                            qmark: qmark,
+                            right: right
                         });
                         qmark = "";
                         closer = new_closer;
@@ -4906,7 +4916,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-02-07",
+            edition: "2017-03-12",
             exports: exports,
             froms: froms,
             functions: functions,
