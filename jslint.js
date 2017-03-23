@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-03-13
+// 2017-03-23
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -4168,19 +4168,9 @@ var jslint = (function JSLint() {
             }
         }
         switch (thing.id) {
-        case "+":
-        case "-":
-            right = thing.expression[1];
-            if (
-                right.id === thing.id &&
-                right.arity === "unary" &&
-                !right.wrapped
-            ) {
-                warn("wrap_unary", right);
-            }
-            break;
         case "=>":
         case "(":
+        case "[":
             break;
         case ".":
             if (thing.expression.id === "RegExp") {
@@ -4188,9 +4178,18 @@ var jslint = (function JSLint() {
             }
             break;
         default:
+            right = thing.expression[1];
+            if (
+                (thing.id === "+" || thing.id === "-") &&
+                right.id === thing.id &&
+                right.arity === "unary" &&
+                !right.wrapped
+            ) {
+                warn("wrap_unary", right);
+            }
             if (
                 thing.expression[0].constant === true &&
-                thing.expression[1].constant === true
+                right.constant === true
             ) {
                 thing.constant = true;
             }
@@ -4401,6 +4400,14 @@ var jslint = (function JSLint() {
         }
     });
     postaction("unary", "function", postaction_function);
+    postaction("unary", "+", function (thing) {
+        var right = thing.expression;
+        if (right.id === "(" && right.expression[0].id === "new") {
+            warn("unexpected_a_before_b", thing, "+", "new");
+        } else if (right.constant || right.id === "{" || right.id === "[") {
+            warn("unexpected_a", thing, "+");
+        }
+    });
 
     function delve(the_function) {
         Object.keys(the_function.context).forEach(function (id) {
@@ -4916,7 +4923,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-03-13",
+            edition: "2017-03-23",
             exports: exports,
             froms: froms,
             functions: functions,
