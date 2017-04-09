@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-03-23
+// 2017-04-09
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -105,20 +105,21 @@
     module, multivar, naked_block, name, names, nested_comment, new, node,
     not_label_a, nr, nud, number_isNaN, ok, open, option, out_of_scope_a,
     parameters, pop, property, push, qmark, quote, redefinition_a_b, replace,
-    reserved_a, right, role, search, signature, single, slice, some, sort,
-    split, statement, stop, strict, subscript_a, switch, test, this, thru,
-    toString, todo_comment, tokens, too_long, too_many, too_many_digits, tree,
-    try, type, u, unclosed_comment, unclosed_mega, unclosed_string,
-    undeclared_a, unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
-    unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
-    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
-    unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
-    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
-    unreachable_a, unregistered_property_a, unsafe, unused_a, use_double,
-    use_spaces, use_strict, used, value, var_loop, var_switch, variable,
-    warning, warnings, weird_condition_a, weird_expression_a, weird_loop,
-    weird_relation_a, white, wrap_assignment, wrap_condition, wrap_immediate,
-    wrap_parameter, wrap_regexp, wrap_unary, wrapped, writable, y
+    required_a_optional_b, reserved_a, right, role, search, signature, single,
+    slice, some, sort, split, statement, stop, strict, subscript_a, switch,
+    test, this, thru, toString, todo_comment, tokens, too_long, too_many,
+    too_many_digits, tree, try, type, u, unclosed_comment, unclosed_mega,
+    unclosed_string, undeclared_a, unexpected_a, unexpected_a_after_b,
+    unexpected_a_before_b, unexpected_at_top_level_a, unexpected_char_a,
+    unexpected_comment, unexpected_directive_a, unexpected_expression_a,
+    unexpected_label_a, unexpected_parens, unexpected_space_a_b,
+    unexpected_statement_a, unexpected_trailing_space, unexpected_typeof_a,
+    uninitialized_a, unreachable_a, unregistered_property_a, unsafe, unused_a,
+    use_double, use_spaces, use_strict, used, value, var_loop, var_switch,
+    variable, warning, warnings, weird_condition_a, weird_expression_a,
+    weird_loop, weird_relation_a, white, wrap_assignment, wrap_condition,
+    wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary, wrapped, writable,
+    y
 */
 
 var jslint = (function JSLint() {
@@ -344,6 +345,7 @@ var jslint = (function JSLint() {
         number_isNaN: "Use Number.isNaN function to compare with NaN.",
         out_of_scope_a: "'{a}' is out of scope.",
         redefinition_a_b: "Redefinition of '{a}' from line {b}.",
+        required_a_optional_b: "Required parameter '{a}' after optional parameter '{b}'.",
         reserved_a: "Reserved name '{a}'.",
         subscript_a: "['{a}'] is better written in dot notation.",
         todo_comment: "Unexpected TODO comment.",
@@ -2690,6 +2692,7 @@ var jslint = (function JSLint() {
     function parameter_list() {
         var complex = false;
         var list = [];
+        var optional;
         var signature = ["("];
         if (next_token.id !== ")" && next_token.id !== "(end)") {
             (function parameter() {
@@ -2699,6 +2702,13 @@ var jslint = (function JSLint() {
                     complex = true;
                     if (!option.es6) {
                         warn("es6");
+                    } else if (optional !== undefined) {
+                        warn(
+                            "required_a_optional_b",
+                            next_token,
+                            next_token.id,
+                            optional.id
+                        );
                     }
                     param = next_token;
                     param.names = [];
@@ -2740,6 +2750,13 @@ var jslint = (function JSLint() {
                     complex = true;
                     if (!option.es6) {
                         warn("es6");
+                    } else if (optional !== undefined) {
+                        warn(
+                            "required_a_optional_b",
+                            next_token,
+                            next_token.id,
+                            optional.id
+                        );
                     }
                     param = next_token;
                     param.names = [];
@@ -2773,6 +2790,14 @@ var jslint = (function JSLint() {
                         ellipsis = true;
                         signature.push("...");
                         advance("...");
+                        if (optional !== undefined) {
+                            warn(
+                                "required_a_optional_b",
+                                next_token,
+                                next_token.id,
+                                optional.id
+                            );
+                        }
                     }
                     if (!next_token.identifier) {
                         return stop("expected_identifier_a");
@@ -2786,11 +2811,16 @@ var jslint = (function JSLint() {
                     } else {
                         if (next_token.id === "=") {
                             complex = true;
+                            optional = param;
                             if (!option.es6) {
                                 stop("unexpected_statement_a");
                             }
                             advance("=");
                             param.expression = expression(0);
+                        } else {
+                            if (optional !== undefined) {
+                                warn("required_a_optional_b", param, param.id, optional.id);
+                            }
                         }
                         if (next_token.id === ",") {
                             advance(",");
@@ -4923,7 +4953,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-03-23",
+            edition: "2017-04-09",
             exports: exports,
             froms: froms,
             functions: functions,
