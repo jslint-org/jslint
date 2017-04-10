@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-04-09
+// 2017-04-10
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -4248,6 +4248,7 @@ var jslint = (function JSLint() {
     postaction("binary", "(", function (thing) {
         var left = thing.expression[0];
         var the_new;
+        var arg;
         if (left.id === "new") {
             the_new = left;
             left = left.expression;
@@ -4271,7 +4272,13 @@ var jslint = (function JSLint() {
                         warn("unexpected_a", left, "new Function");
                     }
                 } else if (left.id === "Array") {
-                    warn("expected_a_b", left, "[]", "new Array");
+                    arg = thing.expression;
+                    if (arg.length !== 2 || (
+                        arg[1].id !== "(number)" &&
+                        arg[1].arity !== "binary"
+                    )) {
+                        warn("expected_a_b", left, "[]", "new Array");
+                    }
                 } else if (left.id === "Object") {
                     warn(
                         "expected_a_b",
@@ -4953,7 +4960,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-04-09",
+            edition: "2017-04-10",
             exports: exports,
             froms: froms,
             functions: functions,
