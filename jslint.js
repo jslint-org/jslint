@@ -85,6 +85,8 @@
 
 // WARNING: JSLint will hurt your feelings.
 
+/*jslint bitwise*/
+
 /*property
     a, and, arity, assign, b, bad_assignment_a, bad_directive_a, bad_get,
     bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
@@ -4274,7 +4276,10 @@ var jslint = (function JSLint() {
                 } else if (left.id === "Array") {
                     arg = thing.expression;
                     if (arg.length !== 2 || (
-                        arg[1].id !== "(number)" &&
+                        (
+                            arg[1].id !== "(number)" ||
+                            +arg[1].value !== (arg[1].value | 0)
+                        ) &&
                         arg[1].arity !== "binary"
                     )) {
                         warn("expected_a_b", left, "[]", "new Array");
