@@ -5,7 +5,7 @@
 This file allows JSLint to be run from a web browser. It can accept a source
 program and analyze it without sending it over the network.">
 <meta name="author" content="Douglas Crockford">
-<meta name="date" content="2017-02-22">
+<meta name="date" content="2017-05-09">
 <title>JSLint:&nbsp;The JavaScript Code Quality Tool</title>
 <link rel="stylesheet" type="text/css"
     href="http://fonts.googleapis.com/css?family=Patua+One">
@@ -343,7 +343,7 @@ a:link {
   </ul>
   <fieldset><legend>Source</legend>
       <textarea id="JSLINT_NUMBER" rows="18" readonly=true></textarea><textarea
-      id="JSLINT_SOURCE" rows="18" autofocus
+      id="JSLINT_SOURCE" rows="18" autofocus spellcheck="false"
       placeholder="// Paste JavaScript source or JSON text here."></textarea>
   </fieldset>
   <div style="text-align: center;">
@@ -390,7 +390,7 @@ a:link {
       <div><label><input type=text title=maxerr>Maximum warnings</label></div>
     </div>
     <div>Global variables...
-      <textarea id=JSLINT_GLOBAL title=global placeholder="imported globals here"></textarea>
+      <textarea id=JSLINT_GLOBAL title=global spellcheck="false" placeholder="imported globals here"></textarea>
     </div>
   </fieldset>
   <script>
