@@ -32,10 +32,10 @@ as in literature: It makes for better reading. A great writer doesn't express
 herself by putting the spaces before her commas instead of after, or by putting
 extra spaces inside her parentheses. A great writer will slavishly conform to
 some rules of style, and that in no way constrains her power to express herself
-creatively. See for example William Strunk's The Elements of Style
+creatively. For example, see: William Strunk's The Elements of Style
 [http://www.crockford.com/wrrrld/style.html].
 
 This applies to programming as well. Conforming to a consistent style improves
-readability, and frees you to express yourself in ways that matter. JSLint here
+readability, and frees you to express yourself in ways that matter. JSLint
 plays the part of a stern but benevolent editor, helping you to get the style
 right so that you can focus your creative energy where it is most needed.
