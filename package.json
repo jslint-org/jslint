@@ -1,0 +1,16 @@
+{
+  "name": "jslint-cli",
+  "version": "0.1.0",
+  "description": "Wrap jslint up as CLI tool using nodejs",
+  "repository": "JSLint",
+  "bin": "cli.js",
+  "main": "cli.js",
+  "scripts": {
+    "test": "echo 'Error: no test specified' && exit 1"
+  },
+  "author": "Dylan Mao",
+  "license": "MIT",
+  "devDependencies": {
+    "minimatch": "^3.0.2"
+  }
+}
