@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-04-10
+// 2017-06-13
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -388,10 +388,10 @@ var jslint = (function JSLint() {
         weird_relation_a: "Weird relation '{a}'.",
         wrap_assignment: "Don't wrap assignment statements in parens.",
         wrap_condition: "Wrap the condition in parens.",
-        wrap_immediate: "Wrap an immediate function invocation in " +
-                "parentheses to assist the reader in understanding that the " +
-                "expression is the result of a function, and not the " +
-                "function itself.",
+        wrap_immediate: "Wrap an immediate function invocation in "
+                + "parentheses to assist the reader in understanding that the "
+                + "expression is the result of a function, and not the "
+                + "function itself.",
         wrap_parameter: "Wrap the parameter in parens.",
         wrap_regexp: "Wrap this regexp in parens to avoid confusion.",
         wrap_unary: "Wrap the unary expression in parens."
@@ -439,8 +439,10 @@ var jslint = (function JSLint() {
     var rx_cap = /^[A-Z]/;
 
     function is_letter(string) {
-        return (string >= "a" && string <= "z\uffff") ||
-                (string >= "A" && string <= "Z\uffff");
+        return (
+            (string >= "a" && string <= "z\uffff")
+            || (string >= "A" && string <= "Z\uffff")
+        );
     }
 
     function supplant(string, object) {
@@ -542,8 +544,8 @@ var jslint = (function JSLint() {
         warning.message = supplant(bundle[code] || code, warning);
         warnings.push(warning);
         return (
-            typeof option.maxerr === "number" &&
-            warnings.length === option.maxerr
+            typeof option.maxerr === "number"
+            && warnings.length === option.maxerr
         )   ? stop_at("too_many", line, column)
             : warning;
     }
@@ -824,15 +826,10 @@ var jslint = (function JSLint() {
 // This warning is not suppressed by option.white.
 
             if (
-                previous.line === line &&
-                previous.thru === from &&
-                (
-                    (id === "(comment)" || id === "(regexp)" || id === "/") &&
-                    (
-                        previous.id === "(comment)" ||
-                        previous.id === "(regexp)"
-                    )
-                )
+                previous.line === line
+                && previous.thru === from
+                && (id === "(comment)" || id === "(regexp)" || id === "/")
+                && (previous.id === "(comment)" || previous.id === "(regexp)")
             ) {
                 warn(
                     "expected_space_a_b",
@@ -1992,23 +1989,25 @@ var jslint = (function JSLint() {
         }
         if (a.arity === b.arity && a.id === b.id) {
             if (a.id === ".") {
-                return are_similar(a.expression, b.expression) &&
-                        are_similar(a.name, b.name);
+                return (
+                    are_similar(a.expression, b.expression)
+                    && are_similar(a.name, b.name)
+                );
             }
             switch (a.arity) {
             case "unary":
                 return are_similar(a.expression, b.expression);
             case "binary":
                 return (
-                    a.id !== "(" &&
-                    are_similar(a.expression[0], b.expression[0]) &&
-                    are_similar(a.expression[1], b.expression[1])
+                    a.id !== "("
+                    && are_similar(a.expression[0], b.expression[0])
+                    && are_similar(a.expression[1], b.expression[1])
                 );
             case "ternary":
                 return (
-                    are_similar(a.expression[0], b.expression[0]) &&
-                    are_similar(a.expression[1], b.expression[1]) &&
-                    are_similar(a.expression[2], b.expression[2])
+                    are_similar(a.expression[0], b.expression[0])
+                    && are_similar(a.expression[1], b.expression[1])
+                    && are_similar(a.expression[2], b.expression[2])
                 );
             case "function":
             case "regexp":
@@ -2165,9 +2164,9 @@ var jslint = (function JSLint() {
 // use es6 syntax.
 
         if (
-            special === "body" &&
-            stack.length === 1 &&
-            next_token.value === "use strict"
+            special === "body"
+            && stack.length === 1
+            && next_token.value === "use strict"
         ) {
             the_block.strict = next_token;
             next_token.statement = true;
@@ -2196,9 +2195,9 @@ var jslint = (function JSLint() {
 //      v
 
         if (
-            the_thing.id !== "." &&
-            the_thing.arity !== "variable" &&
-            (the_thing.id !== "[" || the_thing.arity !== "binary")
+            the_thing.id !== "."
+            && the_thing.arity !== "variable"
+            && (the_thing.id !== "[" || the_thing.arity !== "binary")
         ) {
             warn("bad_assignment_a", the_thing);
             return false;
@@ -2216,10 +2215,10 @@ var jslint = (function JSLint() {
 
         var id = left.id;
         if (
-            !left.identifier &&
-            (
-                left.arity !== "binary" ||
-                (id !== "." && id !== "(" && id !== "[")
+            !left.identifier
+            && (
+                left.arity !== "binary"
+                || (id !== "." && id !== "(" && id !== "[")
             )
         ) {
             warn("unexpected_a", right);
@@ -2821,7 +2820,12 @@ var jslint = (function JSLint() {
                             param.expression = expression(0);
                         } else {
                             if (optional !== undefined) {
-                                warn("required_a_optional_b", param, param.id, optional.id);
+                                warn(
+                                    "required_a_optional_b",
+                                    param,
+                                    param.id,
+                                    optional.id
+                                );
                             }
                         }
                         if (next_token.id === ",") {
@@ -2996,9 +3000,9 @@ var jslint = (function JSLint() {
 // with one token of lookahead.
 
         if (
-            next_token.id === ")" ||
-            next_token.id === "..." ||
-            (next_token.identifier && (cadet === "," || cadet === "="))
+            next_token.id === ")"
+            || next_token.id === "..."
+            || (next_token.identifier && (cadet === "," || cadet === "="))
         ) {
             the_paren.free = false;
             return fart(parameter_list());
@@ -3122,8 +3126,8 @@ var jslint = (function JSLint() {
         var the_break = token;
         var the_label;
         if (
-            (functionage.loop < 1 && functionage.switch < 1) ||
-            functionage.finally > 0
+            (functionage.loop < 1 && functionage.switch < 1)
+            || functionage.finally > 0
         ) {
             warn("unexpected_a", the_break);
         }
@@ -3299,8 +3303,8 @@ var jslint = (function JSLint() {
         var the_token = token;
         var the_value = expression(0);
         if (
-            (the_value.id !== "." && the_value.id !== "[") ||
-            the_value.arity !== "binary"
+            (the_value.id !== "." && the_value.id !== "[")
+            || the_value.arity !== "binary"
         ) {
             stop("expected_a_b", the_value, ".", artifact(the_value));
         }
@@ -3418,11 +3422,10 @@ var jslint = (function JSLint() {
         if (next_token.id === ";") {
             return stop("expected_a_b", the_for, "while (", "for (;");
         }
-        if (
-            next_token.id === "var" ||
-            next_token.id === "let" ||
-            next_token.id === "const"
-        ) {
+        switch (next_token.id) {
+        case "var":
+        case "let":
+        case "const":
             return stop("unexpected_a");
         }
         first = expression(0);
@@ -3831,8 +3834,8 @@ var jslint = (function JSLint() {
                     break;
                 default:
                     warn((
-                        thing.id === "(string)" &&
-                        thing.value === "use strict"
+                        thing.id === "(string)"
+                        && thing.value === "use strict"
                     )
                         ? "unexpected_a"
                         : "unexpected_expression_a", thing);
@@ -3858,8 +3861,8 @@ var jslint = (function JSLint() {
                 stack.forEach(function (outer) {
                     var a_variable = outer.context[thing.id];
                     if (
-                        a_variable !== undefined &&
-                        a_variable.role !== "label"
+                        a_variable !== undefined
+                        && a_variable.role !== "label"
                     ) {
                         the_variable = a_variable;
                     }
@@ -3958,14 +3961,15 @@ var jslint = (function JSLint() {
             warn("unexpected_a", thing);
         }
         if (
-            thing.id !== "(" &&
-            thing.id !== "&&" &&
-            thing.id !== "||" &&
-            thing.id !== "=" &&
-            Array.isArray(thing.expression) &&
-            thing.expression.length === 2 && (
-                relationop[thing.expression[0].id] === true ||
-                relationop[thing.expression[1].id] === true
+            thing.id !== "("
+            && thing.id !== "&&"
+            && thing.id !== "||"
+            && thing.id !== "="
+            && Array.isArray(thing.expression)
+            && thing.expression.length === 2
+            && (
+                relationop[thing.expression[0].id] === true
+                || relationop[thing.expression[1].id] === true
             )
         ) {
             warn("unexpected_a", thing);
@@ -4023,11 +4027,11 @@ var jslint = (function JSLint() {
                     } else if (value === "null" || value === "undefined") {
                         warn("unexpected_typeof_a", right, value);
                     } else if (
-                        value !== "boolean" &&
-                        value !== "function" &&
-                        value !== "number" &&
-                        value !== "object" &&
-                        value !== "string"
+                        value !== "boolean"
+                        && value !== "function"
+                        && value !== "number"
+                        && value !== "object"
+                        && value !== "string"
                     ) {
                         warn("expected_type_string_a", right, value);
                     }
@@ -4052,19 +4056,19 @@ var jslint = (function JSLint() {
     preaction("binary", "(", function (thing) {
         var left = thing.expression[0];
         if (
-            left.identifier &&
-            functionage.context[left.id] === undefined &&
-            typeof functionage.name === "object"
+            left.identifier
+            && functionage.context[left.id] === undefined
+            && typeof functionage.name === "object"
         ) {
             var parent = functionage.name.function;
             if (parent) {
                 var left_variable = parent.context[left.id];
                 if (
-                    left_variable !== undefined &&
-                    left_variable.dead &&
-                    left_variable.function === parent &&
-                    left_variable.calls !== undefined &&
-                    left_variable.calls[functionage.name.id] !== undefined
+                    left_variable !== undefined
+                    && left_variable.dead
+                    && left_variable.function === parent
+                    && left_variable.calls !== undefined
+                    && left_variable.calls[functionage.name.id] !== undefined
                 ) {
                     left_variable.dead = false;
                 }
@@ -4137,8 +4141,8 @@ var jslint = (function JSLint() {
                 }
             } else {
                 if (
-                    lvalue.id === "." &&
-                    thing.expression[1].id === "undefined"
+                    lvalue.id === "."
+                    && thing.expression[1].id === "undefined"
                 ) {
                     warn(
                         "expected_a_b",
@@ -4158,12 +4162,12 @@ var jslint = (function JSLint() {
             if (
                 right !== undefined &&
                 (
-                    right.id === "function" ||
-                    right.id === "=>" ||
-                    (
-                        right.constant &&
-                        right.id !== "(number)" &&
-                        (right.id !== "(string)" || thing.id !== "+=")
+                    right.id === "function"
+                    || right.id === "=>"
+                    || (
+                        right.constant
+                        && right.id !== "(number)"
+                        && (right.id !== "(string)" || thing.id !== "+=")
                     )
                 )
             ) {
@@ -4188,10 +4192,10 @@ var jslint = (function JSLint() {
         var right;
         if (relationop[thing.id]) {
             if (
-                is_weird(thing.expression[0]) ||
-                is_weird(thing.expression[1]) ||
-                are_similar(thing.expression[0], thing.expression[1]) ||
-                (
+                is_weird(thing.expression[0])
+                || is_weird(thing.expression[1])
+                || are_similar(thing.expression[0], thing.expression[1])
+                || (
                     thing.expression[0].constant === true &&
                     thing.expression[1].constant === true
                 )
@@ -4229,19 +4233,19 @@ var jslint = (function JSLint() {
     });
     postaction("binary", "&&", function (thing) {
         if (
-            is_weird(thing.expression[0]) ||
-            are_similar(thing.expression[0], thing.expression[1]) ||
-            thing.expression[0].constant === true ||
-            thing.expression[1].constant === true
+            is_weird(thing.expression[0])
+            || are_similar(thing.expression[0], thing.expression[1])
+            || thing.expression[0].constant === true
+            || thing.expression[1].constant === true
         ) {
             warn("weird_condition_a", thing);
         }
     });
     postaction("binary", "||", function (thing) {
         if (
-            is_weird(thing.expression[0]) ||
-            are_similar(thing.expression[0], thing.expression[1]) ||
-            thing.expression[0].constant === true
+            is_weird(thing.expression[0])
+            || are_similar(thing.expression[0], thing.expression[1])
+            || thing.expression[0].constant === true
         ) {
             warn("weird_condition_a", thing);
         }
@@ -4262,11 +4266,11 @@ var jslint = (function JSLint() {
         } else if (left.identifier) {
             if (the_new !== undefined) {
                 if (
-                    left.id.charAt(0) > "Z" ||
-                    left.id === "Boolean" ||
-                    left.id === "Number" ||
-                    left.id === "String" ||
-                    (left.id === "Symbol" && option.es6)
+                    left.id.charAt(0) > "Z"
+                    || left.id === "Boolean"
+                    || left.id === "Number"
+                    || left.id === "String"
+                    || (left.id === "Symbol" && option.es6)
                 ) {
                     warn("unexpected_a", the_new);
                 } else if (left.id === "Function") {
@@ -4277,8 +4281,8 @@ var jslint = (function JSLint() {
                     arg = thing.expression;
                     if (arg.length !== 2 || (
                         (
-                            arg[1].id !== "(number)" ||
-                            +arg[1].value !== (arg[1].value | 0)
+                            arg[1].id !== "(number)"
+                            || +arg[1].value !== (arg[1].value | 0)
                         ) &&
                         arg[1].arity !== "binary"
                     )) {
@@ -4294,12 +4298,12 @@ var jslint = (function JSLint() {
                 }
             } else {
                 if (
-                    left.id.charAt(0) >= "A" &&
-                    left.id.charAt(0) <= "Z" &&
-                    left.id !== "Boolean" &&
-                    left.id !== "Number" &&
-                    left.id !== "String" &&
-                    left.id !== "Symbol"
+                    left.id.charAt(0) >= "A"
+                    && left.id.charAt(0) <= "Z"
+                    && left.id !== "Boolean"
+                    && left.id !== "Number"
+                    && left.id !== "String"
+                    && left.id !== "Symbol"
                 ) {
                     warn(
                         "expected_a_before_b",
@@ -4390,9 +4394,9 @@ var jslint = (function JSLint() {
     postaction("statement", "var", action_var);
     postaction("ternary", function (thing) {
         if (
-            is_weird(thing.expression[0]) ||
-            thing.expression[0].constant === true ||
-            are_similar(thing.expression[1], thing.expression[2])
+            is_weird(thing.expression[0])
+            || thing.expression[0].constant === true
+            || are_similar(thing.expression[1], thing.expression[2])
         ) {
             warn("unexpected_a", thing);
         } else if (are_similar(thing.expression[0], thing.expression[1])) {
@@ -4410,8 +4414,8 @@ var jslint = (function JSLint() {
         ) {
             warn("expected_a_b", thing, "!", "?");
         } else if (thing.expression[0].wrapped !== true && (
-            thing.expression[0].id === "||" ||
-            thing.expression[0].id === "&&"
+            thing.expression[0].id === "||"
+            || thing.expression[0].id === "&&"
         )) {
             warn("wrap_condition", thing.expression[0]);
         }
@@ -4457,8 +4461,8 @@ var jslint = (function JSLint() {
                 var name = the_function.context[id];
                 if (name.function === the_function) {
                     if (name.used === 0 && (
-                        name.role !== "function" ||
-                        name.function.arity !== "unary"
+                        name.role !== "function"
+                        || name.function.arity !== "unary"
                     )) {
                         warn("unused_a", name);
                     } else if (!name.init) {
@@ -4730,22 +4734,22 @@ var jslint = (function JSLint() {
                             }
                             at_margin(0);
                         } else if (
-                            right.arity === "binary" &&
-                            right.id === "(" &&
-                            free
+                            right.arity === "binary"
+                            && right.id === "("
+                            && free
                         ) {
                             no_space();
                         } else if (
-                            left.id === "." ||
-                            left.id === "..." ||
-                            right.id === "," ||
-                            right.id === ";" ||
-                            right.id === ":" ||
-                            (right.arity === "binary" && (
-                                right.id === "(" ||
-                                right.id === "["
-                            )) ||
-                            (
+                            left.id === "."
+                            || left.id === "..."
+                            || right.id === ","
+                            || right.id === ";"
+                            || right.id === ":"
+                            || (right.arity === "binary" && (
+                                right.id === "("
+                                || right.id === "["
+                            ))
+                            || (
                                 right.arity === "function" &&
                                 left.id !== "function"
                             )
@@ -4769,17 +4773,17 @@ var jslint = (function JSLint() {
                                 one_space();
                             }
                         } else if (
-                            left.arity === "ternary" ||
-                            left.id === "case" ||
-                            left.id === "catch" ||
-                            left.id === "else" ||
-                            left.id === "finally" ||
-                            left.id === "while" ||
-                            right.id === "catch" ||
-                            right.id === "else" ||
-                            right.id === "finally" ||
-                            (right.id === "while" && !right.statement) ||
-                            (left.id === ")" && right.id === "{")
+                            left.arity === "ternary"
+                            || left.id === "case"
+                            || left.id === "catch"
+                            || left.id === "else"
+                            || left.id === "finally"
+                            || left.id === "while"
+                            || right.id === "catch"
+                            || right.id === "else"
+                            || right.id === "finally"
+                            || (right.id === "while" && !right.statement)
+                            || (left.id === ")" && right.id === "{")
                         ) {
                             one_space_only();
                         } else if (right.statement === true) {
@@ -4789,9 +4793,9 @@ var jslint = (function JSLint() {
                                 one_space();
                             }
                         } else if (
-                            left.id === "var" ||
-                            left.id === "const" ||
-                            left.id === "let"
+                            left.id === "var"
+                            || left.id === "const"
+                            || left.id === "let"
                         ) {
                             stack.push({
                                 closer: closer,
@@ -4814,31 +4818,31 @@ var jslint = (function JSLint() {
 
 // There is a space between left and right.
 
-                            spaceop[left.id] === true ||
-                            spaceop[right.id] === true ||
-                            (
+                            spaceop[left.id] === true
+                            || spaceop[right.id] === true
+                            || (
                                 left.arity === "binary" &&
                                 (left.id === "+" || left.id === "-")
-                            ) ||
-                            (
+                            )
+                            || (
                                 right.arity === "binary" &&
                                 (right.id === "+" || right.id === "-")
-                            ) ||
-                            left.id === "function" ||
-                            left.id === ":" ||
-                            (
+                            )
+                            || left.id === "function"
+                            || left.id === ":"
+                            || (
                                 (
-                                    left.identifier ||
-                                    left.id === "(string)" ||
-                                    left.id === "(number)"
-                                ) &&
-                                (
-                                    right.identifier ||
-                                    right.id === "(string)" ||
-                                    right.id === "(number)"
+                                    left.identifier
+                                    || left.id === "(string)"
+                                    || left.id === "(number)"
                                 )
-                            ) ||
-                            (left.arity === "statement" && right.id !== ";")
+                                && (
+                                    right.identifier
+                                    || right.id === "(string)"
+                                    || right.id === "(number)"
+                                )
+                            )
+                            || (left.arity === "statement" && right.id !== ";")
                         ) {
                             one_space();
                         } else if (left.arity === "unary" && left.id !== "`") {
@@ -4965,7 +4969,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-04-10",
+            edition: "2017-06-13",
             exports: exports,
             froms: froms,
             functions: functions,

@@ -1,14 +1,14 @@
 // report.js
-// 2016-10-10
+// 2017-06-13
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Generate JSLint HTML reports.
 
 /*property
-    closure, column, context, edition, error, filter, forEach, fudge, function,
-    functions, global, id, froms, isArray, join, json, keys, length, level,
-    line, lines, message, module, name, names, option, parameters, property,
-    push, replace, role, signature, sort, stop, warnings
+    closure, column, context, edition, error, exports, filter, forEach, fudge,
+    function, functions, global, id, froms, isArray, join, json, keys, length,
+    level, line, lines, message, module, name, names, option, parameters,
+    property, push, replace, role, signature, sort, stop, warnings
 */
 
 var REPORT = (function () {
@@ -95,7 +95,7 @@ var REPORT = (function () {
             }
             var global = Object.keys(data.global.context).sort();
             var froms = data.froms.sort();
-            var exports = Object.keys(data.exports).sort()
+            var exports = Object.keys(data.exports).sort();
             if (global.length + froms.length + exports.length > 0) {
                 output.push("<dl class=level0>");
                 detail(mode, global);
@@ -144,21 +144,27 @@ var REPORT = (function () {
                     list.sort();
                     detail("variable", list.filter(function (id) {
                         var the_variable = context[id];
-                        return the_variable.role === "variable" &&
-                                the_variable.function === the_function;
+                        return (
+                            the_variable.role === "variable"
+                            && the_variable.function === the_function
+                        );
                     }));
                     detail("exception", list.filter(function (id) {
                         return context[id].role === "exception";
                     }));
                     detail("closure", list.filter(function (id) {
                         var the_variable = context[id];
-                        return the_variable.closure === true &&
-                                the_variable.function === the_function;
+                        return (
+                            the_variable.closure === true
+                            && the_variable.function === the_function
+                        );
                     }));
                     detail("outer", list.filter(function (id) {
                         var the_variable = context[id];
-                        return the_variable.function !== the_function &&
-                                the_variable.function.id !== "(global)";
+                        return (
+                            the_variable.function !== the_function
+                            && the_variable.function.id !== "(global)"
+                        );
                     }));
                     detail(mode, list.filter(function (id) {
                         return context[id].function.id === "(global)";
