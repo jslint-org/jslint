@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-06-13
+// 2017-06-27
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -95,17 +95,18 @@
     default, devel, directive, directives, disrupt, dot, duplicate_a, edition,
     ellipsis, else, empty_block, es6, escape_mega, eval, every, expected_a,
     expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d,
-    expected_a_before_b, expected_digits_after_a, expected_four_digits,
-    expected_identifier_a, expected_line_break_a_b, expected_regexp_factor_a,
-    expected_space_a_b, expected_statements_a, expected_string_a,
-    expected_type_string_a, exports, expression, extra, finally, flag, for,
-    forEach, free, from, froms, fud, fudge, function, function_in_loop,
-    functions, g, global, i, id, identifier, import, inc, indexOf, infix_in,
-    init, initial, isArray, isNaN, join, json, keys, label, label_a, lbp, led,
-    length, level, line, lines, live, loop, m, margin, match, maxerr, maxlen,
-    message, misplaced_a, misplaced_directive_a, missing_browser, missing_m,
-    module, multivar, naked_block, name, names, nested_comment, new, node,
-    not_label_a, nr, nud, number_isNaN, ok, open, option, out_of_scope_a,
+    expected_a_before_b, expected_a_next_at_b, expected_digits_after_a,
+    expected_four_digits, expected_identifier_a, expected_line_break_a_b,
+    expected_regexp_factor_a, expected_space_a_b, expected_statements_a,
+    expected_string_a, expected_type_string_a, exports, expression, extra,
+    finally, flag, for, forEach, free, from, froms, fud, fudge, function,
+    function_in_loop, functions, g, global, i, id, identifier, import, inc,
+    indexOf, infix_in, init, initial, isArray, isNaN, join, json, keys, label,
+    label_a, lbp, led, length, level, line, lines, live, loop, m, margin, match,
+    maxerr, maxlen, message, misplaced_a, misplaced_directive_a,
+    missing_browser, missing_m, module, multivar, naked_block, name, names,
+    nested_comment, new, node, not_label_a, nr, nud, number_isNaN, ok, open,
+    option, out_of_scope_a,
     parameters, pop, property, push, qmark, quote, redefinition_a_b, replace,
     required_a_optional_b, reserved_a, right, role, search, signature, single,
     slice, some, sort, split, statement, stop, strict, subscript_a, switch,
@@ -324,6 +325,7 @@ var jslint = (function JSLint() {
         expected_a_b: "Expected '{a}' and instead saw '{b}'.",
         expected_a_b_from_c_d: "Expected '{a}' to match '{b}' from line {c} and instead saw '{d}'.",
         expected_a_before_b: "Expected '{a}' before '{b}'.",
+        expected_a_next_at_b: "Expected '{a}' at column {b} on the next line.",
         expected_digits_after_a: "Expected digits after '{a}'.",
         expected_four_digits: "Expected four digits after '\\u'.",
         expected_identifier_a: "Expected an identifier and instead saw '{a}'.",
@@ -4588,11 +4590,10 @@ var jslint = (function JSLint() {
                     var mislaid = stack[stack.length - 1].right;
                     if (!open && mislaid !== undefined) {
                         warn(
-                            "expected_a_at_b_c",
+                            "expected_a_next_at_b",
                             mislaid,
                             artifact(mislaid.id),
-                            margin + 4 + fudge,
-                            mislaid.from + fudge
+                            margin + 4 + fudge
                         );
                     } else if (right.from !== margin + 8) {
                         expected_at(margin + 8);
@@ -4969,7 +4970,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-06-13",
+            edition: "2017-06-27",
             exports: exports,
             froms: froms,
             functions: functions,
