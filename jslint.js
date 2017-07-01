@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-06-27
+// 2017-07-01
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1017,7 +1017,7 @@ var jslint = (function JSLint() {
                     next_char();
                     return true;
                 case " ":
-                    warn_at("expected_a_before_b", line, column, "\\", " ");
+                    warn_at("expected_a_b", line, column, "\\u0020", " ");
                     next_char();
                     return true;
                 default:
@@ -4970,7 +4970,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-06-27",
+            edition: "2017-07-01",
             exports: exports,
             froms: froms,
             functions: functions,
