@@ -1,5 +1,5 @@
 // browser.js
-// 2016-08-08
+// 2017-08-05
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 /*jslint
@@ -136,9 +136,12 @@ ADSAFE.lib("browser_ui", function () {
 // Display the reports.
 
             setHTML(warnings_div, error_html);
-            warnings.style("display", (error_html.length === 0)
-                ? "none"
-                : "block");
+            warnings.style(
+                "display",
+                (error_html.length === 0)
+                    ? "none"
+                    : "block"
+            );
             setHTML(report_div, function_html);
             report_field.style("display", "block");
             if (property_text) {

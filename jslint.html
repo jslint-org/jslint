@@ -14,7 +14,7 @@ program and analyze it without sending it over the network.">
 @font-face {
   font-family: 'Programma';
   font-weight: normal;
-  src:  url('http://programma.us/1071/Programma-Regular.woff') format('woff');
+  src:  url('http://programma.us/1072/Programma-Regular.woff') format('woff');
 }
 
 body {
@@ -339,7 +339,7 @@ a:link {
   </div>
   <ul style="float: right; margin: 1em; padding-right: 1em;">
     <li><a href="help.html">Read the instructions.</a></li>
-    <li><a href="http://www.amazon.com/exec/obidos/ASIN/0596517742/wrrrldwideweb" target="_blank">Enjoy&nbsp;<i>The Good Parts</i>.</a></li>
+    <li><a href="http://www.amazon.com/exec/obidos/ASIN/0596517742/wrrrldwideweb" target="_blank">Read&nbsp;<i>The Good Parts</i>.</a></li>
   </ul>
   <fieldset><legend>Source</legend>
       <textarea id="JSLINT_NUMBER" rows="18" readonly=true></textarea><textarea
@@ -380,6 +380,7 @@ a:link {
       <div><label><input title=bitwise type=checkbox>bitwise operators</label></div>
       <div><label><input title=eval type=checkbox>eval</label></div>
       <div><label><input title=for type=checkbox>for statement</label></div>
+      <div><label><input title=getset type=checkbox>get and set</label></div>
       <div><label><input title=multivar type=checkbox>multiple vars</label></div>
       <div><label><input title=single type=checkbox>single quote strings</label></div>
       <div><label><input title=this type=checkbox>this</label></div>
@@ -399,7 +400,7 @@ a:link {
   <script src="browser.js"></script>
   <script>
     ADSAFE.go("JSLINT_", function (dom, lib) {
-        'use strict';
+        "use strict";
         lib.browser_ui(dom);
     });
   </script>

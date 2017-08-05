@@ -6,7 +6,7 @@
     formation in JavaScript programs. JSLint recommends using only the good
     parts of The ECMAScript Programming Language Standard, Sixth Edition [ES6].">
 <meta name="author" content="Douglas Crockford">
-<meta name="date" content="2015-12-22">
+<meta name="date" content="2017-08-05">
 <link rel="stylesheet" type="text/css"
     href="http://fonts.googleapis.com/css?family=Patua+One">
 <link rel="icon" href="image/favicon.ico">
@@ -417,6 +417,11 @@ a:active {
                 columns at one. <s>J<u>SLint</u></s> will by default start
                 numbering at zero. Use this option to start the numbering at one
                 in its reports.</td>
+        </tr>
+        <tr>
+            <td id="fudge">Tolerate <code>get</code> and <code>set</code></td>
+            <td><code>getset</code></td>
+            <td><code>true</code> if accessor properties are allowed in object literals.</td>
         </tr>
         <tr>
             <td id="maxerr">Maximum number of errors</td>

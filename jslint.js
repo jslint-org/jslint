@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-07-01
+// 2017-08-05
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -100,29 +100,28 @@
     expected_regexp_factor_a, expected_space_a_b, expected_statements_a,
     expected_string_a, expected_type_string_a, exports, expression, extra,
     finally, flag, for, forEach, free, from, froms, fud, fudge, function,
-    function_in_loop, functions, g, global, i, id, identifier, import, inc,
-    indexOf, infix_in, init, initial, isArray, isNaN, join, json, keys, label,
-    label_a, lbp, led, length, level, line, lines, live, loop, m, margin, match,
-    maxerr, maxlen, message, misplaced_a, misplaced_directive_a,
+    function_in_loop, functions, g, getset, global, i, id, identifier, import,
+    inc, indexOf, infix_in, init, initial, isArray, isNaN, join, json, keys,
+    label, label_a, lbp, led, length, level, line, lines, live, loop, m,
+    margin, match, maxerr, maxlen, message, misplaced_a, misplaced_directive_a,
     missing_browser, missing_m, module, multivar, naked_block, name, names,
     nested_comment, new, node, not_label_a, nr, nud, number_isNaN, ok, open,
-    option, out_of_scope_a,
-    parameters, pop, property, push, qmark, quote, redefinition_a_b, replace,
-    required_a_optional_b, reserved_a, right, role, search, signature, single,
-    slice, some, sort, split, statement, stop, strict, subscript_a, switch,
-    test, this, thru, toString, todo_comment, tokens, too_long, too_many,
-    too_many_digits, tree, try, type, u, unclosed_comment, unclosed_mega,
-    unclosed_string, undeclared_a, unexpected_a, unexpected_a_after_b,
-    unexpected_a_before_b, unexpected_at_top_level_a, unexpected_char_a,
-    unexpected_comment, unexpected_directive_a, unexpected_expression_a,
-    unexpected_label_a, unexpected_parens, unexpected_space_a_b,
-    unexpected_statement_a, unexpected_trailing_space, unexpected_typeof_a,
-    uninitialized_a, unreachable_a, unregistered_property_a, unsafe, unused_a,
-    use_double, use_spaces, use_strict, used, value, var_loop, var_switch,
-    variable, warning, warnings, weird_condition_a, weird_expression_a,
-    weird_loop, weird_relation_a, white, wrap_assignment, wrap_condition,
-    wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary, wrapped, writable,
-    y
+    option, out_of_scope_a, parameters, pop, property, push, qmark, quote,
+    redefinition_a_b, replace, required_a_optional_b, reserved_a, right, role,
+    search, signature, single, slice, some, sort, split, statement, stop,
+    strict, subscript_a, switch, test, this, thru, toString, todo_comment,
+    tokens, too_long, too_many, too_many_digits, tree, try, type, u,
+    unclosed_comment, unclosed_mega, unclosed_string, undeclared_a,
+    unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
+    unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
+    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
+    unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
+    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
+    unreachable_a, unregistered_property_a, unsafe, unused_a, use_double,
+    use_spaces, use_strict, used, value, var_loop, var_switch, variable,
+    warning, warnings, weird_condition_a, weird_expression_a, weird_loop,
+    weird_relation_a, white, wrap_assignment, wrap_condition, wrap_immediate,
+    wrap_parameter, wrap_regexp, wrap_unary, wrapped, writable, y
 */
 
 var jslint = (function JSLint() {
@@ -193,6 +192,7 @@ var jslint = (function JSLint() {
         eval: true,
         for: true,
         fudge: true,
+        getset: true,
         maxerr: 10000,
         maxlen: 10000,
         multivar: true,
@@ -3045,6 +3045,9 @@ var jslint = (function JSLint() {
                     (name.id === "get" || name.id === "set") &&
                     next_token.identifier
                 ) {
+                    if (!option.getset) {
+                        warn("unexpected_a", name);
+                    }
                     extra = name.id + " " + next_token.id;
                     name = next_token;
                     advance();
@@ -4970,7 +4973,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-07-01",
+            edition: "2017-08-05",
             exports: exports,
             froms: froms,
             functions: functions,
