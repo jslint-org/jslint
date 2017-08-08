@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-08-07
+// 2017-08-08
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -3037,6 +3037,7 @@ var jslint = (function JSLint() {
         if (next_token.id !== "}") {
             (function member() {
                 var extra;
+                var full;
                 var id;
                 var name = next_token;
                 var value;
@@ -3048,15 +3049,16 @@ var jslint = (function JSLint() {
                     if (!option.getset) {
                         warn("unexpected_a", name);
                     }
-                    extra = name.id + " " + next_token.id;
+                    extra = name.id ;
+                    full = extra + " " + next_token.id;
                     name = next_token;
                     advance();
                     id = survey(name);
-                    if (seen[extra] === true || seen[id] === true) {
+                    if (seen[full] === true || seen[id] === true) {
                         warn("duplicate_a", name);
                     }
                     seen[id] = false;
-                    seen[extra] = true;
+                    seen[full] = true;
                 } else {
                     id = survey(name);
                     if (typeof seen[id] === "boolean") {
@@ -4975,7 +4977,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-08-07",
+            edition: "2017-08-08",
             exports: exports,
             froms: froms,
             functions: functions,
