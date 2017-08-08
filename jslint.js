@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-08-05
+// 2017-08-07
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -4590,7 +4590,9 @@ var jslint = (function JSLint() {
                         expected_at(margin);
                     }
                 } else {
-                    var mislaid = stack[stack.length - 1].right;
+                    var mislaid = (stack.length) > 0
+                        ? stack[stack.length - 1].right
+                        : undefined;
                     if (!open && mislaid !== undefined) {
                         warn(
                             "expected_a_next_at_b",
@@ -4973,7 +4975,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-08-05",
+            edition: "2017-08-07",
             exports: exports,
             froms: froms,
             functions: functions,
