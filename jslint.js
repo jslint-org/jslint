@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-08-08
+// 2017-09-08
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -3043,13 +3043,13 @@ var jslint = (function JSLint() {
                 var value;
                 advance();
                 if (
-                    (name.id === "get" || name.id === "set") &&
-                    next_token.identifier
+                    (name.id === "get" || name.id === "set")
+                    && next_token.identifier
                 ) {
                     if (!option.getset) {
                         warn("unexpected_a", name);
                     }
-                    extra = name.id ;
+                    extra = name.id;
                     full = extra + " " + next_token.id;
                     name = next_token;
                     advance();
@@ -4977,7 +4977,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-08-08",
+            edition: "2017-09-08",
             exports: exports,
             froms: froms,
             functions: functions,
