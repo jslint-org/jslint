@@ -3049,7 +3049,7 @@ var jslint = (function JSLint() {
                     if (!option.getset) {
                         warn("unexpected_a", name);
                     }
-                    extra = name.id ;
+                    extra = name.id;
                     full = extra + " " + next_token.id;
                     name = next_token;
                     advance();
