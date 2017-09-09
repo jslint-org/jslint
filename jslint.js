@@ -390,10 +390,11 @@ var jslint = (function JSLint() {
         weird_relation_a: "Weird relation '{a}'.",
         wrap_assignment: "Don't wrap assignment statements in parens.",
         wrap_condition: "Wrap the condition in parens.",
-        wrap_immediate: "Wrap an immediate function invocation in "
-                + "parentheses to assist the reader in understanding that the "
-                + "expression is the result of a function, and not the "
-                + "function itself.",
+        wrap_immediate: (
+            "Wrap an immediate function invocation in parentheses to assist "
+            + "the reader in understanding that the expression is the result "
+            + "of a function, and not the function itself."
+        ),
         wrap_parameter: "Wrap the parameter in parens.",
         wrap_regexp: "Wrap this regexp in parens to avoid confusion.",
         wrap_unary: "Wrap the unary expression in parens."
