@@ -3279,9 +3279,10 @@ var jslint = (function JSLint() {
                 return next();
             }
         }());
-        the_statement.open =
-                the_statement.names.length > 1
-                && the_statement.line !== the_statement.names[1].line;
+        the_statement.open = (
+            the_statement.names.length > 1
+            && the_statement.line !== the_statement.names[1].line
+        );
         semicolon();
         return the_statement;
     }
