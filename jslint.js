@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-09-09
+// 2017-09-19
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -3370,9 +3370,7 @@ var jslint = (function JSLint() {
             }
             advance("default");
             the_thing = expression();
-            if (the_thing.id !== "function") {
-                semicolon();
-            }
+            semicolon();
             exports.default = the_thing;
             the_export.expression.push(the_thing);
         } else {
@@ -4983,7 +4981,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-09-09",
+            edition: "2017-09-19",
             exports: exports,
             froms: froms,
             functions: functions,
