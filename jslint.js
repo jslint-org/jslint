@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-09-27
+// 2017-09-28
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -2196,11 +2196,14 @@ var jslint = (function JSLint() {
 //      e.b
 //      e[b]
 //      v
+//      [destructure]
+//      {destructure}
 
         if (
-            the_thing.id !== "."
-            && the_thing.arity !== "variable"
-            && (the_thing.id !== "[" || the_thing.arity !== "binary")
+            the_thing.arity !== "variable"
+            && the_thing.id !== "."
+            && the_thing.id !== "["
+            && the_thing.id !== "{"
         ) {
             warn("bad_assignment_a", the_thing);
             return false;
@@ -2272,15 +2275,7 @@ var jslint = (function JSLint() {
                 warn("unexpected_a", right);
                 break;
             }
-            if (
-                option.es6
-                && left.arity === "unary"
-                && (left.id === "[" || left.id === "{")
-            ) {
-                warn("expected_a_before_b", left, "const", left.id);
-            } else {
-                mutation_check(left);
-            }
+            mutation_check(left);
             return the_token;
         };
         return the_symbol;
@@ -4985,7 +4980,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-09-27",
+            edition: "2017-09-28",
             exports: exports,
             froms: froms,
             functions: functions,
