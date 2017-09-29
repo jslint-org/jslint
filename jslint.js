@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-09-28
+// 2017-09-29
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -426,7 +426,7 @@ var jslint = (function JSLint() {
     var rx_directive = /^(jslint|property|global)\s+(.*)$/;
     var rx_directive_part = /^([a-zA-Z$_][a-zA-Z0-9$_]*)\s*(?::\s*(true|false|[0-9]+)\s*)?(?:,\s*)?(.*)$/;
 // token (sorry it is so long)
-    var rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\]?,:;'"~`]|=(?:==?|>)?|\.+|\/[=*\/]?|\*[\/=]?|\+(?:=|\++)?|-(?:=|-+)?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<<?=?|!={0,2}|(0|[1-9][0-9]*))(.*)$/;
+    var rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\]?,:;'"~`]|=(?:==?|>)?|\.+|[*\/][*\/=]?|\+(?:=|\++)?|-(?:=|-+)?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<<?=?|!={0,2}|(0|[1-9][0-9]*))(.*)$/;
     var rx_digits = /^([0-9]+)(.*)$/;
     var rx_hexs = /^([0-9a-fA-F]+)(.*)$/;
     var rx_octals = /^([0-7]+)(.*)$/;
@@ -2318,6 +2318,20 @@ var jslint = (function JSLint() {
         return the_symbol;
     }
 
+    function infixr(id, bp) {
+
+// Make a right associative infix operator.
+
+        var the_symbol = symbol(id, bp);
+        the_symbol.led = function (left) {
+            var the_token = token;
+            the_token.arity = "binary";
+            the_token.expression = [left, expression(bp - 1)];
+            return the_token;
+        };
+        return the_symbol;
+    }
+
     function post(id) {
 
 // Make one of the post operators.
@@ -2507,6 +2521,7 @@ var jslint = (function JSLint() {
     infix("*", 140);
     infix("/", 140);
     infix("%", 140);
+    infixr("**", 150);
     infix("(", 160, function (left) {
         var the_paren = token;
         var the_argument;
@@ -4980,7 +4995,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-09-28",
+            edition: "2017-09-29",
             exports: exports,
             froms: froms,
             functions: functions,
