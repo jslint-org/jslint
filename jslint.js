@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-09-29
+// 2017-09-30
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -2571,7 +2571,9 @@ var jslint = (function JSLint() {
         var the_token = token;
         var name = next_token;
         if (
-            (left.id !== "(string)" || name.id !== "indexOf")
+            (left.id !== "(string)" || (
+                name.id !== "indexOf" && name.id !== "repeat"
+            ))
             && (left.id !== "[" || (
                 name.id !== "concat" && name.id !== "forEach"
             ))
@@ -4995,7 +4997,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-09-29",
+            edition: "2017-09-30",
             exports: exports,
             froms: froms,
             functions: functions,
@@ -5016,5 +5018,3 @@ var jslint = (function JSLint() {
         };
     };
 }());
-
-/*node module.exports = jslint;*/
