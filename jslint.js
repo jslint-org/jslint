@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-09-30
+// 2017-10-09
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -182,13 +182,7 @@ var jslint = (function JSLint() {
         devel: [
             "alert", "confirm", "console", "prompt"
         ],
-        es6: [
-            "ArrayBuffer", "DataView", "Float32Array", "Float64Array",
-            "Generator", "GeneratorFunction", "Int8Array", "Int16Array",
-            "Int32Array", "Intl", "Map", "Promise", "Proxy", "Reflect",
-            "Set", "Symbol", "System", "Uint8Array", "Uint8ClampedArray",
-            "Uint16Array", "Uint32Array", "WeakMap", "WeakSet"
-        ],
+        es6: true,
         eval: true,
         for: true,
         fudge: true,
@@ -290,13 +284,17 @@ var jslint = (function JSLint() {
 
     var standard = [
 
-// These are the globals that are provided by the ES5 language standard.
+// These are the globals that are provided by the language standard.
 
-        "Array", "Boolean", "Date", "decodeURI", "decodeURIComponent",
-        "encodeURI", "encodeURIComponent", "Error", "EvalError", "isFinite",
-        "JSON", "Math", "Number", "Object", "parseInt", "parseFloat",
-        "RangeError", "ReferenceError", "RegExp", "String", "SyntaxError",
-        "TypeError", "URIError"
+        "Array", "ArrayBuffer", "Boolean", "DataView", "Date", "decodeURI",
+        "decodeURIComponent", "encodeURI", "encodeURIComponent", "Error",
+        "EvalError", "Float32Array", "Float64Array", "Generator",
+        "GeneratorFunction", "Int8Array", "Int16Array", "Int32Array", "Intl",
+        "isFinite", "JSON", "Map", "Math", "Number", "Object", "parseInt",
+        "parseFloat", "Promise", "Proxy", "RangeError", "ReferenceError",
+        "Reflect", "RegExp", "Set", "String", "Symbol", "SyntaxError", "System",
+        "TypeError", "Uint8Array", "Uint8ClampedArray", "Uint16Array",
+        "Uint32Array", "URIError", "WeakMap", "WeakSet"
     ];
 
     var bundle = {
@@ -318,7 +316,6 @@ var jslint = (function JSLint() {
         bad_set: "A set function takes one parameter.",
         duplicate_a: "Duplicate '{a}'.",
         empty_block: "Empty block.",
-        es6: "Unexpected ES6 feature '{a}'.",
         escape_mega: "Unexpected escapement in mega literal.",
         expected_a: "Expected '{a}'.",
         expected_a_at_b_c: "Expected '{a}' at column {b}, not column {c}.",
@@ -484,7 +481,7 @@ var jslint = (function JSLint() {
     var tokens;             // The array of tokens.
     var tenure;             // The predefined property registry.
     var tree;               // The abstract parse tree.
-    var var_mode;           // true if using var; false if using let.
+    var var_mode;           // "var" if using var; "let" if using let.
     var warnings;           // The array collecting all generated warnings.
 
 // Error reportage functions:
@@ -765,9 +762,6 @@ var jslint = (function JSLint() {
                     }
                     if (some_digits(rx_hexs) > 5) {
                         warn_at("too_many_digits", line, column - 1);
-                    }
-                    if (!option.es6) {
-                        warn_at("es6", line, column, "u{");
                     }
                     if (next_char() !== "}") {
                         stop_at("expected_a_before_b", line, column, "}", char);
@@ -1191,21 +1185,13 @@ var jslint = (function JSLint() {
                 g: true,
                 i: true,
                 m: true,
-                u: 6,
-                y: 6
+                u: true,
+                y: true
             };
             var flag = empty();
             (function make_flag() {
                 if (is_letter(char)) {
-                    switch (allowed[char]) {
-                    case true:
-                        break;
-                    case 6:
-                        if (!option.es6) {
-                            warn_at("es6", line, column, char);
-                        }
-                        break;
-                    default:
+                    if (allowed[char] !== true) {
                         warn_at("unexpected_a", line, column, char);
                     }
                     allowed[char] = false;
@@ -2441,9 +2427,7 @@ var jslint = (function JSLint() {
     constant("(regexp)", "regexp");
     constant("(string)", "string");
     constant("arguments", "object", function () {
-        if (option.es6) {
-            warn("unexpected_a", token);
-        }
+        warn("unexpected_a", token);
         return token;
     });
     constant("eval", "function", function () {
@@ -2469,9 +2453,7 @@ var jslint = (function JSLint() {
     });
     constant("Infinity", "number", Infinity);
     constant("isNaN", "function", function () {
-        if (option.es6) {
-            warn("expected_a_b", token, "Number.isNaN", "isNaN");
-        }
+        warn("expected_a_b", token, "Number.isNaN", "isNaN");
         return token;
     });
     constant("NaN", "number", NaN);
@@ -2536,9 +2518,6 @@ var jslint = (function JSLint() {
             (function next() {
                 var ellipsis;
                 if (next_token.id === "...") {
-                    if (!option.es6) {
-                        warn("es6");
-                    }
                     ellipsis = true;
                     advance("...");
                 }
@@ -2616,9 +2595,6 @@ var jslint = (function JSLint() {
 
     function do_tick() {
         var the_tick = token;
-        if (!option.es6) {
-            warn("es6", the_tick);
-        }
         the_tick.value = [];
         the_tick.expression = [];
         if (next_token.id !== "`") {
@@ -2663,9 +2639,6 @@ var jslint = (function JSLint() {
                 var ellipsis = false;
                 if (next_token.id === "...") {
                     ellipsis = true;
-                    if (!option.es6) {
-                        warn("es6");
-                    }
                     advance("...");
                 }
                 element = expression(10);
@@ -2716,9 +2689,7 @@ var jslint = (function JSLint() {
                 var param;
                 if (next_token.id === "{") {
                     complex = true;
-                    if (!option.es6) {
-                        warn("es6");
-                    } else if (optional !== undefined) {
+                    if (optional !== undefined) {
                         warn(
                             "required_a_optional_b",
                             next_token,
@@ -2764,9 +2735,7 @@ var jslint = (function JSLint() {
                     }
                 } else if (next_token.id === "[") {
                     complex = true;
-                    if (!option.es6) {
-                        warn("es6");
-                    } else if (optional !== undefined) {
+                    if (optional !== undefined) {
                         warn(
                             "required_a_optional_b",
                             next_token,
@@ -2800,9 +2769,6 @@ var jslint = (function JSLint() {
                 } else {
                     if (next_token.id === "...") {
                         complex = true;
-                        if (!option.es6) {
-                            warn("es6");
-                        }
                         ellipsis = true;
                         signature.push("...");
                         advance("...");
@@ -2828,9 +2794,6 @@ var jslint = (function JSLint() {
                         if (next_token.id === "=") {
                             complex = true;
                             optional = param;
-                            if (!option.es6) {
-                                stop("unexpected_statement_a");
-                            }
                             advance("=");
                             param.expression = expression(0);
                         } else {
@@ -2993,9 +2956,6 @@ var jslint = (function JSLint() {
         the_fart.parameters.forEach(function (name) {
             enroll(name, "parameter", true);
         });
-        if (!option.es6) {
-            warn("es6", the_fart);
-        }
         if (next_token.id === "{") {
             warn("expected_a_b", the_fart, "function", "=>");
             the_fart.block = block("body");
@@ -3083,18 +3043,12 @@ var jslint = (function JSLint() {
                     switch (next_token.id) {
                     case "}":
                     case ",":
-                        if (!option.es6) {
-                            warn("es6");
-                        }
                         if (typeof extra === "string") {
                             advance("(");
                         }
                         value = expression(Infinity, true);
                         break;
                     case "(":
-                        if (!option.es6 && typeof extra !== "string") {
-                            warn("es6");
-                        }
                         value = do_function({
                             arity: "unary",
                             from: name.from,
@@ -3177,25 +3131,19 @@ var jslint = (function JSLint() {
         var is_const = the_statement.id === "const";
         the_statement.names = [];
 
-// A program may use var or let, but not both, and let and const require
-// option.es6.
+// A program may use var or let, but not both.
 
-        if (is_const) {
-            if (!option.es6) {
-                warn("es6", the_statement);
+        if (!is_const) {
+            if (var_mode === undefined) {
+                var_mode = the_statement.id;
+            } else if (the_statement.id !== var_mode) {
+                warn(
+                    "expected_a_b",
+                    the_statement,
+                    var_mode,
+                    the_statement.id
+                );
             }
-        } else if (var_mode === undefined) {
-            var_mode = the_statement.id;
-            if (!option.es6 && var_mode !== "var") {
-                warn("es6", the_statement);
-            }
-        } else if (the_statement.id !== var_mode) {
-            warn(
-                "expected_a_b",
-                the_statement,
-                var_mode,
-                the_statement.id
-            );
         }
 
 // We don't expect to see variables created in switch statements.
@@ -3372,9 +3320,6 @@ var jslint = (function JSLint() {
             the_export.expression.push(the_thing);
         }
 
-        if (!option.es6) {
-            warn("es6", the_export);
-        }
         the_export.expression = [];
         if (next_token.id === "default") {
             if (exports.default !== undefined) {
@@ -3498,9 +3443,7 @@ var jslint = (function JSLint() {
     stmt("import", function () {
         var the_import = token;
         var name;
-        if (!option.es6) {
-            warn("es6", the_import);
-        } else if (typeof module_mode === "object") {
+        if (typeof module_mode === "object") {
             warn("unexpected_directive_a", module_mode, module_mode.directive);
         }
         module_mode = true;
@@ -4027,11 +3970,7 @@ var jslint = (function JSLint() {
             var left = thing.expression[0];
             var right = thing.expression[1];
             if (left.id === "NaN" || right.id === "NaN") {
-                if (option.es6) {
-                    warn("number_isNaN", thing);
-                } else {
-                    warn("isNaN", thing);
-                }
+                warn("number_isNaN", thing);
             } else if (left.id === "typeof") {
                 if (right.id !== "(string)") {
                     if (right.id !== "typeof") {
@@ -4039,11 +3978,7 @@ var jslint = (function JSLint() {
                     }
                 } else {
                     var value = right.value;
-                    if (value === "symbol") {
-                        if (!option.es6) {
-                            warn("es6", right, value);
-                        }
-                    } else if (value === "null" || value === "undefined") {
+                    if (value === "null" || value === "undefined") {
                         warn("unexpected_typeof_a", right, value);
                     } else if (
                         value !== "boolean"
@@ -4289,7 +4224,7 @@ var jslint = (function JSLint() {
                     || left.id === "Boolean"
                     || left.id === "Number"
                     || left.id === "String"
-                    || (left.id === "Symbol" && option.es6)
+                    || left.id === "Symbol"
                 ) {
                     warn("unexpected_a", the_new);
                 } else if (left.id === "Function") {
@@ -4350,15 +4285,18 @@ var jslint = (function JSLint() {
                 }
             }
             if (left.name.id === "getTime") {
-                var l1 = left.expression;
-                if (l1.id === "(") {
-                    var l2 = l1.expression;
-                    if (l2.length === 1) {
-                        var l3 = l2[0];
-                        if (l3.id === "new" && l3.expression.id === "Date") {
+                var paren = left.expression;
+                if (paren.id === "(") {
+                    var array = paren.expression;
+                    if (array.length === 1) {
+                        var new_date = array[0];
+                        if (
+                            new_date.id === "new"
+                            && new_date.expression.id === "Date"
+                        ) {
                             warn(
                                 "expected_a_b",
-                                l3,
+                                new_date,
                                 "Date.now()",
                                 "new Date().getTime()"
                             );
@@ -4997,7 +4935,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-09-30",
+            edition: "2017-10-09",
             exports: exports,
             froms: froms,
             functions: functions,

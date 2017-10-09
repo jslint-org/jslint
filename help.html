@@ -222,15 +222,9 @@ a:active {
 <p><s>J<u>SLint</u></s> can operate on JavaScript source
     or <a href="http://www.JSON.org/">JSON</a> text.</p>
 <h1 id=es6>ECMAScript Sixth Edition</h1>
-<p>It may take time for the sixth edition of <i>ECMAScript</i> [ES6]  to
-    reach ubiquity. Using the new features in enviroments that do not fully
-    implement the new standard will result in failure. This is why
-    <s>J<u>SLint</u></s> gives warnings when ES6 features are used. Some of
+<p>Some of
     ES6&rsquo;s features are good, so <s>J<u>SLint</u></s> will recognize the good
-    parts of ES6 with the <code>es6</code> option. As implementations of the new
-    standard become more stable and better understood, the set of features
-    recognized by JSLint may increase. After the transition to ES6 is complete,
-    the <code>es6</code> option will be dropped.</p>
+    parts of ES6. </p>
 <p>Currently, these features are recognized:</p>
 <ul>
     <li>The <code>...</code>&nbsp;<small>ellipsis</small> marker in parameter
@@ -380,21 +374,6 @@ a:active {
         into production.</td>
         </tr>
         <tr>
-            <td>Tolerate the good parts of ES6</td>
-            <td><code>es6</code></td>
-            <td><code>true</code> if using the good parts of <i>ECMAScript Sixth
-                Edition</i>. Some ES6 features are still under probation. Some
-                ES6 features will never be good parts.  It adds the
-                same globals as this directive:
-                <blockquote><code>/*global </code>
-    <div><code>ArrayBuffer, DataView, Float32Array, Float64Array,
-            Int8Array, Int16Array, Int32Array, Intl, Map, Promise,
-            Proxy, Reflect, Set, Symbol, System, Uint8Array,
-            Uint8ClampedArray, Uint16Array, Uint32Array, WeakMap,
-            WeakSet</code></div>
-    <code> */</code></blockquote></td>
-        </tr>
-        <tr>
             <td id="eval">Tolerate <code>eval</code></td>
             <td><code>eval</code></td>
             <td><code>true</code> if <code>eval</code> should be allowed. In the
@@ -474,7 +453,7 @@ a:active {
 </table>
 <p>For example:</p>
 <pre>/*jslint
-    es6, maxerr: 10, node
+    bitwise, maxerr: 10, node
 */</pre>
 
 <h1 id=property><code>/*property*/</code></h1>
@@ -513,8 +492,7 @@ a:active {
     The <code>const</code> statement is like <code>let</code> except that it
     marks the variable (but not its contents) as read only, making it an error
     to attempt to assign to the variable. When given a choice,
-    <code>const</code> is the best, <code>var</code> is the worst. Use of
-    <code>let</code> and <code>const</code> require the <code>es6</code> option.</p>
+    <code>const</code> is the best, <code>var</code> is the worst. </p>
 <p><s>J<u>SLint</u></s> uses the intersection of the <code>var</code> rules and the
     <code>let</code> rules, and by doing so avoids the errors related to either.
     A name should be declared only once in a function. It should be declared
