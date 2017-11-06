@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-11-03
+// 2017-11-06
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -101,7 +101,7 @@
     expected_string_a, expected_type_string_a, exports, expression, extra,
     finally, flag, for, forEach, free, from, froms, fud, fudge, function,
     function_in_loop, functions, g, getset, global, i, id, identifier, import,
-    inc, indexOf, infix_in, init, initial, isArray, isNaN, join, json, keys,
+    inc, indexOf, infix_in, init, initial, isArray, isFinite, join, json, keys,
     label, label_a, lbp, led, length, level, line, lines, live, loop, m,
     margin, match, maxerr, maxlen, message, misplaced_a, misplaced_directive_a,
     missing_browser, missing_m, module, multivar, naked_block, name, names,
@@ -334,7 +334,6 @@ var jslint = (function JSLint() {
         expected_type_string_a: "Expected a type string and instead saw '{a}'.",
         function_in_loop: "Don't make functions within a loop.",
         infix_in: "Unexpected 'in'. Compare with undefined, or use the hasOwnProperty method instead.",
-        isNaN: "Use the isNaN function to compare with NaN.",
         label_a: "'{a}' is a statement label.",
         misplaced_a: "Place '{a}' at the outermost level.",
         misplaced_directive_a: "Place the '/*{a}*/' directive before the first statement.",
@@ -894,7 +893,7 @@ var jslint = (function JSLint() {
                         }
                         break;
                     case "number":
-                        if (isFinite(+value)) {
+                        if (Number.isFinite(+value)) {
                             option[name] = +value;
                         } else {
                             warn(
@@ -2453,7 +2452,11 @@ var jslint = (function JSLint() {
     });
     constant("Infinity", "number", Infinity);
     constant("isNaN", "function", function () {
-        warn("expected_a_b", token, "Number.isNaN", "isNaN");
+        warn("number_isNaN", token);
+        return token;
+    });
+    constant("isFinite", "function", function () {
+        warn("expected_a_b", token, "Number.isFinite", "isFinite");
         return token;
     });
     constant("NaN", "number", NaN);
@@ -4935,7 +4938,7 @@ var jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-11-03",
+            edition: "2017-11-06",
             exports: exports,
             froms: froms,
             functions: functions,
