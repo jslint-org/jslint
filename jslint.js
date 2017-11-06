@@ -290,11 +290,11 @@ var jslint = (function JSLint() {
         "decodeURIComponent", "encodeURI", "encodeURIComponent", "Error",
         "EvalError", "Float32Array", "Float64Array", "Generator",
         "GeneratorFunction", "Int8Array", "Int16Array", "Int32Array", "Intl",
-        "isFinite", "JSON", "Map", "Math", "Number", "Object", "parseInt",
-        "parseFloat", "Promise", "Proxy", "RangeError", "ReferenceError",
-        "Reflect", "RegExp", "Set", "String", "Symbol", "SyntaxError", "System",
-        "TypeError", "Uint8Array", "Uint8ClampedArray", "Uint16Array",
-        "Uint32Array", "URIError", "WeakMap", "WeakSet"
+        "JSON", "Map", "Math", "Number", "Object", "parseInt", "parseFloat",
+        "Promise", "Proxy", "RangeError", "ReferenceError", "Reflect", "RegExp",
+        "Set", "String", "Symbol", "SyntaxError", "System", "TypeError",
+        "Uint8Array", "Uint8ClampedArray", "Uint16Array", "Uint32Array",
+        "URIError", "WeakMap", "WeakSet"
     ];
 
     var bundle = {
@@ -2451,12 +2451,12 @@ var jslint = (function JSLint() {
         return token;
     });
     constant("Infinity", "number", Infinity);
-    constant("isNaN", "function", function () {
-        warn("number_isNaN", token);
-        return token;
-    });
     constant("isFinite", "function", function () {
         warn("expected_a_b", token, "Number.isFinite", "isFinite");
+        return token;
+    });
+    constant("isNaN", "function", function () {
+        warn("number_isNaN", token);
         return token;
     });
     constant("NaN", "number", NaN);
