@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-11-06
+// 2017-11-11
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -154,7 +154,6 @@ const jslint = (function JSLint() {
 
         bitwise: true,
         browser: [
-            "Audio",
             "clearInterval",
             "clearTimeout",
             "document",
@@ -162,12 +161,10 @@ const jslint = (function JSLint() {
             "FileReader",
             "FormData",
             "history",
-            "Image",
             "localStorage",
             "location",
             "name",
             "navigator",
-            "Option",
             "screen",
             "sessionStorage",
             "setInterval",
@@ -4938,7 +4935,7 @@ const jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-11-06",
+            edition: "2017-11-11",
             exports: exports,
             froms: froms,
             functions: functions,
