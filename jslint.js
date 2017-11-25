@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-11-11
+// 2017-11-24
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -693,7 +693,7 @@ const jslint = (function JSLint() {
                 );
             }
             if (source_line) {
-                char = source_line.charAt(0);
+                char = source_line[0];
                 source_line = source_line.slice(1);
                 snippet += char;
             } else {
@@ -1126,7 +1126,7 @@ const jslint = (function JSLint() {
                         );
                         break;
                     case "$":
-                        if (source_line.charAt(0) !== "/") {
+                        if (source_line[0] !== "/") {
                             multi_mode = true;
                         }
                         break;
@@ -1331,7 +1331,7 @@ const jslint = (function JSLint() {
                     "unexpected_char_a",
                     line,
                     column,
-                    source_line.charAt(0)
+                    source_line[0]
                 );
             }
 
@@ -1410,7 +1410,7 @@ const jslint = (function JSLint() {
                     snippet += source_line.slice(0, at);
                     column += at;
                     source_line = source_line.slice(at);
-                    if (source_line.charAt(0) === "\\") {
+                    if (source_line[0] === "\\") {
                         stop_at("escape_mega", line, at);
                     }
                     make("(string)", snippet).quote = "`";
@@ -1419,7 +1419,7 @@ const jslint = (function JSLint() {
 // If ${, then make tokens that will become part of an expression until
 // a } token is made.
 
-                    if (source_line.charAt(0) === "$") {
+                    if (source_line[0] === "$") {
                         column += 2;
                         make("${");
                         source_line = source_line.slice(2);
@@ -1461,7 +1461,7 @@ const jslint = (function JSLint() {
 
             case "/*":
                 array = [];
-                if (source_line.charAt(0) === "/") {
+                if (source_line[0] === "/") {
                     warn_at("unexpected_a", line, column + i, "/");
                 }
                 (function next() {
@@ -1524,7 +1524,7 @@ const jslint = (function JSLint() {
                         }
                     }
                 } else {
-                    last = prior.id.charAt(prior.id.length - 1);
+                    last = prior.id[prior.id.length - 1];
                     if ("(,=:?[".indexOf(last) >= 0) {
                         return regexp();
                     }
@@ -1534,7 +1534,7 @@ const jslint = (function JSLint() {
                         return the_token;
                     }
                 }
-                if (source_line.charAt(0) === "/") {
+                if (source_line[0] === "/") {
                     column += 1;
                     source_line = source_line.slice(1);
                     snippet = "/=";
@@ -4220,7 +4220,7 @@ const jslint = (function JSLint() {
         } else if (left.identifier) {
             if (the_new !== undefined) {
                 if (
-                    left.id.charAt(0) > "Z"
+                    left.id[0] > "Z"
                     || left.id === "Boolean"
                     || left.id === "Number"
                     || left.id === "String"
@@ -4252,8 +4252,8 @@ const jslint = (function JSLint() {
                 }
             } else {
                 if (
-                    left.id.charAt(0) >= "A"
-                    && left.id.charAt(0) <= "Z"
+                    left.id[0] >= "A"
+                    && left.id[0] <= "Z"
                     && left.id !== "Boolean"
                     && left.id !== "Number"
                     && left.id !== "String"
@@ -4935,7 +4935,7 @@ const jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-11-11",
+            edition: "2017-11-24",
             exports: exports,
             froms: froms,
             functions: functions,
