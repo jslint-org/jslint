@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-11-24
+// 2017-11-27
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -2550,16 +2550,19 @@ const jslint = (function JSLint() {
         const the_token = token;
         const name = next_token;
         if (
-            (left.id !== "(string)" || (
-                name.id !== "indexOf" && name.id !== "repeat"
-            ))
-            && (left.id !== "[" || (
-                name.id !== "concat" && name.id !== "forEach"
-            ))
+            (
+                left.id !== "(string)"
+                || (name.id !== "indexOf" && name.id !== "repeat")
+            )
+            && (
+                left.id !== "["
+                || (name.id !== "concat" && name.id !== "forEach")
+            )
             && (left.id !== "+" || name.id !== "slice")
-            && (left.id !== "(regexp)" || (
-                name.id !== "exec" && name.id !== "test"
-            ))
+            && (
+                left.id !== "(regexp)"
+                || (name.id !== "exec" && name.id !== "test")
+            )
         ) {
             left_check(left, the_token);
         }
@@ -4233,13 +4236,16 @@ const jslint = (function JSLint() {
                     }
                 } else if (left.id === "Array") {
                     arg = thing.expression;
-                    if (arg.length !== 2 || (
-                        (
-                            arg[1].id !== "(number)"
-                            || +arg[1].value !== (arg[1].value | 0)
+                    if (
+                        arg.length !== 2
+                        || (
+                            (
+                                arg[1].id !== "(number)"
+                                || +arg[1].value !== (arg[1].value | 0)
+                            )
+                            && arg[1].arity !== "binary"
                         )
-                        && arg[1].arity !== "binary"
-                    )) {
+                    ) {
                         warn("expected_a_b", left, "[]", "new Array");
                     }
                 } else if (left.id === "Object") {
@@ -4424,10 +4430,12 @@ const jslint = (function JSLint() {
             if (id !== "ignore") {
                 const name = the_function.context[id];
                 if (name.function === the_function) {
-                    if (name.used === 0 && (
-                        name.role !== "function"
-                        || name.function.arity !== "unary"
-                    )) {
+                    if (
+                        name.used === 0 && (
+                            name.role !== "function"
+                            || name.function.arity !== "unary"
+                        )
+                    ) {
                         warn("unused_a", name);
                     } else if (!name.init) {
                         warn("uninitialized_a", name);
@@ -4711,10 +4719,10 @@ const jslint = (function JSLint() {
                             || right.id === ","
                             || right.id === ";"
                             || right.id === ":"
-                            || (right.arity === "binary" && (
-                                right.id === "("
-                                || right.id === "["
-                            ))
+                            || (
+                                right.arity === "binary"
+                                && (right.id === "(" || right.id === "[")
+                            )
                             || (
                                 right.arity === "function"
                                 && left.id !== "function"
@@ -4935,7 +4943,7 @@ const jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-11-24",
+            edition: "2017-11-27",
             exports: exports,
             froms: froms,
             functions: functions,
