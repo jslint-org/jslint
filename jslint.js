@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-11-27
+// 2017-11-29
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -745,6 +745,7 @@ const jslint = (function JSLint() {
             switch (next_char("\\")) {
             case "\\":
             case "/":
+            case "`":
             case "b":
             case "f":
             case "n":
@@ -4943,7 +4944,7 @@ const jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-11-27",
+            edition: "2017-11-29",
             exports: exports,
             froms: froms,
             functions: functions,
