@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-11-29
+// 2017-12-07
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1816,10 +1816,14 @@ const jslint = (function JSLint() {
                             warn("unexpected_a", name);
                         }
                     } else {
-                        if ((
-                            role !== "exception"
-                            || earlier.role !== "exception"
-                        ) && role !== "parameter") {
+                        if (
+                            (
+                                role !== "exception"
+                                || earlier.role !== "exception"
+                            )
+                            && role !== "parameter"
+                            && role !== "function"
+                        ) {
                             warn(
                                 "redefinition_a_b",
                                 name,
@@ -4839,7 +4843,7 @@ const jslint = (function JSLint() {
 
 // The jslint function itself.
 
-    return function (source, option_object, global_array) {
+    return function jslint(source, option_object, global_array) {
         try {
             warnings = [];
             option = Object.assign(empty(), option_object);
@@ -4944,7 +4948,7 @@ const jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-11-29",
+            edition: "2017-12-07",
             exports: exports,
             froms: froms,
             functions: functions,
