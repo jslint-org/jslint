@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-12-07
+// 2017-12-22
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -170,6 +170,7 @@ const jslint = (function JSLint() {
             "setInterval",
             "setTimeout",
             "Storage",
+            "URL",
             "XMLHttpRequest"
         ],
         couch: [
@@ -4948,7 +4949,7 @@ const jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-12-07",
+            edition: "2017-12-22",
             exports: exports,
             froms: froms,
             functions: functions,
