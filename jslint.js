@@ -4088,6 +4088,21 @@ const jslint = (function JSLint() {
         warn("bad_assignment_a", name);
     }
 
+    postaction("assignment", "+=", function (thing) {
+        let right = thing.expression[1];
+        if (right.constant) {
+            if (
+                right.value === ""
+                || (right.id === "(number)" && right.value === "0")
+                || right.id === "(boolean)"
+                || right.id === "null"
+                || right.id === "undefined"
+                || Number.isNaN(right.value)
+            ) {
+                warn("unexpected_a", right);
+            }
+        }
+    });
     postaction("assignment", function (thing) {
 
 // Assignment using = sets the init property of a variable. No other assignment
