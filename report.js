@@ -1,5 +1,5 @@
 // report.js
-// 2017-06-13
+// 2017-12-26
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Generate JSLint HTML reports.
@@ -37,7 +37,7 @@ var REPORT = (function () {
 // <cite><address>LINE_NUMBER</address>MESSAGE</cite>
 // <samp>EVIDENCE</samp>
 
-            var fudge = +!!data.option.fudge;
+            var fudge = Number(Boolean(data.option.fudge));
             var output = [];
             if (data.stop) {
                 output.push("<center>J<u>SLint</u> was unable to finish.</center>");
@@ -66,7 +66,7 @@ var REPORT = (function () {
 //     <dt>DETAIL</dt><dd>NAMES</dd>
 // </dl>
 
-            var fudge = +!!data.option.fudge;
+            var fudge = Number(Boolean(data.option.fudge));
             var mode = (data.module)
                 ? "module"
                 : "global";

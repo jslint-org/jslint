@@ -1,5 +1,5 @@
 // browser.js
-// 2017-08-05
+// 2017-12-26
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 /*jslint
@@ -12,8 +12,8 @@
 
 /*property
     ___nodes___, check, create, each, enable, error, focus, function, getCheck,
-    getName, getTitle, getValue, innerHTML, length, lib, lines, on, onscroll,
-    property, q, scrollTop, select, split, style, value
+    getName, getTitle, getValue, innerHTML, isFinite, length, lib, on,
+    onscroll, property, q, scrollTop, select, split, style, value
 */
 
 // This is the web script companion file for JSLint. It includes code for
@@ -81,7 +81,7 @@ ADSAFE.lib("browser_ui", function () {
         }
 
         function show_numbers() {
-            var f = +(fudge.getCheck());
+            var f = Number(fudge.getCheck());
             var n = source.getValue().split(rx_crlf).length + f;
             var text = "";
             var i;
@@ -110,8 +110,8 @@ ADSAFE.lib("browser_ui", function () {
                 option[node.getTitle()] = true;
             });
             options.q("input_text").each(function (node) {
-                var value = +node.getValue();
-                if (isFinite(value) && value > 0) {
+                var value = Number(node.getValue());
+                if (Number.isFinite(value) && value > 0) {
                     option[node.getTitle()] = value;
                 }
             });

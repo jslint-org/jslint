@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-12-22
+// 2017-12-26
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -90,10 +90,10 @@
 /*property
     a, and, arity, assign, b, bad_assignment_a, bad_directive_a, bad_get,
     bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
-    body, browser, c, calls, catch, charAt, charCodeAt, closer, closure, code,
-    column, complex, concat, constant, context, couch, create, d, dead,
+    body, browser, c, calls, catch, charCodeAt, closer, closure, code, column,
+    complex, concat, constant, context, convert, couch, create, d, dead,
     default, devel, directive, directives, disrupt, dot, duplicate_a, edition,
-    ellipsis, else, empty_block, es6, escape_mega, eval, every, expected_a,
+    ellipsis, else, empty_block, escape_mega, eval, every, expected_a,
     expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d,
     expected_a_before_b, expected_a_next_at_b, expected_digits_after_a,
     expected_four_digits, expected_identifier_a, expected_line_break_a_b,
@@ -177,10 +177,10 @@ const jslint = (function JSLint() {
             "emit", "getRow", "isArray", "log", "provides", "registerType",
             "require", "send", "start", "sum", "toJSON"
         ],
+        convert: true,
         devel: [
             "alert", "confirm", "console", "prompt"
         ],
-        es6: true,
         eval: true,
         for: true,
         fudge: true,
@@ -420,7 +420,7 @@ const jslint = (function JSLint() {
     const rx_directive = /^(jslint|property|global)\s+(.*)$/;
     const rx_directive_part = /^([a-zA-Z$_][a-zA-Z0-9$_]*)\s*(?::\s*(true|false|[0-9]+)\s*)?(?:,\s*)?(.*)$/;
 // token (sorry it is so long)
-    const rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\]?,:;'"~`]|=(?:==?|>)?|\.+|[*\/][*\/=]?|\+(?:=|\++)?|-(?:=|-+)?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<<?=?|!={0,2}|(0|[1-9][0-9]*))(.*)$/;
+    const rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\]?,:;'"~`]|=(?:==?|>)?|\.+|[*\/][*\/=]?|\+(?:=|\++)?|-(?:=|-+)?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<<?=?|!(?:!|==?)?|(0|[1-9][0-9]*))(.*)$/;
     const rx_digits = /^([0-9]+)(.*)$/;
     const rx_hexs = /^([0-9a-fA-F]+)(.*)$/;
     const rx_octals = /^([0-7]+)(.*)$/;
@@ -795,7 +795,7 @@ const jslint = (function JSLint() {
             const the_token = {
                 from: from,
                 id: id,
-                identifier: !!identifier,
+                identifier: Boolean(identifier),
                 line: line,
                 nr: nr,
                 thru: column
@@ -892,8 +892,8 @@ const jslint = (function JSLint() {
                         }
                         break;
                     case "number":
-                        if (Number.isFinite(+value)) {
-                            option[name] = +value;
+                        if (Number.isFinite(Number(value))) {
+                            option[name] = Number(value);
                         } else {
                             warn(
                                 "bad_option_a",
@@ -4167,6 +4167,15 @@ const jslint = (function JSLint() {
             }
         }
         switch (thing.id) {
+        case "+":
+            if (!option.convert) {
+                if (thing.expression[0].value === "") {
+                    warn("expected_a_b", thing, "String(...)", "\"\" +");
+                } else if (thing.expression[1].value === "") {
+                    warn("expected_a_b", thing, "String(...)", "+ \"\"");
+                }
+            }
+            break;
         case "=>":
         case "(":
         case "[":
@@ -4247,7 +4256,7 @@ const jslint = (function JSLint() {
                         || (
                             (
                                 arg[1].id !== "(number)"
-                                || +arg[1].value !== (arg[1].value | 0)
+                                || Number(arg[1].value) !== (arg[1].value | 0)
                             )
                             && arg[1].arity !== "binary"
                         )
@@ -4411,6 +4420,11 @@ const jslint = (function JSLint() {
                 warn("unexpected_a", thing);
             }
             break;
+        case "!!":
+            if (!option.convert) {
+                warn("expected_a_b", thing, "Boolean(...)", "!!");
+            }
+            break;
         default:
             if (thing.expression.constant === true) {
                 thing.constant = true;
@@ -4419,6 +4433,9 @@ const jslint = (function JSLint() {
     });
     postaction("unary", "function", postaction_function);
     postaction("unary", "+", function (thing) {
+        if (!option.convert) {
+            warn("expected_a_b", thing, "Number(...)", "+");
+        }
         const right = thing.expression;
         if (right.id === "(" && right.expression[0].id === "new") {
             warn("unexpected_a_before_b", thing, "+", "new");
@@ -4949,7 +4966,7 @@ const jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-12-22",
+            edition: "2017-12-26",
             exports: exports,
             froms: froms,
             functions: functions,
