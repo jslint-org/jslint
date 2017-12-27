@@ -3995,6 +3995,7 @@ const jslint = (function JSLint() {
                         && value !== "number"
                         && value !== "object"
                         && value !== "string"
+                        && value !== "symbol"
                     ) {
                         warn("expected_type_string_a", right, value);
                     }
