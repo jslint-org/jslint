@@ -1,5 +1,5 @@
 // jslint.js
-// 2017-12-26
+// 2018-01-04
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -2562,7 +2562,12 @@ const jslint = (function JSLint() {
             )
             && (
                 left.id !== "["
-                || (name.id !== "concat" && name.id !== "forEach")
+                || (
+                    name.id !== "concat"
+                    && name.id !== "forEach"
+                    && name.id !== "join"
+                    && name.id !== "map"
+                )
             )
             && (left.id !== "+" || name.id !== "slice")
             && (
@@ -4982,7 +4987,7 @@ const jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2017-12-26",
+            edition: "2018-01-04",
             exports: exports,
             froms: froms,
             functions: functions,
