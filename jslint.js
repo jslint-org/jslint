@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-01-04
+// 2018-01-18
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -101,18 +101,18 @@
     expected_string_a, expected_type_string_a, exports, expression, extra,
     finally, flag, for, forEach, free, from, froms, fud, fudge, function,
     function_in_loop, functions, g, getset, global, i, id, identifier, import,
-    inc, indexOf, infix_in, init, initial, isArray, isFinite, join, json, keys,
-    label, label_a, lbp, led, length, level, line, lines, live, loop, m,
-    margin, match, maxerr, maxlen, message, misplaced_a, misplaced_directive_a,
-    missing_browser, missing_m, module, multivar, naked_block, name, names,
-    nested_comment, new, node, not_label_a, nr, nud, number_isNaN, ok, open,
-    option, out_of_scope_a, parameters, pop, property, push, qmark, quote,
-    redefinition_a_b, replace, required_a_optional_b, reserved_a, right, role,
-    search, signature, single, slice, some, sort, split, statement, stop,
-    strict, subscript_a, switch, test, this, thru, toString, todo_comment,
-    tokens, too_long, too_many, too_many_digits, tree, try, type, u,
-    unclosed_comment, unclosed_mega, unclosed_string, undeclared_a,
-    unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
+    inc, indexOf, infix_in, init, initial, isArray, isFinite, isNaN, join,
+    json, keys, label, label_a, lbp, led, length, level, line, lines, live,
+    loop, m, margin, match, maxerr, maxlen, message, misplaced_a,
+    misplaced_directive_a, missing_browser, missing_m, module, multivar,
+    naked_block, name, names, nested_comment, new, node, not_label_a, nr, nud,
+    number_isNaN, ok, open, option, out_of_scope_a, parameters, pop, property,
+    push, qmark, quote, redefinition_a_b, replace, required_a_optional_b,
+    reserved_a, right, role, search, signature, single, slice, some, sort,
+    split, statement, stop, strict, subscript_a, switch, test, this, thru,
+    toString, todo_comment, tokens, too_long, too_many, too_many_digits, tree,
+    try, type, u, unclosed_comment, unclosed_mega, unclosed_string,
+    undeclared_a, unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
     unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
     unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
     unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
@@ -4987,7 +4987,7 @@ const jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2018-01-04",
+            edition: "2018-01-18",
             exports: exports,
             froms: froms,
             functions: functions,
