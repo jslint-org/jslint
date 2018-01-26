@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-01-18
+// 2018-01-26
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -420,7 +420,7 @@ const jslint = (function JSLint() {
     const rx_directive = /^(jslint|property|global)\s+(.*)$/;
     const rx_directive_part = /^([a-zA-Z$_][a-zA-Z0-9$_]*)\s*(?::\s*(true|false|[0-9]+)\s*)?(?:,\s*)?(.*)$/;
 // token (sorry it is so long)
-    const rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\]?,:;'"~`]|=(?:==?|>)?|\.+|[*\/][*\/=]?|\+(?:=|\++)?|-(?:=|-+)?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<<?=?|!(?:!|==?)?|(0|[1-9][0-9]*))(.*)$/;
+    const rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\]?,:;'"~`]|=(?:==?|>)?|\.+|[*\/][*\/=]?|\+[=+]?|-[=\-]?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<<?=?|!(?:!|==?)?|(0|[1-9][0-9]*))(.*)$/;
     const rx_digits = /^([0-9]+)(.*)$/;
     const rx_hexs = /^([0-9a-fA-F]+)(.*)$/;
     const rx_octals = /^([0-7]+)(.*)$/;
@@ -4967,9 +4967,11 @@ const jslint = (function JSLint() {
                 if (module_mode && global.strict !== undefined) {
                     warn("unexpected_a", global.strict);
                 }
-                uninitialized_and_unused();
-                if (!option.white) {
-                    whitage();
+                if (warnings.length > 0) {
+                    uninitialized_and_unused();
+                    if (!option.white) {
+                        whitage();
+                    }
                 }
             }
             if (!option.browser) {
@@ -4987,7 +4989,7 @@ const jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2018-01-18",
+            edition: "2018-01-26",
             exports: exports,
             froms: froms,
             functions: functions,
