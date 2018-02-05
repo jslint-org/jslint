@@ -4972,11 +4972,13 @@ const jslint = (function JSLint() {
                 if (module_mode && global.strict !== undefined) {
                     warn("unexpected_a", global.strict);
                 }
-                if (warnings.length > 0) {
+                if (warnings.length === 0) {
                     uninitialized_and_unused();
                     if (!option.white) {
                         whitage();
                     }
+                } else {
+                    throw({"name": "JSLintError"});
                 }
             }
             if (!option.browser) {
