@@ -12,7 +12,7 @@ ECMAScript Programming Language Standard, Sixth Edition [ES6]."
     name="author"
     content="Douglas Crockford"
 >
-<meta name="date" content="2017-12-23"
+<meta name="date" content="2018-02-05"
 >
 <link
     rel="stylesheet"
@@ -348,24 +348,27 @@ a:active {
                 predefined. This option will reject the use of
                 <code>import</code> and <code>export</code>. This option also
                 disallows the file form of the <code>&quot;use
-                strict&quot;</code> pragma. It does not supply <code>self</code>
-                or <code>window</code>; you will have to request these aliases
-                of the dreaded global object yourself. It adds the same globals
-                as this directive:
-    <blockquote><code>/*global </code>
-    <div><code>
-        clearInterval, clearTimeout, document, event, FileReader, FormData,
-        history, localStorage, location, name, navigator, screen,
-        sessionStorage, setInterval, setTimeout, Storage, URL, XMLHttpRequest
-    </code></div>
-    <code>*/</code></blockquote>
-</td>
+                strict&quot;</code> pragma. It does not supply
+                <code>self</code>; you will have to request that unnecessary
+                alias of the dreaded global object yourself. It adds the same
+                globals as this directive:
+                <blockquote><code>/*global </code>
+                <div><code>
+                    clearInterval, clearTimeout, document, event, FileReader,
+                    FormData, history, localStorage, location, name, navigator,
+                    screen, sessionStorage, setInterval, setTimeout, Storage,
+                    URL, window, XMLHttpRequest
+                </code></div>
+                <code>*/</code></blockquote>
+            </td>
         </tr>
         <tr>
             <td id="convert">Tolerate conversion operators</td>
             <td><code>convert</code></td>
-            <td><code>true</code> if  <code>!!</code>, <code>+</code> prefix, and concatenation with <code>&quot;&quot;</code> are allowed. The <code>Boolean</code>, <code>Number</code>, and <code>String</code> functions 
-            are preferred</td>
+            <td><code>true</code> if <code>!!</code>, <code>+</code> prefix,
+                and concatenation with <code>&quot;&quot;</code> are allowed.
+                The <code>Boolean</code>, <code>Number</code>, and
+                <code>String</code> functions are preferred</td>
         </tr>
         <tr>
             <td id="couch">Assume <a href="http://couchdb.apache.org/">CouchDB</a></td>

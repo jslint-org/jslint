@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-01-26
+// 2018-02-05
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -171,6 +171,7 @@ const jslint = (function JSLint() {
             "setTimeout",
             "Storage",
             "URL",
+            "window",
             "XMLHttpRequest"
         ],
         couch: [
@@ -4199,7 +4200,11 @@ const jslint = (function JSLint() {
             break;
         case "=>":
         case "(":
+            break;
         case "[":
+            if (thing.expression[0].id === "window") {
+                warn("weird_expression_a", thing, "window[...]");
+            }
             break;
         case ".":
             if (thing.expression.id === "RegExp") {
@@ -4989,7 +4994,7 @@ const jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2018-01-26",
+            edition: "2018-02-05",
             exports: exports,
             froms: froms,
             functions: functions,
