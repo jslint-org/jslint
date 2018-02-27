@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-02-05
+// 2018-02-27
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -91,9 +91,9 @@
     a, and, arity, assign, b, bad_assignment_a, bad_directive_a, bad_get,
     bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
     body, browser, c, calls, catch, charCodeAt, closer, closure, code, column,
-    complex, concat, constant, context, convert, couch, create, d, dead,
-    default, devel, directive, directives, disrupt, dot, duplicate_a, edition,
-    ellipsis, else, empty_block, escape_mega, eval, every, expected_a,
+    complex, concat, constant, const_or_let, context, convert, couch, create, d,
+    dead, default, devel, directive, directives, disrupt, dot, duplicate_a,
+    edition, ellipsis, else, empty_block, escape_mega, eval, every, expected_a,
     expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d,
     expected_a_before_b, expected_a_next_at_b, expected_digits_after_a,
     expected_four_digits, expected_identifier_a, expected_line_break_a_b,
@@ -313,6 +313,7 @@ const jslint = (function JSLint() {
         bad_option_a: "Bad option '{a}'.",
         bad_property_a: "Bad property name '{a}'.",
         bad_set: "A set function takes one parameter.",
+        const_or_let: "Use 'const' or 'let' to do destructuring.",
         duplicate_a: "Duplicate '{a}'.",
         empty_block: "Empty block.",
         escape_mega: "Unexpected escapement in mega literal.",
@@ -2703,6 +2704,7 @@ const jslint = (function JSLint() {
                 let ellipsis = false;
                 let param;
                 if (next_token.id === "{") {
+                    warn("const_or_let", next_token);
                     complex = true;
                     if (optional !== undefined) {
                         warn(
@@ -2749,6 +2751,7 @@ const jslint = (function JSLint() {
                         return parameter();
                     }
                 } else if (next_token.id === "[") {
+                    warn("const_or_let", next_token);
                     complex = true;
                     if (optional !== undefined) {
                         warn(
@@ -4978,7 +4981,7 @@ const jslint = (function JSLint() {
                         whitage();
                     }
                 } else {
-                    throw({"name": "JSLintError"});
+                    throw {"name": "JSLintError"};
                 }
             }
             if (!option.browser) {
@@ -4996,7 +4999,7 @@ const jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2018-02-05",
+            edition: "2018-02-27",
             exports: exports,
             froms: froms,
             functions: functions,
