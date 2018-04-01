@@ -179,7 +179,7 @@ const jslint = (function JSLint() {
             "window",
             "Worker",
             "XMLHttpRequest"
-],
+        ],
         couch: [
             "emit", "getRow", "isArray", "log", "provides", "registerType",
             "require", "send", "start", "sum", "toJSON"
