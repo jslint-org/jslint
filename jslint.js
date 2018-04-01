@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-03-21
+// 2018-04-01
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -154,15 +154,21 @@ const jslint = (function JSLint() {
 
         bitwise: true,
         browser: [
+            "caches",
             "clearInterval",
             "clearTimeout",
+            "console",
             "document",
+            "DOMException",
+            "Element",
+            "Event",
             "event",
             "FileReader",
             "FormData",
             "history",
             "localStorage",
             "location",
+            "MutationObserver",
             "name",
             "navigator",
             "screen",
@@ -172,8 +178,9 @@ const jslint = (function JSLint() {
             "Storage",
             "URL",
             "window",
+            "Worker",
             "XMLHttpRequest"
-        ],
+],
         couch: [
             "emit", "getRow", "isArray", "log", "provides", "registerType",
             "require", "send", "start", "sum", "toJSON"
@@ -5002,7 +5009,7 @@ const jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2018-03-21",
+            edition: "2018-04-01",
             exports: exports,
             froms: froms,
             functions: functions,
