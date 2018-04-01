@@ -157,7 +157,6 @@ const jslint = (function JSLint() {
             "caches",
             "clearInterval",
             "clearTimeout",
-            "console",
             "document",
             "DOMException",
             "Element",
