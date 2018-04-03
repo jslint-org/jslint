@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-04-01
+// 2018-04-03
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -4217,6 +4217,9 @@ const jslint = (function JSLint() {
             if (thing.expression[0].id === "window") {
                 warn("weird_expression_a", thing, "window[...]");
             }
+            if (thing.expression[0].id === "self") {
+                warn("weird_expression_a", thing, "self[...]");
+            }
             break;
         case ".":
             if (thing.expression.id === "RegExp") {
@@ -5008,7 +5011,7 @@ const jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2018-04-01",
+            edition: "2018-04-03",
             exports: exports,
             froms: froms,
             functions: functions,
