@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-04-03
+// 2018-04-04
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -4292,16 +4292,7 @@ const jslint = (function JSLint() {
                     }
                 } else if (left.id === "Array") {
                     arg = thing.expression;
-                    if (
-                        arg.length !== 2
-                        || (
-                            (
-                                arg[1].id !== "(number)"
-                                || Number(arg[1].value) !== (arg[1].value | 0)
-                            )
-                            && arg[1].arity !== "binary"
-                        )
-                    ) {
+                    if (arg.length !== 2 || arg[1].id === "(string)") {
                         warn("expected_a_b", left, "[]", "new Array");
                     }
                 } else if (left.id === "Object") {
@@ -5011,7 +5002,7 @@ const jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2018-04-03",
+            edition: "2018-04-04",
             exports: exports,
             froms: froms,
             functions: functions,
