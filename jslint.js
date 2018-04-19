@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-04-04
+// 2018-04-19
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -84,8 +84,6 @@
 // required.
 
 // WARNING: JSLint will hurt your feelings.
-
-/*jslint bitwise*/
 
 /*property
     a, and, arity, assign, b, bad_assignment_a, bad_directive_a, bad_get,
@@ -3246,8 +3244,8 @@ const jslint = (function JSLint() {
                 enroll(name, "variable", is_const);
                 if (next_token.id === "=" || is_const) {
                     advance("=");
-                    name.expression = expression(0);
                     name.init = true;
+                    name.expression = expression(0);
                 }
                 the_statement.names.push(name);
             } else {
@@ -3968,6 +3966,7 @@ const jslint = (function JSLint() {
     }
 
     function activate(name) {
+        name.dead = false;
         if (name.expression !== undefined) {
             walk_expression(name.expression);
             if (name.id === "{" || name.id === "[") {
@@ -3976,7 +3975,6 @@ const jslint = (function JSLint() {
                 name.init = true;
             }
         }
-        name.dead = false;
         blockage.live.push(name);
     }
 
@@ -5002,7 +5000,7 @@ const jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2018-04-04",
+            edition: "2018-04-19",
             exports: exports,
             froms: froms,
             functions: functions,
