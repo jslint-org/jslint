@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-04-19
+// 2018-04-25
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -195,9 +195,9 @@ const jslint = (function JSLint() {
         multivar: true,
         node: [
             "Buffer", "clearImmediate", "clearInterval", "clearTimeout",
-            "console", "exports", "module", "process", "querystring",
-            "require", "setImmediate", "setInterval", "setTimeout",
-            "__dirname", "__filename"
+            "console", "exports", "module", "process", "require",
+            "setImmediate", "setInterval", "setTimeout", "URL",
+            "URLSearchParams", "__dirname", "__filename"
         ],
         single: true,
         this: true,
@@ -5000,7 +5000,7 @@ const jslint = (function JSLint() {
         }
         return {
             directives: directives,
-            edition: "2018-04-19",
+            edition: "2018-04-25",
             exports: exports,
             froms: froms,
             functions: functions,
