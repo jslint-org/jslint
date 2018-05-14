@@ -1,193 +1,155 @@
 // browser.js
-// 2017-12-26
+// 2018-05-14
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 /*jslint
-    browser, for
-*/
-
-/*global
-    ADSAFE, REPORT, jslint
+    browser
 */
 
 /*property
-    ___nodes___, check, create, each, enable, error, focus, function, getCheck,
-    getName, getTitle, getValue, innerHTML, isFinite, length, lib, on,
-    onscroll, property, q, scrollTop, select, split, style, value
+    checked, create, disable, display, error, focus, forEach, function,
+    getElementById, innerHTML, join, length, map, name, onchange, onclick,
+    onscroll, property, querySelectorAll, scrollTop, select, split, style,
+    value
 */
 
+import jslint from "./jslint.js";
+import report from "./report.js";
+
 // This is the web script companion file for JSLint. It includes code for
-// interacting with the browser and generating the reports.
+// interacting with the browser and displaying the reports.
 
-ADSAFE.lib("browser_ui", function () {
-    "use strict";
+let rx_crlf = /\n|\r\n?/;
+let rx_separator = /[\s,;'"]+/;
 
-    var rx_crlf = /\n|\r\n?/;
-    var rx_separator = /[\s,;'"]+/;
+let fudge_unit = 0;
 
-    function setHTML(bunch, html) {
-        bunch.___nodes___[0].innerHTML = html;
-    }
+const aux = document.getElementById("JSLINT_AUX");
+const boxes = document.querySelectorAll("[type=checkbox]");
+const fudge = document.getElementById("JSLINT_FUDGE");
+const global = document.getElementById("JSLINT_GLOBAL");
+const number = document.getElementById("JSLINT_NUMBER");
+const property = document.getElementById("JSLINT_PROPERTY");
+const property_fieldset = document.getElementById("JSLINT_PROPERTYFIELDSET");
+const report_field = document.getElementById("JSLINT_REPORT");
+const report_list = document.getElementById("JSLINT_REPORT_LIST");
+const source = document.getElementById("JSLINT_SOURCE");
+const select = document.getElementById("JSLINT_SELECT");
+const warnings = document.getElementById("JSLINT_WARNINGS");
+const warnings_list = document.getElementById("JSLINT_WARNINGS_LIST");
 
-    function setScrollTop(bunch, number) {
-        bunch.___nodes___[0].scrollTop = number;
-    }
+function show_numbers() {
+    number.value = source.value.split(rx_crlf).map(function (ignore, index) {
+        return index + fudge_unit;
+    }).join("\n");
+}
 
-    function getScrollTop(bunch) {
-        return bunch.___nodes___[0].scrollTop;
-    }
+function clear() {
+    aux.style.display = "none";
+    number.value = "";
+    property.value = "";
+    property_fieldset.style.display = "none";
+    report_field.style.display = "none";
+    report_list.innerHTML = "";
+    source.focus();
+    source.value = "";
+    warnings.style.display = "none";
+    warnings_list.innerHTML = "";
+}
 
-    function onscroll(bunch, handler) {
-        bunch.___nodes___[0].onscroll = handler;
-    }
+function fudge_change() {
+    fudge_unit = Number(fudge.checked);
+    show_numbers();
+}
 
-    return function (dom) {
+function clear_options() {
+    boxes.forEach(function (node) {
+        node.checked = false;
+    });
+    fudge_change();
+    global.innerHTML = "";
+}
 
-// This function is the entry point to this web module.
-
-// First get handles to some of the page features.
-
-        var warnings = dom.q("#JSLINT_WARNINGS");
-        var warnings_div = warnings.q(">div");
-        var options = dom.q("#JSLINT_OPTIONS");
-        var global = dom.q("#JSLINT_GLOBAL");
-        var property_fieldset = dom.q("#JSLINT_PROPERTYFIELDSET");
-        var property = dom.q("#JSLINT_PROPERTY");
-        var report_field = dom.q("#JSLINT_REPORT");
-        var report_div = report_field.q(">div");
-        var select = dom.q("#JSLINT_SELECT");
-        var source = dom.q("#JSLINT_SOURCE");
-        var number = dom.q("#JSLINT_NUMBER");
-        var fudge = dom.q("#JSLINT_FUDGE");
-        var aux = dom.q("#JSLINT_AUX");
-
-        function clear() {
-            warnings.style("display", "none");
-            report_field.style("display", "none");
-            property_fieldset.style("display", "none");
-            aux.style("display", "none");
-            number.value("");
-            property.value("");
-            report_div.value("");
-            source.value("");
-            source.focus();
-            warnings_div.value("");
-        }
-
-        function clear_options() {
-            options.q("input_checkbox").check(false);
-            options.q("input_text").value("");
-            global.value("");
-        }
-
-        function show_numbers() {
-            var f = Number(fudge.getCheck());
-            var n = source.getValue().split(rx_crlf).length + f;
-            var text = "";
-            var i;
-            for (i = f; i <= n; i += 1) {
-                text += i + "\n";
-            }
-            number.value(text);
-        }
-
-        function mark_scroll() {
-            var ss = getScrollTop(source);
-            setScrollTop(number, ss);
-            var sn = getScrollTop(number);
-            if (ss > sn) {
-                show_numbers();
-                setScrollTop(number, ss);
-            }
-        }
-
-        function call_jslint() {
+function call_jslint() {
 
 // First build the option object.
 
-            var option = Object.create(null);
-            options.q("input_checkbox:checked").each(function (node) {
-                option[node.getTitle()] = true;
-            });
-            options.q("input_text").each(function (node) {
-                var value = Number(node.getValue());
-                if (Number.isFinite(value) && value > 0) {
-                    option[node.getTitle()] = value;
-                }
-            });
+    let option = Object.create(null);
+    boxes.forEach(function (node) {
+        if (node.checked) {
+            option[node.name] = true;
+        }
+    });
 
 // Call JSLint with the source text, the options, and the predefined globals.
 
-            var global_string = global.getValue();
-            var result = jslint(
-                source.getValue(),
-                option,
-                (global_string === "")
-                    ? undefined
-                    : global_string.split(rx_separator)
-            );
+    let global_string = global.innerHTML;
+    let result = jslint(
+        source.value,
+        option,
+        (global_string === "")
+            ? undefined
+            : global_string.split(rx_separator)
+    );
 
 // Generate the reports.
 
-            var error_html = REPORT.error(result);
-            var function_html = REPORT.function(result);
-            var property_text = REPORT.property(result);
+    let error_html = report.error(result);
+    let function_html = report.function(result);
+    let property_text = report.property(result);
 
 // Display the reports.
 
-            setHTML(warnings_div, error_html);
-            warnings.style(
-                "display",
-                (error_html.length === 0)
-                    ? "none"
-                    : "block"
-            );
-            setHTML(report_div, function_html);
-            report_field.style("display", "block");
-            if (property_text) {
-                property.value(property_text);
-                property_fieldset.style("display", "block");
-                setScrollTop(property, 0);
-                select.enable(true);
-            } else {
-                property_fieldset.style("display", "none");
-                select.enable(false);
-            }
-            aux.style("display", "block");
-            source.select();
-        }
+    warnings_list.innerHTML = error_html;
+    warnings.style.display = (error_html.length === 0)
+        ? "none"
+        : "block";
 
-        function select_property_directive() {
-            property.select();
-        }
+    report_list.innerHTML = function_html;
+    report_field.style.display = "block";
+    if (property_text) {
+        property.value = property_text;
+        property_fieldset.style.display = "block";
+        property.scrollTop = 0;
+        select.disable = false;
+    } else {
+        property_fieldset.style.display = "none";
+        select.disable = true;
+    }
+    aux.style.display = "block";
+    source.select();
+}
 
-// Lay in the click handlers.
+fudge.onchange = fudge_change;
 
-        dom.q("button").each(function (button) {
-            switch (button.getName()) {
-            case "JSLint":
-                button.on("click", call_jslint);
-                break;
-            case "clear":
-                button.on("click", clear);
-                break;
-            case "options":
-                button.on("click", clear_options);
-                break;
-            case "select":
-                button.on("click", select_property_directive);
-                break;
-            }
-        });
-        fudge.on("change", function (ignore) {
-            show_numbers();
-        });
-        source.on("change", function (ignore) {
-            show_numbers();
-        });
-        onscroll(source, function (ignore) {
-            mark_scroll();
-        });
-        source.select();
-    };
+source.onchange = function (ignore) {
+    show_numbers();
+};
+
+source.onscroll = function () {
+    let ss = source.scrollTop;
+    number.scrollTop = ss;
+    let sn = number.scrollTop;
+    if (ss > sn) {
+        show_numbers();
+        number.scrollTop = ss;
+    }
+};
+
+document.querySelectorAll("[name='JSLint']").forEach(function (node) {
+    node.onclick = call_jslint;
 });
+
+document.querySelectorAll("[name='clear']").forEach(function (node) {
+    node.onclick = clear;
+});
+
+document.getElementById("JSLINT_SELECT").onclick = function () {
+    property.focus();
+    property.select();
+};
+document.getElementById("JSLINT_CLEAR_OPTIONS").onclick = clear_options;
+
+fudge_change();
+source.select();
+source.focus();
