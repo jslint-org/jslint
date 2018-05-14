@@ -13,12 +13,7 @@
 />
 <meta
     name="date"
-    content="2018-02-25"
-/>
-<link
-    rel="stylesheet"
-    type="text/css"
-    href="https://fonts.googleapis.com/css?family=Patua+One"
+    content="2018-05-14"
 />
 <link
     rel="icon"
@@ -31,6 +26,11 @@
     font-weight: normal;
     src:  url('Programma-Bold.woff') format('woff');
 }
+@font-face {
+    font-family: 'Daly';
+    font-weight: bold;
+    src:  url('Daly-Bold.woff') format('woff');
+}
 body {
 	background-color: seashell;
 	font-family: Palatino, serif;
@@ -41,11 +41,10 @@ body {
 #JSLINT_TITLE {
     color: darkslategray;
     float: left;
-    font-family: "Patua One", monospace;
+    font-family: "Daly", monospace;
     font-size: 48pt;
-    margin: 0;
+    margin-left: 12%;
     padding: 0;
-    transform: rotate(-17deg);
 }
 
 h1 {
@@ -100,13 +99,6 @@ big {
 	font-weight: normal;
 	margin-left: 0.125em;
 	margin-top: -0.2em;
-}
-ins {
-	color: gray;
-	font-family: "Trebuchet MS", sans-serif;
-	font-size: 200%;
-	font-weight: bold;
-	text-decoration: none;
 }
 code, pre {
 	font-family: Programma, monospace;
@@ -169,39 +161,46 @@ a:hover {
 a:active {
 	color: red;
 }
+#title {
+    color: gray;
+    font-family: "Trebuchet MS", sans-serif;
+    font-size: 200%;
+    font-weight: bold;
+    padding-top: 0.75em;
+    text-align: center;
+    text-decoration: none;
+}
 </style>
 </head>
 <body>
-<div id="JSLINT_TITLE">J<u>SLint</u></div>
-<ul style="float: right; margin: 1em; padding-right: 1em;">
+<div id="JSLINT_TITLE">JSLint</div>
+<ul style="float: right; margin: 1em; padding-right: 12%;">
     <li><a href="#try">Try it.</a></li>
     <li><a
         href="http://www.amazon.com/exec/obidos/ASIN/0596517742/wrrrldwideweb"
         target="_blank"
     >Enjoy&nbsp;<i>The&nbsp;Good&nbsp;Parts</i>.</a></li>
 </ul>
-<div style="text-align: center;"><ins>The <code>jslint</code> Function</ins></div>
+<div id=title>The <code>jslint</code> Function</div>
 <br clear=all>
-<h1 id=jslint><s>J<u>SLint</u></s></h1>
-<p><s>J<u>SLint</u></s> is delivered as a set of files:</p>
+<h1 id=jslint>JSLint</h1>
+<p>JSLint is delivered as a set of files:</p>
 <center><table align="center">
 <tr><th>Filename</th><th>Content</th></tr>
 <tr>
     <td><code>browser.js</code></td>
-<td>Browser based UI, uses
-<code><a href="https://github.com/douglascrockford/ADsafe">adsafe.js</a></code>
-for DOM manipulation.</td></tr>
+<td>Browser based UI.</td></tr>
 <tr><td><code>function.html</code></td>
 <td>This page that you are looking at right now.</td></tr>
 <tr><td><code>help.html</code></td>
-<td>Using <code>jslint</code> as a single page <s>J<u>SLint</u></s> application.</td></tr>
-<tr><td><code>jslint.html</code></td>
-    <td>Single page <s>J<u>SLint</u></s> application that uses the
+<td>Using <code>jslint</code> as a single page JSLint application.</td></tr>
+<tr><td><code>index.html</code></td>
+    <td>Single page JSLint application that uses the
         <code>js</code> files.</td></tr>
 <tr><td><code>jslint.js</code></td>
 <td>The <code>jslint</code> function.</td></tr>
 <tr><td><code>report.js</code></td>
-<td>The <code>REPORT</code> object, containing report generator functions for
+<td>The <code>report</code> object, containing report generator functions for
     HTML.</td></tr>
 </table></center>
 <h1><code>function jslint</code></h1>
@@ -253,7 +252,7 @@ for DOM manipulation.</td></tr>
     <td>The global object, a body that contains the outermost statements and
         variables.</td></tr>
 <tr><td><code>id</code></td><td>string</td>
-    <td><code>(JSLint)</code></td></tr>
+    <td><code>"(JSLint)"</code></td></tr>
 <tr><td><code>json</code></td><td>boolean</td>
     <td><code>true</code> if the source was a
         <a href="http://www.JSON.org/">JSON</a> text.</td></tr>
@@ -270,7 +269,7 @@ for DOM manipulation.</td></tr>
     <td>The names are the names of properties used in the source. The values are
         the number of times each name occurred.</td></tr>
 <tr><td><code>stop</code></td><td>boolean</td>
-    <td><code>true</code> if <s>J<u>SLint</u></s> was not able to process the
+    <td><code>true</code> if JSLint was not able to process the
         entire file.</td></tr>
 <tr><td><code>tokens</code></td><td>array</td>
 <td>All of the token objects in source order.</td></tr>
@@ -569,7 +568,7 @@ for DOM manipulation.</td></tr>
         </tr>
     </table>
     <h1>Reports</h1>
-    <p>The <code>REPORT</code> object contains three functions that all take a
+    <p>The <code>report</code> object contains three functions that all take a
         result from the <code>jslint</code> function as input.
         <code>report.js</code> has no other dependence on other files.</p>
     <table>
@@ -589,7 +588,7 @@ for DOM manipulation.</td></tr>
         </tr>
         <tr>
             <td><code>property</code></td>
-            <td>This function takes a result and returns a <s>J<u>SLint</u></s>
+            <td>This function takes a result and returns a JSLint
                 property directive. This directive could be pasted into a file.</td>
         </tr>
     </table>

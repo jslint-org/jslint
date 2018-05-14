@@ -12,7 +12,7 @@ ECMAScript Programming Language Standard, Sixth Edition [ES6]."
     name="author"
     content="Douglas Crockford"
 >
-<meta name="date" content="2018-02-25"
+<meta name="date" content="2018-05-14"
 >
 <link
     rel="stylesheet"
@@ -30,6 +30,11 @@ ECMAScript Programming Language Standard, Sixth Edition [ES6]."
     font-weight: normal;
     src:  url('Programma-Bold.woff') format('woff');
 }
+@font-face {
+    font-family: 'Daly';
+    font-weight: bold;
+    src:  url('Daly-Bold.woff') format('woff');
+}
 body {
 	background-color: seashell;
 	font-family: Palatino, serif;
@@ -40,17 +45,16 @@ body {
 #JSLINT_TITLE {
     color: darkslategray;
     float: left;
-    font-family: "Patua One", monospace;
+    font-family: "Daly", monospace;
     font-size: 48pt;
-    margin: 0;
+    margin-left: 12%;
     padding: 0;
-    transform: rotate(-17deg);
 }
 
 h1 {
 	background-color: darkslategray;
 	color: white;
-	font-family: "Patua One", serif;
+	font-family: "Daly", serif;
 	font-size: 100%;
 	font-style: normal;
 	font-weight: normal;
@@ -76,7 +80,7 @@ button {
 	border: 0;
 	color: black;
 	cursor: pointer;
-	font-family: "Patua One", serif;
+	font-family: "Daly", serif;
 	font-size: 100%;
 	font-style: normal;
 	margin-bottom: 0;
@@ -89,7 +93,7 @@ button {
 }
 s {
 	display: inline-block;
-    font-family: "Patua One", cursive;
+    font-family: "Daly", cursive;
 	font-style: normal;
 	padding-left: 0.1em;
 	text-decoration: none;
@@ -100,13 +104,6 @@ big {
 	font-weight: normal;
 	margin-left: 0.125em;
 	margin-top: -0.2em;
-}
-ins {
-	color: gray;
-	font-family: "Trebuchet MS", sans-serif;
-	font-size: 200%;
-	font-weight: bold;
-	text-decoration: none;
 }
 code, pre {
 	font-family: Programma, monospace;
@@ -160,7 +157,6 @@ th, td {
 }
 a:link {
 	color: darkblue;
-    font-family: "Patua One", cursive;
 }
 a:visited {
 	color: purple;
@@ -172,16 +168,25 @@ a:hover {
 a:active {
 	color: red;
 }
+#title {
+    color: gray;
+    font-family: "Trebuchet MS", sans-serif;
+    font-size: 200%;
+    font-weight: bold;
+    padding-top: 0.75em;
+    text-align: center;
+    text-decoration: none;
+}
 </style>
 </head>
 <body>
-<div id="JSLINT_TITLE">J<u>SLint</u></div>
-<ul style="float: right; margin: 1em; padding-right: 1em;">
+<div id="JSLINT_TITLE">JSLint</div>
+<ul style="float: right; margin: 1em; padding-right: 12%;">
     <li><a href="#try">Try it.</a></li>
     <li><a href="http://www.amazon.com/exec/obidos/ASIN/0596517742/wrrrldwideweb"
       target="_blank">Enjoy&nbsp;<i>The&nbsp;Good&nbsp;Parts</i>.</a></li>
 </ul>
-<div style="text-align: center;"><ins>  Help</ins> </div>
+<div id=title>Help</div>
 <br clear=all>
 <blockquote>Il semble que la perfection soit atteinte non quand il n&#8217;y a
     plus rien &agrave; ajouter, mais quand il n&#8217;y a plus rien &agrave;
@@ -196,7 +201,7 @@ a:active {
 <p>The Principle of the Good Parts is</p>
 <blockquote> If a feature is sometimes useful and sometimes dangerous and if
     there is a  better option then always use the better option. </blockquote>
-<p><s>J<u>SLint</u></s> is a JavaScript program that looks for problems in
+<p>JSLint is a JavaScript program that looks for problems in
     JavaScript programs. It is a code quality tool.</p>
 <p>When <a href="http://en.wikipedia.org/wiki/C_programming_language">C</a> was
     a <a href="chistory.html">young</a>
@@ -213,30 +218,30 @@ a:active {
     a surprisingly capable language, and it is now being used in larger
     projects. Many of the features that were intended to make the language easy
     to use are troublesome when projects become complicated. A <code>lint</code>
-    for JavaScript is needed: <s>J<u>SLint</u></s>, a JavaScript syntax checker
+    for JavaScript is needed: JSLint, a JavaScript syntax checker
     and validator.</p>
-<p><s>J<u>SLint</u></s> takes a JavaScript source and scans it. If it finds a
+<p>JSLint takes a JavaScript source and scans it. If it finds a
     problem, it returns a message describing the problem and an approximate
     location within the source. The problem is not necessarily a syntax error,
-    although it often is. <s>J<u>SLint</u></s> looks at some style conventions
+    although it often is. JSLint looks at some style conventions
     as well as structural problems. It does not prove that your program is
     correct. It just provides another set of eyes to help spot problems.</p>
-<p><s>J<u>SLint</u></s> defines a professional subset of JavaScript, a stricter
+<p>JSLint defines a professional subset of JavaScript, a stricter
     language than that defined by the <i>ECMAScript Programming Language
     Standard</i> (the strangely named document that governs JavaScript).
-    <s>J<u>SLint</u></s> will reject most legal programs. It is a higher
+    JSLint will reject most legal programs. It is a higher
     standard.</p>
 <p>JavaScript is a sloppy language, but hidden deep inside there is an elegant,
-    better language. <s>J<u>SLint</u></s> helps you to program in that better
-    language and to avoid most of the slop. <s>J<u>SLint</u></s> will reject
-    programs that browsers will accept because <s>J<u>SLint</u></s> is concerned
+    better language. JSLint helps you to program in that better
+    language and to avoid most of the slop. JSLint will reject
+    programs that browsers will accept because JSLint is concerned
     with the quality of your code and browsers are not. You should gladly accept
-    all of <s>J<u>SLint</u></s>'s advice.</p>
-<p><s>J<u>SLint</u></s> can operate on JavaScript source
+    all of JSLint's advice.</p>
+<p>JSLint can operate on JavaScript source
     or <a href="http://www.JSON.org/">JSON</a> text.</p>
 <h1 id=es6>ECMAScript Sixth Edition</h1>
 <p>Some of
-    ES6&rsquo;s features are good, so <s>J<u>SLint</u></s> will recognize the good
+    ES6&rsquo;s features are good, so JSLint will recognize the good
     parts of ES6. </p>
 <p>Currently, these features are recognized:</p>
 <ul>
@@ -248,7 +253,7 @@ a:active {
         You may use <code>let</code> or <code>var</code> but not both.</li>
     <li>The <code>const</code> statement is like the <code>let</code> statement
         except that it disallows the use of assignment on the variable, although
-        if the value of the variable is mutable, but can still be mutated.
+        if the value of the variable is mutable, it can still be mutated.
         <code>const</code> is preferred to <code>let</code>.
     <li>Destructuring of arrays and objects is allowed in parameter lists and on
         the left side of <code>let</code>, and <code>const</code>, but not
@@ -266,27 +271,27 @@ a:active {
     <li><code>0b</code>- and <code>0o</code>- number literals.</li>
 </ul>
 <p>The most important new feature of ES6 is proper tail calls. This has no
-    new syntax, so <s>J<u>SLint</u></s> doesn&rsquo;t see it. But it makes recursion
+    new syntax, so JSLint doesn&rsquo;t see it. But it makes recursion
     much more attractive, which makes loops, particularly <code>for</code>
     loops, much less attractive.</p>
 <h1 id="import"><code>import export</code></h1>
 <p>The ES6 module feature will be an important improvement over JavaScript&rsquo;s
     global variables as a means of linking separate files together.
-    <s>J<u>SLint</u></s> recognizes a small but essential subset of the module
+    JSLint recognizes a small but essential subset of the module
     syntax.</p>
 <blockquote>
     <p><code>import </code><var>name</var><code> from </code><var>stringliteral</var><code>;</code></p>
     <p><code>import {</code><var>name</var><code>} from </code><var>stringliteral</var><code>;</code></p>
-<p><code>export default function () {}</code></p>
-<p><code>export default function <var>name</var>() {}</code></p>
+<p><code>export default function () {};</code></p>
+<p><code>export default function <var>name</var>() {};</code></p>
     <p><code>export default </code><var>expression</var><code>;</code></p>
     <p><code>export  function <var>name</var>() {}</code></p>
     <p><code>export  </code><var>name</var><code>; // </code> where <var>name</var> is <code>const</code></p>
     <p><code>export {</code><var>name</var><code>}</code><code>;</code></p>
 </blockquote>
 <h1 id=directives>Directives</h1>
-<p><s>J<u>SLint</u></s> provides three directives that may be placed in a
-    file to manage <s>J<u>SLint</u></s>&rsquo;s behavior. Use of these directives is
+<p>JSLint provides three directives that may be placed in a
+    file to manage JSLint&rsquo;s behavior. Use of these directives is
     optional. If they are used, they should be placed in a source file before
     the first statement. They are written in the form of a comment, where the
     directive name is placed immediately after the opening of the comment before
@@ -310,7 +315,7 @@ a:active {
 <blockquote><code>/*global</code>
 <div><code>ADSAFE,  report, jslint</code></div>
 <code>*/</code></blockquote>
-<p>instructs <s>J<u>SLint</u></s> to not give warnings about the global
+<p>instructs JSLint to not give warnings about the global
     variables <code>ADsafe</code>, <code>report</code>, and <code>jslint</code>.
     However, if any of those names are expected to be supplied by other files
     and those other files fail to do so, then execution errors will result. It
@@ -323,7 +328,7 @@ a:active {
 <h1><code>/*jslint*/</code></h1>
 <p>The <code>/*jslint*/</code> directive allows for the control of several
     options. These options can also be set from the
-    <a href="http://new.JSLint.com/jslint.html">JSLint.com</a> user interface.</p>
+    <a href="http://JSLint.com/index.html">JSLint.com</a> user interface.</p>
 <table>
     <tbody>
         <tr>
@@ -337,8 +342,8 @@ a:active {
             <td><code>true</code> if bitwise operators should  be allowed. The
                 bitwise operators are rarely used in JavaScript programs, so it
                 is usually more likely that <code>&amp;</code> is a mistyping of
-                <code>&amp;&amp;</code> than that it indicates a bitwise and.
-                <s>J<u>SLint</u></s> will give warnings on the bitwise operators
+                <code>&amp;&amp;</code> than that it indicates a bitwise <i>and</i>.
+                JSLint will give warnings on the bitwise operators
                 unless this option is selected.</td>
         </tr>
         <tr>
@@ -415,7 +420,7 @@ a:active {
             <td><code>true</code> if the origin of a text file is line 1 column
                 1. Programmers know that number systems start at zero.
                 Unfortunately, most text editors start numbering lines and
-                columns at one. <s>J<u>SLint</u></s> will by default start
+                columns at one. JSLint will by default start
                 numbering at zero. Use this option to start the numbering at one
                 in its reports.</td>
         </tr>
@@ -423,18 +428,6 @@ a:active {
             <td id="fudge">Tolerate <code>get</code> and <code>set</code></td>
             <td><code>getset</code></td>
             <td><code>true</code> if accessor properties are allowed in object literals.</td>
-        </tr>
-        <tr>
-            <td id="maxerr">Maximum number of errors</td>
-            <td><code>maxerr</code></td>
-            <td>The maximum number of warnings reported.
-            (The default is unlimited)</td>
-        </tr>
-        <tr>
-            <td>Maximum line length</td>
-            <td><code>maxlen</code></td>
-            <td>The maximum number of characters in a line.
-                (The default is unlimited)</td>
         </tr>
         <tr>
             <td id="multivar">Tolerate multiple variables declarations per statement</td>
@@ -450,9 +443,11 @@ a:active {
                 will predefine globals that are used in the Node.js environment.
                 It adds the same globals as this directive:
                 <blockquote><code>/*global </code>
-    <div><code>Buffer, clearImmediate, clearInterval, clearTimeout, console,
-        exports,  module, process, querystring, require, setImmediate,
-        setInterval, setTimeout, __dirname, __filename</code></div>
+    <div><code>
+        Buffer, clearImmediate, clearInterval, clearTimeout, console, exports,
+        module, process, require, setImmediate, setInterval, setTimeout, URL,
+        URLSearchParams, __dirname, __filename
+</code></div>
     <code>*/</code></blockquote></td>
         </tr>
         <tr>
@@ -475,7 +470,7 @@ a:active {
 </table>
 <p>For example:</p>
 <pre>/*jslint
-    bitwise, maxerr: 10, node
+    bitwise, node
 */</pre>
 
 <h1 id=property><code>/*property*/</code></h1>
@@ -483,23 +478,23 @@ a:active {
     property identifiers that are used in the file. Each property name in the
     program is looked up in this list. If a name is not found, that indicates an
     error, most likely a typing error.</p>
-<p>The list can also be used to evade some of <s>J<u>SLint</u></s>&rsquo;s naming
+<p>The list can also be used to evade some of JSLint&rsquo;s naming
     rules.</p>
-<p><s>J<u>SLint</u></s> can build the <code>/*property*/</code> list for you. At
-    the bottom of its report, <s>J<u>SLint</u></s> displays a
+<p>JSLint can build the <code>/*property*/</code> list for you. At
+    the bottom of its report, JSLint displays a
     <code>/*property*/</code> directive. It contains all of the names that were
     used with dot notation, subscript notation, and object literals to name the
     properties of objects. You can look through the list for misspellings. You
     can copy the <code>/*property*/</code></code> directive to the top of your
-    script file. <s>J<u>SLint</u></s> will check the spelling of all property
-    names against the list. That way, you can have <s>J<u>SLint</u></s> look for
+    script file. JSLint will check the spelling of all property
+    names against the list. That way, you can have JSLint look for
     misspellings for you.</p>
 <p>For example,</p>
 <blockquote><code>/*property
     <div>charAt, slice, _$_</div>
     */</code></blockquote>
 <h1 id=ignore><code>ignore</code></h1>
-<p><s>J<u>SLint</u></s> introduces a new reserved word: <code>ignore</code>. It
+<p>JSLint introduces a new reserved word: <code>ignore</code>. It
     is used in parameter lists and in <code>catch</code> clauses to indicate a
     parameter that will be ignored. Unused warnings will not be produced for
     <code>ignore</code>.
@@ -515,7 +510,7 @@ a:active {
     marks the variable (but not its contents) as read only, making it an error
     to attempt to assign to the variable. When given a choice,
     <code>const</code> is the best, <code>var</code> is the worst. </p>
-<p><s>J<u>SLint</u></s> uses the intersection of the <code>var</code> rules and the
+<p>JSLint uses the intersection of the <code>var</code> rules and the
     <code>let</code> rules, and by doing so avoids the errors related to either.
     A name should be declared only once in a function. It should be declared
     before it is used. It should not be used outside of the block in which it is
@@ -531,7 +526,7 @@ a:active {
     making <code>==</code> a type coercing comparison operator that produces
     false positive results. This was mitigated by adding the <code>===</code>
     operator, leaving the broken <code>==</code> operator in place.</p>
-<p><s>J<u>SLint</u></s> attempts to minimize errors by the following rules:</p>
+<p>JSLint attempts to minimize errors by the following rules:</p>
 <p><code>==</code> is not allowed. This avoids the false positives, and
     increases the visual distance between <code>=</code> and <code>===</code>.
     Assignments are not allowed in expression position, and comparisons are not
@@ -543,10 +538,10 @@ a:active {
     work very well. Automatic semicolon insertion was added to make
     things easier for beginners. Unfortunately, it sometimes fails. Do not rely
     on it unless you are a beginner.</p>
-<p><s>J<u>SLint</u></s> expects that every statement will be followed by
+<p>JSLint expects that every statement will be followed by
     <code>;</code> except for <code>for</code>, <code>function</code>,
     <code>if</code>, <code>switch</code>, <code>try</code>, and
-    <code>while</code>. <s>J<u>SLint</u></s> does not expect to see unnecessary
+    <code>while</code>. JSLint does not expect to see unnecessary
     semicolons, the empty statement, or empty blocks.</p>
 <h1 id=function><code>function =></code></h1>
 <p>JavaScript has four syntactic forms for making function objects: function
@@ -576,28 +571,28 @@ a:active {
     out the words <code>function</code> and <code>return</code>:</p>
 <blockquote> <code>(</code><var>parameters</var><code>) =>
     </code><var>expression</var> </blockquote>
-<p><s>J<u>SLint</u></s> requires the parens around the parameters, and forbids a
+<p>JSLint requires the parens around the parameters, and forbids a
     <code>{</code>&nbsp;<small>left brace</small> after the
     <code>=></code>&nbsp;<small>fart</small> to avoid syntactic ambiguity.</p>
 <h1 id=comma>Comma</h1>
 <p>The <code>,</code>&nbsp;<small>comma</small> operator is unnecessary and can
     mask programming errors.</p>
-<p><s>J<u>SLint</u></s> expects to see the comma used as a separator, but not as
+<p>JSLint expects to see the comma used as a separator, but not as
     an operator. It does not expect to see elided elements in array literals.  A
     comma should not appear after the last element of an array literal or object
     literal.</p>
 <h1 id=blocks>Blocks</h1>
-<p><s>J<u>SLint</u></s> expects blocks with <code>function</code>,
+<p>JSLint expects blocks with <code>function</code>,
     <code>if</code>, <code>switch</code>, <code>while</code>, <code>for</code>,
     <code>do</code>, and <code>try</code> statements and nowhere else.</p>
-<p><s>J<u>SLint</u></s> expects that <code>if</code>, <code>while</code>,
+<p>JSLint expects that <code>if</code>, <code>while</code>,
     <code>do</code> and <code>for</code> statements will be made with blocks
     <code>{</code>that is, with statements enclosed in braces<code>}</code>.</p>
 <p>JavaScript allows an <code>if</code> to be written like this:</p>
 <pre>if (<i>condition</i><code>)
     </code><i>statement</i>;</pre>
 <p>That form is known to contribute to mistakes in projects where many
-    programmers are working on the same code. That is why <s>J<u>SLint</u></s>
+    programmers are working on the same code. That is why JSLint
     expects the use of a block:</p>
 <pre>if (<i>condition</i>) {
     <i>statements</i>;
@@ -608,12 +603,12 @@ a:active {
     call. All other expression statements are considered
     to be errors.</p>
 <h1 id=for><code>for</code></h1>
-<p><s>J<u>SLint</u></s> does not recommend use of the <code>for</code> statement.
+<p>JSLint does not recommend use of the <code>for</code> statement.
     Use array methods like <code>forEach</code> instead. The <code>for</code>
     option will suppress some warnings. The forms of <code>for</code> that
-    <s>J<u>SLint</u></s> accepts are restricted, excluding the new ES6 forms.</p>
+    JSLint accepts are restricted, excluding the new ES6 forms.</p>
 <h1 id=forin><code>for</code> <code>in</code></h1>
-<p><s>J<u>SLint</u></s> does not recommend use of the <code>for</code>
+<p>JSLint does not recommend use of the <code>for</code>
     <code>in</code> statement. Use <code>Object.keys</code> instead.</p>
 <p>The <code>for</code> <code>in</code> statement allows for looping through
     the names of all of the properties of an object. Unfortunately, it also
@@ -635,7 +630,7 @@ a:active {
 <h1 id=switch><code>switch</code></h1>
 <p>A common error in <code>switch</code> statements is to forget to place a
     <code>break</code> statement after each case, resulting in unintended
-    fall-through. <s>J<u>SLint</u></s> expects that the statement before the next
+    fall-through. JSLint expects that the statement before the next
     <code>case</code> or <code>default</code> is one of these:
     <code>break</code>, <code>return</code>, or <code>throw</code>.</p>
 <h1 id=with><code>with</code></h1>
@@ -643,21 +638,21 @@ a:active {
     accessing properties in deeply nested objects. Unfortunately, it behaves
     very badly when setting new properties. Never use the <code>with</code>
     statement.</p>
-<p><s>J<u>SLint</u></s> does not expect to see a <code>with</code> statement.</p>
+<p>JSLint does not expect to see a <code>with</code> statement.</p>
 <h1 id=labels>Labels</h1>
 <p>JavaScript allows any statement to have a label, and labels have a
-    separate name space. <s>J<u>SLint</u></s> is more strict.</p>
-<p><s>J<u>SLint</u></s> expects labels only on statements that interact
+    separate name space. JSLint is more strict.</p>
+<p>JSLint expects labels only on statements that interact
     with <code>break</code>: <code>switch</code>, <code>while</code>,
-    <code>do</code>, and <code>for</code>. <s>J<u>SLint</u></s> expects that
+    <code>do</code>, and <code>for</code>. JSLint expects that
     labels will be distinct from vars and parameters.</p>
 <h1 id=unreachable>Unreachable Code</h1>
-<p><s>J<u>SLint</u></s> expects that a <code>return</code>, <code>break</code>,
+<p>JSLint expects that a <code>return</code>, <code>break</code>,
     or <code>throw</code> statement will be followed by a
     <code>}</code>&nbsp;<small>right brace</small> or <code>case</code> or
     <code>default</code>.</p>
 <h1 id=pluses>Confusing Pluses and Minuses</h1>
-<p><s>J<u>SLint</u></s> expects that <code>+</code> will not be followed by
+<p>JSLint expects that <code>+</code> will not be followed by
     <code>+</code> or <code>++</code>, and that <code>-</code> will not be
     followed by <code>-</code> or <code>--</code>. A misplaced space can turn
     <code>+ +</code> into <code>++</code>, an error that is difficult to see.
@@ -675,16 +670,16 @@ a:active {
 <h1 id=void><code>void</code></h1>
 <p>In most C-like languages, <code>void</code> is a type. In
     JavaScript, <code>void</code> is a prefix operator that always
-    returns <code>undefined</code>. <s>J<u>SLint</u></s> does not expect to
+    returns <code>undefined</code>. JSLint does not expect to
     see <code>void</code> because it is confusing and not very useful.</p>
 <h1 id=regexp>Regular Expressions</h1>
 <p>Regular expressions are written in a terse and cryptic notation.
-    <s>J<u>SLint</u></s> looks for problems that may cause portability problems.
+    JSLint looks for problems that may cause portability problems.
     It also attempts to resolve visual ambiguities by recommending explicit
     escapement.</p>
 <p>JavaScript&rsquo;s syntax for regular expression literals overloads the
     <code>/</code>&nbsp;<small>slash</small> character. To avoid ambiguity,
-    <s>J<u>SLint</u></s> expects that the character preceding a regular
+    JSLint expects that the character preceding a regular
     expression literal is a <code>(</code>&nbsp;<small>left paren</small> or
     <code>=</code>&nbsp;<small>equal</small> or
     <code>:</code>&nbsp;<small>colon</small> or
@@ -702,18 +697,18 @@ a:active {
     function's implied <code>this</code> parameter. If you neglect to use the
     <code>new</code> prefix, no new object will be made and <code>this</code>
     will be bound to the global object.</p>
-<p><s>J<u>SLint</u></s> enforces the convention that constructor functions be
-    given names with initial uppercase. <s>J<u>SLint</u></s> does not expect to
+<p>JSLint enforces the convention that constructor functions be
+    given names with initial uppercase. JSLint does not expect to
     see a function invocation with an initial uppercase name unless it has the
-    <code>new</code> prefix. <s>J<u>SLint</u></s> does not expect to see the
+    <code>new</code> prefix. JSLint does not expect to see the
     <code>new</code> prefix used with functions whose names do not start with
     initial uppercase.</p>
-<p><s>J<u>SLint</u></s> does not expect to see the wrapper forms
+<p>JSLint does not expect to see the wrapper forms
     <code>new Number</code>, <code>new String</code>, <code>new Boolean</code>.</p>
-<p><s>J<u>SLint</u></s> does not expect to see <code>new Object</code>.
+<p>JSLint does not expect to see <code>new Object</code>.
     Use <code>Object.create(null)</code> instead.</p>
 <h1>Whitespace</h1>
-<p><s>J<u>SLint</u></s> has a specific set of rules about the use of whitespace.
+<p>JSLint has a specific set of rules about the use of whitespace.
     Where possible, these rules are consistent with centuries of good practice
     with literary style.</p>
 <p>The indentation increases by 4 spaces when the last token on a line is
@@ -769,12 +764,12 @@ a:active {
 \ufeff
 \ufff0-\uffff</pre>
 <h1 id=report>Report</h1>
-<p>If <s>J<u>SLint</u></s> is able to complete its scan, it generates a function
+<p>If JSLint is able to complete its scan, it generates a function
     report. It lists for each function:</p>
 <ul>
     <li>The line number on which it starts.</li>
     <li>The function&rsquo;s name. In the case of anonymous functions,
-        <s>J<u>SLint</u></s> will attempt to
+        JSLint will attempt to
         <code>«</code>guess<code>»</code> the name.</li>
     <li>The parameters.</li>
     <li><i>Variables</i>: The variables that are declared in the function.</li>
@@ -791,38 +786,37 @@ a:active {
 <p>The report will also include a list of all of the property
     names that were used.</p>
 <h1 id=feedback>Feedback</h1>
-<p>Please let me know if <s>J<u>SLint</u></s> is useful for you. Is it too
+<p>Please let me know if JSLint is useful for you. Is it too
     strict? Is there a check or a report that could help you to improve the
     quality of your programs?
     <a href="mailto:douglas@crockford.com">douglas@crockford.com</a>.
-    But please don't ask me to dumb <s>J<u>SLint</u></s> down or to make it more
+    But please don't ask me to dumb JSLint down or to make it more
     forgiving of bad practices. You would only be disappointed.</p>
-<p>I intend to continue to adapt <s>J<u>SLint</u></s> based on your comments.
+<p>I intend to continue to adapt JSLint based on your comments.
     Keep watching for improvements. Updates are announced at
     <a href="https://plus.google.com/communities/104441363299760713736">https://plus.google.com/communities/104441363299760713736</a>.</p>
 <h1 id=try>Try it</h1>
 <p><a href="http://www.JSLint.com" target="_blank">Try it.</a> Paste your script
     into the window and click the
-    <a href="http://new.JSLint.com/jslint.html"
-    target=jslint><button><s>J<u>SLint</u></s></button></a>
+    <a href="http://JSLint.com/index.html" target=jslint><button>JSLint</button></a>
     button. The analysis is done by a script running on your machine.
     Your script is not sent over the network. You can set the options used.</p>
-<p><s>J<u>SLint</u></s> is written entirely in JavaScript, so it can run
+<p>JSLint is written entirely in JavaScript, so it can run
     anywhere that JavaScript (or even Java) can run.</p>
 <h1>Perfectly fine</h1>
-<p><s>J<u>SLint</u></s> was designed to reject code that some would consider to
-    be <b>perfectly fine</b>. The reason for this is that <s>J<u>SLint</u></s>'s
+<p>JSLint was designed to reject code that some would consider to
+    be <b>perfectly fine</b>. The reason for this is that JSLint's
     purpose is to help produce programs that are free of error. That is
     difficult in any language and is especially hard in JavaScript.
-    <s>J<u>SLint</u></s> attempts to help you increase the visual distance
+    JSLint attempts to help you increase the visual distance
     between correct programs and incorrect programs, making the remaining errors
-    more obvious. <s>J<u>SLint</u></s> will give warnings about things that are
+    more obvious. JSLint will give warnings about things that are
     not necessarily wrong in the current situation, but which have been observed
     to mask or obscure errors. Avoid those things when there are better options
     available. </p>
-<p>It is dangerous out there. <s>J<u>SLint</u></s> is here to help.</p>
+<p>It is dangerous out there. JSLint is here to help.</p>
 <h1 id=warning>Warning</h1>
-<p><s>J<u>SLint</u></s> will hurt your feelings. Side effects may include
+<p>JSLint will hurt your feelings. Side effects may include
     headache, irritability, dizziness, snarkiness, stomach pain, defensiveness,
     dry mouth, cleaner code, and a reduced error rate.</p>
 <h1 id=reading>Further Reading</h1>
