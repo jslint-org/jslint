@@ -1,5 +1,5 @@
 // browser.js
-// 2018-05-14
+// 2018-05-16
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 /*jslint
@@ -8,9 +8,8 @@
 
 /*property
     checked, create, disable, display, error, focus, forEach, function,
-    getElementById, innerHTML, join, length, map, name, onchange, onclick,
-    onscroll, property, querySelectorAll, scrollTop, select, split, style,
-    value
+    getElementById, innerHTML, join, length, map, onchange, onclick, onscroll,
+    property, querySelectorAll, scrollTop, select, split, style, title, value
 */
 
 import jslint from "./jslint.js";
@@ -77,7 +76,7 @@ function call_jslint() {
     let option = Object.create(null);
     boxes.forEach(function (node) {
         if (node.checked) {
-            option[node.name] = true;
+            option[node.title] = true;
         }
     });
 
