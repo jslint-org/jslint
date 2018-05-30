@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-05-16
+// 2018-05-30
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -435,7 +435,7 @@ const rx_todo = /\b(?:todo|TO\s?DO|HACK)\b/;
 const rx_tab = /\t/g;
 // directive
 const rx_directive = /^(jslint|property|global)\s+(.*)$/;
-const rx_directive_part = /^([a-zA-Z$_][a-zA-Z0-9$_]*)(?::\s*(true|false))?(?:,\s*)?(.*)$/;
+const rx_directive_part = /^([a-zA-Z$_][a-zA-Z0-9$_]*)(?::\s*(true|false))?,?\s*(.*)$/;
 // token (sorry it is so long)
 const rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\]?,:;'"~`]|=(?:==?|>)?|\.+|[*\/][*\/=]?|\+[=+]?|-[=\-]?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<<?=?|!(?:!|==?)?|(0|[1-9][0-9]*))(.*)$/;
 const rx_digits = /^([0-9]+)(.*)$/;
@@ -5004,7 +5004,7 @@ export default function jslint(source, option_object, global_array) {
     }
     return {
         directives: directives,
-        edition: "2018-05-16",
+        edition: "2018-05-30",
         exports: exports,
         froms: froms,
         functions: functions,
