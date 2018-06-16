@@ -1,5 +1,5 @@
 // browser.js
-// 2018-05-16
+// 2018-06-16
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 /*jslint
@@ -82,7 +82,7 @@ function call_jslint() {
 
 // Call JSLint with the source text, the options, and the predefined globals.
 
-    let global_string = global.innerHTML;
+    let global_string = global.value;
     let result = jslint(
         source.value,
         option,
