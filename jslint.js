@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-05-30
+// 2018-06-16
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -98,30 +98,30 @@
     expected_a_before_b, expected_a_next_at_b, expected_digits_after_a,
     expected_four_digits, expected_identifier_a, expected_line_break_a_b,
     expected_regexp_factor_a, expected_space_a_b, expected_statements_a,
-    expected_string_a, expected_type_string_a, exports, expression, extra,
+    expected_string_a, expected_type_string_a, exports, expression, extra, f,
     finally, flag, for, forEach, free, from, froms, fud, fudge, function,
     function_in_loop, functions, g, getset, global, i, id, identifier, import,
     inc, indexOf, infix_in, init, initial, isArray, isNaN, join, json, keys,
     label, label_a, lbp, led, length, level, line, lines, live, long, loop, m,
     margin, match, message, misplaced_a, misplaced_directive_a,
-    missing_browser, missing_m, module, multivar, naked_block, name, names,
+    missing_browser, missing_m, module, multivar, n, naked_block, name, names,
     nested_comment, new, node, not_label_a, nr, nud, number_isNaN, ok, open,
-    option, out_of_scope_a, parameters, pop, property, push, qmark, quote,
+    option, out_of_scope_a, parameters, pop, property, push, qmark, quote, r,
     redefinition_a_b, replace, required_a_optional_b, reserved_a, right, role,
     search, signature, single, slice, some, sort, split, statement, stop,
-    strict, subscript_a, switch, test, this, thru, toString, todo_comment,
-    tokens, too_long, too_many_digits, tree, try, type, u, unclosed_comment,
-    unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
-    unexpected_a_after_b, unexpected_a_before_b, unexpected_at_top_level_a,
-    unexpected_char_a, unexpected_comment, unexpected_directive_a,
-    unexpected_expression_a, unexpected_label_a, unexpected_parens,
-    unexpected_space_a_b, unexpected_statement_a, unexpected_trailing_space,
-    unexpected_typeof_a, uninitialized_a, unreachable_a,
-    unregistered_property_a, unsafe, unused_a, use_double, use_spaces,
-    use_strict, used, value, var_loop, var_switch, variable, warning, warnings,
-    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
-    wrap_assignment, wrap_condition, wrap_immediate, wrap_parameter,
-    wrap_regexp, wrap_unary, wrapped, writable, y
+    strict, subscript_a, switch, t, test, this, thru, toString, todo_comment,
+    tokens, too_long, too_many_digits, tree, try, type, typeof, u,
+    unclosed_comment, unclosed_mega, unclosed_string, undeclared_a,
+    unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
+    unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
+    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
+    unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
+    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
+    unreachable_a, unregistered_property_a, unsafe, unused_a, use_double,
+    use_spaces, use_strict, used, value, var_loop, var_switch, variable,
+    warning, warnings, weird_condition_a, weird_expression_a, weird_loop,
+    weird_relation_a, white, wrap_assignment, wrap_condition, wrap_immediate,
+    wrap_parameter, wrap_regexp, wrap_unary, wrapped, writable, y
 */
 
 function empty() {
@@ -257,6 +257,37 @@ const bitwiseop = {
     ">>=": true,
     ">>>": true,
     ">>>=": true
+};
+
+const anticondition = {
+    "?": true,
+    "~": true,
+    "&": true,
+    "|": true,
+
+    "^": true,
+    "<<": true,
+    ">>": true,
+    ">>>": true,
+    "+": true,
+    "-": true,
+    "*": true,
+    "/": true,
+    "%": true,
+    "typeof": true,
+    "(number)": true,
+    "(string)": true
+};
+
+const escapeable = {
+    "\\": true,
+    "/": true,
+    "`": true,
+    "b": true,
+    "f": true,
+    "n": true,
+    "r": true,
+    "t": true
 };
 
 const opener = {
@@ -757,17 +788,14 @@ function tokenize(source) {
     }
 
     function escape(extra) {
-        switch (next_char("\\")) {
-        case "\\":
-        case "/":
-        case "`":
-        case "b":
-        case "f":
-        case "n":
-        case "r":
-        case "t":
-            break;
-        case "u":
+        next_char("\\");
+        if (escapeable[char] === true) {
+            return next_char();
+        }
+        if (char === "") {
+            return stop_at("unclosed_string", line, column);
+        }
+        if (char === "u") {
             if (next_char("u") === "{") {
                 if (json_mode) {
                     warn_at("unexpected_a", line, column - 1, char);
@@ -778,28 +806,18 @@ function tokenize(source) {
                 if (next_char() !== "}") {
                     stop_at("expected_a_before_b", line, column, "}", char);
                 }
-                next_char();
-                return;
+                return next_char();
             }
             back_char();
             if (some_digits(rx_hexs, true) < 4) {
                 warn_at("expected_four_digits", line, column - 1);
             }
-            break;
-        case "":
-            return stop_at("unclosed_string", line, column);
-        default:
-            if (!extra || extra.indexOf(char) < 0) {
-                warn_at(
-                    "unexpected_a_before_b",
-                    line,
-                    column - 2,
-                    "\\",
-                    char
-                );
-            }
+            return;
         }
-        next_char();
+        if (extra && extra.indexOf(char) >= 0) {
+            return next_char();
+        }
+        warn_at("unexpected_a_before_b", line, column - 2, "\\", char);
     }
 
     function make(id, value, identifier) {
@@ -879,49 +897,40 @@ function tokenize(source) {
             let allowed;
             const name = result[1];
             const value = result[2];
-            switch (the_comment.directive) {
-            case "jslint":
+            if (the_comment.directive === "jslint") {
                 allowed = allowed_option[name];
-                switch (typeof allowed) {
-                case "boolean":
-                case "object":
-                    switch (value) {
-                    case "true":
-                    case "":
-                    case undefined:
+                if (
+                    typeof allowed === "boolean"
+                    || typeof allowed === "object"
+                ) {
+                    if (
+                        value === ""
+                        || value === "true"
+                        || value === undefined
+                    ) {
                         option[name] = true;
                         if (Array.isArray(allowed)) {
                             populate(declared_globals, allowed, false);
                         }
-                        break;
-                    case "false":
+                    } else if (value === "false") {
                         option[name] = false;
-                        break;
-                    default:
-                        warn(
-                            "bad_option_a",
-                            the_comment,
-                            name + ":" + value
-                        );
+                    } else {
+                        warn("bad_option_a", the_comment, name + ":" + value);
                     }
-                    break;
-                default:
+                } else {
                     warn("bad_option_a", the_comment, name);
                 }
-                break;
-            case "property":
+            } else if (the_comment.directive === "property") {
                 if (tenure === undefined) {
                     tenure = empty();
                 }
                 tenure[name] = true;
-                break;
-            case "global":
+            } else if (the_comment.directive === "global") {
                 if (value) {
                     warn("bad_option_a", the_comment, name + ":" + value);
                 }
                 declared_globals[name] = false;
                 module_mode = the_comment;
-                break;
             }
             return parse_directive(the_comment, result[3]);
         }
@@ -967,13 +976,9 @@ function tokenize(source) {
 
 // Match an optional quantifier.
 
-            switch (char) {
-            case "?":
-            case "*":
-            case "+":
+            if (char === "?" || char === "*" || char === "+") {
                 next_char();
-                break;
-            case "{":
+            } else if (char === "{") {
                 if (some_digits(rx_digits, true) === 0) {
                     warn_at("expected_a", line, column, "0");
                 }
@@ -982,8 +987,7 @@ function tokenize(source) {
                     next_char();
                 }
                 next_char("}");
-                break;
-            default:
+            } else {
                 return;
             }
             if (char === "?") {
@@ -995,31 +999,27 @@ function tokenize(source) {
 
 // Match a character in a character class.
 
-            switch (char) {
-            case "\\":
+            if (char === "\\") {
                 escape("BbDdSsWw-[]^");
                 return true;
-            case "[":
-            case "]":
-            case "/":
-            case "^":
-            case "-":
-            case "":
-                return false;
-            case "`":
-                if (mega_mode) {
-                    warn_at("unexpected_a", line, column, "`");
-                }
-                next_char();
-                return true;
-            case " ":
-                warn_at("expected_a_b", line, column, "\\u0020", " ");
-                next_char();
-                return true;
-            default:
-                next_char();
-                return true;
             }
+            if (
+                char === ""
+                || char === "["
+                || char === "]"
+                || char === "/"
+                || char === "^"
+                || char === "-"
+            ) {
+                return false;
+            }
+            if (char === " ") {
+                warn_at("expected_a_b", line, column, "\\u0020", " ");
+            } else if (char === "`" && mega_mode) {
+                warn_at("unexpected_a", line, column, "`");
+            }
+            next_char();
+            return true;
         }
 
         function ranges() {
@@ -1076,13 +1076,9 @@ function tokenize(source) {
                 next_char("(");
                 if (char === "?") {
                     next_char("?");
-                    switch (char) {
-                    case ":":
-                    case "=":
-                    case "!":
+                    if (char === "=" || char === "!") {
                         next_char();
-                        break;
-                    default:
+                    } else {
                         next_char(":");
                     }
                 } else if (char === ":") {
@@ -1093,21 +1089,33 @@ function tokenize(source) {
             }
 
             function factor() {
-                switch (char) {
-                case "[":
-                    klass();
-                    return true;
-                case "\\":
-                    escape("BbDdSsWw^${}[]():=!.-|*+?");
-                    return true;
-                case "(":
+                if (
+                    char === ""
+                    || char === "/"
+                    || char === "]"
+                    || char === ")"
+                ) {
+                    return false;
+                }
+                if (char === "(") {
                     group();
                     return true;
-                case "?":
-                case "+":
-                case "*":
-                case "}":
-                case "{":
+                }
+                if (char === "[") {
+                    klass();
+                    return true;
+                }
+                if (char === "\\") {
+                    escape("BbDdSsWw^${}[]():=!.-|*+?");
+                    return true;
+                }
+                if (
+                    char === "?"
+                    || char === "+"
+                    || char === "*"
+                    || char === "}"
+                    || char === "{"
+                ) {
                     warn_at(
                         "expected_a_before_b",
                         line,
@@ -1115,19 +1123,11 @@ function tokenize(source) {
                         "\\",
                         char
                     );
-                    break;
-                case "/":
-                case "|":
-                case "]":
-                case ")":
-                case "":
-                    return false;
-                case "`":
+                } else if (char === "`") {
                     if (mega_mode) {
                         warn_at("unexpected_a", line, column - 1, "`");
                     }
-                    break;
-                case " ":
+                } else if (char === " ") {
                     warn_at(
                         "expected_a_b",
                         line,
@@ -1135,17 +1135,14 @@ function tokenize(source) {
                         "\\s",
                         " "
                     );
-                    break;
-                case "$":
+                } else if (char === "$") {
                     if (source_line[0] !== "/") {
                         multi_mode = true;
                     }
-                    break;
-                case "^":
+                } else if (char === "^") {
                     if (snippet !== "^") {
                         multi_mode = true;
                     }
-                    break;
                 }
                 next_char();
                 return true;
@@ -1229,24 +1226,23 @@ function tokenize(source) {
         next_char();
 
         return (function next() {
-            switch (char) {
-            case quote:
+            if (char === quote) {
                 snip();
                 the_token = make("(string)", snippet);
                 the_token.quote = quote;
                 return the_token;
-            case "\\":
-                escape(quote);
-                break;
-            case "":
+            }
+            if (char === "") {
                 return stop_at("unclosed_string", line, column);
-            case "`":
+            }
+            if (char === "\\") {
+                escape(quote);
+            } else if (char === "`") {
                 if (mega_mode) {
                     warn_at("unexpected_a", line, column, "`");
                 }
                 next_char("`");
-                break;
-            default:
+            } else {
                 next_char();
             }
             return next();
@@ -1270,22 +1266,18 @@ function tokenize(source) {
 
     function number() {
         if (snippet === "0") {
-            switch (next_char()) {
-            case ".":
+            next_char();
+            if (char === ".") {
                 frack();
-                break;
-            case "b":
+            } else if (char === "b") {
                 some_digits(rx_bits);
                 next_char();
-                break;
-            case "o":
+            } else if (char === "o") {
                 some_digits(rx_octals);
                 next_char();
-                break;
-            case "x":
+            } else if (char === "x") {
                 some_digits(rx_hexs);
                 next_char();
-                break;
             }
         } else {
             next_char();
@@ -1368,24 +1360,21 @@ function tokenize(source) {
             return number(snippet);
         }
 
-// The token is something miscellaneous.
+// The token is a string.
 
-        switch (snippet) {
-
-// The token is a single or double quote string.
-
-        case "\"":
+        if (snippet === "\"") {
             return string(snippet);
-
-        case "'":
+        }
+        if (snippet === "'") {
             if (!option.single) {
                 warn_at("use_double", line, column);
             }
             return string(snippet);
+        }
 
 // The token is a megastring. We don't allow any kind of mega nesting.
 
-        case "`":
+        if (snippet === "`") {
             if (mega_mode) {
                 return stop_at("expected_a_b", line, column, "}", "`");
             }
@@ -1456,10 +1445,11 @@ function tokenize(source) {
             column += 1;
             mega_mode = false;
             return make("`");
+        }
 
 // The token is a // comment.
 
-        case "//":
+        if (snippet === "//") {
             snippet = source_line;
             source_line = "";
             the_token = comment(snippet);
@@ -1467,10 +1457,11 @@ function tokenize(source) {
                 warn("unexpected_comment", the_token, "`");
             }
             return the_token;
+        }
 
 // The token is a /* comment.
 
-        case "/*":
+        if (snippet === "/*") {
             array = [];
             if (source_line[0] === "/") {
                 warn_at("unexpected_a", line, column + i, "/");
@@ -1502,10 +1493,11 @@ function tokenize(source) {
             column += i + 2;
             source_line = source_line.slice(i + 2);
             return comment(array);
+        }
 
 // The token is a slash.
 
-        case "/":
+        if (snippet === "/") {
 
 // The / can be a division operator or the beginning of a regular expression
 // literal. It is not possible to know which without doing a complete parse.
@@ -1518,18 +1510,20 @@ function tokenize(source) {
 
             if (prior.identifier) {
                 if (!prior.dot) {
-                    switch (prior.id) {
-                    case "return":
+                    if (prior.id === "return") {
                         return regexp();
-                    case "(begin)":
-                    case "case":
-                    case "delete":
-                    case "in":
-                    case "instanceof":
-                    case "new":
-                    case "typeof":
-                    case "void":
-                    case "yield":
+                    }
+                    if (
+                        prior.id === "(begin)"
+                        || prior.id === "case"
+                        || prior.id === "delete"
+                        || prior.id === "in"
+                        || prior.id === "instanceof"
+                        || prior.id === "new"
+                        || prior.id === "typeof"
+                        || prior.id === "void"
+                        || prior.id === "yield"
+                    ) {
                         the_token = regexp();
                         return stop("unexpected_a", the_token);
                     }
@@ -1551,7 +1545,6 @@ function tokenize(source) {
                 snippet = "/=";
                 warn_at("unexpected_a", line, column, "/=");
             }
-            break;
         }
         return make(snippet);
     }
@@ -1695,93 +1688,97 @@ function advance(id, match) {
 
 function json_value() {
     let negative;
-
-    function json_object() {
-        const brace = next_token;
-        const object = empty();
-        const properties = [];
-        brace.expression = properties;
-        advance("{");
-        if (next_token.id !== "}") {
-            (function next() {
-                let name;
-                let value;
-                if (next_token.quote !== "\"") {
-                    warn("unexpected_a", next_token, next_token.quote);
-                }
-                name = next_token;
-                advance("(string)");
-                if (object[token.value] !== undefined) {
-                    warn("duplicate_a", token);
-                } else if (token.value === "__proto__") {
-                    warn("bad_property_a", token);
-                } else {
-                    object[token.value] = token;
-                }
-                advance(":");
-                value = json_value();
-                value.label = name;
-                properties.push(value);
-                if (next_token.id === ",") {
-                    advance(",");
-                    return next();
-                }
-            }());
-        }
-        advance("}", brace);
-        return brace;
+    if (next_token.id === "{") {
+        return (function json_object() {
+            const brace = next_token;
+            const object = empty();
+            const properties = [];
+            brace.expression = properties;
+            advance("{");
+            if (next_token.id !== "}") {
+                (function next() {
+                    let name;
+                    let value;
+                    if (next_token.quote !== "\"") {
+                        warn(
+                            "unexpected_a",
+                            next_token,
+                            next_token.quote
+                        );
+                    }
+                    name = next_token;
+                    advance("(string)");
+                    if (object[token.value] !== undefined) {
+                        warn("duplicate_a", token);
+                    } else if (token.value === "__proto__") {
+                        warn("bad_property_a", token);
+                    } else {
+                        object[token.value] = token;
+                    }
+                    advance(":");
+                    value = json_value();
+                    value.label = name;
+                    properties.push(value);
+                    if (next_token.id === ",") {
+                        advance(",");
+                        return next();
+                    }
+                }());
+            }
+            advance("}", brace);
+            return brace;
+        }());
     }
-
-    function json_array() {
-        const bracket = next_token;
-        const elements = [];
-        bracket.expression = elements;
-        advance("[");
-        if (next_token.id !== "]") {
-            (function next() {
-                elements.push(json_value());
-                if (next_token.id === ",") {
-                    advance(",");
-                    return next();
-                }
-            }());
-        }
-        advance("]", bracket);
-        return bracket;
+    if (next_token.id === "[") {
+        return (function json_array() {
+            const bracket = next_token;
+            const elements = [];
+            bracket.expression = elements;
+            advance("[");
+            if (next_token.id !== "]") {
+                (function next() {
+                    elements.push(json_value());
+                    if (next_token.id === ",") {
+                        advance(",");
+                        return next();
+                    }
+                }());
+            }
+            advance("]", bracket);
+            return bracket;
+        }());
     }
-
-    switch (next_token.id) {
-    case "{":
-        return json_object();
-    case "[":
-        return json_array();
-    case "true":
-    case "false":
-    case "null":
+    if (
+        next_token.id === "true"
+        || next_token.id === "false"
+        || next_token.id === "null"
+    ) {
         advance();
         return token;
-    case "(number)":
+    }
+    if (next_token.id === "(number)") {
         if (!rx_JSON_number.test(next_token.value)) {
             warn("unexpected_a");
         }
         advance();
         return token;
-    case "(string)":
+    }
+    if (next_token.id === "(string)") {
         if (next_token.quote !== "\"") {
             warn("unexpected_a", next_token, next_token.quote);
         }
         advance();
         return token;
-    case "-":
+    }
+    if (next_token.id === "-") {
         negative = next_token;
         negative.arity = "unary";
         advance("-");
         advance("(number)");
         negative.expression = token;
         return negative;
-    default:
-        stop("unexpected_a");
     }
+    stop("unexpected_a");
 }
 
 // Now we parse JavaScript.
@@ -1917,25 +1914,8 @@ function condition() {
     if (the_value.wrapped === true) {
         warn("unexpected_a", the_paren);
     }
-    switch (the_value.id) {
-    case "?":
-    case "~":
-    case "&":
-    case "|":
-    case "^":
-    case "<<":
-    case ">>":
-    case ">>>":
-    case "+":
-    case "-":
-    case "*":
-    case "/":
-    case "%":
-    case "typeof":
-    case "(number)":
-    case "(string)":
+    if (anticondition[the_value.id] === true) {
         warn("unexpected_a", the_value);
-        break;
     }
     return the_value;
 }
@@ -1994,27 +1974,27 @@ function are_similar(a, b) {
                 && are_similar(a.name, b.name)
             );
         }
-        switch (a.arity) {
-        case "unary":
+        if (a.arity === "unary") {
             return are_similar(a.expression, b.expression);
-        case "binary":
+        }
+        if (a.arity === "binary") {
             return (
                 a.id !== "("
                 && are_similar(a.expression[0], b.expression[0])
                 && are_similar(a.expression[1], b.expression[1])
             );
-        case "ternary":
+        }
+        if (a.arity === "ternary") {
             return (
                 are_similar(a.expression[0], b.expression[0])
                 && are_similar(a.expression[1], b.expression[1])
                 && are_similar(a.expression[2], b.expression[2])
             );
-        case "function":
-        case "regexp":
-            return false;
-        default:
-            return true;
         }
+        if (a.arity === "function" && a.arity === "regexp") {
+            return false;
+        }
+        return true;
     }
     return false;
 }
@@ -2054,11 +2034,12 @@ function statement() {
             warn("unexpected_a", the_label);
         }
         advance(":");
-        switch (next_token.id) {
-        case "do":
-        case "for":
-        case "switch":
-        case "while":
+        if (
+            next_token.id === "do"
+            || next_token.id === "for"
+            || next_token.id === "switch"
+            || next_token.id === "while"
+        ) {
             enroll(the_label, "label", true);
             the_label.init = true;
             the_label.dead = false;
@@ -2066,10 +2047,9 @@ function statement() {
             the_statement.label = the_label;
             the_statement.statement = true;
             return the_statement;
-        default:
-            advance();
-            warn("unexpected_label_a", the_label);
         }
+        advance();
+        warn("unexpected_label_a", the_label);
     }
 
 // Parse the statement.
@@ -2104,16 +2084,14 @@ function statements() {
 
     const array = [];
     (function next(disrupt) {
-        let a_statement;
-        switch (next_token.id) {
-        case "}":
-        case "case":
-        case "default":
-        case "else":
-        case "(end)":
-            break;
-        default:
-            a_statement = statement();
+        if (
+            next_token.id !== "}"
+            && next_token.id !== "case"
+            && next_token.id !== "default"
+            && next_token.id !== "else"
+            && next_token.id !== "(end)"
+        ) {
+            let a_statement = statement();
             array.push(a_statement);
             if (disrupt) {
                 warn("unreachable_a", a_statement);
@@ -2265,12 +2243,12 @@ function assignment(id) {
         } else {
             the_token.expression = [left, right];
         }
-        switch (right.arity) {
-        case "assignment":
-        case "pre":
-        case "post":
+        if (
+            right.arity === "assignment"
+            || right.arity === "pre"
+            || right.arity === "post"
+        ) {
             warn("unexpected_a", right);
-            break;
         }
         mutation_check(left);
         return the_token;
@@ -3063,15 +3041,12 @@ prefix("{", function () {
                 seen[id] = true;
             }
             if (name.identifier) {
-                switch (next_token.id) {
-                case "}":
-                case ",":
+                if (next_token.id === "}" || next_token.id === ",") {
                     if (typeof extra === "string") {
                         advance("(");
                     }
                     value = expression(Infinity, true);
-                    break;
-                case "(":
+                } else if (next_token.id === "(") {
                     value = do_function({
                         arity: "unary",
                         from: name.from,
@@ -3082,8 +3057,7 @@ prefix("{", function () {
                             : id,
                         thru: name.from
                     });
-                    break;
-                default:
+                } else {
                     if (typeof extra === "string") {
                         advance("(");
                     }
@@ -3354,8 +3328,7 @@ stmt("export", function () {
         exports.default = the_thing;
         the_export.expression.push(the_thing);
     } else {
-        switch (next_token.id) {
-        case "function":
+        if (next_token.id === "function") {
             the_thing = statement();
             the_name = the_thing.name;
             the_id = the_name.id;
@@ -3367,13 +3340,13 @@ stmt("export", function () {
             the_export.expression.push(the_thing);
             the_thing.statement = false;
             the_thing.arity = "unary";
-            break;
-        case "var":
-        case "let":
-        case "const":
+        } else if (
+            next_token.id === "var"
+            || next_token.id === "let"
+            || next_token.id === "const"
+        ) {
             warn("unexpected_a");
-            break;
-        case "{":
+        } else if (next_token.id === "{") {
             advance("{");
             (function loop() {
                 export_id();
@@ -3384,8 +3357,7 @@ stmt("export", function () {
             }());
             advance("}");
             semicolon();
-            break;
-        default:
+        } else {
             export_id();
             if (the_name.writable !== true) {
                 warn("unexpected_a", token);
@@ -3409,10 +3381,11 @@ stmt("for", function () {
     if (next_token.id === ";") {
         return stop("expected_a_b", the_for, "while (", "for (;");
     }
-    switch (next_token.id) {
-    case "var":
-    case "let":
-    case "const":
+    if (
+        next_token.id === "var"
+        || next_token.id === "let"
+        || next_token.id === "const"
+    ) {
         return stop("unexpected_a");
     }
     first = expression(0);
@@ -3786,15 +3759,13 @@ function walk_expression(thing) {
             if (thing.id === "function") {
                 walk_statement(thing.block);
             }
-            switch (thing.arity) {
-            case "post":
-            case "pre":
+            if (thing.arity === "pre" || thing.arity === "post") {
                 warn("unexpected_a", thing);
-                break;
-            case "statement":
-            case "assignment":
+            } else if (
+                thing.arity === "statement"
+                || thing.arity === "assignment"
+            ) {
                 warn("unexpected_statement_a", thing);
-                break;
             }
             postamble(thing);
         }
@@ -3808,16 +3779,14 @@ function walk_statement(thing) {
         } else {
             preamble(thing);
             walk_expression(thing.expression);
-            switch (thing.arity) {
-            case "statement":
-            case "assignment":
-                break;
-            case "binary":
+            if (thing.arity === "binary") {
                 if (thing.id !== "(") {
                     warn("unexpected_expression_a", thing);
                 }
-                break;
-            default:
+            } else if (
+                thing.arity !== "statement"
+                && thing.arity !== "assignment"
+            ) {
                 warn((
                     thing.id === "(string)"
                     && thing.value === "use strict"
@@ -3918,17 +3887,14 @@ function preaction_function(thing) {
         thing.name.dead = false;
         thing.name.init = true;
     }
-    switch (thing.extra) {
-    case "get":
+    if (thing.extra === "get") {
         if (thing.parameters.length !== 0) {
             warn("bad_get", thing);
         }
-        break;
-    case "set":
+    } else if (thing.extra === "set") {
         if (thing.parameters.length !== 1) {
             warn("bad_set", thing);
         }
-        break;
     }
     thing.parameters.forEach(function (name) {
         walk_expression(name.expression);
@@ -4202,8 +4168,7 @@ postaction("binary", function (thing) {
             warn("weird_relation_a", thing);
         }
     }
-    switch (thing.id) {
-    case "+":
+    if (thing.id === "+") {
         if (!option.convert) {
             if (thing.expression[0].value === "") {
                 warn("expected_a_b", thing, "String(...)", "\"\" +");
@@ -4211,24 +4176,18 @@ postaction("binary", function (thing) {
                 warn("expected_a_b", thing, "String(...)", "+ \"\"");
             }
         }
-        break;
-    case "=>":
-    case "(":
-        break;
-    case "[":
+    } else if (thing.id === "[") {
         if (thing.expression[0].id === "window") {
             warn("weird_expression_a", thing, "window[...]");
         }
         if (thing.expression[0].id === "self") {
             warn("weird_expression_a", thing, "self[...]");
         }
-        break;
-    case ".":
+    } else if (thing.id === ".") {
         if (thing.expression.id === "RegExp") {
             warn("weird_expression_a", thing);
         }
-        break;
-    default:
+    } else if (thing.id !== "=>" && thing.id !== "(") {
         right = thing.expression[1];
         if (
             (thing.id === "+" || thing.id === "-")
@@ -4436,30 +4395,26 @@ postaction("ternary", function (thing) {
     }
 });
 postaction("unary", function (thing) {
-    switch (thing.id) {
-    case "[":
-    case "{":
-    case "function":
-    case "new":
-        break;
-    case "`":
+    if (thing.id === "`") {
         if (thing.expression.every(function (thing) {
             return thing.constant;
         })) {
             thing.constant = true;
         }
-        break;
-    case "!":
+    } else if (thing.id === "!") {
         if (thing.expression.constant === true) {
             warn("unexpected_a", thing);
         }
-        break;
-    case "!!":
+    } else if (thing.id === "!!") {
         if (!option.convert) {
             warn("expected_a_b", thing, "Boolean(...)", "!!");
         }
-        break;
-    default:
+    } else if (
+        thing.id !== "["
+        && thing.id !== "{"
+        && thing.id !== "function"
+        && thing.id !== "new"
+    ) {
         if (thing.expression.constant === true) {
             thing.constant = true;
         }
@@ -5004,7 +4959,7 @@ export default function jslint(source, option_object, global_array) {
     }
     return {
         directives: directives,
-        edition: "2018-05-30",
+        edition: "2018-06-17",
         exports: exports,
         froms: froms,
         functions: functions,
