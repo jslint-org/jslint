@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-06-16
+// 2018-06-18
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -128,18 +128,19 @@ function empty() {
 
 // The empty function produces a new empty object that inherits nothing. This is
 // much better than {} because confusions around accidental method names like
-// "constructor" are completely avoided.
+// 'constructor' are completely avoided.
 
     return Object.create(null);
 }
 
-function populate(object, array, value) {
+function populate(array, object = empty(), value = true) {
 
 // Augment an object by taking property names from an array of strings.
 
     array.forEach(function (name) {
         object[name] = value;
     });
+    return object;
 }
 
 const allowed_option = {
@@ -151,31 +152,11 @@ const allowed_option = {
 
     bitwise: true,
     browser: [
-        "caches",
-        "clearInterval",
-        "clearTimeout",
-        "document",
-        "DOMException",
-        "Element",
-        "Event",
-        "event",
-        "FileReader",
-        "FormData",
-        "history",
-        "localStorage",
-        "location",
-        "MutationObserver",
-        "name",
-        "navigator",
-        "screen",
-        "sessionStorage",
-        "setInterval",
-        "setTimeout",
-        "Storage",
-        "URL",
-        "window",
-        "Worker",
-        "XMLHttpRequest"
+        "caches", "clearInterval", "clearTimeout", "document", "DOMException",
+        "Element", "Event", "event", "FileReader", "FormData", "history",
+        "localStorage", "location", "MutationObserver", "name", "navigator",
+        "screen", "sessionStorage", "setInterval", "setTimeout", "Storage",
+        "URL", "window", "Worker", "XMLHttpRequest"
     ],
     couch: [
         "emit", "getRow", "isArray", "log", "provides", "registerType",
@@ -202,93 +183,21 @@ const allowed_option = {
     white: true
 };
 
-const spaceop = {
-
-// This is the set of infix operators that require a space on each side.
-
-    "!=": true,
-    "!==": true,
-    "%": true,
-    "%=": true,
-    "&": true,
-    "&=": true,
-    "&&": true,
-    "*": true,
-    "*=": true,
-    "+=": true,
-    "-=": true,
-    "/": true,
-    "/=": true,
-    "<": true,
-    "<=": true,
-    "<<": true,
-    "<<=": true,
-    "=": true,
-    "==": true,
-    "===": true,
-    "=>": true,
-    ">": true,
-    ">=": true,
-    ">>": true,
-    ">>=": true,
-    ">>>": true,
-    ">>>=": true,
-    "^": true,
-    "^=": true,
-    "|": true,
-    "|=": true,
-    "||": true
-};
-
-const bitwiseop = {
+const anticondition = populate([
+    "?", "~", "&", "|", "^", "<<", ">>", ">>>", "+", "-", "*", "/", "%",
+    "typeof", "(number)", "(string)"
+]);
 
 // These are the bitwise operators.
 
-    "~": true,
-    "^": true,
-    "^=": true,
-    "&": true,
-    "&=": true,
-    "|": true,
-    "|=": true,
-    "<<": true,
-    "<<=": true,
-    ">>": true,
-    ">>=": true,
-    ">>>": true,
-    ">>>=": true
-};
+const bitwiseop = populate([
+    "~", "^", "^=", "&", "&=", "|", "|=", "<<", "<<=", ">>", ">>=",
+    ">>>", ">>>="
+]);
 
-const anticondition = {
-    "?": true,
-    "~": true,
-    "&": true,
-    "|": true,
-
-    "^": true,
-    "<<": true,
-    ">>": true,
-    ">>>": true,
-    "+": true,
-    "-": true,
-    "*": true,
-    "/": true,
-    "%": true,
-    "typeof": true,
-    "(number)": true,
-    "(string)": true
-};
-
-const escapeable = {
-    "\\": true,
-    "/": true,
-    "`": true,
-    "b": true,
-    "f": true,
-    "n": true,
-    "r": true,
-    "t": true
-};
+const escapeable = populate([
+    "\\", "/", "`", "b", "f", "n", "r", "t"
+]);
 
 const opener = {
 
@@ -300,19 +209,19 @@ const opener = {
     "${": "}"       // mega
 };
 
-const relationop = {
-
 // The relational operators.
 
-    "!=": true,
-    "!==": true,
-    "==": true,
-    "===": true,
-    "<": true,
-    "<=": true,
-    ">": true,
-    ">=": true
-};
+const relationop = populate([
+    "!=", "!==", "==", "===", "<", "<=", ">", ">="
+]);
+
+// This is the set of infix operators that require a space on each side.
+
+const spaceop = populate([
+    "!=", "!==", "%", "%=", "&", "&=", "&&", "*", "*=", "+=", "-=", "/",
+    "/=", "<", "<=", "<<", "<<=", "=", "==", "===", "=>", ">", ">=",
+    ">>", ">>=", ">>>", ">>>=", "^", "^=", "|", "|=", "||"
+]);
 
 const standard = [
 
@@ -910,7 +819,7 @@ function tokenize(source) {
                     ) {
                         option[name] = true;
                         if (Array.isArray(allowed)) {
-                            populate(declared_globals, allowed, false);
+                            populate(allowed, declared_globals, false);
                         }
                     } else if (value === "false") {
                         option[name] = false;
@@ -4890,15 +4799,15 @@ export default function jslint(source, option_object, global_array) {
         token = global;
         token_nr = 0;
         var_mode = undefined;
-        populate(declared_globals, standard, false);
+        populate(standard, declared_globals, false);
         if (global_array !== undefined) {
-            populate(declared_globals, global_array, false);
+            populate(global_array, declared_globals, false);
         }
         Object.keys(option).forEach(function (name) {
             if (option[name] === true) {
                 const allowed = allowed_option[name];
                 if (Array.isArray(allowed)) {
-                    populate(declared_globals, allowed, false);
+                    populate(allowed, declared_globals, false);
                 }
             }
         });
@@ -4959,7 +4868,7 @@ export default function jslint(source, option_object, global_array) {
     }
     return {
         directives: directives,
-        edition: "2018-06-17",
+        edition: "2018-06-18",
         exports: exports,
         froms: froms,
         functions: functions,
