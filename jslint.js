@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-06-18
+// 2018-06-19
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -98,30 +98,30 @@
     expected_a_before_b, expected_a_next_at_b, expected_digits_after_a,
     expected_four_digits, expected_identifier_a, expected_line_break_a_b,
     expected_regexp_factor_a, expected_space_a_b, expected_statements_a,
-    expected_string_a, expected_type_string_a, exports, expression, extra, f,
+    expected_string_a, expected_type_string_a, exports, expression, extra,
     finally, flag, for, forEach, free, from, froms, fud, fudge, function,
     function_in_loop, functions, g, getset, global, i, id, identifier, import,
     inc, indexOf, infix_in, init, initial, isArray, isNaN, join, json, keys,
     label, label_a, lbp, led, length, level, line, lines, live, long, loop, m,
     margin, match, message, misplaced_a, misplaced_directive_a,
-    missing_browser, missing_m, module, multivar, n, naked_block, name, names,
+    missing_browser, missing_m, module, multivar, naked_block, name, names,
     nested_comment, new, node, not_label_a, nr, nud, number_isNaN, ok, open,
-    option, out_of_scope_a, parameters, pop, property, push, qmark, quote, r,
-    redefinition_a_b, replace, required_a_optional_b, reserved_a, right, role,
-    search, signature, single, slice, some, sort, split, statement, stop,
-    strict, subscript_a, switch, t, test, this, thru, toString, todo_comment,
-    tokens, too_long, too_many_digits, tree, try, type, typeof, u,
-    unclosed_comment, unclosed_mega, unclosed_string, undeclared_a,
-    unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
-    unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
-    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
-    unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
-    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
-    unreachable_a, unregistered_property_a, unsafe, unused_a, use_double,
-    use_spaces, use_strict, used, value, var_loop, var_switch, variable,
-    warning, warnings, weird_condition_a, weird_expression_a, weird_loop,
-    weird_relation_a, white, wrap_assignment, wrap_condition, wrap_immediate,
-    wrap_parameter, wrap_regexp, wrap_unary, wrapped, writable, y
+    option, out_of_scope_a, parameters, parent, pop, property, push, qmark,
+    quote, redefinition_a_b, replace, required_a_optional_b, reserved_a, right,
+    role, search, signature, single, slice, some, sort, split, statement, stop,
+    strict, subscript_a, switch, test, this, thru, toString, todo_comment,
+    tokens, too_long, too_many_digits, tree, try, type, u, unclosed_comment,
+    unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
+    unexpected_a_after_b, unexpected_a_before_b, unexpected_at_top_level_a,
+    unexpected_char_a, unexpected_comment, unexpected_directive_a,
+    unexpected_expression_a, unexpected_label_a, unexpected_parens,
+    unexpected_space_a_b, unexpected_statement_a, unexpected_trailing_space,
+    unexpected_typeof_a, uninitialized_a, unreachable_a,
+    unregistered_property_a, unsafe, unused_a, use_double, use_spaces,
+    use_strict, used, value, var_loop, var_switch, variable, warning, warnings,
+    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
+    wrap_assignment, wrap_condition, wrap_immediate, wrap_parameter,
+    wrap_regexp, wrap_unary, wrapped, writable, y
 */
 
 function empty() {
@@ -1754,7 +1754,7 @@ function enroll(name, role, readonly) {
 
             functionage.context[id] = name;
             name.dead = true;
-            name.function = functionage;
+            name.parent = functionage;
             name.init = false;
             name.role = role;
             name.used = 0;
@@ -3755,7 +3755,13 @@ function lookup(thing) {
         } else if (the_variable.role === "label") {
             warn("label_a", thing);
         }
-        if (the_variable.dead) {
+        if (
+            the_variable.dead
+            && (
+                the_variable.calls === undefined
+                || the_variable.calls[functionage.name.id] === undefined
+            )
+        ) {
             warn("out_of_scope_a", thing);
         }
         return the_variable;
@@ -3913,13 +3919,13 @@ preaction("binary", "(", function (thing) {
         && functionage.context[left.id] === undefined
         && typeof functionage.name === "object"
     ) {
-        const parent = functionage.name.function;
+        const parent = functionage.name.parent;
         if (parent) {
             const left_variable = parent.context[left.id];
             if (
                 left_variable !== undefined
                 && left_variable.dead
-                && left_variable.function === parent
+                && left_variable.parent === parent
                 && left_variable.calls !== undefined
                 && left_variable.calls[functionage.name.id] !== undefined
             ) {
@@ -4350,11 +4356,12 @@ function delve(the_function) {
     Object.keys(the_function.context).forEach(function (id) {
         if (id !== "ignore") {
             const name = the_function.context[id];
-            if (name.function === the_function) {
+            if (name.parent === the_function) {
                 if (
-                    name.used === 0 && (
+                    name.used === 0
+                    && (
                         name.role !== "function"
-                        || name.function.arity !== "unary"
+                        || name.parent.arity !== "unary"
                     )
                 ) {
                     warn("unused_a", name);
@@ -4868,7 +4875,7 @@ export default function jslint(source, option_object, global_array) {
     }
     return {
         directives: directives,
-        edition: "2018-06-18",
+        edition: "2018-06-19",
         exports: exports,
         froms: froms,
         functions: functions,
