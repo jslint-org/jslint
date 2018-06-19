@@ -1,14 +1,14 @@
 // report.js
-// 2018-05-14
+// 2018-06-19
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Generate JSLint HTML reports.
 
 /*property
-    closure, column, context, edition, error, exports, filter, forEach, fudge,
-    function, functions, global, id, froms, isArray, join, json, keys, length,
+    closure, column, context, edition, error, exports, filter, forEach, froms,
+    fudge, function, functions, global, id, isArray, join, json, keys, length,
     level, line, lines, message, module, name, names, option, parameters,
-    property, push, replace, role, signature, sort, stop, warnings
+    parent, property, push, replace, role, signature, sort, stop, warnings
 */
 
 const rx_amp = /&/g;
@@ -142,7 +142,7 @@ export default {
                     let the_variable = context[id];
                     return (
                         the_variable.role === "variable"
-                        && the_variable.function === the_function
+                        && the_variable.parent === the_function
                     );
                 }));
                 detail("exception", list.filter(function (id) {
@@ -152,18 +152,18 @@ export default {
                     let the_variable = context[id];
                     return (
                         the_variable.closure === true
-                        && the_variable.function === the_function
+                        && the_variable.parent === the_function
                     );
                 }));
                 detail("outer", list.filter(function (id) {
                     let the_variable = context[id];
                     return (
-                        the_variable.function !== the_function
-                        && the_variable.function.id !== "(global)"
+                        the_variable.parent !== the_function
+                        && the_variable.parent.id !== "(global)"
                     );
                 }));
                 detail(mode, list.filter(function (id) {
-                    return context[id].function.id === "(global)";
+                    return context[id].parent.id === "(global)";
                 }));
                 detail("label", list.filter(function (id) {
                     return context[id].role === "label";

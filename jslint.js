@@ -3501,6 +3501,9 @@ stmt("throw", function () {
     the_throw.disrupt = true;
     the_throw.expression = expression(10);
     semicolon();
+    if (functionage.try > 0) {
+        warn("unexpected_a", the_throw);
+    }
     return the_throw;
 });
 stmt("try", function () {
@@ -3741,7 +3744,7 @@ function lookup(thing) {
                 }
                 the_variable = {
                     dead: false,
-                    function: global,
+                    parent: global,
                     id: thing.id,
                     init: true,
                     role: "variable",
@@ -4856,8 +4859,6 @@ export default function jslint(source, option_object, global_array) {
                 if (!option.white) {
                     whitage();
                 }
-            } else {
-                throw {"name": "JSLintError"};
             }
         }
         if (!option.browser) {
