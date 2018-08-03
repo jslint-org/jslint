@@ -10,47 +10,39 @@
 }
 
 body {
-    background-color: antiquewhite;
     color: black;
     font-family: 'Daley', sans-serif;
     margin: 0;
-    padding: 0;
-}
-
-#JSLINT_TITLEBOX {
-    font-family: 'Daley', sans-serif;
-    margin: 0;
-    margin-left: 3%;
-    margin-right: 3%;
-    padding: 0;
+    padding: 2em;
 }
 
 #JSLINT_TITLEBOX ul {
-    float: right;
     font-size: 12pt;
+    list-style: none;
+    text-align: center;
+    padding: 0;
+}
+
+#JSLINT_TITLEBOX ul li {
+    padding: 0.5em;
 }
 
 #JSLINT_TITLEBOX div {
     color: darkslategray;
-    float: left;
+    text-align: center;
     font-size: 48pt;
 }
 
 #JSLINT_ fieldset {
-    background-color: gainsboro;
     border: 0;
     clear: both;
     margin-bottom: 1em;
-    margin-left: 3%;
-    margin-right: 3%;
     margin-top: 1em;
     padding: 0;
     width: auto;
 }
 #JSLINT_  legend {
-    background-color: darkslategray;
     border: 0;
-    color: white;
     font-size: 100%;
     font-style: normal;
     font-weight: normal;
@@ -58,8 +50,7 @@ body {
     padding-bottom: 0.25em;
     padding-left: 0;
     padding-right: 0;
-    padding-top: 0.25em;
-    text-align: center;
+    padding-top: 2em;
     width: 100%;
 }
 #JSLINT_ button {
@@ -116,9 +107,8 @@ a:link {
 }
 
 #JSLINT_ textarea {
-    border: 0;
-    background-color: white;
-    border: 0;
+    border: none;
+    border-left: 1px solid gainsboro;
     font-family: Programma, monospace;
     font-size: 100%;
     font-weight: bold;
@@ -131,11 +121,11 @@ a:link {
 }
 
 #JSLINT_NUMBER {
+    border: none;
     color: darkgray;
     display: inline-block;
     height: 4in;
-    margin: 2%;
-    margin-right: 0;
+    margin: 2% 0 2% 0;
     overflow: hidden;
     padding-right: 0.5%;
     text-align: right;
@@ -177,7 +167,7 @@ a:link {
 }
 #JSLINT_OPTIONS>div {
     float: left;
-    margin: 0.5em;
+    margin-right: 1em;
 }
 
 #JSLINT_ address {

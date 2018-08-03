@@ -5,24 +5,31 @@
 <meta
     name="description"
     content="How to use JSLint to reduce the rate of error formation in
-JavaScript programs. JSLint recommends using only the good parts of The
-ECMAScript Programming Language Standard, Sixth Edition [ES6]."
->
+    JavaScript programs. JSLint recommends using only the good parts of The
+    ECMAScript Programming Language Standard, Sixth Edition [ES6]."
+/>
 <meta
     name="author"
     content="Douglas Crockford"
->
-<meta name="date" content="2018-05-16"
->
+/>
+<meta 
+    name="date" 
+    content="2018-05-16"
+/>
+
+<meta 
+    name="viewport" 
+    content="width=device-width, initial-scale=1"
+/>
 <link
     rel="stylesheet"
     type="text/css"
     href="https://fonts.googleapis.com/css?family=Patua+One"
->
+/>
 <link
     rel="icon"
     href="image/favicon.ico"
->
+/>
 <title>JSLint: Help</title>
 <style>
 @font-face {
@@ -31,163 +38,162 @@ ECMAScript Programming Language Standard, Sixth Edition [ES6]."
     src:  url('Programma-Bold.woff') format('woff');
 }
 @font-face {
-    font-family: 'Daly';
+    font-family: 'Daley';
     font-weight: bold;
-    src:  url('Daly-Bold.woff') format('woff');
+    src:  url('Daley-Bold.woff') format('woff');
 }
 body {
-	background-color: seashell;
-	font-family: Palatino, serif;
-	font-size: 100%;
-	margin: 0;
-	padding: 0;
+    font-family: Palatino, serif;
+    font-size: 100%;
+    margin: 0;
+    padding: 2em;
 }
 #JSLINT_TITLE {
     color: darkslategray;
-    float: left;
-    font-family: "Daly", monospace;
+    font-family: "Daley", monospace;
     font-size: 48pt;
-    margin-left: 12%;
-    padding: 0;
+    text-align: center;
 }
-
 h1 {
-	background-color: darkslategray;
-	color: white;
-	font-family: "Daly", serif;
-	font-size: 100%;
-	font-style: normal;
-	font-weight: normal;
-	margin-bottom: 1em;
-	margin-left: 12%;
-	margin-right: 12%;
-	margin-top: 1em;
-	padding-bottom: 0.25em;
-	padding-left: 0;
-	padding-right: 0;
-	padding-top: 0.25em;
-	text-align: center;
+    color: darkslategray;
+    font-family: "Daley", serif;
+    font-size: 120%;
+    font-style: normal;
+    font-weight: normal;
+    margin-bottom: 1em;
+    margin-left: 12%;
+    margin-right: 12%;
+    margin-top: 4em;
+    padding-bottom: 0.25em;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0.25em;
+}
+ul.nav {
+    font-size: 12pt;
+    list-style: none;
+    text-align: center;
+    padding: 0;
+    font-family: 'Daley', sans-serif;
+    margin-bottom: 4em;
+}
+ul.nav li {
+    padding: 0.5em;
+    line-height: 100%;
 }
 th {
-	background-color: darkslategray;
-	color: white;
+    background-color: darkslategray;
+    color: white;
 }
 td {
-	background-color: white;
+    background-color: white;
 }
 button {
-	background-color: lightsteelblue;
-	border: 0;
-	color: black;
-	cursor: pointer;
-	font-family: "Daly", serif;
-	font-size: 100%;
-	font-style: normal;
-	margin-bottom: 0;
-	margin-left: 0.25em;
-	margin-right: 0.25em;
-	margin-top: 0;
-	padding-left: 1em;
-	padding-right: 1em;
-	text-align: center;
+    background-color: lightsteelblue;
+    border: 0;
+    color: black;
+    cursor: pointer;
+    font-family: "Daley", serif;
+    font-size: 100%;
+    font-style: normal;
+    margin-bottom: 0;
+    margin-left: 0.25em;
+    margin-right: 0.25em;
+    margin-top: 0;
+    padding-left: 1em;
+    padding-right: 1em;
+    text-align: center;
 }
 s {
-	display: inline-block;
-    font-family: "Daly", cursive;
-	font-style: normal;
-	padding-left: 0.1em;
-	text-decoration: none;
+    display: inline-block;
+    font-family: "Daley", cursive;
+    font-style: normal;
+    padding-left: 0.1em;
+    text-decoration: none;
 }
 big {
-	font-size: 50pt;
-	font-style: normal;
-	font-weight: normal;
-	margin-left: 0.125em;
-	margin-top: -0.2em;
+    font-size: 50pt;
+    font-style: normal;
+    font-weight: normal;
+    margin-left: 0.125em;
+    margin-top: -0.2em;
 }
 code, pre {
-	font-family: Programma, monospace;
-	font-size: 100%;
-	font-style: normal;
-	font-weight: normal;
+    font-family: Programma, monospace;
+    font-size: 100%;
+    font-style: normal;
+    font-weight: normal;
 }
 small {
-	font-style: italic;
+    font-style: italic;
+}
+p, blockquote, li {
+    line-height: 150%;
 }
 p {
-	margin-bottom: 1em;
-	margin-left: 12%;
-	margin-right: 12%;
-	margin-top: 1em;
-	text-align: justify;
+    margin-bottom: 1em;
+    margin-left: 12%;
+    margin-right: 12%;
+    margin-top: 1em;
+    text-align: justify;
 }
 blockquote {
-	margin-bottom: 1em;
-	margin-left: 18%;
-	margin-right: 18%;
-	margin-top: 1em;
+    margin-bottom: 1em;
+    margin-left: 18%;
+    margin-right: 18%;
+    margin-top: 1em;
 }
 blockquote div {
-	margin-left: 2.2em;
+    margin-left: 2.2em;
 }
 pre {
-	margin-bottom: 1em;
-	margin-left: 18%;
-	margin-right: 12%;
-	margin-top: 1em;
+    margin-bottom: 1em;
+    margin-left: 18%;
+    margin-right: 12%;
+    margin-top: 1em;
 }
 table blockquote {
-	margin-left: 0;
-	margin-right: 6%;
+    margin-left: 0;
+    margin-right: 6%;
 }
 ul {
-	list-style-type: square;
-	margin-left: 12%;
-	margin-right: 12%;
+    list-style-type: square;
+    margin-left: 12%;
+    margin-right: 12%;
 }
 table {
-	margin: 1em;
-	border: 0;
+    margin: 1em;
+    border: 0;
 }
 th, td {
-	border: black solid 1pt;
-	padding-left: 10px;
-	padding-right: 10px;
-	vertical-align: top;
+    border: black solid 1pt;
+    padding-left: 10px;
+    padding-right: 10px;
+    vertical-align: top;
 }
 a:link {
-	color: darkblue;
+    color: darkblue;
 }
 a:visited {
-	color: purple;
+    color: purple;
 }
 a:hover {
-	color: blue;
-	text-decoration: underline;
+    color: blue;
+    text-decoration: underline;
 }
 a:active {
-	color: red;
-}
-#title {
-    color: gray;
-    font-family: "Trebuchet MS", sans-serif;
-    font-size: 200%;
-    font-weight: bold;
-    padding-top: 0.75em;
-    text-align: center;
-    text-decoration: none;
+    color: red;
 }
 </style>
 </head>
 <body>
 <div id="JSLINT_TITLE">JSLint</div>
-<ul style="float: right; margin: 1em; padding-right: 12%;">
-    <li><a href="#try">Try it.</a></li>
+<ul class="nav">
+    <li><a href="#try">Try it</a></li>
+    <li>Read the instructions</li>
     <li><a href="http://www.amazon.com/exec/obidos/ASIN/0596517742/wrrrldwideweb"
-      target="_blank">Enjoy&nbsp;<i>The&nbsp;Good&nbsp;Parts</i>.</a></li>
+      target="_blank">Enjoy&nbsp;<i>The&nbsp;Good&nbsp;Parts</i></a></li>
 </ul>
-<div id=title>Help</div>
-<br clear=all>
 <blockquote>Il semble que la perfection soit atteinte non quand il n&#8217;y a
     plus rien &agrave; ajouter, mais quand il n&#8217;y a plus rien &agrave;
     retrancher.</blockquote>
@@ -799,7 +805,7 @@ a:active {
     forgiving of bad practices. You would only be disappointed.</p>
 <p>I intend to continue to adapt JSLint based on your comments.
     Keep watching for improvements. Updates are announced at
-    <a href="https://plus.google.com/communities/104441363299760713736">https://plus.google.com/communities/104441363299760713736</a>.</p>
+    <a href="https://plus.google.com/communities/104441363299760713736">Google Plus</a>.</p>
 <h1 id=try>Try it</h1>
 <p><a href="http://www.JSLint.com" target="_blank">Try it.</a> Paste your script
     into the window and click the
