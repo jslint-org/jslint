@@ -86,9 +86,11 @@ function call_jslint() {
     let result = jslint(
         source.value,
         option,
-        (global_string === "")
+        (
+            global_string === ""
             ? undefined
             : global_string.split(rx_separator)
+        )
     );
 
 // Generate the reports.
@@ -100,9 +102,11 @@ function call_jslint() {
 // Display the reports.
 
     warnings_list.innerHTML = error_html;
-    warnings.style.display = (error_html.length === 0)
+    warnings.style.display = (
+        error_html.length === 0
         ? "none"
-        : "block";
+        : "block"
+    );
 
     report_list.innerHTML = function_html;
     report_field.style.display = "block";

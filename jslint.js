@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-06-19
+// 2018-08-11
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -88,38 +88,41 @@
 /*jslint long */
 
 /*property
-    a, and, arity, assign, b, bad_assignment_a, bad_directive_a, bad_get,
-    bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
-    body, browser, c, calls, catch, charCodeAt, closer, closure, code, column,
-    complex, concat, constant, context, convert, couch, create, d, dead,
-    default, devel, directive, directives, disrupt, dot, duplicate_a, edition,
-    ellipsis, else, empty_block, escape_mega, eval, every, expected_a,
-    expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d,
-    expected_a_before_b, expected_a_next_at_b, expected_digits_after_a,
-    expected_four_digits, expected_identifier_a, expected_line_break_a_b,
+    a, and, arity, assign, b, bad_assignment_a, bad_directive_a,
+    bad_get, bad_module_name_a, bad_option_a, bad_property_a, bad_set,
+    bitwise, block, body, browser, c, calls, catch, charCodeAt, closer,
+    closure, code, column, complex, concat, constant, context, convert,
+    couch, create, d, dead, default, devel, directive, directives,
+    disrupt, dot, duplicate_a, edition, ellipsis, else, empty_block,
+    escape_mega, eval, every, expected_a, expected_a_at_b_c,
+    expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
+    expected_a_next_at_b, expected_digits_after_a, expected_four_digits,
+    expected_identifier_a, expected_line_break_a_b,
     expected_regexp_factor_a, expected_space_a_b, expected_statements_a,
-    expected_string_a, expected_type_string_a, exports, expression, extra,
-    finally, flag, for, forEach, free, from, froms, fud, fudge, function,
-    function_in_loop, functions, g, getset, global, i, id, identifier, import,
-    inc, indexOf, infix_in, init, initial, isArray, isNaN, join, json, keys,
-    label, label_a, lbp, led, length, level, line, lines, live, long, loop, m,
-    margin, match, message, misplaced_a, misplaced_directive_a,
-    missing_browser, missing_m, module, multivar, naked_block, name, names,
-    nested_comment, new, node, not_label_a, nr, nud, number_isNaN, ok, open,
-    option, out_of_scope_a, parameters, parent, pop, property, push, qmark,
-    quote, redefinition_a_b, replace, required_a_optional_b, reserved_a, right,
-    role, search, signature, single, slice, some, sort, split, statement, stop,
-    strict, subscript_a, switch, test, this, thru, toString, todo_comment,
-    tokens, too_long, too_many_digits, tree, try, type, u, unclosed_comment,
-    unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
-    unexpected_a_after_b, unexpected_a_before_b, unexpected_at_top_level_a,
-    unexpected_char_a, unexpected_comment, unexpected_directive_a,
-    unexpected_expression_a, unexpected_label_a, unexpected_parens,
-    unexpected_space_a_b, unexpected_statement_a, unexpected_trailing_space,
-    unexpected_typeof_a, uninitialized_a, unreachable_a,
-    unregistered_property_a, unsafe, unused_a, use_double, use_spaces,
-    use_strict, used, value, var_loop, var_switch, variable, warning, warnings,
-    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
+    expected_string_a, expected_type_string_a, exports, expression,
+    extra, finally, flag, for, forEach, free, from, froms, fud, fudge,
+    function_in_loop, functions, g, getset, global, i, id, identifier,
+    import, inc, indexOf, infix_in, init, initial, isArray, isNaN, join,
+    json, keys, label, label_a, lbp, led, length, level, line, lines,
+    live, long, loop, m, margin, match, message, misplaced_a,
+    misplaced_directive_a, missing_browser, missing_m, module, multivar,
+    naked_block, name, names, nested_comment, new, node, not_label_a,
+    nr, nud, number_isNaN, ok, open, option, out_of_scope_a, parameters,
+    parent, pop, property, push, quote, redefinition_a_b, replace,
+    required_a_optional_b, reserved_a, right, role, search, signature,
+    single, slice, some, sort, split, statement, stop, strict,
+    subscript_a, switch, test, this, thru, toString, todo_comment,
+    tokens, too_long, too_many_digits, tree, try, type, u,
+    unclosed_comment, unclosed_mega, unclosed_string, undeclared_a,
+    unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
+    unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
+    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
+    unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
+    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
+    unreachable_a, unregistered_property_a, unsafe, unused_a,
+    use_double, use_open, use_spaces, use_strict, used, value, var_loop,
+    var_switch, variable, warning, warnings, weird_condition_a,
+    weird_expression_a, weird_loop, weird_relation_a, white,
     wrap_assignment, wrap_condition, wrap_immediate, wrap_parameter,
     wrap_regexp, wrap_unary, wrapped, writable, y
 */
@@ -331,6 +334,10 @@ const bundle = {
     unsafe: "Unsafe character '{a}'.",
     unused_a: "Unused '{a}'.",
     use_double: "Use double quotes, not single quotes.",
+    use_open: (
+        "Wrap a ternary expression in parens, "
+        + "with a line break after the left paren."
+    ),
     use_spaces: "Use spaces, not tabs.",
     use_strict: "This function needs a \"use strict\" pragma.",
     var_loop: "Don't declare variables in a loop.",
@@ -384,9 +391,6 @@ const rx_octals = /^([0-7]+)(.*)$/;
 const rx_bits = /^([01]+)(.*)$/;
 // mega
 const rx_mega = /[`\\]|\$\{/;
-// indentation
-const rx_colons = /^(.*)\?([:.]*)$/;
-const rx_dot = /\.$/;
 // JSON number
 const rx_JSON_number = /^-?\d+(?:\.\d*)?(?:e[\-+]?\d+)?$/i;
 // initial cap
@@ -402,9 +406,11 @@ function is_letter(string) {
 function supplant(string, object) {
     return string.replace(rx_supplant, function (found, filling) {
         const replacement = object[filling];
-        return (replacement !== undefined)
+        return (
+            replacement !== undefined
             ? replacement
-            : found;
+            : found
+        );
     });
 }
 
@@ -447,9 +453,11 @@ function artifact(the_token) {
     if (the_token === undefined) {
         the_token = next_token;
     }
-    return (the_token.id === "(string)" || the_token.id === "(number)")
+    return (
+        (the_token.id === "(string)" || the_token.id === "(number)")
         ? String(the_token.value)
-        : the_token.id;
+        : the_token.id
+    );
 }
 
 function artifact_line(the_token) {
@@ -557,9 +565,11 @@ function tokenize(source) {
 // If the source is not an array, then it is split into lines at the
 // carriage return/linefeed.
 
-    lines = (Array.isArray(source))
+    lines = (
+        Array.isArray(source)
         ? source
-        : source.split(rx_crlf);
+        : source.split(rx_crlf)
+    );
     tokens = [];
 
     let char;                   // a popular character
@@ -638,9 +648,11 @@ function tokenize(source) {
 
         if (match !== undefined && char !== match) {
             return stop_at(
-                (char === "")
+                (
+                    char === ""
                     ? "expected_a"
-                    : "expected_a_b",
+                    : "expected_a_b"
+                ),
                 line,
                 column - 1,
                 match,
@@ -1223,11 +1235,15 @@ function tokenize(source) {
         if (!source_line) {
             source_line = next_line();
             from = 0;
-            return (source_line === undefined)
-                ? (mega_mode)
+            return (
+                source_line === undefined
+                ? (
+                    mega_mode
                     ? stop_at("unclosed_mega", mega_line, mega_from)
                     : make("(end)")
-                : lex();
+                )
+                : lex()
+            );
         }
         from = column;
         result = source_line.match(rx_token);
@@ -1308,9 +1324,11 @@ function tokenize(source) {
 
                 if (at < 0) {
                     snippet += source_line + "\n";
-                    return (next_line() === undefined)
+                    return (
+                        next_line() === undefined
                         ? stop_at("unclosed_mega", mega_line, mega_from)
-                        : part();
+                        : part()
+                    );
                 }
 
 // if either ` or ${ was found, then the preceding joins the snippet to become
@@ -1572,7 +1590,8 @@ function advance(id, match) {
 // Attempt to match next_token with an expected id.
 
     if (id !== undefined && next_token.id !== id) {
-        return (match === undefined)
+        return (
+            match === undefined
             ? stop("expected_a_b", next_token, id, artifact())
             : stop(
                 "expected_a_b_from_c_d",
@@ -1581,7 +1600,8 @@ function advance(id, match) {
                 artifact(match),
                 artifact_line(match),
                 artifact(next_token)
-            );
+            )
+        );
     }
 
 // Promote the tokens, skipping comments.
@@ -2101,11 +2121,13 @@ function left_check(left, right) {
 //      e.b
 //      e[b]
 //      e()
+//      ?:
 //      identifier
 
     const id = left.id;
     if (
         !left.identifier
+        && left.arity !== "ternary"
         && (
             left.arity !== "binary"
             || (id !== "." && id !== "(" && id !== "[")
@@ -2171,7 +2193,8 @@ function constant(id, type, value) {
 
     const the_symbol = symbol(id);
     the_symbol.constant = true;
-    the_symbol.nud = (typeof value === "function")
+    the_symbol.nud = (
+        typeof value === "function"
         ? value
         : function () {
             token.constant = true;
@@ -2179,7 +2202,8 @@ function constant(id, type, value) {
                 token.value = value;
             }
             return token;
-        };
+        }
+    );
     the_symbol.type = type;
     the_symbol.value = value;
     return the_symbol;
@@ -2961,9 +2985,11 @@ prefix("{", function () {
                         from: name.from,
                         id: "function",
                         line: name.line,
-                        name: (typeof extra === "string")
+                        name: (
+                            typeof extra === "string"
                             ? extra
-                            : id,
+                            : id
+                        ),
                         thru: name.from
                     });
                 } else {
@@ -3019,9 +3045,11 @@ stmt("break", function () {
             || the_label.role !== "label"
             || the_label.dead
         ) {
-            warn((the_label !== undefined && the_label.dead)
+            warn(
+                (the_label !== undefined && the_label.dead)
                 ? "out_of_scope_a"
-                : "not_label_a");
+                : "not_label_a"
+            );
         } else {
             the_label.used += 1;
         }
@@ -3332,9 +3360,11 @@ stmt("if", function () {
     if (next_token.id === "else") {
         advance("else");
         the_else = token;
-        the_if.else = (next_token.id === "if")
+        the_if.else = (
+            next_token.id === "if"
             ? statement()
-            : block();
+            : block()
+        );
         if (the_if.block.disrupt === true) {
             if (the_if.else.disrupt === true) {
                 the_if.disrupt = true;
@@ -3699,12 +3729,12 @@ function walk_statement(thing) {
                 thing.arity !== "statement"
                 && thing.arity !== "assignment"
             ) {
-                warn((
-                    thing.id === "(string)"
-                    && thing.value === "use strict"
-                )
+                warn(
+                    (thing.id === "(string)" && thing.value === "use strict")
                     ? "unexpected_a"
-                    : "unexpected_expression_a", thing);
+                    : "unexpected_expression_a",
+                    thing
+                );
             }
             walk_statement(thing.block);
             walk_statement(thing.else);
@@ -4397,8 +4427,6 @@ function whitage() {
     let margin = 0;
     let nr_comments_skipped = 0;
     let open = true;
-    let qmark = "";
-    let result;
     let right;
 
     function expected_at(at) {
@@ -4448,9 +4476,11 @@ function whitage() {
             }
         } else {
             if (open) {
-                const at = (free)
+                const at = (
+                    free
                     ? margin
-                    : margin + 8;
+                    : margin + 8
+                );
                 if (right.from < at) {
                     expected_at(at);
                 }
@@ -4489,9 +4519,11 @@ function whitage() {
                     expected_at(margin);
                 }
             } else {
-                const mislaid = (stack.length) > 0
+                const mislaid = (
+                    stack.length > 0
                     ? stack[stack.length - 1].right
-                    : undefined;
+                    : undefined
+                );
                 if (!open && mislaid !== undefined) {
                     warn(
                         "expected_a_next_at_b",
@@ -4504,17 +4536,6 @@ function whitage() {
                 }
             }
         }
-    }
-
-    function unqmark() {
-
-// Undo the effects of dangling nested ternary operators.
-
-        const level = qmark.length;
-        if (level > 0) {
-            margin -= level * 4;
-        }
-        qmark = "";
     }
 
     stack = [];
@@ -4539,10 +4560,8 @@ function whitage() {
                         free: free,
                         margin: margin,
                         open: open,
-                        qmark: qmark,
                         right: right
                     });
-                    qmark = "";
                     closer = new_closer;
                     if (left.line !== right.line) {
                         free = closer === ")" && left.free;
@@ -4553,7 +4572,6 @@ function whitage() {
                                 expected_at(0);
                             }
                         } else if (right.switch) {
-                            unqmark();
                             at_margin(-4);
                         } else {
                             at_margin(0);
@@ -4597,7 +4615,6 @@ function whitage() {
                     closer = previous.closer;
                     free = previous.free;
                     open = previous.open;
-                    qmark = previous.qmark;
                 } else {
 
 // Left is not an opener, and right is not a closer. The nature of left and
@@ -4608,14 +4625,12 @@ function whitage() {
 
 
                     if (right.switch) {
-                        unqmark();
                         at_margin(-4);
                     } else if (right.role === "label") {
                         if (right.from !== 0) {
                             expected_at(0);
                         }
                     } else if (left.id === ",") {
-                        unqmark();
                         if (!open || (
                             (free || closer === "]")
                             && left.line === right.line
@@ -4625,19 +4640,14 @@ function whitage() {
                             at_margin(0);
                         }
 
-// If right is a ternary operator, line it up on the margin. Use qmark to
-// deal with nested ternary operators.
+// If right is a ternary operator, line it up on the margin.
 
                     } else if (right.arity === "ternary") {
-                        if (right.id === "?") {
-                            margin += 4;
-                            qmark += "?";
+                        if (open) {
+                            at_margin(0);
                         } else {
-                            result = qmark.match(rx_colons);
-                            qmark = result[1] + ":";
-                            margin -= 4 * result[2].length;
+                            warn("use_open", right);
                         }
-                        at_margin(0);
                     } else if (
                         right.arity === "binary"
                         && right.id === "("
@@ -4664,14 +4674,9 @@ function whitage() {
                         if (left.line === right.line) {
                             no_space();
                         } else {
-                            if (!rx_dot.test(qmark)) {
-                                qmark += ".";
-                                margin += 4;
-                            }
                             at_margin(0);
                         }
                     } else if (left.id === ";") {
-                        unqmark();
                         if (open) {
                             at_margin(0);
                         } else {
@@ -4706,13 +4711,11 @@ function whitage() {
                             closer: closer,
                             free: free,
                             margin: margin,
-                            open: open,
-                            qmark: qmark
+                            open: open
                         });
                         closer = ";";
                         free = false;
                         open = left.open;
-                        qmark = "";
                         if (open) {
                             margin = margin + 4;
                             at_margin(0);
@@ -4781,9 +4784,11 @@ export default function jslint(source, option_object, global_array) {
         early_stop = true;
         exports = empty();
         froms = [];
-        fudge = (option.fudge)
+        fudge = (
+            option.fudge
             ? 1
-            : 0;
+            : 0
+        );
         functions = [];
         global = {
             id: "(global)",
@@ -4876,7 +4881,7 @@ export default function jslint(source, option_object, global_array) {
     }
     return {
         directives: directives,
-        edition: "2018-06-19",
+        edition: "2018-08-11",
         exports: exports,
         froms: froms,
         functions: functions,

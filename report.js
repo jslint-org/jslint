@@ -1,5 +1,5 @@
 // report.js
-// 2018-06-19
+// 2018-07-29
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Generate JSLint HTML reports.
@@ -19,10 +19,18 @@ function entityify(string) {
 
 // Replace & < > with less destructive entities.
 
-    return String(string)
-        .replace(rx_amp, "&amp;")
-        .replace(rx_lt, "&lt;")
-        .replace(rx_gt, "&gt;");
+    return String(
+        string
+    ).replace(
+        rx_amp,
+        "&amp;"
+    ).replace(
+        rx_lt,
+        "&lt;"
+    ).replace(
+        rx_gt,
+        "&gt;"
+    );
 }
 
 export default {
@@ -63,15 +71,19 @@ export default {
 // </dl>
 
         let fudge = Number(Boolean(data.option.fudge));
-        let mode = (data.module)
+        let mode = (
+            data.module
             ? "module"
-            : "global";
+            : "global"
+        );
         let output = [];
 
         if (data.json) {
-            return (data.warnings.length === 0)
+            return (
+                data.warnings.length === 0
                 ? "<center>JSON: good.</center>"
-                : "<center>JSON: bad.</center>";
+                : "<center>JSON: bad.</center>"
+            );
         }
 
         function detail(title, array) {
@@ -110,15 +122,15 @@ export default {
                     "><address>",
                     entityify(the_function.line + fudge),
                     "</address><dfn>",
-                    (the_function.name === "=>")
+                    (
+                        the_function.name === "=>"
                         ? entityify(the_function.signature) + " =>"
                         : (
-                            (typeof the_function.name === "string")
-                                ? "<b>«" + entityify(the_function.name)
-                                    + "»</b>"
-                                : "<b>" + entityify(the_function.name.id)
-                                    + "</b>"
-                        ) + entityify(the_function.signature),
+                            typeof the_function.name === "string"
+                            ? "<b>«" + entityify(the_function.name) + "»</b>"
+                            : "<b>" + entityify(the_function.name.id) + "</b>"
+                        )
+                    ) + entityify(the_function.signature),
                     "</dfn>"
                 );
                 if (Array.isArray(the_function.parameters)) {
@@ -195,7 +207,7 @@ export default {
                     length += 2;
                 }
                 not_first = true;
-                if (length + key.length > 78) {
+                if (length + key.length >= 72) {
                     length = 4;
                     output.push("\n   ");
                 }
