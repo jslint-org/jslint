@@ -2127,7 +2127,13 @@ function left_check(left, right) {
     const id = left.id;
     if (
         !left.identifier
-        && left.arity !== "ternary"
+        && (
+            left.arity !== "ternary"
+            || (
+                !left_check(left.expression[1])
+                && !left_check(left.expression[2])
+            )
+        )
         && (
             left.arity !== "binary"
             || (id !== "." && id !== "(" && id !== "[")
