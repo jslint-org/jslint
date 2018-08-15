@@ -207,7 +207,7 @@ export default {
                     length += 2;
                 }
                 not_first = true;
-                if (length + key.length >= 72) {
+                if (length + key.length >= 80) {
                     length = 4;
                     output.push("\n   ");
                 }
