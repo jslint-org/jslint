@@ -116,7 +116,9 @@
     unclosed_comment, unclosed_mega, unclosed_string, undeclared_a,
     unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
     unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
-    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
+    unexpected_directive_a,
+    unexpected_empty_lines,
+    unexpected_expression_a, unexpected_label_a,
     unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
     unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
     unreachable_a, unregistered_property_a, unsafe, unused_a,
@@ -315,6 +317,9 @@ const bundle = {
     unexpected_char_a: "Unexpected character '{a}'.",
     unexpected_comment: "Unexpected comment.",
     unexpected_directive_a: "When using modules, don't use directive '/*{a}'.",
+    unexpected_empty_lines: (
+        "Expected 0, 1, or 3 contiguous empty-lines after current line, instead of {a}."
+    ),
     unexpected_expression_a: (
         "Unexpected expression '{a}' in statement position."
     ),
@@ -417,6 +422,7 @@ function supplant(string, object) {
 let anon;               // The guessed name for anonymous functions.
 let blockage;           // The current block.
 let block_stack;        // The stack of blocks.
+let empty_line_count;   // The current count of contiguous empty-lines in function next_line()
 let declared_globals;   // The object containing the global declarations.
 let directives;         // The directive comments.
 let directive_mode;     // true if directives are still allowed.
@@ -596,6 +602,23 @@ function tokenize(source) {
         line += 1;
         source_line = lines[line];
         if (source_line !== undefined) {
+            empty_line_count += 1;
+            if (source_line.length > 0) {
+                switch (empty_line_count) {
+                case 0:
+                case 1:
+                case 3:
+                    break;
+                default:
+                    warn_at(
+                        "unexpected_empty_lines",
+                        line - empty_line_count - 1,
+                        0,
+                        empty_line_count
+                    );
+                }
+                empty_line_count = -1;
+            }
             at = source_line.search(rx_tab);
             if (at >= 0) {
                 if (!option.white) {
@@ -4629,7 +4652,6 @@ function whitage() {
 // If left is , or ; or right is a statement then if open, right must go at the
 // margin, or if closed, a space between.
 
-
                     if (right.switch) {
                         at_margin(-4);
                     } else if (right.role === "label") {
@@ -4788,6 +4810,7 @@ export default function jslint(source, option_object, global_array) {
         directive_mode = true;
         directives = [];
         early_stop = true;
+        empty_line_count = -1;
         exports = empty();
         froms = [];
         fudge = (
