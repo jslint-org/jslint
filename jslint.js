@@ -619,7 +619,12 @@ function tokenize(source) {
                     source_line.length - 1
                 );
             }
-            if (!option.long && source_line.length > 80) {
+            if (
+                first
+                && !json_mode
+                && !option.long
+                && source_line.length > 80
+            ) {
                 warn_at("too_long", line, 80);
             }
         }
