@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-08-11
+// 2018-09-13
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -619,7 +619,12 @@ function tokenize(source) {
                     source_line.length - 1
                 );
             }
-            if (!option.long && source_line.length > 80) {
+            if (
+                !option.long
+                && source_line.length > 80
+                && !json_mode
+                && first
+            ) {
                 warn_at("too_long", line, 80);
             }
         }
@@ -4623,12 +4628,11 @@ function whitage() {
                     open = previous.open;
                 } else {
 
-// Left is not an opener, and right is not a closer. The nature of left and
-// right will determine the space between them.
+// Left is not an opener, and right is not a closer.
+// The nature of left and right will determine the space between them.
 
-// If left is , or ; or right is a statement then if open, right must go at the
-// margin, or if closed, a space between.
-
+// If left is ',' or ';' or right is a statement then if open,
+// right must go at the margin, or if closed, a space between.
 
                     if (right.switch) {
                         at_margin(-4);
@@ -4778,7 +4782,11 @@ function whitage() {
 
 // The jslint function itself.
 
-export default function jslint(source, option_object, global_array) {
+export default function jslint(
+    source = "",
+    option_object = empty(),
+    global_array = []
+) {
     try {
         warnings = [];
         option = Object.assign(empty(), option_object);
@@ -4821,9 +4829,7 @@ export default function jslint(source, option_object, global_array) {
         token_nr = 0;
         var_mode = undefined;
         populate(standard, declared_globals, false);
-        if (global_array !== undefined) {
-            populate(global_array, declared_globals, false);
-        }
+        populate(global_array, declared_globals, false);
         Object.keys(option).forEach(function (name) {
             if (option[name] === true) {
                 const allowed = allowed_option[name];
@@ -4887,7 +4893,7 @@ export default function jslint(source, option_object, global_array) {
     }
     return {
         directives: directives,
-        edition: "2018-08-11",
+        edition: "2018-09-13",
         exports: exports,
         froms: froms,
         functions: functions,
