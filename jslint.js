@@ -4788,6 +4788,9 @@ export default function jslint(
     global_array = []
 ) {
     try {
+        if (typeof source !== "string") {
+            source = String(source || "");
+        }
         warnings = [];
         option = Object.assign(empty(), option_object);
         anon = "anonymous";
