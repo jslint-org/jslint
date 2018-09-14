@@ -110,7 +110,7 @@
     nr, nud, number_isNaN, ok, open, option, out_of_scope_a, parameters,
     parent, pop, property, push, quote, redefinition_a_b, replace,
     required_a_optional_b, reserved_a, right, role, search, signature,
-    single, slice, some, sort, split, statement, stop, strict,
+    single, slice, some, sort, splice, split, statement, stop, strict,
     subscript_a, switch, test, this, thru, toString, todo_comment,
     tokens, too_long, too_many_digits, tree, try, type, u,
     unclosed_comment, unclosed_mega, unclosed_string, undeclared_a,
@@ -865,11 +865,44 @@ function tokenize(source) {
         }
     }
 
+    function warnings_remove_too_long(line1, line2) {
+    /*
+     * this function will remove too_long warnings in the inclusive-range
+     * [line1, line2]
+     */
+        let ii;
+        let warning;
+        // loop backwards in warnings-list to keep index-counter ii invariant,
+        // as we mutate it
+        ii = warnings.length;
+        while (true) {
+            ii -= 1;
+            warning = warnings[ii];
+            // optimization - break early when we move out of range
+            // [line1, line2]
+            if (!(warning && warning.line >= line1)) {
+                break;
+            }
+            // remove too_long warning in inclusive-range [line1, line2]
+            if (warning.line <= line2 && warnings[ii].code === "too_long") {
+                warnings.splice(ii, 1);
+            }
+        }
+    }
+
     function comment(snippet) {
 
 // Make a comment object. Comments are not allowed in JSON text. Comments can
 // include directives and notices of incompletion.
 
+        // ignore long comments in inclusive line-range
+        // [line - snippet.length + 1, line]
+        warnings_remove_too_long(
+            typeof snippet === "string"
+            ? line
+            : line - snippet.length + 1,
+            line
+        );
         const the_comment = make("(comment)", snippet);
         if (Array.isArray(snippet)) {
             snippet = snippet.join(" ");
@@ -894,6 +927,8 @@ function tokenize(source) {
 
 // Parse a regular expression literal.
 
+        // ignore long regexp in inclusive line-range [line, line]
+        warnings_remove_too_long(line, line);
         let multi_mode = false;
         let result;
         let value;
