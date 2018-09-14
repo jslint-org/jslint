@@ -4892,22 +4892,22 @@ export default function jslint(
         }
     }
     return {
-        directives: directives,
+        directives,
         edition: "2018-09-13",
-        exports: exports,
-        froms: froms,
-        functions: functions,
-        global: global,
+        exports,
+        froms,
+        functions,
+        global,
         id: "(JSLint)",
         json: json_mode,
-        lines: lines,
+        lines,
         module: module_mode === true,
         ok: warnings.length === 0 && !early_stop,
-        option: option,
-        property: property,
+        option,
+        property,
         stop: early_stop,
-        tokens: tokens,
-        tree: tree,
+        tokens,
+        tree,
         warnings: warnings.sort(function (a, b) {
             return a.line - b.line || a.column - b.column;
         })
