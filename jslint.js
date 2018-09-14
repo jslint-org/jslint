@@ -98,6 +98,7 @@
     expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
     expected_a_next_at_b, expected_digits_after_a, expected_four_digits,
     expected_identifier_a, expected_line_break_a_b,
+    expected_newlines,
     expected_regexp_factor_a, expected_space_a_b, expected_statements_a,
     expected_string_a, expected_type_string_a, exports, expression,
     extra, finally, flag, for, forEach, free, from, froms, fud, fudge,
@@ -116,9 +117,7 @@
     unclosed_comment, unclosed_mega, unclosed_string, undeclared_a,
     unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
     unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
-    unexpected_directive_a,
-    unexpected_empty_lines,
-    unexpected_expression_a, unexpected_label_a,
+    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
     unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
     unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
     unreachable_a, unregistered_property_a, unsafe, unused_a,
@@ -275,6 +274,9 @@ const bundle = {
     expected_four_digits: "Expected four digits after '\\u'.",
     expected_identifier_a: "Expected an identifier and instead saw '{a}'.",
     expected_line_break_a_b: "Expected a line break between '{a}' and '{b}'.",
+    expected_newlines: (
+        "Expected 2 or 4 newlines between code-sections instead of {a}."
+    ),
     expected_regexp_factor_a: "Expected a regexp factor and instead saw '{a}'.",
     expected_space_a_b: "Expected one space between '{a}' and '{b}'.",
     expected_statements_a: "Expected statements before '{a}'.",
@@ -317,9 +319,6 @@ const bundle = {
     unexpected_char_a: "Unexpected character '{a}'.",
     unexpected_comment: "Unexpected comment.",
     unexpected_directive_a: "When using modules, don't use directive '/*{a}'.",
-    unexpected_empty_lines: (
-        "Expected 0, 1, or 3 contiguous empty-lines after current line, instead of {a}."
-    ),
     unexpected_expression_a: (
         "Unexpected expression '{a}' in statement position."
     ),
@@ -422,7 +421,7 @@ function supplant(string, object) {
 let anon;               // The guessed name for anonymous functions.
 let blockage;           // The current block.
 let block_stack;        // The stack of blocks.
-let empty_line_count;   // The current count of contiguous empty-lines in function next_line()
+let newlines_streak;    // The current streak of newlines in function next_line()
 let declared_globals;   // The object containing the global declarations.
 let directives;         // The directive comments.
 let directive_mode;     // true if directives are still allowed.
@@ -602,22 +601,21 @@ function tokenize(source) {
         line += 1;
         source_line = lines[line];
         if (source_line !== undefined) {
-            empty_line_count += 1;
+            newlines_streak += 1;
             if (source_line.length > 0) {
-                switch (empty_line_count) {
-                case 0:
-                case 1:
-                case 3:
-                    break;
-                default:
+                if (
+                    newlines_streak !== 1
+                    && newlines_streak !== 2
+                    && newlines_streak !== 4
+                ) {
                     warn_at(
-                        "unexpected_empty_lines",
-                        line - empty_line_count - 1,
+                        "expected_newlines",
+                        Math.max(line - newlines_streak, 0),
                         0,
-                        empty_line_count
+                        newlines_streak
                     );
                 }
-                empty_line_count = -1;
+                newlines_streak = 0;
             }
             at = source_line.search(rx_tab);
             if (at >= 0) {
@@ -4819,7 +4817,6 @@ export default function jslint(
         directive_mode = true;
         directives = [];
         early_stop = true;
-        empty_line_count = -1;
         exports = empty();
         froms = [];
         fudge = (
@@ -4852,6 +4849,7 @@ export default function jslint(
         token = global;
         token_nr = 0;
         var_mode = undefined;
+        newlines_streak = 0;
         populate(standard, declared_globals, false);
         populate(global_array, declared_globals, false);
         Object.keys(option).forEach(function (name) {
