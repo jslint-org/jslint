@@ -105,7 +105,7 @@
     function_in_loop, functions, g, getset, global, i, id, identifier,
     import, inc, indexOf, infix_in, init, initial, isArray, isNaN, join,
     json, keys, label, label_a, lbp, led, length, level, line, lines,
-    live, long, loop, m, margin, match, message, misplaced_a,
+    live, long, loop, m, margin, match, max, message, misplaced_a,
     misplaced_directive_a, missing_browser, missing_m, module, multivar,
     naked_block, name, names, nested_comment, new, node, not_label_a,
     nr, nud, number_isNaN, ok, open, option, out_of_scope_a, parameters,
