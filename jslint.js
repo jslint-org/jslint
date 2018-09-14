@@ -98,6 +98,7 @@
     expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
     expected_a_next_at_b, expected_digits_after_a, expected_four_digits,
     expected_identifier_a, expected_line_break_a_b,
+    expected_newlines,
     expected_regexp_factor_a, expected_space_a_b, expected_statements_a,
     expected_string_a, expected_type_string_a, exports, expression,
     extra, finally, flag, for, forEach, free, from, froms, fud, fudge,
@@ -273,6 +274,9 @@ const bundle = {
     expected_four_digits: "Expected four digits after '\\u'.",
     expected_identifier_a: "Expected an identifier and instead saw '{a}'.",
     expected_line_break_a_b: "Expected a line break between '{a}' and '{b}'.",
+    expected_newlines: (
+        "Expected 2 or 4 newlines between code-sections instead of {a}."
+    ),
     expected_regexp_factor_a: "Expected a regexp factor and instead saw '{a}'.",
     expected_space_a_b: "Expected one space between '{a}' and '{b}'.",
     expected_statements_a: "Expected statements before '{a}'.",
@@ -417,6 +421,7 @@ function supplant(string, object) {
 let anon;               // The guessed name for anonymous functions.
 let blockage;           // The current block.
 let block_stack;        // The stack of blocks.
+let newlines_streak;    // The current streak of newlines in function next_line()
 let declared_globals;   // The object containing the global declarations.
 let directives;         // The directive comments.
 let directive_mode;     // true if directives are still allowed.
@@ -596,6 +601,24 @@ function tokenize(source) {
         line += 1;
         source_line = lines[line];
         if (source_line !== undefined) {
+            newlines_streak += 1;
+            if (source_line.length > 0) {
+                if (
+                    newlines_streak !== 1
+                    && newlines_streak !== 2
+                    && newlines_streak !== 4
+                ) {
+                    warn_at(
+                        "expected_newlines",
+                        line >= newlines_streak
+                        ? line - newlines_streak
+                        : 0,
+                        0,
+                        newlines_streak
+                    );
+                }
+                newlines_streak = 0;
+            }
             at = source_line.search(rx_tab);
             if (at >= 0) {
                 if (!option.white) {
@@ -4828,6 +4851,7 @@ export default function jslint(
         token = global;
         token_nr = 0;
         var_mode = undefined;
+        newlines_streak = 0;
         populate(standard, declared_globals, false);
         populate(global_array, declared_globals, false);
         Object.keys(option).forEach(function (name) {
