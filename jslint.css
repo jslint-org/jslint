@@ -1,7 +1,6 @@
 @font-face {
   font-family: 'Programma';
-  font-weight: bold;
-  src:  url('Programma-Bold.woff') format('woff');
+  src:  url('Programma.woff') format('woff');
 }
 @font-face {
   font-family: 'Daley';
