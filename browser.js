@@ -7,6 +7,7 @@
 */
 
 /*property
+    autofix, currentTarget, name, source_autofixed,
     checked, create, disable, display, error, focus, forEach, function,
     getElementById, innerHTML, join, length, map, onchange, onclick, onscroll,
     property, querySelectorAll, scrollTop, select, split, style, title, value
@@ -69,7 +70,7 @@ function clear_options() {
     global.innerHTML = "";
 }
 
-function call_jslint() {
+function call_jslint(event) {
 
 // First build the option object.
 
@@ -79,6 +80,11 @@ function call_jslint() {
             option[node.title] = true;
         }
     });
+
+// Init autofix option
+    if (event.currentTarget.name === "autofix") {
+        option.autofix = true;
+    }
 
 // Call JSLint with the source text, the options, and the predefined globals.
 
@@ -121,6 +127,14 @@ function call_jslint() {
     }
     aux.style.display = "block";
     source.select();
+
+// Replace input source-code with autofixed result
+    if (option.autofix) {
+        document.getElementById("JSLINT_SOURCE").value =
+                result.source_autofixed;
+    }
+
+    return result;
 }
 
 fudge.onchange = fudge_change;
@@ -145,6 +159,10 @@ document.querySelectorAll("[name='JSLint']").forEach(function (node) {
 
 document.querySelectorAll("[name='clear']").forEach(function (node) {
     node.onclick = clear;
+});
+
+document.querySelectorAll("[name='autofix']").forEach(function (node) {
+    node.onclick = call_jslint;
 });
 
 document.getElementById("JSLINT_SELECT").onclick = function () {

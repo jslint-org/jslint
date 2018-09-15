@@ -88,6 +88,7 @@
 /*jslint long */
 
 /*property
+    autofix, autofix_subroutine, map, repeat, source_autofixed,
     a, and, arity, assign, b, bad_assignment_a, bad_directive_a,
     bad_get, bad_module_name_a, bad_option_a, bad_property_a, bad_set,
     bitwise, block, body, browser, c, calls, catch, charCodeAt, closer,
@@ -429,6 +430,7 @@ let functions;          // The array containing all of the functions.
 let global;             // The global object; the outermost context.
 let json_mode;          // true if parsing JSON.
 let lines;              // The array containing source lines.
+let lines_extra;        // The array containing extra-metadata for each line.
 let module_mode;        // true if import or export was used.
 let next_token;         // The next token to be examined in the parse.
 let option;             // The options parameter.
@@ -480,6 +482,103 @@ function artifact_column(the_token) {
     return the_token.from + fudge;
 }
 
+function autofix(warning) {
+
+// if option.autofix === true, then try to autofix tedious
+// whitespace, single-quote, and regexp warnings
+
+    let source_line;
+    let tmp;
+    source_line = lines[warning.line];
+    switch (warning.message) {
+    case "Expected '\\s' and instead saw ' '.":
+        // autofix regexp - replace " " -> "\u0020"
+        lines_extra[warning.line].source_autofixed = (
+            source_line.slice(0, warning.column) + "\\u0020"
+            + source_line.slice(warning.column + 1)
+        );
+        break;
+    }
+    switch (warning.code) {
+    case "expected_a_at_b_c":
+        tmp = warning.b - warning.c;
+        // autofix indent - increment
+        if (tmp >= 0) {
+            lines_extra[warning.line].source_autofixed = (
+                " ".repeat(tmp) + source_line
+            );
+            break;
+        }
+        tmp = -tmp;
+        // autofix indent - decrement
+        if ((/^\u0020*?$/m).test(source_line.slice(0, warning.column))) {
+            lines_extra[warning.line].source_autofixed = (
+                source_line.slice(tmp)
+            );
+            break;
+        }
+        // autofix indent - newline
+        lines_extra[warning.line].source_autofixed = (
+            source_line.slice(0, warning.column) + "\n"
+            + " ".repeat(warning.b) + source_line.slice(warning.column)
+        );
+        break;
+    // autofix indent - newline
+    case "expected_a_next_at_b":
+        lines_extra[warning.line].source_autofixed = (
+            source_line.slice(0, warning.column) + "\n"
+            + " ".repeat(warning.b) + source_line.slice(warning.column)
+        );
+        break;
+    // autofix key - replace 100: ... -> "100": ...
+    case "expected_identifier_a":
+        if (!(
+            (/^\d+$/m).test(warning.a)
+            && source_line[warning.column + warning.a.length] === ":"
+        )) {
+            break;
+        }
+        lines_extra[warning.line].source_autofixed = (
+            source_line.slice(0, warning.column) + "\"" + warning.a + "\""
+            + source_line.slice(warning.column + warning.a.length)
+        );
+        break;
+    // autofix whitespace - remove
+    case "unexpected_space_a_b":
+        lines_extra[warning.line].source_autofixed = (
+            source_line.slice(0, warning.column - 1)
+            + source_line.slice(warning.column)
+        );
+        break;
+    // autofix quote - replace single -> double
+    case "use_double":
+        if (warning.a[0].indexOf("\u0000") >= 0) {
+            break;
+        }
+        tmp = warning.a[0]
+        .replace((/\\\\/g), "\u0000\u0000")
+        .replace((/\\'/g), "\u0000\u0001")
+        .match(/^'.*?'/);
+        if (!tmp) {
+            break;
+        }
+        lines_extra[warning.line].source_autofixed = (
+            source_line.slice(0, warning.column - 1) + "\""
+        ) + tmp[0].slice(1, -1)
+        .replace((/\\?"/g), "\\\"")
+        .replace((/\u0000\u0000/g), "\\\\")
+        .replace((/\u0000\u0001/g), "'")
+                + "\"" + source_line.slice(warning.column + tmp[0].length - 1);
+        break;
+    // autofix tab - replace tab -> space
+    case "use_spaces":
+        lines_extra[warning.line].source_autofixed = (
+            source_line.replace((/^(\u0020*?)\t/), "$1   ")
+        );
+        break;
+    }
+}
+
 function warn_at(code, line, column, a, b, c, d) {
 
 // Report an error at some line and column of the program. The warning object
@@ -505,6 +604,9 @@ function warn_at(code, line, column, a, b, c, d) {
     }
     warning.message = supplant(bundle[code] || code, warning);
     warnings.push(warning);
+    if (option.autofix) {
+        autofix(warning);
+    }
     return warning;
 }
 
@@ -512,7 +614,13 @@ function stop_at(code, line, column, a, b, c, d) {
 
 // Same as warn_at, except that it stops the analysis.
 
-    throw warn_at(code, line, column, a, b, c, d);
+    let error;
+    error = warn_at(code, line, column, a, b, c, d);
+    // if autofix, then try to recover from error
+    if (option.autofix) {
+        return;
+    }
+    throw error;
 }
 
 function warn(code, the_token, a, b, c, d) {
@@ -544,11 +652,17 @@ function stop(code, the_token, a, b, c, d) {
 // warning will be replaced with this new one. It is likely that the stopping
 // warning will be the more meaningful.
 
+    let error;
     if (the_token === undefined) {
         the_token = next_token;
     }
     delete the_token.warning;
-    throw warn(code, the_token, a, b, c, d);
+    error = warn(code, the_token, a, b, c, d);
+    // if autofix, then try to recover from error
+    if (option.autofix) {
+        return the_token;
+    }
+    throw error;
 }
 
 // Tokenize:
@@ -570,6 +684,9 @@ function tokenize(source) {
         ? source
         : source.split(rx_crlf)
     );
+    lines_extra = lines.map(function () {
+        return {};
+    });
     tokens = [];
 
     let char;                   // a popular character
@@ -1297,7 +1414,8 @@ function tokenize(source) {
         }
         if (snippet === "'") {
             if (!option.single) {
-                warn_at("use_double", line, column);
+                // preserve "result" argument for autofix
+                warn_at("use_double", line, column, result);
             }
             return string(snippet);
         }
@@ -4492,7 +4610,11 @@ function whitage() {
                     ? margin
                     : margin + 8
                 );
-                if (right.from < at) {
+                if (
+                    right.from < at
+                    // if autofix, then indent exactly
+                    || (option.autofix && right.from !== at)
+                ) {
                     expected_at(at);
                 }
             } else {
@@ -4526,7 +4648,11 @@ function whitage() {
             }
         } else {
             if (free) {
-                if (right.from < margin) {
+                if (
+                    right.from < margin
+                    // if autofix, then indent exactly
+                    || (option.autofix && right.from !== margin)
+                ) {
                     expected_at(margin);
                 }
             } else {
@@ -4787,6 +4913,9 @@ export default function jslint(
     option_object = empty(),
     global_array = []
 ) {
+    let ii;
+    let jj;
+    let source_autofixed;
     try {
         warnings = [];
         option = Object.assign(empty(), option_object);
@@ -4838,7 +4967,43 @@ export default function jslint(
                 }
             }
         });
+        // run autofix
+        if (option.autofix) {
+            ii = 0;
+            source_autofixed = source;
+            while (true) {
+                ii += 1;
+                source = source_autofixed;
+                tokenize(source_autofixed);
+                whitage();
+                source_autofixed = "";
+                jj = 0;
+                while (jj < lines_extra.length) {
+                    source_autofixed += (
+                        lines_extra[jj].source_autofixed
+                        || lines[jj]
+                    ) + "\n";
+                    jj += 1;
+                }
+                // remove trailine-whitespace
+                source_autofixed = (
+                    source_autofixed.slice(0, -1).replace((/\u0020+$/gm), "")
+                );
+                // cleanup
+                uninitialized_and_unused();
+                warnings.length = 0;
+                // repeat until source stops changing (all autofixes exhausted)
+                if (ii >= 10 || source_autofixed === source) {
+                    break;
+                }
+            }
+        }
         tokenize(source);
+        if (option.autofix) {
+            whitage();
+            warnings.length = 0;
+            uninitialized_and_unused();
+        }
         advance();
         if (json_mode) {
             tree = json_value();
@@ -4890,6 +5055,9 @@ export default function jslint(
         if (e.name !== "JSLintError") {
             warnings.push(e);
         }
+        if (option.autofix) {
+            option.autofix = "error";
+        }
     }
     return {
         directives,
@@ -4905,6 +5073,7 @@ export default function jslint(
         ok: warnings.length === 0 && !early_stop,
         option,
         property,
+        source_autofixed,
         stop: early_stop,
         tokens,
         tree,
