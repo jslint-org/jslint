@@ -395,6 +395,8 @@ const rx_mega = /[`\\]|\$\{/;
 const rx_JSON_number = /^-?\d+(?:\.\d*)?(?:e[\-+]?\d+)?$/i;
 // initial cap
 const rx_cap = /^[A-Z]/;
+// shebang common in node scripts
+const rx_shebang = /^#!/;
 
 function is_letter(string) {
     return (
@@ -596,6 +598,10 @@ function tokenize(source) {
         line += 1;
         source_line = lines[line];
         if (source_line !== undefined) {
+            // ignore shebang at line=0 common in node scripts
+            if (line === 0 && rx_shebang.test(source_line)) {
+                source_line = "";
+            }
             at = source_line.search(rx_tab);
             if (at >= 0) {
                 if (!option.white) {
