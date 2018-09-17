@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-09-13
+// 2018-09-16
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -88,41 +88,38 @@
 /*jslint long */
 
 /*property
-    a, and, arity, assign, b, bad_assignment_a, bad_directive_a,
-    bad_get, bad_module_name_a, bad_option_a, bad_property_a, bad_set,
-    bitwise, block, body, browser, c, calls, catch, charCodeAt, closer,
-    closure, code, column, complex, concat, constant, context, convert,
-    couch, create, d, dead, default, devel, directive, directives,
-    disrupt, dot, duplicate_a, edition, ellipsis, else, empty_block,
-    escape_mega, eval, every, expected_a, expected_a_at_b_c,
-    expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
+    a, and, arity, assign, b, bad_assignment_a, bad_directive_a, bad_get,
+    bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
+    body, browser, c, calls, catch, charCodeAt, closer, closure, code, column,
+    complex, concat, constant, context, convert, couch, create, d, dead,
+    default, devel, directive, directives, disrupt, dot, duplicate_a, edition,
+    ellipsis, else, empty_block, escape_mega, eval, every, expected_a,
+    expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
     expected_a_next_at_b, expected_digits_after_a, expected_four_digits,
-    expected_identifier_a, expected_line_break_a_b,
-    expected_regexp_factor_a, expected_space_a_b, expected_statements_a,
-    expected_string_a, expected_type_string_a, exports, expression,
-    extra, finally, flag, for, forEach, free, from, froms, fud, fudge,
-    function_in_loop, functions, g, getset, global, i, id, identifier,
-    import, inc, indexOf, infix_in, init, initial, isArray, isNaN, join,
-    json, keys, label, label_a, lbp, led, length, level, line, lines,
-    live, long, loop, m, margin, match, message, misplaced_a,
-    misplaced_directive_a, missing_browser, missing_m, module, multivar,
-    naked_block, name, names, nested_comment, new, node, not_label_a,
-    nr, nud, number_isNaN, ok, open, option, out_of_scope_a, parameters,
-    parent, pop, property, push, quote, redefinition_a_b, replace,
-    required_a_optional_b, reserved_a, right, role, search, signature,
-    single, slice, some, sort, split, statement, stop, strict,
-    subscript_a, switch, test, this, thru, toString, todo_comment,
-    tokens, too_long, too_many_digits, tree, try, type, u,
-    unclosed_comment, unclosed_mega, unclosed_string, undeclared_a,
-    unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
-    unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
-    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
-    unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
-    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
-    unreachable_a, unregistered_property_a, unsafe, unused_a,
-    use_double, use_open, use_spaces, use_strict, used, value, var_loop,
-    var_switch, variable, warning, warnings, weird_condition_a,
-    weird_expression_a, weird_loop, weird_relation_a, white,
+    expected_identifier_a, expected_line_break_a_b, expected_regexp_factor_a,
+    expected_space_a_b, expected_statements_a, expected_string_a,
+    expected_type_string_a, exports, expression, extra, finally, flag, for,
+    forEach, free, from, froms, fud, fudge, function_in_loop, functions, g,
+    getset, global, i, id, identifier, import, inc, indexOf, infix_in, init,
+    initial, isArray, isNaN, join, json, keys, label, label_a, lbp, led, length,
+    level, line, lines, live, long, loop, m, margin, match, message,
+    misplaced_a, misplaced_directive_a, missing_browser, missing_m, module,
+    multivar, naked_block, name, names, nested_comment, new, node, not_label_a,
+    nr, nud, number_isNaN, ok, open, option, out_of_scope_a, parameters, parent,
+    pop, property, push, quote, redefinition_a_b, replace,
+    required_a_optional_b, reserved_a, right, role, search, shebang, signature,
+    single, slice, some, sort, split, startsWith, statement, stop, strict,
+    subscript_a, switch, test, this, thru, toString, todo_comment, tokens,
+    too_long, too_many_digits, tree, try, type, u, unclosed_comment,
+    unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
+    unexpected_a_after_b, unexpected_a_before_b, unexpected_at_top_level_a,
+    unexpected_char_a, unexpected_comment, unexpected_directive_a,
+    unexpected_expression_a, unexpected_label_a, unexpected_parens,
+    unexpected_space_a_b, unexpected_statement_a, unexpected_trailing_space,
+    unexpected_typeof_a, uninitialized_a, unreachable_a,
+    unregistered_property_a, unsafe, unused_a, use_double, use_open, use_spaces,
+    use_strict, used, value, var_loop, var_switch, variable, warning, warnings,
+    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
     wrap_assignment, wrap_condition, wrap_immediate, wrap_parameter,
     wrap_regexp, wrap_unary, wrapped, writable, y
 */
@@ -434,6 +431,7 @@ let next_token;         // The next token to be examined in the parse.
 let option;             // The options parameter.
 let property;           // The object containing the tallied property names.
 let mega_mode;          // true if currently parsing a megastring literal.
+let shebang;            // true if a #! was seen on the first line.
 let stack;              // The stack of functions.
 let syntax;             // The object containing the parser.
 let token;              // The current token being examined in the parse.
@@ -584,6 +582,11 @@ function tokenize(source) {
     let mega_line;              // the starting line of megastring
     let snippet;                // a piece of string
     let source_line;            // the current line source string
+
+    if (lines[0].startsWith("#!")) {
+        line = 1;
+        shebang = true;
+    }
 
     function next_line() {
 
@@ -4823,6 +4826,7 @@ export default function jslint(
         module_mode = false;
         next_token = global;
         property = empty();
+        shebang = false;
         stack = [];
         tenure = undefined;
         token = global;
@@ -4893,7 +4897,7 @@ export default function jslint(
     }
     return {
         directives,
-        edition: "2018-09-13",
+        edition: "2018-09-16",
         exports,
         froms,
         functions,
@@ -4905,6 +4909,11 @@ export default function jslint(
         ok: warnings.length === 0 && !early_stop,
         option,
         property,
+        shebang: (
+            shebang
+            ? lines[0]
+            : undefined
+        ),
         stop: early_stop,
         tokens,
         tree,
