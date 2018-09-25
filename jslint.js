@@ -1041,7 +1041,7 @@ function tokenize(source) {
                     return true;
                 }
                 if (char === "\\") {
-                    escape("BbDdSsWw^${}[]():=!.-|*+?");
+                    escape("BbDdSsWw^${}[]():=!.- |*+?");
                     return true;
                 }
                 if (
@@ -1063,13 +1063,7 @@ function tokenize(source) {
                         warn_at("unexpected_a", line, column - 1, "`");
                     }
                 } else if (char === " ") {
-                    warn_at(
-                        "expected_a_b",
-                        line,
-                        column - 1,
-                        "\\s",
-                        " "
-                    );
+                    warn_at("expected_a_before_b", line, column, "\\", " ");
                 } else if (char === "$") {
                     if (source_line[0] !== "/") {
                         multi_mode = true;
