@@ -726,15 +726,11 @@ a:active {
     <code>?</code>&nbsp;<small>question mark</small> and
     <code>:</code>&nbsp;<small>colon</small>  always begin a line and increase
     the indentation by 4 spaces.</p>
-<pre>return (the_token.id === "(string)" || the_token.id === "(number)")
+<pre>return (
+    (the_token.id === "(string)" || the_token.id === "(number)")
     ? String(the_token.value)
-    : the_token.id;</pre>
-<p>A <code>var</code>, <code>let</code>, or <code>const</code> statement will
-    also cause an indentation if it declares two or more variables, and if the
-    second variable is not on the same line as the start of the statement.</p>
-<p>Long lines can be continued on the next line with 8 spaces added to the
-  current indentation. Those 8 spaces do not change the current indentation.
-  It is 8 to avoid confusion with ordinary indentation.</p>
+    : the_token.id
+);</pre>
 <p>The word <code>function</code> is always followed with one space.</p>
 <p>Clauses (<code>case</code>, <code>catch</code>, <code>default</code>,
     <code>else</code>, <code>finally</code>) are not statements and so should
