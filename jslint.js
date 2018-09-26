@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-09-24
+// 2018-09-26
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -84,8 +84,6 @@
 // required.
 
 // WARNING: JSLint will hurt your feelings.
-
-/*jslint long */
 
 /*property
     a, and, arity, assign, b, bad_assignment_a, bad_directive_a, bad_get,
@@ -4690,11 +4688,7 @@ function whitage() {
                     ) {
                         no_space_only();
                     } else if (right.id === ".") {
-                        if (left.line === right.line) {
-                            no_space();
-                        } else {
-                            at_margin(0);
-                        }
+                        no_space_only();
                     } else if (left.id === ";") {
                         if (open) {
                             at_margin(0);
@@ -4903,7 +4897,7 @@ export default function jslint(
     }
     return {
         directives,
-        edition: "2018-09-24",
+        edition: "2018-09-26",
         exports,
         froms,
         functions,
