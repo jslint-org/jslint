@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-09-26
+// 2018-10-02
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -103,8 +103,8 @@
     level, line, lines, live, long, loop, m, margin, match, message,
     misplaced_a, misplaced_directive_a, missing_browser, missing_m, module,
     multivar, naked_block, name, names, nested_comment, new, node, not_label_a,
-    nr, nud, number_isNaN, ok, open, option, out_of_scope_a, parameters, parent,
-    pop, property, push, quote, redefinition_a_b, replace,
+    nr, nud, number_isNaN, ok, open, opening, option, out_of_scope_a,
+    parameters, parent, pop, property, push, quote, redefinition_a_b, replace,
     required_a_optional_b, reserved_a, right, role, search, shebang, signature,
     single, slice, some, sort, split, startsWith, statement, stop, strict,
     subscript_a, switch, test, this, thru, toString, todo_comment, tokens,
@@ -3279,7 +3279,9 @@ stmt("export", function () {
         }
         advance("default");
         the_thing = expression(0);
-        semicolon();
+        if (next_token.id === ";") {
+            semicolon();
+        }
         exports.default = the_thing;
         the_export.expression.push(the_thing);
     } else {
@@ -4445,7 +4447,27 @@ function whitage() {
     let margin = 0;
     let nr_comments_skipped = 0;
     let open = true;
+    let opening = true;
     let right;
+
+    function pop() {
+        const previous = stack.pop();
+        closer = previous.closer;
+        free = previous.free;
+        margin = previous.margin;
+        open = previous.open;
+        opening = previous.opening;
+    }
+
+    function push() {
+        stack.push({
+            closer,
+            free,
+            margin,
+            open,
+            opening
+        });
+    }
 
     function expected_at(at) {
         warn(
@@ -4573,15 +4595,10 @@ function whitage() {
             const new_closer = opener[left.id];
             if (typeof new_closer === "string") {
                 if (new_closer !== right.id) {
-                    stack.push({
-                        closer: closer,
-                        free: free,
-                        margin: margin,
-                        open: open,
-                        right: right
-                    });
+                    opening = left.line !== right.line;
+                    push();
                     closer = new_closer;
-                    if (left.line !== right.line) {
+                    if (opening) {
                         free = closer === ")" && left.free;
                         open = true;
                         margin += 4;
@@ -4610,7 +4627,7 @@ function whitage() {
                 } else {
 
 // If left and right are opener and closer, then the placement of right depends
-// on the openness. Illegal pairs (like {]) have already been detected.
+// on the openness. Illegal pairs (like '{]') have already been detected.
 
                     if (left.line === right.line) {
                         no_space();
@@ -4619,20 +4636,23 @@ function whitage() {
                     }
                 }
             } else {
+                if (right.statement === true) {
+                    if (left.id === "else") {
+                        one_space_only();
+                    } else {
+                        at_margin(0);
+                        open = false;
+                    }
 
 // If right is a closer, then pop the previous state.
 
-                if (right.id === closer) {
-                    const previous = stack.pop();
-                    margin = previous.margin;
-                    if (open && right.id !== ";") {
+                } else if (right.id === closer) {
+                    pop();
+                    if (opening && right.id !== ";") {
                         at_margin(0);
                     } else {
                         no_space_only();
                     }
-                    closer = previous.closer;
-                    free = previous.free;
-                    open = previous.open;
                 } else {
 
 // Left is not an opener, and right is not a closer.
@@ -4709,23 +4729,12 @@ function whitage() {
                         || (left.id === ")" && right.id === "{")
                     ) {
                         one_space_only();
-                    } else if (right.statement === true) {
-                        if (open) {
-                            at_margin(0);
-                        } else {
-                            one_space();
-                        }
                     } else if (
                         left.id === "var"
                         || left.id === "const"
                         || left.id === "let"
                     ) {
-                        stack.push({
-                            closer: closer,
-                            free: free,
-                            margin: margin,
-                            open: open
-                        });
+                        push();
                         closer = ";";
                         free = false;
                         open = left.open;
@@ -4897,7 +4906,7 @@ export default function jslint(
     }
     return {
         directives,
-        edition: "2018-09-26",
+        edition: "2018-10-02",
         exports,
         froms,
         functions,
