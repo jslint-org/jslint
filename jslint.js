@@ -4719,6 +4719,7 @@ function whitage() {
                         left.id === "var"
                         || left.id === "const"
                         || left.id === "let"
+                        || left.id === "return"
                     ) {
                         stack.push({
                             closer: closer,
