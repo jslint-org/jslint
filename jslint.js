@@ -90,7 +90,9 @@
     bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
     body, browser, c, calls, catch, charCodeAt, closer, closure, code, column,
     complex, concat, constant, context, convert, couch, create, d, dead,
-    default, devel, directive, directives, disrupt, dot, duplicate_a, edition,
+    default, devel, directive, directives, disrupt, dot, duplicate_a,
+    early_stop,
+    edition,
     ellipsis, else, empty_block, escape_mega, eval, every, expected_a,
     expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
     expected_a_next_at_b, expected_digits_after_a, expected_four_digits,
@@ -254,6 +256,7 @@ const bundle = {
     bad_property_a: "Bad property name '{a}'.",
     bad_set: "A set function takes one parameter.",
     duplicate_a: "Duplicate '{a}'.",
+    early_stop: "JSLint was unable to finish.",
     empty_block: "Empty block.",
     escape_mega: "Unexpected escapement in mega literal.",
     expected_a: "Expected '{a}'.",
@@ -4894,6 +4897,7 @@ export default function jslint(
         if (e.name !== "JSLintError") {
             warnings.push(e);
         }
+        warn_at(bundle.early_stop, e.line || 0, e.column || 0);
     }
     return {
         directives,
@@ -4918,7 +4922,11 @@ export default function jslint(
         tokens,
         tree,
         warnings: warnings.sort(function (a, b) {
-            return a.line - b.line || a.column - b.column;
+            return a.code === bundle.early_stop
+            ? -1
+            : b.code === bundle.early_stop
+            ? 1
+            : a.line - b.line || a.column - b.column;
         })
     };
 };

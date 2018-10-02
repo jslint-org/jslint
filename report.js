@@ -8,7 +8,7 @@
     closure, column, context, edition, error, exports, filter, forEach, froms,
     fudge, function, functions, global, id, isArray, join, json, keys, length,
     level, line, lines, message, module, name, names, option, parameters,
-    parent, property, push, replace, role, signature, sort, stop, warnings
+    parent, property, push, replace, role, signature, sort, warnings
 */
 
 const rx_amp = /&/g;
@@ -43,9 +43,6 @@ export default {
 
         let fudge = Number(Boolean(data.option.fudge));
         let output = [];
-        if (data.stop) {
-            output.push("<center>JSLint was unable to finish.</center>");
-        }
         data.warnings.forEach(function (warning) {
             output.push(
                 "<cite><address>",
