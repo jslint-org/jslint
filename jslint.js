@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-10-02
+// 2018-10-03
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -118,14 +118,14 @@
     unregistered_property_a, unsafe, unused_a, use_double, use_open, use_spaces,
     use_strict, used, value, var_loop, var_switch, variable, warning, warnings,
     weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
-    wrap_assignment, wrap_condition, wrap_immediate, wrap_parameter,
-    wrap_regexp, wrap_unary, wrapped, writable, y
+    wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary,
+    wrapped, writable, y
 */
 
 function empty() {
 
 // The empty function produces a new empty object that inherits nothing. This is
-// much better than {} because confusions around accidental method names like
+// much better than '{}' because confusions around accidental method names like
 // 'constructor' are completely avoided.
 
     return Object.create(null);
@@ -341,7 +341,6 @@ const bundle = {
     weird_expression_a: "Weird expression '{a}'.",
     weird_loop: "Weird loop.",
     weird_relation_a: "Weird relation '{a}'.",
-    wrap_assignment: "Don't wrap assignment statements in parens.",
     wrap_condition: "Wrap the condition in parens.",
     wrap_immediate: (
         "Wrap an immediate function invocation in parentheses to assist "
@@ -2876,9 +2875,6 @@ function do_function(the_function) {
 prefix("function", do_function);
 
 function fart(pl) {
-    if (next_token.id === ";") {
-        stop("wrap_assignment", token);
-    }
     advance("=>");
     const the_fart = token;
     the_fart.arity = "binary";
@@ -4906,7 +4902,7 @@ export default function jslint(
     }
     return {
         directives,
-        edition: "2018-10-02",
+        edition: "2018-10-03",
         exports,
         froms,
         functions,
