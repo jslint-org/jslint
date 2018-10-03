@@ -86,6 +86,8 @@
 // WARNING: JSLint will hurt your feelings.
 
 /*property
+    debug,
+    stack,
     a, and, arity, assign, b, bad_assignment_a, bad_directive_a, bad_get,
     bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
     body, browser, c, calls, catch, charCodeAt, closer, closure, code, column,
@@ -500,6 +502,12 @@ function warn_at(code, line, column, a, b, c, d) {
         warning.d = d;
     }
     warning.message = supplant(bundle[code] || code, warning);
+
+// Debug stack-trace of warning.
+
+    if (option.debug) {
+        warning.stack = new Error().stack;
+    }
     warnings.push(warning);
     return warning;
 }

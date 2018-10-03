@@ -4,9 +4,13 @@
 
 /*jslint
     browser
+    devel
 */
 
 /*property
+    debug,
+    stack,
+    warnings,
     checked, create, disable, display, error, focus, forEach, function,
     getElementById, innerHTML, join, length, map, onchange, onclick, onscroll,
     property, querySelectorAll, scrollTop, select, split, style, title, value
@@ -80,6 +84,10 @@ function call_jslint() {
         }
     });
 
+// Enable debug
+
+    option.debug = true;
+
 // Call JSLint with the source text, the options, and the predefined globals.
 
     let global_string = global.value;
@@ -92,6 +100,13 @@ function call_jslint() {
             : global_string.split(rx_separator)
         )
     );
+
+// Debug warnings
+
+    result.warnings.forEach(function (warning) {
+        console.error(warning);
+        console.error(warning.stack);
+    });
 
 // Generate the reports.
 
