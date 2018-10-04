@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-10-03
+// 2018-10-04
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -606,8 +606,8 @@ function tokenize(source) {
         column = 0;
         line += 1;
         regexp_seen = false;
-        whole_line = lines[line];
-        source_line = whole_line;
+        source_line = lines[line];
+        whole_line = source_line || "";
         if (source_line !== undefined) {
             at = source_line.search(rx_tab);
             if (at >= 0) {
@@ -4902,7 +4902,7 @@ export default function jslint(
     }
     return {
         directives,
-        edition: "2018-10-03",
+        edition: "2018-10-04",
         exports,
         froms,
         functions,
