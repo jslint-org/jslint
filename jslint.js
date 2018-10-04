@@ -3567,17 +3567,19 @@ stmt("try", function () {
         the_catch = next_token;
         the_try.catch = the_catch;
         advance("catch");
-        advance("(");
-        if (!next_token.identifier) {
-            return stop("expected_identifier_a", next_token);
+        if (next_token.id === "(") {
+            advance("(");
+            if (!next_token.identifier) {
+                return stop("expected_identifier_a", next_token);
+            }
+            if (next_token.id !== "ignore") {
+                ignored = undefined;
+                the_catch.name = next_token;
+                enroll(next_token, "exception", true);
+            }
+            advance();
+            advance(")");
         }
-        if (next_token.id !== "ignore") {
-            ignored = undefined;
-            the_catch.name = next_token;
-            enroll(next_token, "exception", true);
-        }
-        advance();
-        advance(")");
         the_catch.block = block(ignored);
         if (the_catch.block.disrupt !== true) {
             the_disrupt = false;
