@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-10-04
+// 2018-10-06
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -378,7 +378,7 @@ const rx_tab = /\t/g;
 const rx_directive = /^(jslint|property|global)\s+(.*)$/;
 const rx_directive_part = /^([a-zA-Z$_][a-zA-Z0-9$_]*)(?::\s*(true|false))?,?\s*(.*)$/;
 // token (sorry it is so long)
-const rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\]?,:;'"~`]|=(?:==?|>)?|\.+|[*\/][*\/=]?|\+[=+]?|-[=\-]?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<<?=?|!(?:!|==?)?|(0|[1-9][0-9]*))(.*)$/;
+const rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\],:;'"~`]|\?\.?|=(?:==?|>)?|\.+|[*\/][*\/=]?|\+[=+]?|-[=\-]?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<<?=?|!(?:!|==?)?|(0|[1-9][0-9]*))(.*)$/;
 const rx_digits = /^([0-9]+)(.*)$/;
 const rx_hexs = /^([0-9a-fA-F]+)(.*)$/;
 const rx_octals = /^([0-7]+)(.*)$/;
@@ -423,11 +423,11 @@ let functions;          // The array containing all of the functions.
 let global;             // The global object; the outermost context.
 let json_mode;          // true if parsing JSON.
 let lines;              // The array containing source lines.
+let mega_mode;          // true if currently parsing a megastring literal.
 let module_mode;        // true if import or export was used.
 let next_token;         // The next token to be examined in the parse.
 let option;             // The options parameter.
 let property;           // The object containing the tallied property names.
-let mega_mode;          // true if currently parsing a megastring literal.
 let shebang;            // true if a #! was seen on the first line.
 let stack;              // The stack of functions.
 let syntax;             // The object containing the parser.
@@ -2526,6 +2526,43 @@ infix(".", 170, function (left) {
     the_token.expression = left;
     return the_token;
 });
+infix("?.", 170, function (left) {
+    const the_token = token;
+    const name = next_token;
+    if (
+        (
+            left.id !== "(string)"
+            || (name.id !== "indexOf" && name.id !== "repeat")
+        )
+        && (
+            left.id !== "["
+            || (
+                name.id !== "concat"
+                && name.id !== "forEach"
+                && name.id !== "join"
+                && name.id !== "map"
+            )
+        )
+        && (left.id !== "+" || name.id !== "slice")
+        && (
+            left.id !== "(regexp)"
+            || (name.id !== "exec" && name.id !== "test")
+        )
+    ) {
+        left_check(left, the_token);
+    }
+    if (!name.identifier) {
+        stop("expected_identifier_a");
+    }
+    advance();
+    survey(name);
+
+// The property name is not an expression.
+
+    the_token.name = name;
+    the_token.expression = left;
+    return the_token;
+});
 infix("[", 170, function (left) {
     const the_token = token;
     const the_subscript = expression(0);
@@ -2862,7 +2899,11 @@ function do_function(the_function) {
     ) {
         return stop("unexpected_a", next_token);
     }
-    if (next_token.id === "." || next_token.id === "[") {
+    if (
+        next_token.id === "."
+        || next_token.id === "?."
+        || next_token.id === "["
+    ) {
         warn("unexpected_a");
     }
 
@@ -4149,7 +4190,7 @@ postaction("binary", function (thing) {
         if (thing.expression[0].id === "self") {
             warn("weird_expression_a", thing, "self[...]");
         }
-    } else if (thing.id === ".") {
+    } else if (thing.id === "." || thing.id === "?.") {
         if (thing.expression.id === "RegExp") {
             warn("weird_expression_a", thing);
         }
@@ -4691,6 +4732,7 @@ function whitage() {
                         no_space();
                     } else if (
                         left.id === "."
+                        || left.id === "?."
                         || left.id === "..."
                         || right.id === ","
                         || right.id === ";"
@@ -4705,7 +4747,7 @@ function whitage() {
                         )
                     ) {
                         no_space_only();
-                    } else if (right.id === ".") {
+                    } else if (right.id === "." || right.id === "?.") {
                         no_space_only();
                     } else if (left.id === ";") {
                         if (open) {
@@ -4904,7 +4946,7 @@ export default function jslint(
     }
     return {
         directives,
-        edition: "2018-10-04",
+        edition: "2018-10-06",
         exports,
         froms,
         functions,
