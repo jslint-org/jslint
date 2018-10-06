@@ -409,11 +409,11 @@ function supplant(string, object) {
 }
 
 let anon;               // The guessed name for anonymous functions.
-let blockage;           // The current block.
 let block_stack;        // The stack of blocks.
+let blockage;           // The current block.
 let declared_globals;   // The object containing the global declarations.
-let directives;         // The directive comments.
 let directive_mode;     // true if directives are still allowed.
+let directives;         // The directive comments.
 let early_stop;         // true if JSLint cannot finish.
 let exports;            // The exported names and values.
 let froms;              // The array collecting all import-from strings.
@@ -423,18 +423,18 @@ let functions;          // The array containing all of the functions.
 let global;             // The global object; the outermost context.
 let json_mode;          // true if parsing JSON.
 let lines;              // The array containing source lines.
+let mega_mode;          // true if currently parsing a megastring literal.
 let module_mode;        // true if import or export was used.
 let next_token;         // The next token to be examined in the parse.
 let option;             // The options parameter.
 let property;           // The object containing the tallied property names.
-let mega_mode;          // true if currently parsing a megastring literal.
 let shebang;            // true if a #! was seen on the first line.
 let stack;              // The stack of functions.
 let syntax;             // The object containing the parser.
+let tenure;             // The predefined property registry.
 let token;              // The current token being examined in the parse.
 let token_nr;           // The number of the next token.
 let tokens;             // The array of tokens.
-let tenure;             // The predefined property registry.
 let tree;               // The abstract parse tree.
 let var_mode;           // "var" if using var; "let" if using let.
 let warnings;           // The array collecting all generated warnings.
@@ -4193,8 +4193,8 @@ postaction("binary", "||", function (thing) {
 postaction("binary", "=>", postaction_function);
 postaction("binary", "(", function (thing) {
     let left = thing.expression[0];
-    let the_new;
     let arg;
+    let the_new;
     if (left.id === "new") {
         the_new = left;
         left = left.expression;
