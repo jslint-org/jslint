@@ -1,14 +1,15 @@
 // report.js
-// 2018-07-29
+// 2018-10-22
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Generate JSLint HTML reports.
 
 /*property
-    closure, column, context, edition, error, exports, filter, forEach, froms,
-    fudge, function, functions, global, id, isArray, join, json, keys, length,
-    level, line, lines, message, module, name, names, option, parameters,
-    parent, property, push, replace, role, signature, sort, stop, warnings
+    closure, column, context, edition, error, exports, filter, forEach, freeze,
+    froms, fudge, function, functions, global, id, isArray, join, json, keys,
+    length, level, line, lines, message, module, name, names, option,
+    parameters, parent, property, push, replace, role, signature, sort, stop,
+    warnings
 */
 
 const rx_amp = /&/g;
@@ -33,7 +34,7 @@ function entityify(string) {
     );
 }
 
-export default {
+export default Object.freeze({
     error: function error_report(data) {
 
 // Produce the HTML Error Report.
@@ -218,4 +219,4 @@ export default {
             return output.join("");
         }
     }
-};
+});
