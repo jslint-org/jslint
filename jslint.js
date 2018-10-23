@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-10-22
+// 2018-10-23
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -4343,6 +4343,9 @@ postaction("statement", "const", action_var);
 postaction("statement", "export", top_level_only);
 postaction("statement", "export", function (the_thing) {
     const the_paren = the_thing.expression && the_thing.expression[0];
+    if (!the_paren || the_paren.name !== "default") {
+        return;
+    }
     if (the_paren && the_paren.id === "(") {
         const the_dot = the_paren.expression[0];
         if (
@@ -4963,7 +4966,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2018-10-22",
+        edition: "2018-10-23",
         exports,
         froms,
         functions,
