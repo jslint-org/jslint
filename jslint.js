@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-10-23
+// 2018-10-24
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -154,7 +154,8 @@ const allowed_option = {
         "Element", "Event", "event", "FileReader", "FormData", "history",
         "localStorage", "location", "MutationObserver", "name", "navigator",
         "screen", "sessionStorage", "setInterval", "setTimeout", "Storage",
-        "URL", "window", "Worker", "XMLHttpRequest"
+        "TextDecoder", "TextEncoder", "URL", "window", "Worker",
+        "XMLHttpRequest"
     ],
     couch: [
         "emit", "getRow", "isArray", "log", "provides", "registerType",
@@ -173,8 +174,8 @@ const allowed_option = {
     node: [
         "Buffer", "clearImmediate", "clearInterval", "clearTimeout",
         "console", "exports", "module", "process", "require",
-        "setImmediate", "setInterval", "setTimeout", "URL",
-        "URLSearchParams", "__dirname", "__filename"
+        "setImmediate", "setInterval", "setTimeout", "TextDecoder",
+        "TextEncoder", "URL", "URLSearchParams", "__dirname", "__filename"
     ],
     single: true,
     this: true,
@@ -4966,7 +4967,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2018-10-23",
+        edition: "2018-10-24",
         exports,
         froms,
         functions,
