@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-10-24
+// 2018-10-26
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -3320,6 +3320,14 @@ stmt("export", function () {
         }
         advance("default");
         the_thing = expression(0);
+        if (
+            the_thing.id !== "("
+            || the_thing.expression[0].id !== "."
+            || the_thing.expression[0].expression.id !== "Object"
+            || the_thing.expression[0].name.id !== "freeze"
+        ) {
+            warn("freeze_exports", the_thing);
+        }
         if (next_token.id === ";") {
             semicolon();
         }
@@ -3327,6 +3335,7 @@ stmt("export", function () {
         the_export.expression.push(the_thing);
     } else {
         if (next_token.id === "function") {
+            warn("freeze_exports");
             the_thing = statement();
             the_name = the_thing.name;
             the_id = the_name.id;
@@ -3343,7 +3352,8 @@ stmt("export", function () {
             || next_token.id === "let"
             || next_token.id === "const"
         ) {
-            warn("unexpected_a");
+            warn("unexpected_a", next_token);
+            statement();
         } else if (next_token.id === "{") {
             advance("{");
             (function loop() {
@@ -3356,11 +3366,7 @@ stmt("export", function () {
             advance("}");
             semicolon();
         } else {
-            export_id();
-            if (the_name.writable !== true) {
-                warn("unexpected_a", token);
-            }
-            semicolon();
+            stop("unexpected_a");
         }
     }
     module_mode = true;
@@ -4342,23 +4348,6 @@ postaction("binary", "[", function (thing) {
 postaction("statement", "{", pop_block);
 postaction("statement", "const", action_var);
 postaction("statement", "export", top_level_only);
-postaction("statement", "export", function (the_thing) {
-    const the_paren = the_thing.expression && the_thing.expression[0];
-    if (!the_paren || the_paren.name !== "default") {
-        return;
-    }
-    if (the_paren && the_paren.id === "(") {
-        const the_dot = the_paren.expression[0];
-        if (
-            the_dot.id === "."
-            && the_dot.expression.id === "Object"
-            && the_dot.name.id === "freeze"
-        ) {
-            return;
-        }
-    }
-    warn("freeze_exports", the_paren);
-});
 postaction("statement", "for", function (thing) {
     walk_statement(thing.inc);
 });
@@ -4967,7 +4956,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2018-10-24",
+        edition: "2018-10-26",
         exports,
         froms,
         functions,
