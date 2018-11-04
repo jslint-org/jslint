@@ -1247,18 +1247,19 @@ function tokenize(source) {
         let last;
         let result;
         let the_token;
-        if (!source_line) {
+        // bug-workaround
+        // mitigate v8 RangeError("Maximum call stack size exceeded"),
+        // by avoiding unnecessary recursion
+        while (!source_line) {
             source_line = next_line();
             from = 0;
-            return (
-                source_line === undefined
-                ? (
+            if (source_line === undefined) {
+                return (
                     mega_mode
                     ? stop_at("unclosed_mega", mega_line, mega_from)
                     : make("(end)")
-                )
-                : lex()
-            );
+                );
+            }
         }
         from = column;
         result = source_line.match(rx_token);
