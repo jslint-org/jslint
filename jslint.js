@@ -93,7 +93,7 @@
     default, devel, directive, directives, disrupt, dot, duplicate_a, edition,
     ellipsis, else, empty_block, escape_mega, eval, every, expected_a,
     expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
-    expected_a_next_at_b, expected_digits_after_a, expected_four_digits,
+    expected_digits_after_a, expected_four_digits,
     expected_identifier_a, expected_line_break_a_b, expected_regexp_factor_a,
     expected_space_a_b, expected_statements_a, expected_string_a,
     expected_type_string_a, exports, expression, extra, finally, flag, for,
@@ -105,7 +105,7 @@
     missing_m, module, multivar, naked_block, name, names, nested_comment, new,
     node, not_label_a, nr, nud, number_isNaN, ok, open, opening, option,
     out_of_scope_a, parameters, parent, pop, property, push, quote,
-    redefinition_a_b, replace, required_a_optional_b, reserved_a, right, role,
+    redefinition_a_b, replace, required_a_optional_b, reserved_a, role,
     search, shebang, signature, single, slice, some, sort, split, startsWith,
     statement, stop, strict, subscript_a, switch, test, this, thru, toString,
     todo_comment, tokens, too_long, too_many_digits, tree, try, type, u,
@@ -264,7 +264,6 @@ const bundle = {
         "Expected '{a}' to match '{b}' from line {c} and instead saw '{d}'."
     ),
     expected_a_before_b: "Expected '{a}' before '{b}'.",
-    expected_a_next_at_b: "Expected '{a}' at column {b} on the next line.",
     expected_digits_after_a: "Expected digits after '{a}'.",
     expected_four_digits: "Expected four digits after '\\u'.",
     expected_identifier_a: "Expected an identifier and instead saw '{a}'.",
@@ -4607,22 +4606,16 @@ function whitage() {
                 if (right.from < margin) {
                     expected_at(margin);
                 }
-            } else {
-                const mislaid = (
-                    stack.length > 0
-                    ? stack[stack.length - 1].right
-                    : undefined
-                );
-                if (!open && mislaid !== undefined) {
-                    warn(
-                        "expected_a_next_at_b",
-                        mislaid,
-                        artifact(mislaid.id),
-                        margin + 4 + fudge
-                    );
-                } else if (right.from !== margin + 8) {
-                    expected_at(margin + 8);
-                }
+
+// remove unused warning expected_a_next_at_b,
+// because mislaid / stack[stack.length - 1].right
+// is always undefined
+// since commmit
+// https://github.com/douglascrockford/JSLint/commit/8c13537
+// #diff-01d3d81a6eb6d82af3c377b55dc4fa28L4581
+
+            } else if (right.from !== margin + 8) {
+                expected_at(margin + 8);
             }
         }
     }
