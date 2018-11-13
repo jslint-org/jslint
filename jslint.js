@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-10-26
+// 2018-11-13
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -2331,6 +2331,9 @@ function ternary(id1, id2) {
         token.arity = "ternary";
         the_token.arity = "ternary";
         the_token.expression = [left, second, expression(10)];
+        if (next_token.id !== ")") {
+            warn("use_open", the_token);
+        }
         return the_token;
     };
     return the_symbol;
@@ -3799,9 +3802,14 @@ function walk_statement(thing) {
                 && thing.arity !== "assignment"
             ) {
                 warn(
-                    (thing.id === "(string)" && thing.value === "use strict")
-                    ? "unexpected_a"
-                    : "unexpected_expression_a",
+                    (
+                        (
+                            thing.id === "(string)"
+                            && thing.value === "use strict"
+                        )
+                        ? "unexpected_a"
+                        : "unexpected_expression_a"
+                    ),
                     thing
                 );
             }
@@ -4956,7 +4964,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2018-10-26",
+        edition: "2018-11-13",
         exports,
         froms,
         functions,
