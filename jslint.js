@@ -105,21 +105,21 @@
     missing_m, module, multivar, naked_block, name, names, nested_comment, new,
     node, not_label_a, nr, nud, number_isNaN, ok, open, opening, option,
     out_of_scope_a, parameters, parent, pop, property, push, quote,
-    redefinition_a_b, replace, required_a_optional_b, reserved_a, right, role,
-    search, shebang, signature, single, slice, some, sort, split, startsWith,
-    statement, stop, strict, subscript_a, switch, test, this, thru, toString,
-    todo_comment, tokens, too_long, too_many_digits, tree, try, type, u,
-    unclosed_comment, unclosed_mega, unclosed_string, undeclared_a,
-    unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
-    unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
-    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
-    unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
-    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
-    unreachable_a, unregistered_property_a, unsafe, unused_a, use_double,
-    use_open, use_spaces, use_strict, used, value, var_loop, var_switch,
-    variable, warning, warnings, weird_condition_a, weird_expression_a,
-    weird_loop, weird_relation_a, white, wrap_condition, wrap_immediate,
-    wrap_parameter, wrap_regexp, wrap_unary, wrapped, writable, y
+    redefinition_a_b, replace, required_a_optional_b, reserved_a, role, search,
+    shebang, signature, single, slice, some, sort, split, startsWith, statement,
+    stop, strict, subscript_a, switch, test, this, thru, toString, todo_comment,
+    tokens, too_long, too_many_digits, tree, try, type, u, unclosed_comment,
+    unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
+    unexpected_a_after_b, unexpected_a_before_b, unexpected_at_top_level_a,
+    unexpected_char_a, unexpected_comment, unexpected_directive_a,
+    unexpected_expression_a, unexpected_label_a, unexpected_parens,
+    unexpected_space_a_b, unexpected_statement_a, unexpected_trailing_space,
+    unexpected_typeof_a, uninitialized_a, unreachable_a,
+    unregistered_property_a, unsafe, unused_a, use_double, use_open, use_spaces,
+    use_strict, used, value, var_loop, var_switch, variable, warning, warnings,
+    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
+    wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary,
+    wrapped, writable, y
 */
 
 function empty() {
@@ -4601,7 +4601,7 @@ function whitage() {
     }
 
     function one_space() {
-        if (left.line === right.line) {
+        if (left.line === right.line || !open) {
             if (left.thru + 1 !== right.from && nr_comments_skipped === 0) {
                 warn(
                     "expected_space_a_b",
@@ -4611,26 +4611,8 @@ function whitage() {
                 );
             }
         } else {
-            if (free) {
-                if (right.from < margin) {
-                    expected_at(margin);
-                }
-            } else {
-                const mislaid = (
-                    stack.length > 0
-                    ? stack[stack.length - 1].right
-                    : undefined
-                );
-                if (!open && mislaid !== undefined) {
-                    warn(
-                        "expected_a_next_at_b",
-                        mislaid,
-                        artifact(mislaid.id),
-                        margin + 4 + fudge
-                    );
-                } else if (right.from !== margin + 8) {
-                    expected_at(margin + 8);
-                }
+            if (right.from !== margin) {
+                expected_at(margin);
             }
         }
     }
