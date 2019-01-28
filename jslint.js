@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-11-13
+// 2018-11-28
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -89,10 +89,10 @@
     a, and, arity, assign, b, bad_assignment_a, bad_directive_a, bad_get,
     bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
     body, browser, c, calls, catch, charCodeAt, closer, closure, code, column,
-    complex, concat, constant, context, convert, couch, create, d, dead,
-    default, devel, directive, directives, disrupt, dot, duplicate_a, edition,
-    ellipsis, else, empty_block, escape_mega, eval, every, expected_a,
-    expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
+    concat, constant, context, convert, couch, create, d, dead, default, devel,
+    directive, directives, disrupt, dot, duplicate_a, edition, ellipsis, else,
+    empty_block, escape_mega, eval, every, expected_a, expected_a_at_b_c,
+    expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
     expected_a_next_at_b, expected_digits_after_a, expected_four_digits,
     expected_identifier_a, expected_line_break_a_b, expected_regexp_factor_a,
     expected_space_a_b, expected_statements_a, expected_string_a,
@@ -102,8 +102,8 @@
     inc, indexOf, infix_in, init, initial, isArray, isNaN, join, json, keys,
     label, label_a, lbp, led, length, level, line, lines, live, long, loop, m,
     margin, match, message, misplaced_a, misplaced_directive_a, missing_browser,
-    missing_m, module, multivar, naked_block, name, names, nested_comment, new,
-    node, not_label_a, nr, nud, number_isNaN, ok, open, opening, option,
+    missing_m, module, naked_block, name, names, nested_comment, new, node,
+    not_label_a, nr, nud, number_isNaN, ok, open, opening, option,
     out_of_scope_a, parameters, parent, pop, property, push, quote,
     redefinition_a_b, replace, required_a_optional_b, reserved_a, role, search,
     shebang, signature, single, slice, some, sort, split, startsWith, statement,
@@ -170,7 +170,6 @@ const allowed_option = {
     fudge: true,
     getset: true,
     long: true,
-    multivar: true,
     node: [
         "Buffer", "clearImmediate", "clearInterval", "clearTimeout",
         "console", "exports", "module", "process", "require",
@@ -425,6 +424,7 @@ let fudge;              // true if the natural numbers start with 1.
 let functionage;        // The current function.
 let functions;          // The array containing all of the functions.
 let global;             // The global object; the outermost context.
+let implied_strict;     // true if "use strict" is not needed.
 let json_mode;          // true if parsing JSON.
 let lines;              // The array containing source lines.
 let mega_mode;          // true if currently parsing a megastring literal.
@@ -760,11 +760,11 @@ function tokenize(source) {
 // Make the token object and append it to the tokens list.
 
         const the_token = {
-            from: from,
-            id: id,
+            from,
+            id,
             identifier: Boolean(identifier),
-            line: line,
-            nr: nr,
+            line,
+            nr,
             thru: column
         };
         tokens[nr] = the_token;
@@ -2674,7 +2674,6 @@ prefix("void", function () {
 });
 
 function parameter_list() {
-    let complex = false;
     const list = [];
     let optional;
     const signature = ["("];
@@ -2683,7 +2682,7 @@ function parameter_list() {
             let ellipsis = false;
             let param;
             if (next_token.id === "{") {
-                complex = true;
+                implied_strict = true;
                 if (optional !== undefined) {
                     warn(
                         "required_a_optional_b",
@@ -2713,6 +2712,11 @@ function parameter_list() {
                             return stop("expected_identifier_a");
                         }
                     }
+                    if (next_token.id === "=") {
+                        advance("=");
+                        subparam.expression = expression();
+                        param.open = true;
+                    }
                     param.names.push(subparam);
                     if (next_token.id === ",") {
                         advance(",");
@@ -2729,7 +2733,7 @@ function parameter_list() {
                     return parameter();
                 }
             } else if (next_token.id === "[") {
-                complex = true;
+                implied_strict = true;
                 if (optional !== undefined) {
                     warn(
                         "required_a_optional_b",
@@ -2749,6 +2753,11 @@ function parameter_list() {
                     }
                     advance();
                     param.names.push(subparam);
+                    if (next_token.id === "=") {
+                        advance("=");
+                        subparam.expression = expression();
+                        param.open = true;
+                    }
                     if (next_token.id === ",") {
                         advance(",");
                         return subparameter();
@@ -2763,7 +2772,7 @@ function parameter_list() {
                 }
             } else {
                 if (next_token.id === "...") {
-                    complex = true;
+                    implied_strict = true;
                     ellipsis = true;
                     signature.push("...");
                     advance("...");
@@ -2787,7 +2796,7 @@ function parameter_list() {
                     param.ellipsis = true;
                 } else {
                     if (next_token.id === "=") {
-                        complex = true;
+                        implied_strict = true;
                         optional = param;
                         advance("=");
                         param.expression = expression(0);
@@ -2812,7 +2821,7 @@ function parameter_list() {
     }
     advance(")");
     signature.push(")");
-    return [list, signature.join(""), complex];
+    return [list, signature.join("")];
 }
 
 function do_function(the_function) {
@@ -2885,10 +2894,7 @@ function do_function(the_function) {
     advance("(");
     token.free = false;
     token.arity = "function";
-    const pl = parameter_list();
-    functionage.parameters = pl[0];
-    functionage.signature = pl[1];
-    functionage.complex = pl[2];
+    [functionage.parameters, functionage.signature] = parameter_list();
     functionage.parameters.forEach(function enroll_parameter(name) {
         if (name.identifier) {
             enroll(name, "parameter", false);
@@ -2948,7 +2954,7 @@ function fart(pl) {
     functionage = the_fart;
     the_fart.parameters = pl[0];
     the_fart.signature = pl[1];
-    the_fart.complex = true;
+    implied_strict = true;
     the_fart.parameters.forEach(function (name) {
         enroll(name, "parameter", true);
     });
@@ -3153,7 +3159,7 @@ function do_var() {
     (function next() {
         if (next_token.id === "{" && the_statement.id !== "var") {
             const the_brace = next_token;
-            the_brace.names = [];
+            implied_strict = true;
             advance("{");
             (function pair() {
                 if (!next_token.identifier) {
@@ -3168,12 +3174,20 @@ function do_var() {
                         return stop("expected_identifier_a", next_token);
                     }
                     next_token.label = name;
-                    the_brace.names.push(next_token);
+                    the_statement.names.push(next_token);
                     enroll(next_token, "variable", is_const);
                     advance();
+                    the_brace.open = true;
                 } else {
-                    the_brace.names.push(name);
+                    the_statement.names.push(name);
                     enroll(name, "variable", is_const);
+                }
+                name.dead = false;
+                name.init = true;
+                if (next_token.id === "=") {
+                    advance("=");
+                    name.expression = expression();
+                    the_brace.open = true;
                 }
                 if (next_token.id === ",") {
                     advance(",");
@@ -3182,12 +3196,11 @@ function do_var() {
             }());
             advance("}");
             advance("=");
-            the_brace.expression = expression(0);
-            the_statement.names.push(the_brace);
+            the_statement.expression = expression(0);
         } else if (next_token.id === "[" && the_statement.id !== "var") {
             const the_bracket = next_token;
-            the_bracket.names = [];
             advance("[");
+            implied_strict = true;
             (function element() {
                 let ellipsis;
                 if (next_token.id === "...") {
@@ -3199,19 +3212,27 @@ function do_var() {
                 }
                 const name = next_token;
                 advance();
-                the_bracket.names.push(name);
-                enroll(name, "variable", the_statement.id === "const");
+                the_statement.names.push(name);
+                enroll(name, "variable", is_const);
+                name.dead = false;
+                name.init = true;
                 if (ellipsis) {
                     name.ellipsis = true;
-                } else if (next_token.id === ",") {
-                    advance(",");
-                    return element();
+                } else {
+                    if (next_token.id === "=") {
+                        advance("=");
+                        name.expression = expression();
+                        the_bracket.open = true;
+                    }
+                    if (next_token.id === ",") {
+                        advance(",");
+                        return element();
+                    }
                 }
             }());
             advance("]");
             advance("=");
-            the_bracket.expression = expression(0);
-            the_statement.names.push(the_bracket);
+            the_statement.expression = expression(0);
         } else if (next_token.identifier) {
             const name = next_token;
             advance();
@@ -3220,7 +3241,9 @@ function do_var() {
             }
             enroll(name, "variable", is_const);
             if (next_token.id === "=" || is_const) {
+                implied_strict = true;
                 advance("=");
+                name.dead = false;
                 name.init = true;
                 name.expression = expression(0);
             }
@@ -3228,18 +3251,7 @@ function do_var() {
         } else {
             return stop("expected_identifier_a", next_token);
         }
-        if (next_token.id === ",") {
-            if (!option.multivar) {
-                warn("expected_a_b", next_token, ";", ",");
-            }
-            advance(",");
-            return next();
-        }
     }());
-    the_statement.open = (
-        the_statement.names.length > 1
-        && the_statement.line !== the_statement.names[1].line
-    );
     semicolon();
     return the_statement;
 }
@@ -3892,7 +3904,7 @@ function preaction_function(thing) {
         if (
             module_mode === true
             || global.strict !== undefined
-            || thing.complex
+            || implied_strict
         ) {
             if (thing.id !== "=>" && thing.block.strict !== undefined) {
                 warn("unexpected_a", thing.block.strict);
@@ -4634,7 +4646,7 @@ function whitage() {
             const new_closer = opener[left.id];
             if (typeof new_closer === "string") {
                 if (new_closer !== right.id) {
-                    opening = left.line !== right.line;
+                    opening = left.open || (left.line !== right.line);
                     push();
                     closer = new_closer;
                     if (opening) {
@@ -4870,6 +4882,7 @@ export default Object.freeze(function jslint(
         };
         blockage = global;
         functionage = global;
+        implied_strict = false;
         json_mode = false;
         mega_mode = false;
         module_mode = false;
@@ -4946,7 +4959,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2018-11-13",
+        edition: "2018-11-28",
         exports,
         froms,
         functions,
