@@ -1,5 +1,5 @@
 // jslint.js
-// 2018-11-28
+// 2019-01-30
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -2682,7 +2682,6 @@ function parameter_list() {
             let ellipsis = false;
             let param;
             if (next_token.id === "{") {
-                implied_strict = true;
                 if (optional !== undefined) {
                     warn(
                         "required_a_optional_b",
@@ -2733,7 +2732,6 @@ function parameter_list() {
                     return parameter();
                 }
             } else if (next_token.id === "[") {
-                implied_strict = true;
                 if (optional !== undefined) {
                     warn(
                         "required_a_optional_b",
@@ -2772,7 +2770,6 @@ function parameter_list() {
                 }
             } else {
                 if (next_token.id === "...") {
-                    implied_strict = true;
                     ellipsis = true;
                     signature.push("...");
                     advance("...");
@@ -2796,7 +2793,6 @@ function parameter_list() {
                     param.ellipsis = true;
                 } else {
                     if (next_token.id === "=") {
-                        implied_strict = true;
                         optional = param;
                         advance("=");
                         param.expression = expression(0);
@@ -3159,7 +3155,6 @@ function do_var() {
     (function next() {
         if (next_token.id === "{" && the_statement.id !== "var") {
             const the_brace = next_token;
-            implied_strict = true;
             advance("{");
             (function pair() {
                 if (!next_token.identifier) {
@@ -3200,7 +3195,6 @@ function do_var() {
         } else if (next_token.id === "[" && the_statement.id !== "var") {
             const the_bracket = next_token;
             advance("[");
-            implied_strict = true;
             (function element() {
                 let ellipsis;
                 if (next_token.id === "...") {
@@ -3241,7 +3235,6 @@ function do_var() {
             }
             enroll(name, "variable", is_const);
             if (next_token.id === "=" || is_const) {
-                implied_strict = true;
                 advance("=");
                 name.dead = false;
                 name.init = true;
@@ -4959,7 +4952,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2018-11-28",
+        edition: "2019-01-30",
         exports,
         froms,
         functions,
