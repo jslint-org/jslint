@@ -1,5 +1,5 @@
 // jslint.js
-// 2019-01-30
+// 2019-01-31
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -107,7 +107,7 @@
     out_of_scope_a, parameters, parent, pop, property, push, quote,
     redefinition_a_b, replace, required_a_optional_b, reserved_a, role, search,
     shebang, signature, single, slice, some, sort, split, startsWith, statement,
-    stop, strict, subscript_a, switch, test, this, thru, toString, todo_comment,
+    stop, subscript_a, switch, test, this, thru, toString, todo_comment,
     tokens, too_long, too_many_digits, tree, try, type, u, unclosed_comment,
     unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
     unexpected_a_after_b, unexpected_a_before_b, unexpected_at_top_level_a,
@@ -116,7 +116,7 @@
     unexpected_space_a_b, unexpected_statement_a, unexpected_trailing_space,
     unexpected_typeof_a, uninitialized_a, unreachable_a,
     unregistered_property_a, unsafe, unused_a, use_double, use_open, use_spaces,
-    use_strict, used, value, var_loop, var_switch, variable, warning, warnings,
+    used, value, var_loop, var_switch, variable, warning, warnings,
     weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
     wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary,
     wrapped, writable, y
@@ -337,7 +337,6 @@ const bundle = {
         + "with a line break after the left paren."
     ),
     use_spaces: "Use spaces, not tabs.",
-    use_strict: "This function needs a \"use strict\" pragma.",
     var_loop: "Don't declare variables in a loop.",
     var_switch: "Don't declare variables in a switch.",
     weird_condition_a: "Weird condition '{a}'.",
@@ -424,7 +423,6 @@ let fudge;              // true if the natural numbers start with 1.
 let functionage;        // The current function.
 let functions;          // The array containing all of the functions.
 let global;             // The global object; the outermost context.
-let implied_strict;     // true if "use strict" is not needed.
 let json_mode;          // true if parsing JSON.
 let lines;              // The array containing source lines.
 let mega_mode;          // true if currently parsing a megastring literal.
@@ -2081,16 +2079,13 @@ function block(special) {
     the_block.arity = "statement";
     the_block.body = special === "body";
 
-// All top level function bodies should include the "use strict" pragma unless
-// the whole file is strict or the file is a module or the function parameters
-// use es6 syntax.
+// Top level function bodies may include the "use strict" pragma.
 
     if (
         special === "body"
         && stack.length === 1
         && next_token.value === "use strict"
     ) {
-        the_block.strict = next_token;
         next_token.statement = true;
         advance("(string)");
         advance(";");
@@ -2950,7 +2945,6 @@ function fart(pl) {
     functionage = the_fart;
     the_fart.parameters = pl[0];
     the_fart.signature = pl[1];
-    implied_strict = true;
     the_fart.parameters.forEach(function (name) {
         enroll(name, "parameter", true);
     });
@@ -3806,17 +3800,7 @@ function walk_statement(thing) {
                 thing.arity !== "statement"
                 && thing.arity !== "assignment"
             ) {
-                warn(
-                    (
-                        (
-                            thing.id === "(string)"
-                            && thing.value === "use strict"
-                        )
-                        ? "unexpected_a"
-                        : "unexpected_expression_a"
-                    ),
-                    thing
-                );
+                warn("unexpected_expression_a", thing);
             }
             walk_statement(thing.block);
             walk_statement(thing.else);
@@ -3892,21 +3876,6 @@ function subactivate(name) {
 function preaction_function(thing) {
     if (thing.arity === "statement" && blockage.body !== true) {
         warn("unexpected_a", thing);
-    }
-    if (thing.level === 1) {
-        if (
-            module_mode === true
-            || global.strict !== undefined
-            || implied_strict
-        ) {
-            if (thing.id !== "=>" && thing.block.strict !== undefined) {
-                warn("unexpected_a", thing.block.strict);
-            }
-        } else {
-            if (thing.block.strict === undefined) {
-                warn("use_strict", thing);
-            }
-        }
     }
     stack.push(functionage);
     block_stack.push(blockage);
@@ -4875,7 +4844,6 @@ export default Object.freeze(function jslint(
         };
         blockage = global;
         functionage = global;
-        implied_strict = false;
         json_mode = false;
         mega_mode = false;
         module_mode = false;
@@ -4918,7 +4886,6 @@ export default Object.freeze(function jslint(
                 if (
                     next_token.value === "use strict"
                 ) {
-                    global.strict = next_token;
                     advance("(string)");
                     advance(";");
                 }
@@ -4927,9 +4894,6 @@ export default Object.freeze(function jslint(
             advance("(end)");
             functionage = global;
             walk_statement(tree);
-            if (module_mode && global.strict !== undefined) {
-                warn("unexpected_a", global.strict);
-            }
             if (warnings.length === 0) {
                 uninitialized_and_unused();
                 if (!option.white) {
@@ -4952,7 +4916,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2019-01-30",
+        edition: "2019-01-31",
         exports,
         froms,
         functions,
