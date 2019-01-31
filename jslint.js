@@ -484,9 +484,9 @@ function warn_at(code, line, column, a, b, c, d) {
 
     const warning = {         // ~~
         name: "JSLintError",
-        column: column,
-        line: line,
-        code: code
+        column,
+        line,
+        code
     };
     if (a !== undefined) {
         warning.a = a;
@@ -3054,8 +3054,12 @@ prefix("{", function () {
                     if (typeof extra === "string") {
                         advance("(");
                     }
+                    let the_colon = next_token;
                     advance(":");
                     value = expression(0);
+                    if (value.id === name.id) {
+                        warn("unexpected_a", the_colon, ": " + name.id);
+                    }
                 }
                 value.label = name;
                 if (typeof extra === "string") {
