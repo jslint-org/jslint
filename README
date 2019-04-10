@@ -31,7 +31,7 @@ herself by putting the spaces before her commas instead of after, or by putting
 extra spaces inside her parentheses. A great writer will slavishly conform to
 some rules of style, and that in no way constrains her power to express herself
 creatively. See for example William Strunk's The Elements of Style
-[http://www.crockford.com/wrrrld/style.html].
+[http://www.crockford.com/style.html].
 
 This applies to programming as well. Conforming to a consistent style improves
 readability, and frees you to express yourself in ways that matter. JSLint here
