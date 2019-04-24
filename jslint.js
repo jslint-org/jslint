@@ -151,7 +151,7 @@ const allowed_option = {
     bitwise: true,
     browser: [
         "caches", "clearInterval", "clearTimeout", "document", "DOMException",
-        "Element", "Event", "event", "FileReader", "FormData", "history",
+        "Element", "Event", "FileReader", "FormData", "history",
         "localStorage", "location", "MutationObserver", "name", "navigator",
         "screen", "sessionStorage", "setInterval", "setTimeout", "Storage",
         "TextDecoder", "TextEncoder", "URL", "window", "Worker",
