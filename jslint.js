@@ -1,5 +1,5 @@
 // jslint.js
-// 2019-01-31
+// 2019-08-03
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1245,19 +1245,39 @@ function tokenize(source) {
         let last;
         let result;
         let the_token;
-        if (!source_line) {
+
+// This should properly be a tail recursive function, but sadly, conformant
+// implementations of ES6 are still rare. This is the ideal code:
+
+//      if (!source_line) {
+//          source_line = next_line();
+//          from = 0;
+//          return (
+//              source_line === undefined
+//              ? (
+//                  mega_mode
+//                  ? stop_at("unclosed_mega", mega_line, mega_from)
+//                  : make("(end)")
+//              )
+//              : lex()
+//          );
+//      }
+
+// Unfortunately, incompetent JavaScript engines will sometimes fail to execute
+// it correctly. So for now, we do it the old fashioned way.
+
+        while (!source_line) {
             source_line = next_line();
             from = 0;
-            return (
-                source_line === undefined
-                ? (
+            if (source_line === undefined) {
+                return (
                     mega_mode
                     ? stop_at("unclosed_mega", mega_line, mega_from)
                     : make("(end)")
-                )
-                : lex()
-            );
+                );
+            }
         }
+
         from = column;
         result = source_line.match(rx_token);
 
@@ -1492,8 +1512,8 @@ function tokenize(source) {
     first = lex();
     json_mode = first.id === "{" || first.id === "[";
 
-// This is the only loop in JSLint. It will turn into a recursive call to lex
-// when ES6 has been finished and widely deployed and adopted.
+// This loop will be replaced with a recursive call to lex when ES6 has been
+// finished and widely deployed and adopted.
 
     while (true) {
         if (lex().id === "(end)") {
@@ -4920,7 +4940,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2019-01-31",
+        edition: "2019-08-03",
         exports,
         froms,
         functions,
