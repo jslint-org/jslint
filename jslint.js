@@ -1591,7 +1591,7 @@ function dispense() {
     const next_cadet_id = (tokens[token_nr + 1] || { id: "" }).id;
     if (
         (cadet.id === "async" && next_cadet_id === "function")
-        || (cadet.id === "await" && next_cadet_id.match(/[a-zA-Z_$]/))
+        || (cadet.id === "await" && next_cadet_id[0].match(/[a-zA-Z_$]/))
     ) {
         cadet.id = next_cadet_id;
         token_nr += 1;
