@@ -1,5 +1,5 @@
 // jslint.js
-// 2019-08-03
+// 2019-09-17
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1040,7 +1040,7 @@ function tokenize(source) {
                     return true;
                 }
                 if (char === "\\") {
-                    escape("BbDdSsWw^${}[]():=!.-|*+?");
+                    escape("BbDdSsWw^${}[]():=!.|*+?");
                     return true;
                 }
                 if (
@@ -3077,7 +3077,7 @@ prefix("{", function () {
                     let the_colon = next_token;
                     advance(":");
                     value = expression(0);
-                    if (value.id === name.id) {
+                    if (value.id === name.id && value.id !== "function") {
                         warn("unexpected_a", the_colon, ": " + name.id);
                     }
                 }
@@ -4940,7 +4940,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2019-08-03",
+        edition: "2019-09-17",
         exports,
         froms,
         functions,
