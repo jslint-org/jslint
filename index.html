@@ -56,7 +56,13 @@
       autofocus
       spellcheck="false"
       placeholder="// Paste JavaScript source or JSON text here."
-  ></textarea></fieldset>
+  >/*jslint devel*/
+console.log(1234n);
+console.log(-1234n);
+console.log(-0x1234n);
+console.log(-0o1234n);
+console.log(-0b1010n);
+</textarea></fieldset>
   <div class="center">
       <button name=JSLint>JSLint</button>
       <button name=clear>clear</button>

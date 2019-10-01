@@ -380,11 +380,11 @@ const rx_tab = /\t/g;
 const rx_directive = /^(jslint|property|global)\s+(.*)$/;
 const rx_directive_part = /^([a-zA-Z$_][a-zA-Z0-9$_]*)(?::\s*(true|false))?,?\s*(.*)$/;
 // token (sorry it is so long)
-const rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\],:;'"~`]|\?\.?|=(?:==?|>)?|\.+|[*\/][*\/=]?|\+[=+]?|-[=\-]?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<<?=?|!(?:!|==?)?|(0|[1-9][0-9]*))(.*)$/;
-const rx_digits = /^([0-9]+)(.*)$/;
-const rx_hexs = /^([0-9a-fA-F]+)(.*)$/;
-const rx_octals = /^([0-7]+)(.*)$/;
-const rx_bits = /^([01]+)(.*)$/;
+const rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\],:;'"~`]|\?\.?|=(?:==?|>)?|\.+|[*\/][*\/=]?|\+[=+]?|-[=\-]?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<<?=?|!(?:!|==?)?|(0n?|[1-9][0-9]*n?))(.*)$/;
+const rx_digits = /^([0-9]+n?)(.*)$/;
+const rx_hexs = /^([0-9a-fA-F]+n?)(.*)$/;
+const rx_octals = /^([0-7]+n?)(.*)$/;
+const rx_bits = /^([01]+n?)(.*)$/;
 // mega
 const rx_mega = /[`\\]|\$\{/;
 // JSON number
