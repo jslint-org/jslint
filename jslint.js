@@ -1,5 +1,5 @@
 // jslint.js
-// 2019-09-17
+// 2019-12-10
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -151,7 +151,8 @@ const allowed_option = {
     bitwise: true,
     browser: [
         "caches", "clearInterval", "clearTimeout", "document", "DOMException",
-        "Element", "Event", "event", "FileReader", "FormData", "history",
+        "Element", "Event", "event", "fetch", "FileReader", "FormData",
+        "history", "IntersectionObserver",
         "localStorage", "location", "MutationObserver", "name", "navigator",
         "screen", "sessionStorage", "setInterval", "setTimeout", "Storage",
         "TextDecoder", "TextEncoder", "URL", "window", "Worker",
@@ -4940,7 +4941,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2019-09-17",
+        edition: "2019-12-10",
         exports,
         froms,
         functions,
