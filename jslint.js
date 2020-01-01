@@ -229,10 +229,10 @@ const standard = [
     "Array", "ArrayBuffer", "Boolean", "DataView", "Date", "decodeURI",
     "decodeURIComponent", "encodeURI", "encodeURIComponent", "Error",
     "EvalError", "Float32Array", "Float64Array", "Generator",
-    "GeneratorFunction", "Int8Array", "Int16Array", "Int32Array", "Intl",
-    "JSON", "Map", "Math", "Number", "Object", "parseInt", "parseFloat",
-    "Promise", "Proxy", "RangeError", "ReferenceError", "Reflect", "RegExp",
-    "Set", "String", "Symbol", "SyntaxError", "System", "TypeError",
+    "GeneratorFunction", "globalThis", "Int8Array", "Int16Array",
+    "Int32Array", "Intl", "JSON", "Map", "Math", "Number", "Object", "parseInt",
+    "parseFloat", "Promise", "Proxy", "RangeError", "ReferenceError", "Reflect",
+    "RegExp", "Set", "String", "Symbol", "SyntaxError", "System", "TypeError",
     "Uint8Array", "Uint8ClampedArray", "Uint16Array", "Uint32Array",
     "URIError", "WeakMap", "WeakSet"
 ];
