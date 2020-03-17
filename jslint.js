@@ -1,5 +1,5 @@
 // jslint.js
-// 2020-04-17
+// 2020-03-17
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -3471,6 +3471,22 @@ stmt("if", function () {
 });
 stmt("import", function () {
     const the_import = token;
+    if (next_token.id === "(") {
+        advance("(");
+        const string = expression(0);
+        if (string.id !== "(string)") {
+            warn("expected_string_a", string);
+        }
+        froms.push(token.value);
+        advance(")");
+        advance(".");
+        advance("then");
+        advance("(");
+        the_import.expression = expression(0);
+        advance(")");
+        semicolon();
+        return the_import;
+    }
     let name;
     if (typeof module_mode === "object") {
         warn("unexpected_directive_a", module_mode, module_mode.directive);
@@ -3485,22 +3501,6 @@ stmt("import", function () {
         enroll(name, "variable", true);
         the_import.name = name;
     } else {
-        if (next_token.id === "(") {
-            advance("(");
-            const string = expression(0);
-            if (string.id !== "(string)") {
-                warn("expected_string_a", string);
-            }
-            froms.push(token.value);
-            advance(")");
-            advance(".");
-            advance("then");
-            advance("(");
-            the_import.expression = expression(0);
-            advance(")");
-            semicolon();
-            return the_import;
-        }
         const names = [];
         advance("{");
         if (next_token.id !== "}") {
@@ -4389,8 +4389,8 @@ postaction("statement", "import", function (the_thing) {
             name.init = true;
             blockage.live.push(name);
         }
+        return top_level_only(the_thing);
     }
-    return top_level_only(the_thing);
 });
 postaction("statement", "let", action_var);
 postaction("statement", "try", function (thing) {
@@ -4959,7 +4959,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2020-05-17",
+        edition: "2020-03-17",
         exports,
         froms,
         functions,
