@@ -1,5 +1,5 @@
 // jslint.js
-// 2020-01-17
+// 2020-04-17
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -3485,6 +3485,22 @@ stmt("import", function () {
         enroll(name, "variable", true);
         the_import.name = name;
     } else {
+        if (next_token.id === "(") {
+            advance("(");
+            const string = expression(0);
+            if (string.id !== "(string)") {
+                warn("expected_string_a", string);
+            }
+            froms.push(token.value);
+            advance(")");
+            advance(".");
+            advance("then");
+            advance("(");
+            the_import.expression = expression(0);
+            advance(")");
+            semicolon();
+            return the_import;
+        }
         const names = [];
         advance("{");
         if (next_token.id !== "}") {
@@ -4361,16 +4377,18 @@ postaction("statement", "for", function (thing) {
 postaction("statement", "function", postaction_function);
 postaction("statement", "import", function (the_thing) {
     const name = the_thing.name;
-    if (Array.isArray(name)) {
-        name.forEach(function (name) {
+    if (name) {
+        if (Array.isArray(name)) {
+            name.forEach(function (name) {
+                name.dead = false;
+                name.init = true;
+                blockage.live.push(name);
+            });
+        } else {
             name.dead = false;
             name.init = true;
             blockage.live.push(name);
-        });
-    } else {
-        name.dead = false;
-        name.init = true;
-        blockage.live.push(name);
+        }
     }
     return top_level_only(the_thing);
 });
@@ -4941,7 +4959,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2020-01-17",
+        edition: "2020-05-17",
         exports,
         froms,
         functions,
