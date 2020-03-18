@@ -1,5 +1,5 @@
 // jslint.js
-// 2020-03-17
+// 2020-03-18
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -3472,6 +3472,9 @@ stmt("if", function () {
 stmt("import", function () {
     const the_import = token;
     if (next_token.id === "(") {
+        the_import.arity = "unary";
+        the_import.constant = true;
+        the_import.statement = false;
         advance("(");
         const string = expression(0);
         if (string.id !== "(string)") {
@@ -3840,6 +3843,7 @@ function walk_statement(thing) {
             } else if (
                 thing.arity !== "statement"
                 && thing.arity !== "assignment"
+                && thing.id !== "import"
             ) {
                 warn("unexpected_expression_a", thing);
             }
@@ -4959,7 +4963,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2020-03-17",
+        edition: "2020-03-18",
         exports,
         froms,
         functions,
