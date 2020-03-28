@@ -1,5 +1,5 @@
 // jslint.js
-// 2020-03-18
+// 2020-03-28
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -4773,8 +4773,6 @@ function whitage() {
                     } else if (left.id === ";") {
                         if (open) {
                             at_margin(0);
-                        } else {
-                            one_space();
                         }
                     } else if (
                         left.arity === "ternary"
@@ -4963,7 +4961,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2020-03-18",
+        edition: "2020-03-28",
         exports,
         froms,
         functions,
