@@ -1500,12 +1500,6 @@ function tokenize(source) {
                     return the_token;
                 }
             }
-            if (source_line[0] === "/") {
-                column += 1;
-                source_line = source_line.slice(1);
-                snippet = "/=";
-                warn_at("unexpected_a", line, column, "/=");
-            }
         }
         return make(snippet);
     }
