@@ -1,5 +1,5 @@
 // jslint.js
-// 2020-03-28
+// 2020-07-01
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -381,7 +381,7 @@ const rx_tab = /\t/g;
 const rx_directive = /^(jslint|property|global)\s+(.*)$/;
 const rx_directive_part = /^([a-zA-Z$_][a-zA-Z0-9$_]*)(?::\s*(true|false))?,?\s*(.*)$/;
 // token (sorry it is so long)
-const rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\],:;'"~`]|\?\.?|=(?:==?|>)?|\.+|[*\/][*\/=]?|\+[=+]?|-[=\-]?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<<?=?|!(?:!|==?)?|(0|[1-9][0-9]*))(.*)$/;
+const rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\],:;'"~`]|\?\.?|=(?:==?|>)?|\.+|\*[*\/=]?|\/[*\/]?|\+[=+]?|-[=\-]?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<<?=?|!(?:!|==?)?|(0|[1-9][0-9]*))(.*)$/;
 const rx_digits = /^([0-9]+)(.*)$/;
 const rx_hexs = /^([0-9a-fA-F]+)(.*)$/;
 const rx_octals = /^([0-7]+)(.*)$/;
@@ -1500,7 +1500,7 @@ function tokenize(source) {
                     return the_token;
                 }
             }
-            if (source_line[0] === "/") {
+            if (source_line[0] === "=") {
                 column += 1;
                 source_line = source_line.slice(1);
                 snippet = "/=";
@@ -4961,7 +4961,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2020-03-28",
+        edition: "2020-07-01",
         exports,
         froms,
         functions,
