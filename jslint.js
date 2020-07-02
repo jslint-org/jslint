@@ -458,16 +458,6 @@ function artifact(the_token) {
     );
 }
 
-function artifact_line(the_token) {
-
-// Return the fudged line number of an artifact.
-
-    if (the_token === undefined) {
-        the_token = next_token;
-    }
-    return the_token.line + fudge;
-}
-
 function artifact_column(the_token) {
 
 // Return the fudged column number of an artifact.
@@ -830,6 +820,7 @@ function tokenize(source) {
         if (result) {
             let allowed;
             const name = result[1];
+// value can only ever be one of "true", undefined, or "false"
             const value = result[2];
             if (the_comment.directive === "jslint") {
                 allowed = allowed_option[name];
@@ -837,20 +828,21 @@ function tokenize(source) {
                     typeof allowed === "boolean"
                     || typeof allowed === "object"
                 ) {
+// remove always-false-condition: value === ""
                     if (
-                        value === ""
-                        || value === "true"
+                        value === "true"
                         || value === undefined
                     ) {
                         option[name] = true;
                         if (Array.isArray(allowed)) {
                             populate(allowed, declared_globals, false);
                         }
-                    } else if (value === "false") {
-                        option[name] = false;
+// remove always-true-condition: value === "false"
                     } else {
-                        warn("bad_option_a", the_comment, name + ":" + value);
+                        option[name] = false;
                     }
+// remove unreachable-else-branch:
+//                      warn("bad_option_a", the_comment, name + ":" + value);
                 } else {
                     warn("bad_option_a", the_comment, name);
                 }
@@ -859,7 +851,8 @@ function tokenize(source) {
                     tenure = empty();
                 }
                 tenure[name] = true;
-            } else if (the_comment.directive === "global") {
+// remove alway-true-condition: the_comment.directive === "global"
+            } else {
                 if (value) {
                     warn("bad_option_a", the_comment, name + ":" + value);
                 }
@@ -1632,7 +1625,9 @@ function advance(id, match) {
                 next_token,
                 id,
                 artifact(match),
-                artifact_line(match),
+// inline function artifact-line()
+// and remove always-false-branch: match === undefined
+                match.line + fudge,
                 artifact(next_token)
             )
         );
