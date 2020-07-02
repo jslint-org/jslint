@@ -3906,7 +3906,9 @@ function lookup(thing) {
             the_variable.dead
             && (
                 the_variable.calls === undefined
-                || the_variable.calls[functionage.name.id] === undefined
+                || the_variable.calls[
+                    functionage.name && functionage.name.id
+                ] === undefined
             )
         ) {
             warn("out_of_scope_a", thing);
