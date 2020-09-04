@@ -1,5 +1,5 @@
 // jslint.js
-// 2019-09-17
+// 2020-07-02
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -150,8 +150,9 @@ const allowed_option = {
 
     bitwise: true,
     browser: [
-        "caches", "clearInterval", "clearTimeout", "document", "DOMException",
-        "Element", "Event", "event", "FileReader", "FormData", "history",
+        "caches", "CharacterData", "clearInterval", "clearTimeout", "document",
+        "DocumentType", "DOMException", "Element", "Event", "event", "fetch",
+        "FileReader", "FontFace", "FormData", "history", "IntersectionObserver",
         "localStorage", "location", "MutationObserver", "name", "navigator",
         "screen", "sessionStorage", "setInterval", "setTimeout", "Storage",
         "TextDecoder", "TextEncoder", "URL", "window", "Worker",
@@ -380,7 +381,7 @@ const rx_tab = /\t/g;
 const rx_directive = /^(jslint|property|global)\s+(.*)$/;
 const rx_directive_part = /^([a-zA-Z$_][a-zA-Z0-9$_]*)(?::\s*(true|false))?,?\s*(.*)$/;
 // token (sorry it is so long)
-const rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\],:;'"~`]|\?\.?|=(?:==?|>)?|\.+|[*\/][*\/=]?|\+[=+]?|-[=\-]?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<<?=?|!(?:!|==?)?|(0n?|[1-9][0-9]*n?))(.*)$/;
+const rx_token = /^((\s+)|([a-zA-Z_$][a-zA-Z0-9_$]*)|[(){}\[\],:;'"~`]|\?\.?|=(?:==?|>)?|\.+|\*[*\/=]?|\/[*\/]?|\+[=+]?|-[=\-]?|[\^%]=?|&[&=]?|\|[|=]?|>{1,3}=?|<<?=?|!(?:!|==?)?|(0|[1-9][0-9]*n?))(.*)$/;
 const rx_digits = /^([0-9]+n?)(.*)$/;
 const rx_hexs = /^([0-9a-fA-F]+n?)(.*)$/;
 const rx_octals = /^([0-7]+n?)(.*)$/;
@@ -1499,7 +1500,7 @@ function tokenize(source) {
                     return the_token;
                 }
             }
-            if (source_line[0] === "/") {
+            if (source_line[0] === "=") {
                 column += 1;
                 source_line = source_line.slice(1);
                 snippet = "/=";
@@ -1737,6 +1738,9 @@ function json_value() {
         negative.arity = "unary";
         advance("-");
         advance("(number)");
+        if (!rx_JSON_number.test(token.value)) {
+            warn("unexpected_a", token);
+        }
         negative.expression = token;
         return negative;
     }
@@ -3470,6 +3474,25 @@ stmt("if", function () {
 });
 stmt("import", function () {
     const the_import = token;
+    if (next_token.id === "(") {
+        the_import.arity = "unary";
+        the_import.constant = true;
+        the_import.statement = false;
+        advance("(");
+        const string = expression(0);
+        if (string.id !== "(string)") {
+            warn("expected_string_a", string);
+        }
+        froms.push(token.value);
+        advance(")");
+        advance(".");
+        advance("then");
+        advance("(");
+        the_import.expression = expression(0);
+        advance(")");
+        semicolon();
+        return the_import;
+    }
     let name;
     if (typeof module_mode === "object") {
         warn("unexpected_directive_a", module_mode, module_mode.directive);
@@ -3823,6 +3846,7 @@ function walk_statement(thing) {
             } else if (
                 thing.arity !== "statement"
                 && thing.arity !== "assignment"
+                && thing.id !== "import"
             ) {
                 warn("unexpected_expression_a", thing);
             }
@@ -3882,6 +3906,7 @@ function lookup(thing) {
             the_variable.dead
             && (
                 the_variable.calls === undefined
+                || functionage.name === undefined
                 || the_variable.calls[functionage.name.id] === undefined
             )
         ) {
@@ -4360,18 +4385,20 @@ postaction("statement", "for", function (thing) {
 postaction("statement", "function", postaction_function);
 postaction("statement", "import", function (the_thing) {
     const name = the_thing.name;
-    if (Array.isArray(name)) {
-        name.forEach(function (name) {
+    if (name) {
+        if (Array.isArray(name)) {
+            name.forEach(function (name) {
+                name.dead = false;
+                name.init = true;
+                blockage.live.push(name);
+            });
+        } else {
             name.dead = false;
             name.init = true;
             blockage.live.push(name);
-        });
-    } else {
-        name.dead = false;
-        name.init = true;
-        blockage.live.push(name);
+        }
+        return top_level_only(the_thing);
     }
-    return top_level_only(the_thing);
 });
 postaction("statement", "let", action_var);
 postaction("statement", "try", function (thing) {
@@ -4750,8 +4777,6 @@ function whitage() {
                     } else if (left.id === ";") {
                         if (open) {
                             at_margin(0);
-                        } else {
-                            one_space();
                         }
                     } else if (
                         left.arity === "ternary"
@@ -4940,7 +4965,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2019-09-17",
+        edition: "2020-07-02",
         exports,
         froms,
         functions,
