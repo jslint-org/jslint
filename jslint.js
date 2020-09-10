@@ -1,5 +1,5 @@
 // jslint.js
-// 2020-09-04
+// 2020-09-09
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -437,10 +437,10 @@ const rx_token = tag_regexp ` ^ (
       | [ 1-9 ] [ 0-9 ]*
     )
 ) ( .* ) $ `;
-const rx_digits = tag_regexp ` ( [ 0-9 ]+ ) ( .* ) $ `;
-const rx_hexs = tag_regexp ` ( [ 0-9 a-f A-F ]+ ) ( .* ) $ `;
-const rx_octals = tag_regexp ` ( [ 0-7 ]+ ) ( .* ) $ `;
-const rx_bits = tag_regexp ` ( [ 0 1 ]+ ) ( .* ) $ `;
+const rx_digits = /^[0-9]*/;
+const rx_hexs = /^[0-9A-F]*/i;
+const rx_octals = /^[0-7]*/;
+const rx_bits = /^[01]*/;
 // mega
 const rx_mega = /[`\\]|\$\{/;
 // JSON number
@@ -691,7 +691,7 @@ function tokenize(source) {
 // found with a regular expression. Regular expressions cannot correctly match
 // regular expression literals, so we will match those the hard way. String
 // literals and number literals can be matched by regular expressions, but they
-// don't provide good warnings. The functions snip, next_char, prev_char,
+// don't provide good warnings. The functions snip, next_char, back_char,
 // some_digits, and escape help in the parsing of literals.
 
     function snip() {
@@ -749,24 +749,16 @@ function tokenize(source) {
     }
 
     function some_digits(rx, quiet) {
-        const result = source_line.match(rx);
-        if (result) {
-            char = result[1];
-            column += char.length;
-            source_line = result[2];
-            snippet += char;
-        } else {
-            char = "";
-            if (!quiet) {
-                warn_at(
-                    "expected_digits_after_a",
-                    line,
-                    column,
-                    snippet
-                );
-            }
+        const digits = source_line.match(rx)[0];
+        const length = digits.length;
+        if (!quiet && length === 0) {
+            warn_at("expected_digits_after_a", line, column, snippet);
         }
-        return char.length;
+        column += length;
+        source_line = source_line.slice(length);
+        snippet += digits;
+        next_char();
+        return length;
     }
 
     function escape(extra) {
@@ -963,11 +955,10 @@ function tokenize(source) {
                 next_char();
             } else if (char === "{") {
                 if (some_digits(rx_digits, true) === 0) {
-                    warn_at("expected_a", line, column, "0");
+                    warn_at("expected_a_before_b", line, column, "0", ",");
                 }
-                if (next_char() === ",") {
+                if (char === ",") {
                     some_digits(rx_digits, true);
-                    next_char();
                 }
                 next_char("}");
             } else {
@@ -1235,7 +1226,6 @@ function tokenize(source) {
     function frack() {
         if (char === ".") {
             some_digits(rx_digits);
-            next_char();
         }
         if (char === "E" || char === "e") {
             next_char();
@@ -1243,7 +1233,6 @@ function tokenize(source) {
                 back_char();
             }
             some_digits(rx_digits);
-            next_char();
         }
     }
 
@@ -1254,13 +1243,10 @@ function tokenize(source) {
                 frack();
             } else if (char === "b") {
                 some_digits(rx_bits);
-                next_char();
             } else if (char === "o") {
                 some_digits(rx_octals);
-                next_char();
             } else if (char === "x") {
                 some_digits(rx_hexs);
-                next_char();
             }
         } else {
             next_char();
@@ -5016,7 +5002,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2020-09-04",
+        edition: "2020-09-09",
         exports,
         froms,
         functions,
