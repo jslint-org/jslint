@@ -444,7 +444,7 @@ const rx_bits = /^[01]*/;
 // mega
 const rx_mega = /[`\\]|\$\{/;
 // JSON number
-const rx_JSON_number = tag_regexp ` -? \d+ (?: \. \d* )? (?:
+const rx_JSON_number = tag_regexp ` ^ -? \d+ (?: \. \d* )? (?:
     [ e E ] [ \- + ]? \d+
 )? $ `;
 // initial cap
