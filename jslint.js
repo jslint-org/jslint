@@ -1,5 +1,5 @@
 // jslint.js
-// 2020-09-09
+// 2020-10-21
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -444,9 +444,12 @@ const rx_bits = /^[01]*/;
 // mega
 const rx_mega = /[`\\]|\$\{/;
 // JSON number
-const rx_JSON_number = tag_regexp ` -? \d+ (?: \. \d* )? (?:
-    [ e E ] [ \- + ]? \d+
-)? $ `;
+const rx_JSON_number = tag_regexp ` ^
+    -?
+    (?: 0 | [ 1-9 ] \d* )
+    (?: \. \d* )?
+    (?: [ e E ] [ \- + ]? \d+ )?
+$ `;
 // initial cap
 const rx_cap = /^[A-Z]/;
 
@@ -5002,7 +5005,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2020-09-09",
+        edition: "2020-10-21",
         exports,
         froms,
         functions,
