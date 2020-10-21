@@ -413,7 +413,7 @@ const rx_token = tag_regexp ` ^ (
   | [
       ( ) { } \[ \] , : ; ' " ~ \`
   ]
-  | \? \.?
+  | \? [ ? . ]?
   | = (?:
         = =?
       | >
@@ -2489,6 +2489,7 @@ assignment("<<=");
 assignment(">>=");
 assignment(">>>=");
 
+infix("??", 40);
 infix("||", 40);
 infix("&&", 50);
 infix("|", 70);
