@@ -2489,7 +2489,7 @@ assignment("<<=");
 assignment(">>=");
 assignment(">>>=");
 
-infix("??", 40);
+infix("??", 35);
 infix("||", 40);
 infix("&&", 50);
 infix("|", 70);
