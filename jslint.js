@@ -1,5 +1,5 @@
 // jslint.js
-// 2020-10-21
+// 2020-10-29
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -90,8 +90,8 @@
     bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
     body, browser, c, calls, catch, charCodeAt, closer, closure, code, column,
     concat, constant, context, convert, couch, create, d, dead, default, devel,
-    directive, directives, disrupt, dot, duplicate_a, edition, ellipsis, else,
-    empty_block, eval, every, expected_a, expected_a_at_b_c,
+    directive, directives, disrupt, dot, duplicate_a, early_stop, edition,
+    ellipsis, else, empty_block, eval, every, expected_a, expected_a_at_b_c,
     expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
     expected_a_next_at_b, expected_digits_after_a, expected_four_digits,
     expected_identifier_a, expected_line_break_a_b, expected_regexp_factor_a,
@@ -5000,13 +5000,15 @@ export default Object.freeze(function jslint(
         }
         early_stop = false;
     } catch (e) {
+        e.early_stop = early_stop;
+        e.message += " [JSLint was unable to finish]";
         if (e.name !== "JSLintError") {
             warnings.push(e);
         }
     }
     return {
         directives,
-        edition: "2020-10-21",
+        edition: "2020-10-29",
         exports,
         froms,
         functions,
@@ -5027,7 +5029,13 @@ export default Object.freeze(function jslint(
         tokens,
         tree,
         warnings: warnings.sort(function (a, b) {
-            return a.line - b.line || a.column - b.column;
+            return (
+                a.early_stop
+                ? -1
+                : b.early_stop
+                ? 1
+                : a.line - b.line || a.column - b.column
+            );
         })
     };
 });
