@@ -86,6 +86,7 @@
 // WARNING: JSLint will hurt your feelings.
 
 /*property
+    ignore, source_line, map
     a, and, arity, assign, b, bad_assignment_a, bad_directive_a, bad_get,
     bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
     body, browser, c, calls, catch, charCodeAt, closer, closure, code, column,
@@ -486,6 +487,7 @@ let functions;          // The array containing all of the functions.
 let global;             // The global object; the outermost context.
 let json_mode;          // true if parsing JSON.
 let lines;              // The array containing source lines.
+let lines_extra;        // The array containing source lines metadata.
 let mega_mode;          // true if currently parsing a megastring literal.
 let module_mode;        // true if import or export was used.
 let next_token;         // The next token to be examined in the parse.
@@ -562,7 +564,10 @@ function warn_at(code, line, column, a, b, c, d) {
         warning.d = d;
     }
     warning.message = supplant(bundle[code] || code, warning);
-    warnings.push(warning);
+    // hack-jslint - ignore warning
+    if (!Object.assign(warning, lines_extra[warning.line]).ignore) {
+        warnings.push(warning);
+    }
     return warning;
 }
 
@@ -635,6 +640,8 @@ function tokenize(source) {
     let first;                  // the first token
     let from;                   // the starting column number of the token
     let line = -1;              // the line number of the next character
+    let line_ignore;            // flag indicating whether current line should
+                                // be ignored
     let nr = 0;                 // the next token number
     let previous = global;      // the previous token including comments
     let prior = global;         // the previous token excluding comments
@@ -657,6 +664,7 @@ function tokenize(source) {
 // unsafe characters or is too damn long.
 
         let at;
+        let match;
         if (
             !option.long
             && whole_line.length > 80
@@ -672,6 +680,39 @@ function tokenize(source) {
         source_line = lines[line];
         whole_line = source_line || "";
         if (source_line !== undefined) {
+            // hack-jslint - parse source_line for ignore-macro
+            lines_extra[line] = {
+                line,
+                source_line
+            };
+            match = (
+                source_line.match(
+                    /^\/\*\u0020jslint\u0020(ignore:start|ignore:end)\u0020\*\/$/m
+                ) ||
+                source_line.slice(-50).match(
+                    /\u0020\/\/\u0020jslint\u0020(ignore:line)$/m
+                )
+            );
+            switch (match && match[1]) {
+            case "ignore:end":
+                line_ignore = undefined;
+                break;
+            case "ignore:line":
+                line_ignore = "line";
+                break;
+            case "ignore:start":
+                line_ignore = true;
+                break;
+            }
+            lines_extra[line].ignore = line_ignore;
+            switch (line_ignore) {
+            case "line":
+                line_ignore = undefined;
+                break;
+            case true:
+                source_line = "";
+                break;
+            }
             at = source_line.search(rx_tab);
             if (at >= 0) {
                 if (!option.white) {
@@ -4888,6 +4929,15 @@ export default Object.freeze(function jslint(
     option_object = empty(),
     global_array = []
 ) {
+    // hack-jslint - init lines_extra
+    lines = (
+        Array.isArray(source)
+        ? source
+        : source.split(rx_crlf)
+    );
+    lines_extra = lines.map(function () {
+        return {};
+    });
     try {
         warnings = [];
         option = Object.assign(empty(), option_object);
