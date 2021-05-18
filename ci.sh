@@ -51,22 +51,27 @@ shGithubUploadArtifact() {(set -e
     (cd "branch.$BRANCH" && git reset "$BRANCH" --hard)
     rm -rf "branch.$BRANCH/.git"
     git add -f "branch.$BRANCH"
-    git commit -am "add branch" || true
-    # backup branch-gh-pages and squash to 100 most recent commits
-    if [ "$(git rev-list HEAD --count)" -gt 100 ]
+    git commit -am "update dir branch.$BRANCH" || true
+    # if branch-gh-pages has more than 100 commits,
+    # then backup and squash all commits
+    if [ "$(git rev-list gh-pages --count)" -gt 100 ]
     then
-        shGitCmdWithGithubToken push origin -f HEAD:gh-pages.backup
-        git checkout -q "HEAD~50"
-        git reset -q "$(git rev-list --max-parents=0 HEAD)"
-        git add .
-        git commit -m squash > /dev/null || true
-        git cherry-pick -X theirs --allow-empty --strategy=recursive \
-            "gh-pages~50..gh-pages"
-        git push . -f "HEAD:gh-pages"
-        git checkout "gh-pages"
+        # backup
+        shGitCmdWithGithubToken push origin -f gh-pages:gh-pages.backup
+        # squash all commits
+        git add -f .
+        git checkout --orphan squash1
+        git checkout gh-pages .
+        git add -f .
+        git commit --quiet -am squash || true
+        # reset branch-gh-pages to squashed-commit
+        git push . -f squash1:gh-pages
+        git checkout gh-pages
+        # force push squashed-commit
+        shGitCmdWithGithubToken push origin -f gh-pages
     fi
     # push branch-gh-pages
-    shGitCmdWithGithubToken push origin -f HEAD:gh-pages
+    shGitCmdWithGithubToken push origin gh-pages
 )}
 
 shJslintCli() {(set -e
