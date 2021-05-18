@@ -22,6 +22,81 @@ shGitCmdWithGithubToken() {(set -e
     return "$EXIT_CODE"
 )}
 
+shGitLsTree() {(set -e
+# this function will "git ls-tree" all files committed in HEAD
+# example use:
+# shGitLsTree | sort -rk3 # sort by date
+# shGitLsTree | sort -rk4 # sort by size
+    node -e '
+(function () {
+    "use strict";
+    let result;
+    // get file, mode, size
+    result = require("child_process").spawnSync("git", [
+        "ls-tree", "-lr", "HEAD"
+    ], {
+        encoding: "utf8",
+        stdio: [
+            "ignore", "pipe", 2
+        ]
+    }).stdout;
+    result = Array.from(result.matchAll(
+        /^(\S+?)\u0020+?\S+?\u0020+?\S+?\u0020+?(\S+?)\t(\S+?)$/gm
+    )).map(function ([
+        ignore, mode, size, file
+    ]) {
+        return {
+            file,
+            mode: mode.slice(-3),
+            size: Number(size)
+        };
+    });
+    result = result.sort(function (aa, bb) {
+        return aa.file > bb.file || -1;
+    });
+    result = result.slice(0, 1000);
+    result.unshift({
+        file: ".",
+        mode: "755",
+        size: 0
+    });
+    // get date
+    result.forEach(function (elem) {
+        result[0].size += elem.size;
+        require("child_process").spawn("git", [
+            "log", "--max-count=1", "--format=%at", elem.file
+        ], {
+            stdio: [
+                "ignore", "pipe", 2
+            ]
+        }).stdout.on("data", function (chunk) {
+            elem.date = new Date(
+                Number(chunk) * 1000
+            ).toISOString().slice(0, 19) + "Z";
+        });
+    });
+    process.on("exit", function () {
+        let iiPad;
+        let sizePad;
+        iiPad = String(result.length).length + 1;
+        sizePad = String(Math.ceil(result[0].size / 1024)).length;
+        process.stdout.write(result.map(function (elem, ii) {
+            return (
+                String(ii + ".").padStart(iiPad, " ") +
+                "  " + elem.mode +
+                "  " + elem.date +
+                "  " + String(
+                    Math.ceil(elem.size / 1024)
+                ).padStart(sizePad, " ") + " KB" +
+                "  " + elem.file +
+                "\n"
+            );
+        }).join(""));
+    });
+}());
+' # '
+)}
+
 shGithubCi() {(set -e
 # this function will run github-ci
     # jslint all files
@@ -30,8 +105,14 @@ shGithubCi() {(set -e
     shV8CoverageReport shJslintCli jslint.js
 )}
 
-shGithubUploadArtifact() {(set -e
+shGithubArtifactUpload() {(set -e
 # this function will upload build-artifacts to branch-gh-pages
+    node -e '
+process.exit(
+    `${process.version.split(".")[0]}.${process.arch}.${process.platform}` !==
+    process.env.CI_NODE_VERSION_ARCH_PLATFORM
+);
+' || return 0
     local BRANCH
     # init $BRANCH
     BRANCH="$(git rev-parse --abbrev-ref HEAD)"
@@ -41,35 +122,39 @@ shGithubUploadArtifact() {(set -e
     # commit coverage-report
     git add -f .coverage/
     git commit -am "add coverage-report"
-    # add coverage-report to branch-gh-pages
+    # checkout branch-gh-pages
     git checkout -b gh-pages
     git fetch origin gh-pages
-    git reset origin/gh-pages --hard
+    git reset --hard origin/gh-pages
+    # update dir branch.$BRANCH
     rm -rf "branch.$BRANCH"
     mkdir "branch.$BRANCH"
-    cp -a .git "branch.$BRANCH"
-    (cd "branch.$BRANCH" && git reset "$BRANCH" --hard)
-    rm -rf "branch.$BRANCH/.git"
-    git add -f "branch.$BRANCH"
+    (set -e
+        cd "branch.$BRANCH"
+        git init -b branch1
+        git pull --depth=1 .. "$BRANCH"
+        rm -rf .git
+        git add -f .
+    )
+    git status
     git commit -am "update dir branch.$BRANCH" || true
     # if branch-gh-pages has more than 100 commits,
-    # then backup and squash all commits
-    if [ "$(git rev-list gh-pages --count)" -gt 100 ]
+    # then backup and squash commits
+    if [ "$(git rev-list --count gh-pages)" -gt 100 ]
     then
         # backup
         shGitCmdWithGithubToken push origin -f gh-pages:gh-pages.backup
-        # squash all commits
-        git add -f .
+        # squash commits
         git checkout --orphan squash1
-        git checkout gh-pages .
-        git add -f .
         git commit --quiet -am squash || true
         # reset branch-gh-pages to squashed-commit
         git push . -f squash1:gh-pages
         git checkout gh-pages
-        # force push squashed-commit
+        # force-push squashed-commit
         shGitCmdWithGithubToken push origin -f gh-pages
     fi
+    # list files
+    shGitLsTree
     # push branch-gh-pages
     shGitCmdWithGithubToken push origin gh-pages
 )}
@@ -94,8 +179,7 @@ if (!globalThis.debugInline) {
         return argList[0];
     };
 }
-// hack-jslint - cli
-let errMsg;
+let exitCode;
 function stringLineCount(data) {
 /*
  * this function will count number of newlines in <data>
@@ -126,6 +210,7 @@ async function jslint2({
         /\.\w+?$|$/m
     ).exec(file)[0]) {
     case ".css":
+        /*
         errList = CSSLint.verify( // jslint ignore:line
             code
         ).messages.map(function (err) {
@@ -135,6 +220,7 @@ async function jslint2({
             );
             return err;
         });
+        errList = [];
         // ignore comment
         code = code.replace((
             /^\u0020*?\/\*[\S\s]*?\*\/\u0020*?$/gm
@@ -231,6 +317,7 @@ async function jslint2({
             previous = match0;
             return "";
         });
+        */
         break;
     case ".html":
         // recurse
@@ -246,7 +333,7 @@ async function jslint2({
         });
         // recurse
         code.replace((
-            /^<script>\n([\S\s]*?\n)<\/script>$/gm
+            /^<script\b[^>]*?>\n([\S\s]*?\n)<\/script>$/gm
         ), function (ignore, match1, ii) {
             jslint2({
                 code: match1,
@@ -298,7 +385,7 @@ async function jslint2({
             "global", "globalThis"
         ]).warnings;
     }
-    errMsg = errList.filter(function ({
+    errList = errList.filter(function ({
         message
     }) {
         return message;
@@ -329,64 +416,71 @@ async function jslint2({
             ("    " + String(source_line).trim()).slice(0, 72) +
             ((ii === 0 && stack) || "")
         );
-    }).join("\n");
-    if (errMsg) {
+    });
+    if (errList.length > 0) {
+        exitCode = 1;
         // print err to stderr
-        console.error("\u001b[1mjslint " + file + "\u001b[22m\n" + errMsg);
+        console.error(
+            "\u001b[1mjslint " + file + "\u001b[22m\n" + errList.join("\n")
+        );
     }
 }
-let file;
-file = process.argv[1];
-if (file === ".") {
-    await Promise.all(readdirSync(".").map(async function (file) {
-        let code;
-        let timeStart;
-        timeStart = Date.now();
-        switch ((
-            /\.\w+?$|$/m
-        ).exec(file)[0]) {
-        case ".css":
-        case ".html":
-        case ".js":
-        // case ".json":
-        case ".md":
-        // case ".sh":
-            break;
-        default:
-            return;
-        }
-        try {
-            code = await promises.readFile(file, "utf8");
-        } catch (ignore) {
-            return;
-        }
-        if (!(
-            !(
-                /\b(?:assets\.app\.js|lock|min|raw|rollup)\b/
-            ).test(file) &&
-            code &&
-            code.length < 1048576 &&
-            (
-                /^\/\*\u0020jslint\u0020utility2:true\u0020\*\/$/m
-            ).test(code.slice(0, 65536))
-        )) {
-            return;
-        }
+(async function () {
+    let file;
+    file = process.argv[1];
+    if (file === ".") {
+        await Promise.all(readdirSync(".").map(async function (file) {
+            let code;
+            let timeStart;
+            timeStart = Date.now();
+            switch ((
+                /\.\w+?$|$/m
+            ).exec(file)[0]) {
+            // case ".css":
+            case ".html":
+            case ".js":
+            // case ".json":
+            case ".md":
+            // case ".sh":
+                break;
+            default:
+                return;
+            }
+            try {
+                code = await promises.readFile(file, "utf8");
+            } catch (ignore) {
+                return;
+            }
+            if (!(
+                !(
+                    /\b(?:assets\.app\.js|lock|min|raw|rollup)\b/
+                ).test(file) &&
+                code &&
+                /*
+                (
+                    /^\/\*jslint\b/m
+                ).test(code.slice(0, 65536)) &&
+                */
+                code.length < 1048576
+            )) {
+                return;
+            }
+            jslint2({
+                code,
+                file
+            });
+            console.error(
+                "jslint - " + (Date.now() - timeStart) + "ms - " + file
+            );
+        }));
+    } else {
         jslint2({
-            code,
+            code: readFileSync(file, "utf8"),
             file
         });
-        console.error(
-            "jslint - " + (Date.now() - timeStart) + "ms - " + file
-        );
-    }));
-} else {
-    jslint2({
-        code: readFileSync(file, "utf8"),
-        file
-    });
-}
-process.exit(Boolean(errMsg) | 0);
+    }
+    process.exit(exitCode);
+}());
 ' --input-type=module "$@" # '
 )}
 
@@ -451,7 +545,6 @@ if (!globalThis.debugInline) {
 <head>
 <title>coverage-report</title>
 <style>
-/* jslint utility2:true */
 /* csslint ignore:start */
 * {
 box-sizing: border-box;

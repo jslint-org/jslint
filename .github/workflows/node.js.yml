@@ -17,27 +17,34 @@ on:
     # - beta
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        node-version:
-        # - 12.x
-        - 14.x
-        # - 16.x
+        node_version:
+          - 12
+          - 14
+          - 16
+        architecture:
+          # - arm64
+          - x64
+          # - x86
+        os:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
+    name: node . v${{ matrix.node_version }} . ${{ matrix.architecture }} . ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-    - name: fetch ci.sh from trusted source
-      run: git fetch origin alpha && git checkout origin/alpha ci.sh
-    - name: run ci
-      run: sh ci.sh shGithubCi
-    - name: push build-artifacts to branch-gh-pages
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: sh ci.sh shGithubUploadArtifact
-    # - run: npm ci
-    # - run: npm run build --if-present
-    # - run: npm test
+      # https://github.com/actions/checkout
+      - uses: actions/checkout@v2
+      # https://github.com/actions/setup-node
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node_version }}
+          architecture: ${{ matrix.architecture }}
+      # fetch ci.sh from trusted source
+      - run: git fetch origin alpha && git checkout origin/alpha ci.sh
+      - run: sh ci.sh shGithubCi
+      - run: sh ci.sh shGithubArtifactUpload
+        env:
+          CI_NODE_VERSION_ARCH_PLATFORM: v14.x64.linux
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
