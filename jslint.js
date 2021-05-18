@@ -1,5 +1,5 @@
 // jslint.js
-// 2020-11-06
+// 2021-05-17
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -114,12 +114,12 @@
     unexpected_char_a, unexpected_comment, unexpected_directive_a,
     unexpected_expression_a, unexpected_label_a, unexpected_parens,
     unexpected_space_a_b, unexpected_statement_a, unexpected_trailing_space,
-    unexpected_typeof_a, uninitialized_a, unreachable_a,
-    unregistered_property_a, unused_a, use_double, use_open, use_spaces,
-    used, value, var_loop, var_switch, variable, warning, warnings,
-    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
-    wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary,
-    wrapped, writable, y
+    unexpected_typeof_a, uninitialized_a, unordered_param_a,
+    unordered_property_a, unreachable_a, unregistered_property_a, unused_a,
+    use_double, use_open, use_spaces, used, value, var_loop, var_switch,
+    variable, warning, warnings, weird_condition_a, weird_expression_a,
+    weird_loop, weird_relation_a, white, wrap_condition, wrap_immediate,
+    wrap_parameter, wrap_regexp, wrap_unary, wrapped, writable, y
 */
 
 function empty() {
@@ -158,11 +158,11 @@ const allowed_option = {
         "TextDecoder", "TextEncoder", "URL", "window", "Worker",
         "XMLHttpRequest"
     ],
+    convert: true,
     couch: [
         "emit", "getRow", "isArray", "log", "provides", "registerType",
         "require", "send", "start", "sum", "toJSON"
     ],
-    convert: true,
     devel: [
         "alert", "confirm", "console", "prompt"
     ],
@@ -202,10 +202,10 @@ const opener = {
 
 // The open and close pairs.
 
+    "${": "}",      // mega
     "(": ")",       // paren
     "[": "]",       // bracket
-    "{": "}",       // brace
-    "${": "}"       // mega
+    "{": "}"        // brace
 };
 
 // The relational operators.
@@ -327,6 +327,12 @@ const bundle = {
         "Unexpected 'typeof'. Use '===' to compare directly with {a}."
     ),
     uninitialized_a: "Uninitialized '{a}'.",
+    unordered_param_a: (
+        "Parameter '{a}' not listed in alphabetical order."
+    ),
+    unordered_property_a: (
+        "Property name '{a}' not listed in alphabetical order."
+    ),
     unreachable_a: "Unreachable '{a}'.",
     unregistered_property_a: "Unregistered property name '{a}'.",
     unused_a: "Unused '{a}'.",
@@ -544,10 +550,10 @@ function warn_at(code, line, column, a, b, c, d) {
 // resembles an exception.
 
     const warning = {         // ~~
-        name: "JSLintError",
+        code,
         column,
         line,
-        code
+        name: "JSLintError"
     };
     if (a !== undefined) {
         warning.a = a;
@@ -2742,6 +2748,8 @@ function parameter_list() {
             let ellipsis = false;
             let param;
             if (next_token.id === "{") {
+                let a;
+                let b = "";
                 if (optional !== undefined) {
                     warn(
                         "required_a_optional_b",
@@ -2760,6 +2768,11 @@ function parameter_list() {
                         return stop("expected_identifier_a");
                     }
                     survey(subparam);
+                    a = b;
+                    b = String(subparam.value || subparam.id);
+                    if (a > b) {
+                        warn("unordered_param_a", subparam);
+                    }
                     advance();
                     signature.push(subparam.id);
                     if (next_token.id === ":") {
@@ -3065,12 +3078,19 @@ prefix("{", function () {
     const seen = empty();
     the_brace.expression = [];
     if (next_token.id !== "}") {
+        let a;
+        let b = "";
         (function member() {
             let extra;
             let full;
             let id;
             let name = next_token;
             let value;
+            a = b;
+            b = String(name.value || name.id);
+            if (a > b) {
+                warn("unordered_property_a", name);
+            }
             advance();
             if (
                 (name.id === "get" || name.id === "set")
@@ -3217,6 +3237,8 @@ function do_var() {
     }
     (function next() {
         if (next_token.id === "{" && the_statement.id !== "var") {
+            let a;
+            let b = "";
             const the_brace = next_token;
             advance("{");
             (function pair() {
@@ -3225,6 +3247,11 @@ function do_var() {
                 }
                 const name = next_token;
                 survey(name);
+                a = b;
+                b = String(name.value || name.id);
+                if (a > b) {
+                    warn("unordered_param_a", name);
+                }
                 advance();
                 if (next_token.id === ":") {
                     advance(":");
@@ -3929,9 +3956,9 @@ function lookup(thing) {
                 }
                 the_variable = {
                     dead: false,
-                    parent: global,
                     id: thing.id,
                     init: true,
+                    parent: global,
                     role: "variable",
                     used: 0,
                     writable: false
@@ -4906,10 +4933,10 @@ export default Object.freeze(function jslint(
         );
         functions = [];
         global = {
-            id: "(global)",
             body: true,
             context: empty(),
             from: 0,
+            id: "(global)",
             level: 0,
             line: 0,
             live: [],
@@ -4991,7 +5018,7 @@ export default Object.freeze(function jslint(
     }
     return {
         directives,
-        edition: "2020-11-06",
+        edition: "2021-05-17",
         exports,
         froms,
         functions,
