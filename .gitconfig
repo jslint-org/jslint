@@ -1,0 +1,23 @@
+[branch "alpha"]
+    merge = refs/heads/alpha
+    remote = origin
+[branch "base"]
+    merge = refs/heads/base
+    remote = origin
+[core]
+    # autocrlf = false
+    autocrlf = input
+    bare = false
+    # filemode = false
+    logallrefupdates = true
+    repositoryformatversion = 0
+[diff]
+    algorithm = histogram
+[receive]
+    denyCurrentBranch = warn
+[remote "origin"]
+    fetch = +refs/heads/*:refs/remotes/origin/*
+    url = https://github.com/user/jslint
+[remote "upstream"]
+    fetch = +refs/heads/*:refs/remotes/upstream/*
+    url = https://github.com/jslint-org/jslint
