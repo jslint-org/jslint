@@ -1,4 +1,119 @@
 #!/bin/sh
+: '
+/* jslint utility2:true */
+'
+
+shBrowserScreenshot() {(set -e
+# this function will screenshot url "$1" with headless-chrome
+    node -e '
+// init debugInline
+if (!globalThis.debugInline) {
+    let consoleError;
+    consoleError = console.error;
+    globalThis.debugInline = function (...argList) {
+    /*
+     * this function will both print <argList> to stderr and
+     * return <argList>[0]
+     */
+        consoleError("\n\ndebugInline");
+        consoleError(...argList);
+        consoleError("\n");
+        return argList[0];
+    };
+}
+(function () {
+    "use strict";
+    let file;
+    let timeStart;
+    let url;
+    if (process.platform !== "linux") {
+        return;
+    }
+    timeStart = Date.now();
+    url = process.argv[1];
+    if (!(
+        /^\w+?:/
+    ).test(url)) {
+        url = require("path").resolve(url);
+    }
+    file = require("url").parse(url).pathname;
+    // remove prefix $PWD from file
+    if (String(file + "/").indexOf(process.cwd() + "/") === 0) {
+        file = file.replace(process.cwd(), "");
+    }
+    file = ".build/screenshot.browser." + encodeURIComponent(file);
+    process.on("exit", function (exitCode) {
+        if (typeof exitCode === "object" && exitCode) {
+            console.error(exitCode);
+            exitCode = 1;
+        }
+        console.error(
+            "shBrowserScreenshot" +
+            "\n  - url - " + url +
+            "\n  - wrote - " + file + ".html" +
+            "\n  - wrote - " + file + ".png" +
+            "\n  - timeElapsed - " + (Date.now() - timeStart) + " ms" +
+            "\n  - EXIT_CODE=" + exitCode
+        );
+    });
+    [
+        ".html", ".png"
+    ].forEach(function (extname) {
+        let argList;
+        let child;
+        argList = Array.from([
+            "--headless",
+            "--ignore-certificate-errors",
+            "--incognito",
+            "--timeout=30000",
+            "--user-data-dir=/dev/null",
+            "--window-size=800x600",
+            (
+                extname === ".html"
+                ? "--dump-dom"
+                : ""
+            ),
+            (
+                extname === ".png"
+                ? "--screenshot"
+                : ""
+            ),
+            (
+                extname === ".png"
+                ? "-screenshot=" + file + ".png"
+                : ""
+            ),
+            (
+                (process.getuid && process.getuid() === 0)
+                ? "--no-sandbox"
+                : ""
+            ),
+            url
+        ]).filter(function (elem) {
+            return elem;
+        });
+        // debug argList
+        // console.error(argList);
+        child = require("child_process").spawn((
+            process.platform === "darwin"
+            ? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+            : process.platform === "win32"
+            ? "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+            : "/usr/bin/google-chrome-stable"
+        ), argList, {
+            stdio: [
+                "ignore", "pipe", 2
+            ]
+        });
+        child.stdout.pipe(
+            extname === ".html"
+            ? require("fs").createWriteStream(file + ".html")
+            : process.stdout
+        );
+    });
+}());
+' "$1" # '
+)}
 
 shGitCmdWithGithubToken() {(set -e
 # this function will run git $CMD with $GITHUB_TOKEN
@@ -102,7 +217,16 @@ shGithubCi() {(set -e
     # jslint all files
     shJslintCli .
     # create coverage-report
-    shV8CoverageReport shJslintCli jslint.js
+    shRunWithCoverage shJslintCli jslint.js
+    # screenshot coverage-report
+    shBrowserScreenshot .build/coverage/jslint.js.html
+    # screenshot live-web-demo
+    shBrowserScreenshot https://jslint.com/index.html
+    if [ -f .build/screenshot.browser.%2Findex.html.png ]
+    then
+        mv .build/screenshot.browser.%2Findex.html.png \
+            .build/screenshot.browser.%2Fjslint.com%2Findex.html.png
+    fi
 )}
 
 shGithubArtifactUpload() {(set -e
@@ -119,9 +243,9 @@ process.exit(
     # init .git/config
     git config --local user.email "github-actions@users.noreply.github.com"
     git config --local user.name "github-actions"
-    # commit coverage-report
-    git add -f .coverage/
-    git commit -am "add coverage-report"
+    # add dir .build
+    git add -f .build/
+    git commit -am "add dir .build"
     # checkout branch-gh-pages
     git checkout -b gh-pages
     git fetch origin gh-pages
@@ -136,6 +260,11 @@ process.exit(
         rm -rf .git
         git add -f .
     )
+    # update root-dir with branch-master
+    if [ "$BRANCH" = master ]
+    then
+        git checkout master .
+    fi
     git status
     git commit -am "update dir branch.$BRANCH" || true
     # if branch-gh-pages has more than 100 commits,
@@ -157,6 +286,12 @@ process.exit(
     shGitLsTree
     # push branch-gh-pages
     shGitCmdWithGithubToken push origin gh-pages
+    # validate http-links in README.md
+    (set -e
+        cd "branch.$BRANCH"
+        sleep 15
+        shReadmeLinkValidate
+    )
 )}
 
 shJslintCli() {(set -e
@@ -200,11 +335,9 @@ function stringLineCount(data) {
 }
 async function jslint2({
     code,
-    err,
     errList = [],
     file,
-    lineOffset = 0,
-    previous
+    lineOffset = 0
 }) {
     switch ((
         /\.\w+?$|$/m
@@ -350,8 +483,8 @@ async function jslint2({
         ), function (ignore, match1, ii) {
             jslint2({
                 code: match1.replace((
-                    /'"'"'"'"'"'"'"'"'/g
-                ), "'"'"'"),
+                    /\u0027"\u0027"\u0027/g
+                ), "\u0027"),
                 file: file + ".<```javascript>.js",
                 lineOffset: stringLineCount(code.slice(0, ii)) + 1
             });
@@ -361,12 +494,12 @@ async function jslint2({
     case ".sh":
         // recurse
         code.replace((
-            /\bnode\u0020-e\u0020'"'"'\n([\S\s]*?\n)'"'"'/gm
+            /\bnode\u0020-e\u0020\u0027\n([\S\s]*?\n)\u0027/gm
         ), function (ignore, match1, ii) {
             jslint2({
                 code: match1.replace((
-                    /'"'"'"'"'"'"'"'"'/g
-                ), "'"'"'"),
+                    /\u0027"\u0027"\u0027/g
+                ), "\u0027"),
                 file: file + ".<node -e>.js",
                 lineOffset: stringLineCount(code.slice(0, ii)) + 1
             });
@@ -484,11 +617,62 @@ async function jslint2({
 ' --input-type=module "$@" # '
 )}
 
-shV8CoverageReport() {(set -e
-# this function will create coverage-report .coverage/index.html from
-# nodejs command "$@"
-    rm -rf .coverage/
-    (export NODE_V8_COVERAGE=.coverage/ && "$@" || true)
+shReadmeLinkValidate() {(set -e
+# this function will validate http-links embedded in README.md
+    node -e '
+(function () {
+    "use strict";
+    let dict = {};
+    require("fs").readFileSync("README.md", "utf8").replace((
+        /[(\[]https?:\/\/.*?[)\]]/g
+    ), function (match0) {
+        if (match0.indexOf("http://") === 0) {
+            throw new Error("shReadmeLinkValidate - insecure link " + match0);
+        }
+        match0 = match0.slice(1, -1).replace((
+            /[\u0022\u0027]/g
+        ), "").replace((
+            /\/branch\.\w+?\//g
+        ), "/branch.alpha/");
+        // ignore private-link
+        if (
+            process.env.npm_package_private &&
+            match0.indexOf("https://github.com/") === 0
+        ) {
+            return;
+        }
+        // ignore duplicate-link
+        if (dict.hasOwnProperty(match0)) {
+            return;
+        }
+        dict[match0] = true;
+        let req = require("https").request(require("url").parse(
+            match0
+        ), function (res) {
+            console.log(
+                "shReadmeLinkValidate " + res.statusCode + " " + match0
+            );
+            if (!(res.statusCode < 400)) {
+                throw new Error(
+                    "shReadmeLinkValidate - unreachable link " + match0
+                );
+            }
+            req.abort();
+            res.destroy();
+        });
+        req.setTimeout(30000);
+        req.end();
+    });
+}());
+' # '
+)}
+
+shRunWithCoverage() {(set -e
+# this function will run nodejs command "$@" with v8-coverage and
+# create coverage-report .build/coverage/index.html
+    export DIR_COVERAGE=.build/coverage/
+    rm -rf "$DIR_COVERAGE"
+    (export NODE_V8_COVERAGE="$DIR_COVERAGE" && "$@" || true)
     node -e '
 // init debugInline
 if (!globalThis.debugInline) {
@@ -507,6 +691,7 @@ if (!globalThis.debugInline) {
 }
 (async function () {
     "use strict";
+    let DIR_COVERAGE = process.env.DIR_COVERAGE;
     let cwd;
     let data;
     let fileDict;
@@ -530,7 +715,7 @@ if (!globalThis.debugInline) {
             ), "&amp;").replace((
                 /"/gu
             ), "&quot;").replace((
-                /'"'"'/gu
+                /\u0027/gu
             ), "&apos;").replace((
                 /</gu
             ), "&lt;").replace((
@@ -704,6 +889,41 @@ body {
                 /..$/m
             ), ".$&");
             if (!lineList && ii === 0) {
+                let fill = (
+                    // red
+                    "#" + Math.round(
+                        (100 - Number(coveragePct)) * 2.21
+                    ).toString(16).padStart(2, "0")
+                    // green
+                    + Math.round(
+                        Number(coveragePct) * 2.21
+                    ).toString(16).padStart(2, "0") +
+                    // blue
+                    "00"
+                );
+                let str1 = "coverage";
+                let str2 = coveragePct + " %";
+                let xx1 = 6 * str1.length + 20;
+                let xx2 = 6 * str2.length + 20;
+                // fs - write coverage-badge.svg
+                require("fs").promises.writeFile((
+                    DIR_COVERAGE + "/coverage-badge.svg"
+                ), String(`
+<svg height="20" width="${xx1 + xx2}" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#555" height="20" width="${xx1 + xx2}"/>
+<rect fill="${fill}" height="20" width="${xx2}" x="${xx1}"/>
+<g
+    fill="#fff"
+    font-family="dejavu sans,verdana,geneva,sans-serif"
+    font-size="11"
+    font-weight="bold"
+    text-anchor="middle"
+>
+<text x="${0.5 * xx1}" y="14">${str1}</text>
+<text x="${xx1 + 0.5 * xx2}" y="14">${str2}</text>
+</g>
+</svg>
+                `).trim() + "\n");
                 pathname = "";
             }
             txt += (
@@ -840,25 +1060,29 @@ ${String(count).padStart(7, " ")}
         await require("fs").promises.mkdir(require("path").dirname(pathname), {
             recursive: true
         });
-        if (!lineList) {
-            console.error("\n" + txt);
-            await require("fs").promises.writeFile((
-                ".coverage/coverage.txt"
-            ), txt);
+        // fs - write *.html
+        require("fs").promises.writeFile(pathname + ".html", html);
+        if (lineList) {
+            return;
         }
-        await require("fs").promises.writeFile(pathname + ".html", html);
+        // fs - write coverage.txt
+        console.error("\n" + txt);
+        require("fs").promises.writeFile((
+            DIR_COVERAGE + "/coverage-report.txt"
+        ), txt);
     }
-    data = await require("fs").promises.readdir(".coverage/");
+    data = await require("fs").promises.readdir(DIR_COVERAGE);
     await Promise.all(data.map(async function (file) {
         if ((
             /^coverage-.*?\.json$/
         ).test(file)) {
             data = await require("fs").promises.readFile((
-                ".coverage/" + file
+                DIR_COVERAGE + file
             ), "utf8");
+            // fs - rename to coverage-v8.json
             require("fs").promises.rename(
-                ".coverage/" + file,
-                ".coverage/coverage_v8.json"
+                DIR_COVERAGE + file,
+                DIR_COVERAGE + "coverage-v8.json"
             );
         }
     }));
@@ -922,14 +1146,6 @@ ${String(count).padStart(7, " ")}
                 startOffset
             }, ii, list) {
                 lineList.forEach(function (elem) {
-                    /*
-                    debugInline(
-                        count,
-                        [elem.startOffset, startOffset],
-                        [elem.endOffset, endOffset],
-                        elem.line
-                    );
-                    */
                     if (!(
                         (
                             elem.startOffset <= startOffset &&
@@ -971,7 +1187,7 @@ ${String(count).padStart(7, " ")}
             return count > 0;
         }).length;
         await require("fs").promises.mkdir((
-            require("path").dirname(".coverage/" + pathname)
+            require("path").dirname(DIR_COVERAGE + pathname)
         ), {
             recursive: true
         });
@@ -984,7 +1200,7 @@ ${String(count).padStart(7, " ")}
                 }
             ],
             lineList,
-            pathname: ".coverage/" + pathname
+            pathname: DIR_COVERAGE + pathname
         });
         fileDict[pathname] = {
             lineList,
@@ -998,10 +1214,94 @@ ${String(count).padStart(7, " ")}
         fileList: Object.keys(fileDict).sort().map(function (pathname) {
             return fileDict[pathname];
         }),
-        pathname: ".coverage/index"
+        pathname: DIR_COVERAGE + "index"
     });
 }());
 ' # '
+)}
+
+shRunWithScreenshotTxt() {(set -e
+# this function will run cmd "$@" and screenshot text-output
+# https://www.cnx-software.com/2011/09/22/how-to-convert-a-command-line-result-into-an-image-in-linux/
+    local EXIT_CODE
+    EXIT_CODE=0
+    export SCREENSHOT_SVG=.build/screenshot.svg
+    rm -f "$SCREENSHOT_SVG"
+    printf "0\n" > "$SCREENSHOT_SVG.exit_code"
+    shCiPrint "shRunWithScreenshotTxt - (shRun $* 2>&1)"
+    (
+        (shRun "$@" 2>&1) || printf "$?\n" > "$SCREENSHOT_SVG.exit_code"
+    ) | tee /tmp/shRunWithScreenshotTxt.txt
+    EXIT_CODE="$(cat "$SCREENSHOT_SVG.exit_code")"
+    shCiPrint "shRunWithScreenshotTxt - EXIT_CODE=$EXIT_CODE"
+    # run shRunWithScreenshotTxtAfter
+    if (type shRunWithScreenshotTxtAfter > /dev/null 2>&1)
+    then
+        eval shRunWithScreenshotTxtAfter
+        unset shRunWithScreenshotTxtAfter
+    fi
+    # format text-output
+    node -e '
+(function () {
+    "use strict";
+    let result;
+    let yy;
+    yy = 10;
+    result = require("fs").readFileSync(
+        require("os").tmpdir() + "/shRunWithScreenshotTxt.txt",
+        "utf8"
+    );
+    // remove ansi escape-code
+    result = result.replace((
+        /\u001b.*?m/g
+    ), "");
+    // format unicode
+    result = result.replace((
+        /\\u[0-9a-f]{4}/g
+    ), function (match0) {
+        return String.fromCharCode("0x" + match0.slice(-4));
+    }).trimEnd();
+    // 96 column wordwrap
+    result = result.replace((
+        /^.*?$/gm
+    ), function (line) {
+        return line.replace((
+            /.{0,96}/g
+        ), function (line, ii) {
+            if (ii && !line) {
+                return "";
+            }
+            yy += 16;
+            return "<tspan x=\"10\" y=\"" + yy + "\">" + line.replace((
+                /&/g
+            ), "&amp;").replace((
+                /</g
+            ), "&lt;").replace((
+                />/g
+            ), "&gt;") + "</tspan>";
+        }).replace((
+            /(<\/tspan><tspan)/g
+        ), "\\$1").slice();
+    }) + "\n";
+    result = (
+        "<svg height=\"" + (yy + 20) +
+        "px\" width=\"720px\" xmlns=\"http://www.w3.org/2000/svg\">\n" +
+        "<rect height=\"" + (yy + 20) +
+        "px\" fill=\"#555\" width=\"720px\"></rect>\n" +
+        "<text fill=\"#7f7\" font-family=\"Consolas, Menlo, monospace\" " +
+        "font-size=\"12\" xml:space=\"preserve\">\n" +
+        result + "</text>\n</svg>\n"
+    );
+    try {
+        require("fs").mkdirSync(require("path").dirname(process.argv[1]), {
+            recursive: true
+        });
+    } catch (ignore) {}
+    require("fs").writeFileSync(process.argv[1], result);
+}());
+' "$SCREENSHOT_SVG" # '
+    shCiPrint "shRunWithScreenshotTxt - wrote - $SCREENSHOT_SVG"
+    return "$EXIT_CODE"
 )}
 
 # run "$@"
