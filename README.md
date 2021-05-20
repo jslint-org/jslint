@@ -16,7 +16,7 @@ douglas@crockford.com
 ## Live Web Demo
 - [https://jslint-org.github.io/jslint/index.html](https://jslint-org.github.io/jslint/index.html)
 
-[![screenshot](https://jslint-org.github.io/jslint/branch.alpha/.build/screenshot.browser.%252Findex.html.png)](https://jslint-org.github.io/jslint/index.html)
+[![screenshot](https://jslint-org.github.io/jslint/branch.master/.build/screenshot.browser.%252Findex.html.png)](https://jslint-org.github.io/jslint/index.html)
 
 ## Description
 `jslint.js` contains the jslint function. It parses and analyzes a source file,
