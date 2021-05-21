@@ -3,6 +3,10 @@
 /* jslint utility2:true */
 '
 
+# sh one-liner
+# git fetch origin alpha beta master && git fetch upstream alpha beta master
+# sh ci.sh shCiBranchPromote origin alpha beta
+
 shBrowserScreenshot() {(set -e
 # this function will run headless-chrome to screenshot url $1 with
 # window-size $2
@@ -201,6 +205,21 @@ shCiBase() {(set -e
     shBrowserScreenshot index.html
 )}
 
+shCiBranchPromote() {(set -e
+# this function will promote branch $REMOTE/$BRANCH1 to branch $REMOTE/$BRANCH2
+    local BRANCH1
+    local BRANCH2
+    local REMOTE
+    REMOTE="$1"
+    shift
+    BRANCH1="$1"
+    shift
+    BRANCH2="$1"
+    shift
+    git fetch "$REMOTE" "$BRANCH1"
+    git push "$REMOTE" "$REMOTE/$BRANCH1:$BRANCH2" "$@"
+)}
+
 shDirHttplinkValidate() {(set -e
 # this function will validate http-links embedded in .html and .md files
     node -e '
@@ -216,8 +235,8 @@ shDirHttplinkValidate() {(set -e
         let data = await require("fs").promises.readFile(file, "utf8");
         data.replace((
             /\bhttps?:\/\/.*?(?:[")\]]|$)/gm
-        ), function (match0) {
-            match0 = match0.slice(0, -1).replace((
+        ), function (url) {
+            url = url.slice(0, -1).replace((
                 /[\u0022\u0027]/g
             ), "").replace((
                 /\/branch\.\w+?\//g
@@ -228,26 +247,26 @@ shDirHttplinkValidate() {(set -e
             ), String(
                 process.env.GITHUB_REPOSITORY || "jslint-org/jslint"
             ).replace("/", ".github.io/"));
-            if (match0.indexOf("http://") === 0) {
+            if (url.indexOf("http://") === 0) {
                 throw new Error(
-                    "shDirHttplinkValidate - insecure link " + match0
+                    "shDirHttplinkValidate - insecure link " + url
                 );
             }
             // ignore duplicate-link
-            if (dict.hasOwnProperty(match0)) {
+            if (dict.hasOwnProperty(url)) {
                 return "";
             }
-            dict[match0] = true;
+            dict[url] = true;
             let req = require("https").request(require("url").parse(
-                match0
+                url
             ), function (res) {
                 console.error(
-                    "shDirHttplinkValidate " + res.statusCode + " " + match0
+                    "shDirHttplinkValidate " + res.statusCode + " " + url
                 );
                 if (!(res.statusCode < 400)) {
                     throw new Error(
                         "shDirHttplinkValidate - " + file +
-                        " - unreachable link " + match0
+                        " - unreachable link " + url
                     );
                 }
                 req.abort();
@@ -258,20 +277,27 @@ shDirHttplinkValidate() {(set -e
             return "";
         });
         data.replace((
-            /(?:\bhref=|\bsrc=|\burl\().(.*?)(?:[")\]]|$)/gm
-        ), function (ignore, match1) {
+            /(\bhref=|\bsrc=|\burl\(|\[[^]*?\]\()("?.*?)(?:[")\]]|$)/gm
+        ), function (ignore, linkType, url) {
+            if (linkType[0] !== "[") {
+                url = url.slice(1);
+            }
+            // ignore duplicate-link
+            if (dict.hasOwnProperty(url)) {
+                return "";
+            }
+            dict[url] = true;
             if (!(
                 /^https?|^mailto:|^[#\/]/m
-            ).test(match1)) {
-                require("fs").stat(match1, function (ignore, exists) {
+            ).test(url)) {
+                require("fs").stat(url, function (ignore, exists) {
                     console.error(
-                        "shDirHttplinkValidate " + Boolean(exists) + " " +
-                        match1
+                        "shDirHttplinkValidate " + Boolean(exists) + " " + url
                     );
                     if (!exists) {
                         throw new Error(
                             "shDirHttplinkValidate - " + file +
-                            " - unreachable link " + match1
+                            " - unreachable link " + url
                         );
                     }
                 });

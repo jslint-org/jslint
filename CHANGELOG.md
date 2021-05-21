@@ -1,11 +1,14 @@
 # Changelog
 
 ## Todo
+- app - deploy jslint as chrome-extension
 - doc - add svg package-listing.
 - ci - continue addng regression tests and improve code-coverage.
 - none
 
-## v9999.99.99
+## Branch master
+- ci - validate non-http/file links in *.md files
+- ci - add shell-functions shCiBranchPromote
 - none
 
 ## v2021.5.21
