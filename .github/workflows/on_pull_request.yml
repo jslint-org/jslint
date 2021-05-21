@@ -1,13 +1,7 @@
-# this workflow will run nodejs coverages and tests and
-# upload build-artifacts to branch-gh-pages
-name: CI
+# this workflow will run nodejs coverages and tests
+name: on_pull_request
 on:
-  push:
-    branches:
-      - alpha
-      - beta
-      - master
-      - sandbox
+  - pull_request
 # shCiBase - start
 jobs:
   build:
@@ -40,10 +34,3 @@ jobs:
       # run nodejs coverages and tests
       - run: sh ci.sh shCiBase
 # shCiBase - end
-      # fetch ci.sh from trusted source
-      - run: git fetch origin alpha && git checkout origin/alpha ci.sh
-      # upload build-artifacts to branch-gh-pages
-      - run: sh ci.sh shCiArtifactUpload
-        env:
-          CI_NODE_VERSION_ARCH_PLATFORM: v14.x64.linux
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

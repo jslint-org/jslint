@@ -21,19 +21,20 @@ ECMAScript Programming Language Standard, Sixth Edition [ES6]."
 >
 <link
     rel="icon"
-    href="image/favicon.ico"
->
+    type="image/png"
+    href="image-jslint-64x64.png"
+/>
 <title>JSLint: Help</title>
 <style>
 @font-face {
-    font-family: 'Programma';
-    font-weight: normal;
-    src:  url('Programma-Bold.woff2') format('woff2');
+    font-family: "Programma";
+    font-weight: bold;
+    src: url("font-programma-bold.woff2") format("woff2");
 }
 @font-face {
-    font-family: 'Daley';
+    font-family: "Daley";
     font-weight: bold;
-    src:  url('Daley-Bold.woff2') format('woff2');
+    src: url("font-daley-bold.woff2") format("woff2");
 }
 body {
 	background-color: seashell;
@@ -204,16 +205,16 @@ a:active {
     there is a  better option then always use the better option. </blockquote>
 <p>JSLint is a JavaScript program that looks for problems in
     JavaScript programs. It is a code quality tool.</p>
-<p>When <a href="http://en.wikipedia.org/wiki/C_programming_language">C</a> was
-    a <a href="chistory.html">young</a>
+<p>When <a href="https://en.wikipedia.org/wiki/C_programming_language">C</a> was
+    a young
     programming language, there were several common programming errors that
     were not caught by the primitive compilers, so an accessory program called
-    <code><a href="http://en.wikipedia.org/wiki/Lint_programming_tool">lint</a></code>
+    <code><a href="https://en.wikipedia.org/wiki/Lint_programming_tool">lint</a></code>
     was developed that would scan a source file, looking for problems.</p>
 <p>As the language matured, the definition of the language was
     strengthened to eliminate some insecurities, and compilers got better
     at issuing warnings. <code>lint</code> is no longer needed.</p>
-<p><a href="http://javascript.crockford.com/">JavaScript</a> is a
+<p><a href="https://www.crockford.com/javascript/">JavaScript</a> is a
     young-for-its-age language. It was originally intended to do small tasks in
     webpages, tasks for which Java was too heavy and clumsy. But JavaScript is
     a surprisingly capable language, and it is now being used in larger
@@ -239,7 +240,7 @@ a:active {
     with the quality of your code and browsers are not. You should gladly accept
     all of JSLint's advice.</p>
 <p>JSLint can operate on JavaScript source
-    or <a href="http://www.JSON.org/">JSON</a> text.</p>
+    or <a href="https://www.JSON.org/">JSON</a> text.</p>
 <h1 id=es6>ECMAScript Sixth Edition</h1>
 <p>Some of
     ES6&rsquo;s features are good, so JSLint will recognize the good
@@ -330,7 +331,7 @@ a:active {
 <h1><code>/*jslint*/</code></h1>
 <p>The <code>/*jslint*/</code> directive allows for the control of several
     options. These options can also be set from the
-    <a href="http://JSLint.com/index.html">JSLint.com</a> user interface.</p>
+    <a href="https://www.JSLint.com/index.html">JSLint.com</a> user interface.</p>
 <table>
     <tbody>
         <tr>
@@ -378,10 +379,10 @@ a:active {
                 <code>String</code> functions are preferred</td>
         </tr>
         <tr>
-            <td id="couch">Assume <a href="http://couchdb.apache.org/">CouchDB</a></td>
+            <td id="couch">Assume <a href="https://couchdb.apache.org/">CouchDB</a></td>
             <td><code>couch</code></td>
             <td><code>true</code> if
-                <a href="http://couchdb.apache.org/">Couch DB</a>
+                <a href="https://couchdb.apache.org/">Couch DB</a>
                 globals should be predefined. It adds the same globals as this
                 directive:
                 <blockquote><code>/*global </code>
@@ -437,7 +438,7 @@ a:active {
             <td><code>true</code> if a line can contain more than 80 characters.</td>
         </tr>
         <tr>
-            <td id="node">Assume <a href="http://nodejs.org/">Node.js</a></td>
+            <td id="node">Assume <a href="https://nodejs.org/">Node.js</a></td>
             <td><code>node</code></td>
             <td><code>true</code> if Node.js globals should be predefined. It
                 will predefine globals that are used in the Node.js environment.
@@ -774,9 +775,9 @@ a:active {
 <p>I intend to continue to adapt JSLint based on your comments.
     Keep watching for improvements.</p>
 <h1 id=try>Try it</h1>
-<p><a href="http://www.JSLint.com" target="_blank">Try it.</a> Paste your script
+<p><a href="https://www.JSLint.com" target="_blank">Try it.</a> Paste your script
     into the window and click the
-    <a href="http://JSLint.com/index.html" target=jslint><button>JSLint</button></a>
+    <a href="https://www.JSLint.com/index.html" target=jslint><button>JSLint</button></a>
     button. The analysis is done by a script running on your machine.
     Your script is not sent over the network. You can set the options used.</p>
 <p>JSLint is written entirely in JavaScript, so it can run
@@ -799,14 +800,14 @@ a:active {
     dry mouth, cleaner code, and a reduced error rate.</p>
 <h1 id=reading>Further Reading</h1>
 <ul>
-    <li><a href=function.html>The <code>jslint</code> function.</a></li>
+    <li><a href="function.html">The <code>jslint</code> function.</a></li>
 </ul>
 <center>
-    <p><a href="http://javascript.crockford.com/code.html" target="_blank">
+    <p><a href="https://www.crockford.com/javascript/code.html" target="_blank">
         Code Conventions for the JavaScript Programming Language.</a></p>
-    <a href="http://www.JSLint.com/"><img src="image/jslintpill.gif" width="36" height="17" border="0"></a>
-    <a href="https://github.com/douglascrockford/JSLint"><img src="image/github.gif" width="39" height="16" border="0"></a><a href="http://www.JSON.org/"><img src="image/jsonpill.gif" width="36" height="17" border="0"></a>
-    <a href="http://www.1and1.com/?k_id=10219574"><img src="image/1and1pill.gif" width="36" height="17" border="0"></a>
+    <a href="https://www.JSLint.com/"><img src="image-jslint-64x64.png" height="20"></a>
+    <a href="https://github.com/jslint-org/jslint"><img src="image-github-brands.svg" height="20"></a>
+    <a href="https://www.JSON.org/"><img src="image-json160.gif" height="20"></a>
 </center>
 </body>
 </html>
