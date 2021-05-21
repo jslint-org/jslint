@@ -32,7 +32,7 @@ that sets options.
 
 `report.js` generates the results reports in HTML.
 
-`help.html` describes JSLint's usage. Please read it.
+`help.html` describes JSLint's usage. Please [read it](https://jslint-org.github.io/jslint/help.html).
 
 `function.html` describes the jslint function and the results it produces.
 
