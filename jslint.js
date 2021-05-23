@@ -85,7 +85,7 @@
 
 // WARNING: JSLint will hurt your feelings.
 
-/*property
+/*\property
     a, and, arity, assign, b, bad_assignment_a, bad_directive_a, bad_get,
     bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
     body, browser, c, calls, catch, closer, closure, code, column, concat,
@@ -163,6 +163,7 @@ const allowed_option = {
         "require", "send", "start", "sum", "toJSON"
     ],
     convert: true,
+    debug: true,
     devel: [
         "alert", "confirm", "console", "prompt"
     ],
@@ -229,8 +230,8 @@ const standard = [
     "Array", "ArrayBuffer", "Boolean", "DataView", "Date", "decodeURI",
     "decodeURIComponent", "encodeURI", "encodeURIComponent", "Error",
     "EvalError", "Float32Array", "Float64Array", "Generator",
-    "GeneratorFunction", "Int8Array", "Int16Array", "Int32Array", "Intl",
-    "JSON", "Map", "Math", "Number", "Object", "parseInt", "parseFloat",
+    "GeneratorFunction", "import", "Int8Array", "Int16Array", "Int32Array",
+    "Intl", "JSON", "Map", "Math", "Number", "Object", "parseInt", "parseFloat",
     "Promise", "Proxy", "RangeError", "ReferenceError", "Reflect", "RegExp",
     "Set", "String", "Symbol", "SyntaxError", "System", "TypeError",
     "Uint8Array", "Uint8ClampedArray", "Uint16Array", "Uint32Array",
@@ -564,6 +565,10 @@ function warn_at(code, line, column, a, b, c, d) {
         warning.d = d;
     }
     warning.message = supplant(bundle[code] || code, warning);
+// Include stack_trace for jslint to debug itself for errors.
+    if (option.debug) {
+        warning.stack_trace = new Error().stack;
+    }
     warnings.push(warning);
     return warning;
 }
@@ -2411,6 +2416,7 @@ symbol(",");
 symbol(";");
 symbol(":");
 symbol("*/");
+symbol("async");
 symbol("await");
 symbol("case");
 symbol("catch");
@@ -2991,8 +2997,11 @@ function do_async() {
     }
     token = next_token;
     next_token = dispense();
-    the_async.expression = do_function();
-    if (!the_async.expression.hasAwait) {
+    const the_function = do_function();
+    the_function.arity = the_async.arity;
+    the_function.isAsync = true;
+    the_async.expression = the_function;
+    if (!the_function.hasAwait) {
         warn("missing_await_statement", the_async);
     }
     return the_async;
@@ -4906,7 +4915,7 @@ function whitage() {
 
 // The jslint function itself.
 
-export default Object.freeze(function jslint(
+function jslint(
     source = "",
     option_object = empty(),
     global_array = []
@@ -5008,6 +5017,10 @@ export default Object.freeze(function jslint(
         }
         early_stop = false;
     } catch (e) {
+        e.column = e.column || -1;
+        e.early_stop = true;
+        e.line = e.line || -1;
+        e.message = "[JSLint was unable to finish] - " + e.message;
         if (e.name !== "JSLintError") {
             warnings.push(e);
         }
@@ -5035,7 +5048,331 @@ export default Object.freeze(function jslint(
         tokens,
         tree,
         warnings: warnings.sort(function (a, b) {
-            return a.line - b.line || a.column - b.column;
+            return (
+                Boolean(b.early_stop) - Boolean(a.early_stop)
+                || a.line - b.line || a.column - b.column
+            );
         })
     };
-});
+}
+export default Object.freeze(jslint);
+
+(async function cli() {
+/*
+ * this function will run jslint from nodejs-cli
+ */
+    // feature-detect nodejs-cli
+    if (!(
+        typeof process === "object"
+        && process
+        && process.versions
+        && typeof process.versions.node === "string"
+        && (/\bjslint.m?js$|$/m).test(import.meta.url)
+    )) {
+        return;
+    }
+    const fs = await import("fs");
+    const {
+        readFile,
+        readdir
+    } = fs.promises;
+    let exitCode;
+    function stringLineCount(data) {
+    /*
+     * this function will count number of newlines in <data>
+     */
+        let cnt;
+        let ii;
+        // https://jsperf.com/regexp-counting-2/8
+        cnt = 0;
+        ii = 0;
+        while (true) {
+            ii = data.indexOf("\n", ii) + 1;
+            if (ii === 0) {
+                break;
+            }
+            cnt += 1;
+        }
+        return cnt;
+    }
+    function jslint2({
+        code,
+        errList = [],
+        file,
+        lineOffset = 0
+    }) {
+        switch ((
+            /\.\w+?$|$/m
+        ).exec(file)[0]) {
+        case ".css":
+            /*
+            errList = CSSLint.verify( // jslint ignore:line
+                code
+            ).messages.map(function (err) {
+                err.message = (
+                    err.type + " - " + err.rule.id + " - " + err.message
+                    + "\n    " + err.rule.desc
+                );
+                return err;
+            });
+            errList = [];
+            // ignore comment
+            code = code.replace((
+                /^\u0020*?\/\*[\S\s]*?\*\/\u0020*?$/gm
+            ), function (match0) {
+                // preserve lineno
+                return match0.replace((
+                    /.+/g
+                ), "");
+            });
+            code.replace((
+                /\S\u0020{2}|\u0020,|^\S.*?,.|[;{}]./gm
+            ), function (match0, ii) {
+                switch (match0.slice(-2)) {
+                case "  ":
+                    err = {
+                        message: "unexpected multi-whitespace"
+                    };
+                    break;
+                case " ,":
+                    err = {
+                        message: "unexpected whitespace before comma"
+                    };
+                    break;
+                default:
+                    err = {
+                        message: "unexpected multiline-statement"
+                    };
+                }
+                errList.push(Object.assign(err, {
+                    col: 1,
+                    evidence: match0,
+                    line: stringLineCount(code.slice(0, ii))
+                }));
+                return "";
+            });
+            // validate line-sorted - css-selector
+            previous = "";
+            code = code.replace((
+                /^.|[#.>]|[,}]$|\u0020\{$|\b\w/gm
+            ), function (match0) {
+                switch (match0) {
+                case " ":
+                    return match0;
+                case " {":
+                    return "\u0001" + match0;
+                case "#":
+                    return "\u0002" + match0;
+                case ",":
+                    return "\u0000" + match0;
+                case ".":
+                    return "\u0001" + match0;
+                case ">":
+                    return "\u0003" + match0;
+                case "}":
+                    return match0;
+                default:
+                    return "\u0000" + match0;
+                }
+            });
+            code.replace((
+                /\n{2,}|^\u0000@|^\}\n\}|\}|^(?:\S.*?\n)+/gm
+            ), function (match0, ii) {
+                switch (match0.slice(0, 2)) {
+                case "\n\n":
+                case "\u0000@":
+                case "}\n":
+                    previous = "";
+                    return "";
+                case "}":
+                    return "";
+                }
+                match0 = match0.trim();
+                err = (
+                    !(previous < match0)
+                    ? {
+                        message: "lines not sorted\n" + previous + "\n" + match0
+                    }
+                    : match0.split("\n").sort().join("\n") !== match0
+                    ? {
+                        message: "lines not sorted\n" + match0
+                    }
+                    : undefined
+                );
+                if (err) {
+                    errList.push(Object.assign(err, {
+                        col: 1,
+                        evidence: match0,
+                        line: stringLineCount(code.slice(0, ii)),
+                        message: err.message.replace((
+                            /[\u0000-\u0007]/g
+                        ), "")
+                    }));
+                }
+                previous = match0;
+                return "";
+            });
+            */
+            break;
+        case ".html":
+            // recurse
+            code.replace((
+                /^<style>\n([\S\s]*?\n)<\/style>$/gm
+            ), function (ignore, match1, ii) {
+                jslint2({
+                    code: match1,
+                    file: file + ".<style>.css",
+                    lineOffset: stringLineCount(code.slice(0, ii)) + 1
+                });
+                return "";
+            });
+            // recurse
+            code.replace((
+                /^<script\b[^>]*?>\n([\S\s]*?\n)<\/script>$/gm
+            ), function (ignore, match1, ii) {
+                jslint2({
+                    code: match1,
+                    file: file + ".<script>.js",
+                    lineOffset: stringLineCount(code.slice(0, ii)) + 1
+                });
+                return "";
+            });
+            return;
+        case ".md":
+            // recurse
+            code.replace((
+                /^```javascript\n([\S\s]*?\n)```$/gm
+            ), function (ignore, match1, ii) {
+                jslint2({
+                    code: match1.replace((
+                        /\u0027"\u0027"\u0027/g
+                    ), "\u0027"),
+                    file: file + ".<```javascript>.js",
+                    lineOffset: stringLineCount(code.slice(0, ii)) + 1
+                });
+                return "";
+            });
+            return;
+        case ".sh":
+            // recurse
+            code.replace((
+                /\bnode\u0020-e\u0020\u0027\n([\S\s]*?\n)\u0027/gm
+            ), function (ignore, match1, ii) {
+                jslint2({
+                    code: match1.replace((
+                        /\u0027"\u0027"\u0027/g
+                    ), "\u0027"),
+                    file: file + ".<node -e>.js",
+                    lineOffset: stringLineCount(code.slice(0, ii)) + 1
+                });
+                return "";
+            });
+            return;
+        default:
+            errList = jslint("\n".repeat(lineOffset) + code, {
+                bitwise: true,
+                browser: true,
+                fudge: true,
+                node: true,
+                this: true
+            }, [
+                "global", "globalThis"
+            ]).warnings;
+        }
+        errList = errList.filter(function ({
+            message
+        }) {
+            return message;
+        // print only first 10 err
+        }).slice(0, 10).map(function ({
+            col,
+            column,
+            evidence,
+            line,
+            message,
+            source_line,
+            stack_trace
+        }, ii) {
+            // mode csslint
+            if (col !== undefined) {
+                column = col;
+                source_line = evidence;
+            // mode jslint
+            } else {
+                column += 1;
+                line += 1;
+            }
+            return (
+                String(ii + 1).padStart(3, " ") +
+                " \u001b[31m" + message + "\u001b[39m" +
+                " \u001b[90m\/\/ line " + line + ", column " + column +
+                "\u001b[39m\n" +
+                ("    " + String(source_line).trim()).slice(0, 72) + stack_trace
+            );
+        });
+        if (errList.length > 0) {
+            exitCode = 1;
+            // print err to stderr
+            console.error(
+                "\u001b[1mjslint " + file + "\u001b[22m\n" + errList.join("\n")
+            );
+        }
+    }
+    (async function () {
+        let file;
+        file = process.argv[2];
+        if (file === ".") {
+            file = await readdir(".");
+            await Promise.all(file.map(async function (file) {
+                let code;
+                let timeStart = Date.now();
+                switch ((
+                    /\.\w+?$|$/m
+                ).exec(file)[0]) {
+                // case ".css":
+                case ".html":
+                case ".js":
+                // case ".json":
+                case ".md":
+                case ".mjs":
+                // case ".sh":
+                    break;
+                default:
+                    return;
+                }
+                try {
+                    code = await readFile(file, "utf8");
+                } catch (ignore) {
+                    return;
+                }
+                if (!(
+                    !(
+                        /\b(?:assets\.app\.js|lock|min|raw|rollup)\b/
+                    ).test(file) &&
+                    code &&
+                    /*
+                    (
+                        /^\/\*jslint\b/m
+                    ).test(code.slice(0, 65536)) &&
+                    */
+                    code.length < 1048576
+                )) {
+                    return;
+                }
+                jslint2({
+                    code,
+                    file
+                });
+                console.error(
+                    "jslint - " + (Date.now() - timeStart) + "ms - " + file
+                );
+            }));
+        } else {
+            jslint2({
+                code: await readFile(file, "utf8"),
+                file
+            });
+        }
+        process.exit(exitCode);
+    }());
+}());
