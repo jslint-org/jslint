@@ -85,13 +85,13 @@
 
 // WARNING: JSLint will hurt your feelings.
 
-/*\property
+/*property
     a, and, arity, assign, b, bad_assignment_a, bad_directive_a, bad_get,
     bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
     body, browser, c, calls, catch, closer, closure, code, column, concat,
-    constant, context, convert, couch, create, d, dead, default, devel,
-    directive, directives, disrupt, dot, duplicate_a, edition, ellipsis, else,
-    empty_block, eval, every, expected_a, expected_a_after_b, expected_a_at_b_c,
+    constant, context, convert, couch, create, d, dead, debug, default, devel,
+    directive, directives, disrupt, dot, duplicate_a, early_stop, edition,
+    ellipsis, else, empty_block, eval, every, expected_a, expected_a_at_b_c,
     expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
     expected_a_next_at_b, expected_digits_after_a, expected_four_digits,
     expected_identifier_a, expected_line_break_a_b, expected_regexp_factor_a,
@@ -107,19 +107,19 @@
     ok, open, opening, option, out_of_scope_a, parameters, parent, pop,
     property, push, quote, raw, redefinition_a_b, replace,
     required_a_optional_b, reserved_a, role, search, shebang, signature, single,
-    slice, some, sort, split, startsWith, statement, stop, subscript_a, switch,
-    test, this, thru, todo_comment, tokens, too_long, too_many_digits, tree,
-    try, type, u, unclosed_comment, unclosed_mega, unclosed_string,
-    undeclared_a, unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
-    unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
-    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
-    unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
-    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
-    unreachable_a, unregistered_property_a, unused_a, use_double, use_open,
-    use_spaces, used, value, var_loop, var_switch, variable, warning, warnings,
-    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
-    wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary,
-    wrapped, writable, y
+    slice, some, sort, split, stack, stack_trace, startsWith, statement, stop,
+    subscript_a, switch, test, this, thru, todo_comment, tokens, too_long,
+    too_many_digits, tree, try, type, u, unclosed_comment, unclosed_mega,
+    unclosed_string, undeclared_a, unexpected_a, unexpected_a_after_b,
+    unexpected_a_before_b, unexpected_at_top_level_a, unexpected_char_a,
+    unexpected_comment, unexpected_directive_a, unexpected_expression_a,
+    unexpected_label_a, unexpected_parens, unexpected_space_a_b,
+    unexpected_statement_a, unexpected_trailing_space, unexpected_typeof_a,
+    uninitialized_a, unreachable_a, unregistered_property_a, unused_a,
+    use_double, use_open, use_spaces, used, value, var_loop, var_switch,
+    variable, warning, warnings, weird_condition_a, weird_expression_a,
+    weird_loop, weird_relation_a, white, wrap_condition, wrap_immediate,
+    wrap_parameter, wrap_regexp, wrap_unary, wrapped, writable, y
 */
 
 function empty() {
@@ -258,7 +258,6 @@ const bundle = {
     duplicate_a: "Duplicate '{a}'.",
     empty_block: "Empty block.",
     expected_a: "Expected '{a}'.",
-    expected_a_after_b: "Expected '{a}' after '{b}'.",
     expected_a_at_b_c: "Expected '{a}' at column {b}, not column {c}.",
     expected_a_b: "Expected '{a}' and instead saw '{b}'.",
     expected_a_b_from_c_d: (
@@ -2368,6 +2367,9 @@ function prefix(id, f) {
             return f();
         }
         the_token.expression = expression(150);
+        if (id === "await") {
+            functionage.hasAwait = true;
+        }
         return the_token;
     };
     return the_symbol;
@@ -2990,30 +2992,20 @@ function do_function(the_function) {
     return the_function;
 }
 
-function do_async() {
-    const the_async = token;
-    if (next_token.id !== "function") {
-        return stop("expected_a_after_b", the_async, "function", "async");
-    }
-    token = next_token;
-    next_token = dispense();
-    const the_function = do_function();
+prefix("async", function () {
+    let the_async;
+    let the_function;
+    the_async = token;
+    advance("function");
+    the_function = do_function();
     the_function.arity = the_async.arity;
-    the_function.isAsync = true;
-    the_async.expression = the_function;
     if (!the_function.hasAwait) {
         warn("missing_await_statement", the_async);
     }
-    return the_async;
-}
-
-prefix("async", do_async);
-prefix("function", do_function);
-prefix("await", function () {
-    functionage.hasAwait = true;
-    token.expression = expression(150);
-    return token;
+    return the_function;
 });
+prefix("function", do_function);
+prefix("await");
 
 function fart(pl) {
     advance("=>");
@@ -3520,7 +3512,6 @@ stmt("for", function () {
     functionage.loop -= 1;
     return the_for;
 });
-stmt("async", do_async);
 stmt("function", do_function);
 stmt("if", function () {
     let the_else;
@@ -3920,6 +3911,7 @@ function walk_statement(thing) {
                 thing.arity !== "statement"
                 && thing.arity !== "assignment"
                 && thing.id !== "import"
+                && thing.id !== "await"
             ) {
                 warn("unexpected_expression_a", thing);
             }
@@ -4858,6 +4850,7 @@ function whitage() {
                         || left.id === "else"
                         || left.id === "finally"
                         || left.id === "while"
+                        || left.id === "await"
                         || right.id === "catch"
                         || right.id === "else"
                         || right.id === "finally"
@@ -5067,7 +5060,8 @@ export default Object.freeze(jslint);
         && process
         && process.versions
         && typeof process.versions.node === "string"
-        && (/\bjslint.m?js$|$/m).test(import.meta.url)
+        && process.argv
+        && (/\bjslint.m?js$/m).test(process.argv[1])
     )) {
         return;
     }

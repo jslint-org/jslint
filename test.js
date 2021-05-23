@@ -43,9 +43,6 @@ import jslint from "./jslint.js";
         ],
         "escape_mega": [],
         "expected_a": [],
-        "expected_a_after_b": [
-            "async"
-        ],
         "expected_a_at_b_c": [
             "let aa={\n    aa:\n0\n};"
         ],
@@ -65,11 +62,12 @@ import jslint from "./jslint.js";
             "`${`",
             "`${{`",
             "aa.aa=undefined",
-            "aa=\"\"+\"\"",
             "aa=+aa",
             "aa=/[ ]/",
             "aa=/aa{/",
             "aa=0+\"\"",
+            "aa=\"\"+\"\"",
+            "async",
             "delete [0]",
             "for(;;){}",
             "isFinite(0)",
