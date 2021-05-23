@@ -43,6 +43,9 @@ import jslint from "./jslint.js";
         ],
         "escape_mega": [],
         "expected_a": [],
+        "expected_a_after_b": [
+            "async"
+        ],
         "expected_a_at_b_c": [
             "let aa={\n    aa:\n0\n};"
         ],
@@ -143,6 +146,9 @@ import jslint from "./jslint.js";
         ],
         "misplaced_directive_a": [
             "let aa;\n/*global aa*/"
+        ],
+        "missing_await_statement": [
+            "async function(){}"
         ],
         "missing_browser": [
             "/*global aa*/"

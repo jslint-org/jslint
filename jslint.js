@@ -88,35 +88,35 @@
 /*property
     a, and, arity, assign, b, bad_assignment_a, bad_directive_a, bad_get,
     bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
-    body, browser, c, calls, catch, charCodeAt, closer, closure, code, column,
-    concat, constant, context, convert, couch, create, d, dead, default, devel,
+    body, browser, c, calls, catch, closer, closure, code, column, concat,
+    constant, context, convert, couch, create, d, dead, default, devel,
     directive, directives, disrupt, dot, duplicate_a, edition, ellipsis, else,
-    empty_block, eval, every, expected_a, expected_a_at_b_c,
+    empty_block, eval, every, expected_a, expected_a_after_b, expected_a_at_b_c,
     expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
     expected_a_next_at_b, expected_digits_after_a, expected_four_digits,
     expected_identifier_a, expected_line_break_a_b, expected_regexp_factor_a,
     expected_space_a_b, expected_statements_a, expected_string_a,
     expected_type_string_a, exports, expression, extra, finally, flag, for,
     forEach, free, freeze, freeze_exports, from, froms, fud, fudge,
-    function_in_loop, functions, g, getset, global, i, id, identifier, import,
-    inc, indexOf, infix_in, init, initial, isArray, isNaN, join, json, keys,
-    label, label_a, lbp, led, length, level, line, lines, live, long, loop, m,
-    margin, match, message, misplaced_a, misplaced_directive_a, missing_browser,
-    missing_m, module, naked_block, name, names, nested_comment, new, node,
-    not_label_a, nr, nud, number_isNaN, ok, open, opening, option,
-    out_of_scope_a, parameters, parent, pop, property, push, quote, raw,
-    redefinition_a_b, replace, required_a_optional_b, reserved_a, role, search,
-    shebang, signature, single, slice, some, sort, split, startsWith, statement,
-    stop, subscript_a, switch, test, this, thru, toString, todo_comment,
-    tokens, too_long, too_many_digits, tree, try, type, u, unclosed_comment,
-    unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
-    unexpected_a_after_b, unexpected_a_before_b, unexpected_at_top_level_a,
-    unexpected_char_a, unexpected_comment, unexpected_directive_a,
-    unexpected_expression_a, unexpected_label_a, unexpected_parens,
-    unexpected_space_a_b, unexpected_statement_a, unexpected_trailing_space,
-    unexpected_typeof_a, uninitialized_a, unreachable_a,
-    unregistered_property_a, unused_a, use_double, use_open, use_spaces,
-    used, value, var_loop, var_switch, variable, warning, warnings,
+    function_in_loop, functions, g, getset, global, hasAwait, i, id, identifier,
+    import, inc, indexOf, infix_in, init, initial, isArray, isNaN, join, json,
+    keys, label, label_a, lbp, led, length, level, line, lines, live, long,
+    loop, m, margin, match, message, misplaced_a, misplaced_directive_a,
+    missing_await_statement, missing_browser, missing_m, module, naked_block,
+    name, names, nested_comment, new, node, not_label_a, nr, nud, number_isNaN,
+    ok, open, opening, option, out_of_scope_a, parameters, parent, pop,
+    property, push, quote, raw, redefinition_a_b, replace,
+    required_a_optional_b, reserved_a, role, search, shebang, signature, single,
+    slice, some, sort, split, startsWith, statement, stop, subscript_a, switch,
+    test, this, thru, todo_comment, tokens, too_long, too_many_digits, tree,
+    try, type, u, unclosed_comment, unclosed_mega, unclosed_string,
+    undeclared_a, unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
+    unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
+    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
+    unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
+    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
+    unreachable_a, unregistered_property_a, unused_a, use_double, use_open,
+    use_spaces, used, value, var_loop, var_switch, variable, warning, warnings,
     weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
     wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary,
     wrapped, writable, y
@@ -257,6 +257,7 @@ const bundle = {
     duplicate_a: "Duplicate '{a}'.",
     empty_block: "Empty block.",
     expected_a: "Expected '{a}'.",
+    expected_a_after_b: "Expected '{a}' after '{b}'.",
     expected_a_at_b_c: "Expected '{a}' at column {b}, not column {c}.",
     expected_a_b: "Expected '{a}' and instead saw '{b}'.",
     expected_a_b_from_c_d: (
@@ -286,6 +287,7 @@ const bundle = {
     misplaced_directive_a: (
         "Place the '/*{a}*/' directive before the first statement."
     ),
+    missing_await_statement: "Expected await statement in async function.",
     missing_browser: "/*global*/ requires the Assume a browser option.",
     missing_m: "Expected 'm' flag on a multiline regular expression.",
     naked_block: "Naked block.",
@@ -2982,7 +2984,27 @@ function do_function(the_function) {
     return the_function;
 }
 
+function do_async() {
+    const the_async = token;
+    if (next_token.id !== "function") {
+        return stop("expected_a_after_b", the_async, "function", "async");
+    }
+    token = next_token;
+    next_token = dispense();
+    the_async.expression = do_function();
+    if (!the_async.expression.hasAwait) {
+        warn("missing_await_statement", the_async);
+    }
+    return the_async;
+}
+
+prefix("async", do_async);
 prefix("function", do_function);
+prefix("await", function () {
+    functionage.hasAwait = true;
+    token.expression = expression(150);
+    return token;
+});
 
 function fart(pl) {
     advance("=>");
@@ -3489,6 +3511,7 @@ stmt("for", function () {
     functionage.loop -= 1;
     return the_for;
 });
+stmt("async", do_async);
 stmt("function", do_function);
 stmt("if", function () {
     let the_else;

@@ -8,6 +8,7 @@
 - none
 
 ## Branch master
+- jslint - add async/await support
 - ci - make branch-beta the default branch.
 - ci - validate non-http/file links in *.md files.
 - ci - add shell-functions shCiBranchPromote.
