@@ -1,19 +1,21 @@
 # Changelog
 
 ## Todo
-- app - deploy jslint as chrome-extension
+- cli - merge shell-function shJslintCli into jslint.js.
+- app - deploy jslint as chrome-extension.
 - doc - add svg package-listing.
 - ci - continue addng regression tests and improve code-coverage.
 - none
 
 ## Branch master
-- ci - validate non-http/file links in *.md files
-- ci - add shell-functions shCiBranchPromote
+- ci - make branch-beta the default branch.
+- ci - validate non-http/file links in *.md files.
+- ci - add shell-functions shCiBranchPromote.
 - none
 
 ## v2021.5.21
-- this ci-release does not change any core-functionality of file jslint.js
-- doc - add file CHANGELOG.md
+- this ci-release does not change any core-functionality of file jslint.js.
+- doc - add file CHANGELOG.md.
 - ci - begin addng regression tests and improve code-coverage.
 - ci - allow pull-requests to run restricted-ci (cannot upload artifacts).
 - gh-pages - fix missing assets and insecure http-links.

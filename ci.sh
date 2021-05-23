@@ -4,6 +4,7 @@
 '
 
 # sh one-liner
+# head CHANGELOG.md -n20
 # git fetch origin alpha beta master && git fetch upstream alpha beta master
 # sh ci.sh shCiBranchPromote origin alpha beta
 
@@ -160,11 +161,11 @@ process.exit(
         rm -rf .git
         git add -f .
     )
-    # update root-dir with branch-master
-    if [ "$BRANCH" = master ]
+    # update root-dir with branch-beta
+    if [ "$BRANCH" = beta ]
     then
         git rm -rf .build
-        git checkout master .
+        git checkout beta .
     fi
     git status
     git commit -am "update dir branch.$BRANCH" || true
