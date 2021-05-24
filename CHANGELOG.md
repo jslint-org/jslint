@@ -7,6 +7,10 @@
 - none
 
 ## Branch beta
+- none
+
+## v2021.5.23
+- doc - add section Changelog
 - doc - update README.md with installtion instructions
 - cli - merge shell-function shJslintCli into jslint.js.
 - jslint - update default globals with support for "import"
@@ -15,7 +19,6 @@
 - ci - make branch-beta the default branch.
 - ci - validate non-http/file links in *.md files.
 - ci - add shell-functions shCiBranchPromote.
-- none
 
 ## v2021.5.21
 - this ci-release does not change any core-functionality of file jslint.js.

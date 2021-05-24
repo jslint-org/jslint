@@ -3,7 +3,7 @@
 Douglas Crockford
 douglas@crockford.com
 
-## v2021.5.21
+## v2021.5.23
 
 ## Status
 | Branch | [master<br>(release)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(production)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(development)](https://github.com/jslint-org/jslint/tree/alpha) |
@@ -82,3 +82,6 @@ This applies to programming as well. Conforming to a consistent style improves
 readability, and frees you to express yourself in ways that matter. JSLint here
 plays the part of a stern but benevolent editor, helping you to get the style
 right so that you can focus your creative energy where it is most needed.
+
+## Changelog
+- [CHANGELOG.md](CHANGELOG.md)
