@@ -89,6 +89,7 @@
 /*jslint node*/
 
 /*property
+    console_error, source,
     a, all, and, argv, arity, assign, b, bad_assignment_a, bad_directive_a,
     bad_get, bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise,
     block, body, browser, c, calls, catch, cli_mode, closer, closure, code,
@@ -5119,7 +5120,9 @@ function jslint(
 }
 
 async function cli({
-    file
+    console_error,
+    file,
+    source
 }) {
 /*
  * this function will run jslint from nodejs-cli
@@ -5160,7 +5163,7 @@ async function cli({
         case ".html":
             // recurse
             code.replace((
-                /^<script\b[^>]*?>\n([\S\s]*?\n)<\/script>$/gm
+                /^<script>\n([\S\s]*?\n)<\/script>$/gm
             ), function (ignore, match1, ii) {
                 jslint_from_file({
                     code: match1,
@@ -5213,7 +5216,7 @@ async function cli({
         if (warnings.length > 0) {
             exitCode = 1;
             // print first 10 warnings to stderr
-            console.error(
+            console_error(
                 "\u001b[1mjslint " + file + "\u001b[22m\n" +
                 warnings.slice(0, 10).map(function ({
                     formatted_message
@@ -5222,6 +5225,14 @@ async function cli({
                 }).join("\n")
             );
         }
+    }
+    console_error = console_error || console.error;
+    if (source) {
+        jslint_from_file({
+            code: source,
+            file
+        });
+        return;
     }
     if (file === ".") {
         file = await readdir(".");
@@ -5257,7 +5268,7 @@ async function cli({
                 code,
                 file
             });
-            console.error(
+            console_error(
                 "jslint - " + (Date.now() - timeStart) + "ms - " + file
             );
         }));
@@ -5275,7 +5286,9 @@ export default Object.freeze(function (
     global_array = []
 ) {
     if (option_object.cli_mode) {
-        return cli(option_object);
+        return cli(Object.assign({
+            source
+        }, option_object));
     }
     return jslint(source, option_object, global_array);
 });

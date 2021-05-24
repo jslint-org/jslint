@@ -1,13 +1,110 @@
 import jslint from "./jslint.js";
 
-(async function testCaseCoverage() {
+function assertOrThrow(passed, err) {
+/*
+ * this function will throw <err> if <passed> is falsy
+ */
+    if (!passed) {
+        throw err;
+    }
+}
+
+(function testCaseCoverage() {
 /*
  * this function will try to improve coverage
  */
-    // test cli-handling behavior
-    await jslint("", {
+    // test assertOrThrow's throw handling-behavior
+    try {
+        assertOrThrow(undefined, new Error());
+    } catch (ignore) {}
+    // test jslint's cli handling-behavior
+    jslint("", {
         cli_mode: true,
         file: "."
+    });
+    jslint("", {
+        cli_mode: true,
+        file: "jslint.js"
+    });
+    jslint("", {
+        cli_mode: true,
+        console_error: function () {
+            return;
+        },
+        file: "syntax_error.js",
+        source: "syntax error"
+    });
+    jslint("", {
+        cli_mode: true,
+        file: "aa.html",
+        source: "<script>\nlet aa = 0;\n</script>\n"
+    });
+    // test jslint's option handling-behavior
+    assertOrThrow(jslint([""], {
+        bitwise: true,
+        browser: true,
+        convert: true,
+        couch: true,
+        debug: true,
+        devel: true,
+        eval: true,
+        for: true,
+        fudge: true,
+        getset: true,
+        long: true,
+        node: true,
+        single: true,
+        this: true,
+        white: true
+    }).warnings.length === 0);
+    [
+        "",
+        "#!\n/*jslint browser:false, node*/\n\"use strict\";",
+        "/*jslint browser*/\n;",
+        "/*jslint devel*/\ndebugger;",
+        "/*jslint eval*/\nnew Function();\neval();",
+        "/*jslint this*/\nlet aa = this;",
+        "/*jslint white*/\n\t",
+        "/*property aa bb*/"
+    ].forEach(function (code) {
+        let warnings;
+        warnings = jslint(code).warnings;
+        assertOrThrow(warnings.length === 0, [code, warnings]);
+    });
+    // test jslint's misc handling-behavior
+    [
+        // Array
+        "new Array(1);",
+        // Date.getTime
+        "let aa = aa.aa().getTime();",
+        "let aa = aa().getTime();",
+        "Date.getTime();",
+        // async/await
+        "async function aa() {\n    await aa();\n}",
+        // fart
+        "function aa() {\n    return () => 1;\n}",
+        // getset
+        "/*jslint getset*/\nlet aa = {get aa() {\n    return;\n}};",
+        "/*jslint getset*/\nlet aa = {set aa(aa) {\n    return aa;\n}};",
+        // json
+        "{\"aa\":[[],-1,null]}",
+        // label
+        "function aa() {\nbb:\n    while (true) {\n        if (true) {\n"
+        + "            break bb;\n        }\n    }\n}",
+        // module
+        "export default Object.freeze();",
+        "import {aa, bb} from \"aa\";\naa(bb);",
+        "import {} from \"aa\";",
+        "import(\"aa\").then(function () {\n    return;\n});",
+        // var
+        "let [...aa] = [...aa];",
+        "let [\n    aa, bb = 1\n] = [];",
+        "let {aa, bb} = {};",
+        ""
+    ].forEach(function (code) {
+        let warnings;
+        warnings = jslint(code).warnings;
+        assertOrThrow(warnings.length === 0, [code, warnings]);
     });
 }());
 
@@ -385,16 +482,17 @@ import jslint from "./jslint.js";
         expectedWarning, malformedCodeList
     ]) {
         malformedCodeList.forEach(function (malformedCode) {
-            if (!jslint(malformedCode).warnings.some(function ({
-                code
-            }) {
-                return code === expectedWarning;
-            })) {
-                throw new Error(
+            assertOrThrow(
+                jslint(malformedCode).warnings.some(function ({
+                    code
+                }) {
+                    return code === expectedWarning;
+                }),
+                new Error(
                     `jslint failed to warn "${expectedWarning}" with ` +
                     `malfomed code "${malformedCode}"`
-                );
-            }
+                )
+            );
         });
     });
 }());
