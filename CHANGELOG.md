@@ -7,6 +7,7 @@
 - none
 
 ## Branch beta
+- website - merge file report.js into browser.js.
 - jslint - add new rules unordered_param_a, unordered_property_a, that warn if parameters and properties are listed in nonascii-order.
 - jslint - add "globalThis" to default globals.
 - none

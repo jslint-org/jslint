@@ -189,7 +189,8 @@ a:active {
 <tr><th>Filename</th><th>Content</th></tr>
 <tr>
     <td><code>browser.js</code></td>
-<td>Browser based UI.</td></tr>
+<td>Browser based UI and <code>report</code> object, containing report
+    generator functions for HTML.</td></tr>
 <tr><td><code>function.html</code></td>
 <td>This page that you are looking at right now.</td></tr>
 <tr><td><code>help.html</code></td>
@@ -199,9 +200,6 @@ a:active {
         <code>js</code> files.</td></tr>
 <tr><td><code>jslint.js</code></td>
 <td>The <code>jslint</code> function.</td></tr>
-<tr><td><code>report.js</code></td>
-<td>The <code>report</code> object, containing report generator functions for
-    HTML.</td></tr>
 </table></center>
 <h1><code>function jslint</code></h1>
 <p>The <code>jslint</code> function is written in ES6 JavaScript. It has no
@@ -582,7 +580,6 @@ a:active {
     <h1>Reports</h1>
     <p>The <code>report</code> object contains three functions that all take a
         result from the <code>jslint</code> function as input.
-        <code>report.js</code> has no other dependence on other files.</p>
     <table>
         <tr>
             <th scope="col">Function name</th>
