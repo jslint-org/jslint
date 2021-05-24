@@ -5054,8 +5054,8 @@ function jslint(
             " \u001b[31m" + message + "\u001b[39m" +
             " \u001b[90m\/\/ line " + line + ", column " + column +
             "\u001b[39m\n" +
-            ("    " + String(lines && lines[line]).trim()).slice(0, 72) + "\n" +
-            stack_trace
+            ("    " + String(lines && lines[line - 1]).trim()).slice(0, 72) +
+            "\n" + stack_trace
         ).trim();
     });
     return {

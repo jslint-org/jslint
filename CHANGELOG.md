@@ -6,7 +6,8 @@
 - ci - continue addng regression tests and improve code-coverage.
 - none
 
-## Branch master
+## Branch beta
+- doc - update README.md with installtion instructions
 - cli - merge shell-function shJslintCli into jslint.js.
 - jslint - update default globals with support for "import"
 - jslint - sort warnings with higher priority for early_stop
