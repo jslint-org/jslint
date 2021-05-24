@@ -199,7 +199,7 @@ process.exit(
 shCiBase() {(set -e
 # this function will run github-ci
     # jslint all files
-    shJslintCli .
+    node jslint.js .
     # run test with coverage-report
     shRunWithCoverage node test.js
     # screenshot live-web-demo
@@ -224,10 +224,10 @@ shCiBranchPromote() {(set -e
 shDirHttplinkValidate() {(set -e
 # this function will validate http-links embedded in .html and .md files
     node -e '
-(function () {
+(async function () {
     "use strict";
     let dict = {};
-    require("fs").readdirSync(".").forEach(async function (file) {
+    Array.from(await require("fs").readdir(".")).forEach(async function (file) {
         if (!(
             /.\.html$|.\.md$/m
         ).test(file)) {
@@ -338,18 +338,24 @@ shGitLsTree() {(set -e
 # shGitLsTree | sort -rk3 # sort by date
 # shGitLsTree | sort -rk4 # sort by size
     node -e '
-(function () {
+(async function () {
     "use strict";
     let result;
     // get file, mode, size
-    result = require("child_process").spawnSync("git", [
-        "ls-tree", "-lr", "HEAD"
-    ], {
-        encoding: "utf8",
-        stdio: [
-            "ignore", "pipe", 2
-        ]
-    }).stdout;
+    result = await new Promise(function (resolve) {
+        let child;
+        child = require("child_process").spawn("git", [
+            "ls-tree", "-lr", "HEAD"
+        ], {
+            encoding: "utf8",
+            stdio: [
+                "ignore", "pipe", 2
+            ]
+        });
+        child.on("exit", function () {
+            resolve(child.stdout);
+        });
+    });
     result = Array.from(result.matchAll(
         /^(\S+?)\u0020+?\S+?\u0020+?\S+?\u0020+?(\S+?)\t(\S+?)$/gm
     )).map(function ([
@@ -407,329 +413,6 @@ shGitLsTree() {(set -e
 ' # "'
 )}
 
-shJslintCli() {(set -e
-# this function will run jslint from nodejs
-    node -e '
-import jslint from "./jslint.js";
-import {promises, readFileSync, readdirSync} from "fs";
-// init debugInline
-if (!globalThis.debugInline) {
-    let consoleError;
-    consoleError = console.error;
-    globalThis.debugInline = function (...argList) {
-    /*
-     * this function will both print <argList> to stderr and
-     * return <argList>[0]
-     */
-        consoleError("\n\ndebugInline");
-        consoleError(...argList);
-        consoleError("\n");
-        return argList[0];
-    };
-}
-let exitCode;
-function stringLineCount(data) {
-/*
- * this function will count number of newlines in <data>
- */
-    let cnt;
-    let ii;
-    // https://jsperf.com/regexp-counting-2/8
-    cnt = 0;
-    ii = 0;
-    while (true) {
-        ii = data.indexOf("\n", ii) + 1;
-        if (ii === 0) {
-            break;
-        }
-        cnt += 1;
-    }
-    return cnt;
-}
-async function jslint2({
-    code,
-    errList = [],
-    file,
-    lineOffset = 0
-}) {
-    switch ((
-        /\.\w+?$|$/m
-    ).exec(file)[0]) {
-    case ".css":
-        /*
-        errList = CSSLint.verify( // jslint ignore:line
-            code
-        ).messages.map(function (err) {
-            err.message = (
-                err.type + " - " + err.rule.id + " - " + err.message
-                + "\n    " + err.rule.desc
-            );
-            return err;
-        });
-        errList = [];
-        // ignore comment
-        code = code.replace((
-            /^\u0020*?\/\*[\S\s]*?\*\/\u0020*?$/gm
-        ), function (match0) {
-            // preserve lineno
-            return match0.replace((
-                /.+/g
-            ), "");
-        });
-        code.replace((
-            /\S\u0020{2}|\u0020,|^\S.*?,.|[;{}]./gm
-        ), function (match0, ii) {
-            switch (match0.slice(-2)) {
-            case "  ":
-                err = {
-                    message: "unexpected multi-whitespace"
-                };
-                break;
-            case " ,":
-                err = {
-                    message: "unexpected whitespace before comma"
-                };
-                break;
-            default:
-                err = {
-                    message: "unexpected multiline-statement"
-                };
-            }
-            errList.push(Object.assign(err, {
-                col: 1,
-                evidence: match0,
-                line: stringLineCount(code.slice(0, ii))
-            }));
-            return "";
-        });
-        // validate line-sorted - css-selector
-        previous = "";
-        code = code.replace((
-            /^.|[#.>]|[,}]$|\u0020\{$|\b\w/gm
-        ), function (match0) {
-            switch (match0) {
-            case " ":
-                return match0;
-            case " {":
-                return "\u0001" + match0;
-            case "#":
-                return "\u0002" + match0;
-            case ",":
-                return "\u0000" + match0;
-            case ".":
-                return "\u0001" + match0;
-            case ">":
-                return "\u0003" + match0;
-            case "}":
-                return match0;
-            default:
-                return "\u0000" + match0;
-            }
-        });
-        code.replace((
-            /\n{2,}|^\u0000@|^\}\n\}|\}|^(?:\S.*?\n)+/gm
-        ), function (match0, ii) {
-            switch (match0.slice(0, 2)) {
-            case "\n\n":
-            case "\u0000@":
-            case "}\n":
-                previous = "";
-                return "";
-            case "}":
-                return "";
-            }
-            match0 = match0.trim();
-            err = (
-                !(previous < match0)
-                ? {
-                    message: "lines not sorted\n" + previous + "\n" + match0
-                }
-                : match0.split("\n").sort().join("\n") !== match0
-                ? {
-                    message: "lines not sorted\n" + match0
-                }
-                : undefined
-            );
-            if (err) {
-                errList.push(Object.assign(err, {
-                    col: 1,
-                    evidence: match0,
-                    line: stringLineCount(code.slice(0, ii)),
-                    message: err.message.replace((
-                        /[\u0000-\u0007]/g
-                    ), "")
-                }));
-            }
-            previous = match0;
-            return "";
-        });
-        */
-        break;
-    case ".html":
-        // recurse
-        code.replace((
-            /^<style>\n([\S\s]*?\n)<\/style>$/gm
-        ), function (ignore, match1, ii) {
-            jslint2({
-                code: match1,
-                file: file + ".<style>.css",
-                lineOffset: stringLineCount(code.slice(0, ii)) + 1
-            });
-            return "";
-        });
-        // recurse
-        code.replace((
-            /^<script\b[^>]*?>\n([\S\s]*?\n)<\/script>$/gm
-        ), function (ignore, match1, ii) {
-            jslint2({
-                code: match1,
-                file: file + ".<script>.js",
-                lineOffset: stringLineCount(code.slice(0, ii)) + 1
-            });
-            return "";
-        });
-        return;
-    case ".md":
-        // recurse
-        code.replace((
-            /^```javascript\n([\S\s]*?\n)```$/gm
-        ), function (ignore, match1, ii) {
-            jslint2({
-                code: match1.replace((
-                    /\u0027"\u0027"\u0027/g
-                ), "\u0027"),
-                file: file + ".<```javascript>.js",
-                lineOffset: stringLineCount(code.slice(0, ii)) + 1
-            });
-            return "";
-        });
-        return;
-    case ".sh":
-        // recurse
-        code.replace((
-            /\bnode\u0020-e\u0020\u0027\n([\S\s]*?\n)\u0027/gm
-        ), function (ignore, match1, ii) {
-            jslint2({
-                code: match1.replace((
-                    /\u0027"\u0027"\u0027/g
-                ), "\u0027"),
-                file: file + ".<node -e>.js",
-                lineOffset: stringLineCount(code.slice(0, ii)) + 1
-            });
-            return "";
-        });
-        return;
-    default:
-        errList = jslint("\n".repeat(lineOffset) + code, {
-            bitwise: true,
-            browser: true,
-            debug: true,
-            fudge: true,
-            node: true,
-            this: true
-        }, [
-            "global", "globalThis"
-        ]).warnings;
-    }
-    errList = errList.filter(function ({
-        message
-    }) {
-        return message;
-    // print only first 10 err
-    }).slice(0, 10).map(function ({
-        col,
-        column,
-        evidence,
-        line,
-        message,
-        source_line,
-        stack
-    }, ii) {
-        // mode csslint
-        if (col !== undefined) {
-            column = col;
-            source_line = evidence;
-        // mode jslint
-        } else {
-            column += 1;
-            line += 1;
-        }
-        return (
-            String(ii + 1).padStart(3, " ") +
-            " \u001b[31m" + message + "\u001b[39m" +
-            " \u001b[90m\/\/ line " + line + ", column " + column +
-            "\u001b[39m\n" +
-            ("    " + String(source_line).trim()).slice(0, 72) +
-            ((ii === 0 && stack) || "")
-        );
-    });
-    if (errList.length > 0) {
-        exitCode = 1;
-        // print err to stderr
-        console.error(
-            "\u001b[1mjslint " + file + "\u001b[22m\n" + errList.join("\n")
-        );
-    }
-}
-(async function () {
-    let file;
-    file = process.argv[1];
-    if (file === ".") {
-        await Promise.all(readdirSync(".").map(async function (file) {
-            let code;
-            let timeStart;
-            timeStart = Date.now();
-            switch ((
-                /\.\w+?$|$/m
-            ).exec(file)[0]) {
-            // case ".css":
-            case ".html":
-            case ".js":
-            // case ".json":
-            case ".md":
-            // case ".sh":
-                break;
-            default:
-                return;
-            }
-            try {
-                code = await promises.readFile(file, "utf8");
-            } catch (ignore) {
-                return;
-            }
-            if (!(
-                !(
-                    /\b(?:assets\.app\.js|lock|min|raw|rollup)\b/
-                ).test(file) &&
-                code &&
-                /*
-                (
-                    /^\/\*jslint\b/m
-                ).test(code.slice(0, 65536)) &&
-                */
-                code.length < 1048576
-            )) {
-                return;
-            }
-            jslint2({
-                code,
-                file
-            });
-            console.error(
-                "jslint - " + (Date.now() - timeStart) + "ms - " + file
-            );
-        }));
-    } else {
-        jslint2({
-            code: readFileSync(file, "utf8"),
-            file
-        });
-    }
-    process.exit(exitCode);
-}());
-' --input-type=module "$@" # "'
-)}
-
 shRunWithCoverage() {(set -e
 # this function will run nodejs command $@ with v8-coverage and
 # create coverage-report .build/coverage/index.html
@@ -771,7 +454,8 @@ if (!globalThis.debugInline) {
         function stringHtmlSafe(str) {
         /*
          * this function will make <str> html-safe
-         * https://stackoverflow.com/questions/7381974/which-characters-need-to-be-escaped-on-html
+         * https://stackoverflow.com/questions/7381974/
+         * which-characters-need-to-be-escaped-on-html
          */
             return str.replace((
                 /&/gu
@@ -1305,12 +989,12 @@ shRunWithScreenshotTxt() {(set -e
     fi
     # format text-output
     node -e '
-(function () {
+(async function () {
     "use strict";
     let result;
     let yy;
     yy = 10;
-    result = require("fs").readFileSync(
+    result = await require("fs/promises").readFile(
         require("os").tmpdir() + "/shRunWithScreenshotTxt.txt",
         "utf8"
     );
@@ -1356,11 +1040,13 @@ shRunWithScreenshotTxt() {(set -e
         result + "</text>\n</svg>\n"
     );
     try {
-        require("fs").mkdirSync(require("path").dirname(process.argv[1]), {
+        await require("fs/promises").mkdir((
+            require("path").dirname(process.argv[1])
+        ), {
             recursive: true
         });
     } catch (ignore) {}
-    require("fs").writeFileSync(process.argv[1], result);
+    require("fs/promises").writeFile(process.argv[1], result);
 }());
 ' "$SCREENSHOT_SVG" # "'
     shCiPrint "shRunWithScreenshotTxt - wrote - $SCREENSHOT_SVG"

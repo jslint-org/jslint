@@ -1,13 +1,17 @@
 # Changelog
 
 ## Todo
-- cli - merge shell-function shJslintCli into jslint.js.
 - app - deploy jslint as chrome-extension.
 - doc - add svg package-listing.
 - ci - continue addng regression tests and improve code-coverage.
 - none
 
-## Branch master
+## Branch beta
+- doc - update README.md with installtion instructions
+- cli - merge shell-function shJslintCli into jslint.js.
+- jslint - update default globals with support for "import"
+- jslint - sort warnings with higher priority for early_stop
+- jslint - add async/await support
 - ci - make branch-beta the default branch.
 - ci - validate non-http/file links in *.md files.
 - ci - add shell-functions shCiBranchPromote.

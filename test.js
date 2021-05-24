@@ -1,5 +1,15 @@
 import jslint from "./jslint.js";
 
+(async function testCaseCoverage() {
+/*
+ * this function will try to improve coverage with no validation
+ */
+    await jslint("", {
+        cli_mode: true,
+        file: "."
+    });
+}());
+
 (function testCaseJslintWarningsValidate() {
 /*
  * this function will validate each jslint <warning> is raised with given
@@ -62,11 +72,12 @@ import jslint from "./jslint.js";
             "`${`",
             "`${{`",
             "aa.aa=undefined",
-            "aa=\"\"+\"\"",
             "aa=+aa",
             "aa=/[ ]/",
             "aa=/aa{/",
             "aa=0+\"\"",
+            "aa=\"\"+\"\"",
+            "async",
             "delete [0]",
             "for(;;){}",
             "isFinite(0)",
@@ -144,6 +155,9 @@ import jslint from "./jslint.js";
         "misplaced_directive_a": [
             "let aa;\n/*global aa*/"
         ],
+        "missing_await_statement": [
+            "async function aa(){}"
+        ],
         "missing_browser": [
             "/*global aa*/"
         ],
@@ -215,9 +229,9 @@ import jslint from "./jslint.js";
             "Function",
             "[-0x0]",
             "[0x0]",
-            "`${\"`\"}`",
             "`${/[`]/}`",
             "`${/`/}`",
+            "`${\"`\"}`",
             "aa((0))",
             "aa+=NaN",
             "aa/=0",
@@ -228,6 +242,7 @@ import jslint from "./jslint.js";
             "aa={aa:aa}",
             "aa={set aa(){}}",
             "arguments",
+            "await",
             "debugger",
             "eval",
             "export aa",
@@ -240,8 +255,8 @@ import jslint from "./jslint.js";
             "function aa(){try{}catch(ignore){}finally{switch(0){case 0:}}}",
             "function aa(){while(0){continue;}}",
             "function aa(){while(0){try{0;}catch(ignore){}finally{continue;}}}",
-            "function aa(){}\n[]",
             "function aa(){}0",
+            "function aa(){}\n[]",
             "function ignore(){let ignore;}",
             "ignore",
             "ignore:",
@@ -256,11 +271,11 @@ import jslint from "./jslint.js";
             "while((0)){}",
             "while(0){}",
             "yield /_/",
+            "{//\n}",
+            "{0:0}",
             "{\"\\u{1234}\":0}",
             "{\"aa\":",
-            "{\"aa\":'aa'}",
-            "{//\n}",
-            "{0:0}"
+            "{\"aa\":'aa'}"
         ],
         "unexpected_a_after_b": [
             "0a"

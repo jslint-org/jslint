@@ -6,7 +6,7 @@ douglas@crockford.com
 ## v2021.5.21
 
 ## Status
-| Branch | [master](https://github.com/jslint-org/jslint/tree/master)<br>(release) | [beta](https://github.com/jslint-org/jslint/tree/beta)<br>(production) | [alpha](https://github.com/jslint-org/jslint/tree/alpha)<br>(development) |
+| Branch | [master<br>(release)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(production)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(development)](https://github.com/jslint-org/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jslint-org/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/jslint-org/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/jslint-org/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://jslint-org.github.io/jslint/branch.master/.build/coverage/coverage-badge.svg)](https://jslint-org.github.io/jslint/branch.master/.build/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch.beta/.build/coverage/coverage-badge.svg)](https://jslint-org.github.io/jslint/branch.beta/.build/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch.alpha/.build/coverage/coverage-badge.svg)](https://jslint-org.github.io/jslint/branch.alpha/.build/coverage/index.html) |
@@ -18,21 +18,54 @@ douglas@crockford.com
 
 [![screenshot](https://jslint-org.github.io/jslint/branch.master/.build/screenshot.browser._2findex.html.png)](https://jslint-org.github.io/jslint/index.html)
 
+## Installation
+1. Download [https://www.jslint.com/jslint.js](https://www.jslint.com/jslint.js) and rename to `jslint.mjs`
+```shell
+#!/bin/sh
+curl -L https://www.jslint.com/jslint.js > jslint.mjs
+```
+
+2. To run `jslint.mjs` from command line:
+```shell
+#!/bin/sh
+node jslint.mjs hello.js
+
+# stderr:
+# jslint hello.js
+# 1 Use double quotes, not single quotes. // line 1, column 14
+#     console.log('hello world');
+```
+
+3. To load `jslint.mjs` as es-module:
+```javascript
+import jslint from "./jslint.mjs";
+let code = "console.log('hello world');\n";
+let result = jslint(code);
+result.warnings.forEach(function ({
+    formatted_message
+}) {
+    console.error(formatted_message);
+});
+
+// stderr:
+// 1 Undeclared 'console'. // line 1, column 1
+//     console.log('hello world');
+// 2 Use double quotes, not single quotes. // line 1, column 14
+//     console.log('hello world');
+```
+
 ## Description
-[jslint.js](jslint.js) contains the jslint function. It parses and analyzes a source file,
-returning an object with information about the file. It can also take an object
-that sets options.
+- [jslint.js](jslint.js) contains the jslint function. It parses and analyzes a source file, returning an object with information about the file. It can also take an object that sets options.
 
-[index.html](index.html) runs the jslint.js function in a web page. The page also depends
-`browser.js` and `report.js`.
+- [index.html](index.html) runs the jslint.js function in a web page. The page also depends on `browser.js` and `report.js`.
 
-[browser.js](browser.js) runs the web user interface.
+- [browser.js](browser.js) runs the web user interface.
 
-[report.js](report.js) generates the results reports in HTML.
+- [report.js](report.js) generates the results reports in HTML.
 
-[help.html](help.html) describes JSLint's usage. Please [read it](https://jslint-org.github.io/jslint/help.html).
+- [help.html](help.html) describes JSLint's usage. Please [read it](https://jslint-org.github.io/jslint/help.html).
 
-[function.html](function.html) describes the jslint function and the results it produces.
+- [function.html](function.html) describes the jslint function and the results it produces.
 
 JSLint can be run anywhere that JavaScript (or Java) can run.
 

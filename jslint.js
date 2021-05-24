@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // jslint.js
 // 2020-11-06
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
@@ -86,40 +87,42 @@
 // WARNING: JSLint will hurt your feelings.
 
 /*property
-    a, and, arity, assign, b, bad_assignment_a, bad_directive_a, bad_get,
-    bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise, block,
-    body, browser, c, calls, catch, charCodeAt, closer, closure, code, column,
-    concat, constant, context, convert, couch, create, d, dead, default, devel,
-    directive, directives, disrupt, dot, duplicate_a, edition, ellipsis, else,
-    empty_block, eval, every, expected_a, expected_a_at_b_c,
-    expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
-    expected_a_next_at_b, expected_digits_after_a, expected_four_digits,
-    expected_identifier_a, expected_line_break_a_b, expected_regexp_factor_a,
-    expected_space_a_b, expected_statements_a, expected_string_a,
-    expected_type_string_a, exports, expression, extra, finally, flag, for,
-    forEach, free, freeze, freeze_exports, from, froms, fud, fudge,
-    function_in_loop, functions, g, getset, global, i, id, identifier, import,
-    inc, indexOf, infix_in, init, initial, isArray, isNaN, join, json, keys,
-    label, label_a, lbp, led, length, level, line, lines, live, long, loop, m,
-    margin, match, message, misplaced_a, misplaced_directive_a, missing_browser,
-    missing_m, module, naked_block, name, names, nested_comment, new, node,
-    not_label_a, nr, nud, number_isNaN, ok, open, opening, option,
-    out_of_scope_a, parameters, parent, pop, property, push, quote, raw,
-    redefinition_a_b, replace, required_a_optional_b, reserved_a, role, search,
-    shebang, signature, single, slice, some, sort, split, startsWith, statement,
-    stop, subscript_a, switch, test, this, thru, toString, todo_comment,
-    tokens, too_long, too_many_digits, tree, try, type, u, unclosed_comment,
-    unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
-    unexpected_a_after_b, unexpected_a_before_b, unexpected_at_top_level_a,
-    unexpected_char_a, unexpected_comment, unexpected_directive_a,
-    unexpected_expression_a, unexpected_label_a, unexpected_parens,
-    unexpected_space_a_b, unexpected_statement_a, unexpected_trailing_space,
-    unexpected_typeof_a, uninitialized_a, unreachable_a,
-    unregistered_property_a, unused_a, use_double, use_open, use_spaces,
-    used, value, var_loop, var_switch, variable, warning, warnings,
-    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
-    wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary,
-    wrapped, writable, y
+    a, all, and, argv, arity, assign, b, bad_assignment_a, bad_directive_a,
+    bad_get, bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise,
+    block, body, browser, c, calls, catch, cli_mode, closer, closure, code,
+    column, concat, constant, context, convert, couch, create, d, dead, debug,
+    default, devel, directive, directives, disrupt, dot, duplicate_a,
+    early_stop, edition, ellipsis, else, empty_block, error, eval, every, exec,
+    exit, expected_a, expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d,
+    expected_a_before_b, expected_a_next_at_b, expected_digits_after_a,
+    expected_four_digits, expected_identifier_a, expected_line_break_a_b,
+    expected_regexp_factor_a, expected_space_a_b, expected_statements_a,
+    expected_string_a, expected_type_string_a, exports, expression, extra, file,
+    finally, flag, for, forEach, formatted_message, free, freeze,
+    freeze_exports, from, froms, fud, fudge, function_in_loop, functions, g,
+    getset, global, has_await, i, id, identifier, import, inc, indexOf,
+    infix_in, init, initial, isArray, isNaN, is_async, join, json, keys, label,
+    label_a, lbp, led, length, level, line, line_offset, lines, live, long,
+    loop, m, map, margin, match, message, misplaced_a, misplaced_directive_a,
+    missing_await_statement, missing_browser, missing_m, module, naked_block,
+    name, names, nested_comment, new, node, not_label_a, now, nr, nud,
+    number_isNaN, ok, open, opening, option, out_of_scope_a, padStart,
+    parameters, parent, pop, property, push, quote, raw, readFile, readdir,
+    redefinition_a_b, repeat, replace, required_a_optional_b, reserved_a, role,
+    search, shebang, signature, single, slice, some, sort, split, stack,
+    stack_trace, startsWith, statement, stop, subscript_a, switch, test, then,
+    this, thru, todo_comment, tokens, too_long, too_many_digits, tree, trim,
+    try, type, u, unclosed_comment, unclosed_mega, unclosed_string,
+    undeclared_a, unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
+    unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
+    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
+    unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
+    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
+    unreachable_a, unregistered_property_a, unused_a, use_double, use_open,
+    use_spaces, used, value, var_loop, var_switch, variable, versions, warning,
+    warnings, weird_condition_a, weird_expression_a, weird_loop,
+    weird_relation_a, white, wrap_condition, wrap_immediate, wrap_parameter,
+    wrap_regexp, wrap_unary, wrapped, writable, y
 */
 
 function empty() {
@@ -163,6 +166,7 @@ const allowed_option = {
         "require", "send", "start", "sum", "toJSON"
     ],
     convert: true,
+    debug: true,
     devel: [
         "alert", "confirm", "console", "prompt"
     ],
@@ -229,8 +233,8 @@ const standard = [
     "Array", "ArrayBuffer", "Boolean", "DataView", "Date", "decodeURI",
     "decodeURIComponent", "encodeURI", "encodeURIComponent", "Error",
     "EvalError", "Float32Array", "Float64Array", "Generator",
-    "GeneratorFunction", "Int8Array", "Int16Array", "Int32Array", "Intl",
-    "JSON", "Map", "Math", "Number", "Object", "parseInt", "parseFloat",
+    "GeneratorFunction", "import", "Int8Array", "Int16Array", "Int32Array",
+    "Intl", "JSON", "Map", "Math", "Number", "Object", "parseInt", "parseFloat",
     "Promise", "Proxy", "RangeError", "ReferenceError", "Reflect", "RegExp",
     "Set", "String", "Symbol", "SyntaxError", "System", "TypeError",
     "Uint8Array", "Uint8ClampedArray", "Uint16Array", "Uint32Array",
@@ -286,6 +290,7 @@ const bundle = {
     misplaced_directive_a: (
         "Place the '/*{a}*/' directive before the first statement."
     ),
+    missing_await_statement: "Expected await statement in async function.",
     missing_browser: "/*global*/ requires the Assume a browser option.",
     missing_m: "Expected 'm' flag on a multiline regular expression.",
     naked_block: "Naked block.",
@@ -562,6 +567,10 @@ function warn_at(code, line, column, a, b, c, d) {
         warning.d = d;
     }
     warning.message = supplant(bundle[code] || code, warning);
+// Include stack_trace for jslint to debug itself for errors.
+    if (option.debug) {
+        warning.stack_trace = new Error().stack;
+    }
     warnings.push(warning);
     return warning;
 }
@@ -2409,6 +2418,7 @@ symbol(",");
 symbol(";");
 symbol(":");
 symbol("*/");
+symbol("async");
 symbol("await");
 symbol("case");
 symbol("catch");
@@ -2982,7 +2992,33 @@ function do_function(the_function) {
     return the_function;
 }
 
+function do_async() {
+    let the_async;
+    let the_function;
+    the_async = token;
+    advance("function");
+    the_function = token;
+    the_function.is_async = true;
+    the_function.arity = the_async.arity;
+    do_function();
+    if (!the_function.has_await) {
+        warn("missing_await_statement", the_function);
+    }
+    return the_function;
+}
+
+prefix("async", do_async);
 prefix("function", do_function);
+prefix("await", function () {
+    let the_await;
+    the_await = token;
+    if (!functionage.is_async) {
+        return stop("unexpected_a", the_await);
+    }
+    functionage.has_await = true;
+    the_await.expression = expression(150);
+    return the_await;
+});
 
 function fart(pl) {
     advance("=>");
@@ -3155,6 +3191,7 @@ stmt("{", function () {
     warn("naked_block", token);
     return block("naked");
 });
+stmt("async", do_async);
 stmt("break", function () {
     const the_break = token;
     let the_label;
@@ -3888,6 +3925,7 @@ function walk_statement(thing) {
                 thing.arity !== "statement"
                 && thing.arity !== "assignment"
                 && thing.id !== "import"
+                && thing.id !== "await"
             ) {
                 warn("unexpected_expression_a", thing);
             }
@@ -4826,6 +4864,7 @@ function whitage() {
                         || left.id === "else"
                         || left.id === "finally"
                         || left.id === "while"
+                        || left.id === "await"
                         || right.id === "catch"
                         || right.id === "else"
                         || right.id === "finally"
@@ -4883,7 +4922,7 @@ function whitage() {
 
 // The jslint function itself.
 
-export default Object.freeze(function jslint(
+function jslint(
     source = "",
     option_object = empty(),
     global_array = []
@@ -4985,10 +5024,42 @@ export default Object.freeze(function jslint(
         }
         early_stop = false;
     } catch (e) {
+        e.column = e.column || -1;
+        e.early_stop = true;
+        e.line = e.line || -1;
+        e.message = "[JSLint was unable to finish] - " + e.message;
         if (e.name !== "JSLintError") {
             warnings.push(e);
         }
     }
+
+// sort warnings by early_stop first, line, column respectively
+
+    warnings.sort(function (a, b) {
+        return (
+            Boolean(b.early_stop) - Boolean(a.early_stop)
+            || a.line - b.line || a.column - b.column
+        );
+
+// update each warning with a formatted_message ready for use by cli
+
+    }).map(function ({
+        column = 0,
+        line = 0,
+        message = "",
+        stack_trace = ""
+    }, ii, list) {
+        column += 1;
+        line += 1;
+        list[ii].formatted_message = String(
+            String(ii + 1).padStart(3, " ") +
+            " \u001b[31m" + message + "\u001b[39m" +
+            " \u001b[90m\/\/ line " + line + ", column " + column +
+            "\u001b[39m\n" +
+            ("    " + String(lines && lines[line - 1]).trim()).slice(0, 72) +
+            "\n" + stack_trace
+        ).trim();
+    });
     return {
         directives,
         edition: "2020-11-06",
@@ -5011,8 +5082,183 @@ export default Object.freeze(function jslint(
         stop: early_stop,
         tokens,
         tree,
-        warnings: warnings.sort(function (a, b) {
-            return a.line - b.line || a.column - b.column;
-        })
+        warnings
     };
+}
+
+async function cli({
+    file
+}) {
+/*
+ * this function will run jslint from nodejs-cli
+ */
+    const {
+        readFile,
+        readdir
+    } = await import("fs/promises");
+    let exitCode;
+    function string_line_count(code) {
+    /*
+     * this function will count number of newlines in <code>
+     */
+        let cnt;
+        let ii;
+        // https://jsperf.com/regexp-counting-2/8
+        cnt = 0;
+        ii = 0;
+        while (true) {
+            ii = code.indexOf("\n", ii) + 1;
+            if (ii === 0) {
+                break;
+            }
+            cnt += 1;
+        }
+        return cnt;
+    }
+    function jslint_from_file({
+        code,
+        file,
+        line_offset = 0,
+        warnings = []
+    }) {
+        switch ((
+            /\.\w+?$|$/m
+        ).exec(file)[0]) {
+        case ".html":
+            // recurse
+            code.replace((
+                /^<script\b[^>]*?>\n([\S\s]*?\n)<\/script>$/gm
+            ), function (ignore, match1, ii) {
+                jslint_from_file({
+                    code: match1,
+                    file: file + ".<script>.js",
+                    line_offset: string_line_count(code.slice(0, ii)) + 1
+                });
+                return "";
+            });
+            return;
+        case ".md":
+            // recurse
+            code.replace((
+                /^```javascript\n([\S\s]*?\n)```$/gm
+            ), function (ignore, match1, ii) {
+                jslint_from_file({
+                    code: match1.replace((
+                        /\u0027"\u0027"\u0027/g
+                    ), "\u0027"),
+                    file: file + ".<```javascript>.js",
+                    line_offset: string_line_count(code.slice(0, ii)) + 1
+                });
+                return "";
+            });
+            return;
+        case ".sh":
+            // recurse
+            code.replace((
+                /\bnode\u0020-e\u0020\u0027\n([\S\s]*?\n)\u0027/gm
+            ), function (ignore, match1, ii) {
+                jslint_from_file({
+                    code: match1.replace((
+                        /\u0027"\u0027"\u0027/g
+                    ), "\u0027"),
+                    file: file + ".<node -e>.js",
+                    line_offset: string_line_count(code.slice(0, ii)) + 1
+                });
+                return "";
+            });
+            return;
+        default:
+            warnings = jslint("\n".repeat(line_offset) + code, {
+                bitwise: true,
+                browser: true,
+                fudge: true,
+                node: true,
+                this: true
+            }, [
+                "global", "globalThis"
+            ]).warnings;
+        }
+        // print only first 10 warnings
+        if (warnings.length > 0) {
+            exitCode = 1;
+            // print first 10 warnings to stderr
+            console.error(
+                "\u001b[1mjslint " + file + "\u001b[22m\n" +
+                warnings.slice(0, 10).map(function ({
+                    formatted_message
+                }) {
+                    return formatted_message;
+                }).join("\n")
+            );
+        }
+    }
+    if (file === ".") {
+        file = await readdir(".");
+        await Promise.all(file.map(async function (file) {
+            let code;
+            let timeStart = Date.now();
+            switch ((
+                /\.\w+?$|$/m
+            ).exec(file)[0]) {
+            case ".html":
+            case ".js":
+            case ".json":
+            case ".md":
+            case ".mjs":
+            case ".sh":
+                break;
+            default:
+                return;
+            }
+            try {
+                code = await readFile(file, "utf8");
+            } catch (ignore) {
+                return;
+            }
+            if (!(
+                !(
+                    /\b(?:assets\.app\.js|lock|min|raw|rollup)\b/
+                ).test(file) && code && code.length < 1048576
+            )) {
+                return;
+            }
+            jslint_from_file({
+                code,
+                file
+            });
+            console.error(
+                "jslint - " + (Date.now() - timeStart) + "ms - " + file
+            );
+        }));
+    } else {
+        jslint_from_file({
+            code: await readFile(file, "utf8"),
+            file
+        });
+    }
+    return exitCode;
+}
+export default Object.freeze(function (
+    source = "",
+    option_object = empty(),
+    global_array = []
+) {
+    if (option_object.cli_mode) {
+        return cli(option_object);
+    }
+    return jslint(source, option_object, global_array);
 });
+// feature-detect nodejs-cli
+if (
+    typeof process === "object"
+    && process
+    && process.versions
+    && typeof process.versions.node === "string"
+    && process.argv
+    && (/\bjslint.m?js$/m).test(process.argv[1])
+) {
+    // run cli
+    cli({
+        file: process.argv[2]
+    }).then(process.exit);
+}
