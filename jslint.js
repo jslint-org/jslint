@@ -2989,28 +2989,30 @@ function do_function(the_function) {
     return the_function;
 }
 
-prefix("async", function () {
+function do_async() {
     let the_async;
     let the_function;
     the_async = token;
     advance("function");
     the_function = token;
-    the_function.isAsync = true;
-    do_function();
+    the_function.is_async = true;
     the_function.arity = the_async.arity;
-    if (!the_function.hasAwait) {
+    do_function();
+    if (!the_function.has_await) {
         warn("missing_await_statement", the_function);
     }
     return the_function;
-});
+}
+
+prefix("async", do_async);
 prefix("function", do_function);
 prefix("await", function () {
     let the_await;
     the_await = token;
-    if (!functionage.isAsync) {
+    if (!functionage.is_async) {
         return stop("unexpected_a", the_await);
     }
-    functionage.hasAwait = true;
+    functionage.has_await = true;
     the_await.expression = expression(150);
     return the_await;
 });
@@ -3186,6 +3188,7 @@ stmt("{", function () {
     warn("naked_block", token);
     return block("naked");
 });
+stmt("async", do_async);
 stmt("break", function () {
     const the_break = token;
     let the_label;
@@ -5073,7 +5076,10 @@ export default Object.freeze(jslint);
     )) {
         return;
     }
-    const {readFile, readdir} = await import("fs/promises");
+    const {
+        readFile,
+        readdir
+    } = await import("fs/promises");
     let exitCode;
     function stringLineCount(data) {
     /*

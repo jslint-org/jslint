@@ -155,7 +155,7 @@ import {readFile} from "fs/promises";
             "let aa;\n/*global aa*/"
         ],
         "missing_await_statement": [
-            "async function(){}"
+            "async function aa(){}"
         ],
         "missing_browser": [
             "/*global aa*/"
