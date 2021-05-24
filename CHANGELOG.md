@@ -1,12 +1,14 @@
 # Changelog
 
 ## Todo
+- website - add fork-me ribbon.
 - app - deploy jslint as chrome-extension.
 - doc - add svg package-listing.
 - ci - continue addng regression tests and improve code-coverage.
 - none
 
-## Branch beta
+## v9999.99.99-beta
+- website - load index.html with example code.
 - website - merge file report.js into browser.js.
 - jslint - add new rules unordered_param_a, unordered_property_a, that warn if parameters and properties are listed in nonascii-order.
 - jslint - add "globalThis" to default globals.

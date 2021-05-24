@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // jslint.js
-// v2021.5.23
+// v9999.99.99-beta
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -5095,7 +5095,7 @@ function jslint(
     });
     return {
         directives,
-        edition: "v2021.5.23",
+        edition: "v9999.99.99-beta",
         exports,
         froms,
         functions,
