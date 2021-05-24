@@ -2367,9 +2367,6 @@ function prefix(id, f) {
             return f();
         }
         the_token.expression = expression(150);
-        if (id === "await") {
-            functionage.hasAwait = true;
-        }
         return the_token;
     };
     return the_symbol;
@@ -2997,15 +2994,26 @@ prefix("async", function () {
     let the_function;
     the_async = token;
     advance("function");
-    the_function = do_function();
+    the_function = token;
+    the_function.isAsync = true;
+    do_function();
     the_function.arity = the_async.arity;
     if (!the_function.hasAwait) {
-        warn("missing_await_statement", the_async);
+        warn("missing_await_statement", the_function);
     }
     return the_function;
 });
 prefix("function", do_function);
-prefix("await");
+prefix("await", function () {
+    let the_await;
+    the_await = token;
+    if (!functionage.isAsync) {
+        return stop("unexpected_a", the_await);
+    }
+    functionage.hasAwait = true;
+    the_await.expression = expression(150);
+    return the_await;
+});
 
 function fart(pl) {
     advance("=>");
