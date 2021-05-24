@@ -1,7 +1,6 @@
 # Changelog
 
 ## Todo
-- jslint - add console to browser globals
 - app - deploy jslint as chrome-extension.
 - doc - add svg package-listing.
 - ci - continue addng regression tests and improve code-coverage.

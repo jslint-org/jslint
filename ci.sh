@@ -224,10 +224,10 @@ shCiBranchPromote() {(set -e
 shDirHttplinkValidate() {(set -e
 # this function will validate http-links embedded in .html and .md files
     node -e '
-(function () {
+(async function () {
     "use strict";
     let dict = {};
-    require("fs").readdirSync(".").forEach(async function (file) {
+    Array.from(await require("fs").readdir(".")).forEach(async function (file) {
         if (!(
             /.\.html$|.\.md$/m
         ).test(file)) {
@@ -338,18 +338,24 @@ shGitLsTree() {(set -e
 # shGitLsTree | sort -rk3 # sort by date
 # shGitLsTree | sort -rk4 # sort by size
     node -e '
-(function () {
+(async function () {
     "use strict";
     let result;
     // get file, mode, size
-    result = require("child_process").spawnSync("git", [
-        "ls-tree", "-lr", "HEAD"
-    ], {
-        encoding: "utf8",
-        stdio: [
-            "ignore", "pipe", 2
-        ]
-    }).stdout;
+    result = await new Promise(function (resolve) {
+        let child;
+        child = require("child_process").spawn("git", [
+            "ls-tree", "-lr", "HEAD"
+        ], {
+            encoding: "utf8",
+            stdio: [
+                "ignore", "pipe", 2
+            ]
+        });
+        child.on("exit", function () {
+            resolve(child.stdout);
+        });
+    });
     result = Array.from(result.matchAll(
         /^(\S+?)\u0020+?\S+?\u0020+?\S+?\u0020+?(\S+?)\t(\S+?)$/gm
     )).map(function ([
@@ -448,7 +454,8 @@ if (!globalThis.debugInline) {
         function stringHtmlSafe(str) {
         /*
          * this function will make <str> html-safe
-         * https://stackoverflow.com/questions/7381974/which-characters-need-to-be-escaped-on-html
+         * https://stackoverflow.com/questions/7381974/
+         * which-characters-need-to-be-escaped-on-html
          */
             return str.replace((
                 /&/gu
@@ -982,12 +989,12 @@ shRunWithScreenshotTxt() {(set -e
     fi
     # format text-output
     node -e '
-(function () {
+(async function () {
     "use strict";
     let result;
     let yy;
     yy = 10;
-    result = require("fs").readFileSync(
+    result = await require("fs/promises").readFile(
         require("os").tmpdir() + "/shRunWithScreenshotTxt.txt",
         "utf8"
     );
@@ -1033,11 +1040,13 @@ shRunWithScreenshotTxt() {(set -e
         result + "</text>\n</svg>\n"
     );
     try {
-        require("fs").mkdirSync(require("path").dirname(process.argv[1]), {
+        await require("fs/promises").mkdir((
+            require("path").dirname(process.argv[1])
+        ), {
             recursive: true
         });
     } catch (ignore) {}
-    require("fs").writeFileSync(process.argv[1], result);
+    require("fs/promises").writeFile(process.argv[1], result);
 }());
 ' "$SCREENSHOT_SVG" # "'
     shCiPrint "shRunWithScreenshotTxt - wrote - $SCREENSHOT_SVG"
