@@ -1,4 +1,13 @@
 import jslint from "./jslint.js";
+import {readFile} from "fs/promises";
+
+(async function testCoverage() {
+/*
+ * this function will try to improve coverage with no validation
+ */
+    jslint(await readFile("./jslint.js", "utf8"));
+    jslint(await readFile("./test.js", "utf8"));
+}());
 
 (function testCaseJslintWarningsValidate() {
 /*

@@ -5073,11 +5073,7 @@ export default Object.freeze(jslint);
     )) {
         return;
     }
-    const fs = await import("fs");
-    const {
-        readFile,
-        readdir
-    } = fs.promises;
+    const {readFile, readdir} = await import("fs/promises");
     let exitCode;
     function stringLineCount(data) {
     /*
