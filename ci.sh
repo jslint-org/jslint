@@ -420,6 +420,7 @@ shRunWithCoverage() {(set -e
     rm -rf "$DIR_COVERAGE"
     (export NODE_V8_COVERAGE="$DIR_COVERAGE" && "$@" || true)
     node -e '
+/*jslint bitwise*/
 // init debugInline
 if (!globalThis.debugInline) {
     let consoleError;

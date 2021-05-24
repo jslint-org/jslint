@@ -2,8 +2,9 @@ import jslint from "./jslint.js";
 
 (async function testCaseCoverage() {
 /*
- * this function will try to improve coverage with no validation
+ * this function will try to improve coverage
  */
+    // test cli-handling behavior
     await jslint("", {
         cli_mode: true,
         file: "."
@@ -313,6 +314,13 @@ import jslint from "./jslint.js";
         ],
         "uninitialized_a": [
             "/*jslint node*/\nlet aa;aa();"
+        ],
+        "unordered_param_a": [
+            "function aa({bb,aa}){}",
+            "let{bb,aa}=0"
+        ],
+        "unordered_property_a": [
+            "aa={bb,aa}"
         ],
         "unreachable_a": [
             "function aa(){while(0){break;0;}}"

@@ -7,15 +7,17 @@
 - none
 
 ## Branch beta
+- jslint - add new rules unordered_param_a, unordered_property_a, that warn if parameters and properties are listed in nonascii-order.
+- jslint - add "globalThis" to default globals.
 - none
 
 ## v2021.5.23
-- doc - add section Changelog
-- doc - update README.md with installtion instructions
+- doc - add section Changelog.
+- doc - update README.md with installation instructions.
 - cli - merge shell-function shJslintCli into jslint.js.
-- jslint - update default globals with support for "import"
-- jslint - sort warnings with higher priority for early_stop
-- jslint - add async/await support
+- jslint - update default globals with support for "import".
+- jslint - sort warnings with higher priority for early_stop.
+- jslint - add async/await support.
 - ci - make branch-beta the default branch.
 - ci - validate non-http/file links in *.md files.
 - ci - add shell-functions shCiBranchPromote.

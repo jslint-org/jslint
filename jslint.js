@@ -86,6 +86,8 @@
 
 // WARNING: JSLint will hurt your feelings.
 
+/*jslint node*/
+
 /*property
     a, all, and, argv, arity, assign, b, bad_assignment_a, bad_directive_a,
     bad_get, bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise,
@@ -118,11 +120,12 @@
     unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
     unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
     unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
-    unreachable_a, unregistered_property_a, unused_a, use_double, use_open,
-    use_spaces, used, value, var_loop, var_switch, variable, versions, warning,
-    warnings, weird_condition_a, weird_expression_a, weird_loop,
-    weird_relation_a, white, wrap_condition, wrap_immediate, wrap_parameter,
-    wrap_regexp, wrap_unary, wrapped, writable, y
+    unordered_param_a, unordered_property_a, unreachable_a,
+    unregistered_property_a, unused_a, use_double, use_open, use_spaces, used,
+    value, var_loop, var_switch, variable, versions, warning, warnings,
+    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
+    wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary,
+    wrapped, writable, y
 */
 
 function empty() {
@@ -161,11 +164,11 @@ const allowed_option = {
         "TextDecoder", "TextEncoder", "URL", "window", "Worker",
         "XMLHttpRequest"
     ],
+    convert: true,
     couch: [
         "emit", "getRow", "isArray", "log", "provides", "registerType",
         "require", "send", "start", "sum", "toJSON"
     ],
-    convert: true,
     debug: true,
     devel: [
         "alert", "confirm", "console", "prompt"
@@ -206,10 +209,10 @@ const opener = {
 
 // The open and close pairs.
 
+    "${": "}",      // mega
     "(": ")",       // paren
     "[": "]",       // bracket
-    "{": "}",       // brace
-    "${": "}"       // mega
+    "{": "}"        // brace
 };
 
 // The relational operators.
@@ -230,15 +233,15 @@ const standard = [
 
 // These are the globals that are provided by the language standard.
 
-    "Array", "ArrayBuffer", "Boolean", "DataView", "Date", "decodeURI",
-    "decodeURIComponent", "encodeURI", "encodeURIComponent", "Error",
-    "EvalError", "Float32Array", "Float64Array", "Generator",
-    "GeneratorFunction", "import", "Int8Array", "Int16Array", "Int32Array",
-    "Intl", "JSON", "Map", "Math", "Number", "Object", "parseInt", "parseFloat",
-    "Promise", "Proxy", "RangeError", "ReferenceError", "Reflect", "RegExp",
-    "Set", "String", "Symbol", "SyntaxError", "System", "TypeError",
-    "Uint8Array", "Uint8ClampedArray", "Uint16Array", "Uint32Array",
-    "URIError", "WeakMap", "WeakSet"
+    "Array", "ArrayBuffer", "Boolean", "DataView", "Date", "Error", "EvalError",
+    "Float32Array", "Float64Array", "Generator", "GeneratorFunction",
+    "Int16Array", "Int32Array", "Int8Array", "Intl", "JSON", "Map", "Math",
+    "Number", "Object", "Promise", "Proxy", "RangeError", "ReferenceError",
+    "Reflect", "RegExp", "Set", "String", "Symbol", "SyntaxError", "System",
+    "TypeError", "URIError", "Uint16Array", "Uint32Array", "Uint8Array",
+    "Uint8ClampedArray", "WeakMap", "WeakSet", "decodeURI",
+    "decodeURIComponent", "encodeURI", "encodeURIComponent", "globalThis",
+    "import", "parseFloat", "parseInt"
 ];
 
 const bundle = {
@@ -332,6 +335,12 @@ const bundle = {
         "Unexpected 'typeof'. Use '===' to compare directly with {a}."
     ),
     uninitialized_a: "Uninitialized '{a}'.",
+    unordered_param_a: (
+        "Parameter '{a}' not listed in alphabetical order."
+    ),
+    unordered_property_a: (
+        "Property name '{a}' not listed in alphabetical order."
+    ),
     unreachable_a: "Unreachable '{a}'.",
     unregistered_property_a: "Unregistered property name '{a}'.",
     unused_a: "Unused '{a}'.",
@@ -549,10 +558,10 @@ function warn_at(code, line, column, a, b, c, d) {
 // resembles an exception.
 
     const warning = {         // ~~
-        name: "JSLintError",
+        code,
         column,
         line,
-        code
+        name: "JSLintError"
     };
     if (a !== undefined) {
         warning.a = a;
@@ -567,7 +576,9 @@ function warn_at(code, line, column, a, b, c, d) {
         warning.d = d;
     }
     warning.message = supplant(bundle[code] || code, warning);
+
 // Include stack_trace for jslint to debug itself for errors.
+
     if (option.debug) {
         warning.stack_trace = new Error().stack;
     }
@@ -2752,6 +2763,8 @@ function parameter_list() {
             let ellipsis = false;
             let param;
             if (next_token.id === "{") {
+                let a;
+                let b = "";
                 if (optional !== undefined) {
                     warn(
                         "required_a_optional_b",
@@ -2770,6 +2783,11 @@ function parameter_list() {
                         return stop("expected_identifier_a");
                     }
                     survey(subparam);
+                    a = b;
+                    b = String(subparam.value || subparam.id);
+                    if (a > b) {
+                        warn("unordered_param_a", subparam);
+                    }
                     advance();
                     signature.push(subparam.id);
                     if (next_token.id === ":") {
@@ -3101,6 +3119,8 @@ prefix("{", function () {
     const seen = empty();
     the_brace.expression = [];
     if (next_token.id !== "}") {
+        let a;
+        let b = "";
         (function member() {
             let extra;
             let full;
@@ -3108,6 +3128,11 @@ prefix("{", function () {
             let name = next_token;
             let value;
             advance();
+            a = b;
+            b = String(name.value || name.id);
+            if (a > b) {
+                warn("unordered_property_a", name);
+            }
             if (
                 (name.id === "get" || name.id === "set")
                 && next_token.identifier
@@ -3254,6 +3279,8 @@ function do_var() {
     }
     (function next() {
         if (next_token.id === "{" && the_statement.id !== "var") {
+            let a;
+            let b = "";
             const the_brace = next_token;
             advance("{");
             (function pair() {
@@ -3262,6 +3289,11 @@ function do_var() {
                 }
                 const name = next_token;
                 survey(name);
+                a = b;
+                b = String(name.value || name.id);
+                if (a > b) {
+                    warn("unordered_param_a", name);
+                }
                 advance();
                 if (next_token.id === ":") {
                     advance(":");
@@ -3967,9 +3999,9 @@ function lookup(thing) {
                 }
                 the_variable = {
                     dead: false,
-                    parent: global,
                     id: thing.id,
                     init: true,
+                    parent: global,
                     role: "variable",
                     used: 0,
                     writable: false
@@ -4945,10 +4977,10 @@ function jslint(
         );
         functions = [];
         global = {
-            id: "(global)",
             body: true,
             context: empty(),
             from: 0,
+            id: "(global)",
             level: 0,
             line: 0,
             live: [],
@@ -5119,6 +5151,7 @@ async function cli({
         code,
         file,
         line_offset = 0,
+        option = {},
         warnings = []
     }) {
         switch ((
@@ -5162,21 +5195,19 @@ async function cli({
                         /\u0027"\u0027"\u0027/g
                     ), "\u0027"),
                     file: file + ".<node -e>.js",
-                    line_offset: string_line_count(code.slice(0, ii)) + 1
+                    line_offset: string_line_count(code.slice(0, ii)) + 1,
+                    option: {
+                        node: true
+                    }
                 });
                 return "";
             });
             return;
         default:
-            warnings = jslint("\n".repeat(line_offset) + code, {
-                bitwise: true,
-                browser: true,
-                fudge: true,
-                node: true,
-                this: true
-            }, [
-                "global", "globalThis"
-            ]).warnings;
+            warnings = jslint(
+                "\n".repeat(line_offset) + code,
+                option
+            ).warnings;
         }
         // print only first 10 warnings
         if (warnings.length > 0) {

@@ -38,6 +38,7 @@ node jslint.mjs hello.js
 
 3. To load `jslint.mjs` as es-module:
 ```javascript
+/*jslint devel*/
 import jslint from "./jslint.mjs";
 let code = "console.log('hello world');\n";
 let result = jslint(code);
