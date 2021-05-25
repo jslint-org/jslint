@@ -201,9 +201,14 @@ shCiBase() {(set -e
     # jslint all files
     node jslint.js .
     # run test with coverage-report
+    # coverage-hack - jslint invalid file
+    mkdir -p .test-dir.js
+    # coverage-hack - jslint invalid file
+    touch .test-min.js
     shRunWithCoverage node test.js
     # screenshot live-web-demo
-    shBrowserScreenshot index.html
+    shBrowserScreenshot \
+        https://jslint-org.github.io/jslint/branch.beta/index.html
 )}
 
 shCiBranchPromote() {(set -e
@@ -233,7 +238,7 @@ shDirHttplinkValidate() {(set -e
         ).test(file)) {
             return;
         }
-        let data = await require("fs").promises.readFile(file, "utf8");
+        let data = await require("fs/promises").readFile(file, "utf8");
         data.replace((
             /\bhttps?:\/\/.*?(?:[")\]]|$)/gm
         ), function (url) {
@@ -654,7 +659,7 @@ body {
                 let xx1 = 6 * str1.length + 20;
                 let xx2 = 6 * str2.length + 20;
                 // fs - write coverage-badge.svg
-                require("fs").promises.writeFile((
+                require("fs/promises").writeFile((
                     DIR_COVERAGE + "/coverage-badge.svg"
                 ), String(`
 <svg height="20" width="${xx1 + xx2}" xmlns="http://www.w3.org/2000/svg">
@@ -805,30 +810,30 @@ ${String(count).padStart(7, " ")}
 </body>
 </html>`;
         html += "\n";
-        await require("fs").promises.mkdir(require("path").dirname(pathname), {
+        await require("fs/promises").mkdir(require("path").dirname(pathname), {
             recursive: true
         });
         // fs - write *.html
-        require("fs").promises.writeFile(pathname + ".html", html);
+        require("fs/promises").writeFile(pathname + ".html", html);
         if (lineList) {
             return;
         }
         // fs - write coverage.txt
         console.error("\n" + txt);
-        require("fs").promises.writeFile((
+        require("fs/promises").writeFile((
             DIR_COVERAGE + "/coverage-report.txt"
         ), txt);
     }
-    data = await require("fs").promises.readdir(DIR_COVERAGE);
+    data = await require("fs/promises").readdir(DIR_COVERAGE);
     await Promise.all(data.map(async function (file) {
         if ((
             /^coverage-.*?\.json$/
         ).test(file)) {
-            data = await require("fs").promises.readFile((
+            data = await require("fs/promises").readFile((
                 DIR_COVERAGE + file
             ), "utf8");
             // fs - rename to coverage-v8.json
-            require("fs").promises.rename(
+            require("fs/promises").rename(
                 DIR_COVERAGE + file,
                 DIR_COVERAGE + "coverage-v8.json"
             );
@@ -868,7 +873,7 @@ ${String(count).padStart(7, " ")}
             return;
         }
         pathname = pathname.replace(cwd, "");
-        src = await require("fs").promises.readFile(pathname, "utf8");
+        src = await require("fs/promises").readFile(pathname, "utf8");
         lineList = [{}];
         src.replace((
             /^.*$/gm
@@ -934,7 +939,7 @@ ${String(count).padStart(7, " ")}
         }) {
             return count > 0;
         }).length;
-        await require("fs").promises.mkdir((
+        await require("fs/promises").mkdir((
             require("path").dirname(DIR_COVERAGE + pathname)
         ), {
             recursive: true
@@ -966,6 +971,7 @@ ${String(count).padStart(7, " ")}
     });
 }());
 ' # "'
+    find "$DIR_COVERAGE"
 )}
 
 shRunWithScreenshotTxt() {(set -e

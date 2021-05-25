@@ -371,6 +371,7 @@ fudge_change();
 elem_source.select();
 elem_source.focus();
 elem_source.value = String(`
+#!/usr/bin/env node
 /*jslint devel*/
 import jslint from "./jslint.js";
 import https from "https";

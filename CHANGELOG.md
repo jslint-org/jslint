@@ -7,7 +7,8 @@
 - ci - continue addng regression tests and improve code-coverage.
 - none
 
-## v9999.99.99-beta
+## v2021.5.24-beta
+- jslint - fix bug falsely warning against conditional-chaining-operator "?.".
 - website - load index.html with example code.
 - website - merge file report.js into browser.js.
 - jslint - add new rules unordered_param_a, unordered_property_a, that warn if parameters and properties are listed in nonascii-order.

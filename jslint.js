@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // jslint.js
-// v9999.99.99-beta
+// v2021.5.24-beta
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -476,13 +476,8 @@ function is_letter(string) {
 }
 
 function supplant(string, object) {
-    return string.replace(rx_supplant, function (found, filling) {
-        const replacement = object[filling];
-        return (
-            replacement !== undefined
-            ? replacement
-            : found
-        );
+    return string.replace(rx_supplant, function (ignore, filling) {
+        return object[filling];
     });
 }
 
@@ -576,7 +571,7 @@ function warn_at(code, line, column, a, b, c, d) {
     if (d !== undefined) {
         warning.d = d;
     }
-    warning.message = supplant(bundle[code] || code, warning);
+    warning.message = supplant(bundle[code], warning);
 
 // Include stack_trace for jslint to debug itself for errors.
 
@@ -2231,7 +2226,7 @@ function left_check(left, right) {
         )
         && (
             left.arity !== "binary"
-            || (id !== "." && id !== "(" && id !== "[")
+            || (id !== "." && id !== "?." && id !== "(" && id !== "[")
         )
     ) {
         warn("unexpected_a", right);
@@ -5062,6 +5057,7 @@ function jslint(
         e.line = e.line || -1;
         e.message = "[JSLint was unable to finish] - " + e.message;
         if (e.name !== "JSLintError") {
+            e.stack_trace = e.stack;
             warnings.push(e);
         }
     }
@@ -5095,7 +5091,7 @@ function jslint(
     });
     return {
         directives,
-        edition: "v9999.99.99-beta",
+        edition: "v2021.5.24-beta",
         exports,
         froms,
         functions,
@@ -5122,6 +5118,7 @@ function jslint(
 async function cli({
     console_error,
     file,
+    option,
     source
 }) {
 /*
@@ -5168,7 +5165,10 @@ async function cli({
                 jslint_from_file({
                     code: match1,
                     file: file + ".<script>.js",
-                    line_offset: string_line_count(code.slice(0, ii)) + 1
+                    line_offset: string_line_count(code.slice(0, ii)) + 1,
+                    option: Object.assign({
+                        browser: true
+                    }, option)
                 });
                 return "";
             });
@@ -5179,11 +5179,10 @@ async function cli({
                 /^```javascript\n([\S\s]*?\n)```$/gm
             ), function (ignore, match1, ii) {
                 jslint_from_file({
-                    code: match1.replace((
-                        /\u0027"\u0027"\u0027/g
-                    ), "\u0027"),
+                    code: match1,
                     file: file + ".<```javascript>.js",
-                    line_offset: string_line_count(code.slice(0, ii)) + 1
+                    line_offset: string_line_count(code.slice(0, ii)) + 1,
+                    option
                 });
                 return "";
             });
@@ -5191,17 +5190,15 @@ async function cli({
         case ".sh":
             // recurse
             code.replace((
-                /\bnode\u0020-e\u0020\u0027\n([\S\s]*?\n)\u0027/gm
+                /\bnode\u0020.*?-e\u0020'\n([\S\s]*?\n)'/gm
             ), function (ignore, match1, ii) {
                 jslint_from_file({
-                    code: match1.replace((
-                        /\u0027"\u0027"\u0027/g
-                    ), "\u0027"),
+                    code: match1,
                     file: file + ".<node -e>.js",
                     line_offset: string_line_count(code.slice(0, ii)) + 1,
-                    option: {
+                    option: Object.assign({
                         node: true
-                    }
+                    }, option)
                 });
                 return "";
             });
@@ -5230,7 +5227,8 @@ async function cli({
     if (source) {
         jslint_from_file({
             code: source,
-            file
+            file,
+            option
         });
         return;
     }
@@ -5259,14 +5257,15 @@ async function cli({
             }
             if (!(
                 !(
-                    /\b(?:assets\.app\.js|lock|min|raw|rollup)\b/
+                    /\b(?:lock|min|raw|rollup)\b/
                 ).test(file) && code && code.length < 1048576
             )) {
                 return;
             }
             jslint_from_file({
                 code,
-                file
+                file,
+                option
             });
             console_error(
                 "jslint - " + (Date.now() - timeStart) + "ms - " + file
@@ -5275,7 +5274,8 @@ async function cli({
     } else {
         jslint_from_file({
             code: await readFile(file, "utf8"),
-            file
+            file,
+            option
         });
     }
     return exitCode;
@@ -5295,10 +5295,10 @@ export default Object.freeze(function (
 // feature-detect nodejs-cli
 if (
     typeof process === "object"
-    && process
-    && process.versions
+    // uncomment when nodejs v12 is no longer used in ci
+    // && typeof process?.versions?.node === "string"
+    && process && process.versions
     && typeof process.versions.node === "string"
-    && process.argv
     && (/\bjslint.m?js$/m).test(process.argv[1])
 ) {
     // run cli
