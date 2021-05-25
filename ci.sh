@@ -1,7 +1,4 @@
 #!/bin/sh
-: '
-/* jslint utility2:true */
-'
 
 # sh one-liner
 # head CHANGELOG.md -n20
@@ -125,6 +122,7 @@ if (!globalThis.debugInline) {
 
 shCiArtifactUpload() {(set -e
 # this function will upload build-artifacts to branch-gh-pages
+    export NODE_OPTIONS="--unhandled-rejections=strict"
     node -e '
 process.exit(
     `${process.version.split(".")[0]}.${process.arch}.${process.platform}` !==
@@ -197,15 +195,17 @@ process.exit(
 )}
 
 shCiBase() {(set -e
-# this function will run github-ci
-    # jslint all files
-    node jslint.js .
+# this function will run base-ci
+    export NODE_OPTIONS="--unhandled-rejections=strict"
     # run test with coverage-report
     # coverage-hack - jslint invalid file
     mkdir -p .test-dir.js
     # coverage-hack - jslint invalid file
     touch .test-min.js
-    shRunWithCoverage node test.js
+    (set -e
+        export JSLINT_CLI=1
+        shRunWithCoverage node test.js .
+    )
     # screenshot live-web-demo
     shBrowserScreenshot \
         https://jslint-org.github.io/jslint/branch.beta/index.html
@@ -232,15 +232,17 @@ shDirHttplinkValidate() {(set -e
 (async function () {
     "use strict";
     let dict = {};
-    Array.from(await require("fs").readdir(".")).forEach(async function (file) {
+    Array.from(
+        await require("fs").promises.readdir(".")
+    ).forEach(async function (file) {
         if (!(
             /.\.html$|.\.md$/m
         ).test(file)) {
             return;
         }
-        let data = await require("fs/promises").readFile(file, "utf8");
+        let data = await require("fs").promises.readFile(file, "utf8");
         data.replace((
-            /\bhttps?:\/\/.*?(?:[")\]]|$)/gm
+            /\bhttps?:\/\/.*?(?:[\s")\]]|$)/gm
         ), function (url) {
             url = url.slice(0, -1).replace((
                 /[\u0022\u0027]/g
@@ -333,7 +335,7 @@ shGitCmdWithGithubToken() {(set -e
     EXIT_CODE=0
     # hide $GITHUB_TOKEN in case of err
     git "$CMD" "$URL" "$@" 2>/dev/null || EXIT_CODE="$?"
-    printf "EXIT_CODE=$EXIT_CODE\n"
+    printf "shGitCmdWithGithubToken - EXIT_CODE=$EXIT_CODE\n" 1>&2
     return "$EXIT_CODE"
 )}
 
@@ -361,7 +363,7 @@ shGitLsTree() {(set -e
             resolve(child.stdout);
         });
     });
-    result = Array.from(result.matchAll(
+    result = Array.from(String(result).matchAll(
         /^(\S+?)\u0020+?\S+?\u0020+?\S+?\u0020+?(\S+?)\t(\S+?)$/gm
     )).map(function ([
         ignore, mode, size, file
@@ -421,10 +423,17 @@ shGitLsTree() {(set -e
 shRunWithCoverage() {(set -e
 # this function will run nodejs command $@ with v8-coverage and
 # create coverage-report .build/coverage/index.html
+    local EXIT_CODE
+    EXIT_CODE=0
     export DIR_COVERAGE=.build/coverage/
     rm -rf "$DIR_COVERAGE"
-    (export NODE_V8_COVERAGE="$DIR_COVERAGE" && "$@" || true)
-    node -e '
+    (set -e
+        export NODE_V8_COVERAGE="$DIR_COVERAGE"
+        "$@"
+    ) || EXIT_CODE="$?"
+    if [ "$EXIT_CODE" = 0 ]
+    then
+        node -e '
 /*jslint bitwise*/
 // init debugInline
 if (!globalThis.debugInline) {
@@ -659,7 +668,7 @@ body {
                 let xx1 = 6 * str1.length + 20;
                 let xx2 = 6 * str2.length + 20;
                 // fs - write coverage-badge.svg
-                require("fs/promises").writeFile((
+                require("fs").promises.writeFile((
                     DIR_COVERAGE + "/coverage-badge.svg"
                 ), String(`
 <svg height="20" width="${xx1 + xx2}" xmlns="http://www.w3.org/2000/svg">
@@ -810,30 +819,30 @@ ${String(count).padStart(7, " ")}
 </body>
 </html>`;
         html += "\n";
-        await require("fs/promises").mkdir(require("path").dirname(pathname), {
+        await require("fs").promises.mkdir(require("path").dirname(pathname), {
             recursive: true
         });
         // fs - write *.html
-        require("fs/promises").writeFile(pathname + ".html", html);
+        require("fs").promises.writeFile(pathname + ".html", html);
         if (lineList) {
             return;
         }
         // fs - write coverage.txt
         console.error("\n" + txt);
-        require("fs/promises").writeFile((
+        require("fs").promises.writeFile((
             DIR_COVERAGE + "/coverage-report.txt"
         ), txt);
     }
-    data = await require("fs/promises").readdir(DIR_COVERAGE);
+    data = await require("fs").promises.readdir(DIR_COVERAGE);
     await Promise.all(data.map(async function (file) {
         if ((
             /^coverage-.*?\.json$/
         ).test(file)) {
-            data = await require("fs/promises").readFile((
+            data = await require("fs").promises.readFile((
                 DIR_COVERAGE + file
             ), "utf8");
             // fs - rename to coverage-v8.json
-            require("fs/promises").rename(
+            require("fs").promises.rename(
                 DIR_COVERAGE + file,
                 DIR_COVERAGE + "coverage-v8.json"
             );
@@ -873,7 +882,7 @@ ${String(count).padStart(7, " ")}
             return;
         }
         pathname = pathname.replace(cwd, "");
-        src = await require("fs/promises").readFile(pathname, "utf8");
+        src = await require("fs").promises.readFile(pathname, "utf8");
         lineList = [{}];
         src.replace((
             /^.*$/gm
@@ -939,7 +948,7 @@ ${String(count).padStart(7, " ")}
         }) {
             return count > 0;
         }).length;
-        await require("fs/promises").mkdir((
+        await require("fs").promises.mkdir((
             require("path").dirname(DIR_COVERAGE + pathname)
         ), {
             recursive: true
@@ -971,7 +980,10 @@ ${String(count).padStart(7, " ")}
     });
 }());
 ' # "'
-    find "$DIR_COVERAGE"
+        find "$DIR_COVERAGE"
+    fi
+    printf "shRunWithCoverage - EXIT_CODE=$EXIT_CODE\n" 1>&2
+    return "$EXIT_CODE"
 )}
 
 shRunWithScreenshotTxt() {(set -e
@@ -983,7 +995,7 @@ shRunWithScreenshotTxt() {(set -e
     rm -f "$SCREENSHOT_SVG"
     printf "0\n" > "$SCREENSHOT_SVG.exit_code"
     shCiPrint "shRunWithScreenshotTxt - (shRun $* 2>&1)"
-    (
+    (set -e
         (shRun "$@" 2>&1) || printf "$?\n" > "$SCREENSHOT_SVG.exit_code"
     ) | tee /tmp/shRunWithScreenshotTxt.txt
     EXIT_CODE="$(cat "$SCREENSHOT_SVG.exit_code")"
@@ -1001,7 +1013,7 @@ shRunWithScreenshotTxt() {(set -e
     let result;
     let yy;
     yy = 10;
-    result = await require("fs/promises").readFile(
+    result = await require("fs").promises.readFile(
         require("os").tmpdir() + "/shRunWithScreenshotTxt.txt",
         "utf8"
     );
@@ -1047,16 +1059,17 @@ shRunWithScreenshotTxt() {(set -e
         result + "</text>\n</svg>\n"
     );
     try {
-        await require("fs/promises").mkdir((
+        await require("fs").promises.mkdir((
             require("path").dirname(process.argv[1])
         ), {
             recursive: true
         });
     } catch (ignore) {}
-    require("fs/promises").writeFile(process.argv[1], result);
+    require("fs").promises.writeFile(process.argv[1], result);
 }());
 ' "$SCREENSHOT_SVG" # "'
     shCiPrint "shRunWithScreenshotTxt - wrote - $SCREENSHOT_SVG"
+    printf "shRunWithScreenshotTxt - EXIT_CODE=$EXIT_CODE\n" 1>&2
     return "$EXIT_CODE"
 )}
 

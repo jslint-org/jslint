@@ -8,6 +8,8 @@
 - none
 
 ## v2021.5.24-beta
+- jslint - remove deadcode for preaction-binary-".".
+- cli - add env var JSLINT_CLI to force-trigger cli in jslint.js
 - jslint - fix bug falsely warning against conditional-chaining-operator "?.".
 - website - load index.html with example code.
 - website - merge file report.js into browser.js.

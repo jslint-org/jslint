@@ -1,3 +1,4 @@
+/*jslint node*/
 import jslint from "./jslint.js";
 
 function assertOrThrow(passed, err) {
@@ -9,14 +10,20 @@ function assertOrThrow(passed, err) {
     }
 }
 
+function noop() {
+/*
+ * this function will do nothing
+ */
+    return;
+}
+
 (function testCaseJslintCli() {
 /*
  * this function will test jslint's cli handling-behavior
  */
-    jslint("", {
-        cli_mode: true,
-        file: "."
-    });
+    process.exit = function (exitCode) {
+        assertOrThrow(!exitCode, exitCode);
+    };
     jslint("", {
         cli_mode: true,
         file: "jslint.js"
@@ -24,9 +31,7 @@ function assertOrThrow(passed, err) {
     jslint("", {
         cli_mode: true,
         // suppress error
-        console_error: function () {
-            return;
-        },
+        console_error: noop,
         file: "syntax_error.js",
         option: {
             debug: true
@@ -479,7 +484,8 @@ function assertOrThrow(passed, err) {
         ],
         unsafe: [],
         unused_a: [
-            "/*jslint node*/\nlet aa;"
+            "/*jslint node*/\nlet aa;",
+            "function aa(aa){return;}"
         ],
         use_double: [
             "''"
@@ -499,6 +505,7 @@ function assertOrThrow(passed, err) {
         ],
         weird_condition_a: [
             "let aa=0&&0",
+            "let aa=0||0",
             "let aa=``&&``"
         ],
         weird_expression_a: [

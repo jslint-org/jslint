@@ -14,7 +14,7 @@ douglas@crockford.com
 ## Live Web Demo
 - [https://jslint-org.github.io/jslint/index.html](https://jslint-org.github.io/jslint/index.html)
 
-[![screenshot](https://jslint-org.github.io/jslint/branch.beta/.build/screenshot.browser._2findex.html.png)](https://jslint-org.github.io/jslint/index.html)
+[![screenshot](https://jslint-org.github.io/jslint/branch.beta/.build/screenshot.browser._2fjslint_2fbranch.beta_2findex.html.png)](https://jslint-org.github.io/jslint/index.html)
 
 ## Installation
 1. Download [https://www.jslint.com/jslint.js](https://www.jslint.com/jslint.js) and rename to `jslint.mjs`

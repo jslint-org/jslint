@@ -89,7 +89,7 @@
 /*jslint node*/
 
 /*property
-    console_error, source,
+    JSLINT_CLI, console_error, env, promises, source,
     a, all, and, argv, arity, assign, b, bad_assignment_a, bad_directive_a,
     bad_get, bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise,
     block, body, browser, c, calls, catch, cli_mode, closer, closure, code,
@@ -4180,11 +4180,6 @@ preaction("binary", "in", function (thing) {
 preaction("binary", "instanceof", function (thing) {
     warn("unexpected_a", thing);
 });
-preaction("binary", ".", function (thing) {
-    if (thing.expression.new) {
-        thing.new = true;
-    }
-});
 preaction("statement", "{", function (thing) {
     block_stack.push(blockage);
     blockage = thing;
@@ -4696,6 +4691,9 @@ function whitage() {
     function no_space() {
         if (left.line === right.line) {
             if (left.thru !== right.from && nr_comments_skipped === 0) {
+
+// code - "let aa = aa()( );"
+
                 warn(
                     "unexpected_space_a_b",
                     right,
@@ -4711,6 +4709,9 @@ function whitage() {
                     : margin + 8
                 );
                 if (right.from < at) {
+
+// code - "let aa = aa(\n    aa\n()\n);"
+
                     expected_at(at);
                 }
             } else {
@@ -5124,10 +5125,7 @@ async function cli({
 /*
  * this function will run jslint from nodejs-cli
  */
-    const {
-        readFile,
-        readdir
-    } = await import("fs/promises");
+    const fs = await import("fs");
     let exitCode;
     function string_line_count(code) {
     /*
@@ -5233,7 +5231,7 @@ async function cli({
         return;
     }
     if (file === ".") {
-        file = await readdir(".");
+        file = await fs.promises.readdir(".");
         await Promise.all(file.map(async function (file) {
             let code;
             let timeStart = Date.now();
@@ -5251,7 +5249,7 @@ async function cli({
                 return;
             }
             try {
-                code = await readFile(file, "utf8");
+                code = await fs.promises.readFile(file, "utf8");
             } catch (ignore) {
                 return;
             }
@@ -5273,7 +5271,7 @@ async function cli({
         }));
     } else {
         jslint_from_file({
-            code: await readFile(file, "utf8"),
+            code: await fs.promises.readFile(file, "utf8"),
             file,
             option
         });
@@ -5299,10 +5297,15 @@ if (
     // && typeof process?.versions?.node === "string"
     && process && process.versions
     && typeof process.versions.node === "string"
-    && (/\bjslint.m?js$/m).test(process.argv[1])
+    && (
+        (/\bjslint.m?js$/m).test(process.argv[1])
+        || process.env.JSLINT_CLI === "1"
+    )
 ) {
     // run cli
     cli({
         file: process.argv[2]
-    }).then(process.exit);
+    }).then(function (exitCode) {
+        process.exit(exitCode);
+    });
 }
