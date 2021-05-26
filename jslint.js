@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // jslint.js
-// v2021.5.24-beta
+// v2021.5.26
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -89,33 +89,33 @@
 /*jslint node*/
 
 /*property
-    JSLINT_CLI, console_error, env, promises, source, test_uncaught_error,
-    a, all, and, argv, arity, assign, b, bad_assignment_a, bad_directive_a,
-    bad_get, bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise,
-    block, body, browser, c, calls, catch, cli_mode, closer, closure, code,
-    column, concat, constant, context, convert, couch, create, d, dead, debug,
-    default, devel, directive, directives, disrupt, dot, duplicate_a,
-    early_stop, edition, ellipsis, else, empty_block, error, eval, every, exec,
-    exit, expected_a, expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d,
-    expected_a_before_b, expected_a_next_at_b, expected_digits_after_a,
-    expected_four_digits, expected_identifier_a, expected_line_break_a_b,
-    expected_regexp_factor_a, expected_space_a_b, expected_statements_a,
-    expected_string_a, expected_type_string_a, exports, expression, extra, file,
-    finally, flag, for, forEach, formatted_message, free, freeze,
-    freeze_exports, from, froms, fud, fudge, function_in_loop, functions, g,
-    getset, global, has_await, i, id, identifier, import, inc, indexOf,
-    infix_in, init, initial, isArray, isNaN, is_async, join, json, keys, label,
-    label_a, lbp, led, length, level, line, line_offset, lines, live, long,
-    loop, m, map, margin, match, message, misplaced_a, misplaced_directive_a,
-    missing_await_statement, missing_browser, missing_m, module, naked_block,
-    name, names, nested_comment, new, node, not_label_a, now, nr, nud,
-    number_isNaN, ok, open, opening, option, out_of_scope_a, padStart,
-    parameters, parent, pop, property, push, quote, raw, readFile, readdir,
-    redefinition_a_b, repeat, replace, required_a_optional_b, reserved_a, role,
-    search, shebang, signature, single, slice, some, sort, split, stack,
-    stack_trace, startsWith, statement, stop, subscript_a, switch, test, then,
-    this, thru, todo_comment, tokens, too_long, too_many_digits, tree, trim,
-    try, type, u, unclosed_comment, unclosed_mega, unclosed_string,
+    JSLINT_CLI, a, all, and, argv, arity, assign, b, bad_assignment_a,
+    bad_directive_a, bad_get, bad_module_name_a, bad_option_a, bad_property_a,
+    bad_set, bitwise, block, body, browser, c, calls, catch, cli_mode, closer,
+    closure, code, column, concat, console_error, constant, context, convert,
+    couch, create, d, dead, debug, default, devel, directive, directives,
+    disrupt, dot, duplicate_a, early_stop, edition, ellipsis, else, empty_block,
+    env, error, eval, every, exec, exit, expected_a, expected_a_at_b_c,
+    expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
+    expected_a_next_at_b, expected_digits_after_a, expected_four_digits,
+    expected_identifier_a, expected_line_break_a_b, expected_regexp_factor_a,
+    expected_space_a_b, expected_statements_a, expected_string_a,
+    expected_type_string_a, exports, expression, extra, file, finally, flag,
+    for, forEach, formatted_message, free, freeze, freeze_exports, from, froms,
+    fud, fudge, function_in_loop, functions, g, getset, global, has_await, i,
+    id, identifier, import, inc, indexOf, infix_in, init, initial, isArray,
+    isNaN, is_async, join, json, keys, label, label_a, lbp, led, length, level,
+    line, line_offset, lines, live, long, loop, m, map, margin, match, message,
+    misplaced_a, misplaced_directive_a, missing_await_statement,
+    missing_browser, missing_m, module, naked_block, name, names,
+    nested_comment, node, not_label_a, now, nr, nud, number_isNaN, ok, open,
+    opening, option, out_of_scope_a, padStart, parameters, parent, pop,
+    promises, property, push, quote, raw, readFile, readdir, redefinition_a_b,
+    repeat, replace, required_a_optional_b, reserved_a, role, search, shebang,
+    signature, single, slice, some, sort, source, split, stack, stack_trace,
+    startsWith, statement, stop, subscript_a, switch, test, test_uncaught_error,
+    then, this, thru, todo_comment, tokens, too_long, too_many_digits, tree,
+    trim, try, type, u, unclosed_comment, unclosed_mega, unclosed_string,
     undeclared_a, unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
     unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
     unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
@@ -5190,7 +5190,7 @@ function jslint(
     });
     return {
         directives,
-        edition: "v2021.5.24-beta",
+        edition: "v2021.5.26",
         exports,
         froms,
         functions,

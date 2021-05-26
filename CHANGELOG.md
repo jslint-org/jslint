@@ -1,14 +1,21 @@
 # Changelog
 
 ## Todo
-- jslint - cleanup regexp code using switch-statements.
+- jslint - inline-document each warning with source_code that can reproduce it.
+- node - after node-v14 is deprecated, remove shell-code export "NODE_OPTIONS=--unhandled-rejections=strict".
 - node - after node-v12 is deprecated, change require("fs").promises to require("fs/promises").
+- jslint - add html and css linting back into jslint.
+- jslint - cleanup regexp code using switch-statements.
 - app - deploy jslint as chrome-extension.
+- doc - add svg changelog.
 - doc - add svg package-listing.
 - ci - continue addng regression tests and improve code-coverage.
 - none
 
-## v2021.5.24-beta
+## v2021.5.27-beta
+- none
+
+## v2021.5.26
 - jslint - fix (global) functionage missing properties finally and try.
 - website - add fork-me ribbon.
 - jslint - remove deadcode warning bad_option_a.
@@ -21,7 +28,6 @@
 - website - merge file report.js into browser.js.
 - jslint - add new rules unordered_param_a, unordered_property_a, that warn if parameters and properties are listed in nonascii-order.
 - jslint - add "globalThis" to default globals.
-- none
 
 ## v2021.5.23
 - doc - add section Changelog.

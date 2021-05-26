@@ -351,20 +351,21 @@ shGitLsTree() {(set -e
     let result;
     // get file, mode, size
     result = await new Promise(function (resolve) {
-        let child;
-        child = require("child_process").spawn("git", [
+        result = "";
+        require("child_process").spawn("git", [
             "ls-tree", "-lr", "HEAD"
         ], {
             encoding: "utf8",
             stdio: [
                 "ignore", "pipe", 2
             ]
-        });
-        child.on("exit", function () {
-            resolve(child.stdout);
-        });
+        }).on("exit", function () {
+            resolve(result);
+        }).stdout.on("data", function (chunk) {
+            result += chunk;
+        }).setEncoding("utf8");
     });
-    result = Array.from(String(result).matchAll(
+    result = Array.from(result.matchAll(
         /^(\S+?)\u0020+?\S+?\u0020+?\S+?\u0020+?(\S+?)\t(\S+?)$/gm
     )).map(function ([
         ignore, mode, size, file
