@@ -44,9 +44,7 @@ body {
 
 #JSLINT_TITLEBOX {
     font-family: "Daley", sans-serif;
-    margin: 0;
-    margin-left: 3%;
-    margin-right: 3%;
+    margin: 10px 40px 0 40px;
     padding: 0;
 }
 
@@ -66,8 +64,8 @@ body {
     border: 0;
     clear: both;
     margin-bottom: 1em;
-    margin-left: 3%;
-    margin-right: 3%;
+    margin-left: 40px;
+    margin-right: 40px;
     margin-top: 1em;
     padding: 0;
     width: auto;
@@ -366,7 +364,45 @@ a:link {
 }
 </style>
 </head>
-<body><div id="JSLINT_TITLEBOX">
+<body>
+<div id="bannerFork1"
+style="
+    height: 100px;
+    left: 0;
+    margin: 0;
+    opacity: 0.75;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    width: 200px;
+    z-index: 99;
+">
+    <div
+style="
+    background: darkslategray;
+    font-size: 13px;
+    height: 20px;
+    line-height: 20px;
+    opacity: 0.75;
+    overflow: visible;
+    position: absolute;
+    right: 60px;
+    text-align: center;
+    top: 30px;
+    transform: rotate(-45deg);
+    width: 100%;
+">
+    <a
+        href="https://github.com/jslint-org/jslint"
+        style="color: #fff;"
+        target="_blank"
+    >
+    fork on github
+    </a>
+    </div>
+</div>
+<div id="JSLINT_TITLEBOX">
     <div>JSLint</div>
     <ul>
         <li><a href="help.html">Read the instructions.</a></li>

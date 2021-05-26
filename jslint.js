@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // jslint.js
-// v2021.5.23
+// v2021.5.26
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -86,43 +86,47 @@
 
 // WARNING: JSLint will hurt your feelings.
 
+/*jslint node*/
+
 /*property
-    a, all, and, argv, arity, assign, b, bad_assignment_a, bad_directive_a,
-    bad_get, bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise,
-    block, body, browser, c, calls, catch, cli_mode, closer, closure, code,
-    column, concat, constant, context, convert, couch, create, d, dead, debug,
-    default, devel, directive, directives, disrupt, dot, duplicate_a,
-    early_stop, edition, ellipsis, else, empty_block, error, eval, every, exec,
-    exit, expected_a, expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d,
-    expected_a_before_b, expected_a_next_at_b, expected_digits_after_a,
-    expected_four_digits, expected_identifier_a, expected_line_break_a_b,
-    expected_regexp_factor_a, expected_space_a_b, expected_statements_a,
-    expected_string_a, expected_type_string_a, exports, expression, extra, file,
-    finally, flag, for, forEach, formatted_message, free, freeze,
-    freeze_exports, from, froms, fud, fudge, function_in_loop, functions, g,
-    getset, global, has_await, i, id, identifier, import, inc, indexOf,
-    infix_in, init, initial, isArray, isNaN, is_async, join, json, keys, label,
-    label_a, lbp, led, length, level, line, line_offset, lines, live, long,
-    loop, m, map, margin, match, message, misplaced_a, misplaced_directive_a,
-    missing_await_statement, missing_browser, missing_m, module, naked_block,
-    name, names, nested_comment, new, node, not_label_a, now, nr, nud,
-    number_isNaN, ok, open, opening, option, out_of_scope_a, padStart,
-    parameters, parent, pop, property, push, quote, raw, readFile, readdir,
-    redefinition_a_b, repeat, replace, required_a_optional_b, reserved_a, role,
-    search, shebang, signature, single, slice, some, sort, split, stack,
-    stack_trace, startsWith, statement, stop, subscript_a, switch, test, then,
-    this, thru, todo_comment, tokens, too_long, too_many_digits, tree, trim,
-    try, type, u, unclosed_comment, unclosed_mega, unclosed_string,
+    JSLINT_CLI, a, all, and, argv, arity, assign, b, bad_assignment_a,
+    bad_directive_a, bad_get, bad_module_name_a, bad_option_a, bad_property_a,
+    bad_set, bitwise, block, body, browser, c, calls, catch, cli_mode, closer,
+    closure, code, column, concat, console_error, constant, context, convert,
+    couch, create, d, dead, debug, default, devel, directive, directives,
+    disrupt, dot, duplicate_a, early_stop, edition, ellipsis, else, empty_block,
+    env, error, eval, every, exec, exit, expected_a, expected_a_at_b_c,
+    expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
+    expected_a_next_at_b, expected_digits_after_a, expected_four_digits,
+    expected_identifier_a, expected_line_break_a_b, expected_regexp_factor_a,
+    expected_space_a_b, expected_statements_a, expected_string_a,
+    expected_type_string_a, exports, expression, extra, file, finally, flag,
+    for, forEach, formatted_message, free, freeze, freeze_exports, from, froms,
+    fud, fudge, function_in_loop, functions, g, getset, global, has_await, i,
+    id, identifier, import, inc, indexOf, infix_in, init, initial, isArray,
+    isNaN, is_async, join, json, keys, label, label_a, lbp, led, length, level,
+    line, line_offset, lines, live, long, loop, m, map, margin, match, message,
+    misplaced_a, misplaced_directive_a, missing_await_statement,
+    missing_browser, missing_m, module, naked_block, name, names,
+    nested_comment, node, not_label_a, now, nr, nud, number_isNaN, ok, open,
+    opening, option, out_of_scope_a, padStart, parameters, parent, pop,
+    promises, property, push, quote, raw, readFile, readdir, redefinition_a_b,
+    repeat, replace, required_a_optional_b, reserved_a, role, search, shebang,
+    signature, single, slice, some, sort, source, split, stack, stack_trace,
+    startsWith, statement, stop, subscript_a, switch, test, test_uncaught_error,
+    then, this, thru, todo_comment, tokens, too_long, too_many_digits, tree,
+    trim, try, type, u, unclosed_comment, unclosed_mega, unclosed_string,
     undeclared_a, unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
     unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
     unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
     unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
     unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
-    unreachable_a, unregistered_property_a, unused_a, use_double, use_open,
-    use_spaces, used, value, var_loop, var_switch, variable, versions, warning,
-    warnings, weird_condition_a, weird_expression_a, weird_loop,
-    weird_relation_a, white, wrap_condition, wrap_immediate, wrap_parameter,
-    wrap_regexp, wrap_unary, wrapped, writable, y
+    unordered_param_a, unordered_property_a, unreachable_a,
+    unregistered_property_a, unused_a, use_double, use_open, use_spaces, used,
+    value, var_loop, var_switch, variable, versions, warning, warnings,
+    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
+    wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary,
+    wrapped, writable, y
 */
 
 function empty() {
@@ -161,11 +165,11 @@ const allowed_option = {
         "TextDecoder", "TextEncoder", "URL", "window", "Worker",
         "XMLHttpRequest"
     ],
+    convert: true,
     couch: [
         "emit", "getRow", "isArray", "log", "provides", "registerType",
         "require", "send", "start", "sum", "toJSON"
     ],
-    convert: true,
     debug: true,
     devel: [
         "alert", "confirm", "console", "prompt"
@@ -206,10 +210,10 @@ const opener = {
 
 // The open and close pairs.
 
+    "${": "}",      // mega
     "(": ")",       // paren
     "[": "]",       // bracket
-    "{": "}",       // brace
-    "${": "}"       // mega
+    "{": "}"        // brace
 };
 
 // The relational operators.
@@ -230,15 +234,15 @@ const standard = [
 
 // These are the globals that are provided by the language standard.
 
-    "Array", "ArrayBuffer", "Boolean", "DataView", "Date", "decodeURI",
-    "decodeURIComponent", "encodeURI", "encodeURIComponent", "Error",
-    "EvalError", "Float32Array", "Float64Array", "Generator",
-    "GeneratorFunction", "import", "Int8Array", "Int16Array", "Int32Array",
-    "Intl", "JSON", "Map", "Math", "Number", "Object", "parseInt", "parseFloat",
-    "Promise", "Proxy", "RangeError", "ReferenceError", "Reflect", "RegExp",
-    "Set", "String", "Symbol", "SyntaxError", "System", "TypeError",
-    "Uint8Array", "Uint8ClampedArray", "Uint16Array", "Uint32Array",
-    "URIError", "WeakMap", "WeakSet"
+    "Array", "ArrayBuffer", "Boolean", "DataView", "Date", "Error", "EvalError",
+    "Float32Array", "Float64Array", "Generator", "GeneratorFunction",
+    "Int16Array", "Int32Array", "Int8Array", "Intl", "JSON", "Map", "Math",
+    "Number", "Object", "Promise", "Proxy", "RangeError", "ReferenceError",
+    "Reflect", "RegExp", "Set", "String", "Symbol", "SyntaxError", "System",
+    "TypeError", "URIError", "Uint16Array", "Uint32Array", "Uint8Array",
+    "Uint8ClampedArray", "WeakMap", "WeakSet", "decodeURI",
+    "decodeURIComponent", "encodeURI", "encodeURIComponent", "globalThis",
+    "import", "parseFloat", "parseInt"
 ];
 
 const bundle = {
@@ -332,6 +336,12 @@ const bundle = {
         "Unexpected 'typeof'. Use '===' to compare directly with {a}."
     ),
     uninitialized_a: "Uninitialized '{a}'.",
+    unordered_param_a: (
+        "Parameter '{a}' not listed in alphabetical order."
+    ),
+    unordered_property_a: (
+        "Property name '{a}' not listed in alphabetical order."
+    ),
     unreachable_a: "Unreachable '{a}'.",
     unregistered_property_a: "Unregistered property name '{a}'.",
     unused_a: "Unused '{a}'.",
@@ -466,13 +476,8 @@ function is_letter(string) {
 }
 
 function supplant(string, object) {
-    return string.replace(rx_supplant, function (found, filling) {
-        const replacement = object[filling];
-        return (
-            replacement !== undefined
-            ? replacement
-            : found
-        );
+    return string.replace(rx_supplant, function (ignore, filling) {
+        return object[filling];
     });
 }
 
@@ -523,36 +528,16 @@ function artifact(the_token) {
     );
 }
 
-function artifact_line(the_token) {
-
-// Return the fudged line number of an artifact.
-
-    if (the_token === undefined) {
-        the_token = next_token;
-    }
-    return the_token.line + fudge;
-}
-
-function artifact_column(the_token) {
-
-// Return the fudged column number of an artifact.
-
-    if (the_token === undefined) {
-        the_token = next_token;
-    }
-    return the_token.from + fudge;
-}
-
 function warn_at(code, line, column, a, b, c, d) {
 
 // Report an error at some line and column of the program. The warning object
 // resembles an exception.
 
     const warning = {         // ~~
-        name: "JSLintError",
+        code,
         column,
         line,
-        code
+        name: "JSLintError"
     };
     if (a !== undefined) {
         warning.a = a;
@@ -566,8 +551,10 @@ function warn_at(code, line, column, a, b, c, d) {
     if (d !== undefined) {
         warning.d = d;
     }
-    warning.message = supplant(bundle[code] || code, warning);
+    warning.message = supplant(bundle[code], warning);
+
 // Include stack_trace for jslint to debug itself for errors.
+
     if (option.debug) {
         warning.stack_trace = new Error().stack;
     }
@@ -650,7 +637,7 @@ function tokenize(source) {
     let mega_from;              // the starting column of megastring
     let mega_line;              // the starting line of megastring
     let regexp_seen;            // regular expression literal seen on this line
-    let snippet;                // a piece of string
+    let snippet = "";           // a piece of string
     let source_line = "";       // the remaining line source string
     let whole_line = "";        // the whole line source string
 
@@ -749,14 +736,10 @@ function tokenize(source) {
 // Back up one character by moving a character from the end of the snippet to
 // the front of the source_line.
 
-        if (snippet) {
-            char = snippet.slice(-1);
-            source_line = char + source_line;
-            column -= 1;
-            snip();
-        } else {
-            char = "";
-        }
+        char = snippet.slice(-1);
+        source_line = char + source_line;
+        column -= char.length;
+        snip();
         return char;
     }
 
@@ -789,7 +772,7 @@ function tokenize(source) {
                 if (some_digits(rx_hexs) > 5) {
                     warn_at("too_many_digits", line, column - 1);
                 }
-                if (next_char() !== "}") {
+                if (char !== "}") {
                     stop_at("expected_a_before_b", line, column, "}", char);
                 }
                 return next_char();
@@ -889,19 +872,13 @@ function tokenize(source) {
                     typeof allowed === "boolean"
                     || typeof allowed === "object"
                 ) {
-                    if (
-                        value === ""
-                        || value === "true"
-                        || value === undefined
-                    ) {
+                    if (value === "true" || value === undefined) {
                         option[name] = true;
                         if (Array.isArray(allowed)) {
                             populate(allowed, declared_globals, false);
                         }
                     } else if (value === "false") {
                         option[name] = false;
-                    } else {
-                        warn("bad_option_a", the_comment, name + ":" + value);
                     }
                 } else {
                     warn("bad_option_a", the_comment, name);
@@ -1075,6 +1052,9 @@ function tokenize(source) {
             }
 
             function factor() {
+
+// Parse current character in regexp.
+
                 if (
                     char === ""
                     || char === "/"
@@ -1681,7 +1661,10 @@ function advance(id, match) {
                 next_token,
                 id,
                 artifact(match),
-                artifact_line(match),
+
+// Return the fudged line number of an artifact.
+
+                match.line + fudge,
                 artifact(next_token)
             )
         );
@@ -1922,6 +1905,11 @@ function condition() {
 
     const the_paren = next_token;
     let the_value;
+
+// source: "do {} while ()"
+// source: "if () {}"
+// source: "while () {}"
+
     the_paren.free = true;
     advance("(");
     the_value = expression(0);
@@ -2219,7 +2207,7 @@ function left_check(left, right) {
         )
         && (
             left.arity !== "binary"
-            || (id !== "." && id !== "(" && id !== "[")
+            || (id !== "." && id !== "?." && id !== "(" && id !== "[")
         )
     ) {
         warn("unexpected_a", right);
@@ -2554,6 +2542,9 @@ infix("(", 160, function (left) {
     }
     advance(")", the_paren);
     if (the_paren.expression.length === 2) {
+
+// source: "aa(0)"
+
         the_paren.free = true;
         if (the_argument.wrapped === true) {
             warn("unexpected_a", the_paren);
@@ -2562,6 +2553,10 @@ infix("(", 160, function (left) {
             the_argument.wrapped = true;
         }
     } else {
+
+// source: "aa()"
+// source: "aa(0, 0)"
+
         the_paren.free = false;
     }
     return the_paren;
@@ -2752,6 +2747,8 @@ function parameter_list() {
             let ellipsis = false;
             let param;
             if (next_token.id === "{") {
+                let a;
+                let b = "";
                 if (optional !== undefined) {
                     warn(
                         "required_a_optional_b",
@@ -2770,6 +2767,11 @@ function parameter_list() {
                         return stop("expected_identifier_a");
                     }
                     survey(subparam);
+                    a = b;
+                    b = String(subparam.value || subparam.id);
+                    if (a > b) {
+                        warn("unordered_param_a", subparam);
+                    }
                     advance();
                     signature.push(subparam.id);
                     if (next_token.id === ":") {
@@ -2958,6 +2960,9 @@ function do_function(the_function) {
 // Parse the parameter list.
 
     advance("(");
+
+// source: "function () {}"
+
     token.free = false;
     token.arity = "function";
     [functionage.parameters, functionage.signature] = parameter_list();
@@ -3072,9 +3077,15 @@ prefix("(", function () {
         || next_token.id === "..."
         || (next_token.identifier && (cadet === "," || cadet === "="))
     ) {
+
+// source: "() => {}"
+
         the_paren.free = false;
         return fart(parameter_list());
     }
+
+// source: "(aa)"
+
     the_paren.free = true;
     the_value = expression(0);
     if (the_value.wrapped === true) {
@@ -3101,6 +3112,8 @@ prefix("{", function () {
     const seen = empty();
     the_brace.expression = [];
     if (next_token.id !== "}") {
+        let a;
+        let b = "";
         (function member() {
             let extra;
             let full;
@@ -3108,6 +3121,11 @@ prefix("{", function () {
             let name = next_token;
             let value;
             advance();
+            a = b;
+            b = String(name.value || name.id);
+            if (a > b) {
+                warn("unordered_property_a", name);
+            }
             if (
                 (name.id === "get" || name.id === "set")
                 && next_token.identifier
@@ -3254,6 +3272,8 @@ function do_var() {
     }
     (function next() {
         if (next_token.id === "{" && the_statement.id !== "var") {
+            let a;
+            let b = "";
             const the_brace = next_token;
             advance("{");
             (function pair() {
@@ -3262,6 +3282,11 @@ function do_var() {
                 }
                 const name = next_token;
                 survey(name);
+                a = b;
+                b = String(name.value || name.id);
+                if (a > b) {
+                    warn("unordered_param_a", name);
+                }
                 advance();
                 if (next_token.id === ":") {
                     advance(":");
@@ -3489,6 +3514,9 @@ stmt("for", function () {
     not_top_level(the_for);
     functionage.loop += 1;
     advance("(");
+
+// source: "for () {}"
+
     token.free = true;
     if (next_token.id === ";") {
         return stop("expected_a_b", the_for, "while (", "for (;");
@@ -3645,6 +3673,9 @@ stmt("switch", function () {
     }
     functionage.switch += 1;
     advance("(");
+
+// source: "switch () {}"
+
     token.free = true;
     the_switch.expression = expression(0);
     the_switch.block = the_cases;
@@ -3967,9 +3998,9 @@ function lookup(thing) {
                 }
                 the_variable = {
                     dead: false,
-                    parent: global,
                     id: thing.id,
                     init: true,
+                    parent: global,
                     role: "variable",
                     used: 0,
                     writable: false
@@ -4151,11 +4182,6 @@ preaction("binary", "in", function (thing) {
 });
 preaction("binary", "instanceof", function (thing) {
     warn("unexpected_a", thing);
-});
-preaction("binary", ".", function (thing) {
-    if (thing.expression.new) {
-        thing.new = true;
-    }
 });
 preaction("statement", "{", function (thing) {
     block_stack.push(blockage);
@@ -4603,6 +4629,23 @@ function uninitialized_and_unused() {
 
 function whitage() {
     let closer = "(end)";
+
+// free = false
+// source: "() => {}"
+// source: "aa()"
+// source: "aa(0, 0)"
+// source: "function () {}"
+//
+// free = true
+// source: "(0)"
+// source: "(aa)"
+// source: "aa(0)"
+// source: "do {} while ()"
+// source: "for () {}"
+// source: "if () {}"
+// source: "switch () {}"
+// source: "while () {}"
+
     let free = false;
     let left = global;
     let margin = 0;
@@ -4636,7 +4679,10 @@ function whitage() {
             right,
             artifact(right),
             fudge + at,
-            artifact_column(right)
+
+// Return the fudged column number of an artifact.
+
+            right.from + fudge
         );
     }
 
@@ -4668,6 +4714,9 @@ function whitage() {
     function no_space() {
         if (left.line === right.line) {
             if (left.thru !== right.from && nr_comments_skipped === 0) {
+
+// source: "let aa = aa()( );"
+
                 warn(
                     "unexpected_space_a_b",
                     right,
@@ -4680,12 +4729,19 @@ function whitage() {
                 const at = (
                     free
                     ? margin
-                    : margin + 8
+                    : margin + 8 // dead-code?
                 );
                 if (right.from < at) {
+
+// source:
+// let aa = aa(
+//     aa
+// ()
+// );
+
                     expected_at(at);
                 }
-            } else {
+            } else { // dead-code?
                 if (right.from !== margin + 8) {
                     expected_at(margin + 8);
                 }
@@ -4737,16 +4793,43 @@ function whitage() {
 
             const new_closer = opener[left.id];
             if (typeof new_closer === "string") {
+
+// source: "${"
+// source: "("
+// source: "["
+// source: "{"
+
                 if (new_closer !== right.id) {
+
+// source: "${0"
+// source: "(0"
+// source: "[0"
+// source: "{0"
+
                     opening = left.open || (left.line !== right.line);
                     push();
                     closer = new_closer;
                     if (opening) {
+
+// source: "${\n0\n}"
+// source: "(\n0\n)"
+// source: "[\n0\n]"
+// source: "{\n0\n}"
+
                         free = closer === ")" && left.free;
                         open = true;
                         margin += 4;
                         if (right.role === "label") {
                             if (right.from !== 0) {
+
+// source:
+// function aa() {
+//  bb:
+//     while (aa()) {
+//         aa();
+//     }
+// }
+
                                 expected_at(0);
                             }
                         } else if (right.switch) {
@@ -4756,6 +4839,14 @@ function whitage() {
                         }
                     } else {
                         if (right.statement || right.role === "label") {
+
+// source:
+// function aa() {bb:
+//     while (aa()) {
+//         aa();
+//     }
+// }
+
                             warn(
                                 "expected_line_break_a_b",
                                 right,
@@ -4763,6 +4854,12 @@ function whitage() {
                                 artifact(right)
                             );
                         }
+
+// source: "${0}"
+// source: "(0)"
+// source: "[0]"
+// source: "{0}"
+
                         free = false;
                         open = false;
                         no_space_only();
@@ -4771,6 +4868,11 @@ function whitage() {
 
 // If left and right are opener and closer, then the placement of right depends
 // on the openness. Illegal pairs (like '{]') have already been detected.
+
+// source: "${}"
+// source: "()"
+// source: "[]"
+// source: "{}"
 
                     if (left.line === right.line) {
                         no_space();
@@ -4808,6 +4910,15 @@ function whitage() {
                         at_margin(-4);
                     } else if (right.role === "label") {
                         if (right.from !== 0) {
+
+// source:
+// (function () {
+//     let aa;bb:
+//     while (aa()) {
+//         aa();
+//     }
+// }());
+
                             expected_at(0);
                         }
                     } else if (left.id === ",") {
@@ -4853,7 +4964,7 @@ function whitage() {
                         no_space_only();
                     } else if (right.id === "." || right.id === "?.") {
                         no_space_only();
-                    } else if (left.id === ";") {
+                    } else if (left.id === ";") { // dead-code?
                         if (open) {
                             at_margin(0);
                         }
@@ -4868,6 +4979,14 @@ function whitage() {
                         || right.id === "catch"
                         || right.id === "else"
                         || right.id === "finally"
+
+// source:
+// function aa() {
+//     do {
+//         aa();
+//     } while (aa());
+// }
+
                         || (right.id === "while" && !right.statement)
                         || (left.id === ")" && right.id === "{")
                     ) {
@@ -4927,6 +5046,9 @@ function jslint(
     option_object = empty(),
     global_array = []
 ) {
+    function test_uncaught_error() {
+        throw new Error();
+    }
     try {
         warnings = [];
         option = Object.assign(empty(), option_object);
@@ -4945,16 +5067,18 @@ function jslint(
         );
         functions = [];
         global = {
-            id: "(global)",
             body: true,
             context: empty(),
+            finally: 0,
             from: 0,
+            id: "(global)",
             level: 0,
             line: 0,
             live: [],
             loop: 0,
             switch: 0,
-            thru: 0
+            thru: 0,
+            try: 0
         };
         blockage = global;
         functionage = global;
@@ -5022,13 +5146,17 @@ function jslint(
                 }
             });
         }
+        if (option.test_uncaught_error) {
+            test_uncaught_error();
+        }
         early_stop = false;
     } catch (e) {
-        e.column = e.column || -1;
         e.early_stop = true;
-        e.line = e.line || -1;
         e.message = "[JSLint was unable to finish] - " + e.message;
         if (e.name !== "JSLintError") {
+            e.column = 0;
+            e.line = 0;
+            e.stack_trace = e.stack;
             warnings.push(e);
         }
     }
@@ -5062,7 +5190,7 @@ function jslint(
     });
     return {
         directives,
-        edition: "v2021.5.23",
+        edition: "v2021.5.26",
         exports,
         froms,
         functions,
@@ -5087,15 +5215,15 @@ function jslint(
 }
 
 async function cli({
-    file
+    console_error,
+    file,
+    option,
+    source
 }) {
 /*
  * this function will run jslint from nodejs-cli
  */
-    const {
-        readFile,
-        readdir
-    } = await import("fs/promises");
+    const fs = await import("fs");
     let exitCode;
     function string_line_count(code) {
     /*
@@ -5119,6 +5247,7 @@ async function cli({
         code,
         file,
         line_offset = 0,
+        option = {},
         warnings = []
     }) {
         switch ((
@@ -5127,12 +5256,15 @@ async function cli({
         case ".html":
             // recurse
             code.replace((
-                /^<script\b[^>]*?>\n([\S\s]*?\n)<\/script>$/gm
+                /^<script>\n([\S\s]*?\n)<\/script>$/gm
             ), function (ignore, match1, ii) {
                 jslint_from_file({
                     code: match1,
                     file: file + ".<script>.js",
-                    line_offset: string_line_count(code.slice(0, ii)) + 1
+                    line_offset: string_line_count(code.slice(0, ii)) + 1,
+                    option: Object.assign({
+                        browser: true
+                    }, option)
                 });
                 return "";
             });
@@ -5143,11 +5275,10 @@ async function cli({
                 /^```javascript\n([\S\s]*?\n)```$/gm
             ), function (ignore, match1, ii) {
                 jslint_from_file({
-                    code: match1.replace((
-                        /\u0027"\u0027"\u0027/g
-                    ), "\u0027"),
+                    code: match1,
                     file: file + ".<```javascript>.js",
-                    line_offset: string_line_count(code.slice(0, ii)) + 1
+                    line_offset: string_line_count(code.slice(0, ii)) + 1,
+                    option
                 });
                 return "";
             });
@@ -5155,34 +5286,30 @@ async function cli({
         case ".sh":
             // recurse
             code.replace((
-                /\bnode\u0020-e\u0020\u0027\n([\S\s]*?\n)\u0027/gm
+                /\bnode\u0020.*?-e\u0020'\n([\S\s]*?\n)'/gm
             ), function (ignore, match1, ii) {
                 jslint_from_file({
-                    code: match1.replace((
-                        /\u0027"\u0027"\u0027/g
-                    ), "\u0027"),
+                    code: match1,
                     file: file + ".<node -e>.js",
-                    line_offset: string_line_count(code.slice(0, ii)) + 1
+                    line_offset: string_line_count(code.slice(0, ii)) + 1,
+                    option: Object.assign({
+                        node: true
+                    }, option)
                 });
                 return "";
             });
             return;
         default:
-            warnings = jslint("\n".repeat(line_offset) + code, {
-                bitwise: true,
-                browser: true,
-                fudge: true,
-                node: true,
-                this: true
-            }, [
-                "global", "globalThis"
-            ]).warnings;
+            warnings = jslint(
+                "\n".repeat(line_offset) + code,
+                option
+            ).warnings;
         }
         // print only first 10 warnings
         if (warnings.length > 0) {
             exitCode = 1;
             // print first 10 warnings to stderr
-            console.error(
+            console_error(
                 "\u001b[1mjslint " + file + "\u001b[22m\n" +
                 warnings.slice(0, 10).map(function ({
                     formatted_message
@@ -5192,8 +5319,17 @@ async function cli({
             );
         }
     }
+    console_error = console_error || console.error;
+    if (source) {
+        jslint_from_file({
+            code: source,
+            file,
+            option
+        });
+        return;
+    }
     if (file === ".") {
-        file = await readdir(".");
+        file = await fs.promises.readdir(".");
         await Promise.all(file.map(async function (file) {
             let code;
             let timeStart = Date.now();
@@ -5211,29 +5347,31 @@ async function cli({
                 return;
             }
             try {
-                code = await readFile(file, "utf8");
+                code = await fs.promises.readFile(file, "utf8");
             } catch (ignore) {
                 return;
             }
             if (!(
                 !(
-                    /\b(?:assets\.app\.js|lock|min|raw|rollup)\b/
+                    /\b(?:lock|min|raw|rollup)\b/
                 ).test(file) && code && code.length < 1048576
             )) {
                 return;
             }
             jslint_from_file({
                 code,
-                file
+                file,
+                option
             });
-            console.error(
+            console_error(
                 "jslint - " + (Date.now() - timeStart) + "ms - " + file
             );
         }));
     } else {
         jslint_from_file({
-            code: await readFile(file, "utf8"),
-            file
+            code: await fs.promises.readFile(file, "utf8"),
+            file,
+            option
         });
     }
     return exitCode;
@@ -5244,21 +5382,28 @@ export default Object.freeze(function (
     global_array = []
 ) {
     if (option_object.cli_mode) {
-        return cli(option_object);
+        return cli(Object.assign({
+            source
+        }, option_object));
     }
     return jslint(source, option_object, global_array);
 });
 // feature-detect nodejs-cli
 if (
     typeof process === "object"
-    && process
-    && process.versions
+    // uncomment when nodejs v12 is no longer used in ci
+    // && typeof process?.versions?.node === "string"
+    && process && process.versions
     && typeof process.versions.node === "string"
-    && process.argv
-    && (/\bjslint.m?js$/m).test(process.argv[1])
+    && (
+        (/\bjslint.m?js$/m).test(process.argv[1])
+        || process.env.JSLINT_CLI === "1"
+    )
 ) {
     // run cli
     cli({
         file: process.argv[2]
-    }).then(process.exit);
+    }).then(function (exitCode) {
+        process.exit(exitCode);
+    });
 }

@@ -1,7 +1,4 @@
 #!/bin/sh
-: '
-/* jslint utility2:true */
-'
 
 # sh one-liner
 # head CHANGELOG.md -n20
@@ -125,6 +122,7 @@ if (!globalThis.debugInline) {
 
 shCiArtifactUpload() {(set -e
 # this function will upload build-artifacts to branch-gh-pages
+    export NODE_OPTIONS="--unhandled-rejections=strict"
     node -e '
 process.exit(
     `${process.version.split(".")[0]}.${process.arch}.${process.platform}` !==
@@ -161,11 +159,11 @@ process.exit(
         rm -rf .git
         git add -f .
     )
-    # update root-dir with branch-beta
-    if [ "$BRANCH" = beta ]
+    # update root-dir with branch-master
+    if [ "$BRANCH" = master ]
     then
         git rm -rf .build
-        git checkout beta .
+        git checkout master .
     fi
     git status
     git commit -am "update dir branch.$BRANCH" || true
@@ -197,13 +195,21 @@ process.exit(
 )}
 
 shCiBase() {(set -e
-# this function will run github-ci
-    # jslint all files
-    node jslint.js .
+# this function will run base-ci
+    export NODE_OPTIONS="--unhandled-rejections=strict"
     # run test with coverage-report
-    shRunWithCoverage node test.js
+    # coverage-hack - test jslint's invalid-file handling-behavior
+    mkdir -p .test-dir.js
+    # coverage-hack - test jslint's ignore-file handling-behavior
+    touch .test-min.js
+    (set -e
+        # coverage-hack - test jslint's cli handling-behavior
+        export JSLINT_CLI=1
+        shRunWithCoverage node test.js .
+    )
     # screenshot live-web-demo
-    shBrowserScreenshot index.html
+    shBrowserScreenshot \
+        https://jslint-org.github.io/jslint/branch.beta/index.html
 )}
 
 shCiBranchPromote() {(set -e
@@ -227,7 +233,9 @@ shDirHttplinkValidate() {(set -e
 (async function () {
     "use strict";
     let dict = {};
-    Array.from(await require("fs").readdir(".")).forEach(async function (file) {
+    Array.from(
+        await require("fs").promises.readdir(".")
+    ).forEach(async function (file) {
         if (!(
             /.\.html$|.\.md$/m
         ).test(file)) {
@@ -235,7 +243,7 @@ shDirHttplinkValidate() {(set -e
         }
         let data = await require("fs").promises.readFile(file, "utf8");
         data.replace((
-            /\bhttps?:\/\/.*?(?:[")\]]|$)/gm
+            /\bhttps?:\/\/.*?(?:[\s")\]]|$)/gm
         ), function (url) {
             url = url.slice(0, -1).replace((
                 /[\u0022\u0027]/g
@@ -328,7 +336,7 @@ shGitCmdWithGithubToken() {(set -e
     EXIT_CODE=0
     # hide $GITHUB_TOKEN in case of err
     git "$CMD" "$URL" "$@" 2>/dev/null || EXIT_CODE="$?"
-    printf "EXIT_CODE=$EXIT_CODE\n"
+    printf "shGitCmdWithGithubToken - EXIT_CODE=$EXIT_CODE\n" 1>&2
     return "$EXIT_CODE"
 )}
 
@@ -343,18 +351,19 @@ shGitLsTree() {(set -e
     let result;
     // get file, mode, size
     result = await new Promise(function (resolve) {
-        let child;
-        child = require("child_process").spawn("git", [
+        result = "";
+        require("child_process").spawn("git", [
             "ls-tree", "-lr", "HEAD"
         ], {
             encoding: "utf8",
             stdio: [
                 "ignore", "pipe", 2
             ]
-        });
-        child.on("exit", function () {
-            resolve(child.stdout);
-        });
+        }).on("exit", function () {
+            resolve(result);
+        }).stdout.on("data", function (chunk) {
+            result += chunk;
+        }).setEncoding("utf8");
     });
     result = Array.from(result.matchAll(
         /^(\S+?)\u0020+?\S+?\u0020+?\S+?\u0020+?(\S+?)\t(\S+?)$/gm
@@ -416,10 +425,18 @@ shGitLsTree() {(set -e
 shRunWithCoverage() {(set -e
 # this function will run nodejs command $@ with v8-coverage and
 # create coverage-report .build/coverage/index.html
+    local EXIT_CODE
+    EXIT_CODE=0
     export DIR_COVERAGE=.build/coverage/
     rm -rf "$DIR_COVERAGE"
-    (export NODE_V8_COVERAGE="$DIR_COVERAGE" && "$@" || true)
-    node -e '
+    (set -e
+        export NODE_V8_COVERAGE="$DIR_COVERAGE"
+        "$@"
+    ) || EXIT_CODE="$?"
+    if [ "$EXIT_CODE" = 0 ]
+    then
+        node -e '
+/*jslint bitwise*/
 // init debugInline
 if (!globalThis.debugInline) {
     let consoleError;
@@ -568,7 +585,11 @@ body {
 
 .coverage pre:hover span,
 .coverage tr:hover td {
-    background: #bbe;
+    background: #7d7;
+}
+.coverage pre:hover span.uncovered,
+.coverage tr:hover td.coverageLow {
+    background: #d99;
 }
 </style>
 </head>
@@ -965,6 +986,10 @@ ${String(count).padStart(7, " ")}
     });
 }());
 ' # "'
+        find "$DIR_COVERAGE"
+    fi
+    printf "shRunWithCoverage - EXIT_CODE=$EXIT_CODE\n" 1>&2
+    return "$EXIT_CODE"
 )}
 
 shRunWithScreenshotTxt() {(set -e
@@ -976,7 +1001,7 @@ shRunWithScreenshotTxt() {(set -e
     rm -f "$SCREENSHOT_SVG"
     printf "0\n" > "$SCREENSHOT_SVG.exit_code"
     shCiPrint "shRunWithScreenshotTxt - (shRun $* 2>&1)"
-    (
+    (set -e
         (shRun "$@" 2>&1) || printf "$?\n" > "$SCREENSHOT_SVG.exit_code"
     ) | tee /tmp/shRunWithScreenshotTxt.txt
     EXIT_CODE="$(cat "$SCREENSHOT_SVG.exit_code")"
@@ -994,7 +1019,7 @@ shRunWithScreenshotTxt() {(set -e
     let result;
     let yy;
     yy = 10;
-    result = await require("fs/promises").readFile(
+    result = await require("fs").promises.readFile(
         require("os").tmpdir() + "/shRunWithScreenshotTxt.txt",
         "utf8"
     );
@@ -1040,16 +1065,17 @@ shRunWithScreenshotTxt() {(set -e
         result + "</text>\n</svg>\n"
     );
     try {
-        await require("fs/promises").mkdir((
+        await require("fs").promises.mkdir((
             require("path").dirname(process.argv[1])
         ), {
             recursive: true
         });
     } catch (ignore) {}
-    require("fs/promises").writeFile(process.argv[1], result);
+    require("fs").promises.writeFile(process.argv[1], result);
 }());
 ' "$SCREENSHOT_SVG" # "'
     shCiPrint "shRunWithScreenshotTxt - wrote - $SCREENSHOT_SVG"
+    printf "shRunWithScreenshotTxt - EXIT_CODE=$EXIT_CODE\n" 1>&2
     return "$EXIT_CODE"
 )}
 
