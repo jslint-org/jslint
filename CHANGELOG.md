@@ -8,6 +8,9 @@
 - none
 
 ## v2021.5.24-beta
+- jslint - remove deadcode warning bad_option_a.
+- jslint - fix bug failing to parse unicode "\\u{12345}"
+- ci - fix ci silently failing in node-v12 and node-v14
 - jslint - remove deadcode for preaction-binary-".".
 - cli - add env var JSLINT_CLI to force-trigger cli in jslint.js
 - jslint - fix bug falsely warning against conditional-chaining-operator "?.".

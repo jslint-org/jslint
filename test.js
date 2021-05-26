@@ -76,6 +76,9 @@ function noop() {
         this: true,
         white: true
     }).warnings.length === 0);
+    assertOrThrow(jslint("", {
+        test_uncaught_error: true
+    }).warnings.length === 1);
 }());
 
 (function testCaseJslintCodeValidate() {
@@ -99,7 +102,7 @@ function noop() {
         ],
         RegExp: [
             "function aa() {\n    return /./;\n}",
-            "let aa = aa[`!`];"
+            "let aa = /(?!.)(?:.)(?=.)/;"
         ],
         async_await: [
             "async function aa() {\n    await aa();\n}"
@@ -125,6 +128,9 @@ function noop() {
             "function aa() {\nbb:\n    while (true) {\n        if (true) {\n"
             + "            break bb;\n        }\n    }\n}"
         ],
+        loop: [
+            "function aa() {\n    do {\n        aa();\n    } while (aa());\n}"
+        ],
         misc: [
             ""
         ],
@@ -136,6 +142,9 @@ function noop() {
         ],
         optional_chaining: [
             "let aa = aa?.bb?.cc;"
+        ],
+        property: [
+            "let aa = aa[`!`];"
         ],
         var: [
             "let [...aa] = [...aa];",
@@ -197,6 +206,8 @@ function noop() {
         escape_mega: [],
         expected_a: [],
         expected_a_at_b_c: [
+            "(function(){let aa;bb:while(aa()){aa();}}());",
+            "function aa(){\n bb:while(aa){aa();}}",
             "let aa=aa(\naa\n()\n);",
             "let aa={\n    aa:\n0\n};"
         ],
@@ -237,6 +248,7 @@ function noop() {
             ".0",
             "/*jslint eval*/\nFunction;eval",
             "=>0",
+            "\"\\u{12345\"",
             "aa=/(:)/",
             "aa=/=/",
             "aa=/?/",
@@ -265,7 +277,9 @@ function noop() {
             "let {0}=0",
             "let {aa:0}=0"
         ],
-        expected_line_break_a_b: [],
+        expected_line_break_a_b: [
+            "function aa(){bb:while(aa){aa();}}"
+        ],
         expected_regexp_factor_a: [
             "/ /"
         ],

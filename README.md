@@ -23,7 +23,7 @@ douglas@crockford.com
 curl -L https://www.jslint.com/jslint.js > jslint.mjs
 ```
 
-2. To run `jslint.mjs` from command line:
+2. To run `jslint.mjs` from command-line:
 ```shell
 #!/bin/sh
 node jslint.mjs hello.js

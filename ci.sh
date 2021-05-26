@@ -198,11 +198,12 @@ shCiBase() {(set -e
 # this function will run base-ci
     export NODE_OPTIONS="--unhandled-rejections=strict"
     # run test with coverage-report
-    # coverage-hack - jslint invalid file
+    # coverage-hack - test jslint's invalid-file handling-behavior
     mkdir -p .test-dir.js
-    # coverage-hack - jslint invalid file
+    # coverage-hack - test jslint's ignore-file handling-behavior
     touch .test-min.js
     (set -e
+        # coverage-hack - test jslint's cli handling-behavior
         export JSLINT_CLI=1
         shRunWithCoverage node test.js .
     )

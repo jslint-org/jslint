@@ -89,7 +89,7 @@
 /*jslint node*/
 
 /*property
-    JSLINT_CLI, console_error, env, promises, source,
+    JSLINT_CLI, console_error, env, promises, source, test_uncaught_error,
     a, all, and, argv, arity, assign, b, bad_assignment_a, bad_directive_a,
     bad_get, bad_module_name_a, bad_option_a, bad_property_a, bad_set, bitwise,
     block, body, browser, c, calls, catch, cli_mode, closer, closure, code,
@@ -528,26 +528,6 @@ function artifact(the_token) {
     );
 }
 
-function artifact_line(the_token) {
-
-// Return the fudged line number of an artifact.
-
-    if (the_token === undefined) {
-        the_token = next_token;
-    }
-    return the_token.line + fudge;
-}
-
-function artifact_column(the_token) {
-
-// Return the fudged column number of an artifact.
-
-    if (the_token === undefined) {
-        the_token = next_token;
-    }
-    return the_token.from + fudge;
-}
-
 function warn_at(code, line, column, a, b, c, d) {
 
 // Report an error at some line and column of the program. The warning object
@@ -657,7 +637,7 @@ function tokenize(source) {
     let mega_from;              // the starting column of megastring
     let mega_line;              // the starting line of megastring
     let regexp_seen;            // regular expression literal seen on this line
-    let snippet;                // a piece of string
+    let snippet = "";           // a piece of string
     let source_line = "";       // the remaining line source string
     let whole_line = "";        // the whole line source string
 
@@ -756,14 +736,10 @@ function tokenize(source) {
 // Back up one character by moving a character from the end of the snippet to
 // the front of the source_line.
 
-        if (snippet) {
-            char = snippet.slice(-1);
-            source_line = char + source_line;
-            column -= 1;
-            snip();
-        } else {
-            char = "";
-        }
+        char = snippet.slice(-1);
+        source_line = char + source_line;
+        column -= char.length;
+        snip();
         return char;
     }
 
@@ -796,7 +772,7 @@ function tokenize(source) {
                 if (some_digits(rx_hexs) > 5) {
                     warn_at("too_many_digits", line, column - 1);
                 }
-                if (next_char() !== "}") {
+                if (char !== "}") {
                     stop_at("expected_a_before_b", line, column, "}", char);
                 }
                 return next_char();
@@ -896,19 +872,13 @@ function tokenize(source) {
                     typeof allowed === "boolean"
                     || typeof allowed === "object"
                 ) {
-                    if (
-                        value === ""
-                        || value === "true"
-                        || value === undefined
-                    ) {
+                    if (value === "true" || value === undefined) {
                         option[name] = true;
                         if (Array.isArray(allowed)) {
                             populate(allowed, declared_globals, false);
                         }
                     } else if (value === "false") {
                         option[name] = false;
-                    } else {
-                        warn("bad_option_a", the_comment, name + ":" + value);
                     }
                 } else {
                     warn("bad_option_a", the_comment, name);
@@ -1082,6 +1052,9 @@ function tokenize(source) {
             }
 
             function factor() {
+
+// Parse current character in regexp.
+
                 if (
                     char === ""
                     || char === "/"
@@ -1688,7 +1661,10 @@ function advance(id, match) {
                 next_token,
                 id,
                 artifact(match),
-                artifact_line(match),
+
+// Return the fudged line number of an artifact.
+
+                match.line + fudge,
                 artifact(next_token)
             )
         );
@@ -1929,6 +1905,11 @@ function condition() {
 
     const the_paren = next_token;
     let the_value;
+
+// source: "do {} while ()"
+// source: "if () {}"
+// source: "while () {}"
+
     the_paren.free = true;
     advance("(");
     the_value = expression(0);
@@ -2561,6 +2542,9 @@ infix("(", 160, function (left) {
     }
     advance(")", the_paren);
     if (the_paren.expression.length === 2) {
+
+// source: "aa(0)"
+
         the_paren.free = true;
         if (the_argument.wrapped === true) {
             warn("unexpected_a", the_paren);
@@ -2569,6 +2553,10 @@ infix("(", 160, function (left) {
             the_argument.wrapped = true;
         }
     } else {
+
+// source: "aa()"
+// source: "aa(0, 0)"
+
         the_paren.free = false;
     }
     return the_paren;
@@ -2972,6 +2960,9 @@ function do_function(the_function) {
 // Parse the parameter list.
 
     advance("(");
+
+// source: "function () {}"
+
     token.free = false;
     token.arity = "function";
     [functionage.parameters, functionage.signature] = parameter_list();
@@ -3086,9 +3077,15 @@ prefix("(", function () {
         || next_token.id === "..."
         || (next_token.identifier && (cadet === "," || cadet === "="))
     ) {
+
+// source: "() => {}"
+
         the_paren.free = false;
         return fart(parameter_list());
     }
+
+// source: "(aa)"
+
     the_paren.free = true;
     the_value = expression(0);
     if (the_value.wrapped === true) {
@@ -3517,6 +3514,9 @@ stmt("for", function () {
     not_top_level(the_for);
     functionage.loop += 1;
     advance("(");
+
+// source: "for () {}"
+
     token.free = true;
     if (next_token.id === ";") {
         return stop("expected_a_b", the_for, "while (", "for (;");
@@ -3673,6 +3673,9 @@ stmt("switch", function () {
     }
     functionage.switch += 1;
     advance("(");
+
+// source: "switch () {}"
+
     token.free = true;
     the_switch.expression = expression(0);
     the_switch.block = the_cases;
@@ -4626,6 +4629,23 @@ function uninitialized_and_unused() {
 
 function whitage() {
     let closer = "(end)";
+
+// free = false
+// source: "() => {}"
+// source: "aa()"
+// source: "aa(0, 0)"
+// source: "function () {}"
+//
+// free = true
+// source: "(0)"
+// source: "(aa)"
+// source: "aa(0)"
+// source: "do {} while ()"
+// source: "for () {}"
+// source: "if () {}"
+// source: "switch () {}"
+// source: "while () {}"
+
     let free = false;
     let left = global;
     let margin = 0;
@@ -4659,7 +4679,10 @@ function whitage() {
             right,
             artifact(right),
             fudge + at,
-            artifact_column(right)
+
+// Return the fudged column number of an artifact.
+
+            right.from + fudge
         );
     }
 
@@ -4692,7 +4715,7 @@ function whitage() {
         if (left.line === right.line) {
             if (left.thru !== right.from && nr_comments_skipped === 0) {
 
-// code - "let aa = aa()( );"
+// source: "let aa = aa()( );"
 
                 warn(
                     "unexpected_space_a_b",
@@ -4706,15 +4729,19 @@ function whitage() {
                 const at = (
                     free
                     ? margin
-                    : margin + 8
+                    : margin + 8 // dead-code?
                 );
                 if (right.from < at) {
 
-// code - "let aa = aa(\n    aa\n()\n);"
+// source:
+// let aa = aa(
+//     aa
+// ()
+// );
 
                     expected_at(at);
                 }
-            } else {
+            } else { // dead-code?
                 if (right.from !== margin + 8) {
                     expected_at(margin + 8);
                 }
@@ -4766,16 +4793,43 @@ function whitage() {
 
             const new_closer = opener[left.id];
             if (typeof new_closer === "string") {
+
+// source: "${"
+// source: "("
+// source: "["
+// source: "{"
+
                 if (new_closer !== right.id) {
+
+// source: "${0"
+// source: "(0"
+// source: "[0"
+// source: "{0"
+
                     opening = left.open || (left.line !== right.line);
                     push();
                     closer = new_closer;
                     if (opening) {
+
+// source: "${\n0\n}"
+// source: "(\n0\n)"
+// source: "[\n0\n]"
+// source: "{\n0\n}"
+
                         free = closer === ")" && left.free;
                         open = true;
                         margin += 4;
                         if (right.role === "label") {
                             if (right.from !== 0) {
+
+// source:
+// function aa() {
+//  bb:
+//     while (aa()) {
+//         aa();
+//     }
+// }
+
                                 expected_at(0);
                             }
                         } else if (right.switch) {
@@ -4785,6 +4839,14 @@ function whitage() {
                         }
                     } else {
                         if (right.statement || right.role === "label") {
+
+// source:
+// function aa() {bb:
+//     while (aa()) {
+//         aa();
+//     }
+// }
+
                             warn(
                                 "expected_line_break_a_b",
                                 right,
@@ -4792,6 +4854,12 @@ function whitage() {
                                 artifact(right)
                             );
                         }
+
+// source: "${0}"
+// source: "(0)"
+// source: "[0]"
+// source: "{0}"
+
                         free = false;
                         open = false;
                         no_space_only();
@@ -4800,6 +4868,11 @@ function whitage() {
 
 // If left and right are opener and closer, then the placement of right depends
 // on the openness. Illegal pairs (like '{]') have already been detected.
+
+// source: "${}"
+// source: "()"
+// source: "[]"
+// source: "{}"
 
                     if (left.line === right.line) {
                         no_space();
@@ -4837,6 +4910,15 @@ function whitage() {
                         at_margin(-4);
                     } else if (right.role === "label") {
                         if (right.from !== 0) {
+
+// source:
+// (function () {
+//     let aa;bb:
+//     while (aa()) {
+//         aa();
+//     }
+// }());
+
                             expected_at(0);
                         }
                     } else if (left.id === ",") {
@@ -4882,7 +4964,7 @@ function whitage() {
                         no_space_only();
                     } else if (right.id === "." || right.id === "?.") {
                         no_space_only();
-                    } else if (left.id === ";") {
+                    } else if (left.id === ";") { // dead-code?
                         if (open) {
                             at_margin(0);
                         }
@@ -4897,6 +4979,14 @@ function whitage() {
                         || right.id === "catch"
                         || right.id === "else"
                         || right.id === "finally"
+
+// source:
+// function aa() {
+//     do {
+//         aa();
+//     } while (aa());
+// }
+
                         || (right.id === "while" && !right.statement)
                         || (left.id === ")" && right.id === "{")
                     ) {
@@ -4956,6 +5046,9 @@ function jslint(
     option_object = empty(),
     global_array = []
 ) {
+    function test_uncaught_error() {
+        throw new Error();
+    }
     try {
         warnings = [];
         option = Object.assign(empty(), option_object);
@@ -5051,13 +5144,16 @@ function jslint(
                 }
             });
         }
+        if (option.test_uncaught_error) {
+            test_uncaught_error();
+        }
         early_stop = false;
     } catch (e) {
-        e.column = e.column || -1;
         e.early_stop = true;
-        e.line = e.line || -1;
         e.message = "[JSLint was unable to finish] - " + e.message;
         if (e.name !== "JSLintError") {
+            e.column = 0;
+            e.line = 0;
             e.stack_trace = e.stack;
             warnings.push(e);
         }
