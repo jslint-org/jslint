@@ -197,6 +197,7 @@ function noop() {
         ],
         duplicate_a: [
             "aa={\"aa\":0,\"aa\":0}",
+            "export default 0;export default 0;",
             "let aa;export {aa,aa}",
             "{\"aa\":0,\"aa\":0}"
         ],
@@ -286,7 +287,7 @@ function noop() {
         expected_space_a_b: [
             "(function(){return;}());",
             "/**//**/",
-            "let aa=(aa?1:2);",
+            "let aa=(aa?0:1);",
             "let aa=0;"
         ],
         expected_statements_a: [],
@@ -299,7 +300,8 @@ function noop() {
         ],
         freeze_exports: [
             "export default Object.aa()",
-            "export function aa(){}"
+            "export function aa(){}",
+            "let aa;export {aa};export function aa(){}"
         ],
         function_in_loop: [
             "function aa(){while(0){aa.map(()=>0);}}",
@@ -349,7 +351,7 @@ function noop() {
             "function aa(aa=0,...){}",
             "function aa(aa=0,[]){}",
             "function aa(aa=0,{}){}",
-            "function aa(aa=1,bb){}"
+            "function aa(aa=0,bb){}"
         ],
         reserved_a: [
             "let undefined"
@@ -416,6 +418,7 @@ function noop() {
             "for(const ii=0;;){}",
             "for(ii=0;ii<0;ii++){}",
             "for(ii=0;ii<0;ii+=0){}",
+            "function aa(){for(0;0;0){break;}}",
             "function aa(){try{return;}catch(ignore){}finally{return;}}",
             "function aa(){try{}catch(ignore){}finally{switch(0){case 0:}}}",
             "function aa(){while(0){continue;}}",
@@ -431,11 +434,16 @@ function noop() {
             "new Date.UTC()",
             "new Function()",
             "new Symbol()",
+            "switch(0){case 0:break;case 0:break}",
+            "switch(0){case 0:break;default:break;}",
+            "switch(0){case 0:break;default:}",
             "this",
+            "try{throw 0;try{}catch(){}}catch(){}",
             "try{}finally{break;}",
             "void 0",
             "while((0)){}",
             "while(0){}",
+            "with",
             "yield /_/",
             "{//\n}",
             "{0:0}",

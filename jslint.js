@@ -5069,6 +5069,7 @@ function jslint(
         global = {
             body: true,
             context: empty(),
+            finally: 0,
             from: 0,
             id: "(global)",
             level: 0,
@@ -5076,7 +5077,8 @@ function jslint(
             live: [],
             loop: 0,
             switch: 0,
-            thru: 0
+            thru: 0,
+            try: 0
         };
         blockage = global;
         functionage = global;

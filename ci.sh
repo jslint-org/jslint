@@ -584,7 +584,11 @@ body {
 
 .coverage pre:hover span,
 .coverage tr:hover td {
-    background: #bbe;
+    background: #7d7;
+}
+.coverage pre:hover span.uncovered,
+.coverage tr:hover td.coverageLow {
+    background: #d99;
 }
 </style>
 </head>

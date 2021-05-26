@@ -1,13 +1,16 @@
 # Changelog
 
 ## Todo
-- website - add fork-me ribbon.
+- jslint - cleanup regexp code using switch-statements.
+- node - after node-v12 is deprecated, change require("fs").promises to require("fs/promises").
 - app - deploy jslint as chrome-extension.
 - doc - add svg package-listing.
 - ci - continue addng regression tests and improve code-coverage.
 - none
 
 ## v2021.5.24-beta
+- jslint - fix (global) functionage missing properties finally and try.
+- website - add fork-me ribbon.
 - jslint - remove deadcode warning bad_option_a.
 - jslint - fix bug failing to parse unicode "\\u{12345}"
 - ci - fix ci silently failing in node-v12 and node-v14
