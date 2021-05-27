@@ -2062,9 +2062,10 @@ function are_similar(a, b) {
 
 // cause: "0&&0"
 
-    if (a === b) {
-        return true;
-    }
+    assert_or_throw(a !== b, "Expected a !== b.");
+//  if (a === b) {
+//      return true;
+//  }
     if (Array.isArray(a)) {
         return (
             Array.isArray(b)
@@ -2077,9 +2078,10 @@ function are_similar(a, b) {
             })
         );
     }
-    if (Array.isArray(b)) {
-        return false;
-    }
+    assert_or_throw(!Array.isArray(b), "Expected !Array.isArray(b).");
+//  if (Array.isArray(b)) {
+//      return false;
+//  }
     if (a.id === "(number)" && b.id === "(number)") {
         return a.value === b.value;
     }
@@ -2102,16 +2104,25 @@ function are_similar(a, b) {
         return false;
     }
     if (a.arity === b.arity && a.id === b.id) {
+
+// cause: "aa.bb&&aa.bb"
+
         if (a.id === ".") {
             return (
                 are_similar(a.expression, b.expression)
                 && are_similar(a.name, b.name)
             );
         }
+
+// cause: "+0&&+0"
+
         if (a.arity === "unary") {
             return are_similar(a.expression, b.expression);
         }
         if (a.arity === "binary") {
+
+// cause: "aa[0]&&aa[0]"
+
             return (
                 a.id !== "("
                 && are_similar(a.expression[0], b.expression[0])
@@ -2128,9 +2139,13 @@ function are_similar(a, b) {
                 && are_similar(a.expression[2], b.expression[2])
             );
         }
-        if (a.arity === "function" && a.arity === "regexp") {
-            return false;
-        }
+        assert_or_throw(
+            a.arity !== "function" && a.arity !== "regexp",
+            "Expected a.arity !== \"function\" && a.arity !== \"regexp\"."
+        );
+//      if (a.arity === "function" && a.arity === "regexp") {
+//          return false;
+//      }
 
 // cause: "undefined&&undefined"
 

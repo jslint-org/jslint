@@ -12,6 +12,9 @@
 - none
 
 ## v2021.5.27-beta
+- deadcode - replace with assertion-check in function are_similar() - "if (a === b) { return true }".
+- deadcode - replace with assertion-check in function are_similar() superseded by id-check - "if (Array.isArray(b)) { return false; }".
+- deadcode - replace with assertion-check in function are_similar() superseded by is_weird() check - "if (a.arity === "function" && a.arity ===...c".
 - ci - fix expectedWarningCode not being validated
 - ci - in windows, disable git-autocrlf
 - jslint - inline-document each warning with cause that can reproduce it - part 1.
