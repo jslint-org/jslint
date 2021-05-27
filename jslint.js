@@ -923,7 +923,7 @@ function tokenize(source) {
             } else if (the_comment.directive === "global") {
                 if (value) {
 
-// cause: "/*global aa:true*/"
+// cause: "/*global aa:false*/"
 
                     warn("bad_option_a", the_comment, name + ":" + value);
                 }
@@ -959,7 +959,7 @@ function tokenize(source) {
         if (result) {
             if (!directive_mode) {
 
-// cause: "let aa;\n/*global aa*/"
+// cause: "0\n/*global aa*/"
 
                 warn_at("misplaced_directive_a", line, from, result[1]);
             } else {
@@ -1250,7 +1250,7 @@ function tokenize(source) {
             }
             if (char === "") {
 
-// cause: "\"aa"
+// cause: "\""
 
                 return stop_at("unclosed_string", line, column);
             }
@@ -1449,7 +1449,7 @@ function tokenize(source) {
                     return (
                         next_line() === undefined
 
-// cause: "`aa"
+// cause: "`"
 
                         ? stop_at("unclosed_mega", mega_line, mega_from)
                         : part()
@@ -1752,6 +1752,9 @@ function advance(id, match) {
     if (id !== undefined && next_token.id !== id) {
         return (
             match === undefined
+
+// cause: "()"
+
             ? stop("expected_a_b", next_token, id, artifact())
 
 // cause: "{\"aa\":0"
@@ -2001,6 +2004,9 @@ function expression(rbp, initial) {
         left = token;
         left.arity = "variable";
     } else {
+
+// cause: "!"
+
         return stop("unexpected_a", token);
     }
     (function right() {
@@ -2025,9 +2031,9 @@ function condition() {
     const the_paren = next_token;
     let the_value;
 
-// cause: "do {} while ()"
-// cause: "if () {}"
-// cause: "while () {}"
+// cause: "do{}while()"
+// cause: "if(){}"
+// cause: "while(){}"
 
     the_paren.free = true;
     advance("(");
@@ -2114,7 +2120,7 @@ function are_similar(a, b) {
         }
         if (a.arity === "ternary") {
 
-// cause: "let aa=(``?``:``)&&(``?``:``)"
+// cause: "aa=(``?``:``)&&(``?``:``)"
 
             return (
                 are_similar(a.expression[0], b.expression[0])
@@ -2717,7 +2723,7 @@ infix("(", 160, function (left) {
     } else {
 
 // cause: "aa()"
-// cause: "aa(0, 0)"
+// cause: "aa(0,0)"
 
         the_paren.free = false;
     }
@@ -2904,6 +2910,9 @@ prefix("new", function () {
 prefix("typeof");
 prefix("void", function () {
     const the_void = token;
+
+// cause: "void"
+
     warn("unexpected_a", the_void);
     the_void.expression = expression(0);
     return the_void;
@@ -3111,7 +3120,7 @@ function do_function(the_function) {
 
     if (functionage.loop > 0) {
 
-// cause: "function aa(){while(0){aa.map(function(){});}}"
+// cause: "while(0){aa.map(function(){});}"
 
         warn("function_in_loop", the_function);
     }
@@ -3141,7 +3150,7 @@ function do_function(the_function) {
 
     advance("(");
 
-// cause: "function () {}"
+// cause: "function(){}"
 
     token.free = false;
     token.arity = "function";
@@ -3217,7 +3226,7 @@ function fart(pl) {
     functions.push(the_fart);
     if (functionage.loop > 0) {
 
-// cause: "function aa(){while(0){aa.map(()=>0);}}"
+// cause: "while(0){aa.map(()=>0);}"
 
         warn("function_in_loop", the_fart);
     }
@@ -3264,7 +3273,7 @@ prefix("(", function () {
         || (next_token.identifier && (cadet === "," || cadet === "="))
     ) {
 
-// cause: "() => {}"
+// cause: "()=>0"
 
         the_paren.free = false;
         return fart(parameter_list());
@@ -3345,7 +3354,7 @@ prefix("{", function () {
                 id = survey(name);
                 if (typeof seen[id] === "boolean") {
 
-// cause: "aa={bb,bb}"
+// cause: "aa={aa,aa}"
 
                     warn("duplicate_a", name);
                 }
@@ -3476,7 +3485,7 @@ function do_var() {
 
     if (functionage.switch > 0) {
 
-// cause: "switch(0){case 0:var aa;}"
+// cause: "switch(0){case 0:var aa}"
 
         warn("var_switch", the_statement);
     }
@@ -3639,7 +3648,7 @@ stmt("do", function () {
     semicolon();
     if (the_do.block.disrupt === true) {
 
-// cause: "function aa(){do{break;}while(0);}"
+// cause: "function aa(){do{break;}while(0)}"
 
         warn("weird_loop", the_do);
     }
@@ -3664,7 +3673,7 @@ stmt("export", function () {
             the_name.used += 1;
             if (exports[the_id] !== undefined) {
 
-// cause: "let aa;export {aa,aa}"
+// cause: "let aa;export{aa,aa}"
 
                 warn("duplicate_a");
             }
@@ -3691,7 +3700,7 @@ stmt("export", function () {
             || the_thing.expression[0].name.id !== "freeze"
         ) {
 
-// cause: "export default Object.aa()"
+// cause: "export default {}"
 
             warn("freeze_exports", the_thing);
         }
@@ -3709,11 +3718,10 @@ stmt("export", function () {
             the_thing = statement();
             the_name = the_thing.name;
             the_id = the_name.id;
+
+// cause: "let aa;export{aa};export function aa(){}"
+
             the_name.used += 1;
-            console.error(exports);
-
-// cause: "let aa;export {aa};export function aa(){}"
-
             if (exports[the_id] !== undefined) {
                 warn("duplicate_a", the_name);
             }
@@ -3756,10 +3764,13 @@ stmt("for", function () {
     functionage.loop += 1;
     advance("(");
 
-// cause: "for () {}"
+// cause: "for(){}"
 
     token.free = true;
     if (next_token.id === ";") {
+
+// cause: "for(;;){}"
+
         return stop("expected_a_b", the_for, "while (", "for (;");
     }
     if (
@@ -3773,7 +3784,7 @@ stmt("for", function () {
     if (first.id === "in") {
         if (first.expression[0].arity !== "variable") {
 
-// cause: "/*jslint for*/\nfunction aa(){for (0 in aa){}}"
+// cause: "for(0 in aa){}"
 
             warn("bad_assignment_a", first.expression[0]);
         }
@@ -3788,7 +3799,7 @@ stmt("for", function () {
         the_for.inc = expression(0);
         if (the_for.inc.id === "++") {
 
-// cause: "aa=aa++"
+// cause: "for(aa;aa;aa++){}"
 
             warn("expected_a_b", the_for.inc, "+= 1", "++");
         }
@@ -3930,7 +3941,7 @@ stmt("switch", function () {
     functionage.switch += 1;
     advance("(");
 
-// cause: "switch () {}"
+// cause: "switch(){}"
 
     token.free = true;
     the_switch.expression = expression(0);
@@ -4184,6 +4195,7 @@ function walk_expression(thing) {
     if (thing) {
         if (Array.isArray(thing)) {
 
+// cause: "0&&0"
 // cause: "(function(){}())"
 
             thing.forEach(walk_expression);
@@ -4209,7 +4221,7 @@ function walk_expression(thing) {
                 thing.arity === "statement"
                 || thing.arity === "assignment"
             ) {
-                warn("unexpected_statement_a", thing);
+                warn("unexpected_statement_a", thing); // deadcode?
             }
             postamble(thing);
         }
@@ -4229,7 +4241,7 @@ function walk_statement(thing) {
             if (thing.arity === "binary") {
                 if (thing.id !== "(") {
 
-// cause: "0+0"
+// cause: "0&&0"
 
                     warn("unexpected_expression_a", thing);
                 }
@@ -4240,7 +4252,7 @@ function walk_statement(thing) {
                 && thing.id !== "await"
             ) {
 
-// cause: "!!aa"
+// cause: "!0"
 // cause: "+[]"
 // cause: "0"
 
@@ -4329,7 +4341,15 @@ function subactivate(name) {
 }
 
 function preaction_function(thing) {
+
+// cause: "()=>0"
+// cause: "(function (){}())"
+// cause: "function aa(){}"
+
     if (thing.arity === "statement" && blockage.body !== true) {
+
+// cause: "if(0){function aa(){}\n}"
+
         warn("unexpected_a", thing);
     }
     stack.push(functionage);
@@ -4472,7 +4492,7 @@ preaction("binary", "||", function (thing) {
     thing.expression.forEach(function (thang) {
         if (thang.id === "&&" && !thang.wrapped) {
 
-// cause: "aa&&aa||aa"
+// cause: "0&&0||0"
 
             warn("and", thang);
         }
@@ -4716,9 +4736,9 @@ postaction("binary", "&&", function (thing) {
         || thing.expression[1].constant === true
     ) {
 
-// cause: "let aa=0&&0"
-// cause: "let aa=`${0}`&&`${0}`"
-// cause: "let aa=(``?``:``)&&(``?``:``)"
+// cause: "aa=0&&0"
+// cause: "aa=`${0}`&&`${0}`"
+// cause: "aa=(``?``:``)&&(``?``:``)"
 
         warn("weird_condition_a", thing);
     }
@@ -4730,7 +4750,7 @@ postaction("binary", "||", function (thing) {
         || thing.expression[0].constant === true
     ) {
 
-// cause: "let aa=0||0"
+// cause: "aa=0||0"
 
         warn("weird_condition_a", thing);
     }
@@ -4935,6 +4955,9 @@ postaction("unary", function (thing) {
         }
     } else if (thing.id === "!!") {
         if (!option.convert) {
+
+// cause: "!!0"
+
             warn("expected_a_b", thing, "Boolean(...)", "!!");
         }
     } else if (
@@ -5012,14 +5035,12 @@ function whitage() {
 
 // free = false
 
-// cause: "()=>{}"
+// cause: "()=>0"
 // cause: "aa()"
 // cause: "aa(0,0)"
 // cause: "function(){}"
 
     let free = false;
-
-// free = true
 
 // cause: "(0)"
 // cause: "(aa)"
@@ -5029,6 +5050,8 @@ function whitage() {
 // cause: "if(){}"
 // cause: "switch(){}"
 // cause: "while(){}"
+
+// let free = true;
 
     let left = global;
     let margin = 0;
@@ -5086,7 +5109,6 @@ function whitage() {
             )
         ) {
 
-// cause: "let aa=( 0 );"
 // cause:
 //  (
 // function aa (
@@ -5140,7 +5162,7 @@ function whitage() {
                 const at = (
                     free
                     ? margin
-                    : margin + 8 // dead-code?
+                    : margin + 8 // deadcode?
                 );
                 if (right.from < at) {
 
@@ -5152,7 +5174,7 @@ function whitage() {
 
                     expected_at(at);
                 }
-            } else { // dead-code?
+            } else { // deadcode?
                 if (right.from !== margin + 8) {
                     expected_at(margin + 8);
                 }
@@ -5174,9 +5196,6 @@ function whitage() {
     function one_space() {
         if (left.line === right.line || !open) {
             if (left.thru + 1 !== right.from && nr_comments_skipped === 0) {
-
-// cause: "let aa=( 0 );"
-
                 warn(
                     "expected_space_a_b",
                     right,
@@ -5256,7 +5275,11 @@ function whitage() {
                     } else {
                         if (right.statement || right.role === "label") {
 
-// cause: "function aa(){bb:while(aa){aa();}}"
+// cause:
+// function aa() {bb:
+//     while (aa) {aa();
+//     }
+// }
 
                             warn(
                                 "expected_line_break_a_b",
@@ -5274,7 +5297,7 @@ function whitage() {
                         free = false;
                         open = false;
 
-// cause: "let aa=( 0 );"
+// cause: "let aa = ( 0 );"
 
                         no_space_only();
                     }
@@ -5380,7 +5403,7 @@ function whitage() {
                         no_space_only();
                     } else if (right.id === "." || right.id === "?.") {
                         no_space_only();
-                    } else if (left.id === ";") { // dead-code?
+                    } else if (left.id === ";") { // deadcode?
                         if (open) {
                             at_margin(0);
                         }
@@ -5438,7 +5461,7 @@ function whitage() {
                         || (left.arity === "statement" && right.id !== ";")
                     ) {
 
-// cause: "let aa=( 0 );"
+// cause: "let aa=0;"
 
                         one_space();
                     } else if (left.arity === "unary" && left.id !== "`") {
@@ -5599,12 +5622,12 @@ function jslint(
         column += 1;
         line += 1;
         list[ii].formatted_message = String(
-            String(ii + 1).padStart(3, " ") +
-            " \u001b[31m" + message + "\u001b[39m" +
-            " \u001b[90m\/\/ line " + line + ", column " + column +
-            "\u001b[39m\n" +
-            ("    " + String(lines && lines[line - 1]).trim()).slice(0, 72) +
-            "\n" + stack_trace
+            String(ii + 1).padStart(3, " ")
+            + " \u001b[31m" + message + "\u001b[39m"
+            + " \u001b[90m\/\/ line " + line + ", column " + column
+            + "\u001b[39m\n"
+            + ("    " + String(lines && lines[line - 1]).trim()).slice(0, 72)
+            + "\n" + stack_trace
         ).trim();
     });
     return {
@@ -5729,8 +5752,8 @@ async function cli({
             exitCode = 1;
             // print first 10 warnings to stderr
             console_error(
-                "\u001b[1mjslint " + file + "\u001b[22m\n" +
-                warnings.slice(0, 10).map(function ({
+                "\u001b[1mjslint " + file + "\u001b[22m\n"
+                + warnings.slice(0, 10).map(function ({
                     formatted_message
                 }) {
                     return formatted_message;

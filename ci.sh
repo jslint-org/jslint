@@ -53,12 +53,12 @@ if (!globalThis.debugInline) {
             exitCode = 1;
         }
         console.error(
-            "shBrowserScreenshot" +
-            "\n  - url - " + url +
-            "\n  - wrote - " + file + ".html" +
-            "\n  - wrote - " + file + ".png" +
-            "\n  - timeElapsed - " + (Date.now() - timeStart) + " ms" +
-            "\n  - EXIT_CODE=" + exitCode
+            "shBrowserScreenshot"
+            + "\n  - url - " + url
+            + "\n  - wrote - " + file + ".html"
+            + "\n  - wrote - " + file + ".png"
+            + "\n  - timeElapsed - " + (Date.now() - timeStart) + " ms"
+            + "\n  - EXIT_CODE=" + exitCode
         );
     });
     [
@@ -276,8 +276,8 @@ shDirHttplinkValidate() {(set -e
                 );
                 if (!(res.statusCode < 400)) {
                     throw new Error(
-                        "shDirHttplinkValidate - " + file +
-                        " - unreachable link " + url
+                        "shDirHttplinkValidate - " + file
+                        + " - unreachable link " + url
                     );
                 }
                 req.abort();
@@ -307,8 +307,8 @@ shDirHttplinkValidate() {(set -e
                     );
                     if (!exists) {
                         throw new Error(
-                            "shDirHttplinkValidate - " + file +
-                            " - unreachable link " + url
+                            "shDirHttplinkValidate - " + file
+                            + " - unreachable link " + url
                         );
                     }
                 });
@@ -409,14 +409,14 @@ shGitLsTree() {(set -e
         sizePad = String(Math.ceil(result[0].size / 1024)).length;
         process.stdout.write(result.map(function (elem, ii) {
             return (
-                String(ii + ".").padStart(iiPad, " ") +
-                "  " + elem.mode +
-                "  " + elem.date +
-                "  " + String(
+                String(ii + ".").padStart(iiPad, " ")
+                + "  " + elem.mode
+                + "  " + elem.date
+                + "  " + String(
                     Math.ceil(elem.size / 1024)
-                ).padStart(sizePad, " ") + " KB" +
-                "  " + elem.file +
-                "\n"
+                ).padStart(sizePad, " ") + " KB"
+                + "  " + elem.file
+                + "\n"
             );
         }).join(""));
     });
@@ -629,15 +629,15 @@ body {
             });
         }
         txtBorder = (
-            "+" + "-".repeat(padPathname + 2) + "+" +
-            "-".repeat(padLines + 2) + "+\n"
+            "+" + "-".repeat(padPathname + 2) + "+"
+            + "-".repeat(padLines + 2) + "+\n"
         );
         txt = "";
         txt += "coverage-report\n";
         txt += txtBorder;
         txt += (
-            "| " + String("files covered").padEnd(padPathname, " ") + " | " +
-            String("lines").padStart(padLines, " ") + " |\n"
+            "| " + String("files covered").padEnd(padPathname, " ") + " | "
+            + String("lines").padStart(padLines, " ") + " |\n"
         );
         txt += txtBorder;
         fileList.forEach(function ({
@@ -667,8 +667,8 @@ body {
                     // green
                     + Math.round(
                         Number(coveragePct) * 2.21
-                    ).toString(16).padStart(2, "0") +
-                    // blue
+                    ).toString(16).padStart(2, "0")
+                    + // blue
                     "00"
                 );
                 let str1 = "coverage";
@@ -697,15 +697,15 @@ body {
                 pathname = "";
             }
             txt += (
-                "| " +
-                String("./" + pathname).padEnd(padPathname, " ") + " | " +
-                String(coveragePct + " %").padStart(padLines, " ") + " |\n"
+                "| "
+                + String("./" + pathname).padEnd(padPathname, " ") + " | "
+                + String(coveragePct + " %").padStart(padLines, " ") + " |\n"
             );
             txt += (
                 "| " + "*".repeat(
                     Math.round(0.01 * coveragePct * padPathname)
-                ).padEnd(padPathname, "_") + " | " +
-                String(
+                ).padEnd(padPathname, "_") + " | "
+                + String(
                     linesCovered + " / " + linesTotal
                 ).padStart(padLines, " ") + " |\n"
             );
@@ -716,12 +716,12 @@ body {
             ${(
                 lineList
                 ? (
-                    "<a href=\"index.html\">./ </a>" +
-                    pathname + "<br>"
+                    "<a href=\"index.html\">./ </a>"
+                    + pathname + "<br>"
                 )
                 : (
-                    "<a href=\"" + (pathname || "index") + ".html\">./ " +
-                    pathname + "</a><br>"
+                    "<a href=\"" + (pathname || "index") + ".html\">./ "
+                    + pathname + "</a><br>"
                 )
             )}
 <div class="percentbar">
@@ -880,11 +880,11 @@ ${String(count).padStart(7, " ")}
             /\\\\/g
         ), "/");
         if (
-            pathname.indexOf(cwd) !== 0 ||
-            pathname.indexOf(cwd + "[") === 0 ||
-            (
-                process.env.npm_config_mode_coverage !== "all" &&
-                pathname.indexOf("/node_modules/") >= 0
+            pathname.indexOf(cwd) !== 0
+            || pathname.indexOf(cwd + "[") === 0
+            || (
+                process.env.npm_config_mode_coverage !== "all"
+                && pathname.indexOf("/node_modules/") >= 0
             )
         ) {
             return;
@@ -918,14 +918,14 @@ ${String(count).padStart(7, " ")}
                 lineList.forEach(function (elem) {
                     if (!(
                         (
-                            elem.startOffset <= startOffset &&
-                            startOffset <= elem.endOffset
+                            elem.startOffset <= startOffset
+                            && startOffset <= elem.endOffset
                         ) || (
-                            elem.startOffset <= endOffset &&
-                            endOffset <= elem.endOffset
+                            elem.startOffset <= endOffset
+                            && endOffset <= elem.endOffset
                         ) || (
-                            startOffset <= elem.startOffset &&
-                            elem.endOffset <= endOffset
+                            startOffset <= elem.startOffset
+                            && elem.endOffset <= endOffset
                         )
                     )) {
                         return;
@@ -1058,13 +1058,13 @@ shRunWithScreenshotTxt() {(set -e
         ), "\\$1").slice();
     }) + "\n";
     result = (
-        "<svg height=\"" + (yy + 20) +
-        "px\" width=\"720px\" xmlns=\"http://www.w3.org/2000/svg\">\n" +
-        "<rect height=\"" + (yy + 20) +
-        "px\" fill=\"#555\" width=\"720px\"></rect>\n" +
-        "<text fill=\"#7f7\" font-family=\"Consolas, Menlo, monospace\" " +
-        "font-size=\"12\" xml:space=\"preserve\">\n" +
-        result + "</text>\n</svg>\n"
+        "<svg height=\"" + (yy + 20)
+        + "px\" width=\"720px\" xmlns=\"http://www.w3.org/2000/svg\">\n"
+        + "<rect height=\"" + (yy + 20)
+        + "px\" fill=\"#555\" width=\"720px\"></rect>\n"
+        + "<text fill=\"#7f7\" font-family=\"Consolas, Menlo, monospace\" "
+        + "font-size=\"12\" xml:space=\"preserve\">\n"
+        + result + "</text>\n</svg>\n"
     );
     try {
         await require("fs").promises.mkdir((

@@ -12,8 +12,10 @@
 - none
 
 ## v2021.5.27-beta
-- jslint - inline-document each warning with cause that can reproduce it - part 1.
+- ci - fix expectedWarningCode not being validated
 - ci - in windows, disable git-autocrlf
+- jslint - inline-document each warning with cause that can reproduce it - part 1.
+- style - refactor code moving infix-operators from post-position to pre-position in multiline statements
 - none
 
 ## v2021.5.26

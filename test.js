@@ -2,22 +2,6 @@
 import fs from "fs";
 import jslint from "./jslint.js";
 
-// init debugInline
-if (!globalThis.debugInline) {
-    let consoleError;
-    consoleError = console.error;
-    globalThis.debugInline = function (...argList) {
-    /*
-     * this function will both print <argList> to stderr and
-     * return <argList>[0]
-     */
-        consoleError("\n\ndebugInline");
-        consoleError(...argList);
-        consoleError("\n");
-        return argList[0];
-    };
-}
-
 function assertOrThrow(passed, msg) {
 /*
  * this function will throw <msg> if <passed> is falsy
@@ -338,44 +322,60 @@ function noop() {
                     return code === expectedWarning;
                 }),
                 new Error(
-                    `jslint failed to warn "${expectedWarning}" with ` +
-                    `malfomed code "${malformedCode}"`
+                    `jslint failed to warn "${expectedWarning}" with `
+                    + `malfomed code "${malformedCode}"`
                 )
             );
         });
     });
-    String(await fs.promises.readFile("jslint.js", "utf8")).replace(new RegExp((
-        "(\\s*?\\n" +
-        "(?:\\s*?\\/\\/\\s*?cause:\\s*?" +
-        "(?:\".*\n|(?:(?:\/\/.*?\n)+))" +
-        ")+" +
-        ")" +
-        "\\s*?(?:.*?)?" +
-        "(?:" +
-        "(" +
-        "expected_at" +
-        "|one_space_only" +
-        "|stop" +
-        "|stop_at" +
-        "|warn" +
-        "|warn_at" +
-        ")" +
-        "\\\u0028\\s*?\"?(\\S[^\n\"]+)" +
-        "|\\S" +
-        ")"
-    ), "g"), function (match0, causeList, fnc, expectedCode) {
+    Array.from(String(
+        await fs.promises.readFile("jslint.js", "utf8")
+    ).matchAll(new RegExp((
+        "\\s*?"
+        + "(\\/\\/\\s*?cause:.*?\\n(?:\\/\\/.*?\\n)*?)"
+        + "(\\s*?\\n[^\\/].*?(?:\\n\\s*?\".*?)?$)"
+    ), "gm"))).forEach(function ([
+        match0, causeList, warning
+    ]) {
+        let expectedWarningCode;
+        let fnc;
+        // debug match0
         console.error(match0.trim().replace((/\n\n/g), "\n"));
         assertOrThrow(
-            match0.indexOf(causeList + "\n    ") === 0,
-            JSON.stringify(match0)
+            match0.indexOf("\n\n" + causeList + "\n    ") === 0,
+            JSON.stringify([
+                match0, causeList
+            ], undefined, 4)
         );
-        switch (fnc) {
-        case "expected_at":
-            expectedCode = "expected_a_at_b_c";
-            break;
-        case "one_space_only":
-            expectedCode = "expected_space_a_b";
-            break;
+        warning = warning.match(
+            "("
+            + "expected_at"
+            + "|no_space_only"
+            + "|one_space_only"
+            + "|one_space"
+            + "|stop"
+            + "|stop_at"
+            + "|warn"
+            + "|warn_at"
+            + ")"
+            + "\\\u0028\\s*?\"?"
+            + "(\\S[^\n\"]+)"
+        );
+        if (warning) {
+            expectedWarningCode = warning[2];
+            fnc = warning[1];
+            switch (fnc) {
+            case "expected_at":
+                expectedWarningCode = "expected_a_at_b_c";
+                break;
+            case "no_space_only":
+                expectedWarningCode = "unexpected_space_a_b";
+                break;
+            case "one_space":
+            case "one_space_only":
+                expectedWarningCode = "expected_space_a_b";
+                break;
+            }
         }
         causeList.split(
             /\/\/\u0020cause:[\n|\u0020]/
@@ -392,11 +392,10 @@ function noop() {
                 jslint(cause).warnings.some(function ({
                     code
                 }) {
-                    return code === expectedCode;
-                }) || !expectedCode,
+                    return code === expectedWarningCode;
+                }) || !expectedWarningCode,
                 "\n" + cause.trim()
             );
         });
-        return "";
     });
 }());
