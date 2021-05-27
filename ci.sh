@@ -202,6 +202,8 @@ shCiBase() {(set -e
     mkdir -p .test-dir.js
     # coverage-hack - test jslint's ignore-file handling-behavior
     touch .test-min.js
+    # test jslint's cli handling-behavior
+    ./jslint.js .
     (set -e
         # coverage-hack - test jslint's cli handling-behavior
         export JSLINT_CLI=1

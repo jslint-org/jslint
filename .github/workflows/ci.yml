@@ -28,6 +28,8 @@ jobs:
           - windows-latest
     name: node . v${{ matrix.node_version }} . ${{ matrix.architecture }} . ${{ matrix.os }}
     steps:
+      # disable autocrlf in windows
+      - run: git config --global core.autocrlf false
       # https://github.com/actions/checkout
       - uses: actions/checkout@v2
       # https://github.com/actions/setup-node

@@ -1,33 +1,34 @@
 # Changelog
 
 ## Todo
-- jslint - inline-document each warning with source_code that can reproduce it.
-- node - after node-v14 is deprecated, remove shell-code export "NODE_OPTIONS=--unhandled-rejections=strict".
-- node - after node-v12 is deprecated, change require("fs").promises to require("fs/promises").
-- jslint - add html and css linting back into jslint.
-- jslint - cleanup regexp code using switch-statements.
 - app - deploy jslint as chrome-extension.
+- ci - continue addng regression tests and improve code-coverage.
 - doc - add svg changelog.
 - doc - add svg package-listing.
-- ci - continue addng regression tests and improve code-coverage.
+- jslint - add html and css linting back into jslint.
+- jslint - cleanup regexp code using switch-statements.
+- node - after node-v12 is deprecated, change require("fs").promises to require("fs/promises").
+- node - after node-v14 is deprecated, remove shell-code export "NODE_OPTIONS=--unhandled-rejections=strict".
 - none
 
 ## v2021.5.27-beta
+- jslint - inline-document each warning with cause that can reproduce it - part 1.
+- ci - in windows, disable git-autocrlf
 - none
 
 ## v2021.5.26
-- jslint - fix (global) functionage missing properties finally and try.
-- website - add fork-me ribbon.
-- jslint - remove deadcode warning bad_option_a.
-- jslint - fix bug failing to parse unicode "\\u{12345}"
-- ci - fix ci silently failing in node-v12 and node-v14
-- jslint - remove deadcode for preaction-binary-".".
-- cli - add env var JSLINT_CLI to force-trigger cli in jslint.js
+- ci - fix ci silently failing in node-v12 and node-v14.
+- cli - add env var JSLINT_CLI to force-trigger cli in jslint.js (used for code-coverage of cli).
+- jslint - add "globalThis" to default globals.
+- jslint - add new rules unordered_param_a, unordered_property_a, that warn if parameters and properties are listed in nonascii-order.
+- jslint - fix bug where (global) functionage missing properties finally and try.
+- jslint - fix bug failing to parse unicode "\\u{12345}".
 - jslint - fix bug falsely warning against conditional-chaining-operator "?.".
+- jslint - remove deadcode for preaction-binary-".".
+- jslint - remove deadcode warning bad_option_a.
+- website - add fork-me ribbon.
 - website - load index.html with example code.
 - website - merge file report.js into browser.js.
-- jslint - add new rules unordered_param_a, unordered_property_a, that warn if parameters and properties are listed in nonascii-order.
-- jslint - add "globalThis" to default globals.
 
 ## v2021.5.23
 - doc - add section Changelog.
@@ -58,4 +59,13 @@
 - ci - add github-workflows to generate code-coverage for jslint.js.
 
 ## v2020.11.6
-- vestigial
+- last jslint version before jslint-org migration.
+
+## v2018.4.25
+- last jslint version written in commonjs.
+
+## v2017.11.6
+- last jslint version written in es5.
+
+## v2013.3.13
+- last jslint version that can lint .html and .css files.

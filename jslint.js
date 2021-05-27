@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // jslint.js
-// v2021.5.26
+// v2021.5.27-beta
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -128,6 +128,15 @@
     wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary,
     wrapped, writable, y
 */
+
+function assert_or_throw(passed, message) {
+
+// this function will throw <message> if <passed> is falsy
+
+    if (!passed) {
+        throw new Error(message);
+    }
+}
 
 function empty() {
 
@@ -271,7 +280,6 @@ const bundle = {
         "Expected '{a}' to match '{b}' from line {c} and instead saw '{d}'."
     ),
     expected_a_before_b: "Expected '{a}' before '{b}'.",
-    expected_a_next_at_b: "Expected '{a}' at column {b} on the next line.",
     expected_digits_after_a: "Expected digits after '{a}'.",
     expected_four_digits: "Expected four digits after '\\u'.",
     expected_identifier_a: "Expected an identifier and instead saw '{a}'.",
@@ -475,12 +483,6 @@ function is_letter(string) {
     );
 }
 
-function supplant(string, object) {
-    return string.replace(rx_supplant, function (ignore, filling) {
-        return object[filling];
-    });
-}
-
 let anon;               // The guessed name for anonymous functions.
 let blockage;           // The current block.
 let block_stack;        // The stack of blocks.
@@ -551,7 +553,13 @@ function warn_at(code, line, column, a, b, c, d) {
     if (d !== undefined) {
         warning.d = d;
     }
-    warning.message = supplant(bundle[code], warning);
+    warning.message = bundle[code].replace(rx_supplant, function (
+        ignore,
+        filling
+    ) {
+        assert_or_throw(warning[filling] !== undefined);
+        return warning[filling];
+    });
 
 // Include stack_trace for jslint to debug itself for errors.
 
@@ -671,6 +679,9 @@ function tokenize(source) {
             at = source_line.search(rx_tab);
             if (at >= 0) {
                 if (!option.white) {
+
+// cause: "\t"
+
                     warn_at("use_spaces", line, at + 1);
                 }
                 source_line = source_line.replace(rx_tab, " ");
@@ -747,6 +758,9 @@ function tokenize(source) {
         const digits = source_line.match(rx)[0];
         const length = digits.length;
         if (!quiet && length === 0) {
+
+// cause: "0x"
+
             warn_at("expected_digits_after_a", line, column, snippet);
         }
         column += length;
@@ -762,6 +776,9 @@ function tokenize(source) {
             return next_char();
         }
         if (char === "") {
+
+// cause: "\"\\"
+
             return stop_at("unclosed_string", line, column);
         }
         if (char === "u") {
@@ -770,6 +787,9 @@ function tokenize(source) {
                     warn_at("unexpected_a", line, column - 1, char);
                 }
                 if (some_digits(rx_hexs) > 5) {
+
+// cause: "\"\\u{123456}\""
+
                     warn_at("too_many_digits", line, column - 1);
                 }
                 if (char !== "}") {
@@ -779,6 +799,9 @@ function tokenize(source) {
             }
             back_char();
             if (some_digits(rx_hexs, true) < 4) {
+
+// cause: "\"\\u0\""
+
                 warn_at("expected_four_digits", line, column - 1);
             }
             return;
@@ -786,6 +809,9 @@ function tokenize(source) {
         if (extra && extra.indexOf(char) >= 0) {
             return next_char();
         }
+
+// cause: "\"\\a\""
+
         warn_at("unexpected_a_before_b", line, column - 2, "\\", char);
     }
 
@@ -835,6 +861,9 @@ function tokenize(source) {
             );
         }
         if (previous.id === "." && id === "(number)") {
+
+// cause: ".0"
+
             warn("expected_a_before_b", previous, "0", ".");
         }
         if (prior.id === "." && the_token.identifier) {
@@ -881,6 +910,9 @@ function tokenize(source) {
                         option[name] = false;
                     }
                 } else {
+
+// cause: "/*jslint undefined*/"
+
                     warn("bad_option_a", the_comment, name);
                 }
             } else if (the_comment.directive === "property") {
@@ -890,6 +922,9 @@ function tokenize(source) {
                 tenure[name] = true;
             } else if (the_comment.directive === "global") {
                 if (value) {
+
+// cause: "/*global aa:true*/"
+
                     warn("bad_option_a", the_comment, name + ":" + value);
                 }
                 declared_globals[name] = false;
@@ -898,6 +933,9 @@ function tokenize(source) {
             return parse_directive(the_comment, result[3]);
         }
         if (body) {
+
+// cause: "/*jslint !*/"
+
             return stop("bad_directive_a", the_comment, body);
         }
     }
@@ -912,11 +950,17 @@ function tokenize(source) {
             snippet = snippet.join(" ");
         }
         if (!option.devel && rx_todo.test(snippet)) {
+
+// cause: "//\u0074odo"
+
             warn("todo_comment", the_comment);
         }
         const result = snippet.match(rx_directive);
         if (result) {
             if (!directive_mode) {
+
+// cause: "let aa;\n/*global aa*/"
+
                 warn_at("misplaced_directive_a", line, from, result[1]);
             } else {
                 the_comment.directive = result[1];
@@ -1120,6 +1164,9 @@ function tokenize(source) {
                     return sequence(true);
                 }
                 if (!follow) {
+
+// cause: "/ /"
+
                     warn_at("expected_regexp_factor_a", line, column, char);
                 }
             }
@@ -1178,6 +1225,9 @@ function tokenize(source) {
         result.flag = flag;
         result.value = value;
         if (multi_mode && !flag.m) {
+
+// cause: "aa=/$^/"
+
             warn_at("missing_m", line, column);
         }
         return result;
@@ -1199,6 +1249,9 @@ function tokenize(source) {
                 return the_token;
             }
             if (char === "") {
+
+// cause: "\"aa"
+
                 return stop_at("unclosed_string", line, column);
             }
             if (char === "\\") {
@@ -1253,6 +1306,9 @@ function tokenize(source) {
             || (char >= "a" && char <= "z")
             || (char >= "A" && char <= "Z")
         ) {
+
+// cause: "0a"
+
             return stop_at(
                 "unexpected_a_after_b",
                 line,
@@ -1315,6 +1371,9 @@ function tokenize(source) {
 // result[5] rest
 
         if (!result) {
+
+// cause: "#"
+
             return stop_at(
                 "unexpected_char_a",
                 line,
@@ -1352,6 +1411,9 @@ function tokenize(source) {
         }
         if (snippet === "'") {
             if (!option.single) {
+
+// cause: "''"
+
                 warn_at("use_double", line, column);
             }
             return string(snippet);
@@ -1386,6 +1448,9 @@ function tokenize(source) {
                     snippet += source_line + "\n";
                     return (
                         next_line() === undefined
+
+// cause: "`aa"
+
                         ? stop_at("unclosed_mega", mega_line, mega_from)
                         : part()
                     );
@@ -1444,6 +1509,9 @@ function tokenize(source) {
             source_line = "";
             the_token = comment(snippet);
             if (mega_mode) {
+
+// cause: "`${//}`"
+
                 warn("unexpected_comment", the_token, "`");
             }
             return the_token;
@@ -1464,12 +1532,18 @@ function tokenize(source) {
                     }
                     j = source_line.search(rx_slash_star);
                     if (j >= 0) {
+
+// cause: "/*/*"
+
                         warn_at("nested_comment", line, column + j);
                     }
                 }
                 array.push(source_line);
                 source_line = next_line();
                 if (source_line === undefined) {
+
+// cause: "/*"
+
                     return stop_at("unclosed_comment", line, column);
                 }
                 return next();
@@ -1477,6 +1551,9 @@ function tokenize(source) {
             snippet = source_line.slice(0, i);
             j = snippet.search(rx_slash_star_or_slash);
             if (j >= 0) {
+
+// cause: "/*/**/"
+
                 warn_at("nested_comment", line, column + j);
             }
             array.push(snippet);
@@ -1515,6 +1592,17 @@ function tokenize(source) {
                         || prior.id === "yield"
                     ) {
                         the_token = regexp();
+
+// cause: "/./"
+// cause: "case /./"
+// cause: "delete /./"
+// cause: "in /./"
+// cause: "instanceof /./"
+// cause: "new /./"
+// cause: "typeof /./"
+// cause: "void /./"
+// cause: "yield /./"
+
                         return stop("unexpected_a", the_token);
                     }
                 }
@@ -1525,6 +1613,9 @@ function tokenize(source) {
                 }
                 if ("!&|{};~+-*%/^<>".indexOf(last) >= 0) {
                     the_token = regexp();
+
+// cause: "!/./"
+
                     warn("wrap_regexp", the_token);
                     return the_token;
                 }
@@ -1600,10 +1691,16 @@ function survey(name) {
     } else {
         if (tenure !== undefined) {
             if (tenure[id] !== true) {
+
+// cause: "/*property aa*/\naa.bb"
+
                 warn("unregistered_property_a", name);
             }
         } else {
             if (name.identifier && rx_bad_property.test(id)) {
+
+// cause: "aa._"
+
                 warn("bad_property_a", name);
             }
         }
@@ -1656,6 +1753,9 @@ function advance(id, match) {
         return (
             match === undefined
             ? stop("expected_a_b", next_token, id, artifact())
+
+// cause: "{\"aa\":0"
+
             : stop(
                 "expected_a_b_from_c_d",
                 next_token,
@@ -1704,8 +1804,14 @@ function json_value() {
                     name = next_token;
                     advance("(string)");
                     if (object[token.value] !== undefined) {
+
+// cause: "{\"aa\":0,\"aa\":0}"
+
                         warn("duplicate_a", token);
                     } else if (token.value === "__proto__") {
+
+// cause: "{\"__proto__\":0}"
+
                         warn("bad_property_a", token);
                     } else {
                         object[token.value] = token;
@@ -1792,6 +1898,9 @@ function enroll(name, role, readonly) {
 // Reserved words may not be enrolled.
 
     if (syntax[id] !== undefined && id !== "ignore") {
+
+// cause: "let undefined"
+
         warn("reserved_a", name);
     } else {
 
@@ -1799,6 +1908,9 @@ function enroll(name, role, readonly) {
 
         let earlier = functionage.context[id];
         if (earlier) {
+
+// cause: "let aa;let aa"
+
             warn(
                 "redefinition_a_b",
                 name,
@@ -1818,6 +1930,9 @@ function enroll(name, role, readonly) {
             if (earlier) {
                 if (id === "ignore") {
                     if (earlier.role === "variable") {
+
+// cause: "let ignore;function aa(ignore) {}"
+
                         warn("unexpected_a", name);
                     }
                 } else {
@@ -1829,6 +1944,10 @@ function enroll(name, role, readonly) {
                         && role !== "parameter"
                         && role !== "function"
                     ) {
+
+// cause: "function aa(){var aa;}"
+// cause: "function aa(){try{aa();}catch(aa){aa();}}"
+
                         warn(
                             "redefinition_a_b",
                             name,
@@ -1906,9 +2025,9 @@ function condition() {
     const the_paren = next_token;
     let the_value;
 
-// source: "do {} while ()"
-// source: "if () {}"
-// source: "while () {}"
+// cause: "do {} while ()"
+// cause: "if () {}"
+// cause: "while () {}"
 
     the_paren.free = true;
     advance("(");
@@ -1934,6 +2053,9 @@ function is_weird(thing) {
 }
 
 function are_similar(a, b) {
+
+// cause: "0&&0"
+
     if (a === b) {
         return true;
     }
@@ -1942,6 +2064,9 @@ function are_similar(a, b) {
             Array.isArray(b)
             && a.length === b.length
             && a.every(function (value, index) {
+
+// cause: "`${0}`&&`${0}`"
+
                 return are_similar(value, b[index]);
             })
         );
@@ -1988,6 +2113,9 @@ function are_similar(a, b) {
             );
         }
         if (a.arity === "ternary") {
+
+// cause: "let aa=(``?``:``)&&(``?``:``)"
+
             return (
                 are_similar(a.expression[0], b.expression[0])
                 && are_similar(a.expression[1], b.expression[1])
@@ -1997,8 +2125,14 @@ function are_similar(a, b) {
         if (a.arity === "function" && a.arity === "regexp") {
             return false;
         }
+
+// cause: "undefined&&undefined"
+
         return true;
     }
+
+// cause: "null&&undefined"
+
     return false;
 }
 
@@ -2009,6 +2143,10 @@ function semicolon() {
     if (next_token.id === ";") {
         advance(";");
     } else {
+
+// cause: "0"
+// cause: "0\n0"
+
         warn_at(
             "expected_a_b",
             token.line,
@@ -2052,6 +2190,9 @@ function statement() {
             return the_statement;
         }
         advance();
+
+// cause: "aa:"
+
         warn("unexpected_label_a", the_label);
     }
 
@@ -2070,6 +2211,9 @@ function statement() {
 
         the_statement = expression(0, true);
         if (the_statement.wrapped && the_statement.id !== "(") {
+
+// cause: "(0)"
+
             warn("unexpected_a", first);
         }
         semicolon();
@@ -2097,6 +2241,9 @@ function statements() {
             let a_statement = statement();
             array.push(a_statement);
             if (disrupt) {
+
+// cause: "while(0){break;0;}"
+
                 warn("unreachable_a", a_statement);
             }
             return next(a_statement.disrupt);
@@ -2119,6 +2266,9 @@ function top_level_only(the_thing) {
 // Some features must be at the most outermost level.
 
     if (blockage !== global) {
+
+// cause: "if(0){import aa from \"aa\";}"
+
         warn("misplaced_a", the_thing);
     }
 }
@@ -2155,6 +2305,9 @@ function block(special) {
     the_block.block = stmts;
     if (stmts.length === 0) {
         if (!option.devel && special !== "ignore") {
+
+// cause: "function aa(){}"
+
             warn("empty_block", the_block);
         }
         the_block.disrupt = false;
@@ -2180,6 +2333,9 @@ function mutation_check(the_thing) {
         && the_thing.id !== "["
         && the_thing.id !== "{"
     ) {
+
+// cause: "0=0"
+
         warn("bad_assignment_a", the_thing);
         return false;
     }
@@ -2388,6 +2544,9 @@ function ternary(id1, id2) {
         the_token.arity = "ternary";
         the_token.expression = [left, second, expression(10)];
         if (next_token.id !== ")") {
+
+// cause: "0?0:0"
+
             warn("use_open", the_token);
         }
         return the_token;
@@ -2460,6 +2619,9 @@ constant("isFinite", "function", function () {
     return token;
 });
 constant("isNaN", "function", function () {
+
+// cause: "isNaN(0)"
+
     warn("number_isNaN", token);
     return token;
 });
@@ -2543,7 +2705,7 @@ infix("(", 160, function (left) {
     advance(")", the_paren);
     if (the_paren.expression.length === 2) {
 
-// source: "aa(0)"
+// cause: "aa(0)"
 
         the_paren.free = true;
         if (the_argument.wrapped === true) {
@@ -2554,8 +2716,8 @@ infix("(", 160, function (left) {
         }
     } else {
 
-// source: "aa()"
-// source: "aa(0, 0)"
+// cause: "aa()"
+// cause: "aa(0, 0)"
 
         the_paren.free = false;
     }
@@ -2641,6 +2803,9 @@ infix("[", 170, function (left) {
     if (the_subscript.id === "(string)" || the_subscript.id === "`") {
         const name = survey(the_subscript);
         if (rx_identifier.test(name)) {
+
+// cause: "aa[`aa`]"
+
             warn("subscript_a", the_subscript, name);
         }
     }
@@ -2650,6 +2815,9 @@ infix("[", 170, function (left) {
     return the_token;
 });
 infix("=>", 170, function (left) {
+
+// cause: "aa=>0"
+
     return stop("wrap_parameter", left);
 });
 
@@ -2716,6 +2884,9 @@ prefix("[", function () {
     return the_token;
 });
 prefix("/=", function () {
+
+// cause: "/="
+
     stop("expected_a_b", token, "/\\=", "/=");
 });
 prefix("=>", function () {
@@ -2770,6 +2941,9 @@ function parameter_list() {
                     a = b;
                     b = String(subparam.value || subparam.id);
                     if (a > b) {
+
+// cause: "function aa({bb,aa}){}"
+
                         warn("unordered_param_a", subparam);
                     }
                     advance();
@@ -2901,6 +3075,9 @@ function do_function(the_function) {
 
         if (the_function.arity === "statement") {
             if (!next_token.identifier) {
+
+// cause: "function*aa(){}"
+
                 return stop("expected_identifier_a", next_token);
             }
             name = next_token;
@@ -2933,6 +3110,9 @@ function do_function(the_function) {
 // errors.
 
     if (functionage.loop > 0) {
+
+// cause: "function aa(){while(0){aa.map(function(){});}}"
+
         warn("function_in_loop", the_function);
     }
 
@@ -2961,7 +3141,7 @@ function do_function(the_function) {
 
     advance("(");
 
-// source: "function () {}"
+// cause: "function () {}"
 
     token.free = false;
     token.arity = "function";
@@ -3007,6 +3187,9 @@ function do_async() {
     the_function.arity = the_async.arity;
     do_function();
     if (!the_function.has_await) {
+
+// cause: "async function aa(){}"
+
         warn("missing_await_statement", the_function);
     }
     return the_function;
@@ -3033,6 +3216,9 @@ function fart(pl) {
     the_fart.level = functionage.level + 1;
     functions.push(the_fart);
     if (functionage.loop > 0) {
+
+// cause: "function aa(){while(0){aa.map(()=>0);}}"
+
         warn("function_in_loop", the_fart);
     }
 
@@ -3078,17 +3264,20 @@ prefix("(", function () {
         || (next_token.identifier && (cadet === "," || cadet === "="))
     ) {
 
-// source: "() => {}"
+// cause: "() => {}"
 
         the_paren.free = false;
         return fart(parameter_list());
     }
 
-// source: "(aa)"
+// cause: "(0)"
 
     the_paren.free = true;
     the_value = expression(0);
     if (the_value.wrapped === true) {
+
+// cause: "((0))"
+
         warn("unexpected_a", the_paren);
     }
     the_value.wrapped = true;
@@ -3124,6 +3313,9 @@ prefix("{", function () {
             a = b;
             b = String(name.value || name.id);
             if (a > b) {
+
+// cause: "aa={bb,aa}"
+
                 warn("unordered_property_a", name);
             }
             if (
@@ -3131,6 +3323,9 @@ prefix("{", function () {
                 && next_token.identifier
             ) {
                 if (!option.getset) {
+
+// cause: "aa={get aa(){}}"
+
                     warn("unexpected_a", name);
                 }
                 extra = name.id;
@@ -3139,6 +3334,9 @@ prefix("{", function () {
                 advance();
                 id = survey(name);
                 if (seen[full] === true || seen[id] === true) {
+
+// cause: "aa={get aa(){},get aa(){}}"
+
                     warn("duplicate_a", name);
                 }
                 seen[id] = false;
@@ -3146,6 +3344,9 @@ prefix("{", function () {
             } else {
                 id = survey(name);
                 if (typeof seen[id] === "boolean") {
+
+// cause: "aa={bb,bb}"
+
                     warn("duplicate_a", name);
                 }
                 seen[id] = true;
@@ -3206,6 +3407,9 @@ stmt(";", function () {
     return token;
 });
 stmt("{", function () {
+
+// cause: "class aa{}"
+
     warn("naked_block", token);
     return block("naked");
 });
@@ -3227,11 +3431,17 @@ stmt("break", function () {
             || the_label.role !== "label"
             || the_label.dead
         ) {
-            warn(
-                (the_label !== undefined && the_label.dead)
-                ? "out_of_scope_a"
-                : "not_label_a"
-            );
+            if (the_label !== undefined && the_label.dead) {
+
+// cause: "aa:{function aa(aa){break aa;}}"
+
+                warn("out_of_scope_a");
+            } else {
+
+// cause: "aa:{break aa;}"
+
+                warn("not_label_a");
+            }
         } else {
             the_label.used += 1;
         }
@@ -3265,9 +3475,15 @@ function do_var() {
 // We don't expect to see variables created in switch statements.
 
     if (functionage.switch > 0) {
+
+// cause: "switch(0){case 0:var aa;}"
+
         warn("var_switch", the_statement);
     }
     if (functionage.loop > 0 && the_statement.id === "var") {
+
+// cause: "while(0){var aa;}"
+
         warn("var_loop", the_statement);
     }
     (function next() {
@@ -3285,6 +3501,9 @@ function do_var() {
                 a = b;
                 b = String(name.value || name.id);
                 if (a > b) {
+
+// cause: "let{bb,aa}=0"
+
                     warn("unordered_param_a", name);
                 }
                 advance();
@@ -3356,6 +3575,9 @@ function do_var() {
             const name = next_token;
             advance();
             if (name.id === "ignore") {
+
+// cause: "let ignore;function aa(ignore) {}"
+
                 warn("unexpected_a", name);
             }
             enroll(name, "variable", is_const);
@@ -3416,6 +3638,9 @@ stmt("do", function () {
     the_do.expression = condition();
     semicolon();
     if (the_do.block.disrupt === true) {
+
+// cause: "function aa(){do{break;}while(0);}"
+
         warn("weird_loop", the_do);
     }
     functionage.loop -= 1;
@@ -3438,6 +3663,9 @@ stmt("export", function () {
         } else {
             the_name.used += 1;
             if (exports[the_id] !== undefined) {
+
+// cause: "let aa;export {aa,aa}"
+
                 warn("duplicate_a");
             }
             exports[the_id] = the_name;
@@ -3449,6 +3677,9 @@ stmt("export", function () {
     the_export.expression = [];
     if (next_token.id === "default") {
         if (exports.default !== undefined) {
+
+// cause: "export default 0;export default 0"
+
             warn("duplicate_a");
         }
         advance("default");
@@ -3459,6 +3690,9 @@ stmt("export", function () {
             || the_thing.expression[0].expression.id !== "Object"
             || the_thing.expression[0].name.id !== "freeze"
         ) {
+
+// cause: "export default Object.aa()"
+
             warn("freeze_exports", the_thing);
         }
         if (next_token.id === ";") {
@@ -3468,11 +3702,18 @@ stmt("export", function () {
         the_export.expression.push(the_thing);
     } else {
         if (next_token.id === "function") {
+
+// cause: "export function aa(){}"
+
             warn("freeze_exports");
             the_thing = statement();
             the_name = the_thing.name;
             the_id = the_name.id;
             the_name.used += 1;
+            console.error(exports);
+
+// cause: "let aa;export {aa};export function aa(){}"
+
             if (exports[the_id] !== undefined) {
                 warn("duplicate_a", the_name);
             }
@@ -3515,7 +3756,7 @@ stmt("for", function () {
     functionage.loop += 1;
     advance("(");
 
-// source: "for () {}"
+// cause: "for () {}"
 
     token.free = true;
     if (next_token.id === ";") {
@@ -3531,6 +3772,9 @@ stmt("for", function () {
     first = expression(0);
     if (first.id === "in") {
         if (first.expression[0].arity !== "variable") {
+
+// cause: "/*jslint for*/\nfunction aa(){for (0 in aa){}}"
+
             warn("bad_assignment_a", first.expression[0]);
         }
         the_for.name = first.expression[0];
@@ -3543,6 +3787,9 @@ stmt("for", function () {
         advance(";");
         the_for.inc = expression(0);
         if (the_for.inc.id === "++") {
+
+// cause: "aa=aa++"
+
             warn("expected_a_b", the_for.inc, "+= 1", "++");
         }
     }
@@ -3587,6 +3834,9 @@ stmt("import", function () {
         advance("(");
         const string = expression(0);
         if (string.id !== "(string)") {
+
+// cause: "import(aa)"
+
             warn("expected_string_a", string);
         }
         froms.push(token.value);
@@ -3601,6 +3851,9 @@ stmt("import", function () {
     }
     let name;
     if (typeof module_mode === "object") {
+
+// cause: "/*global aa*/\nimport aa from \"aa\""
+
         warn("unexpected_directive_a", module_mode, module_mode.directive);
     }
     module_mode = true;
@@ -3640,6 +3893,9 @@ stmt("import", function () {
     advance("(string)");
     the_import.import = token;
     if (!rx_module.test(token.value)) {
+
+// cause: "import aa from \"!aa\""
+
         warn("bad_module_name_a", token);
     }
     froms.push(token.value);
@@ -3674,7 +3930,7 @@ stmt("switch", function () {
     functionage.switch += 1;
     advance("(");
 
-// source: "switch () {}"
+// cause: "switch () {}"
 
     token.free = true;
     the_switch.expression = expression(0);
@@ -3821,12 +4077,18 @@ stmt("while", function () {
     the_while.expression = condition();
     the_while.block = block();
     if (the_while.block.disrupt === true) {
+
+// cause: "function aa(){while(0){break;}}"
+
         warn("weird_loop", the_while);
     }
     functionage.loop -= 1;
     return the_while;
 });
 stmt("with", function () {
+
+// cause: "with"
+
     stop("unexpected_a", token);
 });
 
@@ -3921,16 +4183,29 @@ const postamble = amble(posts);
 function walk_expression(thing) {
     if (thing) {
         if (Array.isArray(thing)) {
+
+// cause: "(function(){}())"
+
             thing.forEach(walk_expression);
         } else {
             preamble(thing);
             walk_expression(thing.expression);
             if (thing.id === "function") {
+
+// cause: "aa=function(){}"
+
                 walk_statement(thing.block);
             }
             if (thing.arity === "pre" || thing.arity === "post") {
+
+// cause: "aa=++aa"
+// cause: "aa=--aa"
+
                 warn("unexpected_a", thing);
             } else if (
+
+// cause: "aa=0"
+
                 thing.arity === "statement"
                 || thing.arity === "assignment"
             ) {
@@ -3944,12 +4219,18 @@ function walk_expression(thing) {
 function walk_statement(thing) {
     if (thing) {
         if (Array.isArray(thing)) {
+
+// cause: "+[]"
+
             thing.forEach(walk_statement);
         } else {
             preamble(thing);
             walk_expression(thing.expression);
             if (thing.arity === "binary") {
                 if (thing.id !== "(") {
+
+// cause: "0+0"
+
                     warn("unexpected_expression_a", thing);
                 }
             } else if (
@@ -3958,6 +4239,11 @@ function walk_statement(thing) {
                 && thing.id !== "import"
                 && thing.id !== "await"
             ) {
+
+// cause: "!!aa"
+// cause: "+[]"
+// cause: "0"
+
                 warn("unexpected_expression_a", thing);
             }
             walk_statement(thing.block);
@@ -3993,6 +4279,10 @@ function lookup(thing) {
 
             if (the_variable === undefined) {
                 if (declared_globals[thing.id] === undefined) {
+
+// cause: "aa"
+// cause: "class aa{}"
+
                     warn("undeclared_a", thing);
                     return;
                 }
@@ -4010,6 +4300,9 @@ function lookup(thing) {
             the_variable.closure = true;
             functionage.context[thing.id] = the_variable;
         } else if (the_variable.role === "label") {
+
+// cause: "aa:while(0){aa;}"
+
             warn("label_a", thing);
         }
         if (
@@ -4020,6 +4313,9 @@ function lookup(thing) {
                 || the_variable.calls[functionage.name.id] === undefined
             )
         ) {
+
+// cause: "function aa(){bb();}\nfunction bb(){}"
+
             warn("out_of_scope_a", thing);
         }
         return the_variable;
@@ -4047,10 +4343,16 @@ function preaction_function(thing) {
     }
     if (thing.extra === "get") {
         if (thing.parameters.length !== 0) {
+
+// cause: "/*jslint getset*/\naa={get aa(aa){}}"
+
             warn("bad_get", thing);
         }
     } else if (thing.extra === "set") {
         if (thing.parameters.length !== 1) {
+
+// cause: "/*jslint getset*/\naa={set aa(){}}"
+
             warn("bad_set", thing);
         }
     }
@@ -4117,15 +4419,24 @@ preaction("binary", function (thing) {
         const left = thing.expression[0];
         const right = thing.expression[1];
         if (left.id === "NaN" || right.id === "NaN") {
+
+// cause: "NaN===NaN"
+
             warn("number_isNaN", thing);
         } else if (left.id === "typeof") {
             if (right.id !== "(string)") {
                 if (right.id !== "typeof") {
+
+// cause: "typeof 0===0"
+
                     warn("expected_string_a", right);
                 }
             } else {
                 const value = right.value;
                 if (value === "null" || value === "undefined") {
+
+// cause: "typeof aa===\"undefined\""
+
                     warn("unexpected_typeof_a", right, value);
                 } else if (
                     value !== "boolean"
@@ -4135,6 +4446,9 @@ preaction("binary", function (thing) {
                     && value !== "string"
                     && value !== "symbol"
                 ) {
+
+// cause: "typeof 0===\"aa\""
+
                     warn("expected_type_string_a", right, value);
                 }
             }
@@ -4142,15 +4456,24 @@ preaction("binary", function (thing) {
     }
 });
 preaction("binary", "==", function (thing) {
+
+// cause: "0==0"
+
     warn("expected_a_b", thing, "===", "==");
 });
 preaction("binary", "!=", function (thing) {
+
+// cause: "0!=0"
+
     warn("expected_a_b", thing, "!==", "!=");
 });
 preaction("binary", "=>", preaction_function);
 preaction("binary", "||", function (thing) {
     thing.expression.forEach(function (thang) {
         if (thang.id === "&&" && !thang.wrapped) {
+
+// cause: "aa&&aa||aa"
+
             warn("and", thang);
         }
     });
@@ -4178,9 +4501,15 @@ preaction("binary", "(", function (thing) {
     }
 });
 preaction("binary", "in", function (thing) {
+
+// cause: "aa in aa"
+
     warn("infix_in", thing);
 });
 preaction("binary", "instanceof", function (thing) {
+
+// cause: "0 instanceof 0"
+
     warn("unexpected_a", thing);
 });
 preaction("statement", "{", function (thing) {
@@ -4194,6 +4523,9 @@ preaction("statement", "for", function (thing) {
         if (the_variable !== undefined) {
             the_variable.init = true;
             if (!the_variable.writable) {
+
+// cause: "const aa=0;for(aa in aa){}"
+
                 warn("bad_assignment_a", thing.name);
             }
         }
@@ -4301,6 +4633,9 @@ function postaction_function(thing) {
     delete functionage.try;
     functionage = stack.pop();
     if (thing.wrapped) {
+
+// cause: "aa=(function(){})"
+
         warn("unexpected_parens", thing);
     }
     return pop_block();
@@ -4318,6 +4653,9 @@ postaction("binary", function (thing) {
                 && thing.expression[1].constant === true
             )
         ) {
+
+// cause: "if(0===0){0}"
+
             warn("weird_relation_a", thing);
         }
     }
@@ -4331,13 +4669,22 @@ postaction("binary", function (thing) {
         }
     } else if (thing.id === "[") {
         if (thing.expression[0].id === "window") {
+
+// cause: "aa=window[0]"
+
             warn("weird_expression_a", thing, "window[...]");
         }
         if (thing.expression[0].id === "self") {
+
+// cause: "aa=self[0]"
+
             warn("weird_expression_a", thing, "self[...]");
         }
     } else if (thing.id === "." || thing.id === "?.") {
         if (thing.expression.id === "RegExp") {
+
+// cause: "aa=RegExp.aa"
+
             warn("weird_expression_a", thing);
         }
     } else if (thing.id !== "=>" && thing.id !== "(") {
@@ -4348,6 +4695,9 @@ postaction("binary", function (thing) {
             && right.arity === "unary"
             && !right.wrapped
         ) {
+
+// cause: "0- -0"
+
             warn("wrap_unary", right);
         }
         if (
@@ -4365,6 +4715,11 @@ postaction("binary", "&&", function (thing) {
         || thing.expression[0].constant === true
         || thing.expression[1].constant === true
     ) {
+
+// cause: "let aa=0&&0"
+// cause: "let aa=`${0}`&&`${0}`"
+// cause: "let aa=(``?``:``)&&(``?``:``)"
+
         warn("weird_condition_a", thing);
     }
 });
@@ -4374,6 +4729,9 @@ postaction("binary", "||", function (thing) {
         || are_similar(thing.expression[0], thing.expression[1])
         || thing.expression[0].constant === true
     ) {
+
+// cause: "let aa=0||0"
+
         warn("weird_condition_a", thing);
     }
 });
@@ -4388,6 +4746,9 @@ postaction("binary", "(", function (thing) {
     }
     if (left.id === "function") {
         if (!thing.wrapped) {
+
+// cause: "aa=function(){}()"
+
             warn("wrap_immediate", thing);
         }
     } else if (left.identifier) {
@@ -4399,6 +4760,9 @@ postaction("binary", "(", function (thing) {
                 || left.id === "String"
                 || left.id === "Symbol"
             ) {
+
+// cause: "+new aa()"
+
                 warn("unexpected_a", the_new);
             } else if (left.id === "Function") {
                 if (!option.eval) {
@@ -4475,9 +4839,15 @@ postaction("binary", "(", function (thing) {
 });
 postaction("binary", "[", function (thing) {
     if (thing.expression[0].id === "RegExp") {
+
+// cause: "aa=RegExp[0]"
+
         warn("weird_expression_a", thing);
     }
     if (is_weird(thing.expression[1])) {
+
+// cause: "aa[[0]]"
+
         warn("weird_expression_a", thing.expression[1]);
     }
 });
@@ -4546,6 +4916,9 @@ postaction("ternary", function (thing) {
             || thing.expression[0].id === "&&"
         )
     ) {
+
+// cause: "(aa&&!aa?0:1)"
+
         warn("wrap_condition", thing.expression[0]);
     }
 });
@@ -4604,8 +4977,15 @@ function delve(the_function) {
                         || name.parent.arity !== "unary"
                     )
                 ) {
+
+// cause: "/*jslint node*/\nlet aa;"
+// cause: "function aa(aa){return;}"
+
                     warn("unused_a", name);
                 } else if (!name.init) {
+
+// cause: "/*jslint node*/\nlet aa;aa();"
+
                     warn("uninitialized_a", name);
                 }
             }
@@ -4631,22 +5011,25 @@ function whitage() {
     let closer = "(end)";
 
 // free = false
-// source: "() => {}"
-// source: "aa()"
-// source: "aa(0, 0)"
-// source: "function () {}"
-//
-// free = true
-// source: "(0)"
-// source: "(aa)"
-// source: "aa(0)"
-// source: "do {} while ()"
-// source: "for () {}"
-// source: "if () {}"
-// source: "switch () {}"
-// source: "while () {}"
+
+// cause: "()=>{}"
+// cause: "aa()"
+// cause: "aa(0,0)"
+// cause: "function(){}"
 
     let free = false;
+
+// free = true
+
+// cause: "(0)"
+// cause: "(aa)"
+// cause: "aa(0)"
+// cause: "do{}while()"
+// cause: "for(){}"
+// cause: "if(){}"
+// cause: "switch(){}"
+// cause: "while(){}"
+
     let left = global;
     let margin = 0;
     let nr_comments_skipped = 0;
@@ -4702,6 +5085,34 @@ function whitage() {
                 || left.thru !== right.from
             )
         ) {
+
+// cause: "let aa=( 0 );"
+// cause:
+//  (
+// function aa (
+// bb
+// ,
+// [
+// cc,dd
+// ]
+// ,
+// {
+// ee,ff=( 0 )
+// }
+// ,
+// ... zz
+// )
+// {
+// return {
+// aa,bb
+// }
+// ;
+// }
+// (
+// )
+//  )
+//  ;
+
             warn(
                 "unexpected_space_a_b",
                 right,
@@ -4715,7 +5126,7 @@ function whitage() {
         if (left.line === right.line) {
             if (left.thru !== right.from && nr_comments_skipped === 0) {
 
-// source: "let aa = aa()( );"
+// cause: "let aa = aa()( );"
 
                 warn(
                     "unexpected_space_a_b",
@@ -4733,7 +5144,7 @@ function whitage() {
                 );
                 if (right.from < at) {
 
-// source:
+// cause:
 // let aa = aa(
 //     aa
 // ()
@@ -4763,6 +5174,9 @@ function whitage() {
     function one_space() {
         if (left.line === right.line || !open) {
             if (left.thru + 1 !== right.from && nr_comments_skipped === 0) {
+
+// cause: "let aa=( 0 );"
+
                 warn(
                     "expected_space_a_b",
                     right,
@@ -4794,27 +5208,27 @@ function whitage() {
             const new_closer = opener[left.id];
             if (typeof new_closer === "string") {
 
-// source: "${"
-// source: "("
-// source: "["
-// source: "{"
+// cause: "${"
+// cause: "("
+// cause: "["
+// cause: "{"
 
                 if (new_closer !== right.id) {
 
-// source: "${0"
-// source: "(0"
-// source: "[0"
-// source: "{0"
+// cause: "${0"
+// cause: "(0"
+// cause: "[0"
+// cause: "{0"
 
                     opening = left.open || (left.line !== right.line);
                     push();
                     closer = new_closer;
                     if (opening) {
 
-// source: "${\n0\n}"
-// source: "(\n0\n)"
-// source: "[\n0\n]"
-// source: "{\n0\n}"
+// cause: "${\n0\n}"
+// cause: "(\n0\n)"
+// cause: "[\n0\n]"
+// cause: "{\n0\n}"
 
                         free = closer === ")" && left.free;
                         open = true;
@@ -4822,11 +5236,13 @@ function whitage() {
                         if (right.role === "label") {
                             if (right.from !== 0) {
 
-// source:
+// cause:
 // function aa() {
 //  bb:
-//     while (aa()) {
-//         aa();
+//     while (aa) {
+//         if (aa) {
+//             break bb;
+//         }
 //     }
 // }
 
@@ -4840,12 +5256,7 @@ function whitage() {
                     } else {
                         if (right.statement || right.role === "label") {
 
-// source:
-// function aa() {bb:
-//     while (aa()) {
-//         aa();
-//     }
-// }
+// cause: "function aa(){bb:while(aa){aa();}}"
 
                             warn(
                                 "expected_line_break_a_b",
@@ -4855,13 +5266,16 @@ function whitage() {
                             );
                         }
 
-// source: "${0}"
-// source: "(0)"
-// source: "[0]"
-// source: "{0}"
+// cause: "${0}"
+// cause: "(0)"
+// cause: "[0]"
+// cause: "{0}"
 
                         free = false;
                         open = false;
+
+// cause: "let aa=( 0 );"
+
                         no_space_only();
                     }
                 } else {
@@ -4869,10 +5283,10 @@ function whitage() {
 // If left and right are opener and closer, then the placement of right depends
 // on the openness. Illegal pairs (like '{]') have already been detected.
 
-// source: "${}"
-// source: "()"
-// source: "[]"
-// source: "{}"
+// cause: "${}"
+// cause: "()"
+// cause: "[]"
+// cause: "{}"
 
                     if (left.line === right.line) {
                         no_space();
@@ -4911,13 +5325,15 @@ function whitage() {
                     } else if (right.role === "label") {
                         if (right.from !== 0) {
 
-// source:
-// (function () {
-//     let aa;bb:
-//     while (aa()) {
-//         aa();
+// cause:
+// function aa() {
+//     let bb = 0;cc:
+//     while (aa) {
+//         if (aa) {
+//             break cc;
+//         }
 //     }
-// }());
+// }
 
                             expected_at(0);
                         }
@@ -4979,17 +5395,17 @@ function whitage() {
                         || right.id === "catch"
                         || right.id === "else"
                         || right.id === "finally"
-
-// source:
-// function aa() {
-//     do {
-//         aa();
-//     } while (aa());
-// }
-
                         || (right.id === "while" && !right.statement)
                         || (left.id === ")" && right.id === "{")
                     ) {
+
+// cause:
+// function aa() {
+//     do {
+//         aa();
+//     } while(aa());
+// }
+
                         one_space_only();
                     } else if (
 
@@ -5021,6 +5437,9 @@ function whitage() {
                         )
                         || (left.arity === "statement" && right.id !== ";")
                     ) {
+
+// cause: "let aa=( 0 );"
+
                         one_space();
                     } else if (left.arity === "unary" && left.id !== "`") {
                         no_space_only();
@@ -5046,9 +5465,6 @@ function jslint(
     option_object = empty(),
     global_array = []
 ) {
-    function test_uncaught_error() {
-        throw new Error();
-    }
     try {
         warnings = [];
         option = Object.assign(empty(), option_object);
@@ -5142,12 +5558,15 @@ function jslint(
         if (!option.browser) {
             directives.forEach(function (comment) {
                 if (comment.directive === "global") {
+
+// cause: "/*global aa*/"
+
                     warn("missing_browser", comment);
                 }
             });
         }
         if (option.test_uncaught_error) {
-            test_uncaught_error();
+            assert_or_throw(undefined, "Uncaught error.");
         }
         early_stop = false;
     } catch (e) {
@@ -5190,7 +5609,7 @@ function jslint(
     });
     return {
         directives,
-        edition: "v2021.5.26",
+        edition: "v2021.5.27-beta",
         exports,
         froms,
         functions,
