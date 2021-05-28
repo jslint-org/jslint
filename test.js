@@ -328,6 +328,7 @@ function noop() {
             + "|no_space_only"
             + "|one_space_only"
             + "|one_space"
+            + "|semicolon"
             + "|stop"
             + "|stop_at"
             + "|warn"
@@ -350,6 +351,9 @@ function noop() {
             case "one_space":
             case "one_space_only":
                 expectedWarningCode = "expected_space_a_b";
+                break;
+            case "semicolon":
+                expectedWarningCode = "expected_a_b";
                 break;
             }
         }

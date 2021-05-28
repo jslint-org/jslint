@@ -3824,8 +3824,10 @@ stmt("export", function () {
 // cause: "export default {}"
 
             warn("freeze_exports", the_thing);
-        }
-        if (next_token.id === ";") {
+        } else {
+
+// cause: "export default Object.freeze({})"
+
             semicolon();
         }
         exports.default = the_thing;
