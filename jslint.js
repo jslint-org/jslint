@@ -137,7 +137,7 @@ function assert_or_throw(passed, message) {
 
     if (!passed) {
         throw new Error(`This was caused by a bug in JSLint.
-Please open an issue with this stack-trace at
+Please open an issue with this stack-trace (and possible example-code) at
 https://github.com/jslint-org/jslint/issues.
 edition = "${edition}";` + "\n" + message);
     }

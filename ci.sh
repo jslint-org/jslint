@@ -212,6 +212,61 @@ shCiBase() {(set -e
     # screenshot live-web-demo
     shBrowserScreenshot \
         https://jslint-org.github.io/jslint/branch-beta/index.html
+    # update version from CHANGELOG.md
+    node -e '
+(async function () {
+    "use strict";
+    let dict;
+    let versionBeta;
+    let versionMaster;
+    dict = {};
+    await Promise.all([
+        "CHANGELOG.md",
+        "README.md",
+        "jslint.js"
+    ].map(async function (file) {
+        dict[file] = await require("fs").promises.readFile(file, "utf8");
+    }));
+    Array.from(dict["CHANGELOG.md"].matchAll(
+        /\n##\u0020(v\d\d\d\d\.\d\d?\.\d\d?(.*?)?)\n/g
+    )).slice(0, 2).forEach(function ([
+        ignore, version, isBeta
+    ]) {
+        versionBeta = versionBeta || version;
+        versionMaster = versionMaster || (!isBeta && version);
+    });
+    [
+        {
+            file: "README.md",
+            src: dict["README.md"].replace((
+                /\bv\d\d\d\d\.\d\d?\.\d\d?\b/m
+            ), versionMaster).replace((
+                /\n#\u0020Changelog[\S\s]*?\n#\u0020/
+            ), (
+                "\n"
+                + dict["CHANGELOG.md"].split("\n## ").slice(0, 4).join("\n## ")
+                + "\n# "
+            )),
+            src0: dict["README.md"]
+        }, {
+            file: "jslint.js",
+            src: dict["jslint.js"].replace((
+                /^const\u0020edition\u0020=\u0020".*?";$/m
+            ), `const edition = "${versionBeta}";`),
+            src0: dict["jslint.js"]
+        }
+    ].forEach(function ({
+        file,
+        src,
+        src0
+    }) {
+        if (src !== src0) {
+            console.error(`update file ${file}`);
+            require("fs").promises.writeFile(file, src);
+        }
+    });
+}());
+' # '
 )}
 
 shCiBranchPromote() {(set -e

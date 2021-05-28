@@ -1,10 +1,9 @@
 # Changelog
+- [Full CHANGELOG.md](CHANGELOG.md)
 
 ## Todo
 - app - deploy jslint as chrome-extension.
-- ci - auto-update version numbers in README.md and jslint.js FROM CHANGELOG.md
 - ci - continue addng regression tests and improve code-coverage.
-- doc - add svg changelog.
 - doc - add svg package-listing.
 - jslint - add html and css linting back into jslint.
 - jslint - cleanup regexp code using switch-statements.
@@ -13,6 +12,8 @@
 - none
 
 ## v2021.5.28-beta
+- ci - auto-update changelog in README.md from CHANGELOG.md.
+- ci - auto-update version numbers in README.md and jslint.js from CHANGELOG.md.
 - website - replace links `branch.xxx` with `branch-xxx`.
 - deadcode - replace with assertion-check in function do_function() - "if (mega_mode) { warn... }".
 - jslint - inline function `activate` into function `action_var`.
