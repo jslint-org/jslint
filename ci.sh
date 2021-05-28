@@ -159,11 +159,11 @@ process.exit(
         rm -rf .git
         git add -f .
     )
-    # update root-dir with branch-master
-    if [ "$BRANCH" = master ]
+    # update root-dir with branch-beta
+    if [ "$BRANCH" = beta ]
     then
         git rm -rf .build
-        git checkout master .
+        git checkout beta .
     fi
     git status
     git commit -am "update dir branch.$BRANCH" || true

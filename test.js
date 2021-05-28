@@ -87,43 +87,36 @@ function noop() {
  * this function will validate each code is valid in jslint
  */
     Object.values({
-        Array: [
-            "new Array(1);"
-        ],
-        Date: [
-            "Date.getTime();",
-            "let aa = aa().getTime();",
-            "let aa = aa.aa().getTime();"
-        ],
-        Number: [
-            "let aa = 0.0e0;",
-            "let aa = 0b0;",
-            "let aa = 0o0;",
-            "let aa = 0x0;"
-        ],
-        RegExp: [
-            "function aa() {\n    return /./;\n}",
-            "let aa = /(?!.)(?:.)(?=.)/;"
+        array: [
+            "new Array(0);"
         ],
         async_await: [
             "async function aa() {\n    await aa();\n}"
         ],
+        date: [
+            "Date.getTime();",
+            "let aa = aa().getTime();",
+            "let aa = aa.aa().getTime();"
+        ],
         directives: [
             "#!\n/*jslint browser:false, node*/\n\"use strict\";",
+            "/*jslint bitwise*/\nlet aa = aa | 0;",
             "/*jslint browser*/\n;",
+            "/*jslint debug*/\n",
             "/*jslint devel*/\ndebugger;",
             "/*jslint eval*/\nnew Function();\neval();",
             "/*jslint getset*/\nlet aa = {get aa() {\n    return;\n}};",
             "/*jslint getset*/\nlet aa = {set aa(aa) {\n    return aa;\n}};",
             "/*jslint this*/\nlet aa = this;",
+            "/*jslint unordered*/\nlet {bb, aa} = 0;",
             "/*jslint white*/\n\t",
             "/*property aa bb*/"
         ],
         fart: [
-            "function aa() {\n    return () => 1;\n}"
+            "function aa() {\n    return () => 0;\n}"
         ],
         json: [
-            "{\"aa\":[[],-1,null]}"
+            "{\"aa\":[[],-0,null]}"
         ],
         label: [
             "function aa() {\nbb:\n    while (true) {\n        if (true) {\n"
@@ -132,14 +125,17 @@ function noop() {
         loop: [
             "function aa() {\n    do {\n        aa();\n    } while (aa());\n}"
         ],
-        misc: [
-            ""
-        ],
         module: [
             "export default Object.freeze();",
             "import {aa, bb} from \"aa\";\naa(bb);",
             "import {} from \"aa\";",
             "import(\"aa\").then(function () {\n    return;\n});"
+        ],
+        number: [
+            "let aa = 0.0e0;",
+            "let aa = 0b0;",
+            "let aa = 0o0;",
+            "let aa = 0x0;"
         ],
         optional_chaining: [
             "let aa = aa?.bb?.cc;"
@@ -147,13 +143,17 @@ function noop() {
         property: [
             "let aa = aa[`!`];"
         ],
+        regexp: [
+            "function aa() {\n    return /./;\n}",
+            "let aa = /(?!.)(?:.)(?=.)/;"
+        ],
         ternary: [
             "let aa = (\n    aa()\n    ? 0\n    : 1\n) "
             + "&& (\n    aa()\n    ? 0\n    : 1\n);"
         ],
         var: [
             "let [...aa] = [...aa];",
-            "let [\n    aa, bb = 1\n] = 0;",
+            "let [\n    aa, bb = 0\n] = 0;",
             "let {aa, bb} = 0;",
             "let {\n    aa: bb\n} = 0;"
         ]
@@ -161,7 +161,10 @@ function noop() {
         codeList.forEach(function (code) {
             let warnings;
             warnings = jslint(code).warnings;
-            assertOrThrow(warnings.length === 0, [code, warnings]);
+            assertOrThrow(
+                warnings.length === 0,
+                JSON.stringify([code, warnings])
+            );
         });
     });
 }());
@@ -172,12 +175,6 @@ function noop() {
  * malformed <code>
  */
     Object.entries({
-        expected_a_at_b_c: [
-            "(function(){let aa;bb:while(aa()){aa();}}());",
-            "function aa(){\n bb:while(aa){aa();}}",
-            "let aa=aa(\naa\n()\n);",
-            "let aa={\n    aa:\n0\n};"
-        ],
         expected_a_b: [
             "([])=>0",
             "(aa)=>{}",
@@ -199,42 +196,22 @@ function noop() {
             "delete [0]",
             "for(;;){}",
             "isFinite(0)",
-            "let aa;var aa;",
-            "new Array(\"\")",
-            "new Date().getTime()",
-            "new Object()"
+            "let aa;var aa;"
         ],
         expected_a_before_b: [
-            ".0",
-            "/*jslint eval*/\nFunction;eval",
-            "=>0",
-            "\"\\u{12345\"",
             "aa=/(:)/",
             "aa=/=/",
             "aa=/?/",
-            "aa=/[/",
-            "let Aa=Aa()",
-            "let Aa=Aa.Aa()",
-            "new Aa"
+            "aa=/[/"
         ],
         expected_identifier_a: [
-            "(0)=>0",
-            "aa.0",
-            "aa?.0",
             "function aa(0){}",
             "function aa([aa]){}\nfunction aa([aa],[aa,aa=aa],[0]){}",
             "function aa({aa}){}\nfunction aa({aa},{aa:aa,aa=aa},{aa:0}){}",
-            "function(){}",
-            "import {",
-            "let aa={0:0}",
-            "let {0}=0",
-            "let {aa:0}=0"
+            "function(){}"
         ],
         expected_space_a_b: [
-            "(function(){return;}());",
-            "/**//**/",
-            "let aa=(aa?0:1);",
-            "let aa=0;"
+            "(function(){return;}());"
         ],
         required_a_optional_b: [
             "function aa(aa=0,...){}",
@@ -255,7 +232,6 @@ function noop() {
             "0[0][0]",
             "0|0",
             ";",
-            "Function",
             "[-0x0]",
             "[0x0]",
             "\"aa\"?.bb",
@@ -274,8 +250,6 @@ function noop() {
             "await",
             "debugger",
             "eval",
-            "export aa",
-            "export const aa=0",
             "for(aa in aa){}",
             "for(const ii=0;;){}",
             "for(ii=0;ii<0;ii++){}",
@@ -333,7 +307,7 @@ function noop() {
     ).matchAll(new RegExp((
         "\\s*?"
         + "(\\/\\/\\s*?cause:.*?\\n(?:\\/\\/.*?\\n)*?)"
-        + "(\\s*?\\n[^\\/].*?(?:\\n\\s*?\".*?)?$)"
+        + "(\\s*?^[^\\/].*?(?:\\n\\s*?\".*?)?$)"
     ), "gm"))).forEach(function ([
         match0, causeList, warning
     ]) {
@@ -349,7 +323,8 @@ function noop() {
         );
         warning = warning.match(
             "("
-            + "expected_at"
+            + "at_margin"
+            + "|expected_at"
             + "|no_space_only"
             + "|one_space_only"
             + "|one_space"
@@ -365,6 +340,7 @@ function noop() {
             expectedWarningCode = warning[2];
             fnc = warning[1];
             switch (fnc) {
+            case "at_margin":
             case "expected_at":
                 expectedWarningCode = "expected_a_at_b_c";
                 break;

@@ -2,6 +2,7 @@
 
 ## Todo
 - app - deploy jslint as chrome-extension.
+- ci - auto-update version numbers in README.md and jslint.js FROM CHANGELOG.md
 - ci - continue addng regression tests and improve code-coverage.
 - doc - add svg changelog.
 - doc - add svg package-listing.
@@ -10,6 +11,12 @@
 - node - after node-v12 is deprecated, change require("fs").promises to require("fs/promises").
 - node - after node-v14 is deprecated, remove shell-code export "NODE_OPTIONS=--unhandled-rejections=strict".
 - none
+
+## v2021.5.28-beta
+- deadcode - replace with assertion-check in function do_function() - "if (mega_mode) { warn... }".
+- jslint - inline function `activate` into function `action_var`.
+- jslint - inline-document each deadcode-removal/assertion-check.
+- jslint - inline-document each warning with cause that can reproduce it - part 2.
 
 ## v2021.5.27
 - ci - fix expectedWarningCode not being validated.
@@ -22,7 +29,6 @@
 - jslint - inline-document each warning with cause that can reproduce it - part 1.
 - style - refactor code moving infix-operators from post-position to pre-position in multiline statements.
 - website - add hotkey ctrl-enter to run jslint.
-- none
 
 ## v2021.5.26
 - ci - fix ci silently failing in node-v12 and node-v14.
