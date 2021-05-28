@@ -78,7 +78,7 @@ function noop() {
         white: true
     }).warnings.length === 0);
     assertOrThrow(jslint("", {
-        test_uncaught_error: true
+        test_internal_error: true
     }).warnings.length === 1);
 }());
 

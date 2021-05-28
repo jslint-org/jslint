@@ -11,14 +11,17 @@
 - node - after node-v14 is deprecated, remove shell-code export "NODE_OPTIONS=--unhandled-rejections=strict".
 - none
 
-## v2021.5.27-beta
+## v2021.5.27
+- ci - fix expectedWarningCode not being validated.
+- ci - in windows, disable git-autocrlf.
 - deadcode - replace with assertion-check in function are_similar() - "if (a === b) { return true }".
 - deadcode - replace with assertion-check in function are_similar() superseded by id-check - "if (Array.isArray(b)) { return false; }".
 - deadcode - replace with assertion-check in function are_similar() superseded by is_weird() check - "if (a.arity === "function" && a.arity ===...c".
-- ci - fix expectedWarningCode not being validated
-- ci - in windows, disable git-autocrlf
+- jslint - add directive `test_internal_error`.
+- jslint - add directive `unordered` to tolerate unordered properties and params.
 - jslint - inline-document each warning with cause that can reproduce it - part 1.
-- style - refactor code moving infix-operators from post-position to pre-position in multiline statements
+- style - refactor code moving infix-operators from post-position to pre-position in multiline statements.
+- website - add hotkey ctrl-enter to run jslint.
 - none
 
 ## v2021.5.26
