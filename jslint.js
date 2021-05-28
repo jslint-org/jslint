@@ -129,7 +129,7 @@
     wrapped, writable, y
 */
 
-const edition = "v2021.5.27-beta";
+const edition = "v2021.5.27";
 
 function assert_or_throw(passed, message) {
 

@@ -4,7 +4,7 @@ Douglas Crockford
 douglas@crockford.com
 
 ## Status
-| Branch | [master<br>(v2021.5.26)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(testing)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(development)](https://github.com/jslint-org/jslint/tree/alpha) |
+| Branch | [master<br>(v2021.5.27)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(testing)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(development)](https://github.com/jslint-org/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jslint-org/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/jslint-org/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/jslint-org/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://jslint-org.github.io/jslint/branch.master/.build/coverage/coverage-badge.svg)](https://jslint-org.github.io/jslint/branch.master/.build/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch.beta/.build/coverage/coverage-badge.svg)](https://jslint-org.github.io/jslint/branch.beta/.build/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch.alpha/.build/coverage/coverage-badge.svg)](https://jslint-org.github.io/jslint/branch.alpha/.build/coverage/index.html) |
