@@ -149,11 +149,11 @@ process.exit(
     git checkout -b gh-pages
     git fetch origin gh-pages
     git reset --hard origin/gh-pages
-    # update dir branch.$BRANCH
-    rm -rf "branch.$BRANCH"
-    mkdir "branch.$BRANCH"
+    # update dir branch-$BRANCH
+    rm -rf "branch-$BRANCH"
+    mkdir "branch-$BRANCH"
     (set -e
-        cd "branch.$BRANCH"
+        cd "branch-$BRANCH"
         git init -b branch1
         git pull --depth=1 .. "$BRANCH"
         rm -rf .git
@@ -166,13 +166,13 @@ process.exit(
         git checkout beta .
     fi
     git status
-    git commit -am "update dir branch.$BRANCH" || true
+    git commit -am "update dir branch-$BRANCH" || true
     # if branch-gh-pages has more than 100 commits,
     # then backup and squash commits
     if [ "$(git rev-list --count gh-pages)" -gt 100 ]
     then
         # backup
-        shGitCmdWithGithubToken push origin -f gh-pages:gh-pages.backup
+        shGitCmdWithGithubToken push origin -f gh-pages:gh-pages-backup
         # squash commits
         git checkout --orphan squash1
         git commit --quiet -am squash || true
@@ -188,7 +188,7 @@ process.exit(
     shGitCmdWithGithubToken push origin gh-pages
     # validate http-links
     (set -e
-        cd "branch.$BRANCH"
+        cd "branch-$BRANCH"
         sleep 15
         shDirHttplinkValidate
     )
@@ -211,7 +211,7 @@ shCiBase() {(set -e
     )
     # screenshot live-web-demo
     shBrowserScreenshot \
-        https://jslint-org.github.io/jslint/branch.beta/index.html
+        https://jslint-org.github.io/jslint/branch-beta/index.html
 )}
 
 shCiBranchPromote() {(set -e
@@ -250,8 +250,8 @@ shDirHttplinkValidate() {(set -e
             url = url.slice(0, -1).replace((
                 /[\u0022\u0027]/g
             ), "").replace((
-                /\/branch\.\w+?\//g
-            ), "/branch.alpha/").replace((
+                /\/branch-\w+?\//g
+            ), "/branch-alpha/").replace((
                 /\bjslint-org\/jslint\b/g
             ), process.env.GITHUB_REPOSITORY || "jslint-org/jslint").replace((
                 /\bjslint-org\.github\.io\/jslint\b/g

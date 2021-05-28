@@ -13,6 +13,7 @@
 - none
 
 ## v2021.5.28-beta
+- website - replace links `branch.xxx` with `branch-xxx`.
 - deadcode - replace with assertion-check in function do_function() - "if (mega_mode) { warn... }".
 - jslint - inline function `activate` into function `action_var`.
 - jslint - inline-document each deadcode-removal/assertion-check.
