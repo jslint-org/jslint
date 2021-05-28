@@ -12,6 +12,7 @@
 - none
 
 ## v2021.5.28-beta
+- bugfix - fix #282 - fail to warn trailing semicolon in `export default Object.freeze({})`.
 - ci - auto-update changelog in README.md from CHANGELOG.md.
 - ci - auto-update version numbers in README.md and jslint.js from CHANGELOG.md.
 - website - replace links `branch.xxx` with `branch-xxx`.
