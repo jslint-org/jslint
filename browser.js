@@ -7,6 +7,7 @@
 */
 
 /*property
+    addEventListener, ctrlKey, key,
     checked, closure, column, context, create, disable, display, edition,
     exports, filter, focus, forEach, froms, fudge, functions, getElementById,
     global, id, innerHTML, isArray, join, json, keys, length, level, line,
@@ -352,6 +353,12 @@ elem_source.onscroll = function () {
         elem_number.scrollTop = ss;
     }
 };
+
+document.addEventListener("keydown", function (evt) {
+    if (evt.ctrlKey && evt.key === "Enter") {
+        call_jslint();
+    }
+});
 
 document.querySelectorAll("[name='JSLint']").forEach(function (node) {
     node.onclick = call_jslint;

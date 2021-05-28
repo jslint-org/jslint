@@ -12,6 +12,9 @@
 - none
 
 ## v2021.5.27-beta
+- website - add hotkey ctrl-enter to run jslint.
+- jslint - add directive unordered to tolerate unordered properties and params.
+- jslint - add directive test_internal_error.
 - deadcode - replace with assertion-check in function are_similar() - "if (a === b) { return true }".
 - deadcode - replace with assertion-check in function are_similar() superseded by id-check - "if (Array.isArray(b)) { return false; }".
 - deadcode - replace with assertion-check in function are_similar() superseded by is_weird() check - "if (a.arity === "function" && a.arity ===...c".

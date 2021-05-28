@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 // jslint.js
-// v2021.5.27-beta
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -89,6 +88,7 @@
 /*jslint node*/
 
 /*property
+    unordered,
     JSLINT_CLI, a, all, and, argv, arity, assign, b, bad_assignment_a,
     bad_directive_a, bad_get, bad_module_name_a, bad_option_a, bad_property_a,
     bad_set, bitwise, block, body, browser, c, calls, catch, cli_mode, closer,
@@ -113,7 +113,7 @@
     promises, property, push, quote, raw, readFile, readdir, redefinition_a_b,
     repeat, replace, required_a_optional_b, reserved_a, role, search, shebang,
     signature, single, slice, some, sort, source, split, stack, stack_trace,
-    startsWith, statement, stop, subscript_a, switch, test, test_uncaught_error,
+    startsWith, statement, stop, subscript_a, switch, test, test_internal_error,
     then, this, thru, todo_comment, tokens, too_long, too_many_digits, tree,
     trim, try, type, u, unclosed_comment, unclosed_mega, unclosed_string,
     undeclared_a, unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
@@ -129,12 +129,17 @@
     wrapped, writable, y
 */
 
+const edition = "v2021.5.27-beta";
+
 function assert_or_throw(passed, message) {
 
 // this function will throw <message> if <passed> is falsy
 
     if (!passed) {
-        throw new Error(message);
+        throw new Error(`This was caused by a bug in JSLint.
+Please open an issue with this stack-trace at
+https://github.com/jslint-org/jslint/issues.
+edition = "${edition}";` + "\n" + message);
     }
 }
 
@@ -195,7 +200,9 @@ const allowed_option = {
         "TextEncoder", "URL", "URLSearchParams", "__dirname", "__filename"
     ],
     single: true,
+    test_internal_error: true,
     this: true,
+    unordered: true,
     white: true
 };
 
@@ -557,7 +564,10 @@ function warn_at(code, line, column, a, b, c, d) {
         ignore,
         filling
     ) {
-        assert_or_throw(warning[filling] !== undefined);
+        assert_or_throw(
+            warning[filling] !== undefined,
+            "Expected warning[filling] !== undefined."
+        );
         return warning[filling];
     });
 
@@ -2965,10 +2975,12 @@ function parameter_list() {
                     a = b;
                     b = String(subparam.value || subparam.id);
                     if (a > b) {
+                        if (!option.unordered) {
 
 // cause: "function aa({bb,aa}){}"
 
-                        warn("unordered_param_a", subparam);
+                            warn("unordered_param_a", subparam);
+                        }
                     }
                     advance();
                     signature.push(subparam.id);
@@ -3337,10 +3349,12 @@ prefix("{", function () {
             a = b;
             b = String(name.value || name.id);
             if (a > b) {
+                if (!option.unordered) {
 
 // cause: "aa={bb,aa}"
 
-                warn("unordered_property_a", name);
+                    warn("unordered_property_a", name);
+                }
             }
             if (
                 (name.id === "get" || name.id === "set")
@@ -3525,10 +3539,12 @@ function do_var() {
                 a = b;
                 b = String(name.value || name.id);
                 if (a > b) {
+                    if (!option.unordered) {
 
 // cause: "let{bb,aa}=0"
 
-                    warn("unordered_param_a", name);
+                        warn("unordered_param_a", name);
+                    }
                 }
                 advance();
                 if (next_token.id === ":") {
@@ -5603,13 +5619,13 @@ function jslint(
                 }
             });
         }
-        if (option.test_uncaught_error) {
-            assert_or_throw(undefined, "Uncaught error.");
+        if (option.test_internal_error) {
+            assert_or_throw(undefined, "test_internal_error");
         }
         early_stop = false;
     } catch (e) {
         e.early_stop = true;
-        e.message = "[JSLint was unable to finish] - " + e.message;
+        e.message = "[JSLint was unable to finish]\n" + e.message;
         if (e.name !== "JSLintError") {
             e.column = 0;
             e.line = 0;
@@ -5647,7 +5663,7 @@ function jslint(
     });
     return {
         directives,
-        edition: "v2021.5.27-beta",
+        edition,
         exports,
         froms,
         functions,
