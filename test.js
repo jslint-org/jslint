@@ -175,50 +175,6 @@ function noop() {
  * malformed <code>
  */
     Object.entries({
-        expected_a_b: [
-            "([])=>0",
-            "(aa)=>{}",
-            "(aa?0:aa)",
-            "(aa?aa:0)",
-            "(aa?false:true)",
-            "(aa?true:false)",
-            ";{",
-            "`${/ /}`",
-            "`${`",
-            "`${{`",
-            "aa.aa=undefined",
-            "aa=+aa",
-            "aa=/[ ]/",
-            "aa=/aa{/",
-            "aa=0+\"\"",
-            "aa=\"\"+\"\"",
-            "async",
-            "delete [0]",
-            "for(;;){}",
-            "isFinite(0)",
-            "let aa;var aa;"
-        ],
-        expected_a_before_b: [
-            "aa=/(:)/",
-            "aa=/=/",
-            "aa=/?/",
-            "aa=/[/"
-        ],
-        expected_identifier_a: [
-            "function aa(0){}",
-            "function aa([aa]){}\nfunction aa([aa],[aa,aa=aa],[0]){}",
-            "function aa({aa}){}\nfunction aa({aa},{aa:aa,aa=aa},{aa:0}){}",
-            "function(){}"
-        ],
-        expected_space_a_b: [
-            "(function(){return;}());"
-        ],
-        required_a_optional_b: [
-            "function aa(aa=0,...){}",
-            "function aa(aa=0,[]){}",
-            "function aa(aa=0,{}){}",
-            "function aa(aa=0,bb){}"
-        ],
         too_long: [
             "//".repeat(100)
         ],
@@ -246,10 +202,6 @@ function noop() {
             "aa=/./z",
             "aa={aa:aa}",
             "aa={set aa(){}}",
-            "arguments",
-            "await",
-            "debugger",
-            "eval",
             "for(aa in aa){}",
             "for(const ii=0;;){}",
             "for(ii=0;ii<0;ii++){}",
@@ -262,25 +214,13 @@ function noop() {
             "function aa(){}0",
             "function aa(){}\n[]",
             "function ignore(){let ignore;}",
-            "ignore",
-            "ignore:",
-            "import ignore from \"aa\"",
-            "import {ignore} from \"aa\"",
             "let aa=[]?.bb",
-            "new Date.UTC()",
-            "new Function()",
-            "new Symbol()",
             "switch(0){case 0:break;case 0:break}",
             "switch(0){case 0:break;default:break;}",
             "switch(0){case 0:break;default:}",
-            "this",
             "try{throw 0;try{}catch(){}}catch(){}",
             "try{}finally{break;}",
-            "void 0",
-            "while((0)){}",
-            "while(0){}",
             "{//\n}",
-            "{0:0}",
             "{\"\\u{1234}\":0}",
             "{\"aa\":",
             "{\"aa\":'aa'}"
@@ -311,6 +251,7 @@ function noop() {
     ), "gm"))).forEach(function ([
         match0, causeList, warning
     ]) {
+        let cause0;
         let expectedWarningCode;
         let fnc;
         // debug match0
@@ -357,6 +298,7 @@ function noop() {
                 break;
             }
         }
+        cause0 = "";
         causeList.split(
             /\/\/\u0020cause:[\n|\u0020]/
         ).slice(1).forEach(function (cause) {
@@ -368,6 +310,12 @@ function noop() {
                     /^\/\/\u0020/gm
                 ), "")
             );
+            // Assert causes are sorted.
+            assertOrThrow(cause0 < cause, JSON.stringify([
+                cause0, cause
+            ], undefined, 4));
+            cause0 = cause;
+            // Assert expectedWarningCode from cause.
             assertOrThrow(
                 jslint(cause).warnings.some(function ({
                     code

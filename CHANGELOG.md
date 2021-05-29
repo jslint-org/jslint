@@ -2,6 +2,8 @@
 - [Full CHANGELOG.md](CHANGELOG.md)
 
 ## Todo
+- jslint - add new warning if case-statements are not sorted.
+- jslint - add new warning if const/let/var statements are not sorted.
 - app - deploy jslint as chrome-extension.
 - ci - continue addng regression tests and improve code-coverage.
 - doc - add svg package-listing.
@@ -9,10 +11,10 @@
 - jslint - cleanup regexp code using switch-statements.
 - node - after node-v12 is deprecated, change require("fs").promises to require("fs/promises").
 - node - after node-v14 is deprecated, remove shell-code export "NODE_OPTIONS=--unhandled-rejections=strict".
-- none
 
 ## v2021.5.28-beta
-- bugfix - fix #282 - fail to warn trailing semicolon in `export default Object.freeze({})`.
+- tests - validate inline-multi-causes are sorted.
+- bugfix - fix issue #282 - fail to warn trailing semicolon in `export default Object.freeze({})`.
 - ci - auto-update changelog in README.md from CHANGELOG.md.
 - ci - auto-update version numbers in README.md and jslint.js from CHANGELOG.md.
 - website - replace links `branch.xxx` with `branch-xxx`.

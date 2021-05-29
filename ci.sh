@@ -15,8 +15,8 @@ if (!globalThis.debugInline) {
     consoleError = console.error;
     globalThis.debugInline = function (...argList) {
     /*
-     * this function will both print <argList> to stderr and
-     * return <argList>[0]
+     * this function will both print <argList> to stderr
+     * and return <argList>[0]
      */
         consoleError("\n\ndebugInline");
         consoleError(...argList);
@@ -387,8 +387,8 @@ shGitCmdWithGithubToken() {(set -e
     REMOTE="$1"
     shift
     URL="$(
-        git config "remote.$REMOTE.url" |
-            sed -e "s|https://|https://x-access-token:$GITHUB_TOKEN@|"
+        git config "remote.$REMOTE.url" \
+        | sed -e "s|https://|https://x-access-token:$GITHUB_TOKEN@|"
     )"
     EXIT_CODE=0
     # hide $GITHUB_TOKEN in case of err
@@ -480,8 +480,8 @@ shGitLsTree() {(set -e
 )}
 
 shRunWithCoverage() {(set -e
-# this function will run nodejs command $@ with v8-coverage and
-# create coverage-report .build/coverage/index.html
+# this function will run nodejs command $@ with v8-coverage
+# and create coverage-report .build/coverage/index.html
     local EXIT_CODE
     EXIT_CODE=0
     export DIR_COVERAGE=.build/coverage/
@@ -500,8 +500,8 @@ if (!globalThis.debugInline) {
     consoleError = console.error;
     globalThis.debugInline = function (...argList) {
     /*
-     * this function will both print <argList> to stderr and
-     * return <argList>[0]
+     * this function will both print <argList> to stderr
+     * and return <argList>[0]
      */
         consoleError("\n\ndebugInline");
         consoleError(...argList);
