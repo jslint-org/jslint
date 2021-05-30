@@ -13,15 +13,17 @@
 - node - after node-v14 is deprecated, remove shell-code export "NODE_OPTIONS=--unhandled-rejections=strict".
 
 ## v2021.5.28-beta
-- tests - validate inline-multi-causes are sorted.
 - bugfix - fix issue #282 - fail to warn trailing semicolon in `export default Object.freeze({})`.
 - ci - auto-update changelog in README.md from CHANGELOG.md.
 - ci - auto-update version numbers in README.md and jslint.js from CHANGELOG.md.
-- website - replace links `branch.xxx` with `branch-xxx`.
 - deadcode - replace with assertion-check in function do_function() - "if (mega_mode) { warn... }".
+- deadcode - replace with assertion-check in function no_space() - "const at = (free ? ...)".
+- deadcode - replace with assertion-check in function no_space() - "if (open) {...}".
 - jslint - inline function `activate` into function `action_var`.
 - jslint - inline-document each deadcode-removal/assertion-check.
 - jslint - inline-document each warning with cause that can reproduce it - part 2.
+- tests - validate inline-multi-causes are sorted.
+- website - replace links `branch.xxx` with `branch-xxx`.
 
 ## v2021.5.27
 - ci - fix expectedWarningCode not being validated.

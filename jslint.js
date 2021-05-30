@@ -5505,9 +5505,15 @@ function whitage() {
 
     function no_space() {
         if (left.line === right.line) {
+
+// from:
+//                  if (left.line === right.line) {
+//                      no_space();
+//                  } else {
+
             if (left.thru !== right.from && nr_comments_skipped === 0) {
 
-// cause: "let aa = aa()( );"
+// cause: "let aa = aa( );"
 
                 warn(
                     "unexpected_space_a_b",
@@ -5517,14 +5523,25 @@ function whitage() {
                 );
             }
         } else {
-            if (open) {
-                const at = (
-                    free
-                    ? margin
-//                  Probably deadcode.
-                    : margin + 8
-                );
-                if (right.from < at) {
+
+// from:
+//                  } else if (
+//                      right.arity === "binary"
+//                      && right.id === "("
+//                      && free
+//                  ) {
+//                      no_space();
+//                  } else if (
+
+            assert_or_throw(open, `Expected open.`);
+            assert_or_throw(free, `Expected free.`);
+//          Probably deadcode.
+//          const at = (
+//              free
+//              ? margin
+//              : margin + 8
+//          );
+            if (right.from < margin) {
 
 // cause:
 // let aa = aa(
@@ -5532,14 +5549,14 @@ function whitage() {
 // ()
 // );
 
-                    expected_at(at);
-                }
-//          Probably deadcode.
-            } else {
-                if (right.from !== margin + 8) {
-                    expected_at(margin + 8);
-                }
+                expected_at(margin);
             }
+//          Probably deadcode.
+//          } else {
+//              if (right.from !== margin + 8) {
+//                  expected_at(margin + 8);
+//              }
+//          }
         }
     }
 
@@ -5673,16 +5690,34 @@ function whitage() {
 // cause: "{}"
 
                     if (left.line === right.line) {
+
+// cause: "let aa = aa( );"
+
                         no_space();
                     } else {
+
+// cause: "let aa = aa(\n );"
+
                         at_margin(0);
                     }
                 }
             } else {
                 if (right.statement === true) {
                     if (left.id === "else") {
+
+// cause:
+// let aa = 0;
+// if (aa) {
+//     aa();
+// } else  if (aa) {
+//     aa();
+// }
+
                         one_space_only();
                     } else {
+
+// cause: " let aa = 0;"
+
                         at_margin(0);
                         open = false;
                     }
@@ -5711,7 +5746,7 @@ function whitage() {
 
 // cause:
 // function aa() {
-//     let bb = 0;cc:
+//     aa();cc:
 //     while (aa) {
 //         if (aa) {
 //             break cc;
@@ -5727,10 +5762,18 @@ function whitage() {
                             && left.line === right.line
                         )) {
 
-// cause: "let {aa,bb}=0;"
+// cause: "let {aa,bb} = 0;"
 
                             one_space();
                         } else {
+
+// cause:
+// function aa() {
+//     aa(
+//         0,0
+//     );
+// }
+
                             at_margin(0);
                         }
 
@@ -5749,7 +5792,7 @@ function whitage() {
                             at_margin(0);
                         } else {
 
-// cause: "let aa=(aa?0:1);"
+// cause: "let aa = (aa ? 0 : 1);"
 
                             warn("use_open", right);
                         }
@@ -5758,6 +5801,13 @@ function whitage() {
                         && right.id === "("
                         && free
                     ) {
+
+// cause:
+// let aa = aa(
+//     aa
+// ()
+// );
+
                         no_space();
                     } else if (
                         left.id === "."
@@ -5775,11 +5825,29 @@ function whitage() {
                             && left.id !== "function"
                         )
                     ) {
+
+// cause: "let aa = 0 ;"
+
                         no_space_only();
                     } else if (right.id === "." || right.id === "?.") {
+
+// cause: "let aa = aa ?.aa;"
+
                         no_space_only();
-//                  Probably deadcode.
                     } else if (left.id === ";") {
+
+// cause:
+// /*jslint for*/
+// function aa() {
+//     for (
+//         aa();
+// aa;
+//         aa()
+//     ) {
+//         aa();
+//     }
+// }
+
                         if (open) {
                             at_margin(0);
                         }
