@@ -565,6 +565,12 @@ function warn_at(code, line, column, a, b, c, d) {
             warning[filling] !== undefined,
             "Expected warning[filling] !== undefined."
         );
+//      Probably deadcode.
+//      return (
+//          replacement !== undefined
+//          ? replacement
+//          : found
+//      );
         return warning[filling];
     });
 
@@ -922,8 +928,17 @@ function tokenize(source) {
                         if (Array.isArray(allowed)) {
                             populate(allowed, declared_globals, false);
                         }
-                    } else if (value === "false") {
+                    } else {
+                        assert_or_throw(
+                            value === "false",
+                            `Expected value === "false".`
+                        );
                         option[name] = false;
+//                  Probably deadcode.
+//                  } else if (value === "false") {
+//                      option[name] = false;
+//                  } else {
+//                      warn("bad_option_a", the_comment, name + ":" + value);
                     }
                 } else {
 
@@ -5536,11 +5551,20 @@ function whitage() {
             assert_or_throw(open, `Expected open.`);
             assert_or_throw(free, `Expected free.`);
 //          Probably deadcode.
-//          const at = (
-//              free
-//              ? margin
-//              : margin + 8
-//          );
+//          if (open) {
+//              const at = (
+//                  free
+//                  ? margin
+//                  : margin + 8
+//              );
+//              if (right.from < at) {
+//                  expected_at(at);
+//              }
+//          } else {
+//              if (right.from !== margin + 8) {
+//                  expected_at(margin + 8);
+//              }
+//          }
             if (right.from < margin) {
 
 // cause:
@@ -5551,12 +5575,6 @@ function whitage() {
 
                 expected_at(margin);
             }
-//          Probably deadcode.
-//          } else {
-//              if (right.from !== margin + 8) {
-//                  expected_at(margin + 8);
-//              }
-//          }
         }
     }
 
