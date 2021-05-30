@@ -94,7 +94,6 @@ right so that you can focus your creative energy where it is most needed.
 - ci - continue addng regression tests and improve code-coverage.
 - doc - add svg package-listing.
 - jslint - add html and css linting back into jslint.
-- jslint - cleanup regexp code using switch-statements.
 - node - after node-v12 is deprecated, change require("fs").promises to require("fs/promises").
 - node - after node-v14 is deprecated, remove shell-code export "NODE_OPTIONS=--unhandled-rejections=strict".
 
@@ -102,11 +101,13 @@ right so that you can focus your creative energy where it is most needed.
 - bugfix - fix issue #282 - fail to warn trailing semicolon in `export default Object.freeze({})`.
 - ci - auto-update changelog in README.md from CHANGELOG.md.
 - ci - auto-update version numbers in README.md and jslint.js from CHANGELOG.md.
+- deadcode - replace with assertion-check in function choice() - `if (char === "|") { warn... }`.
 - deadcode - replace with assertion-check in function do_function() - `if (mega_mode) { warn... }`.
 - deadcode - replace with assertion-check in function no_space() - `const at = (free ? ...)`.
 - deadcode - replace with assertion-check in function no_space() - `if (open) {...}`.
 - deadcode - replace with assertion-check in function parse_directive() - `} else if (value === "false") {...}`.
 - deadcode - replace with assertion-check in function supplant() - `return ( replacement !== undefined ?...)`.
+- jslint - cleanup regexp code using switch-case-statements.
 - jslint - inline function `activate` into function `action_var`.
 - jslint - inline-document each deadcode-removal/assertion-check.
 - jslint - inline-document each warning with cause that can reproduce it - part 2.

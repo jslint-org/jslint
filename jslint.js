@@ -1115,61 +1115,68 @@ function tokenize(source) {
         }
 
         function choice() {
+            let follow;
 
-            function group() {
+// Parse sequence of characters in regexp.
+
+            while (true) {
+                switch (char) {
+                case "":
+                case "/":
+                case "]":
+                case ")":
+                    if (!follow) {
+
+// cause: "/ /"
+
+                        warn_at("expected_regexp_factor_a", line, column, char);
+                    }
+
+// Match a choice (a sequence that can be followed by | and another choice).
+
+                    assert_or_throw(
+                        !(char === "|"),
+                        `Expected !(char === "|").`
+                    );
+//                  Probably deadcode.
+//                  if (char === "|") {
+//                      next_char("|");
+//                      return choice();
+//                  }
+                    return;
+                case "(":
 
 // Match a group that starts with left paren.
 
-                next_char("(");
-                if (char === "?") {
-                    next_char("?");
-                    if (char === "=" || char === "!") {
-                        next_char();
-                    } else {
-                        next_char(":");
-                    }
-                } else if (char === ":") {
+                    next_char("(");
+                    if (char === "?") {
+                        next_char("?");
+                        if (char === "=" || char === "!") {
+                            next_char();
+                        } else {
+                            next_char(":");
+                        }
+                    } else if (char === ":") {
 
 // cause: "aa=/(:)/"
 // cause: "aa=/?/"
 
-                    warn_at("expected_a_before_b", line, column, "?", ":");
-                }
-                choice();
-                next_char(")");
-            }
-
-            function factor() {
-
-// Parse current character in regexp.
-
-                if (
-                    char === ""
-                    || char === "/"
-                    || char === "]"
-                    || char === ")"
-                ) {
-                    return false;
-                }
-                if (char === "(") {
-                    group();
-                    return true;
-                }
-                if (char === "[") {
+                        warn_at("expected_a_before_b", line, column, "?", ":");
+                    }
+                    choice();
+                    next_char(")");
+                    break;
+                case "[":
                     klass();
-                    return true;
-                }
-                if (char === "\\") {
+                    break;
+                case "\\":
                     escape("BbDdSsWw^${}[]():=!.|*+?");
-                    return true;
-                }
-                if (
-                    char === "?"
-                    || char === "+"
-                    || char === "*"
-                    || char === "}"
-                    || char === "{"
-                ) {
+                    break;
+                case "?":
+                case "+":
+                case "*":
+                case "}":
+                case "{":
                     warn_at(
                         "expected_a_before_b",
                         line,
@@ -1177,53 +1184,38 @@ function tokenize(source) {
                         "\\",
                         char
                     );
-                } else if (char === "`") {
+                    next_char();
+                    break;
+                case "`":
                     if (mega_mode) {
                         warn_at("unexpected_a", line, column - 1, "`");
                     }
-                } else if (char === " ") {
+                    next_char();
+                    break;
+                case " ":
 
 // cause: "aa=/ /"
 
-                    warn_at(
-                        "expected_a_b",
-                        line,
-                        column - 1,
-                        "\\s",
-                        " "
-                    );
-                } else if (char === "$") {
+                    warn_at("expected_a_b", line, column - 1, "\\s", " ");
+                    next_char();
+                    break;
+                case "$":
                     if (source_line[0] !== "/") {
                         multi_mode = true;
                     }
-                } else if (char === "^") {
+                    next_char();
+                    break;
+                case "^":
                     if (snippet !== "^") {
                         multi_mode = true;
                     }
+                    next_char();
+                    break;
+                default:
+                    next_char();
                 }
-                next_char();
-                return true;
-            }
-
-            function sequence(follow) {
-                if (factor()) {
-                    quantifier();
-                    return sequence(true);
-                }
-                if (!follow) {
-
-// cause: "/ /"
-
-                    warn_at("expected_regexp_factor_a", line, column, char);
-                }
-            }
-
-// Match a choice (a sequence that can be followed by | and another choice).
-
-            sequence();
-            if (char === "|") {
-                next_char("|");
-                return choice();
+                quantifier();
+                follow = true;
             }
         }
 
