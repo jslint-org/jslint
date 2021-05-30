@@ -4,7 +4,7 @@ Douglas Crockford
 douglas@crockford.com
 
 # Status
-| Branch | [master<br>(v2021.5.27)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
+| Branch | [master<br>(v2021.5.30)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jslint-org/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/jslint-org/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/jslint-org/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://jslint-org.github.io/jslint/branch-master/.build/coverage/coverage-badge.svg)](https://jslint-org.github.io/jslint/branch-master/.build/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-beta/.build/coverage/coverage-badge.svg)](https://jslint-org.github.io/jslint/branch-beta/.build/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-alpha/.build/coverage/coverage-badge.svg)](https://jslint-org.github.io/jslint/branch-alpha/.build/coverage/index.html) |
@@ -93,7 +93,7 @@ right so that you can focus your creative energy where it is most needed.
 - doc - document cli-feature to jslint entire directory.
 - jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
-- jslint - add ignore macros `/*jslint-disable*/`, `/*jslint-enable*/`, `//jslint-ignore-line`.
+- jslint - add eslint-like disable-macros `/*jslint-disable*/`, `/*jslint-enable*/`, `//jslint-disable-line`.
 - jslint - add new warning if case-statements are not sorted.
 - jslint - add new warning if const/let/var statements are not declared at top of function-scope.
 - jslint - add new warning if const/let/var statements are not sorted.
@@ -101,7 +101,7 @@ right so that you can focus your creative energy where it is most needed.
 - node - after node-v12 is deprecated, change `require("fs").promises` to `require("fs/promises")`.
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 
-## v2021.5.28-beta
+## v2021.5.30
 - bugfix - fix issue #282 - fail to warn trailing semicolon in `export default Object.freeze({})`.
 - ci - 100% code-coverage!
 - ci - auto-update changelog in README.md from CHANGELOG.md.
