@@ -174,74 +174,6 @@ function noop() {
  * this function will validate each jslint <warning> is raised with given
  * malformed <code>
  */
-    Object.entries({
-        too_long: [
-            "//".repeat(100)
-        ],
-        unexpected_a: [
-            "((0))",
-            "(+0?+0:+0)()",
-            "(/./)?.foo",
-            "/*/",
-            "/./",
-            "0===(0==0)",
-            "0[0][0]",
-            "0|0",
-            ";",
-            "[-0x0]",
-            "[0x0]",
-            "\"aa\"?.bb",
-            "`${/[`]/}`",
-            "`${/`/}`",
-            "`${\"`\"}`",
-            "aa((0))",
-            "aa+=NaN",
-            "aa/=0",
-            "aa=/[0-]/",
-            "aa=/.//",
-            "aa=/./z",
-            "aa={aa:aa}",
-            "aa={set aa(){}}",
-            "for(aa in aa){}",
-            "for(const ii=0;;){}",
-            "for(ii=0;ii<0;ii++){}",
-            "for(ii=0;ii<0;ii+=0){}",
-            "function aa(){for(0;0;0){break;}}",
-            "function aa(){try{return;}catch(ignore){}finally{return;}}",
-            "function aa(){try{}catch(ignore){}finally{switch(0){case 0:}}}",
-            "function aa(){while(0){continue;}}",
-            "function aa(){while(0){try{0;}catch(ignore){}finally{continue;}}}",
-            "function aa(){}0",
-            "function aa(){}\n[]",
-            "function ignore(){let ignore;}",
-            "let aa=[]?.bb",
-            "switch(0){case 0:break;case 0:break}",
-            "switch(0){case 0:break;default:break;}",
-            "switch(0){case 0:break;default:}",
-            "try{throw 0;try{}catch(){}}catch(){}",
-            "try{}finally{break;}",
-            "{//\n}",
-            "{\"\\u{1234}\":0}",
-            "{\"aa\":",
-            "{\"aa\":'aa'}"
-        ]
-    }).forEach(function ([
-        expectedWarning, malformedCodeList
-    ]) {
-        malformedCodeList.forEach(function (malformedCode) {
-            assertOrThrow(
-                jslint(malformedCode).warnings.some(function ({
-                    code
-                }) {
-                    return code === expectedWarning;
-                }),
-                new Error(
-                    `jslint failed to warn "${expectedWarning}" with `
-                    + `malfomed code "${malformedCode}"`
-                )
-            );
-        });
-    });
     Array.from(String(
         await fs.promises.readFile("jslint.js", "utf8")
     ).matchAll(new RegExp((
@@ -266,6 +198,7 @@ function noop() {
             "("
             + "at_margin"
             + "|expected_at"
+            + "|left_check"
             + "|no_space_only"
             + "|one_space"
             + "|one_space_only"
@@ -286,6 +219,9 @@ function noop() {
             case "expected_at":
                 expectedWarningCode = "expected_a_at_b_c";
                 break;
+            case "left_check":
+                expectedWarningCode = "unexpected_a";
+                break;
             case "no_space_only":
                 expectedWarningCode = "unexpected_space_a_b";
                 break;
@@ -304,7 +240,9 @@ function noop() {
         ).slice(1).forEach(function (cause) {
             assertOrThrow(cause === cause.trim() + "\n", JSON.stringify(cause));
             cause = (
-                cause[0] === "\""
+                expectedWarningCode === "too_long"
+                ? "//".repeat(100)
+                : cause[0] === "\""
                 ? JSON.parse(cause)
                 : cause.replace((
                     /^\/\/\u0020/gm

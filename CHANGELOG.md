@@ -2,26 +2,35 @@
 - [Full CHANGELOG.md](CHANGELOG.md)
 
 ## Todo
-- jslint - add new warning if case-statements are not sorted.
-- jslint - add new warning if const/let/var statements are not sorted.
 - app - deploy jslint as chrome-extension.
-- ci - continue addng regression tests and improve code-coverage.
 - doc - add svg package-listing.
+- doc - document cli-feature to jslint entire directory.
+- jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
-- jslint - cleanup regexp code using switch-statements.
-- node - after node-v12 is deprecated, change require("fs").promises to require("fs/promises").
-- node - after node-v14 is deprecated, remove shell-code export "NODE_OPTIONS=--unhandled-rejections=strict".
+- jslint - add eslint-like disable-macros `/*jslint-disable*/`, `/*jslint-enable*/`, `//jslint-disable-line`.
+- jslint - add new warning if case-statements are not sorted.
+- jslint - add new warning if const/let/var statements are not declared at top of function-scope.
+- jslint - add new warning if const/let/var statements are not sorted.
+- jslint - migrate code away from recursive-loops to for/while loops.
+- node - after node-v12 is deprecated, change `require("fs").promises` to `require("fs/promises")`.
+- node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 
 ## v2021.5.28-beta
 - bugfix - fix issue #282 - fail to warn trailing semicolon in `export default Object.freeze({})`.
+- ci - 100% code-coverage!
 - ci - auto-update changelog in README.md from CHANGELOG.md.
 - ci - auto-update version numbers in README.md and jslint.js from CHANGELOG.md.
-- deadcode - replace with assertion-check in function do_function() - "if (mega_mode) { warn... }".
-- deadcode - replace with assertion-check in function no_space() - "const at = (free ? ...)".
-- deadcode - replace with assertion-check in function no_space() - "if (open) {...}".
+- deadcode - replace with assertion-check in function choice() - `if (char === "|") { warn... }`.
+- deadcode - replace with assertion-check in function do_function() - `if (mega_mode) { warn... }`.
+- deadcode - replace with assertion-check in function no_space() - `const at = (free ? ...)`.
+- deadcode - replace with assertion-check in function no_space() - `if (open) {...}`.
+- deadcode - replace with assertion-check in function parse_directive() - `} else if (value === "false") {...}`.
+- deadcode - replace with assertion-check in function supplant() - `return ( replacement !== undefined ?...)`.
+- jslint - cleanup regexp code using switch-case-statements.
 - jslint - inline function `activate` into function `action_var`.
 - jslint - inline-document each deadcode-removal/assertion-check.
 - jslint - inline-document each warning with cause that can reproduce it - part 2.
+- tests - inline remaining causal-regressions from test.js into jslint.js
 - tests - validate inline-multi-causes are sorted.
 - website - replace links `branch.xxx` with `branch-xxx`.
 
