@@ -698,18 +698,18 @@ function tokenize(source) {
         whole_line = source_line;
 
 // Scan each line for following ignore-directives:
-// "/*jslint_disable_parse*/"
-// "/*jslint_enable_parse*/"
+// "/*jslint-disable*/"
+// "/*jslint-enable*/"
 // "//jslint_ignore_warning
 
-        if (source_line === "/*jslint_disable_parse*/") {
+        if (source_line === "/*jslint-disable*/") {
 
-// cause: "/*jslint_disable_parse*/"
+// cause: "/*jslint-disable*/"
 
             disable_parse = true;
-        } else if (source_line === "/*jslint_enable_parse*/") {
+        } else if (source_line === "/*jslint-enable*/") {
 
-// cause: "/*jslint_enable_parse*/"
+// cause: "/*jslint-enable*/"
 
             disable_parse = false;
         } else if (source_line.endsWith(" //jslint_ignore_warning")) {
@@ -720,7 +720,7 @@ function tokenize(source) {
         }
         if (disable_parse) {
 
-// cause: "/*jslint_disable_parse*/\n0"
+// cause: "/*jslint-disable*/\n0"
 
             source_line = "";
         }

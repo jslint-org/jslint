@@ -375,10 +375,10 @@ elem_source.value = `#!/usr/bin/env node
 import jslint from "./jslint.mjs";
 import https from "https";
 
-/*jslint_disable_parse*/
+/*jslint-disable*/
 // Todo: jslint this code-block in the future.
 console.log('hello world');
-/*jslint_enable_parse*/
+/*jslint-enable*/
 
 eval("console.log('hello world');"); //jslint_ignore_warning
 
