@@ -538,7 +538,7 @@ function warn_at(code, line, column, a, b, c, d) {
         b,
         c,
         code,
-        column,
+        column: column || fudge,
         d,
         line,
         name: "JSLintError",
@@ -595,6 +595,9 @@ function warn(code, the_token, a, b, c, d) {
         the_token.warning = warn_at(
             code,
             the_token.line,
+
+// Fudge column numbers in warning message.
+
             the_token.from + fudge,
             a || artifact(the_token),
             b,
@@ -673,6 +676,7 @@ function tokenize(source) {
         if (
             !option.long
             && whole_line.length > 80
+            && !disable_parse
             && !json_mode
             && first
             && !regexp_seen
@@ -5584,10 +5588,10 @@ function whitage() {
             "expected_a_at_b_c",
             right,
             artifact(right),
+
+// Fudge column numbers in warning message.
+
             at + fudge,
-
-// Return the fudged column number of an artifact.
-
             right.from + fudge
         );
     }
