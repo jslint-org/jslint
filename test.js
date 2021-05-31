@@ -60,7 +60,7 @@ function noop() {
 /*
  * this function will test jslint's option handling-behavior
  */
-    assertOrThrow(jslint([""], {
+    assertOrThrow(jslint("", {
         bitwise: true,
         browser: true,
         convert: true,
@@ -69,7 +69,6 @@ function noop() {
         devel: true,
         eval: true,
         for: true,
-        fudge: true,
         getset: true,
         long: true,
         node: true,
@@ -114,6 +113,12 @@ function noop() {
         ],
         fart: [
             "function aa() {\n    return () => 0;\n}"
+        ],
+        jslint_disable_parse: [
+            "/*jslint_disable_parse*/\n0\n/*jslint_enable_parse*/"
+        ],
+        jslint_ignore_warning: [
+            "0 //jslint_ignore_warning"
         ],
         json: [
             "{\"aa\":[[],-0,null]}"

@@ -7,9 +7,9 @@
 */
 
 /*property
-    addEventListener, ctrlKey, key,
+    addEventListener, ctrlKey, key, source_line, stack_trace,
     checked, closure, column, context, create, disable, display, edition,
-    exports, filter, focus, forEach, froms, fudge, functions, getElementById,
+    exports, filter, focus, forEach, froms, functions, getElementById,
     global, id, innerHTML, isArray, join, json, keys, length, level, line,
     lines, map, message, module, name, names, onchange, onclick, onscroll,
     option, parameters, parent, property, push, querySelectorAll, replace, role,
@@ -22,14 +22,8 @@ import jslint from "./jslint.js";
 // This is the web script companion file for JSLint. It includes code for
 // interacting with the browser and displaying the reports.
 
-let rx_crlf = /\n|\r\n?/;
-let rx_separator = /[\s,;'"]+/;
-
-let fudge_unit = 0;
-
 const elem_aux = document.getElementById("JSLINT_AUX");
 const elem_boxes = document.querySelectorAll("[type=checkbox]");
-const elem_fudge = document.getElementById("JSLINT_FUDGE");
 const elem_global = document.getElementById("JSLINT_GLOBAL");
 const elem_number = document.getElementById("JSLINT_NUMBER");
 const elem_property = document.getElementById("JSLINT_PROPERTY");
@@ -71,21 +65,26 @@ function error_report(data) {
 // <cite><address>LINE_NUMBER</address>MESSAGE</cite>
 // <samp>EVIDENCE</samp>
 
-    let fudge = Number(Boolean(data.option.fudge));
     let output = [];
     if (data.stop) {
         output.push("<center>JSLint was unable to finish.</center>");
     }
-    data.warnings.forEach(function (warning) {
+    data.warnings.forEach(function ({
+        column,
+        line,
+        message,
+        source_line,
+        stack_trace = ""
+    }) {
         output.push(
             "<cite><address>",
-            entityify(warning.line + fudge),
+            entityify(line),
             ".",
-            entityify(warning.column + fudge),
+            entityify(column),
             "</address>",
-            entityify(warning.message),
+            entityify(message),
             "</cite><samp>",
-            entityify(data.lines[warning.line] || ""),
+            entityify(source_line + "\n" + stack_trace),
             "</samp>"
         );
     });
@@ -100,7 +99,6 @@ function function_report(data) {
 //     <dt>DETAIL</dt><dd>NAMES</dd>
 // </dl>
 
-    let fudge = Number(Boolean(data.option.fudge));
     let mode = (
         data.module
         ? "module"
@@ -150,7 +148,7 @@ function function_report(data) {
                 "<dl class=level",
                 entityify(the_function.level),
                 "><address>",
-                entityify(the_function.line + fudge),
+                entityify(the_function.line),
                 "</address><dfn>",
                 (
                     the_function.name === "=>"
@@ -250,11 +248,13 @@ function property_directive(data) {
 }
 
 function show_numbers() {
-    elem_number.value = elem_source.value.split(rx_crlf).map(function (
+    elem_number.value = elem_source.value.split(
+        /\n|\r\n?/
+    ).map(function (
         ignore,
         index
     ) {
-        return index + fudge_unit;
+        return index + 1;
     }).join("\n");
 }
 
@@ -271,16 +271,10 @@ function clear() {
     elem_warnings_list.innerHTML = "";
 }
 
-function fudge_change() {
-    fudge_unit = Number(elem_fudge.checked);
-    show_numbers();
-}
-
 function clear_options() {
     elem_boxes.forEach(function (node) {
         node.checked = false;
     });
-    fudge_change();
     elem_global.innerHTML = "";
 }
 
@@ -304,7 +298,9 @@ function call_jslint() {
         (
             global_string === ""
             ? undefined
-            : global_string.split(rx_separator)
+            : global_string.split(
+                /[\s,;'"]+/
+            )
         )
     );
 
@@ -337,8 +333,6 @@ function call_jslint() {
     elem_aux.style.display = "block";
     elem_source.select();
 }
-
-elem_fudge.onchange = fudge_change;
 
 elem_source.onchange = function (ignore) {
     show_numbers();
@@ -374,7 +368,6 @@ document.getElementById("JSLINT_SELECT").onclick = function () {
 };
 document.getElementById("JSLINT_CLEAR_OPTIONS").onclick = clear_options;
 
-fudge_change();
 elem_source.select();
 elem_source.focus();
 elem_source.value = String(`

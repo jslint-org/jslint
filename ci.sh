@@ -1,8 +1,10 @@
 #!/bin/sh
 
 # sh one-liner
-# head CHANGELOG.md -n20
+#
+# git branch -d -r origin/aa
 # git fetch origin alpha beta master && git fetch upstream alpha beta master
+# head CHANGELOG.md -n50
 # sh ci.sh shCiBranchPromote origin alpha beta
 
 shBrowserScreenshot() {(set -e

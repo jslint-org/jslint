@@ -93,13 +93,18 @@ right so that you can focus your creative energy where it is most needed.
 - doc - document cli-feature to jslint entire directory.
 - jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
-- jslint - add eslint-like disable-macros `/*jslint-disable*/`, `/*jslint-enable*/`, `//jslint-disable-line`.
 - jslint - add new warning if case-statements are not sorted.
 - jslint - add new warning if const/let/var statements are not declared at top of function-scope.
 - jslint - add new warning if const/let/var statements are not sorted.
 - jslint - migrate code away from recursive-loops to for/while loops.
+- jslint - remove obsolete ie-warning about duplicate names for caught-errors.
 - node - after node-v12 is deprecated, change `require("fs").promises` to `require("fs/promises")`.
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
+
+## v2021.6.1-beta
+- breaking-change - hardcode `const fudge = 1`
+- breaking-change - remove little-used-feature allowing jslint to accept array-of-strings as source b/c internal lines-object has been changed from array-of-strings to array-of-objects.
+- jslint - add ignore-directives `/*jslint_disable_parse*/`, `/*jslint_enable_parse*/`, `//jslint_ignore_warning`.
 
 ## v2021.5.30
 - bugfix - fix issue #282 - fail to warn trailing semicolon in `export default Object.freeze({})`.
@@ -119,17 +124,5 @@ right so that you can focus your creative energy where it is most needed.
 - tests - inline remaining causal-regressions from test.js into jslint.js
 - tests - validate inline-multi-causes are sorted.
 - website - replace links `branch.xxx` with `branch-xxx`.
-
-## v2021.5.27
-- ci - fix expectedWarningCode not being validated.
-- ci - in windows, disable git-autocrlf.
-- deadcode - replace with assertion-check in function are_similar() - "if (a === b) { return true }".
-- deadcode - replace with assertion-check in function are_similar() superseded by id-check - "if (Array.isArray(b)) { return false; }".
-- deadcode - replace with assertion-check in function are_similar() superseded by is_weird() check - "if (a.arity === "function" && a.arity ===...c".
-- jslint - add directive `test_internal_error`.
-- jslint - add directive `unordered` to tolerate unordered properties and params.
-- jslint - inline-document each warning with cause that can reproduce it - part 1.
-- style - refactor code moving infix-operators from post-position to pre-position in multiline statements.
-- website - add hotkey ctrl-enter to run jslint.
 
 # End

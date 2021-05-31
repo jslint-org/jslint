@@ -88,7 +88,7 @@
 /*jslint node*/
 
 /*property
-    unordered,
+    disable_parse, endsWith, ignore_warning, source_line, unordered,
     JSLINT_CLI, a, all, and, argv, arity, assign, b, bad_assignment_a,
     bad_directive_a, bad_get, bad_module_name_a, bad_option_a, bad_property_a,
     bad_set, bitwise, block, body, browser, c, calls, catch, cli_mode, closer,
@@ -102,7 +102,7 @@
     expected_space_a_b, expected_statements_a, expected_string_a,
     expected_type_string_a, exports, expression, extra, file, finally, flag,
     for, forEach, formatted_message, free, freeze, freeze_exports, from, froms,
-    fud, fudge, function_in_loop, functions, g, getset, global, has_await, i,
+    fud, function_in_loop, functions, g, getset, global, has_await, i,
     id, identifier, import, inc, indexOf, infix_in, init, initial, isArray,
     isNaN, is_async, join, json, keys, label, label_a, lbp, led, length, level,
     line, line_offset, lines, live, long, loop, m, map, margin, match, message,
@@ -121,7 +121,7 @@
     unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
     unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
     unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
-    unordered_param_a, unordered_property_a, unreachable_a,
+    unordered_a_b, unreachable_a,
     unregistered_property_a, unused_a, use_double, use_open, use_spaces, used,
     value, var_loop, var_switch, variable, versions, warning, warnings,
     weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
@@ -129,7 +129,7 @@
     wrapped, writable, y
 */
 
-const edition = "v2021.5.30";
+const edition = "v2021.6.1-beta";
 
 function assert_or_throw(passed, message) {
 
@@ -141,7 +141,8 @@ function assert_or_throw(passed, message) {
     throw new Error(`This was caused by a bug in JSLint.
 Please open an issue with this stack-trace (and possible example-code) at
 https://github.com/jslint-org/jslint/issues.
-edition = "${edition}";` + "\n" + message);
+edition = "${edition}";
+${message}`);
 }
 
 function empty() {
@@ -191,7 +192,6 @@ const allowed_option = {
     ],
     eval: true,
     for: true,
-    fudge: true,
     getset: true,
     long: true,
     node: [
@@ -352,8 +352,7 @@ const bundle = {
         "Unexpected 'typeof'. Use '===' to compare directly with {a}."
     ),
     uninitialized_a: "Uninitialized '{a}'.",
-    unordered_param_a: "Parameter '{a}' not listed in alphabetical order.",
-    unordered_property_a: "Property '{a}' not listed in alphabetical order.",
+    unordered_a_b: "{a} '{b}' not listed in alphabetical order.",
     unreachable_a: "Unreachable '{a}'.",
     unregistered_property_a: "Unregistered property name '{a}'.",
     unused_a: "Unused '{a}'.",
@@ -388,11 +387,6 @@ function tag_regexp(strings) {
 
 // supplant {variables}
 const rx_supplant = /\{([^{}]*)\}/g;
-// carriage return, carriage return linefeed, or linefeed
-const rx_crlf = tag_regexp `
-      \n
-    | \r \n?
-`;
 // identifier
 const rx_identifier = tag_regexp ` ^(
     [ a-z A-Z _ $ ]
@@ -487,16 +481,16 @@ function is_letter(string) {
     );
 }
 
+const fudge = 1;        // Fudge starting line and starting column to 1.
 let anon;               // The guessed name for anonymous functions.
-let blockage;           // The current block.
 let block_stack;        // The stack of blocks.
+let blockage;           // The current block.
 let declared_globals;   // The object containing the global declarations.
-let directives;         // The directive comments.
 let directive_mode;     // true if directives are still allowed.
+let directives;         // The directive comments.
 let early_stop;         // true if JSLint cannot finish.
 let exports;            // The exported names and values.
 let froms;              // The array collecting all import-from strings.
-let fudge;              // true if the natural numbers start with 1.
 let functionage;        // The current function.
 let functions;          // The array containing all of the functions.
 let global;             // The global object; the outermost context.
@@ -510,10 +504,10 @@ let property;           // The object containing the tallied property names.
 let shebang;            // true if a #! was seen on the first line.
 let stack;              // The stack of functions.
 let syntax;             // The object containing the parser.
+let tenure;             // The predefined property registry.
 let token;              // The current token being examined in the parse.
 let token_nr;           // The number of the next token.
 let tokens;             // The array of tokens.
-let tenure;             // The predefined property registry.
 let tree;               // The abstract parse tree.
 let var_mode;           // "var" if using var; "let" if using let.
 let warnings;           // The array collecting all generated warnings.
@@ -539,24 +533,17 @@ function warn_at(code, line, column, a, b, c, d) {
 // Report an error at some line and column of the program. The warning object
 // resembles an exception.
 
-    const warning = {         // ~~
+    const warning = Object.assign({
+        a,
+        b,
+        c,
         code,
         column,
+        d,
         line,
-        name: "JSLintError"
-    };
-    if (a !== undefined) {
-        warning.a = a;
-    }
-    if (b !== undefined) {
-        warning.b = b;
-    }
-    if (c !== undefined) {
-        warning.c = c;
-    }
-    if (d !== undefined) {
-        warning.d = d;
-    }
+        name: "JSLintError",
+        source_line: ""
+    }, lines[line]);
     warning.message = bundle[code].replace(rx_supplant, function (
         ignore,
         filling
@@ -579,7 +566,12 @@ function warn_at(code, line, column, a, b, c, d) {
     if (option.debug) {
         warning.stack_trace = new Error().stack;
     }
-    warnings.push(warning);
+    if (!warning.ignore_warning) {
+
+// cause: "0 //jslint_ignore_warning"
+
+        warnings.push(warning);
+    }
     return warning;
 }
 
@@ -603,7 +595,7 @@ function warn(code, the_token, a, b, c, d) {
         the_token.warning = warn_at(
             code,
             the_token.line,
-            the_token.from,
+            the_token.from + fudge,
             a || artifact(the_token),
             b,
             c,
@@ -637,33 +629,37 @@ function tokenize(source) {
 // automatic semicolon insertion and nested megastring literals, which allows
 // full tokenization to precede parsing.
 
-// If the source is not an array, then it is split into lines at the
-// carriage return/linefeed.
-
-    lines = (
-        Array.isArray(source)
-        ? source
-        : source.split(rx_crlf)
-    );
-    tokens = [];
-
     let char;                   // a popular character
     let column = 0;             // the column number of the next character
+    let disable_parse;          // boolean to disable parsing of current line
     let first;                  // the first token
     let from;                   // the starting column number of the token
-    let line = -1;              // the line number of the next character
+    let line = 0;               // the line number of the next character
+    let mega_from;              // the starting column of megastring
+    let mega_line;              // the starting line of megastring
     let nr = 0;                 // the next token number
     let previous = global;      // the previous token including comments
     let prior = global;         // the previous token excluding comments
-    let mega_from;              // the starting column of megastring
-    let mega_line;              // the starting line of megastring
     let regexp_seen;            // regular expression literal seen on this line
     let snippet = "";           // a piece of string
     let source_line = "";       // the remaining line source string
     let whole_line = "";        // the whole line source string
 
-    if (lines[0].startsWith("#!")) {
-        line = 0;
+// Split source into lines at the carriage return/linefeed.
+
+    lines = String("\n" + source).split(
+        /\n|\r\n?/
+    ).map(function (source_line) {
+        return {
+            source_line
+        };
+    });
+    tokens = [];
+
+// Scan first line for "#!" and ignore it.
+
+    if (lines[fudge].source_line.startsWith("#!")) {
+        line += 1;
         shebang = true;
     }
 
@@ -689,26 +685,56 @@ function tokenize(source) {
         column = 0;
         line += 1;
         regexp_seen = false;
-        source_line = lines[line];
-        whole_line = source_line || "";
-        if (source_line !== undefined) {
-            at = source_line.search(rx_tab);
-            if (at >= 0) {
-                if (!option.white) {
+        source_line = undefined;
+        whole_line = "";
+        if (lines[line] === undefined) {
+            return source_line;
+        }
+        source_line = lines[line].source_line;
+        whole_line = source_line;
+
+// Scan each line for following ignore-directives:
+// "/*jslint_disable_parse*/"
+// "/*jslint_enable_parse*/"
+// "//jslint_ignore_warning
+
+        if (source_line === "/*jslint_disable_parse*/") {
+
+// cause: "/*jslint_disable_parse*/"
+
+            disable_parse = true;
+        } else if (source_line === "/*jslint_enable_parse*/") {
+
+// cause: "/*jslint_enable_parse*/"
+
+            disable_parse = false;
+        } else if (source_line.endsWith(" //jslint_ignore_warning")) {
+
+// cause: "0 //jslint_ignore_warning"
+
+            lines[line].ignore_warning = true;
+        }
+        if (disable_parse) {
+
+// cause: "/*jslint_disable_parse*/\n0"
+
+            source_line = "";
+        }
+        at = source_line.search(rx_tab);
+        if (at >= 0) {
+            if (!option.white) {
 
 // cause: "\t"
 
-                    warn_at("use_spaces", line, at + 1);
-                }
-                source_line = source_line.replace(rx_tab, " ");
+                warn_at("use_spaces", line, at + 1);
             }
-            if (!option.white && source_line.slice(-1) === " ") {
-                warn_at(
-                    "unexpected_trailing_space",
-                    line,
-                    source_line.length - 1
-                );
-            }
+            source_line = source_line.replace(rx_tab, " ");
+        }
+        if (!option.white && source_line.endsWith(" ")) {
+
+// cause: " "
+
+            warn_at("unexpected_trailing_space", line, source_line.length - 1);
         }
         return source_line;
     }
@@ -739,11 +765,11 @@ function tokenize(source) {
 
 // cause: "aa=/[/"
 
-                ? stop_at("expected_a", line, column - 1, match, char)
+                ? stop_at("expected_a", line, column, match, char)
 
 // cause: "aa=/aa{/"
 
-                : stop_at("expected_a_b", line, column - 1, match, char)
+                : stop_at("expected_a_b", line, column, match, char)
             );
         }
         if (source_line) {
@@ -803,13 +829,13 @@ function tokenize(source) {
 
 // cause: "[\"\\u{12345}\"]"
 
-                    warn_at("unexpected_a", line, column - 1, char);
+                    warn_at("unexpected_a", line, column, char);
                 }
                 if (some_digits(rx_hexs) > 5) {
 
 // cause: "\"\\u{123456}\""
 
-                    warn_at("too_many_digits", line, column - 1);
+                    warn_at("too_many_digits", line, column);
                 }
                 if (char !== "}") {
 
@@ -824,7 +850,7 @@ function tokenize(source) {
 
 // cause: "\"\\u0\""
 
-                warn_at("expected_four_digits", line, column - 1);
+                warn_at("expected_four_digits", line, column);
             }
             return;
         }
@@ -834,7 +860,7 @@ function tokenize(source) {
 
 // cause: "\"\\a\""
 
-        warn_at("unexpected_a_before_b", line, column - 2, "\\", char);
+        warn_at("unexpected_a_before_b", line, column - 1, "\\", char);
     }
 
     function make(id, value, identifier) {
@@ -1083,12 +1109,7 @@ function tokenize(source) {
 
 // cause: "aa=/[0-]/"
 
-                        return stop_at(
-                            "unexpected_a",
-                            line,
-                            column - 1,
-                            "-"
-                        );
+                        return stop_at("unexpected_a", line, column, "-");
                     }
                 }
                 return ranges();
@@ -1109,13 +1130,7 @@ function tokenize(source) {
 
 // cause: "aa=/[/"
 
-                    warn_at(
-                        "expected_a_before_b",
-                        line,
-                        column,
-                        "\\",
-                        char
-                    );
+                    warn_at("expected_a_before_b", line, column, "\\", char);
                     next_char();
                     return classy();
                 }
@@ -1186,13 +1201,7 @@ function tokenize(source) {
                 case "*":
                 case "}":
                 case "{":
-                    warn_at(
-                        "expected_a_before_b",
-                        line,
-                        column - 1,
-                        "\\",
-                        char
-                    );
+                    warn_at("expected_a_before_b", line, column, "\\", char);
                     next_char();
                     break;
                 case "`":
@@ -1200,7 +1209,7 @@ function tokenize(source) {
 
 // cause: "`${/`/}`"
 
-                        warn_at("unexpected_a", line, column - 1, "`");
+                        warn_at("unexpected_a", line, column, "`");
                     }
                     next_char();
                     break;
@@ -1208,7 +1217,7 @@ function tokenize(source) {
 
 // cause: "aa=/ /"
 
-                    warn_at("expected_a_b", line, column - 1, "\\s", " ");
+                    warn_at("expected_a_b", line, column, "\\s", " ");
                     next_char();
                     break;
                 case "$":
@@ -1375,7 +1384,7 @@ function tokenize(source) {
             return stop_at(
                 "unexpected_a_after_b",
                 line,
-                column - 1,
+                column,
                 snippet.slice(-1),
                 snippet.slice(0, -1)
             );
@@ -1839,10 +1848,7 @@ function advance(id, match) {
                 next_token,
                 id,
                 artifact(match),
-
-// Return the fudged line number of an artifact.
-
-                match.line + fudge,
+                match.line,
                 artifact(next_token)
             )
         );
@@ -2002,7 +2008,7 @@ function enroll(name, role, readonly) {
                 "redefinition_a_b",
                 name,
                 name.id,
-                earlier.line + fudge
+                earlier.line
             );
 
 // Has the name been enrolled in an outer context?
@@ -2039,7 +2045,7 @@ function enroll(name, role, readonly) {
                             "redefinition_a_b",
                             name,
                             name.id,
-                            earlier.line + fudge
+                            earlier.line
                         );
                     }
                 }
@@ -3144,7 +3150,12 @@ function parameter_list() {
 
 // cause: "function aa({bb,aa}){}"
 
-                        warn("unordered_param_a", subparam);
+                        warn(
+                            "unordered_a_b",
+                            subparam,
+                            "Parameter",
+                            artifact(subparam)
+                        );
                     }
                     advance();
                     signature.push(subparam.id);
@@ -3573,7 +3584,7 @@ prefix("{", function () {
 
 // cause: "aa={bb,aa}"
 
-                warn("unordered_property_a", name);
+                warn("unordered_a_b", name, "Property", artifact(name));
             }
             if (
                 (name.id === "get" || name.id === "set")
@@ -3789,7 +3800,7 @@ function do_var() {
 
 // cause: "let{bb,aa}"
 
-                    warn("unordered_param_a", name);
+                    warn("unordered_a_b", name, "Parameter", artifact(name));
                 }
                 advance();
                 if (next_token.id === ":") {
@@ -5573,7 +5584,7 @@ function whitage() {
             "expected_a_at_b_c",
             right,
             artifact(right),
-            fudge + at,
+            at + fudge,
 
 // Return the fudged column number of an artifact.
 
@@ -6081,11 +6092,6 @@ function jslint(
         early_stop = true;
         exports = empty();
         froms = [];
-        fudge = (
-            option.fudge
-            ? 1
-            : 0
-        );
         functions = [];
         global = {
             body: true,
@@ -6094,7 +6100,7 @@ function jslint(
             from: 0,
             id: "(global)",
             level: 0,
-            line: 0,
+            line: fudge,
             live: [],
             loop: 0,
             switch: 0,
@@ -6178,9 +6184,10 @@ function jslint(
         e.early_stop = true;
         e.message = "[JSLint was unable to finish]\n" + e.message;
         if (e.name !== "JSLintError") {
-            e.column = 0;
-            e.line = 0;
+            e.column = fudge;
+            e.line = fudge;
             e.stack_trace = e.stack;
+            e.source_line = "";
             warnings.push(e);
         }
     }
@@ -6196,20 +6203,19 @@ function jslint(
 // update each warning with a formatted_message ready for use by cli
 
     }).map(function ({
-        column = 0,
-        line = 0,
-        message = "",
+        column,
+        line,
+        message,
+        source_line,
         stack_trace = ""
     }, ii, list) {
-        column += 1;
-        line += 1;
         list[ii].formatted_message = String(
             String(ii + 1).padStart(3, " ")
             + " \u001b[31m" + message + "\u001b[39m"
             + " \u001b[90m\/\/ line " + line + ", column " + column
             + "\u001b[39m\n"
-            + ("    " + String(lines[line - 1] || "").trim()).slice(0, 72)
-            + "\n" + stack_trace
+            + ("    " + source_line.trim()).slice(0, 72) + "\n"
+            + stack_trace
         ).trim();
     });
     return {
@@ -6228,7 +6234,7 @@ function jslint(
         property,
         shebang: (
             shebang
-            ? lines[0]
+            ? lines[fudge].source_line
             : undefined
         ),
         stop: early_stop,
@@ -6248,7 +6254,7 @@ async function cli({
  * this function will run jslint from nodejs-cli
  */
     const fs = await import("fs");
-    let exitCode;
+    let exit_code;
     function string_line_count(code) {
     /*
      * this function will count number of newlines in <code>
@@ -6331,7 +6337,7 @@ async function cli({
         }
         // print only first 10 warnings
         if (warnings.length > 0) {
-            exitCode = 1;
+            exit_code = 1;
             // print first 10 warnings to stderr
             console_error(
                 "\u001b[1mjslint " + file + "\u001b[22m\n"
@@ -6398,7 +6404,7 @@ async function cli({
             option
         });
     }
-    return exitCode;
+    return exit_code;
 }
 export default Object.freeze(function (
     source = "",
@@ -6420,14 +6426,16 @@ if (
     && process && process.versions
     && typeof process.versions.node === "string"
     && (
-        (/[\/|\\]jslint.m?js$/m).test(process.argv[1])
+        (
+            /[\/|\\]jslint\.m?js$/m
+        ).test(process.argv[1])
         || process.env.JSLINT_CLI === "1"
     )
 ) {
     // run cli
     cli({
         file: process.argv[2]
-    }).then(function (exitCode) {
-        process.exit(exitCode);
+    }).then(function (exit_code) {
+        process.exit(exit_code);
     });
 }
