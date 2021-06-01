@@ -99,7 +99,7 @@ right so that you can focus your creative energy where it is most needed.
 - jslint - migrate code away from recursive-loops to for/while loops.
 - node - after node-v12 is deprecated, change `require("fs").promises` to `require("fs/promises")`.
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
-- website - replace current-editor with CodeMirror-editor and change programming-font-faminly from `Programma` to `Consolas, Menlo, monospace`.
+- website - replace current-editor with CodeMirror-editor and change programming-font-family from `Programma` to `Consolas, Menlo, monospace`.
 
 ## v2021.6.1-beta
 - breaking-change - hardcode `const fudge = 1`
