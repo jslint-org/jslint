@@ -4424,9 +4424,10 @@ stmt("throw", function () {
     return the_throw;
 });
 stmt("try", function () {
+    const the_try = token;
+    let ignored;
     let the_catch;
     let the_disrupt;
-    const the_try = token;
     if (functionage.try > 0) {
 
 // cause: "try{try{}catch(){}}catch(){}"
@@ -4437,10 +4438,16 @@ stmt("try", function () {
     the_try.block = block();
     the_disrupt = the_try.block.disrupt;
     if (next_token.id === "catch") {
-        let ignored = "ignore";
-        the_catch = next_token;
-        the_try.catch = the_catch;
         advance("catch");
+        the_catch = next_token;
+        ignored = "ignore";
+        the_try.catch = the_catch;
+
+// Create new function-scope for catch-parameter.
+
+        stack.push(functionage);
+        functionage = the_catch;
+        functionage.context = empty();
         if (next_token.id === "(") {
             advance("(");
             if (!next_token.identifier) {
@@ -4461,6 +4468,10 @@ stmt("try", function () {
         if (the_catch.block.disrupt !== true) {
             the_disrupt = false;
         }
+
+// Restore previous function-scope after catch-block.
+
+        functionage = stack.pop();
     } else {
 
 // cause: "try{}finally{break;}"
@@ -4702,6 +4713,7 @@ function lookup(thing) {
 
 // cause: "aa"
 // cause: "class aa{}"
+// cause: "let aa=0;try{aa();}catch(bb){bb();}bb();"
 
                     warn("undeclared_a", thing);
                     return;
@@ -4984,6 +4996,15 @@ preaction("statement", "for", function (thing) {
     walk_statement(thing.initial);
 });
 preaction("statement", "function", preaction_function);
+preaction("statement", "try", function (thing) {
+    if (thing.catch !== undefined) {
+
+// Create new function-scope for catch-parameter.
+
+        stack.push(functionage);
+        functionage = thing.catch;
+    }
+});
 preaction("unary", "~", bitwise_check);
 preaction("unary", "function", preaction_function);
 preaction("variable", function (thing) {
@@ -5385,6 +5406,10 @@ postaction("statement", "try", function (thing) {
             the_variable.init = true;
         }
         walk_statement(thing.catch.block);
+
+// Restore previous function-scope after catch-block.
+
+        functionage = stack.pop();
     }
 });
 postaction("statement", "var", action_var);

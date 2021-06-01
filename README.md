@@ -97,7 +97,6 @@ right so that you can focus your creative energy where it is most needed.
 - jslint - add new warning if const/let/var statements are not declared at top of function-scope.
 - jslint - add new warning if const/let/var statements are not sorted.
 - jslint - migrate code away from recursive-loops to for/while loops.
-- jslint - remove obsolete ie-warning about duplicate names for caught-errors.
 - node - after node-v12 is deprecated, change `require("fs").promises` to `require("fs/promises")`.
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 - website - replace current-editor with CodeMirror-editor and change programming-font-faminly from `Programma` to `Consolas, Menlo, monospace`.
@@ -107,6 +106,7 @@ right so that you can focus your creative energy where it is most needed.
 - breaking-change - remove little-used-feature allowing jslint to accept array-of-strings as source b/c internal lines-object has been changed from array-of-strings to array-of-objects.
 - jslint - add eslint-like ignore-directives `/*jslint-disable*/`, `/*jslint-enable*/`, `//jslint-quiet`.
 - jslint - add new warning `Unclosed directive /*jslint-disable*/.`.
+- jslint - remove obsolete ie-era warning about duplicate names for caught-errors.
 
 ## v2021.5.30
 - bugfix - fix issue #282 - fail to warn trailing semicolon in `export default Object.freeze({})`.
