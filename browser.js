@@ -376,11 +376,11 @@ import jslint from "./jslint.mjs";
 import https from "https";
 
 /*jslint-disable*/
-// Todo: jslint this code-block in the future.
+// TODO: jslint this code-block in the future.
 console.log('hello world');
 /*jslint-enable*/
 
-eval("console.log('hello world');"); //jslint_ignore_warning
+eval("console.log('hello world');"); //jslint-quiet
 
 (async function () {
     let result;
@@ -398,9 +398,7 @@ eval("console.log('hello world');"); //jslint_ignore_warning
     result.warnings.forEach(function ({
         formatted_message
     }) {
-
-        console.error(formatted_message); //jslint_ignore_warning
-
+        console.error(formatted_message);
     });
 }());`;
 elem_source.onchange();

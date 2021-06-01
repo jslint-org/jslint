@@ -19,7 +19,8 @@
 ## v2021.6.1-beta
 - breaking-change - hardcode `const fudge = 1`
 - breaking-change - remove little-used-feature allowing jslint to accept array-of-strings as source b/c internal lines-object has been changed from array-of-strings to array-of-objects.
-- jslint - add eslint-like ignore-directives `/*jslint-disable*/`, `/*jslint-enable*/`, `//jslint_ignore_warning`.
+- jslint - add eslint-like ignore-directives `/*jslint-disable*/`, `/*jslint-enable*/`, `//jslint-quiet`.
+- jslint - add new warning `Unclosed directive /*jslint-disable*/.`.
 
 ## v2021.5.30
 - bugfix - fix issue #282 - fail to warn trailing semicolon in `export default Object.freeze({})`.

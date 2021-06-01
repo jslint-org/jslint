@@ -88,7 +88,7 @@
 /*jslint node*/
 
 /*property
-    disable_parse, endsWith, ignore_warning, source_line, unordered,
+    directive_quiet, endsWith, source_line, unclosed_disable, unordered,
     JSLINT_CLI, a, all, and, argv, arity, assign, b, bad_assignment_a,
     bad_directive_a, bad_get, bad_module_name_a, bad_option_a, bad_property_a,
     bad_set, bitwise, block, body, browser, c, calls, catch, cli_mode, closer,
@@ -328,6 +328,7 @@ const bundle = {
     too_long: "Line is longer than 80 characters.",
     too_many_digits: "Too many digits.",
     unclosed_comment: "Unclosed comment.",
+    unclosed_disable: "Unclosed directive /*jslint-disable*/.",
     unclosed_mega: "Unclosed mega literal.",
     unclosed_string: "Unclosed string.",
     undeclared_a: "Undeclared '{a}'.",
@@ -538,7 +539,10 @@ function warn_at(code, line, column, a, b, c, d) {
         b,
         c,
         code,
-        column: column || fudge,
+
+// Fudge column numbers in warning message.
+
+        column: (column || 0) + fudge,
         d,
         line,
         name: "JSLintError",
@@ -566,12 +570,13 @@ function warn_at(code, line, column, a, b, c, d) {
     if (option.debug) {
         warning.stack_trace = new Error().stack;
     }
-    if (!warning.ignore_warning) {
+    if (warning.directive_quiet) {
 
-// cause: "0 //jslint_ignore_warning"
+// cause: "0 //jslint-quiet"
 
-        warnings.push(warning);
+        return warning;
     }
+    warnings.push(warning);
     return warning;
 }
 
@@ -595,10 +600,7 @@ function warn(code, the_token, a, b, c, d) {
         the_token.warning = warn_at(
             code,
             the_token.line,
-
-// Fudge column numbers in warning message.
-
-            the_token.from + fudge,
+            the_token.from,
             a || artifact(the_token),
             b,
             c,
@@ -634,7 +636,7 @@ function tokenize(source) {
 
     let char;                   // a popular character
     let column = 0;             // the column number of the next character
-    let disable_parse;          // boolean to disable parsing of current line
+    let disable_line;           // the starting line of /*jslint-disable*/
     let first;                  // the first token
     let from;                   // the starting column number of the token
     let line = 0;               // the line number of the next character
@@ -676,7 +678,7 @@ function tokenize(source) {
         if (
             !option.long
             && whole_line.length > 80
-            && !disable_parse
+            && disable_line === undefined
             && !json_mode
             && first
             && !regexp_seen
@@ -700,25 +702,25 @@ function tokenize(source) {
 // Scan each line for following ignore-directives:
 // "/*jslint-disable*/"
 // "/*jslint-enable*/"
-// "//jslint_ignore_warning
+// "//jslint-quiet"
 
         if (source_line === "/*jslint-disable*/") {
 
 // cause: "/*jslint-disable*/"
 
-            disable_parse = true;
+            disable_line = line;
         } else if (source_line === "/*jslint-enable*/") {
 
 // cause: "/*jslint-enable*/"
 
-            disable_parse = false;
-        } else if (source_line.endsWith(" //jslint_ignore_warning")) {
+            disable_line = undefined;
+        } else if (source_line.endsWith(" //jslint-quiet")) {
 
-// cause: "0 //jslint_ignore_warning"
+// cause: "0 //jslint-quiet"
 
-            lines[line].ignore_warning = true;
+            lines[line].directive_quiet = true;
         }
-        if (disable_parse) {
+        if (disable_line !== undefined) {
 
 // cause: "/*jslint-disable*/\n0"
 
@@ -730,7 +732,7 @@ function tokenize(source) {
 
 // cause: "\t"
 
-                warn_at("use_spaces", line, at + 1);
+                warn_at("use_spaces", line, at);
             }
             source_line = source_line.replace(rx_tab, " ");
         }
@@ -1431,7 +1433,15 @@ function tokenize(source) {
             if (source_line === undefined) {
                 return (
                     mega_mode
+
+// cause: "`${//}`"
+
                     ? stop_at("unclosed_mega", mega_line, mega_from)
+                    : disable_line !== undefined
+
+// cause: "/*jslint-disable*/"
+
+                    ? stop_at("unclosed_disable", disable_line)
                     : make("(end)")
                 );
             }
