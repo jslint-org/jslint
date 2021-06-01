@@ -60,7 +60,7 @@ function noop() {
 /*
  * this function will test jslint's option handling-behavior
  */
-    assertOrThrow(jslint([""], {
+    assertOrThrow(jslint("", {
         bitwise: true,
         browser: true,
         convert: true,
@@ -69,7 +69,6 @@ function noop() {
         devel: true,
         eval: true,
         for: true,
-        fudge: true,
         getset: true,
         long: true,
         node: true,
@@ -114,6 +113,12 @@ function noop() {
         ],
         fart: [
             "function aa() {\n    return () => 0;\n}"
+        ],
+        jslint_disable: [
+            "/*jslint-disable*/\n0\n/*jslint-enable*/"
+        ],
+        jslint_quiet: [
+            "0 //jslint-quiet"
         ],
         json: [
             "{\"aa\":[[],-0,null]}"
@@ -187,7 +192,7 @@ function noop() {
         let expectedWarningCode;
         let fnc;
         // debug match0
-        console.error(match0.trim().replace((/\n\n/g), "\n"));
+        // console.error(match0.trim().replace((/\n\n/g), "\n"));
         assertOrThrow(
             match0.indexOf("\n\n" + causeList + "\n    ") === 0,
             JSON.stringify([
