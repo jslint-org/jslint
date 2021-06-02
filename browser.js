@@ -380,7 +380,9 @@ import https from "https";
 console.log('hello world');
 /*jslint-enable*/
 
-eval("console.log('hello world');"); //jslint-quiet
+eval( //jslint-quiet
+    "console.log('hello world');"
+);
 
 (async function () {
     let result;
