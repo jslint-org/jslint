@@ -25,12 +25,15 @@ function noop() {
     process.exit = function (exitCode) {
         assertOrThrow(!exitCode, exitCode);
     };
-    jslint("", {
-        cli_mode: true,
+    jslint.cli({
         file: "jslint.js"
     });
-    jslint("", {
-        cli_mode: true,
+    jslint.cli({
+        // suppress error
+        console_error: noop,
+        file: "undefined"
+    });
+    jslint.cli({
         // suppress error
         console_error: noop,
         file: "syntax_error.js",
@@ -39,8 +42,7 @@ function noop() {
         },
         source: "syntax error"
     });
-    jslint("", {
-        cli_mode: true,
+    jslint.cli({
         file: "aa.html",
         source: "<script>\nlet aa = 0;\n</script>\n"
     });

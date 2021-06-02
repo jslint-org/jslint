@@ -17,13 +17,13 @@ douglas@crockford.com
 [![screenshot](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot.browser._2fjslint_2fbranch-beta_2findex.html.png)](https://jslint-org.github.io/jslint/index.html)
 
 # Install
-1. To install, just download and rename https://www.jslint.com/jslint.js to `jslint.mjs`:
+### 1. To install, just download and rename https://www.jslint.com/jslint.js to `jslint.mjs`:
 ```shell
 #!/bin/sh
 curl -L https://www.jslint.com/jslint.js > jslint.mjs
 ```
 
-2. To run `jslint.mjs` from command-line:
+### 2. To run `jslint.mjs` from command-line:
 ```shell
 #!/bin/sh
 node jslint.mjs hello.js
@@ -37,7 +37,7 @@ node jslint.mjs hello.js
 #     console.log('hello world');
 ```
 
-3. To load `jslint.mjs` as es-module:
+### 3. To load `jslint.mjs` as es-module:
 ```javascript
 /*jslint devel*/
 import jslint from "./jslint.mjs";
@@ -55,6 +55,26 @@ result.warnings.forEach(function ({
 //     console.log('hello world');
 // 2 Use double quotes, not single quotes. // line 1, column 14
 //     console.log('hello world');
+```
+
+### 4. To jslint entire directory:
+```shell
+#!/bin/sh
+node jslint.mjs .
+
+# stderr:
+#
+# jslint - 20ms - ./CHANGELOG.md
+# jslint - 20ms - ./README.md
+# jslint - 20ms - ./browser.js
+# jslint - 20ms - ./function.html
+# jslint - 20ms - ./image-jslint.html
+# jslint - 20ms - ./index.html
+# jslint - 20ms - ./package.json
+# jslint - 20ms - ./test.js
+# jslint - 50ms - ./ci.sh
+# jslint - 50ms - ./help.html
+# jslint - 150ms - ./jslint.mjs
 ```
 
 # Description
@@ -90,7 +110,6 @@ right so that you can focus your creative energy where it is most needed.
 ## Todo
 - app - deploy jslint as chrome-extension.
 - doc - add svg package-listing.
-- doc - document cli-feature to jslint entire directory.
 - jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning if case-statements are not sorted.
@@ -104,6 +123,7 @@ right so that you can focus your creative energy where it is most needed.
 ## v2021.6.1-beta
 - breaking-change - hardcode `const fudge = 1`
 - breaking-change - remove little-used-feature allowing jslint to accept array-of-strings as source b/c internal lines-object has been changed from array-of-strings to array-of-objects.
+- doc - document cli-feature to jslint entire directory.
 - jslint - add eslint-like ignore-directives `/*jslint-disable*/`, `/*jslint-enable*/`, `//jslint-quiet`.
 - jslint - add new warning `Directive /*jslint-disable*/ was not closed with /*jslint-enable*/.`.
 - jslint - add new warning `Directive /*jslint-enable*/ was not opened with /*jslint-disable*/.`.

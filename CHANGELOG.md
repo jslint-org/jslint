@@ -4,7 +4,6 @@
 ## Todo
 - app - deploy jslint as chrome-extension.
 - doc - add svg package-listing.
-- doc - document cli-feature to jslint entire directory.
 - jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning if case-statements are not sorted.
@@ -18,6 +17,7 @@
 ## v2021.6.1-beta
 - breaking-change - hardcode `const fudge = 1`
 - breaking-change - remove little-used-feature allowing jslint to accept array-of-strings as source b/c internal lines-object has been changed from array-of-strings to array-of-objects.
+- doc - document cli-feature to jslint entire directory.
 - jslint - add eslint-like ignore-directives `/*jslint-disable*/`, `/*jslint-enable*/`, `//jslint-quiet`.
 - jslint - add new warning `Directive /*jslint-disable*/ was not closed with /*jslint-enable*/.`.
 - jslint - add new warning `Directive /*jslint-enable*/ was not opened with /*jslint-disable*/.`.

@@ -88,11 +88,12 @@
 /*jslint node*/
 
 /*property
-    directive_quiet, endsWith, source_line, unclosed_disable, unopened_enable,
-    unordered,
+    bind, cli, cwd, directive_quiet, endsWith, jslint, resolve, sep,
+    source_line,
+    unclosed_disable, unopened_enable, unordered,
     JSLINT_CLI, a, all, and, argv, arity, assign, b, bad_assignment_a,
     bad_directive_a, bad_get, bad_module_name_a, bad_option_a, bad_property_a,
-    bad_set, bitwise, block, body, browser, c, calls, catch, cli_mode, closer,
+    bad_set, bitwise, block, body, browser, c, calls, catch, closer,
     closure, code, column, concat, console_error, constant, context, convert,
     couch, create, d, dead, debug, default, devel, directive, directives,
     disrupt, dot, duplicate_a, early_stop, edition, ellipsis, else, empty_block,
@@ -134,7 +135,7 @@ const edition = "v2021.6.1-beta";
 
 function assert_or_throw(passed, message) {
 
-// this function will throw <message> if <passed> is falsy
+// This function will throw <message> if <passed> is falsy.
 
     if (passed) {
         return passed;
@@ -5658,33 +5659,6 @@ function whitage() {
                 || left.thru !== right.from
             )
         ) {
-
-// cause:
-//  (
-// function aa (
-// bb
-// ,
-// [
-// cc,dd
-// ]
-// ,
-// {
-// ee,ff=( 0 )
-// }
-// ,
-// ... zz
-// )
-// {
-// return {
-// aa,bb
-// }
-// ;
-// }
-// (
-// )
-//  )
-//  ;
-
             warn(
                 "unexpected_space_a_b",
                 right,
@@ -6309,18 +6283,23 @@ async function cli({
     option,
     source
 }) {
-/*
- * this function will run jslint from nodejs-cli
- */
+
+// This function will run jslint from nodejs-cli.
+
     const fs = await import("fs");
+    const path = await import("path");
+    let data;
     let exit_code;
+
     function string_line_count(code) {
-    /*
-     * this function will count number of newlines in <code>
-     */
+
+// This function will count number of newlines in <code>.
+
         let cnt;
         let ii;
-        // https://jsperf.com/regexp-counting-2/8
+
+// https://jsperf.com/regexp-counting-2/8
+
         cnt = 0;
         ii = 0;
         while (true) {
@@ -6332,6 +6311,7 @@ async function cli({
         }
         return cnt;
     }
+
     function jslint_from_file({
         code,
         file,
@@ -6343,7 +6323,9 @@ async function cli({
             /\.\w+?$|$/m
         ).exec(file)[0]) {
         case ".html":
-            // recurse
+
+// Recursively jslint embedded "<script>\n...\n</script>".
+
             code.replace((
                 /^<script>\n([\S\s]*?\n)<\/script>$/gm
             ), function (ignore, match1, ii) {
@@ -6359,7 +6341,9 @@ async function cli({
             });
             return;
         case ".md":
-            // recurse
+
+// Recursively jslint embedded "```javascript\n...\n```".
+
             code.replace((
                 /^```javascript\n([\S\s]*?\n)```$/gm
             ), function (ignore, match1, ii) {
@@ -6373,7 +6357,9 @@ async function cli({
             });
             return;
         case ".sh":
-            // recurse
+
+// Recursively jslint embedded "node -e '\n...\n'".
+
             code.replace((
                 /\bnode\u0020.*?-e\u0020'\n([\S\s]*?\n)'/gm
             ), function (ignore, match1, ii) {
@@ -6394,10 +6380,11 @@ async function cli({
                 option
             ).warnings;
         }
-        // print only first 10 warnings
+
+// Print only first 10 warnings to stderr.
+
         if (warnings.length > 0) {
             exit_code = 1;
-            // print first 10 warnings to stderr
             console_error(
                 "\u001b[1mjslint " + file + "\u001b[22m\n"
                 + warnings.slice(0, 10).map(function ({
@@ -6408,7 +6395,18 @@ async function cli({
             );
         }
     }
+
     console_error = console_error || console.error;
+
+// Normalize file relative to process.cwd().
+
+    file = path.resolve(file) + path.sep;
+    if (file.startsWith(process.cwd() + path.sep)) {
+        file = file.replace(process.cwd() + path.sep, "").slice(0, -1) || ".";
+    }
+    file = file.replace((
+        /\\/g
+    ), "/");
     if (source) {
         jslint_from_file({
             code: source,
@@ -6417,14 +6415,20 @@ async function cli({
         });
         return;
     }
-    if (file === ".") {
-        file = await fs.promises.readdir(".");
-        await Promise.all(file.map(async function (file) {
+
+// cli - jslint directory.
+
+    try {
+        data = await fs.promises.readdir(file, "utf8");
+    } catch (ignore) {}
+    if (data) {
+        await Promise.all(data.map(async function (file2) {
             let code;
-            let timeStart = Date.now();
+            let time_start = Date.now();
+            file2 = file + "/" + file2;
             switch ((
                 /\.\w+?$|$/m
-            ).exec(file)[0]) {
+            ).exec(file2)[0]) {
             case ".html":
             case ".js":
             case ".json":
@@ -6436,52 +6440,56 @@ async function cli({
                 return;
             }
             try {
-                code = await fs.promises.readFile(file, "utf8");
+                code = await fs.promises.readFile(file2, "utf8");
             } catch (ignore) {
                 return;
             }
             if (!(
                 !(
                     /\b(?:lock|min|raw|rollup)\b/
-                ).test(file) && code && code.length < 1048576
+                ).test(file2) && code && code.length < 1048576
             )) {
                 return;
             }
             jslint_from_file({
                 code,
-                file,
+                file: file2,
                 option
             });
             console_error(
-                "jslint - " + (Date.now() - timeStart) + "ms - " + file
+                "jslint - " + (Date.now() - time_start) + "ms - " + file2
             );
         }));
-    } else {
-        jslint_from_file({
-            code: await fs.promises.readFile(file, "utf8"),
-            file,
-            option
-        });
+        return exit_code;
     }
+
+// cli - jslint file.
+
+    try {
+        data = await fs.promises.readFile(file, "utf8");
+    } catch (err) {
+        console_error(err);
+        return 1;
+    }
+    jslint_from_file({
+        code: data,
+        file,
+        option
+    });
     return exit_code;
 }
-export default Object.freeze(function (
-    source = "",
-    option_object = empty(),
-    global_array = []
-) {
-    if (option_object.cli_mode) {
-        return cli(Object.assign({
-            source
-        }, option_object));
-    }
-    return jslint(source, option_object, global_array);
-});
+jslint.cli = Object.freeze(cli);
+jslint.jslint = Object.freeze(jslint.bind(undefined));
+export default Object.freeze(jslint);
+
 // feature-detect nodejs-cli
+
 if (
     typeof process === "object"
-    // uncomment when nodejs v12 is no longer used in ci
-    // && typeof process?.versions?.node === "string"
+
+//  uncomment when nodejs v12 is no longer used in ci
+//  && typeof process?.versions?.node === "string"
+
     && process && process.versions
     && typeof process.versions.node === "string"
     && (
@@ -6491,7 +6499,9 @@ if (
         || process.env.JSLINT_CLI === "1"
     )
 ) {
-    // run cli
+
+// run cli
+
     cli({
         file: process.argv[2]
     }).then(function (exit_code) {
