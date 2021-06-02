@@ -6169,7 +6169,13 @@ function jslint(
                 }
             }
         });
+
+// 1. Tokenize source into ast.
+
         tokenize(source);
+
+// 2. Walk ast.
+
         advance();
         if (json_mode) {
             tree = json_value();
@@ -6198,6 +6204,9 @@ function jslint(
             advance("(end)");
             functionage = global;
             walk_statement(tree);
+
+// 3. Re-walk ast validating whitespace.
+
             if (warnings.length === 0) {
                 uninitialized_and_unused();
                 if (!option.white) {
