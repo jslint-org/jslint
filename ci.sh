@@ -4,6 +4,7 @@
 #
 # git branch -d -r origin/aa
 # git fetch origin alpha beta master && git fetch upstream alpha beta master
+# git fetch upstream "refs/tags/*:refs/tags/*"
 # head CHANGELOG.md -n50
 # sh ci.sh shCiBranchPromote origin alpha beta
 
@@ -530,8 +531,7 @@ if (!globalThis.debugInline) {
         function stringHtmlSafe(str) {
         /*
          * this function will make <str> html-safe
-         * https://stackoverflow.com/questions/7381974/
-         * which-characters-need-to-be-escaped-on-html
+         * https://stackoverflow.com/questions/7381974/which-characters-need-to-be-escaped-on-html //jslint-quiet
          */
             return str.replace((
                 /&/gu

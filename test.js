@@ -156,6 +156,20 @@ function noop() {
             "let aa = (\n    aa()\n    ? 0\n    : 1\n) "
             + "&& (\n    aa()\n    ? 0\n    : 1\n);"
         ],
+        try_catch: [
+            "let aa = 0;\n"
+            + "try {\n"
+            + "    aa();\n"
+            + "} catch (err) {\n"
+            + "    aa = err;\n"
+            + "}\n"
+            + "try {\n"
+            + "    aa();\n"
+            + "} catch (err) {\n"
+            + "    aa = err;\n"
+            + "}\n"
+            + "aa();\n"
+        ],
         var: [
             "let [...aa] = [...aa];",
             "let [\n    aa, bb = 0\n] = 0;",
