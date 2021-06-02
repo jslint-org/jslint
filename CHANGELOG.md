@@ -19,7 +19,8 @@
 - breaking-change - hardcode `const fudge = 1`
 - breaking-change - remove little-used-feature allowing jslint to accept array-of-strings as source b/c internal lines-object has been changed from array-of-strings to array-of-objects.
 - jslint - add eslint-like ignore-directives `/*jslint-disable*/`, `/*jslint-enable*/`, `//jslint-quiet`.
-- jslint - add new warning `Unclosed directive /*jslint-disable*/.`.
+- jslint - add new warning `Directive /*jslint-disable*/ was not closed with /*jslint-enable*/.`.
+- jslint - add new warning `Directive /*jslint-enable*/ was not opened with /*jslint-disable*/.`.
 - jslint - remove obsolete ie-era warning about duplicate names for caught-errors.
 
 ## v2021.5.30

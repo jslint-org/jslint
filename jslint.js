@@ -88,7 +88,8 @@
 /*jslint node*/
 
 /*property
-    directive_quiet, endsWith, source_line, unclosed_disable, unordered,
+    directive_quiet, endsWith, source_line, unclosed_disable, unopened_enable,
+    unordered,
     JSLINT_CLI, a, all, and, argv, arity, assign, b, bad_assignment_a,
     bad_directive_a, bad_get, bad_module_name_a, bad_option_a, bad_property_a,
     bad_set, bitwise, block, body, browser, c, calls, catch, cli_mode, closer,
@@ -328,7 +329,10 @@ const bundle = {
     too_long: "Line is longer than 80 characters.",
     too_many_digits: "Too many digits.",
     unclosed_comment: "Unclosed comment.",
-    unclosed_disable: "Unclosed directive /*jslint-disable*/.",
+    unclosed_disable: (
+        "Directive '/*jslint-disable*/' was not closed "
+        + "with '/*jslint-enable*/'."
+    ),
     unclosed_mega: "Unclosed mega literal.",
     unclosed_string: "Unclosed string.",
     undeclared_a: "Undeclared '{a}'.",
@@ -353,6 +357,10 @@ const bundle = {
         "Unexpected 'typeof'. Use '===' to compare directly with {a}."
     ),
     uninitialized_a: "Uninitialized '{a}'.",
+    unopened_enable: (
+        "Directive '/*jslint-enable*/' was not opened "
+        + "with '/*jslint-disable*/'."
+    ),
     unordered_a_b: "{a} '{b}' not listed in alphabetical order.",
     unreachable_a: "Unreachable '{a}'.",
     unregistered_property_a: "Unregistered property name '{a}'.",
@@ -710,9 +718,12 @@ function tokenize(source) {
 
             disable_line = line;
         } else if (source_line === "/*jslint-enable*/") {
+            if (disable_line === undefined) {
 
 // cause: "/*jslint-enable*/"
 
+                stop_at("unopened_enable", line);
+            }
             disable_line = undefined;
         } else if (source_line.endsWith(" //jslint-quiet")) {
 
