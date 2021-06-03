@@ -22,6 +22,7 @@
 - jslint - add new warning `Directive /*jslint-disable*/ was not closed with /*jslint-enable*/.`.
 - jslint - add new warning `Directive /*jslint-enable*/ was not opened with /*jslint-disable*/.`.
 - jslint - remove obsolete ie-era warning about duplicate names for caught-errors.
+- website - move options-ui to top of page after editor-ui
 
 ## v2021.5.30
 - bugfix - fix issue #282 - fail to warn trailing semicolon in `export default Object.freeze({})`.

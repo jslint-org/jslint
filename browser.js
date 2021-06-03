@@ -22,7 +22,6 @@ import jslint from "./jslint.js";
 // This is the web script companion file for JSLint. It includes code for
 // interacting with the browser and displaying the reports.
 
-const elem_aux = document.getElementById("JSLINT_AUX");
 const elem_boxes = document.querySelectorAll("[type=checkbox]");
 const elem_global = document.getElementById("JSLINT_GLOBAL");
 const elem_number = document.getElementById("JSLINT_NUMBER");
@@ -35,7 +34,6 @@ const elem_report_list = document.getElementById("JSLINT_REPORT_LIST");
 const rx_amp = /&/g;
 const rx_gt = />/g;
 const rx_lt = /</g;
-const elem_select = document.getElementById("JSLINT_SELECT");
 const elem_source = document.getElementById("JSLINT_SOURCE");
 const elem_warnings = document.getElementById("JSLINT_WARNINGS");
 const elem_warnings_list = document.getElementById("JSLINT_WARNINGS_LIST");
@@ -259,7 +257,6 @@ function show_numbers() {
 }
 
 function clear() {
-    elem_aux.style.display = "none";
     elem_number.value = "";
     elem_property.value = "";
     elem_property_fieldset.style.display = "none";
@@ -325,12 +322,9 @@ function call_jslint() {
         elem_property.value = property_text;
         elem_property_fieldset.style.display = "block";
         elem_property.scrollTop = 0;
-        elem_select.disable = false;
     } else {
         elem_property_fieldset.style.display = "none";
-        elem_select.disable = true;
     }
-    elem_aux.style.display = "block";
     elem_source.select();
 }
 
@@ -362,10 +356,6 @@ document.querySelectorAll("[name='clear']").forEach(function (node) {
     node.onclick = clear;
 });
 
-document.getElementById("JSLINT_SELECT").onclick = function () {
-    elem_property.focus();
-    elem_property.select();
-};
 document.getElementById("JSLINT_CLEAR_OPTIONS").onclick = clear_options;
 
 elem_source.select();
