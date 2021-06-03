@@ -551,7 +551,7 @@ function warn_at(code, line, column, a, b, c, d) {
 
 // Fudge column numbers in warning message.
 
-        column: (column || 0) + fudge,
+        column: column || fudge,
         d,
         line,
         name: "JSLintError",
@@ -609,7 +609,7 @@ function warn(code, the_token, a, b, c, d) {
         the_token.warning = warn_at(
             code,
             the_token.line,
-            the_token.from,
+            (the_token.from || 0) + fudge,
             a || artifact(the_token),
             b,
             c,
@@ -783,7 +783,7 @@ function tokenize(source) {
 
 // cause: "aa=/[/"
 
-                ? stop_at("expected_a", line, column, match, char)
+                ? stop_at("expected_a", line, column - 1, match, char)
 
 // cause: "aa=/aa{/"
 
@@ -876,9 +876,9 @@ function tokenize(source) {
             return next_char();
         }
 
-// cause: "\"\\a\""
+// cause: "\"\\0\""
 
-        warn_at("unexpected_a_before_b", line, column - 1, "\\", char);
+        warn_at("unexpected_a_before_b", line, column, "\\", char);
     }
 
     function make(id, value, identifier) {
@@ -1127,7 +1127,7 @@ function tokenize(source) {
 
 // cause: "aa=/[0-]/"
 
-                        return stop_at("unexpected_a", line, column, "-");
+                        return stop_at("unexpected_a", line, column - 1, "-");
                     }
                 }
                 return ranges();
