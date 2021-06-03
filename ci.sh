@@ -47,7 +47,7 @@ if (!globalThis.debugInline) {
     if (String(file + "/").indexOf(process.cwd() + "/") === 0) {
         file = file.replace(process.cwd(), "");
     }
-    file = ".build/screenshot.browser." + encodeURIComponent(file).replace((
+    file = ".build/screenshot-browser-" + encodeURIComponent(file).replace((
         /%/g
     ), "_").toLowerCase();
     process.on("exit", function (exitCode) {
@@ -125,6 +125,7 @@ if (!globalThis.debugInline) {
 
 shCiArtifactUpload() {(set -e
 # this function will upload build-artifacts to branch-gh-pages
+    local BRANCH
     export NODE_OPTIONS="--unhandled-rejections=strict"
     node -e '
 process.exit(
@@ -132,19 +133,21 @@ process.exit(
     process.env.CI_NODE_VERSION_ARCH_PLATFORM
 );
 ' || return 0
-    local BRANCH
     # init $BRANCH
     BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+    git pull --unshallow origin "$BRANCH"
     # init .git/config
     git config --local user.email "github-actions@users.noreply.github.com"
     git config --local user.name "github-actions"
-    # update README.md with $GITHUB_REPOSITORY
-    sed -i \
-        -e "s|\bjslint-org/jslint\b|$GITHUB_REPOSITORY|g" \
-        -e "s|\bjslint-org\.github\.io/jslint\b|$(
-            printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
-        )|g" \
-        README.md
+    # screenshot live-web-demo
+    shBrowserScreenshot \
+        https://jslint-org.github.io/jslint/branch-beta/index.html
+    # screenshot files
+    shRunWithScreenshotTxt shGitLsTree
+    mv .build/shRunWithScreenshotTxt.svg .build/screenshot-files.svg
+    # screenshot changelog
+    shRunWithScreenshotTxt head -n50 CHANGELOG.md
+    mv .build/shRunWithScreenshotTxt.svg .build/screenshot-changelog.svg
     # add dir .build
     git add -f .build
     git commit -am "add dir .build"
@@ -168,6 +171,14 @@ process.exit(
         git rm -rf .build
         git checkout beta .
     fi
+    # update README.md with branch-$BRANCH and $GITHUB_REPOSITORY
+    sed -i \
+        -e "s|/branch-[0-9A-Z_a-z]*/|/branch-$BRANCH/|g" \
+        -e "s|\bjslint-org/jslint\b|$GITHUB_REPOSITORY|g" \
+        -e "s|\bjslint-org\.github\.io/jslint\b|$(
+            printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
+        )|g" \
+        "branch-$BRANCH/README.md"
     git status
     git commit -am "update dir branch-$BRANCH" || true
     # if branch-gh-pages has more than 100 commits,
@@ -212,9 +223,6 @@ shCiBase() {(set -e
         export JSLINT_CLI=1
         shRunWithCoverage node test.js .
     )
-    # screenshot live-web-demo
-    shBrowserScreenshot \
-        https://jslint-org.github.io/jslint/branch-beta/index.html
     # update version from CHANGELOG.md
     node -e '
 (async function () {
@@ -243,13 +251,7 @@ shCiBase() {(set -e
             file: "README.md",
             src: dict["README.md"].replace((
                 /\bv\d\d\d\d\.\d\d?\.\d\d?\b/m
-            ), versionMaster).replace((
-                /\n#\u0020Changelog[\S\s]*?\n#\u0020/
-            ), (
-                "\n"
-                + dict["CHANGELOG.md"].split("\n## ").slice(0, 4).join("\n## ")
-                + "\n# "
-            )),
+            ), versionMaster),
             src0: dict["README.md"]
         }, {
             file: "jslint.js",
@@ -742,7 +744,7 @@ body {
 <g
     fill="#fff"
     font-family="dejavu sans,verdana,geneva,sans-serif"
-    font-size="11"
+    font-size="11px"
     font-weight="bold"
     text-anchor="middle"
 >
@@ -1056,15 +1058,16 @@ shRunWithScreenshotTxt() {(set -e
 # https://www.cnx-software.com/2011/09/22/how-to-convert-a-command-line-result-into-an-image-in-linux/
     local EXIT_CODE
     EXIT_CODE=0
-    export SCREENSHOT_SVG=.build/screenshot.svg
+    export SCREENSHOT_SVG=.build/shRunWithScreenshotTxt.svg
     rm -f "$SCREENSHOT_SVG"
     printf "0\n" > "$SCREENSHOT_SVG.exit_code"
-    shCiPrint "shRunWithScreenshotTxt - (shRun $* 2>&1)"
+    printf "shRunWithScreenshotTxt - ($* 2>&1)\n" 1>&2
+    # run "$@" with screenshot
     (set -e
-        (shRun "$@" 2>&1) || printf "$?\n" > "$SCREENSHOT_SVG.exit_code"
-    ) | tee /tmp/shRunWithScreenshotTxt.txt
+        "$@" 2>&1 || printf "$?\n" > "$SCREENSHOT_SVG.exit_code"
+    ) | tee "$SCREENSHOT_SVG.txt"
     EXIT_CODE="$(cat "$SCREENSHOT_SVG.exit_code")"
-    shCiPrint "shRunWithScreenshotTxt - EXIT_CODE=$EXIT_CODE"
+    printf "shRunWithScreenshotTxt - EXIT_CODE=$EXIT_CODE\n" 1>&2
     # run shRunWithScreenshotTxtAfter
     if (type shRunWithScreenshotTxtAfter > /dev/null 2>&1)
     then
@@ -1079,7 +1082,7 @@ shRunWithScreenshotTxt() {(set -e
     let yy;
     yy = 10;
     result = await require("fs").promises.readFile(
-        require("os").tmpdir() + "/shRunWithScreenshotTxt.txt",
+        process.argv[1] + ".txt",
         "utf8"
     );
     // remove ansi escape-code
@@ -1092,18 +1095,18 @@ shRunWithScreenshotTxt() {(set -e
     ), function (match0) {
         return String.fromCharCode("0x" + match0.slice(-4));
     }).trimEnd();
-    // 96 column wordwrap
+    // 100 column wordwrap
     result = result.replace((
         /^.*?$/gm
     ), function (line) {
         return line.replace((
-            /.{0,96}/g
+            /.{0,100}/g
         ), function (line, ii) {
             if (ii && !line) {
                 return "";
             }
-            yy += 16;
-            return "<tspan x=\"10\" y=\"" + yy + "\">" + line.replace((
+            yy += 20;
+            return `<tspan x="10" y="${yy}">` + line.replace((
                 /&/g
             ), "&amp;").replace((
                 /</g
@@ -1114,29 +1117,42 @@ shRunWithScreenshotTxt() {(set -e
             /(<\/tspan><tspan)/g
         ), "\\$1").slice();
     }) + "\n";
-    result = (
-        "<svg height=\"" + (yy + 20)
-        + "px\" width=\"720px\" xmlns=\"http://www.w3.org/2000/svg\">\n"
-        + "<rect height=\"" + (yy + 20)
-        + "px\" fill=\"#555\" width=\"720px\"></rect>\n"
-        + "<text fill=\"#7f7\" font-family=\"Consolas, Menlo, monospace\" "
-        + "font-size=\"12\" xml:space=\"preserve\">\n"
-        + result + "</text>\n</svg>\n"
-    );
-    try {
-        await require("fs").promises.mkdir((
-            require("path").dirname(process.argv[1])
-        ), {
-            recursive: true
-        });
-    } catch (ignore) {}
+    result = String(`
+  <svg height="${yy + 20}px" width="800px" xmlns="http://www.w3.org/2000/svg">
+<rect height="${yy + 20}px" fill="#222" width="800px"></rect>
+<text
+    fill="#7d7"
+    font-family="consolas, menlo, monospace"
+    font-size="12px"
+    xml:space="preserve"
+>
+${result}
+</text>
+</svg>
+    `).trim() + "\n";
     require("fs").promises.writeFile(process.argv[1], result);
 }());
 ' "$SCREENSHOT_SVG" # "'
-    shCiPrint "shRunWithScreenshotTxt - wrote - $SCREENSHOT_SVG"
-    printf "shRunWithScreenshotTxt - EXIT_CODE=$EXIT_CODE\n" 1>&2
+    printf "shRunWithScreenshotTxt - wrote - $SCREENSHOT_SVG\n"
+    # cleanup
+    rm "$SCREENSHOT_SVG.exit_code" "$SCREENSHOT_SVG.txt"
     return "$EXIT_CODE"
 )}
 
 # run $@
-"$@"
+(set -e
+    case "$(uname)" in
+    MSYS*)
+        if [ "$IS_WINPTY" ]
+        then
+            "$@"
+        else
+            export IS_WINPTY=1
+            winpty -Xallow-non-tty -Xplain sh ci.sh "$@"
+        fi
+        ;;
+    *)
+        "$@"
+        ;;
+    esac
+)

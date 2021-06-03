@@ -12,9 +12,9 @@ douglas@crockford.com
 | Artifacts | [<img src="image-folder-open-solid.svg" height="30">](https://github.com/jslint-org/jslint/tree/gh-pages/branch-master/.build) | [<img src="image-folder-open-solid.svg" height="30">](https://github.com/jslint-org/jslint/tree/gh-pages/branch-beta/.build) | [<img src="image-folder-open-solid.svg" height="30">](https://github.com/jslint-org/jslint/tree/gh-pages/branch-alpha/.build) |
 
 # Web Demo
-- https://www.jslint.com/index.html
+- https://www.jslint.com/
 
-[![screenshot](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot.browser._2fjslint_2fbranch-beta_2findex.html.png)](https://jslint-org.github.io/jslint/index.html)
+[![screenshot](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-browser-_2fjslint_2fbranch-beta_2findex.html.png)](https://jslint-org.github.io/jslint/index.html)
 
 # Install
 ### 1. To install, just download and rename https://www.jslint.com/jslint.js to `jslint.mjs`:
@@ -104,48 +104,10 @@ readability, and frees you to express yourself in ways that matter. JSLint here
 plays the part of a stern but benevolent editor, helping you to get the style
 right so that you can focus your creative energy where it is most needed.
 
+# Files
+![screenshot-files.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-files.svg)
+
 # Changelog
 - [Full CHANGELOG.md](CHANGELOG.md)
 
-## Todo
-- app - deploy jslint as chrome-extension.
-- doc - add svg package-listing.
-- jslint - add `for...of` syntax support.
-- jslint - add html and css linting back into jslint.
-- jslint - add new warning if case-statements are not sorted.
-- jslint - add new warning if const/let/var statements are not declared at top of function-scope.
-- jslint - add new warning if const/let/var statements are not sorted.
-- jslint - migrate code away from recursive-loops to for/while loops.
-- node - after node-v12 is deprecated, change `require("fs").promises` to `require("fs/promises")`.
-- node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
-- website - replace current-editor with CodeMirror-editor and change programming-font-family from `Programma` to `Consolas, Menlo, monospace`.
-
-## v2021.6.1-beta
-- breaking-change - hardcode `const fudge = 1`
-- breaking-change - remove little-used-feature allowing jslint to accept array-of-strings as source b/c internal lines-object has been changed from array-of-strings to array-of-objects.
-- doc - document cli-feature to jslint entire directory.
-- jslint - add eslint-like ignore-directives `/*jslint-disable*/`, `/*jslint-enable*/`, `//jslint-quiet`.
-- jslint - add new warning `Directive /*jslint-disable*/ was not closed with /*jslint-enable*/.`.
-- jslint - add new warning `Directive /*jslint-enable*/ was not opened with /*jslint-disable*/.`.
-- jslint - remove obsolete ie-era warning about duplicate names for caught-errors.
-
-## v2021.5.30
-- bugfix - fix issue #282 - fail to warn trailing semicolon in `export default Object.freeze({})`.
-- ci - 100% code-coverage!
-- ci - auto-update changelog in README.md from CHANGELOG.md.
-- ci - auto-update version numbers in README.md and jslint.js from CHANGELOG.md.
-- deadcode - replace with assertion-check in function choice() - `if (char === "|") { warn... }`.
-- deadcode - replace with assertion-check in function do_function() - `if (mega_mode) { warn... }`.
-- deadcode - replace with assertion-check in function no_space() - `const at = (free ? ...)`.
-- deadcode - replace with assertion-check in function no_space() - `if (open) {...}`.
-- deadcode - replace with assertion-check in function parse_directive() - `} else if (value === "false") {...}`.
-- deadcode - replace with assertion-check in function supplant() - `return ( replacement !== undefined ?...)`.
-- jslint - cleanup regexp code using switch-case-statements.
-- jslint - inline function `activate` into function `action_var`.
-- jslint - inline-document each deadcode-removal/assertion-check.
-- jslint - inline-document each warning with cause that can reproduce it - part 2.
-- tests - inline remaining causal-regressions from test.js into jslint.js
-- tests - validate inline-multi-causes are sorted.
-- website - replace links `branch.xxx` with `branch-xxx`.
-
-# End
+![screenshot-changelog.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-changelog.svg)
