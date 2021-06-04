@@ -5,13 +5,22 @@
 - jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning if case-statements are not sorted.
-- jslint - add new warning if const/let/var statements are not declared at top of function-scope.
+- jslint - add new warning if const/let/var statements are not declared
+  at top of function-scope.
 - jslint - add new warning if const/let/var statements are not sorted.
-- jslint - migrate code away from recursive-loops to for/while loops.
-- node - after node-v12 is deprecated, change `require("fs").promises` to `require("fs/promises")`.
-- node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
-- tests - update function warn_at() with assertion-check matching column with artifact.
-- website - replace current-editor with CodeMirror-editor and change programming-font-family from `Programma` to `Consolas, Menlo, monospace`.
+- jslint rewrite part2 - migrate recursive-loops to for/while loops.
+- node - after node-v12 is deprecated, change `require("fs").promises`
+  to `require("fs/promises")`.
+- node - after node-v14 is deprecated, remove shell-code
+  `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
+- tests - update function warn_at() with assertion-check matching
+  column with artifact.
+- website - replace current-editor with CodeMirror-editor and change
+  programming-font-family from `Programma` to `Consolas, Menlo, monospace`.
+
+## v2021.6.4-beta
+- jslint rewrite part1 - make "stateful" variables scoped outside of
+  jslint() "stateless" by moving them into jslint().
 
 ## v2021.6.3
 - breaking-change - hardcode `const fudge = 1`
@@ -106,6 +115,9 @@
 
 ## v2017.11.6
 - last jslint version written in es5.
+
+## v2014.7.8
+- last jslint version before 2 year hiatus.
 
 ## v2013.3.13
 - last jslint version that can lint .html and .css files.
