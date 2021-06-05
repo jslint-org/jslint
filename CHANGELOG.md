@@ -5,22 +5,19 @@
 - jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning if case-statements are not sorted.
-- jslint - add new warning if const/let/var statements are not declared
-  at top of function-scope.
+- jslint - add new warning if const/let/var statements are not declared at top of function-scope.
 - jslint - add new warning if const/let/var statements are not sorted.
-- jslint rewrite part2 - migrate recursive-loops to for/while loops.
-- node - after node-v12 is deprecated, change `require("fs").promises`
-  to `require("fs/promises")`.
-- node - after node-v14 is deprecated, remove shell-code
-  `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
-- tests - update function warn_at() with assertion-check matching
-  column with artifact.
-- website - replace current-editor with CodeMirror-editor and change
-  programming-font-family from `Programma` to `Consolas, Menlo, monospace`.
+- jslint-refactor - migrate recursive-loops to for/while loops.
+- node - after node-v12 is deprecated, change `require("fs").promises` to `require("fs/promises")`.
+- node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
+- tests - update function warn_at() with assertion-check matching column with artifact.
+- website - replace current-editor with CodeMirror-editor and change programming-font-family from `Programma` to `Consolas, Menlo, monospace`.
 
 ## v2021.6.4-beta
-- jslint rewrite part1 - make "stateful" variables scoped outside of
-  jslint() "stateless" by moving them into jslint().
+- jslint - add warning for unexpected ? in example `aa=/.{0}?/`.
+- jslint-refactor-1 - make "stateful" variables scoped outside of jslint() "stateless" by moving them into jslint().
+- jslint-refactor-2 - inline constants anticondition, bitwiseop, escapeable, and opener directly into code.
+- jslint-refactor-3 - inline regexp-functions quantifier(), ranges(), klass(), choice(), directly into code.
 
 ## v2021.6.3
 - breaking-change - hardcode `const fudge = 1`

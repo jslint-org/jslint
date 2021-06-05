@@ -22,11 +22,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// jslint(source, option, global_array) is a function that takes 3
+// jslint(source, option_object, global_array) is a function that takes 3
 // arguments. The second two arguments are optional.
 
 //      source          A text to analyze, a string or an array of strings.
-//      option          An object whose keys correspond to option names.
+//      option_object   An object whose keys correspond to option names.
 //      global_array    An array of strings containing global variables that
 //                      the file is allowed readonly access.
 
@@ -168,7 +168,7 @@ function populate(array, object = empty(), value = true) {
 
 function jslint(
     source = "",
-    option = empty(),
+    option_object = empty(),
     global_array = []
 ) {
 
@@ -216,32 +216,6 @@ function jslint(
         this: true,
         unordered: true,
         white: true
-    };
-
-    const anticondition = populate([
-        "?", "~", "&", "|", "^", "<<", ">>", ">>>", "+", "-", "*", "/", "%",
-        "typeof", "(number)", "(string)"
-    ]);
-
-// These are the bitwise operators.
-
-    const bitwiseop = populate([
-        "~", "^", "^=", "&", "&=", "|", "|=", "<<", "<<=", ">>", ">>=",
-        ">>>", ">>>="
-    ]);
-
-    const escapeable = populate([
-        "\\", "/", "`", "b", "f", "n", "r", "t"
-    ]);
-
-    const opener = {
-
-// The open and close pairs.
-
-        "${": "}",      // mega
-        "(": ")",       // paren
-        "[": "]",       // bracket
-        "{": "}"        // brace
     };
 
 // The relational operators.
@@ -499,31 +473,20 @@ function jslint(
     $ `;
 // initial cap
     const rx_cap = /^[A-Z]/;
-
-    function is_letter(string) {
-        return (
-            (string >= "a" && string <= "z\uffff")
-            || (string >= "A" && string <= "Z\uffff")
-        );
-    }
-
-    const fudge = 1;        // Fudge starting line and starting column to 1.
-    let anon;               // The guessed name for anonymous functions.
-    let block_stack;        // The stack of blocks.
-    let blockage;           // The current block.
-    let char;               // A popular character.
-    let column = 0;         // The column number of the next character.
-    let declared_globals;   // The object containing the global declarations.
-    let directive_mode;     // true if directives are still allowed.
-    let directives;         // The directive comments.
-    let disable_line;       // The starting line of "/*jslint-disable*/".
-    let early_stop;         // true if JSLint cannot finish.
-    let exports;            // The exported names and values.
-    let from;               // The starting column number of the token.
-    let froms;              // The array collecting all import-from strings.
-    let functionage;        // The current function.
-    let functions;          // The array containing all of the functions.
-    const global = {        // The global object; the outermost context.
+// The stack of blocks.
+    const block_stack = [];
+// The directive comments.
+    const directives = [];
+// The exported names and values.
+    const exports = empty();
+// The array collecting all import-from strings.
+    const froms = [];
+// Fudge starting line and starting column to 1.
+    const fudge = 1;
+// The array containing all of the functions.
+    const functions = [];
+// The global object; the outermost context.
+    const global = {
         body: true,
         context: empty(),
         finally: 0,
@@ -537,33 +500,78 @@ function jslint(
         thru: 0,
         try: 0
     };
-    let json_mode;          // true if parsing JSON.
-    let line = 0;           // The line number of the next character.
-    let lines;              // The array containing source lines.
-    let mega_from;          // The starting column of megastring.
-    let mega_line;          // The starting line of megastring.
-    let mega_mode;          // true if currently parsing a megastring literal.
-    let module_mode;        // true if import or export was used.
-    let nr = 0;             // The next token number.
-    let prior = global;     // The previous token excluding comments.
-    let property;           // The object containing the tallied property names.
-    let regexp_seen;        // Regular expression literal seen on this line.
-    let shebang;            // true if a #! was seen on the first line.
-    let snippet = "";       // A piece of string.
-    let source_line = "";   // The remaining line source string.
-    let stack;              // The stack of functions.
-    let syntax;             // The object containing the parser.
-    let tenure;             // The predefined property registry.
-    let token_curr;         // The current token being examined in the parse.
-    let token_frst;         // The first token.
-    let token_next;         // The next token to be examined in the parse.
-    let token_nr;           // The number of the next token.
-    let token_prev = global;// The previous token including comments.
-    let tokens;             // The array of tokens.
-    let tree;               // The abstract parse tree.
-    let var_mode;           // "var" if using var; "let" if using let.
-    let warnings;           // The array collecting all generated warnings.
-    let whole_line = "";    // The whole line source string.
+// The object containing the tallied property names.
+    const property = empty();
+// The array collecting all generated warnings.
+    const warnings = [];
+// The guessed name for anonymous functions.
+    let anon = "anonymous";
+// The current block.
+    let blockage = global;
+// A popular character.
+    let char;
+// The column number of the next character.
+    let column = 0;
+// true if directives are still allowed.
+    let directive_mode = true;
+// The starting line of "/*jslint-disable*/".
+    let disable_line;
+// true if JSLint cannot finish.
+    let early_stop = true;
+// The starting column number of the token.
+    let from;
+// The current function.
+    let functionage = global;
+// true if parsing JSON.
+    let json_mode = false;
+// The line number of the next character.
+    let line = 0;
+// The array containing source lines.
+    let lines;
+// The starting column of megastring.
+    let mega_from;
+// The starting line of megastring.
+    let mega_line;
+// true if currently parsing a megastring literal.
+    let mega_mode = false;
+// true if import or export was used.
+    let module_mode = false;
+// The next token number.
+    let nr = 0;
+// The previous token excluding comments.
+    let prior = global;
+// Regular expression literal seen on this line.
+    let regexp_seen;
+// true if a #! was seen on the first line.
+    let shebang = false;
+// A piece of string.
+    let snippet = "";
+// The remaining line source string.
+    let source_line = "";
+// The stack of functions.
+    let stack = [];
+// The object containing the parser.
+    let syntax;
+// The predefined property registry.
+    let tenure;
+// The current token being examined in the parse.
+    let token_curr = global;
+// The first token.
+    let token_frst;
+// The next token to be examined in the parse.
+    let token_next = global;
+// The number of the next token.
+    let token_nr = 0;
+// The previous token including comments.
+    let token_prev = global;
+// The array of tokens.
+    let tokens;
+// The abstract parse tree.
+    let tree;
+// "var" if using var; "let" if using let.
+    let var_mode;
+// The whole line source string.
+    let whole_line = "";
 
 // Error reportage functions:
 
@@ -619,7 +627,7 @@ function jslint(
 
 // Include stack_trace for jslint to debug itself for errors.
 
-        if (option.debug) {
+        if (option_object.debug) {
             warning.stack_trace = new Error().stack;
         }
         if (warning.directive_quiet) {
@@ -674,11 +682,6 @@ function jslint(
         delete the_token.warning;
         throw warn(code, the_token, a, b, c, d);
     }
-
-//!! // Tokenize:
-
-    //!! function tokenize(source) {
-    //!! }
 
 // Parsing:
 
@@ -1064,6 +1067,7 @@ function jslint(
         } else {
 
 // cause: "!"
+// cause: "let aa=`${}`;"
 
             return stop("unexpected_a", token_curr);
         }
@@ -1103,11 +1107,46 @@ function jslint(
 
             warn("unexpected_a", the_paren);
         }
-        if (anticondition[the_value.id] === true) {
 
-// cause: "while(~0){}"
+// Check for anticondition.
+
+        switch (the_value.id) {
+        case "%":
+        case "&":
+        case "(number)":
+        case "(string)":
+        case "*":
+        case "+":
+        case "-":
+        case "/":
+        case "<<":
+        case ">>":
+        case ">>>":
+        case "?":
+        case "^":
+        case "typeof":
+        case "|":
+        case "~":
+
+// cause: "if(\"aa\"){}"
+// cause: "if(0%0){}"
+// cause: "if(0&0){}"
+// cause: "if(0){}"
+// cause: "if(0*0){}"
+// cause: "if(0+0){}"
+// cause: "if(0-0){}"
+// cause: "if(0/0){}"
+// cause: "if(0<<0){}"
+// cause: "if(0>>0){}"
+// cause: "if(0>>>0){}"
+// cause: "if(0?0:0){}"
+// cause: "if(0^0){}"
+// cause: "if(0|0){}"
+// cause: "if(typeof 0){}"
+// cause: "if(~0){}"
 
             warn("unexpected_a", the_value);
+            break;
         }
         return the_value;
     }
@@ -1397,7 +1436,7 @@ function jslint(
         stmts = statements();
         the_block.block = stmts;
         if (stmts.length === 0) {
-            if (!option.devel && special !== "ignore") {
+            if (!option_object.devel && special !== "ignore") {
 
 // cause: "function aa(){}"
 
@@ -1693,7 +1732,7 @@ function jslint(
         return token_curr;
     });
     constant("eval", "function", function () {
-        if (!option.eval) {
+        if (!option_object.eval) {
 
 // cause: "eval"
 
@@ -1708,7 +1747,7 @@ function jslint(
     });
     constant("false", "boolean", false);
     constant("Function", "function", function () {
-        if (!option.eval) {
+        if (!option_object.eval) {
 
 // cause: "Function()"
 
@@ -1746,7 +1785,7 @@ function jslint(
     constant("NaN", "number", NaN);
     constant("null", "null", null);
     constant("this", "object", function () {
-        if (!option.this) {
+        if (!option_object.this) {
 
 // cause: "this"
 
@@ -1979,6 +2018,9 @@ function jslint(
                 the_tick.value.push(token_curr);
                 if (token_next.id === "${") {
                     advance("${");
+
+// cause: "let aa=`${}`;"
+
                     the_tick.expression.push(expression(0));
                     advance("}");
                     return part();
@@ -2108,7 +2150,7 @@ function jslint(
                         survey(subparam);
                         a = b;
                         b = String(subparam.value || subparam.id);
-                        if (!option.unordered && a > b) {
+                        if (!option_object.unordered && a > b) {
 
 // cause: "function aa({bb,aa}){}"
 
@@ -2542,7 +2584,7 @@ function jslint(
                 advance();
                 a = b;
                 b = String(name.value || name.id);
-                if (!option.unordered && a > b) {
+                if (!option_object.unordered && a > b) {
 
 // cause: "aa={bb,aa}"
 
@@ -2552,7 +2594,7 @@ function jslint(
                     (name.id === "get" || name.id === "set")
                     && token_next.identifier
                 ) {
-                    if (!option.getset) {
+                    if (!option_object.getset) {
 
 // cause: "aa={get aa(){}}"
 
@@ -2632,12 +2674,18 @@ function jslint(
                     }
                     the_brace.expression.push(value);
                 } else {
+
+// cause: aa={"aa":0}
+
                     advance(":");
                     value = expression(0);
                     value.label = name;
                     the_brace.expression.push(value);
                 }
                 if (token_next.id === ",") {
+
+// cause: aa={"aa":0,"bb":0}
+
                     advance(",");
                     return member();
                 }
@@ -2758,7 +2806,7 @@ function jslint(
                     survey(name);
                     a = b;
                     b = String(name.value || name.id);
-                    if (!option.unordered && a > b) {
+                    if (!option_object.unordered && a > b) {
 
 // cause: "let{bb,aa}"
 
@@ -2891,7 +2939,7 @@ function jslint(
     });
     stmt("debugger", function () {
         const the_debug = token_curr;
-        if (!option.devel) {
+        if (!option_object.devel) {
 
 // cause: "debugger"
 
@@ -3054,7 +3102,7 @@ function jslint(
     stmt("for", function () {
         let first;
         const the_for = token_curr;
-        if (!option.for) {
+        if (!option_object.for) {
 
 // cause: "for"
 
@@ -3662,7 +3710,7 @@ function jslint(
 // If so, add it to the global context.
 
                 if (the_variable === undefined) {
-                    if (declared_globals[thing.id] === undefined) {
+                    if (global_array[thing.id] === undefined) {
 
 // cause: "aa"
 // cause: "class aa{}"
@@ -3761,7 +3809,23 @@ function jslint(
     }
 
     function bitwise_check(thing) {
-        if (!option.bitwise && bitwiseop[thing.id] === true) {
+
+// These are the bitwise operators.
+
+        switch (!option_object.bitwise && thing.id) {
+        case "&":
+        case "&=":
+        case "<<":
+        case "<<=":
+        case ">>":
+        case ">>=":
+        case ">>>":
+        case ">>>=":
+        case "^":
+        case "^=":
+        case "|":
+        case "|=":
+        case "~":
 
 // cause: "0&0"
 // cause: "0&=0"
@@ -3775,10 +3839,10 @@ function jslint(
 // cause: "0^=0"
 // cause: "0|0"
 // cause: "0|=0"
-// cause: "0~0"
 // cause: "~0"
 
             warn("unexpected_a", thing);
+            break;
         }
         if (
             thing.id !== "("
@@ -4100,7 +4164,7 @@ function jslint(
             }
         }
         if (thing.id === "+") {
-            if (!option.convert) {
+            if (!option_object.convert) {
                 if (thing.expression[0].value === "") {
 
 // cause: "\"\"+0"
@@ -4215,7 +4279,7 @@ function jslint(
 
                     warn("unexpected_a", the_new);
                 } else if (left.id === "Function") {
-                    if (!option.eval) {
+                    if (!option_object.eval) {
 
 // cause: "new Function()"
 
@@ -4424,7 +4488,7 @@ function jslint(
                 warn("unexpected_a", thing);
             }
         } else if (thing.id === "!!") {
-            if (!option.convert) {
+            if (!option_object.convert) {
 
 // cause: "!!0"
 
@@ -4443,7 +4507,7 @@ function jslint(
     });
     postaction("unary", "function", postaction_function);
     postaction("unary", "+", function (thing) {
-        if (!option.convert) {
+        if (!option_object.convert) {
 
 // cause: "aa=+0"
 
@@ -4506,7 +4570,7 @@ function jslint(
 // or used. If the file imports or exports, then its global object is also
 // delved.
 
-        if (module_mode === true || option.node) {
+        if (module_mode === true || option_object.node) {
             delve(global);
         }
         functions.forEach(delve);
@@ -4711,30 +4775,78 @@ function jslint(
 // etc) starting on its own line. Closed form is more compact. Statement blocks
 // are always in open form.
 
-                const new_closer = opener[left.id];
-                if (typeof new_closer === "string") {
+// The open and close pairs.
 
-// cause: "${"
-// cause: "("
-// cause: "["
-// cause: "{"
+                switch (left.id) {
+                case "${":
+                case "(":
+                case "[":
+                case "{":
 
-                    if (new_closer !== right.id) {
+// cause: "let aa=("
+// cause: "let aa=["
+// cause: "let aa=`${"
+// cause: "let aa={"
 
-// cause: "${0"
-// cause: "(0"
-// cause: "[0"
-// cause: "{0"
+                    assert_or_throw(
+                        !(left.id + right.id === "${}"),
+                        "Expected !(left.id + right.id === \"${}\")."
+                    );
+//                  Probably deadcode.
+//                  case "${}":
+                    switch (left.id + right.id) {
+                    case "()":
+                    case "[]":
+                    case "{}":
+
+// If left and right are opener and closer, then the placement of right depends
+// on the openness. Illegal pairs (like '{]') have already been detected.
+
+// cause: "let aa=[];"
+// cause: "let aa=aa();"
+// cause: "let aa={};"
+
+                        if (left.line === right.line) {
+
+// cause: "let aa = aa( );"
+
+                            no_space();
+                        } else {
+
+// cause: "let aa = aa(\n );"
+
+                            at_margin(0);
+                        }
+                        break;
+                    default:
+
+// cause: "let aa=(0"
+// cause: "let aa=[0"
+// cause: "let aa=`${0"
+// cause: "let aa={0"
 
                         opening = left.open || (left.line !== right.line);
                         push();
-                        closer = new_closer;
+                        switch (left.id) {
+                        case "${":
+                            closer = "}";
+                            break;
+                        case "(":
+                            closer = ")";
+                            break;
+                        case "[":
+                            closer = "]";
+                            break;
+                        case "{":
+                            closer = "}";
+                            break;
+                        }
                         if (opening) {
 
-// cause: "${\n0\n}"
-// cause: "(\n0\n)"
-// cause: "[\n0\n]"
-// cause: "{\n0\n}"
+// cause: "function aa(){\nreturn;\n}"
+// cause: "let aa=(\n0\n)"
+// cause: "let aa=[\n0\n]"
+// cause: "let aa=`${\n0\n}`"
 
                             free = closer === ")" && left.free;
                             open = true;
@@ -4788,29 +4900,9 @@ function jslint(
 
                             no_space_only();
                         }
-                    } else {
-
-// If left and right are opener and closer, then the placement of right depends
-// on the openness. Illegal pairs (like '{]') have already been detected.
-
-// cause: "${}"
-// cause: "()"
-// cause: "[]"
-// cause: "{}"
-
-                        if (left.line === right.line) {
-
-// cause: "let aa = aa( );"
-
-                            no_space();
-                        } else {
-
-// cause: "let aa = aa(\n );"
-
-                            at_margin(0);
-                        }
                     }
-                } else {
+                    break;
+                default:
                     if (right.statement === true) {
                         if (left.id === "else") {
 
@@ -5047,7 +5139,7 @@ function jslint(
 
         let at;
         if (
-            !option.long
+            !option_object.long
             && whole_line.length > 80
             && disable_line === undefined
             && !json_mode
@@ -5102,7 +5194,7 @@ function jslint(
         }
         at = source_line.search(rx_tab);
         if (at >= 0) {
-            if (!option.white) {
+            if (!option_object.white) {
 
 // cause: "\t"
 
@@ -5110,7 +5202,7 @@ function jslint(
             }
             source_line = source_line.replace(rx_tab, " ");
         }
-        if (!option.white && source_line.endsWith(" ")) {
+        if (!option_object.white && source_line.endsWith(" ")) {
 
 // cause: " "
 
@@ -5123,17 +5215,10 @@ function jslint(
 // found with a regular expression. Regular expressions cannot correctly match
 // regular expression literals, so we will match those the hard way. String
 // literals and number literals can be matched by regular expressions, but they
-// don't provide good warnings. The functions snip, next_char, back_char,
-// some_digits, and escape help in the parsing of literals.
+// don't provide good warnings. The functions char_after, char_before,
+// read_some_digits, and char_after_escape help in the parsing of literals.
 
-    function snip() {
-
-// Remove the last character from snippet.
-
-        snippet = snippet.slice(0, -1);
-    }
-
-    function next_char(match) {
+    function char_after(match) {
 
 // Get the next character from the source line. Remove it from the source_line,
 // and append it to the snippet. Optionally check that the previous character
@@ -5152,19 +5237,14 @@ function jslint(
                 : stop_at("expected_a_b", line, column, match, char)
             );
         }
-        if (source_line) {
-            char = source_line[0];
-            source_line = source_line.slice(1);
-            snippet += char;
-        } else {
-            char = "";
-            snippet += " ";
-        }
+        char = source_line.slice(0, 1);
+        source_line = source_line.slice(1);
+        snippet += char || " ";
         column += 1;
         return char;
     }
 
-    function back_char() {
+    function char_before() {
 
 // Back up one character by moving a character from the end of the snippet to
 // the front of the source_line.
@@ -5172,11 +5252,14 @@ function jslint(
         char = snippet.slice(-1);
         source_line = char + source_line;
         column -= char.length;
-        snip();
+
+// Remove last character from snippet.
+
+        snippet = snippet.slice(0, -1);
         return char;
     }
 
-    function some_digits(rx, quiet) {
+    function read_some_digits(rx, quiet) {
         const digits = source_line.match(rx)[0];
         const length = digits.length;
         if (!quiet && length === 0) {
@@ -5188,30 +5271,39 @@ function jslint(
         column += length;
         source_line = source_line.slice(length);
         snippet += digits;
-        next_char();
+        char_after();
         return length;
     }
 
-    function escape(extra) {
-        next_char("\\");
-        if (escapeable[char] === true) {
-            return next_char();
-        }
-        if (char === "") {
+    function char_after_escape(extra) {
+
+// Validate char after escape "\\".
+
+        char_after("\\");
+        switch (char) {
+        case "":
 
 // cause: "\"\\"
 
             return stop_at("unclosed_string", line, column);
-        }
-        if (char === "u") {
-            if (next_char("u") === "{") {
+        case "/":
+        case "\\":
+        case "`":
+        case "b":
+        case "f":
+        case "n":
+        case "r":
+        case "t":
+            return char_after();
+        case "u":
+            if (char_after("u") === "{") {
                 if (json_mode) {
 
 // cause: "[\"\\u{12345}\"]"
 
                     warn_at("unexpected_a", line, column, char);
                 }
-                if (some_digits(rx_hexs) > 5) {
+                if (read_some_digits(rx_hexs) > 5) {
 
 // cause: "\"\\u{123456}\""
 
@@ -5223,24 +5315,25 @@ function jslint(
 
                     stop_at("expected_a_before_b", line, column, "}", char);
                 }
-                return next_char();
+                return char_after();
             }
-            back_char();
-            if (some_digits(rx_hexs, true) < 4) {
+            char_before();
+            if (read_some_digits(rx_hexs, true) < 4) {
 
 // cause: "\"\\u0\""
 
                 warn_at("expected_four_digits", line, column);
             }
             return;
-        }
-        if (extra && extra.indexOf(char) >= 0) {
-            return next_char();
-        }
+        default:
+            if (extra && extra.indexOf(char) >= 0) {
+                return char_after();
+            }
 
 // cause: "\"\\0\""
 
-        warn_at("unexpected_a_before_b", line, column, "\\", char);
+            warn_at("unexpected_a_before_b", line, column, "\\", char);
+        }
     }
 
     function make(id, value, identifier) {
@@ -5273,7 +5366,7 @@ function jslint(
 // If this token is an identifier that touches a preceding number, or
 // a "/", comment, or regular expression literal that touches a preceding
 // comment or regular expression literal, then give a missing space warning.
-// This warning is not suppressed by option.white.
+// This warning is not suppressed by option_object.white.
 
         if (
             token_prev.line === line
@@ -5333,19 +5426,19 @@ function jslint(
                     || typeof allowed === "object"
                 ) {
                     if (value === "true" || value === undefined) {
-                        option[name] = true;
+                        option_object[name] = true;
                         if (Array.isArray(allowed)) {
-                            populate(allowed, declared_globals, false);
+                            populate(allowed, global_array, false);
                         }
                     } else {
                         assert_or_throw(
                             value === "false",
                             `Expected value === "false".`
                         );
-                        option[name] = false;
+                        option_object[name] = false;
 //                  Probably deadcode.
 //                  } else if (value === "false") {
-//                      option[name] = false;
+//                      option_object[name] = false;
 //                  } else {
 //                      warn("bad_option_a", the_comment, name + ":" + value);
                     }
@@ -5367,7 +5460,7 @@ function jslint(
 
                     warn("bad_option_a", the_comment, name + ":" + value);
                 }
-                declared_globals[name] = false;
+                global_array[name] = false;
                 module_mode = the_comment;
             }
             return parse_directive(the_comment, result[3]);
@@ -5389,7 +5482,7 @@ function jslint(
         if (Array.isArray(snippet)) {
             snippet = snippet.join(" ");
         }
-        if (!option.devel && rx_todo.test(snippet)) {
+        if (!option_object.devel && rx_todo.test(snippet)) {
 
 // cause: "//\u0074odo"
 
@@ -5413,6 +5506,7 @@ function jslint(
 
     function regexp() {
 
+// Regexp
 // Parse a regular expression literal.
 
         let multi_mode = false;
@@ -5420,107 +5514,48 @@ function jslint(
         let value;
         regexp_seen = true;
 
-        function quantifier() {
+        function regexp_subklass() {
 
-// Match an optional quantifier.
-
-            if (char === "?" || char === "*" || char === "+") {
-                next_char();
-            } else if (char === "{") {
-                if (some_digits(rx_digits, true) === 0) {
-
-// cause: "aa=/aa{/"
-
-                    warn_at("expected_a_before_b", line, column, "0", ",");
-                }
-                if (char === ",") {
-                    some_digits(rx_digits, true);
-                }
-                next_char("}");
-            } else {
-                return;
-            }
-            if (char === "?") {
-                next_char("?");
-            }
-        }
-
-        function subklass() {
-
+// RegExp
 // Match a character in a character class.
 
-            if (char === "\\") {
-                escape("BbDdSsWw-[]^");
+            switch (char) {
+            case "\\":
+                char_after_escape("BbDdSsWw-[]^");
                 return true;
-            }
-            if (
-                char === ""
-                || char === "["
-                || char === "]"
-                || char === "/"
-                || char === "^"
-                || char === "-"
-            ) {
+            case "":
+            case "[":
+            case "]":
+            case "/":
+            case "^":
+            case "-":
                 return false;
-            }
-            if (char === " ") {
+            case " ":
 
 // cause: "aa=/[ ]/"
 
                 warn_at("expected_a_b", line, column, "\\u0020", " ");
-            } else if (char === "`" && mega_mode) {
+                char_after();
+                return true;
+            case "`":
+                if (mega_mode) {
 
 // cause: "`${/[`]/}`"
 
-                warn_at("unexpected_a", line, column, "`");
-            }
-            next_char();
-            return true;
-        }
-
-        function ranges() {
-
-// Match a range of subclasses.
-
-            if (subklass()) {
-                if (char === "-") {
-                    next_char("-");
-                    if (!subklass()) {
-
-// cause: "aa=/[0-]/"
-
-                        return stop_at("unexpected_a", line, column - 1, "-");
-                    }
+                    warn_at("unexpected_a", line, column, "`");
                 }
-                return ranges();
+                char_after();
+                return true;
+            default:
+                char_after();
+                return true;
             }
         }
 
-        function klass() {
-
-// Match a class.
-
-            next_char("[");
-            if (char === "^") {
-                next_char("^");
-            }
-            (function classy() {
-                ranges();
-                if (char !== "]" && char !== "") {
-
-// cause: "aa=/[/"
-
-                    warn_at("expected_a_before_b", line, column, "\\", char);
-                    next_char();
-                    return classy();
-                }
-            }());
-            next_char("]");
-        }
-
-        function choice() {
+        function regexp_choice() {
             let follow;
 
+// RegExp
 // Parse sequence of characters in regexp.
 
             while (true) {
@@ -5529,6 +5564,10 @@ function jslint(
                 case "/":
                 case "]":
                 case ")":
+
+// RegExp
+// Break while-loop in regexp_choice().
+
                     if (!follow) {
 
 // cause: "/ /"
@@ -5536,6 +5575,7 @@ function jslint(
                         warn_at("expected_regexp_factor_a", line, column, char);
                     }
 
+// RegExp
 // Match a choice (a sequence that can be followed by | and another choice).
 
                     assert_or_throw(
@@ -5544,21 +5584,22 @@ function jslint(
                     );
 //                  Probably deadcode.
 //                  if (char === "|") {
-//                      next_char("|");
-//                      return choice();
+//                      char_after("|");
+//                      return regexp_choice();
 //                  }
                     return;
                 case "(":
 
+// RegExp
 // Match a group that starts with left paren.
 
-                    next_char("(");
+                    char_after("(");
                     if (char === "?") {
-                        next_char("?");
+                        char_after("?");
                         if (char === "=" || char === "!") {
-                            next_char();
+                            char_after();
                         } else {
-                            next_char(":");
+                            char_after(":");
                         }
                     } else if (char === ":") {
 
@@ -5567,14 +5608,62 @@ function jslint(
 
                         warn_at("expected_a_before_b", line, column, "?", ":");
                     }
-                    choice();
-                    next_char(")");
+
+// RegExp
+// Recurse regexp_choice().
+
+                    regexp_choice();
+                    char_after(")");
                     break;
                 case "[":
-                    klass();
+
+// RegExp
+// Match a class.
+
+                    char_after("[");
+                    if (char === "^") {
+                        char_after("^");
+                    }
+                    while (true) {
+
+// RegExp
+// Match a range of subclasses.
+
+                        while (regexp_subklass()) {
+                            if (char === "-") {
+                                char_after("-");
+                                if (!regexp_subklass()) {
+
+// cause: "aa=/[0-]/"
+
+                                    return stop_at(
+                                        "unexpected_a",
+                                        line,
+                                        column - 1,
+                                        "-"
+                                    );
+                                }
+                            }
+                        }
+                        if (char === "]" || char === "") {
+                            break;
+                        }
+
+// cause: "aa=/[/"
+
+                        warn_at(
+                            "expected_a_before_b",
+                            line,
+                            column,
+                            "\\",
+                            char
+                        );
+                        char_after();
+                    }
+                    char_after("]");
                     break;
                 case "\\":
-                    escape("BbDdSsWw^${}[]():=!.|*+?");
+                    char_after_escape("BbDdSsWw^${}[]():=!.|*+?");
                     break;
                 case "?":
                 case "+":
@@ -5582,7 +5671,7 @@ function jslint(
                 case "}":
                 case "{":
                     warn_at("expected_a_before_b", line, column, "\\", char);
-                    next_char();
+                    char_after();
                     break;
                 case "`":
                     if (mega_mode) {
@@ -5591,54 +5680,94 @@ function jslint(
 
                         warn_at("unexpected_a", line, column, "`");
                     }
-                    next_char();
+                    char_after();
                     break;
                 case " ":
 
 // cause: "aa=/ /"
 
                     warn_at("expected_a_b", line, column, "\\s", " ");
-                    next_char();
+                    char_after();
                     break;
                 case "$":
                     if (source_line[0] !== "/") {
                         multi_mode = true;
                     }
-                    next_char();
+                    char_after();
                     break;
                 case "^":
                     if (snippet !== "^") {
                         multi_mode = true;
                     }
-                    next_char();
+                    char_after();
                     break;
                 default:
-                    next_char();
+                    char_after();
                 }
-                quantifier();
+
+// RegExp
+// Match an optional quantifier.
+
+                switch (char) {
+                case "?":
+                case "*":
+                case "+":
+                    if (char_after() === "?") {
+                        char_after("?");
+                    }
+                    break;
+                case "{":
+                    if (read_some_digits(rx_digits, true) === 0) {
+
+// cause: "aa=/aa{/"
+
+                        warn_at("expected_a_before_b", line, column, "0", ",");
+                    }
+                    if (char === ",") {
+
+// cause: "aa=/.{,/"
+
+                        read_some_digits(rx_digits, true);
+                    }
+                    if (char_after("}") === "?") {
+
+// cause: "aa=/.{0}?/"
+
+                        warn_at("unexpected_a", line, column, char);
+                        char_after("?");
+                    }
+                    break;
+                }
                 follow = true;
             }
         }
 
+// RegExp
 // Scan the regexp literal. Give a warning if the first character is = because
 // /= looks like a division assignment operator.
 
         snippet = "";
-        next_char();
+        char_after();
         if (char === "=") {
 
 // cause: "aa=/=/"
 
             warn_at("expected_a_before_b", line, column, "\\", "=");
         }
-        choice();
+        regexp_choice();
 
+// RegExp
+// Remove last character from snippet.
+
+        snippet = snippet.slice(0, -1);
+
+// RegExp
 // Make sure there is a closing slash.
 
-        snip();
         value = snippet;
-        next_char("/");
+        char_after("/");
 
+// RegExp
 // Process dangling flag letters.
 
         const allowed = {
@@ -5648,22 +5777,30 @@ function jslint(
             u: true,
             y: true
         };
+
+// RegExp
+// Make flag.
+
         const flag = empty();
-        (function make_flag() {
-            if (is_letter(char)) {
-                if (allowed[char] !== true) {
+        while (
+
+// Regexp
+// char is a letter.
+
+            (char >= "a" && char <= "z\uffff")
+            || (char >= "A" && char <= "Z\uffff")
+        ) {
+            if (allowed[char] !== true) {
 
 // cause: "aa=/./z"
 
-                    warn_at("unexpected_a", line, column, char);
-                }
-                allowed[char] = false;
-                flag[char] = true;
-                next_char();
-                return make_flag();
+                warn_at("unexpected_a", line, column, char);
             }
-        }());
-        back_char();
+            allowed[char] = false;
+            flag[char] = true;
+            char_after();
+        }
+        char_before();
         if (char === "/" || char === "*") {
 
 // cause: "aa=/.//"
@@ -5688,11 +5825,14 @@ function jslint(
 
         let the_token;
         snippet = "";
-        next_char();
+        char_after();
 
         return (function next() {
             if (char === quote) {
-                snip();
+
+// Remove last character from snippet.
+
+                snippet = snippet.slice(0, -1);
                 the_token = make("(string)", snippet);
                 the_token.quote = quote;
                 return the_token;
@@ -5704,7 +5844,7 @@ function jslint(
                 return stop_at("unclosed_string", line, column);
             }
             if (char === "\\") {
-                escape(quote);
+                char_after_escape(quote);
             } else if (char === "`") {
                 if (mega_mode) {
 
@@ -5712,9 +5852,9 @@ function jslint(
 
                     warn_at("unexpected_a", line, column, "`");
                 }
-                next_char("`");
+                char_after("`");
             } else {
-                next_char();
+                char_after();
             }
             return next();
         }());
@@ -5722,31 +5862,31 @@ function jslint(
 
     function frack() {
         if (char === ".") {
-            some_digits(rx_digits);
+            read_some_digits(rx_digits);
         }
         if (char === "E" || char === "e") {
-            next_char();
+            char_after();
             if (char !== "+" && char !== "-") {
-                back_char();
+                char_before();
             }
-            some_digits(rx_digits);
+            read_some_digits(rx_digits);
         }
     }
 
     function number() {
         if (snippet === "0") {
-            next_char();
+            char_after();
             if (char === ".") {
                 frack();
             } else if (char === "b") {
-                some_digits(rx_bits);
+                read_some_digits(rx_bits);
             } else if (char === "o") {
-                some_digits(rx_octals);
+                read_some_digits(rx_octals);
             } else if (char === "x") {
-                some_digits(rx_hexs);
+                read_some_digits(rx_hexs);
             }
         } else {
-            next_char();
+            char_after();
             frack();
         }
 
@@ -5769,7 +5909,7 @@ function jslint(
                 snippet.slice(0, -1)
             );
         }
-        back_char();
+        char_before();
         return make("(number)", snippet);
     }
 
@@ -5870,7 +6010,7 @@ function jslint(
             return string(snippet);
         }
         if (snippet === "'") {
-            if (!option.single) {
+            if (!option_object.single) {
 
 // cause: "''"
 
@@ -6099,37 +6239,14 @@ function jslint(
 // The jslint function itself.
 
     try {
-        anon = "anonymous";
-        block_stack = [];
-        blockage = global;
-        declared_globals = empty();
-        directive_mode = true;
-        directives = [];
-        early_stop = true;
-        exports = empty();
-        froms = [];
-        functionage = global;
-        functions = [];
-        json_mode = false;
-        mega_mode = false;
-        module_mode = false;
-        option = Object.assign(empty(), option);
-        populate(global_array, declared_globals, false);
-        populate(standard, declared_globals, false);
-        property = empty();
-        shebang = false;
-        stack = [];
-        tenure = undefined;
-        token_curr = global;
-        token_next = global;
-        token_nr = 0;
-        var_mode = undefined;
-        warnings = [];
-        Object.keys(option).forEach(function (name) {
-            if (option[name] === true) {
+        option_object = Object.assign(empty(), option_object);
+        global_array = Object.assign(empty(), global_array);
+        populate(standard, global_array, false);
+        Object.keys(option_object).forEach(function (name) {
+            if (option_object[name] === true) {
                 const allowed = allowed_option[name];
                 if (Array.isArray(allowed)) {
-                    populate(allowed, declared_globals, false);
+                    populate(allowed, global_array, false);
                 }
             }
         });
@@ -6183,7 +6300,7 @@ function jslint(
 // Because browsers encourage combining of script files, the first token might
 // be a semicolon to defend against a missing semicolon in the preceding file.
 
-            if (option.browser) {
+            if (option_object.browser) {
                 if (token_next.id === ";") {
                     advance(";");
                 }
@@ -6207,12 +6324,12 @@ function jslint(
 
             if (warnings.length === 0) {
                 uninitialized_and_unused();
-                if (!option.white) {
+                if (!option_object.white) {
                     whitage();
                 }
             }
         }
-        if (!option.browser) {
+        if (!option_object.browser) {
             directives.forEach(function (comment) {
                 if (comment.directive === "global") {
 
@@ -6222,7 +6339,7 @@ function jslint(
                 }
             });
         }
-        if (option.test_internal_error) {
+        if (option_object.test_internal_error) {
             assert_or_throw(undefined, "test_internal_error");
         }
         early_stop = false;
@@ -6238,15 +6355,16 @@ function jslint(
         }
     }
 
-// sort warnings by early_stop first, line, column respectively
+// Sort warnings by early_stop first, line, column respectively.
 
     warnings.sort(function (a, b) {
         return (
             Boolean(b.early_stop) - Boolean(a.early_stop)
-            || a.line - b.line || a.column - b.column
+            || a.line - b.line
+            || a.column - b.column
         );
 
-// update each warning with a formatted_message ready for use by cli
+// Update each warning with a formatted_message ready for use by cli.
 
     }).map(function ({
         column,
@@ -6276,7 +6394,7 @@ function jslint(
         lines,
         module: module_mode === true,
         ok: warnings.length === 0 && !early_stop,
-        option,
+        option: option_object,
         property,
         shebang: (
             shebang
@@ -6332,6 +6450,9 @@ async function cli({
         option = {},
         warnings = []
     }) {
+        option = Object.assign({}, option, {
+            file
+        });
         switch ((
             /\.\w+?$|$/m
         ).exec(file)[0]) {
