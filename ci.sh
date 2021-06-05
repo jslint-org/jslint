@@ -1100,13 +1100,13 @@ shRunWithScreenshotTxt() {(set -e
     ), "\n").trimEnd();
     // 96-column wordwrap
     result = result.split("\n").map(function (line) {
-        let wordwrap = line.slice(0, 96 - 1);
-        line = line.slice(96 - 1);
+        let wordwrap = line.slice(0, 96).padEnd(96, " ");
+        line = line.slice(96);
         while (line) {
-            wordwrap += "\\\n  " + line.slice(0, 96 - 3);
-            line = line.slice(96 - 3);
+            wordwrap += "\\\n  " + line.slice(0, 96 - 2).padEnd(96 - 2, " ");
+            line = line.slice(96 - 2);
         }
-        return wordwrap;
+        return wordwrap + " ";
     }).join("\n");
     // html-escape
     result = result.replace((
@@ -1116,11 +1116,12 @@ shRunWithScreenshotTxt() {(set -e
     ), "&lt;").replace((
         />/g
     ), "&gt;");
+    // convert text to svg-tspan
     result = result.split("\n").map(function (line) {
         yy += 22;
         return `<tspan
     lengthAdjust="spacingAndGlyphs"
-    textLength="${8 * line.length}"
+    textLength="${96 * 8}"
     x="10"
     y="${yy}"
 >${line}</tspan>\n`;

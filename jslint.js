@@ -473,14 +473,6 @@ function jslint(
     $ `;
 // initial cap
     const rx_cap = /^[A-Z]/;
-
-    function is_letter(string) {
-        return (
-            (string >= "a" && string <= "z\uffff")
-            || (string >= "A" && string <= "Z\uffff")
-        );
-    }
-
 // The stack of blocks.
     const block_stack = [];
 // The directive comments.
@@ -5223,15 +5215,8 @@ function jslint(
 // found with a regular expression. Regular expressions cannot correctly match
 // regular expression literals, so we will match those the hard way. String
 // literals and number literals can be matched by regular expressions, but they
-// don't provide good warnings. The functions snip, char_after, char_before,
+// don't provide good warnings. The functions char_after, char_before,
 // read_some_digits, and char_after_escape help in the parsing of literals.
-
-    function snip() {
-
-// Remove the last character from snippet.
-
-        snippet = snippet.slice(0, -1);
-    }
 
     function char_after(match) {
 
@@ -5252,14 +5237,9 @@ function jslint(
                 : stop_at("expected_a_b", line, column, match, char)
             );
         }
-        if (source_line) {
-            char = source_line[0];
-            source_line = source_line.slice(1);
-            snippet += char;
-        } else {
-            char = "";
-            snippet += " ";
-        }
+        char = source_line.slice(0, 1);
+        source_line = source_line.slice(1);
+        snippet += char || " ";
         column += 1;
         return char;
     }
@@ -5272,7 +5252,10 @@ function jslint(
         char = snippet.slice(-1);
         source_line = char + source_line;
         column -= char.length;
-        snip();
+
+// Remove last character from snippet.
+
+        snippet = snippet.slice(0, -1);
         return char;
     }
 
@@ -5523,6 +5506,7 @@ function jslint(
 
     function regexp() {
 
+// Regexp
 // Parse a regular expression literal.
 
         let multi_mode = false;
@@ -5530,110 +5514,48 @@ function jslint(
         let value;
         regexp_seen = true;
 
-        function quantifier() {
+        function regexp_subklass() {
 
-// Match an optional quantifier.
-
-            if (char === "?" || char === "*" || char === "+") {
-                char_after();
-            } else if (char === "{") {
-                if (read_some_digits(rx_digits, true) === 0) {
-
-// cause: "aa=/aa{/"
-
-                    warn_at("expected_a_before_b", line, column, "0", ",");
-                }
-                if (char === ",") {
-
-// cause: "aa=/.{,/"
-
-                    read_some_digits(rx_digits, true);
-                }
-                char_after("}");
-            } else {
-                return;
-            }
-            if (char === "?") {
-                char_after("?");
-            }
-        }
-
-        function subklass() {
-
+// RegExp
 // Match a character in a character class.
 
-            if (char === "\\") {
+            switch (char) {
+            case "\\":
                 char_after_escape("BbDdSsWw-[]^");
                 return true;
-            }
-            if (
-                char === ""
-                || char === "["
-                || char === "]"
-                || char === "/"
-                || char === "^"
-                || char === "-"
-            ) {
+            case "":
+            case "[":
+            case "]":
+            case "/":
+            case "^":
+            case "-":
                 return false;
-            }
-            if (char === " ") {
+            case " ":
 
 // cause: "aa=/[ ]/"
 
                 warn_at("expected_a_b", line, column, "\\u0020", " ");
-            } else if (char === "`" && mega_mode) {
+                char_after();
+                return true;
+            case "`":
+                if (mega_mode) {
 
 // cause: "`${/[`]/}`"
 
-                warn_at("unexpected_a", line, column, "`");
-            }
-            char_after();
-            return true;
-        }
-
-        function ranges() {
-
-// Match a range of subclasses.
-
-            if (subklass()) {
-                if (char === "-") {
-                    char_after("-");
-                    if (!subklass()) {
-
-// cause: "aa=/[0-]/"
-
-                        return stop_at("unexpected_a", line, column - 1, "-");
-                    }
+                    warn_at("unexpected_a", line, column, "`");
                 }
-                return ranges();
+                char_after();
+                return true;
+            default:
+                char_after();
+                return true;
             }
         }
 
-        function klass() {
-
-// Match a class.
-
-            char_after("[");
-            if (char === "^") {
-                char_after("^");
-            }
-            (function classy() {
-                ranges();
-                if (char !== "]" && char !== "") {
-
-// cause: "aa=/[/"
-
-                    warn_at("expected_a_before_b", line, column, "\\", char);
-                    char_after();
-                    return classy();
-                }
-            }());
-            char_after("]");
-        }
-
-        function choice() {
+        function regexp_choice() {
             let follow;
 
+// RegExp
 // Parse sequence of characters in regexp.
 
             while (true) {
@@ -5642,6 +5564,10 @@ function jslint(
                 case "/":
                 case "]":
                 case ")":
+
+// RegExp
+// Break while-loop in regexp_choice().
+
                     if (!follow) {
 
 // cause: "/ /"
@@ -5649,6 +5575,7 @@ function jslint(
                         warn_at("expected_regexp_factor_a", line, column, char);
                     }
 
+// RegExp
 // Match a choice (a sequence that can be followed by | and another choice).
 
                     assert_or_throw(
@@ -5658,11 +5585,12 @@ function jslint(
 //                  Probably deadcode.
 //                  if (char === "|") {
 //                      char_after("|");
-//                      return choice();
+//                      return regexp_choice();
 //                  }
                     return;
                 case "(":
 
+// RegExp
 // Match a group that starts with left paren.
 
                     char_after("(");
@@ -5680,11 +5608,59 @@ function jslint(
 
                         warn_at("expected_a_before_b", line, column, "?", ":");
                     }
-                    choice();
+
+// RegExp
+// Recurse regexp_choice().
+
+                    regexp_choice();
                     char_after(")");
                     break;
                 case "[":
-                    klass();
+
+// RegExp
+// Match a class.
+
+                    char_after("[");
+                    if (char === "^") {
+                        char_after("^");
+                    }
+                    while (true) {
+
+// RegExp
+// Match a range of subclasses.
+
+                        while (regexp_subklass()) {
+                            if (char === "-") {
+                                char_after("-");
+                                if (!regexp_subklass()) {
+
+// cause: "aa=/[0-]/"
+
+                                    return stop_at(
+                                        "unexpected_a",
+                                        line,
+                                        column - 1,
+                                        "-"
+                                    );
+                                }
+                            }
+                        }
+                        if (char === "]" || char === "") {
+                            break;
+                        }
+
+// cause: "aa=/[/"
+
+                        warn_at(
+                            "expected_a_before_b",
+                            line,
+                            column,
+                            "\\",
+                            char
+                        );
+                        char_after();
+                    }
+                    char_after("]");
                     break;
                 case "\\":
                     char_after_escape("BbDdSsWw^${}[]():=!.|*+?");
@@ -5728,11 +5704,45 @@ function jslint(
                 default:
                     char_after();
                 }
-                quantifier();
+
+// RegExp
+// Match an optional quantifier.
+
+                switch (char) {
+                case "?":
+                case "*":
+                case "+":
+                    if (char_after() === "?") {
+                        char_after("?");
+                    }
+                    break;
+                case "{":
+                    if (read_some_digits(rx_digits, true) === 0) {
+
+// cause: "aa=/aa{/"
+
+                        warn_at("expected_a_before_b", line, column, "0", ",");
+                    }
+                    if (char === ",") {
+
+// cause: "aa=/.{,/"
+
+                        read_some_digits(rx_digits, true);
+                    }
+                    if (char_after("}") === "?") {
+
+// cause: "aa=/.{0}?/"
+
+                        warn_at("unexpected_a", line, column, char);
+                        char_after("?");
+                    }
+                    break;
+                }
                 follow = true;
             }
         }
 
+// RegExp
 // Scan the regexp literal. Give a warning if the first character is = because
 // /= looks like a division assignment operator.
 
@@ -5744,14 +5754,20 @@ function jslint(
 
             warn_at("expected_a_before_b", line, column, "\\", "=");
         }
-        choice();
+        regexp_choice();
 
+// RegExp
+// Remove last character from snippet.
+
+        snippet = snippet.slice(0, -1);
+
+// RegExp
 // Make sure there is a closing slash.
 
-        snip();
         value = snippet;
         char_after("/");
 
+// RegExp
 // Process dangling flag letters.
 
         const allowed = {
@@ -5761,21 +5777,29 @@ function jslint(
             u: true,
             y: true
         };
+
+// RegExp
+// Make flag.
+
         const flag = empty();
-        (function make_flag() {
-            if (is_letter(char)) {
-                if (allowed[char] !== true) {
+        while (
+
+// Regexp
+// char is a letter.
+
+            (char >= "a" && char <= "z\uffff")
+            || (char >= "A" && char <= "Z\uffff")
+        ) {
+            if (allowed[char] !== true) {
 
 // cause: "aa=/./z"
 
-                    warn_at("unexpected_a", line, column, char);
-                }
-                allowed[char] = false;
-                flag[char] = true;
-                char_after();
-                return make_flag();
+                warn_at("unexpected_a", line, column, char);
             }
-        }());
+            allowed[char] = false;
+            flag[char] = true;
+            char_after();
+        }
         char_before();
         if (char === "/" || char === "*") {
 
@@ -5805,7 +5829,10 @@ function jslint(
 
         return (function next() {
             if (char === quote) {
-                snip();
+
+// Remove last character from snippet.
+
+                snippet = snippet.slice(0, -1);
                 the_token = make("(string)", snippet);
                 the_token.quote = quote;
                 return the_token;
