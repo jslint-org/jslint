@@ -7,7 +7,7 @@
 */
 
 /*property
-    addEventListener, ctrlKey, key, source_line, stack_trace,
+    addEventListener, ctrlKey, key, querySelector, source_line, stack_trace,
     checked, closure, column, context, create, disable, display, edition,
     exports, filter, focus, forEach, froms, functions, getElementById,
     global, id, innerHTML, isArray, join, json, keys, length, level, line,
@@ -35,7 +35,6 @@ const rx_amp = /&/g;
 const rx_gt = />/g;
 const rx_lt = /</g;
 const elem_source = document.getElementById("JSLINT_SOURCE");
-const elem_warnings = document.getElementById("JSLINT_WARNINGS");
 const elem_warnings_list = document.getElementById("JSLINT_WARNINGS_LIST");
 
 function entityify(string) {
@@ -86,6 +85,9 @@ function error_report(data) {
             "</samp>"
         );
     });
+    if (output.length === 0) {
+        output.push("<center>There are no warnings.</center>");
+    }
     return output.join("");
 }
 
@@ -226,23 +228,21 @@ function property_directive(data) {
     let length = 1111;
     let properties = Object.keys(data.property);
 
-    if (properties.length > 0) {
-        properties.sort().forEach(function (key) {
-            if (not_first) {
-                output.push(",");
-                length += 2;
-            }
-            not_first = true;
-            if (length + key.length >= 80) {
-                length = 4;
-                output.push("\n   ");
-            }
-            output.push(" ", key);
-            length += key.length;
-        });
-        output.push("\n*/\n");
-        return output.join("");
-    }
+    properties.sort().forEach(function (key) {
+        if (not_first) {
+            output.push(",");
+            length += 2;
+        }
+        not_first = true;
+        if (length + key.length >= 80) {
+            length = 4;
+            output.push("\n   ");
+        }
+        output.push(" ", key);
+        length += key.length;
+    });
+    output.push("\n*/\n");
+    return output.join("");
 }
 
 function show_numbers() {
@@ -256,18 +256,6 @@ function show_numbers() {
     }).join("\n");
 }
 
-function clear() {
-    elem_number.value = "";
-    elem_property.value = "";
-    elem_property_fieldset.style.display = "none";
-    elem_report_field.style.display = "none";
-    elem_report_list.innerHTML = "";
-    elem_source.focus();
-    elem_source.value = "";
-    elem_warnings.style.display = "none";
-    elem_warnings_list.innerHTML = "";
-}
-
 function clear_options() {
     elem_boxes.forEach(function (node) {
         node.checked = false;
@@ -276,6 +264,10 @@ function clear_options() {
 }
 
 function call_jslint() {
+
+// Show ui-loader-animation.
+
+    document.querySelector("#uiLoader1").style.display = "flex";
 
 // First build the option object.
 
@@ -310,22 +302,25 @@ function call_jslint() {
 // Display the reports.
 
     elem_warnings_list.innerHTML = error_html;
-    elem_warnings.style.display = (
-        error_html.length === 0
-        ? "none"
-        : "block"
-    );
 
     elem_report_list.innerHTML = function_html;
     elem_report_field.style.display = "block";
-    if (property_text) {
-        elem_property.value = property_text;
-        elem_property_fieldset.style.display = "block";
-        elem_property.scrollTop = 0;
-    } else {
-        elem_property_fieldset.style.display = "none";
-    }
     elem_source.select();
+    elem_property.value = property_text;
+    elem_property_fieldset.style.display = "block";
+    elem_property.scrollTop = 0;
+
+// Hide ui-loader-animation.
+
+    setTimeout(function () {
+        document.querySelector("#uiLoader1").style.display = "none";
+    }, 500);
+}
+
+function clear() {
+    elem_source.focus();
+    elem_source.value = "";
+    call_jslint();
 }
 
 elem_source.onchange = function (ignore) {
@@ -358,8 +353,6 @@ document.querySelectorAll("[name='clear']").forEach(function (node) {
 
 document.getElementById("JSLINT_CLEAR_OPTIONS").onclick = clear_options;
 
-elem_source.select();
-elem_source.focus();
 elem_source.value = `#!/usr/bin/env node
 /*jslint node*/
 import jslint from "./jslint.mjs";

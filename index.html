@@ -356,12 +356,22 @@ a:link {
     margin-left: 9em;
 }
 
-.none {
-    display: none;
-}
 .center {
     text-align: center;
 }
+
+.uiLoaderEllipsis span {
+    animation: uiLoaderEllipsis1 1s infinite steps(1);
+}
+.uiLoaderEllipsis span:first-child + span {
+    animation-name: uiLoaderEllipsis2;
+}
+.uiLoaderEllipsis span:first-child + span + span {
+    animation-name: uiLoaderEllipsis3;
+}
+@keyframes uiLoaderEllipsis1 { from { opacity: 0; } 25% { opacity: 1; } }
+@keyframes uiLoaderEllipsis2 { from { opacity: 0; } 50% { opacity: 1; } }
+@keyframes uiLoaderEllipsis3 { from { opacity: 0; } 75% { opacity: 1; } }
 </style>
 </head>
 <body>
@@ -400,6 +410,29 @@ style="
     >
     fork on github
     </a>
+    </div>
+</div>
+<div id="uiLoader1" style="
+    align-items: center;
+    background: lightslategray;
+    color: white;
+    display: none;
+    height: 50px;
+    justify-content: center;
+    left: 50%;
+    margin: -50px 0 0 -100px;
+    opacity: 0.95;
+    position: fixed;
+    top: 40%;
+    width: 200px;
+">
+<div style="">
+    linting
+    <span class="uiLoaderEllipsis">
+        <span>.</span>
+        <span>.</span>
+        <span>.</span>
+    </span>
     </div>
 </div>
 <div id="JSLINT_TITLEBOX">
@@ -456,21 +489,18 @@ style="
     ></textarea>
     </div>
   </fieldset>
-  <fieldset id="JSLINT_WARNINGS" class="none">
+  <fieldset id="JSLINT_WARNINGS">
     <legend>Warnings</legend>
     <div id="JSLINT_WARNINGS_LIST"></div>
   </fieldset>
-  <fieldset id="JSLINT_REPORT" class="none">
-    <legend>Function Report</legend>
-    <div id="JSLINT_REPORT_LIST"></div>
-  </fieldset>
-  <fieldset id="JSLINT_PROPERTYFIELDSET" class="none">
+  <fieldset id="JSLINT_PROPERTYFIELDSET">
     <legend>Property Directive</legend>
     <textarea id="JSLINT_PROPERTY" rows="8" readonly></textarea>
   </fieldset>
+  <fieldset id="JSLINT_REPORT">
+    <legend>Function Report</legend>
+    <div id="JSLINT_REPORT_LIST"></div>
+  </fieldset>
 </div>
-<script
-    src="browser.js"
-    type="module"
-></script>
+<script src="browser.js" type="module"></script>
 </body></html>
