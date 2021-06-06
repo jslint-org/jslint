@@ -70,13 +70,15 @@
 
 // Phases:
 
-//      1. If the source is a single string, split it into an array of strings.
-//      2. Turn the source into an array of tokens.
-//      3. Furcate the tokens into a parse tree.
-//      4. Walk the tree, traversing all of the nodes of the tree. It is a
+// PHASE 1. split the <source> by newlines into <lines>.
+// PHASE 2. lex <lines> into an array of <tokens>.
+// PHASE 3. Furcate the <tokens> into a parse <tree>.
+// PHASE 4. Walk the <tree>, traversing all of the nodes of the tree. It is a
 //          recursive traversal. Each node may be processed on the way down
 //          (preaction) and on the way up (postaction).
-//      5. Check the whitespace between the tokens.
+// PHASE 5. Check the whitespace between the <tokens>.
+// PHASE 6: sort and format <warnings>.
+// PHASE 7: return jslint result.
 
 // jslint can also examine JSON text. It decides that a file is JSON text if
 // the first token is "[" or "{". Processing of JSON text is much simpler than
@@ -171,6 +173,8 @@ function jslint(
     option_object = empty(),
     global_array = []
 ) {
+
+// The jslint function itself.
 
     const allowed_option = {
 
@@ -504,6 +508,8 @@ function jslint(
     const property = empty();
 // The array collecting all generated warnings.
     const warnings = [];
+// The array of tokens.
+    const tokens = [];
 // The guessed name for anonymous functions.
     let anon = "anonymous";
 // The current block.
@@ -564,8 +570,6 @@ function jslint(
     let token_nr = 0;
 // The previous token including comments.
     let token_prev = global;
-// The array of tokens.
-    let tokens;
 // The abstract parse tree.
     let tree;
 // "var" if using var; "let" if using let.
@@ -832,7 +836,8 @@ function jslint(
 
     function json_value() {
         let negative;
-        if (token_next.id === "{") {
+        switch (token_next.id) {
+        case "{":
             return (function json_object() {
                 const brace = token_next;
                 const object = empty();
@@ -840,10 +845,17 @@ function jslint(
                 brace.expression = properties;
                 advance("{");
                 if (token_next.id !== "}") {
-                    (function next() {
+
+// JSON
+// Parse/loop through each property in {...}.
+
+                    while (true) {
                         let name;
                         let value;
                         if (token_next.quote !== "\"") {
+
+// cause: "{0:0}"
+
                             warn(
                                 "unexpected_a",
                                 token_next,
@@ -869,64 +881,68 @@ function jslint(
                         value = json_value();
                         value.label = name;
                         properties.push(value);
-                        if (token_next.id === ",") {
-                            advance(",");
-                            return next();
+                        if (token_next.id !== ",") {
+                            break;
                         }
-                    }());
+                        advance(",");
+                    }
                 }
                 advance("}", brace);
                 return brace;
             }());
-        }
-        if (token_next.id === "[") {
+        case "[":
+
+// cause: "[]"
+
             return (function json_array() {
                 const bracket = token_next;
                 const elements = [];
                 bracket.expression = elements;
                 advance("[");
                 if (token_next.id !== "]") {
-                    (function next() {
+                    while (true) {
                         elements.push(json_value());
-                        if (token_next.id === ",") {
-                            advance(",");
-                            return next();
+                        if (token_next.id !== ",") {
+
+// cause: "[0,0]"
+
+                            break;
                         }
-                    }());
+                        advance(",");
+                    }
                 }
                 advance("]", bracket);
                 return bracket;
             }());
-        }
-        if (
-            token_next.id === "true"
-            || token_next.id === "false"
-            || token_next.id === "null"
-        ) {
+        case "true":
+        case "false":
+        case "null":
+
+// cause: "[false]"
+// cause: "[null]"
+// cause: "[true]"
+
             advance();
             return token_curr;
-        }
-        if (token_next.id === "(number)") {
+        case "(number)":
+            if (!rx_JSON_number.test(token_next.value)) {
 
 // cause: "[0x0]"
 
-            if (!rx_JSON_number.test(token_next.value)) {
                 warn("unexpected_a");
             }
             advance();
             return token_curr;
-        }
-        if (token_next.id === "(string)") {
+        case "(string)":
+            if (token_next.quote !== "\"") {
 
 // cause: "['']"
 
-            if (token_next.quote !== "\"") {
                 warn("unexpected_a", token_next, token_next.quote);
             }
             advance();
             return token_curr;
-        }
-        if (token_next.id === "-") {
+        case "-":
             negative = token_next;
             negative.arity = "unary";
             advance("-");
@@ -939,8 +955,12 @@ function jslint(
             }
             negative.expression = token_curr;
             return negative;
+        default:
+
+// cause: "[undefined]"
+
+            stop("unexpected_a");
         }
-        stop("unexpected_a");
     }
 
 // Now we parse JavaScript.
@@ -1071,18 +1091,21 @@ function jslint(
 
             return stop("unexpected_a", token_curr);
         }
-        (function right() {
+
+// Parse/loop through each symbol in expression.
+
+        while (true) {
             the_symbol = syntax[token_next.id];
             if (
-                the_symbol !== undefined
-                && the_symbol.led !== undefined
-                && rbp < the_symbol.lbp
+                the_symbol === undefined
+                || the_symbol.led === undefined
+                || the_symbol.lbp <= rbp
             ) {
-                advance();
-                left = the_symbol.led(left);
-                return right();
+                break;
             }
-        }());
+            advance();
+            left = the_symbol.led(left);
+        }
         return left;
     }
 
@@ -1358,27 +1381,31 @@ function jslint(
 // Parse a list of statements. Give a warning if an unreachable statement
 // follows a disruptive statement.
 
-        const array = [];
-        (function next(disrupt) {
-            if (
-                token_next.id !== "}"
-                && token_next.id !== "case"
-                && token_next.id !== "default"
-                && token_next.id !== "else"
-                && token_next.id !== "(end)"
-            ) {
-                let a_statement = statement();
-                array.push(a_statement);
-                if (disrupt) {
+        const statement_array = [];
+        let a_statement;
+        let disrupt = false;
+
+// Parse/loop each statement until a statement-terminator is reached.
+
+        while (true) {
+            switch (token_next.id) {
+            case "}":
+            case "case":
+            case "default":
+            case "else":
+            case "(end)":
+                return statement_array;
+            }
+            a_statement = statement();
+            statement_array.push(a_statement);
+            if (disrupt) {
 
 // cause: "while(0){break;0;}"
 
-                    warn("unreachable_a", a_statement);
-                }
-                return next(a_statement.disrupt);
+                warn("unreachable_a", a_statement);
             }
-        }(false));
-        return array;
+            disrupt = a_statement.disrupt;
+        }
     }
 
     function not_top_level(thing) {
@@ -1836,6 +1863,7 @@ function jslint(
     infixr("**", 150);
     infix("(", 160, function (left) {
         const the_paren = token_curr;
+        let ellipsis;
         let the_argument;
         if (left.id !== "function") {
 
@@ -1849,8 +1877,10 @@ function jslint(
         }
         the_paren.expression = [left];
         if (token_next.id !== ")") {
-            (function next() {
-                let ellipsis;
+
+// Parse/loop through each token in expression (...).
+
+            while (true) {
                 if (token_next.id === "...") {
                     ellipsis = true;
                     advance("...");
@@ -1860,11 +1890,11 @@ function jslint(
                     the_argument.ellipsis = true;
                 }
                 the_paren.expression.push(the_argument);
-                if (token_next.id === ",") {
-                    advance(",");
-                    return next();
+                if (token_next.id !== ",") {
+                    break;
                 }
-            }());
+                advance(",");
+            }
         }
         advance(")", the_paren);
         if (the_paren.expression.length === 2) {
@@ -2013,19 +2043,22 @@ function jslint(
         the_tick.value = [];
         the_tick.expression = [];
         if (token_next.id !== "`") {
-            (function part() {
+
+// Parse/loop through each token in `${...}`.
+
+            while (true) {
                 advance("(string)");
                 the_tick.value.push(token_curr);
-                if (token_next.id === "${") {
-                    advance("${");
+                if (token_next.id !== "${") {
+                    break;
+                }
+                advance("${");
 
 // cause: "let aa=`${}`;"
 
-                    the_tick.expression.push(expression(0));
-                    advance("}");
-                    return part();
-                }
-            }());
+                the_tick.expression.push(expression(0));
+                advance("}");
+            }
         }
         advance("`");
         return the_tick;
@@ -2053,11 +2086,15 @@ function jslint(
     prefix("!!");
     prefix("[", function () {
         const the_token = token_curr;
+        let element;
+        let ellipsis;
         the_token.expression = [];
         if (token_next.id !== "]") {
-            (function next() {
-                let element;
-                let ellipsis = false;
+
+// Parse/loop through each element in [...].
+
+            while (true) {
+                ellipsis = false;
                 if (token_next.id === "...") {
                     ellipsis = true;
                     advance("...");
@@ -2067,11 +2104,11 @@ function jslint(
                     element.ellipsis = true;
                 }
                 the_token.expression.push(element);
-                if (token_next.id === ",") {
-                    advance(",");
-                    return next();
+                if (token_next.id !== ",") {
+                    break;
                 }
-            }());
+                advance(",");
+            }
         }
         advance("]");
         return the_token;
@@ -2575,7 +2612,10 @@ function jslint(
         if (token_next.id !== "}") {
             let a;
             let b = "";
-            (function member() {
+
+// Parse/loop through each property in {...}.
+
+            while (true) {
                 let extra;
                 let full;
                 let id;
@@ -2682,14 +2722,14 @@ function jslint(
                     value.label = name;
                     the_brace.expression.push(value);
                 }
-                if (token_next.id === ",") {
+                if (token_next.id !== ",") {
+                    break;
+                }
 
 // cause: aa={"aa":0,"bb":0}
 
-                    advance(",");
-                    return member();
-                }
-            }());
+                advance(",");
+            }
         }
         advance("}");
         return the_brace;
@@ -5827,8 +5867,11 @@ function jslint(
         snippet = "";
         char_after();
 
-        return (function next() {
-            if (char === quote) {
+// Parse/loop through each character in "...".
+
+        while (true) {
+            switch (char) {
+            case quote:
 
 // Remove last character from snippet.
 
@@ -5836,16 +5879,15 @@ function jslint(
                 the_token = make("(string)", snippet);
                 the_token.quote = quote;
                 return the_token;
-            }
-            if (char === "") {
+            case "":
 
 // cause: "\""
 
                 return stop_at("unclosed_string", line, column);
-            }
-            if (char === "\\") {
+            case "\\":
                 char_after_escape(quote);
-            } else if (char === "`") {
+                break;
+            case "`":
                 if (mega_mode) {
 
 // cause: "`${\"`\"}`"
@@ -5853,11 +5895,11 @@ function jslint(
                     warn_at("unexpected_a", line, column, "`");
                 }
                 char_after("`");
-            } else {
+                break;
+            default:
                 char_after();
             }
-            return next();
-        }());
+        }
     }
 
     function frack() {
@@ -6235,9 +6277,6 @@ function jslint(
         }
         return make(snippet);
     }
-
-// The jslint function itself.
-
     try {
         option_object = Object.assign(empty(), option_object);
         global_array = Object.assign(empty(), global_array);
@@ -6251,8 +6290,6 @@ function jslint(
             }
         });
 
-// 1. Tokenize source into ast.
-
 // tokenize takes a source and produces from it an array of token objects.
 // JavaScript is notoriously difficult to tokenize because of the horrible
 // interactions between automatic semicolon insertion, regular expression
@@ -6260,7 +6297,7 @@ function jslint(
 // automatic semicolon insertion and nested megastring literals, which allows
 // full tokenization to precede parsing.
 
-// Split source into lines at the carriage return/linefeed.
+// PHASE 1. split the <source> by newlines into <lines>.
 
         lines = String("\n" + source).split(
             /\n|\r\n?/
@@ -6269,7 +6306,8 @@ function jslint(
                 source_line
             };
         });
-        tokens = [];
+
+// PHASE 2. lex <lines> into an array of <tokens>.
 
 // Scan first line for "#!" and ignore it.
 
@@ -6289,7 +6327,7 @@ function jslint(
             }
         }
 
-// 2. Walk ast.
+// PHASE 3. Furcate the <tokens> into a parse <tree>.
 
         advance();
         if (json_mode) {
@@ -6318,9 +6356,14 @@ function jslint(
             tree = statements();
             advance("(end)");
             functionage = global;
+
+// PHASE 4. Walk the <tree>, traversing all of the nodes of the tree. It is a
+//          recursive traversal. Each node may be processed on the way down
+//          (preaction) and on the way up (postaction).
+
             walk_statement(tree);
 
-// 3. Re-walk ast validating whitespace.
+// PHASE 5. Check the whitespace between the <tokens>.
 
             if (warnings.length === 0) {
                 uninitialized_and_unused();
@@ -6355,6 +6398,8 @@ function jslint(
         }
     }
 
+// PHASE 6: sort and format <warnings>.
+
 // Sort warnings by early_stop first, line, column respectively.
 
     warnings.sort(function (a, b) {
@@ -6382,6 +6427,9 @@ function jslint(
             + stack_trace
         ).trim();
     });
+
+// PHASE 7: return jslint result.
+
     return {
         directives,
         edition,

@@ -18,6 +18,7 @@
 - jslint-refactor-1 - make "stateful" variables scoped outside of jslint() "stateless" by moving them into jslint().
 - jslint-refactor-2 - inline constants anticondition, bitwiseop, escapeable, and opener directly into code.
 - jslint-refactor-3 - inline regexp-functions quantifier(), ranges(), klass(), choice(), directly into code.
+- jslint-refactor-4 - document jslint process and each recursion-loop converted to while-loop.
 - website - add ui-loader-animation.
 
 ## v2021.6.3
