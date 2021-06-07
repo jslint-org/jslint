@@ -7,17 +7,29 @@
 - jslint - add new warning if case-statements are not sorted.
 - jslint - add new warning if const/let/var statements are not declared at top of function-scope.
 - jslint - add new warning if const/let/var statements are not sorted.
+- jslint - remove directive "eval" (use line-specific ignore-directive "//jslint-quiet" instead).
+- jslint - simplify comments/docs by removing unnecessary grammar-article "the".
+- jslint-refactor - group/localize code together by phases.
 - jslint-refactor - migrate recursive-loops to for/while loops.
+    - inline functions number(), string().
 - node - after node-v12 is deprecated, change `require("fs").promises` to `require("fs/promises")`.
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 - tests - update function warn_at() with assertion-check matching column with artifact.
 - website - replace current-editor with CodeMirror-editor and change programming-font-family from `Programma` to `Consolas, Menlo, monospace`.
 
 ## v2021.6.4-beta
+- bugfix - fix cli appending slash "/" to normalized filename.
+- bugfix - fix try-catch-block complaining about "Unexpected await" inside async-function.
 - jslint - add warning for unexpected ? in example `aa=/.{0}?/`.
 - jslint-refactor-1 - make "stateful" variables scoped outside of jslint() "stateless" by moving them into jslint().
 - jslint-refactor-2 - inline constants anticondition, bitwiseop, escapeable, and opener directly into code.
 - jslint-refactor-3 - inline regexp-functions quantifier(), ranges(), klass(), choice(), directly into code.
+- jslint-refactor-4 - document jslint process and each recursion-loop converted to while-loop.
+    - remove unnecessary variables nr.
+    - rename artifact-related variables a, b to let artifact_now, artifact_nxt.
+    - rename functions make() to token_create().
+    - reorganize/rename "global" variables by topical-prefixes:
+        artifact_xxx, export_xxx, from_xxx, import_xxx, line_xxx, mode_xxx, token_xxx
 - website - add ui-loader-animation.
 
 ## v2021.6.3

@@ -70,13 +70,15 @@
 
 // Phases:
 
-//      1. If the source is a single string, split it into an array of strings.
-//      2. Turn the source into an array of tokens.
-//      3. Furcate the tokens into a parse tree.
-//      4. Walk the tree, traversing all of the nodes of the tree. It is a
+// PHASE 1. split the <source> by newlines into <line_array>.
+// PHASE 2. lex <line_array> into an array of <token_array>.
+// PHASE 3. Furcate the <token_array> into a parse <tree>.
+// PHASE 4. Walk the <tree>, traversing all of the nodes of the tree. It is a
 //          recursive traversal. Each node may be processed on the way down
 //          (preaction) and on the way up (postaction).
-//      5. Check the whitespace between the tokens.
+// PHASE 5. Check the whitespace between the <token_array>.
+// PHASE 6: sort and format <warnings>.
+// PHASE 7: return jslint result.
 
 // jslint can also examine JSON text. It decides that a file is JSON text if
 // the first token is "[" or "{". Processing of JSON text is much simpler than
@@ -88,15 +90,15 @@
 /*jslint node*/
 
 /*property
-    bind, cli, cwd, directive_quiet, endsWith, jslint, resolve, sep,
-    source_line,
+    bind, cli, cwd, directive_quiet, endsWith, jslint, line_source, resolve,
     unclosed_disable, unopened_enable, unordered,
     JSLINT_CLI, a, all, and, argv, arity, assign, b, bad_assignment_a,
     bad_directive_a, bad_get, bad_module_name_a, bad_option_a, bad_property_a,
     bad_set, bitwise, block, body, browser, c, calls, catch, closer,
     closure, code, column, concat, console_error, constant, context, convert,
     couch, create, d, dead, debug, default, devel, directive, directives,
-    disrupt, dot, duplicate_a, early_stop, edition, ellipsis, else, empty_block,
+    disrupt, dot, duplicate_a, mode_early_stop, edition, ellipsis, else,
+    empty_block,
     env, error, eval, every, exec, exit, expected_a, expected_a_at_b_c,
     expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
     expected_a_next_at_b, expected_digits_after_a, expected_four_digits,
@@ -156,6 +158,16 @@ function empty() {
     return Object.create(null);
 }
 
+function noop() {
+
+// This function will do nothing.
+
+    return;
+}
+
+// coverage-hack
+noop();
+
 function populate(array, object = empty(), value = true) {
 
 // Augment an object by taking property names from an array of strings.
@@ -171,6 +183,8 @@ function jslint(
     option_object = empty(),
     global_array = []
 ) {
+
+// The jslint function itself.
 
     const allowed_option = {
 
@@ -290,7 +304,7 @@ function jslint(
         freeze_exports: (
             "Expected 'Object.freeze('. All export values should be frozen."
         ),
-        function_in_loop: "Don't make functions within a loop.",
+        function_in_loop: "Don't create functions within a loop.",
         infix_in: (
             "Unexpected 'in'. Compare with undefined, "
             + "or use the hasOwnProperty method instead."
@@ -478,11 +492,7 @@ function jslint(
 // The directive comments.
     const directives = [];
 // The exported names and values.
-    const exports = empty();
-// The array collecting all import-from strings.
-    const froms = [];
-// Fudge starting line and starting column to 1.
-    const fudge = 1;
+    const export_object = empty();
 // The array containing all of the functions.
     const functions = [];
 // The global object; the outermost context.
@@ -493,15 +503,21 @@ function jslint(
         from: 0,
         id: "(global)",
         level: 0,
-        line: fudge,
+        line: 1,
         live: [],
         loop: 0,
         switch: 0,
         thru: 0,
         try: 0
     };
+// The array collecting all import-from strings.
+    const import_from_array = [];
+// Fudge starting line and starting column to 1.
+    const line_fudge = 1;
 // The object containing the tallied property names.
     const property = empty();
+// The array of tokens.
+    const token_array = [];
 // The array collecting all generated warnings.
     const warnings = [];
 // The guessed name for anonymous functions.
@@ -512,66 +528,62 @@ function jslint(
     let char;
 // The column number of the next character.
     let column = 0;
-// true if directives are still allowed.
-    let directive_mode = true;
-// The starting line of "/*jslint-disable*/".
-    let disable_line;
-// true if JSLint cannot finish.
-    let early_stop = true;
 // The starting column number of the token.
     let from;
+// The starting column of megastring.
+    let from_mega;
 // The current function.
     let functionage = global;
-// true if parsing JSON.
-    let json_mode = false;
 // The line number of the next character.
     let line = 0;
 // The array containing source lines.
-    let lines;
-// The starting column of megastring.
-    let mega_from;
+    let line_array;
+// The starting line of "/*jslint-disable*/".
+    let line_disable;
 // The starting line of megastring.
-    let mega_line;
+    let line_mega;
+// The remaining line source string.
+    let line_source = "";
+// The whole line source string.
+    let line_whole = "";
+// true if directives are still allowed.
+    let mode_directive = true;
+// true if JSLint cannot finish.
+    let mode_early_stop = true;
+// true if parsing JSON.
+    let mode_json = false;
 // true if currently parsing a megastring literal.
-    let mega_mode = false;
+    let mode_mega = false;
 // true if import or export was used.
-    let module_mode = false;
-// The next token number.
-    let nr = 0;
-// The previous token excluding comments.
-    let prior = global;
-// Regular expression literal seen on this line.
-    let regexp_seen;
+    let mode_module = false;
+// true if regular expression literal seen on this line.
+    let mode_regexp;
 // true if a #! was seen on the first line.
-    let shebang = false;
+    let mode_shebang = false;
+// "var" if using var; "let" if using let.
+    let mode_var;
 // A piece of string.
     let snippet = "";
-// The remaining line source string.
-    let source_line = "";
 // The stack of functions.
     let stack = [];
 // The object containing the parser.
     let syntax;
 // The predefined property registry.
     let tenure;
-// The current token being examined in the parse.
-    let token_curr = global;
 // The first token.
-    let token_frst;
-// The next token to be examined in the parse.
-    let token_next = global;
+    let token_1;
+// The previous token excluding comments.
+    let token_before_slash = global;
+// The current token being examined in the parse.
+    let token_now = global;
 // The number of the next token.
     let token_nr = 0;
+// The next token to be examined in the parse.
+    let token_nxt = global;
 // The previous token including comments.
-    let token_prev = global;
-// The array of tokens.
-    let tokens;
+    let token_prv = global;
 // The abstract parse tree.
     let tree;
-// "var" if using var; "let" if using let.
-    let var_mode;
-// The whole line source string.
-    let whole_line = "";
 
 // Error reportage functions:
 
@@ -580,7 +592,7 @@ function jslint(
 // Return a string representing an artifact.
 
         if (the_token === undefined) {
-            the_token = token_next;
+            the_token = token_nxt;
         }
         return (
             (the_token.id === "(string)" || the_token.id === "(number)")
@@ -602,12 +614,12 @@ function jslint(
 
 // Fudge column numbers in warning message.
 
-            column: column || fudge,
+            column: column || line_fudge,
             d,
             line,
-            name: "JSLintError",
-            source_line: ""
-        }, lines[line]);
+            line_source: "",
+            name: "JSLintError"
+        }, line_array[line]);
         warning.message = bundle[code].replace(rx_supplant, function (
             ignore,
             filling
@@ -654,13 +666,13 @@ function jslint(
 // likely that the first warning will be the most meaningful.
 
         if (the_token === undefined) {
-            the_token = token_next;
+            the_token = token_nxt;
         }
         if (the_token.warning === undefined) {
             the_token.warning = warn_at(
                 code,
                 the_token.line,
-                (the_token.from || 0) + fudge,
+                (the_token.from || 0) + line_fudge,
                 a || artifact(the_token),
                 b,
                 c,
@@ -677,7 +689,7 @@ function jslint(
 // warning will be the more meaningful.
 
         if (the_token === undefined) {
-            the_token = token_next;
+            the_token = token_nxt;
         }
         delete the_token.warning;
         throw warn(code, the_token, a, b, c, d);
@@ -756,10 +768,10 @@ function jslint(
 
 // Deliver the next token, skipping the comments.
 
-        const cadet = tokens[token_nr];
+        const cadet = token_array[token_nr];
         token_nr += 1;
         if (cadet.id === "(comment)") {
-            if (json_mode) {
+            if (mode_json) {
 
 // cause: "[//]"
 
@@ -787,43 +799,43 @@ function jslint(
 
 // Attempt to give helpful names to anonymous functions.
 
-        if (token_curr.identifier && token_curr.id !== "function") {
-            anon = token_curr.id;
+        if (token_now.identifier && token_now.id !== "function") {
+            anon = token_now.id;
         } else if (
-            token_curr.id === "(string)"
-            && rx_identifier.test(token_curr.value)
+            token_now.id === "(string)"
+            && rx_identifier.test(token_now.value)
         ) {
-            anon = token_curr.value;
+            anon = token_now.value;
         }
 
-// Attempt to match token_next with an expected id.
+// Attempt to match token_nxt with an expected id.
 
-        if (id !== undefined && token_next.id !== id) {
+        if (id !== undefined && token_nxt.id !== id) {
             return (
                 match === undefined
 
 // cause: "()"
 
-                ? stop("expected_a_b", token_next, id, artifact())
+                ? stop("expected_a_b", token_nxt, id, artifact())
 
 // cause: "{\"aa\":0"
 
                 : stop(
                     "expected_a_b_from_c_d",
-                    token_next,
+                    token_nxt,
                     id,
                     artifact(match),
                     match.line,
-                    artifact(token_next)
+                    artifact(token_nxt)
                 )
             );
         }
 
 // Promote the tokens, skipping comments.
 
-        token_curr = token_next;
-        token_next = dispense();
-        if (token_next.id === "(end)") {
+        token_now = token_nxt;
+        token_nxt = dispense();
+        if (token_nxt.id === "(end)") {
             token_nr -= 1;
         }
     }
@@ -832,115 +844,131 @@ function jslint(
 
     function json_value() {
         let negative;
-        if (token_next.id === "{") {
+        switch (token_nxt.id) {
+        case "{":
             return (function json_object() {
-                const brace = token_next;
+                const brace = token_nxt;
                 const object = empty();
                 const properties = [];
                 brace.expression = properties;
                 advance("{");
-                if (token_next.id !== "}") {
-                    (function next() {
+                if (token_nxt.id !== "}") {
+
+// JSON
+// Parse/loop through each property in {...}.
+
+                    while (true) {
                         let name;
                         let value;
-                        if (token_next.quote !== "\"") {
+                        if (token_nxt.quote !== "\"") {
+
+// cause: "{0:0}"
+
                             warn(
                                 "unexpected_a",
-                                token_next,
-                                token_next.quote
+                                token_nxt,
+                                token_nxt.quote
                             );
                         }
-                        name = token_next;
+                        name = token_nxt;
                         advance("(string)");
-                        if (object[token_curr.value] !== undefined) {
+                        if (object[token_now.value] !== undefined) {
 
 // cause: "{\"aa\":0,\"aa\":0}"
 
-                            warn("duplicate_a", token_curr);
-                        } else if (token_curr.value === "__proto__") {
+                            warn("duplicate_a", token_now);
+                        } else if (token_now.value === "__proto__") {
 
 // cause: "{\"__proto__\":0}"
 
-                            warn("bad_property_a", token_curr);
+                            warn("bad_property_a", token_now);
                         } else {
-                            object[token_curr.value] = token_curr;
+                            object[token_now.value] = token_now;
                         }
                         advance(":");
                         value = json_value();
                         value.label = name;
                         properties.push(value);
-                        if (token_next.id === ",") {
-                            advance(",");
-                            return next();
+                        if (token_nxt.id !== ",") {
+                            break;
                         }
-                    }());
+                        advance(",");
+                    }
                 }
                 advance("}", brace);
                 return brace;
             }());
-        }
-        if (token_next.id === "[") {
+        case "[":
+
+// cause: "[]"
+
             return (function json_array() {
-                const bracket = token_next;
+                const bracket = token_nxt;
                 const elements = [];
                 bracket.expression = elements;
                 advance("[");
-                if (token_next.id !== "]") {
-                    (function next() {
+                if (token_nxt.id !== "]") {
+                    while (true) {
                         elements.push(json_value());
-                        if (token_next.id === ",") {
-                            advance(",");
-                            return next();
+                        if (token_nxt.id !== ",") {
+
+// cause: "[0,0]"
+
+                            break;
                         }
-                    }());
+                        advance(",");
+                    }
                 }
                 advance("]", bracket);
                 return bracket;
             }());
-        }
-        if (
-            token_next.id === "true"
-            || token_next.id === "false"
-            || token_next.id === "null"
-        ) {
+        case "true":
+        case "false":
+        case "null":
+
+// cause: "[false]"
+// cause: "[null]"
+// cause: "[true]"
+
             advance();
-            return token_curr;
-        }
-        if (token_next.id === "(number)") {
+            return token_now;
+        case "(number)":
+            if (!rx_JSON_number.test(token_nxt.value)) {
 
 // cause: "[0x0]"
 
-            if (!rx_JSON_number.test(token_next.value)) {
                 warn("unexpected_a");
             }
             advance();
-            return token_curr;
-        }
-        if (token_next.id === "(string)") {
+            return token_now;
+        case "(string)":
+            if (token_nxt.quote !== "\"") {
 
 // cause: "['']"
 
-            if (token_next.quote !== "\"") {
-                warn("unexpected_a", token_next, token_next.quote);
+                warn("unexpected_a", token_nxt, token_nxt.quote);
             }
             advance();
-            return token_curr;
-        }
-        if (token_next.id === "-") {
-            negative = token_next;
+            return token_now;
+        case "-":
+            negative = token_nxt;
             negative.arity = "unary";
             advance("-");
             advance("(number)");
-            if (!rx_JSON_number.test(token_curr.value)) {
+            if (!rx_JSON_number.test(token_now.value)) {
 
 // cause: "[-0x0]"
 
-                warn("unexpected_a", token_curr);
+                warn("unexpected_a", token_now);
             }
-            negative.expression = token_curr;
+            negative.expression = token_now;
             return negative;
+        default:
+
+// cause: "[undefined]"
+
+            stop("unexpected_a");
         }
-        stop("unexpected_a");
     }
 
 // Now we parse JavaScript.
@@ -1052,37 +1080,40 @@ function jslint(
         if (!initial) {
             advance();
         }
-        the_symbol = syntax[token_curr.id];
+        the_symbol = syntax[token_now.id];
         if (the_symbol !== undefined && the_symbol.nud !== undefined) {
 
 // cause: "0"
 
             left = the_symbol.nud();
-        } else if (token_curr.identifier) {
+        } else if (token_now.identifier) {
 
 // cause: "aa"
 
-            left = token_curr;
+            left = token_now;
             left.arity = "variable";
         } else {
 
 // cause: "!"
 // cause: "let aa=`${}`;"
 
-            return stop("unexpected_a", token_curr);
+            return stop("unexpected_a", token_now);
         }
-        (function right() {
-            the_symbol = syntax[token_next.id];
+
+// Parse/loop through each symbol in expression.
+
+        while (true) {
+            the_symbol = syntax[token_nxt.id];
             if (
-                the_symbol !== undefined
-                && the_symbol.led !== undefined
-                && rbp < the_symbol.lbp
+                the_symbol === undefined
+                || the_symbol.led === undefined
+                || the_symbol.lbp <= rbp
             ) {
-                advance();
-                left = the_symbol.led(left);
-                return right();
+                break;
             }
-        }());
+            advance();
+            left = the_symbol.led(left);
+        }
         return left;
     }
 
@@ -1090,7 +1121,7 @@ function jslint(
 
 // Parse the condition part of a do, if, while.
 
-        const the_paren = token_next;
+        const the_paren = token_nxt;
         let the_value;
 
 // cause: "do{}while()"
@@ -1267,7 +1298,7 @@ function jslint(
 
 // Try to match a semicolon.
 
-        if (token_next.id === ";") {
+        if (token_nxt.id === ";") {
             advance(";");
         } else {
 
@@ -1275,10 +1306,10 @@ function jslint(
 
             warn_at(
                 "expected_a_b",
-                token_curr.line,
-                token_curr.thru,
+                token_now.line,
+                token_now.thru,
                 ";",
-                artifact(token_next)
+                artifact(token_nxt)
             );
         }
         anon = "anonymous";
@@ -1295,8 +1326,8 @@ function jslint(
         let the_statement;
         let the_symbol;
         advance();
-        if (token_curr.identifier && token_next.id === ":") {
-            the_label = token_curr;
+        if (token_now.identifier && token_nxt.id === ":") {
+            the_label = token_now;
             if (the_label.id === "ignore") {
 
 // cause: "ignore:"
@@ -1305,10 +1336,10 @@ function jslint(
             }
             advance(":");
             if (
-                token_next.id === "do"
-                || token_next.id === "for"
-                || token_next.id === "switch"
-                || token_next.id === "while"
+                token_nxt.id === "do"
+                || token_nxt.id === "for"
+                || token_nxt.id === "switch"
+                || token_nxt.id === "while"
             ) {
                 enroll(the_label, "label", true);
                 the_label.init = true;
@@ -1327,7 +1358,7 @@ function jslint(
 
 // Parse the statement.
 
-        first = token_curr;
+        first = token_now;
         first.statement = true;
         the_symbol = syntax[first.id];
         if (the_symbol !== undefined && the_symbol.fud !== undefined) {
@@ -1358,27 +1389,31 @@ function jslint(
 // Parse a list of statements. Give a warning if an unreachable statement
 // follows a disruptive statement.
 
-        const array = [];
-        (function next(disrupt) {
-            if (
-                token_next.id !== "}"
-                && token_next.id !== "case"
-                && token_next.id !== "default"
-                && token_next.id !== "else"
-                && token_next.id !== "(end)"
-            ) {
-                let a_statement = statement();
-                array.push(a_statement);
-                if (disrupt) {
+        const statement_array = [];
+        let a_statement;
+        let disrupt = false;
+
+// Parse/loop each statement until a statement-terminator is reached.
+
+        while (true) {
+            switch (token_nxt.id) {
+            case "}":
+            case "case":
+            case "default":
+            case "else":
+            case "(end)":
+                return statement_array;
+            }
+            a_statement = statement();
+            statement_array.push(a_statement);
+            if (disrupt) {
 
 // cause: "while(0){break;0;}"
 
-                    warn("unreachable_a", a_statement);
-                }
-                return next(a_statement.disrupt);
+                warn("unreachable_a", a_statement);
             }
-        }(false));
-        return array;
+            disrupt = a_statement.disrupt;
+        }
     }
 
     function not_top_level(thing) {
@@ -1418,7 +1453,7 @@ function jslint(
         if (special !== "naked") {
             advance("{");
         }
-        the_block = token_curr;
+        the_block = token_now;
         the_block.arity = "statement";
         the_block.body = special === "body";
 
@@ -1427,9 +1462,9 @@ function jslint(
         if (
             special === "body"
             && stack.length === 1
-            && token_next.value === "use strict"
+            && token_nxt.value === "use strict"
         ) {
-            token_next.statement = true;
+            token_nxt.statement = true;
             advance("(string)");
             advance(";");
         }
@@ -1509,7 +1544,7 @@ function jslint(
 
     function symbol(id, bp) {
 
-// Make a symbol if it does not already exist in the language's syntax.
+// Create a symbol if it does not already exist in the language's syntax.
 
         let the_symbol = syntax[id];
         if (the_symbol === undefined) {
@@ -1523,14 +1558,14 @@ function jslint(
 
     function assignment(id) {
 
-// Make an assignment operator. The one true assignment is different because
+// Create an assignment operator. The one true assignment is different because
 // its left side, when it is a variable, is not treated as an expression.
 // That case is special because that is when a variable gets initialized. The
 // other assignment operators can modify, but they cannot initialize.
 
         const the_symbol = symbol(id, 20);
         the_symbol.led = function (left) {
-            const the_token = token_curr;
+            const the_token = token_now;
             let right;
             the_token.arity = "assignment";
             right = expression(20 - 1);
@@ -1555,7 +1590,7 @@ function jslint(
 
     function constant(id, type, value) {
 
-// Make a constant symbol.
+// Create a constant symbol.
 
         const the_symbol = symbol(id);
         the_symbol.constant = true;
@@ -1563,11 +1598,11 @@ function jslint(
             typeof value === "function"
             ? value
             : function () {
-                token_curr.constant = true;
+                token_now.constant = true;
                 if (value !== undefined) {
-                    token_curr.value = value;
+                    token_now.value = value;
                 }
-                return token_curr;
+                return token_now;
             }
         );
         the_symbol.type = type;
@@ -1577,11 +1612,11 @@ function jslint(
 
     function infix(id, bp, f) {
 
-// Make an infix operator.
+// Create an infix operator.
 
         const the_symbol = symbol(id, bp);
         the_symbol.led = function (left) {
-            const the_token = token_curr;
+            const the_token = token_now;
             the_token.arity = "binary";
             if (f !== undefined) {
                 return f(left);
@@ -1594,14 +1629,14 @@ function jslint(
 
     function infixr(id, bp) {
 
-// Make a right associative infix operator.
+// Create a right associative infix operator.
 
         const the_symbol = symbol(id, bp);
         the_symbol.led = function (left) {
 
 // cause: "0**0"
 
-            const the_token = token_curr;
+            const the_token = token_now;
             the_token.arity = "binary";
             the_token.expression = [left, expression(bp - 1)];
             return the_token;
@@ -1611,25 +1646,25 @@ function jslint(
 
     function post(id) {
 
-// Make one of the post operators.
+// Create one of the post operators.
 
         const the_symbol = symbol(id, 150);
         the_symbol.led = function (left) {
-            token_curr.expression = left;
-            token_curr.arity = "post";
-            mutation_check(token_curr.expression);
-            return token_curr;
+            token_now.expression = left;
+            token_now.arity = "post";
+            mutation_check(token_now.expression);
+            return token_now;
         };
         return the_symbol;
     }
 
     function pre(id) {
 
-// Make one of the pre operators.
+// Create one of the pre operators.
 
         const the_symbol = symbol(id);
         the_symbol.nud = function () {
-            const the_token = token_curr;
+            const the_token = token_now;
             the_token.arity = "pre";
             the_token.expression = expression(150);
             mutation_check(the_token.expression);
@@ -1640,11 +1675,11 @@ function jslint(
 
     function prefix(id, f) {
 
-// Make a prefix operator.
+// Create a prefix operator.
 
         const the_symbol = symbol(id);
         the_symbol.nud = function () {
-            const the_token = token_curr;
+            const the_token = token_now;
             the_token.arity = "unary";
             if (typeof f === "function") {
                 return f();
@@ -1657,11 +1692,11 @@ function jslint(
 
     function stmt(id, f) {
 
-// Make a statement.
+// Create a statement.
 
         const the_symbol = symbol(id);
         the_symbol.fud = function () {
-            token_curr.arity = "statement";
+            token_now.arity = "statement";
             return f();
         };
         return the_symbol;
@@ -1669,17 +1704,17 @@ function jslint(
 
     function ternary(id1, id2) {
 
-// Make a ternary operator.
+// Create a ternary operator.
 
         const the_symbol = symbol(id1, 30);
         the_symbol.led = function (left) {
-            const the_token = token_curr;
+            const the_token = token_now;
             const second = expression(20);
             advance(id2);
-            token_curr.arity = "ternary";
+            token_now.arity = "ternary";
             the_token.arity = "ternary";
             the_token.expression = [left, second, expression(10)];
-            if (token_next.id !== ")") {
+            if (token_nxt.id !== ")") {
 
 // cause: "0?0:0"
 
@@ -1728,22 +1763,22 @@ function jslint(
 
 // cause: "arguments"
 
-        warn("unexpected_a", token_curr);
-        return token_curr;
+        warn("unexpected_a", token_now);
+        return token_now;
     });
     constant("eval", "function", function () {
         if (!option_object.eval) {
 
 // cause: "eval"
 
-            warn("unexpected_a", token_curr);
-        } else if (token_next.id !== "(") {
+            warn("unexpected_a", token_now);
+        } else if (token_nxt.id !== "(") {
 
 // cause: "/*jslint eval*/\neval"
 
-            warn("expected_a_before_b", token_next, "(", artifact());
+            warn("expected_a_before_b", token_nxt, "(", artifact());
         }
-        return token_curr;
+        return token_now;
     });
     constant("false", "boolean", false);
     constant("Function", "function", function () {
@@ -1751,36 +1786,36 @@ function jslint(
 
 // cause: "Function()"
 
-            warn("unexpected_a", token_curr);
-        } else if (token_next.id !== "(") {
+            warn("unexpected_a", token_now);
+        } else if (token_nxt.id !== "(") {
 
 // cause: "/*jslint eval*/\nFunction"
 
-            warn("expected_a_before_b", token_next, "(", artifact());
+            warn("expected_a_before_b", token_nxt, "(", artifact());
         }
-        return token_curr;
+        return token_now;
     });
     constant("ignore", "undefined", function () {
 
 // cause: "ignore"
 
-        warn("unexpected_a", token_curr);
-        return token_curr;
+        warn("unexpected_a", token_now);
+        return token_now;
     });
     constant("Infinity", "number", Infinity);
     constant("isFinite", "function", function () {
 
 // cause: "isFinite"
 
-        warn("expected_a_b", token_curr, "Number.isFinite", "isFinite");
-        return token_curr;
+        warn("expected_a_b", token_now, "Number.isFinite", "isFinite");
+        return token_now;
     });
     constant("isNaN", "function", function () {
 
 // cause: "isNaN(0)"
 
-        warn("number_isNaN", token_curr);
-        return token_curr;
+        warn("number_isNaN", token_now);
+        return token_now;
     });
     constant("NaN", "number", NaN);
     constant("null", "null", null);
@@ -1789,9 +1824,9 @@ function jslint(
 
 // cause: "this"
 
-            warn("unexpected_a", token_curr);
+            warn("unexpected_a", token_now);
         }
-        return token_curr;
+        return token_now;
     });
     constant("true", "boolean", true);
     constant("undefined", "undefined");
@@ -1835,7 +1870,8 @@ function jslint(
     infix("%", 140);
     infixr("**", 150);
     infix("(", 160, function (left) {
-        const the_paren = token_curr;
+        const the_paren = token_now;
+        let ellipsis;
         let the_argument;
         if (left.id !== "function") {
 
@@ -1848,10 +1884,12 @@ function jslint(
             functionage.name.calls[left.id] = left;
         }
         the_paren.expression = [left];
-        if (token_next.id !== ")") {
-            (function next() {
-                let ellipsis;
-                if (token_next.id === "...") {
+        if (token_nxt.id !== ")") {
+
+// Parse/loop through each token in expression (...).
+
+            while (true) {
+                if (token_nxt.id === "...") {
                     ellipsis = true;
                     advance("...");
                 }
@@ -1860,11 +1898,11 @@ function jslint(
                     the_argument.ellipsis = true;
                 }
                 the_paren.expression.push(the_argument);
-                if (token_next.id === ",") {
-                    advance(",");
-                    return next();
+                if (token_nxt.id !== ",") {
+                    break;
                 }
-            }());
+                advance(",");
+            }
         }
         advance(")", the_paren);
         if (the_paren.expression.length === 2) {
@@ -1891,8 +1929,8 @@ function jslint(
         return the_paren;
     });
     infix(".", 170, function (left) {
-        const the_token = token_curr;
-        const name = token_next;
+        const the_token = token_now;
+        const name = token_nxt;
         if (
             (
                 left.id !== "(string)"
@@ -1934,8 +1972,8 @@ function jslint(
         return the_token;
     });
     infix("?.", 170, function (left) {
-        const the_token = token_curr;
-        const name = token_next;
+        const the_token = token_now;
+        const name = token_nxt;
         if (
             (
                 left.id !== "(string)"
@@ -1982,7 +2020,7 @@ function jslint(
         return the_token;
     });
     infix("[", 170, function (left) {
-        const the_token = token_curr;
+        const the_token = token_now;
         const the_subscript = expression(0);
         if (the_subscript.id === "(string)" || the_subscript.id === "`") {
             const name = survey(the_subscript);
@@ -2009,23 +2047,26 @@ function jslint(
     });
 
     function do_tick() {
-        const the_tick = token_curr;
+        const the_tick = token_now;
         the_tick.value = [];
         the_tick.expression = [];
-        if (token_next.id !== "`") {
-            (function part() {
+        if (token_nxt.id !== "`") {
+
+// Parse/loop through each token in `${...}`.
+
+            while (true) {
                 advance("(string)");
-                the_tick.value.push(token_curr);
-                if (token_next.id === "${") {
-                    advance("${");
+                the_tick.value.push(token_now);
+                if (token_nxt.id !== "${") {
+                    break;
+                }
+                advance("${");
 
 // cause: "let aa=`${}`;"
 
-                    the_tick.expression.push(expression(0));
-                    advance("}");
-                    return part();
-                }
-            }());
+                the_tick.expression.push(expression(0));
+                advance("}");
+            }
         }
         advance("`");
         return the_tick;
@@ -2052,13 +2093,17 @@ function jslint(
     prefix("!");
     prefix("!!");
     prefix("[", function () {
-        const the_token = token_curr;
+        const the_token = token_now;
+        let element;
+        let ellipsis;
         the_token.expression = [];
-        if (token_next.id !== "]") {
-            (function next() {
-                let element;
-                let ellipsis = false;
-                if (token_next.id === "...") {
+        if (token_nxt.id !== "]") {
+
+// Parse/loop through each element in [...].
+
+            while (true) {
+                ellipsis = false;
+                if (token_nxt.id === "...") {
                     ellipsis = true;
                     advance("...");
                 }
@@ -2067,11 +2112,11 @@ function jslint(
                     element.ellipsis = true;
                 }
                 the_token.expression.push(element);
-                if (token_next.id === ",") {
-                    advance(",");
-                    return next();
+                if (token_nxt.id !== ",") {
+                    break;
                 }
-            }());
+                advance(",");
+            }
         }
         advance("]");
         return the_token;
@@ -2080,29 +2125,29 @@ function jslint(
 
 // cause: "/="
 
-        stop("expected_a_b", token_curr, "/\\=", "/=");
+        stop("expected_a_b", token_now, "/\\=", "/=");
     });
     prefix("=>", function () {
 
 // cause: "=>0"
 
-        return stop("expected_a_before_b", token_curr, "()", "=>");
+        return stop("expected_a_before_b", token_now, "()", "=>");
     });
     prefix("new", function () {
-        const the_new = token_curr;
+        const the_new = token_now;
         const right = expression(160);
-        if (token_next.id !== "(") {
+        if (token_nxt.id !== "(") {
 
 // cause: "new aa"
 
-            warn("expected_a_before_b", token_next, "()", artifact(token_next));
+            warn("expected_a_before_b", token_nxt, "()", artifact(token_nxt));
         }
         the_new.expression = right;
         return the_new;
     });
     prefix("typeof");
     prefix("void", function () {
-        const the_void = token_curr;
+        const the_void = token_now;
 
 // cause: "void"
 // cause: "void 0"
@@ -2116,30 +2161,30 @@ function jslint(
         const list = [];
         let optional;
         const signature = ["("];
-        if (token_next.id !== ")" && token_next.id !== "(end)") {
+        if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
             (function parameter() {
                 let ellipsis = false;
                 let param;
-                if (token_next.id === "{") {
-                    let a;
-                    let b = "";
+                if (token_nxt.id === "{") {
+                    let artifact_now;
+                    let artifact_nxt = "";
                     if (optional !== undefined) {
 
 // cause: "function aa(aa=0,{}){}"
 
                         warn(
                             "required_a_optional_b",
-                            token_next,
-                            token_next.id,
+                            token_nxt,
+                            token_nxt.id,
                             optional.id
                         );
                     }
-                    param = token_next;
+                    param = token_nxt;
                     param.names = [];
                     advance("{");
                     signature.push("{");
                     (function subparameter() {
-                        let subparam = token_next;
+                        let subparam = token_nxt;
                         if (!subparam.identifier) {
 
 // cause: "function aa(aa=0,{}){}"
@@ -2148,9 +2193,12 @@ function jslint(
                             return stop("expected_identifier_a");
                         }
                         survey(subparam);
-                        a = b;
-                        b = String(subparam.value || subparam.id);
-                        if (!option_object.unordered && a > b) {
+                        artifact_now = artifact_nxt;
+                        artifact_nxt = artifact(subparam);
+                        if (
+                            !option_object.unordered
+                            && artifact_now > artifact_nxt
+                        ) {
 
 // cause: "function aa({bb,aa}){}"
 
@@ -2158,16 +2206,16 @@ function jslint(
                                 "unordered_a_b",
                                 subparam,
                                 "Parameter",
-                                artifact(subparam)
+                                artifact_nxt
                             );
                         }
                         advance();
                         signature.push(subparam.id);
-                        if (token_next.id === ":") {
+                        if (token_nxt.id === ":") {
                             advance(":");
                             advance();
-                            token_curr.label = subparam;
-                            subparam = token_curr;
+                            token_now.label = subparam;
+                            subparam = token_now;
                             if (!subparam.identifier) {
 
 // cause: "function aa({aa:0}){}"
@@ -2178,13 +2226,13 @@ function jslint(
 
 // cause: "function aa({aa=aa},aa){}"
 
-                        if (token_next.id === "=") {
+                        if (token_nxt.id === "=") {
                             advance("=");
                             subparam.expression = expression();
                             param.open = true;
                         }
                         param.names.push(subparam);
-                        if (token_next.id === ",") {
+                        if (token_nxt.id === ",") {
                             advance(",");
                             signature.push(", ");
                             return subparameter();
@@ -2193,29 +2241,29 @@ function jslint(
                     list.push(param);
                     advance("}");
                     signature.push("}");
-                    if (token_next.id === ",") {
+                    if (token_nxt.id === ",") {
                         advance(",");
                         signature.push(", ");
                         return parameter();
                     }
-                } else if (token_next.id === "[") {
+                } else if (token_nxt.id === "[") {
                     if (optional !== undefined) {
 
 // cause: "function aa(aa=0,[]){}"
 
                         warn(
                             "required_a_optional_b",
-                            token_next,
-                            token_next.id,
+                            token_nxt,
+                            token_nxt.id,
                             optional.id
                         );
                     }
-                    param = token_next;
+                    param = token_nxt;
                     param.names = [];
                     advance("[");
                     signature.push("[]");
                     (function subparameter() {
-                        const subparam = token_next;
+                        const subparam = token_nxt;
                         if (!subparam.identifier) {
 
 // cause: "function aa(aa=0,[]){}"
@@ -2227,25 +2275,25 @@ function jslint(
 
 // cause: "function aa([aa=aa],aa){}"
 
-                        if (token_next.id === "=") {
+                        if (token_nxt.id === "=") {
                             advance("=");
                             subparam.expression = expression();
                             param.open = true;
                         }
-                        if (token_next.id === ",") {
+                        if (token_nxt.id === ",") {
                             advance(",");
                             return subparameter();
                         }
                     }());
                     list.push(param);
                     advance("]");
-                    if (token_next.id === ",") {
+                    if (token_nxt.id === ",") {
                         advance(",");
                         signature.push(", ");
                         return parameter();
                     }
                 } else {
-                    if (token_next.id === "...") {
+                    if (token_nxt.id === "...") {
                         ellipsis = true;
                         signature.push("...");
                         advance("...");
@@ -2255,26 +2303,26 @@ function jslint(
 
                             warn(
                                 "required_a_optional_b",
-                                token_next,
-                                token_next.id,
+                                token_nxt,
+                                token_nxt.id,
                                 optional.id
                             );
                         }
                     }
-                    if (!token_next.identifier) {
+                    if (!token_nxt.identifier) {
 
 // cause: "function aa(0){}"
 
                         return stop("expected_identifier_a");
                     }
-                    param = token_next;
+                    param = token_nxt;
                     list.push(param);
                     advance();
                     signature.push(param.id);
                     if (ellipsis) {
                         param.ellipsis = true;
                     } else {
-                        if (token_next.id === "=") {
+                        if (token_nxt.id === "=") {
                             optional = param;
                             advance("=");
                             param.expression = expression(0);
@@ -2291,7 +2339,7 @@ function jslint(
                                 );
                             }
                         }
-                        if (token_next.id === ",") {
+                        if (token_nxt.id === ",") {
                             advance(",");
                             signature.push(", ");
                             return parameter();
@@ -2308,19 +2356,19 @@ function jslint(
     function do_function(the_function) {
         let name;
         if (the_function === undefined) {
-            the_function = token_curr;
+            the_function = token_now;
 
 // A function statement must have a name that will be in the parent's scope.
 
             if (the_function.arity === "statement") {
-                if (!token_next.identifier) {
+                if (!token_nxt.identifier) {
 
 // cause: "function(){}"
 // cause: "function*aa(){}"
 
-                    return stop("expected_identifier_a", token_next);
+                    return stop("expected_identifier_a", token_nxt);
                 }
-                name = token_next;
+                name = token_nxt;
                 enroll(name, "variable", true);
                 the_function.name = name;
                 name.init = true;
@@ -2330,8 +2378,8 @@ function jslint(
 
 // A function expression may have an optional name.
 
-                if (token_next.identifier) {
-                    name = token_next;
+                if (token_nxt.identifier) {
+                    name = token_nxt;
                     the_function.name = name;
                     advance();
                 } else {
@@ -2342,14 +2390,14 @@ function jslint(
             name = the_function.name;
         }
         the_function.level = functionage.level + 1;
-        assert_or_throw(!mega_mode, `Expected !mega_mode.`);
+        assert_or_throw(!mode_mega, `Expected !mode_mega.`);
 //  Probably deadcode.
-//  if (mega_mode) {
+//  if (mode_mega) {
 //      warn("unexpected_a", the_function);
 //  }
 
-// Don't make functions in loops. It is inefficient, and it can lead to scoping
-// errors.
+// Don't create functions in loops. It is inefficient, and it can lead to
+// scoping errors.
 
         if (functionage.loop > 0) {
 
@@ -2388,8 +2436,8 @@ function jslint(
 
 // cause: "function(){}"
 
-        token_curr.free = false;
-        token_curr.arity = "function";
+        token_now.free = false;
+        token_now.arity = "function";
         [functionage.parameters, functionage.signature] = parameter_list();
         functionage.parameters.forEach(function enroll_parameter(name) {
             if (name.identifier) {
@@ -2404,17 +2452,17 @@ function jslint(
         the_function.block = block("body");
         if (
             the_function.arity === "statement"
-            && token_next.line === token_curr.line
+            && token_nxt.line === token_now.line
         ) {
 
 // cause: "function aa(){}0"
 
-            return stop("unexpected_a", token_next);
+            return stop("unexpected_a", token_nxt);
         }
         if (
-            token_next.id === "."
-            || token_next.id === "?."
-            || token_next.id === "["
+            token_nxt.id === "."
+            || token_nxt.id === "?."
+            || token_nxt.id === "["
         ) {
 
 // cause: "function aa(){}\n[]"
@@ -2431,9 +2479,9 @@ function jslint(
     function do_async() {
         let the_async;
         let the_function;
-        the_async = token_curr;
+        the_async = token_now;
         advance("function");
-        the_function = token_curr;
+        the_function = token_now;
         the_function.is_async = true;
         the_function.arity = the_async.arity;
         do_function();
@@ -2450,7 +2498,7 @@ function jslint(
     prefix("function", do_function);
     prefix("await", function () {
         let the_await;
-        the_await = token_curr;
+        the_await = token_now;
         if (!functionage.is_async) {
 
 // cause: "await"
@@ -2465,7 +2513,7 @@ function jslint(
 
     function fart(pl) {
         advance("=>");
-        const the_fart = token_curr;
+        const the_fart = token_now;
         the_fart.arity = "binary";
         the_fart.name = "=>";
         the_fart.level = functionage.level + 1;
@@ -2498,7 +2546,7 @@ function jslint(
 
             enroll(name, "parameter", true);
         });
-        if (token_next.id === "{") {
+        if (token_nxt.id === "{") {
 
 // cause: "()=>{}"
 
@@ -2512,7 +2560,7 @@ function jslint(
     }
 
     prefix("(", function () {
-        const the_paren = token_curr;
+        const the_paren = token_now;
         let the_value;
         const cadet = lookahead().id;
 
@@ -2520,9 +2568,9 @@ function jslint(
 // with one token of lookahead.
 
         if (
-            token_next.id === ")"
-            || token_next.id === "..."
-            || (token_next.identifier && (cadet === "," || cadet === "="))
+            token_nxt.id === ")"
+            || token_nxt.id === "..."
+            || (token_nxt.identifier && (cadet === "," || cadet === "="))
         ) {
 
 // cause: "()=>0"
@@ -2543,7 +2591,7 @@ function jslint(
         }
         the_value.wrapped = true;
         advance(")", the_paren);
-        if (token_next.id === "=>") {
+        if (token_nxt.id === "=>") {
             if (the_value.arity !== "variable") {
                 if (the_value.id === "{" || the_value.id === "[") {
 
@@ -2555,7 +2603,7 @@ function jslint(
 // cause: "([])=>0"
 // cause: "({})=>0"
 
-                    return stop("expected_a_b", token_next, "{", "=>");
+                    return stop("expected_a_b", token_nxt, "{", "=>");
                 }
 
 // cause: "(0)=>0"
@@ -2569,30 +2617,33 @@ function jslint(
     });
     prefix("`", do_tick);
     prefix("{", function () {
-        const the_brace = token_curr;
+        const the_brace = token_now;
         const seen = empty();
         the_brace.expression = [];
-        if (token_next.id !== "}") {
-            let a;
-            let b = "";
-            (function member() {
+        if (token_nxt.id !== "}") {
+            let artifact_now;
+            let artifact_nxt = "";
+
+// Parse/loop through each property in {...}.
+
+            while (true) {
                 let extra;
                 let full;
                 let id;
-                let name = token_next;
+                let name = token_nxt;
                 let value;
                 advance();
-                a = b;
-                b = String(name.value || name.id);
-                if (!option_object.unordered && a > b) {
+                artifact_now = artifact_nxt;
+                artifact_nxt = artifact(name);
+                if (!option_object.unordered && artifact_now > artifact_nxt) {
 
 // cause: "aa={bb,aa}"
 
-                    warn("unordered_a_b", name, "Property", artifact(name));
+                    warn("unordered_a_b", name, "Property", artifact_nxt);
                 }
                 if (
                     (name.id === "get" || name.id === "set")
-                    && token_next.identifier
+                    && token_nxt.identifier
                 ) {
                     if (!option_object.getset) {
 
@@ -2601,8 +2652,8 @@ function jslint(
                         warn("unexpected_a", name);
                     }
                     extra = name.id;
-                    full = extra + " " + token_next.id;
-                    name = token_next;
+                    full = extra + " " + token_nxt.id;
+                    name = token_nxt;
                     advance();
                     id = survey(name);
                     if (seen[full] === true || seen[id] === true) {
@@ -2624,7 +2675,7 @@ function jslint(
                     seen[id] = true;
                 }
                 if (name.identifier) {
-                    if (token_next.id === "}" || token_next.id === ",") {
+                    if (token_nxt.id === "}" || token_nxt.id === ",") {
                         if (typeof extra === "string") {
 
 // cause: "aa={get aa}"
@@ -2632,7 +2683,7 @@ function jslint(
                             advance("(");
                         }
                         value = expression(Infinity, true);
-                    } else if (token_next.id === "(") {
+                    } else if (token_nxt.id === "(") {
                         value = do_function({
                             arity: "unary",
                             from: name.from,
@@ -2658,7 +2709,7 @@ function jslint(
 
                             advance("(");
                         }
-                        let the_colon = token_next;
+                        let the_colon = token_nxt;
                         advance(":");
                         value = expression(0);
                         if (value.id === name.id && value.id !== "function") {
@@ -2682,14 +2733,14 @@ function jslint(
                     value.label = name;
                     the_brace.expression.push(value);
                 }
-                if (token_next.id === ",") {
+                if (token_nxt.id !== ",") {
+                    break;
+                }
 
 // cause: aa={"aa":0,"bb":0}
 
-                    advance(",");
-                    return member();
-                }
-            }());
+                advance(",");
+            }
         }
         advance("}");
         return the_brace;
@@ -2699,20 +2750,20 @@ function jslint(
 
 // cause: ";"
 
-        warn("unexpected_a", token_curr);
-        return token_curr;
+        warn("unexpected_a", token_now);
+        return token_now;
     });
     stmt("{", function () {
 
 // cause: ";{}"
 // cause: "class aa{}"
 
-        warn("naked_block", token_curr);
+        warn("naked_block", token_now);
         return block("naked");
     });
     stmt("async", do_async);
     stmt("break", function () {
-        const the_break = token_curr;
+        const the_break = token_now;
         let the_label;
         if (
             (functionage.loop < 1 && functionage.switch < 1)
@@ -2724,8 +2775,8 @@ function jslint(
             warn("unexpected_a", the_break);
         }
         the_break.disrupt = true;
-        if (token_next.identifier && token_curr.line === token_next.line) {
-            the_label = functionage.context[token_next.id];
+        if (token_nxt.identifier && token_now.line === token_nxt.line) {
+            the_label = functionage.context[token_nxt.id];
             if (
                 the_label === undefined
                 || the_label.role !== "label"
@@ -2745,7 +2796,7 @@ function jslint(
             } else {
                 the_label.used += 1;
             }
-            the_break.label = token_next;
+            the_break.label = token_nxt;
             advance();
         }
         advance(";");
@@ -2753,23 +2804,23 @@ function jslint(
     });
 
     function do_var() {
-        const the_statement = token_curr;
+        const the_statement = token_now;
         const is_const = the_statement.id === "const";
         the_statement.names = [];
 
 // A program may use var or let, but not both.
 
         if (!is_const) {
-            if (var_mode === undefined) {
-                var_mode = the_statement.id;
-            } else if (the_statement.id !== var_mode) {
+            if (mode_var === undefined) {
+                mode_var = the_statement.id;
+            } else if (the_statement.id !== mode_var) {
 
 // cause: "let aa;var aa"
 
                 warn(
                     "expected_a_b",
                     the_statement,
-                    var_mode,
+                    mode_var,
                     the_statement.id
                 );
             }
@@ -2790,23 +2841,26 @@ function jslint(
             warn("var_loop", the_statement);
         }
         (function next() {
-            if (token_next.id === "{" && the_statement.id !== "var") {
-                let a;
-                let b = "";
-                const the_brace = token_next;
+            if (token_nxt.id === "{" && the_statement.id !== "var") {
+                let artifact_now;
+                let artifact_nxt = "";
+                const the_brace = token_nxt;
                 advance("{");
                 (function pair() {
-                    if (!token_next.identifier) {
+                    if (!token_nxt.identifier) {
 
 // cause: "let {0}"
 
-                        return stop("expected_identifier_a", token_next);
+                        return stop("expected_identifier_a", token_nxt);
                     }
-                    const name = token_next;
+                    const name = token_nxt;
                     survey(name);
-                    a = b;
-                    b = String(name.value || name.id);
-                    if (!option_object.unordered && a > b) {
+                    artifact_now = artifact_nxt;
+                    artifact_nxt = artifact(name);
+                    if (
+                        !option_object.unordered
+                        && artifact_now > artifact_nxt
+                    ) {
 
 // cause: "let{bb,aa}"
 
@@ -2814,22 +2868,22 @@ function jslint(
                             "unordered_a_b",
                             name,
                             "Parameter",
-                            artifact(name)
+                            artifact_nxt
                         );
                     }
                     advance();
-                    if (token_next.id === ":") {
+                    if (token_nxt.id === ":") {
                         advance(":");
-                        if (!token_next.identifier) {
+                        if (!token_nxt.identifier) {
 
 // cause: "let {aa:0}"
 // cause: "let {aa:{aa}}"
 
-                            return stop("expected_identifier_a", token_next);
+                            return stop("expected_identifier_a", token_nxt);
                         }
-                        token_next.label = name;
-                        the_statement.names.push(token_next);
-                        enroll(token_next, "variable", is_const);
+                        token_nxt.label = name;
+                        the_statement.names.push(token_nxt);
+                        enroll(token_nxt, "variable", is_const);
                         advance();
                         the_brace.open = true;
                     } else {
@@ -2838,7 +2892,7 @@ function jslint(
                     }
                     name.dead = false;
                     name.init = true;
-                    if (token_next.id === "=") {
+                    if (token_nxt.id === "=") {
 
 // cause: "let {aa=0}"
 
@@ -2846,7 +2900,7 @@ function jslint(
                         name.expression = expression();
                         the_brace.open = true;
                     }
-                    if (token_next.id === ",") {
+                    if (token_nxt.id === ",") {
                         advance(",");
                         return pair();
                     }
@@ -2854,22 +2908,22 @@ function jslint(
                 advance("}");
                 advance("=");
                 the_statement.expression = expression(0);
-            } else if (token_next.id === "[" && the_statement.id !== "var") {
-                const the_bracket = token_next;
+            } else if (token_nxt.id === "[" && the_statement.id !== "var") {
+                const the_bracket = token_nxt;
                 advance("[");
                 (function element() {
                     let ellipsis;
-                    if (token_next.id === "...") {
+                    if (token_nxt.id === "...") {
                         ellipsis = true;
                         advance("...");
                     }
-                    if (!token_next.identifier) {
+                    if (!token_nxt.identifier) {
 
 // cause: "let[]"
 
-                        return stop("expected_identifier_a", token_next);
+                        return stop("expected_identifier_a", token_nxt);
                     }
-                    const name = token_next;
+                    const name = token_nxt;
                     advance();
                     the_statement.names.push(name);
                     enroll(name, "variable", is_const);
@@ -2878,12 +2932,12 @@ function jslint(
                     if (ellipsis) {
                         name.ellipsis = true;
                     } else {
-                        if (token_next.id === "=") {
+                        if (token_nxt.id === "=") {
                             advance("=");
                             name.expression = expression();
                             the_bracket.open = true;
                         }
-                        if (token_next.id === ",") {
+                        if (token_nxt.id === ",") {
                             advance(",");
                             return element();
                         }
@@ -2892,8 +2946,8 @@ function jslint(
                 advance("]");
                 advance("=");
                 the_statement.expression = expression(0);
-            } else if (token_next.identifier) {
-                const name = token_next;
+            } else if (token_nxt.identifier) {
+                const name = token_nxt;
                 advance();
                 if (name.id === "ignore") {
 
@@ -2902,7 +2956,7 @@ function jslint(
                     warn("unexpected_a", name);
                 }
                 enroll(name, "variable", is_const);
-                if (token_next.id === "=" || is_const) {
+                if (token_nxt.id === "=" || is_const) {
                     advance("=");
                     name.dead = false;
                     name.init = true;
@@ -2914,7 +2968,7 @@ function jslint(
 // cause: "let 0"
 // cause: "var{aa:{aa}}"
 
-                return stop("expected_identifier_a", token_next);
+                return stop("expected_identifier_a", token_nxt);
             }
         }());
         semicolon();
@@ -2923,7 +2977,7 @@ function jslint(
 
     stmt("const", do_var);
     stmt("continue", function () {
-        const the_continue = token_curr;
+        const the_continue = token_now;
         if (functionage.loop < 1 || functionage.finally > 0) {
 
 // cause: "continue"
@@ -2938,7 +2992,7 @@ function jslint(
         return the_continue;
     });
     stmt("debugger", function () {
-        const the_debug = token_curr;
+        const the_debug = token_now;
         if (!option_object.devel) {
 
 // cause: "debugger"
@@ -2949,7 +3003,7 @@ function jslint(
         return the_debug;
     });
     stmt("delete", function () {
-        const the_token = token_curr;
+        const the_token = token_now;
         const the_value = expression(0);
         if (
             (the_value.id !== "." && the_value.id !== "[")
@@ -2965,7 +3019,7 @@ function jslint(
         return the_token;
     });
     stmt("do", function () {
-        const the_do = token_curr;
+        const the_do = token_now;
         not_top_level(the_do);
         functionage.loop += 1;
         the_do.block = block();
@@ -2982,19 +3036,19 @@ function jslint(
         return the_do;
     });
     stmt("export", function () {
-        const the_export = token_curr;
+        const the_export = token_now;
         let the_id;
         let the_name;
         let the_thing;
 
         function export_id() {
-            if (!token_next.identifier) {
+            if (!token_nxt.identifier) {
 
 // cause: "export {}"
 
                 stop("expected_identifier_a");
             }
-            the_id = token_next.id;
+            the_id = token_nxt.id;
             the_name = global.context[the_id];
             if (the_name === undefined) {
 
@@ -3003,21 +3057,21 @@ function jslint(
                 warn("unexpected_a");
             } else {
                 the_name.used += 1;
-                if (exports[the_id] !== undefined) {
+                if (export_object[the_id] !== undefined) {
 
 // cause: "let aa;export{aa,aa}"
 
                     warn("duplicate_a");
                 }
-                exports[the_id] = the_name;
+                export_object[the_id] = the_name;
             }
             advance();
             the_export.expression.push(the_thing);
         }
 
         the_export.expression = [];
-        if (token_next.id === "default") {
-            if (exports.default !== undefined) {
+        if (token_nxt.id === "default") {
+            if (export_object.default !== undefined) {
 
 // cause: "export default 0;export default 0"
 
@@ -3041,10 +3095,10 @@ function jslint(
 
                 semicolon();
             }
-            exports.default = the_thing;
+            export_object.default = the_thing;
             the_export.expression.push(the_thing);
         } else {
-            if (token_next.id === "function") {
+            if (token_nxt.id === "function") {
 
 // cause: "export function aa(){}"
 
@@ -3056,33 +3110,33 @@ function jslint(
 
 // cause: "let aa;export{aa};export function aa(){}"
 
-                if (exports[the_id] !== undefined) {
+                if (export_object[the_id] !== undefined) {
                     warn("duplicate_a", the_name);
                 }
-                exports[the_id] = the_thing;
+                export_object[the_id] = the_thing;
                 the_export.expression.push(the_thing);
                 the_thing.statement = false;
                 the_thing.arity = "unary";
             } else if (
-                token_next.id === "var"
-                || token_next.id === "let"
-                || token_next.id === "const"
+                token_nxt.id === "var"
+                || token_nxt.id === "let"
+                || token_nxt.id === "const"
             ) {
 
 // cause: "export const"
 // cause: "export let"
 // cause: "export var"
 
-                warn("unexpected_a", token_next);
+                warn("unexpected_a", token_nxt);
                 statement();
-            } else if (token_next.id === "{") {
+            } else if (token_nxt.id === "{") {
 
 // cause: "export {}"
 
                 advance("{");
                 (function loop() {
                     export_id();
-                    if (token_next.id === ",") {
+                    if (token_nxt.id === ",") {
                         advance(",");
                         return loop();
                     }
@@ -3096,12 +3150,12 @@ function jslint(
                 stop("unexpected_a");
             }
         }
-        module_mode = true;
+        mode_module = true;
         return the_export;
     });
     stmt("for", function () {
         let first;
-        const the_for = token_curr;
+        const the_for = token_now;
         if (!option_object.for) {
 
 // cause: "for"
@@ -3114,17 +3168,17 @@ function jslint(
 
 // cause: "for(){}"
 
-        token_curr.free = true;
-        if (token_next.id === ";") {
+        token_now.free = true;
+        if (token_nxt.id === ";") {
 
 // cause: "for(;;){}"
 
             return stop("expected_a_b", the_for, "while (", "for (;");
         }
         if (
-            token_next.id === "var"
-            || token_next.id === "let"
-            || token_next.id === "const"
+            token_nxt.id === "var"
+            || token_nxt.id === "let"
+            || token_nxt.id === "const"
         ) {
 
 // cause: "for(const aa in aa){}"
@@ -3169,14 +3223,14 @@ function jslint(
     stmt("function", do_function);
     stmt("if", function () {
         let the_else;
-        const the_if = token_curr;
+        const the_if = token_now;
         the_if.expression = condition();
         the_if.block = block();
-        if (token_next.id === "else") {
+        if (token_nxt.id === "else") {
             advance("else");
-            the_else = token_curr;
+            the_else = token_now;
             the_if.else = (
-                token_next.id === "if"
+                token_nxt.id === "if"
 
 // cause: "if(0){0}else if(0){0}"
 
@@ -3203,8 +3257,8 @@ function jslint(
         return the_if;
     });
     stmt("import", function () {
-        const the_import = token_curr;
-        if (token_next.id === "(") {
+        const the_import = token_now;
+        if (token_nxt.id === "(") {
             the_import.arity = "unary";
             the_import.constant = true;
             the_import.statement = false;
@@ -3216,7 +3270,7 @@ function jslint(
 
                 warn("expected_string_a", string);
             }
-            froms.push(token_curr.value);
+            import_from_array.push(token_now.value);
             advance(")");
             advance(".");
             advance("then");
@@ -3227,15 +3281,15 @@ function jslint(
             return the_import;
         }
         let name;
-        if (typeof module_mode === "object") {
+        if (typeof mode_module === "object") {
 
 // cause: "/*global aa*/\nimport aa from \"aa\""
 
-            warn("unexpected_directive_a", module_mode, module_mode.directive);
+            warn("unexpected_directive_a", mode_module, mode_module.directive);
         }
-        module_mode = true;
-        if (token_next.identifier) {
-            name = token_next;
+        mode_module = true;
+        if (token_nxt.identifier) {
+            name = token_nxt;
             advance();
             if (name.id === "ignore") {
 
@@ -3248,15 +3302,15 @@ function jslint(
         } else {
             const names = [];
             advance("{");
-            if (token_next.id !== "}") {
+            if (token_nxt.id !== "}") {
                 while (true) {
-                    if (!token_next.identifier) {
+                    if (!token_nxt.identifier) {
 
 // cause: "import {"
 
                         stop("expected_identifier_a");
                     }
-                    name = token_next;
+                    name = token_nxt;
                     advance();
                     if (name.id === "ignore") {
 
@@ -3266,7 +3320,7 @@ function jslint(
                     }
                     enroll(name, "variable", true);
                     names.push(name);
-                    if (token_next.id !== ",") {
+                    if (token_nxt.id !== ",") {
                         break;
                     }
                     advance(",");
@@ -3277,20 +3331,20 @@ function jslint(
         }
         advance("from");
         advance("(string)");
-        the_import.import = token_curr;
-        if (!rx_module.test(token_curr.value)) {
+        the_import.import = token_now;
+        if (!rx_module.test(token_now.value)) {
 
 // cause: "import aa from \"!aa\""
 
-            warn("bad_module_name_a", token_curr);
+            warn("bad_module_name_a", token_now);
         }
-        froms.push(token_curr.value);
+        import_from_array.push(token_now.value);
         semicolon();
         return the_import;
     });
     stmt("let", do_var);
     stmt("return", function () {
-        const the_return = token_curr;
+        const the_return = token_now;
         not_top_level(the_return);
         if (functionage.finally > 0) {
 
@@ -3299,7 +3353,7 @@ function jslint(
             warn("unexpected_a", the_return);
         }
         the_return.disrupt = true;
-        if (token_next.id !== ";" && the_return.line === token_next.line) {
+        if (token_nxt.id !== ";" && the_return.line === token_nxt.line) {
             the_return.expression = expression(10);
         }
         advance(";");
@@ -3311,7 +3365,7 @@ function jslint(
         let stmts;
         const the_cases = [];
         let the_disrupt = true;
-        const the_switch = token_curr;
+        const the_switch = token_now;
         not_top_level(the_switch);
         if (functionage.finally > 0) {
 
@@ -3324,18 +3378,18 @@ function jslint(
 
 // cause: "switch(){}"
 
-        token_curr.free = true;
+        token_now.free = true;
         the_switch.expression = expression(0);
         the_switch.block = the_cases;
         advance(")");
         advance("{");
         (function major() {
-            const the_case = token_next;
+            const the_case = token_nxt;
             the_case.arity = "statement";
             the_case.expression = [];
             (function minor() {
                 advance("case");
-                token_curr.switch = true;
+                token_now.switch = true;
                 const exp = expression(0);
                 if (dups.some(function (thing) {
                     return are_similar(thing, exp);
@@ -3348,7 +3402,7 @@ function jslint(
                 dups.push(exp);
                 the_case.expression.push(exp);
                 advance(":");
-                if (token_next.id === "case") {
+                if (token_nxt.id === "case") {
                     return minor();
                 }
             }());
@@ -3370,20 +3424,20 @@ function jslint(
             } else {
                 warn(
                     "expected_a_before_b",
-                    token_next,
+                    token_nxt,
                     "break;",
-                    artifact(token_next)
+                    artifact(token_nxt)
                 );
             }
-            if (token_next.id === "case") {
+            if (token_nxt.id === "case") {
                 return major();
             }
         }());
         dups = undefined;
-        if (token_next.id === "default") {
-            const the_default = token_next;
+        if (token_nxt.id === "default") {
+            const the_default = token_nxt;
             advance("default");
-            token_curr.switch = true;
+            token_now.switch = true;
             advance(":");
             the_switch.else = statements();
             if (the_switch.else.length < 1) {
@@ -3412,7 +3466,7 @@ function jslint(
         return the_switch;
     });
     stmt("throw", function () {
-        const the_throw = token_curr;
+        const the_throw = token_now;
         the_throw.disrupt = true;
         the_throw.expression = expression(10);
         semicolon();
@@ -3425,7 +3479,7 @@ function jslint(
         return the_throw;
     });
     stmt("try", function () {
-        const the_try = token_curr;
+        const the_try = token_now;
         let ignored;
         let the_catch;
         let the_disrupt;
@@ -3438,29 +3492,30 @@ function jslint(
         functionage.try += 1;
         the_try.block = block();
         the_disrupt = the_try.block.disrupt;
-        if (token_next.id === "catch") {
+        if (token_nxt.id === "catch") {
             advance("catch");
-            the_catch = token_next;
-            ignored = "ignore";
+            the_catch = token_nxt;
+            the_catch.context = empty();
+            the_catch.is_async = functionage.is_async;
             the_try.catch = the_catch;
 
 // Create new function-scope for catch-parameter.
 
             stack.push(functionage);
             functionage = the_catch;
-            functionage.context = empty();
-            if (token_next.id === "(") {
+            ignored = "ignore";
+            if (token_nxt.id === "(") {
                 advance("(");
-                if (!token_next.identifier) {
+                if (!token_nxt.identifier) {
 
 // cause: "try{}catch(){}"
 
-                    return stop("expected_identifier_a", token_next);
+                    return stop("expected_identifier_a", token_nxt);
                 }
-                if (token_next.id !== "ignore") {
+                if (token_nxt.id !== "ignore") {
                     ignored = undefined;
-                    the_catch.name = token_next;
-                    enroll(token_next, "exception", true);
+                    the_catch.name = token_nxt;
+                    enroll(token_nxt, "exception", true);
                 }
                 advance();
                 advance(")");
@@ -3479,13 +3534,13 @@ function jslint(
 
             warn(
                 "expected_a_before_b",
-                token_next,
+                token_nxt,
                 "catch",
-                artifact(token_next)
+                artifact(token_nxt)
             );
 
         }
-        if (token_next.id === "finally") {
+        if (token_nxt.id === "finally") {
             functionage.finally += 1;
             advance("finally");
             the_try.else = block();
@@ -3498,7 +3553,7 @@ function jslint(
     });
     stmt("var", do_var);
     stmt("while", function () {
-        const the_while = token_curr;
+        const the_while = token_now;
         not_top_level(the_while);
         functionage.loop += 1;
         the_while.expression = condition();
@@ -3516,7 +3571,7 @@ function jslint(
 
 // cause: "with"
 
-        stop("unexpected_a", token_curr);
+        stop("unexpected_a", token_now);
     });
 
     ternary("?", ":");
@@ -4570,7 +4625,7 @@ function jslint(
 // or used. If the file imports or exports, then its global object is also
 // delved.
 
-        if (module_mode === true || option_object.node) {
+        if (mode_module === true || option_object.node) {
             delve(global);
         }
         functions.forEach(delve);
@@ -4634,7 +4689,7 @@ function jslint(
             );
 //      Probably deadcode.
 //      if (right === undefined) {
-//          right = token_next;
+//          right = token_nxt;
 //      }
             warn(
                 "expected_a_at_b_c",
@@ -4643,8 +4698,8 @@ function jslint(
 
 // Fudge column numbers in warning message.
 
-                at + fudge,
-                right.from + fudge
+                at + line_fudge,
+                right.from + line_fudge
             );
         }
 
@@ -4762,7 +4817,7 @@ function jslint(
         }
 
         stack = [];
-        tokens.forEach(function (the_token) {
+        token_array.forEach(function (the_token) {
             right = the_token;
             if (right.id === "(comment)" || right.id === "(end)") {
                 nr_comments_skipped += 1;
@@ -5131,20 +5186,20 @@ function jslint(
         });
     }
 
-    function next_line() {
+    function line_next() {
 
-// Put the next line of source in source_line. If the line contains tabs,
+// Put the next line of source in line_source. If the line contains tabs,
 // replace them with spaces and give a warning. Also warn if the line contains
 // unsafe characters or is too damn long.
 
         let at;
         if (
             !option_object.long
-            && whole_line.length > 80
-            && disable_line === undefined
-            && !json_mode
-            && token_frst
-            && !regexp_seen
+            && line_whole.length > 80
+            && line_disable === undefined
+            && !mode_json
+            && token_1
+            && !mode_regexp
         ) {
 
 // cause: "too_long"
@@ -5153,46 +5208,46 @@ function jslint(
         }
         column = 0;
         line += 1;
-        regexp_seen = false;
-        source_line = undefined;
-        whole_line = "";
-        if (lines[line] === undefined) {
-            return source_line;
+        mode_regexp = false;
+        line_source = undefined;
+        line_whole = "";
+        if (line_array[line] === undefined) {
+            return line_source;
         }
-        source_line = lines[line].source_line;
-        whole_line = source_line;
+        line_source = line_array[line].line_source;
+        line_whole = line_source;
 
 // Scan each line for following ignore-directives:
 // "/*jslint-disable*/"
 // "/*jslint-enable*/"
 // "//jslint-quiet"
 
-        if (source_line === "/*jslint-disable*/") {
+        if (line_source === "/*jslint-disable*/") {
 
 // cause: "/*jslint-disable*/"
 
-            disable_line = line;
-        } else if (source_line === "/*jslint-enable*/") {
-            if (disable_line === undefined) {
+            line_disable = line;
+        } else if (line_source === "/*jslint-enable*/") {
+            if (line_disable === undefined) {
 
 // cause: "/*jslint-enable*/"
 
                 stop_at("unopened_enable", line);
             }
-            disable_line = undefined;
-        } else if (source_line.endsWith(" //jslint-quiet")) {
+            line_disable = undefined;
+        } else if (line_source.endsWith(" //jslint-quiet")) {
 
 // cause: "0 //jslint-quiet"
 
-            lines[line].directive_quiet = true;
+            line_array[line].directive_quiet = true;
         }
-        if (disable_line !== undefined) {
+        if (line_disable !== undefined) {
 
 // cause: "/*jslint-disable*/\n0"
 
-            source_line = "";
+            line_source = "";
         }
-        at = source_line.search(rx_tab);
+        at = line_source.search(rx_tab);
         if (at >= 0) {
             if (!option_object.white) {
 
@@ -5200,15 +5255,15 @@ function jslint(
 
                 warn_at("use_spaces", line, at);
             }
-            source_line = source_line.replace(rx_tab, " ");
+            line_source = line_source.replace(rx_tab, " ");
         }
-        if (!option_object.white && source_line.endsWith(" ")) {
+        if (!option_object.white && line_source.endsWith(" ")) {
 
 // cause: " "
 
-            warn_at("unexpected_trailing_space", line, source_line.length - 1);
+            warn_at("unexpected_trailing_space", line, line_source.length - 1);
         }
-        return source_line;
+        return line_source;
     }
 
 // Most tokens, including the identifiers, operators, and punctuators, can be
@@ -5220,7 +5275,7 @@ function jslint(
 
     function char_after(match) {
 
-// Get the next character from the source line. Remove it from the source_line,
+// Get the next character from the source line. Remove it from the line_source,
 // and append it to the snippet. Optionally check that the previous character
 // matched an expected value.
 
@@ -5237,8 +5292,8 @@ function jslint(
                 : stop_at("expected_a_b", line, column, match, char)
             );
         }
-        char = source_line.slice(0, 1);
-        source_line = source_line.slice(1);
+        char = line_source.slice(0, 1);
+        line_source = line_source.slice(1);
         snippet += char || " ";
         column += 1;
         return char;
@@ -5247,10 +5302,10 @@ function jslint(
     function char_before() {
 
 // Back up one character by moving a character from the end of the snippet to
-// the front of the source_line.
+// the front of the line_source.
 
         char = snippet.slice(-1);
-        source_line = char + source_line;
+        line_source = char + line_source;
         column -= char.length;
 
 // Remove last character from snippet.
@@ -5260,7 +5315,7 @@ function jslint(
     }
 
     function read_some_digits(rx, quiet) {
-        const digits = source_line.match(rx)[0];
+        const digits = line_source.match(rx)[0];
         const length = digits.length;
         if (!quiet && length === 0) {
 
@@ -5269,7 +5324,7 @@ function jslint(
             warn_at("expected_digits_after_a", line, column, snippet);
         }
         column += length;
-        source_line = source_line.slice(length);
+        line_source = line_source.slice(length);
         snippet += digits;
         char_after();
         return length;
@@ -5297,7 +5352,7 @@ function jslint(
             return char_after();
         case "u":
             if (char_after("u") === "{") {
-                if (json_mode) {
+                if (mode_json) {
 
 // cause: "[\"\\u{12345}\"]"
 
@@ -5336,25 +5391,24 @@ function jslint(
         }
     }
 
-    function make(id, value, identifier) {
+    function token_create(id, value, identifier) {
 
-// Make the token object and append it to the tokens list.
+// Create the token object and append it to token_array.
 
         const the_token = {
             from,
             id,
             identifier: Boolean(identifier),
             line,
-            nr,
+            nr: token_array.length,
             thru: column
         };
-        tokens[nr] = the_token;
-        nr += 1;
+        token_array.push(the_token);
 
 // Directives must appear before the first statement.
 
         if (id !== "(comment)" && id !== ";") {
-            directive_mode = false;
+            mode_directive = false;
         }
 
 // If the token is to have a value, give it one.
@@ -5369,10 +5423,10 @@ function jslint(
 // This warning is not suppressed by option_object.white.
 
         if (
-            token_prev.line === line
-            && token_prev.thru === from
+            token_prv.line === line
+            && token_prv.thru === from
             && (id === "(comment)" || id === "(regexp)" || id === "/")
-            && (token_prev.id === "(comment)" || token_prev.id === "(regexp)")
+            && (token_prv.id === "(comment)" || token_prv.id === "(regexp)")
         ) {
 
 // cause: "/**//**/"
@@ -5380,30 +5434,31 @@ function jslint(
             warn(
                 "expected_space_a_b",
                 the_token,
-                artifact(token_prev),
+                artifact(token_prv),
                 artifact(the_token)
             );
         }
-        if (token_prev.id === "." && id === "(number)") {
+        if (token_prv.id === "." && id === "(number)") {
 
 // cause: ".0"
 
-            warn("expected_a_before_b", token_prev, "0", ".");
+            warn("expected_a_before_b", token_prv, "0", ".");
         }
-        if (prior.id === "." && the_token.identifier) {
+        if (token_before_slash.id === "." && the_token.identifier) {
             the_token.dot = true;
         }
 
 // The previous token is used to detect adjacency problems.
 
-        token_prev = the_token;
+        token_prv = the_token;
 
-// The prior token is a previous token that was not a comment. The prior token
+// The token_before_slash token is a previous token that was not a comment.
+// The token_before_slash token
 // is used to disambiguate "/", which can mean division or regular expression
 // literal.
 
-        if (token_prev.id !== "(comment)") {
-            prior = token_prev;
+        if (token_prv.id !== "(comment)") {
+            token_before_slash = token_prv;
         }
         return the_token;
     }
@@ -5461,7 +5516,7 @@ function jslint(
                     warn("bad_option_a", the_comment, name + ":" + value);
                 }
                 global_array[name] = false;
-                module_mode = the_comment;
+                mode_module = the_comment;
             }
             return parse_directive(the_comment, result[3]);
         }
@@ -5475,10 +5530,10 @@ function jslint(
 
     function comment(snippet) {
 
-// Make a comment object. Comments are not allowed in JSON text. Comments can
+// Create a comment object. Comments are not allowed in JSON text. Comments can
 // include directives and notices of incompletion.
 
-        const the_comment = make("(comment)", snippet);
+        const the_comment = token_create("(comment)", snippet);
         if (Array.isArray(snippet)) {
             snippet = snippet.join(" ");
         }
@@ -5490,7 +5545,7 @@ function jslint(
         }
         const result = snippet.match(rx_directive);
         if (result) {
-            if (!directive_mode) {
+            if (!mode_directive) {
 
 // cause: "0\n/*global aa*/"
 
@@ -5509,10 +5564,10 @@ function jslint(
 // Regexp
 // Parse a regular expression literal.
 
-        let multi_mode = false;
+        let mode_multi = false;
         let result;
         let value;
-        regexp_seen = true;
+        mode_regexp = true;
 
         function regexp_subklass() {
 
@@ -5538,7 +5593,7 @@ function jslint(
                 char_after();
                 return true;
             case "`":
-                if (mega_mode) {
+                if (mode_mega) {
 
 // cause: "`${/[`]/}`"
 
@@ -5674,7 +5729,7 @@ function jslint(
                     char_after();
                     break;
                 case "`":
-                    if (mega_mode) {
+                    if (mode_mega) {
 
 // cause: "`${/`/}`"
 
@@ -5690,14 +5745,14 @@ function jslint(
                     char_after();
                     break;
                 case "$":
-                    if (source_line[0] !== "/") {
-                        multi_mode = true;
+                    if (line_source[0] !== "/") {
+                        mode_multi = true;
                     }
                     char_after();
                     break;
                 case "^":
                     if (snippet !== "^") {
-                        multi_mode = true;
+                        mode_multi = true;
                     }
                     char_after();
                     break;
@@ -5779,7 +5834,7 @@ function jslint(
         };
 
 // RegExp
-// Make flag.
+// Create flag.
 
         const flag = empty();
         while (
@@ -5807,10 +5862,10 @@ function jslint(
 
             return stop_at("unexpected_a", line, from, char);
         }
-        result = make("(regexp)", char);
+        result = token_create("(regexp)", char);
         result.flag = flag;
         result.value = value;
-        if (multi_mode && !flag.m) {
+        if (mode_multi && !flag.m) {
 
 // cause: "aa=/$^/"
 
@@ -5821,43 +5876,45 @@ function jslint(
 
     function string(quote) {
 
-// Make a string token.
+// Create a string token.
 
         let the_token;
         snippet = "";
         char_after();
 
-        return (function next() {
-            if (char === quote) {
+// Parse/loop through each character in "...".
+
+        while (true) {
+            switch (char) {
+            case quote:
 
 // Remove last character from snippet.
 
                 snippet = snippet.slice(0, -1);
-                the_token = make("(string)", snippet);
+                the_token = token_create("(string)", snippet);
                 the_token.quote = quote;
                 return the_token;
-            }
-            if (char === "") {
+            case "":
 
 // cause: "\""
 
                 return stop_at("unclosed_string", line, column);
-            }
-            if (char === "\\") {
+            case "\\":
                 char_after_escape(quote);
-            } else if (char === "`") {
-                if (mega_mode) {
+                break;
+            case "`":
+                if (mode_mega) {
 
 // cause: "`${\"`\"}`"
 
                     warn_at("unexpected_a", line, column, "`");
                 }
                 char_after("`");
-            } else {
+                break;
+            default:
                 char_after();
             }
-            return next();
-        }());
+        }
     }
 
     function frack() {
@@ -5910,7 +5967,7 @@ function jslint(
             );
         }
         char_before();
-        return make("(number)", snippet);
+        return token_create("(number)", snippet);
     }
 
     function lex() {
@@ -5924,15 +5981,15 @@ function jslint(
 // This should properly be a tail recursive function, but sadly, conformant
 // implementations of ES6 are still rare. This is the ideal code:
 
-//      if (!source_line) {
-//          source_line = next_line();
+//      if (!line_source) {
+//          line_source = line_next();
 //          from = 0;
 //          return (
-//              source_line === undefined
+//              line_source === undefined
 //              ? (
-//                  mega_mode
-//                  ? stop_at("unclosed_mega", mega_line, mega_from)
-//                  : make("(end)")
+//                  mode_mega
+//                  ? stop_at("unclosed_mega", line_mega, from_mega)
+//                  : token_create("(end)")
 //              )
 //              : lex()
 //          );
@@ -5941,28 +5998,28 @@ function jslint(
 // Unfortunately, incompetent JavaScript engines will sometimes fail to execute
 // it correctly. So for now, we do it the old fashioned way.
 
-        while (!source_line) {
-            source_line = next_line();
+        while (!line_source) {
+            line_source = line_next();
             from = 0;
-            if (source_line === undefined) {
+            if (line_source === undefined) {
                 return (
-                    mega_mode
+                    mode_mega
 
 // cause: "`${//}`"
 
-                    ? stop_at("unclosed_mega", mega_line, mega_from)
-                    : disable_line !== undefined
+                    ? stop_at("unclosed_mega", line_mega, from_mega)
+                    : line_disable !== undefined
 
 // cause: "/*jslint-disable*/"
 
-                    ? stop_at("unclosed_disable", disable_line)
-                    : make("(end)")
+                    ? stop_at("unclosed_disable", line_disable)
+                    : token_create("(end)")
                 );
             }
         }
 
         from = column;
-        result = source_line.match(rx_token);
+        result = line_source.match(rx_token);
 
 // result[1] token
 // result[2] whitespace
@@ -5978,13 +6035,13 @@ function jslint(
                 "unexpected_char_a",
                 line,
                 column,
-                source_line[0]
+                line_source[0]
             );
         }
 
         snippet = result[1];
         column += snippet.length;
-        source_line = result[5];
+        line_source = result[5];
 
 // Whitespace was matched. Call lex again to get more.
 
@@ -5995,16 +6052,16 @@ function jslint(
 // The token is an identifier.
 
         if (result[3]) {
-            return make(snippet, undefined, true);
+            return token_create(snippet, undefined, true);
         }
 
-// The token is a number.
+// Create token from number.
 
         if (result[4]) {
             return number(snippet);
         }
 
-// The token is a string.
+// Create token from string.
 
         if (snippet === "\"") {
             return string(snippet);
@@ -6022,20 +6079,20 @@ function jslint(
 // The token is a megastring. We don't allow any kind of mega nesting.
 
         if (snippet === "`") {
-            if (mega_mode) {
+            if (mode_mega) {
 
 // cause: "`${`"
 
                 return stop_at("expected_a_b", line, column, "}", "`");
             }
             snippet = "";
-            mega_from = from;
-            mega_line = line;
-            mega_mode = true;
+            from_mega = from;
+            line_mega = line;
+            mode_mega = true;
 
-// Parsing a mega literal is tricky. First make a ` token.
+// Parsing a mega literal is tricky. First create a ` token.
 
-            make("`");
+            token_create("`");
             from += 1;
 
 // Then loop, building up a string, possibly from many lines, until seeing
@@ -6043,27 +6100,27 @@ function jslint(
 // string.
 
             (function part() {
-                const at = source_line.search(rx_mega);
+                const at = line_source.search(rx_mega);
 
 // If neither ` nor ${ is seen, then the whole line joins the snippet.
 
                 if (at < 0) {
-                    snippet += source_line + "\n";
+                    snippet += line_source + "\n";
                     return (
-                        next_line() === undefined
+                        line_next() === undefined
 
 // cause: "`"
 
-                        ? stop_at("unclosed_mega", mega_line, mega_from)
+                        ? stop_at("unclosed_mega", line_mega, from_mega)
                         : part()
                     );
                 }
-                snippet += source_line.slice(0, at);
+                snippet += line_source.slice(0, at);
                 column += at;
-                source_line = source_line.slice(at);
-                if (source_line[0] === "\\") {
-                    snippet += source_line.slice(0, 2);
-                    source_line = source_line.slice(2);
+                line_source = line_source.slice(at);
+                if (line_source[0] === "\\") {
+                    snippet += line_source.slice(0, 2);
+                    line_source = line_source.slice(2);
                     column += 2;
                     return part();
                 }
@@ -6071,16 +6128,16 @@ function jslint(
 // if either ` or ${ was found, then the preceding joins the snippet to become
 // a string token.
 
-                make("(string)", snippet).quote = "`";
+                token_create("(string)", snippet).quote = "`";
                 snippet = "";
 
-// If ${, then make tokens that will become part of an expression until
+// If ${, then create tokens that will become part of an expression until
 // a } token is made.
 
-                if (source_line[0] === "$") {
+                if (line_source[0] === "$") {
                     column += 2;
-                    make("${");
-                    source_line = source_line.slice(2);
+                    token_create("${");
+                    line_source = line_source.slice(2);
                     (function expr() {
                         const id = lex().id;
                         if (id === "{") {
@@ -6102,19 +6159,19 @@ function jslint(
                     return part();
                 }
             }());
-            source_line = source_line.slice(1);
+            line_source = line_source.slice(1);
             column += 1;
-            mega_mode = false;
-            return make("`");
+            mode_mega = false;
+            return token_create("`");
         }
 
 // The token is a // comment.
 
         if (snippet === "//") {
-            snippet = source_line;
-            source_line = "";
+            snippet = line_source;
+            line_source = "";
             the_token = comment(snippet);
-            if (mega_mode) {
+            if (mode_mega) {
 
 // cause: "`${//}`"
 
@@ -6127,16 +6184,16 @@ function jslint(
 
         if (snippet === "/*") {
             array = [];
-            if (source_line[0] === "/") {
+            if (line_source[0] === "/") {
                 warn_at("unexpected_a", line, column + i, "/");
             }
             (function next() {
-                if (source_line > "") {
-                    i = source_line.search(rx_star_slash);
+                if (line_source > "") {
+                    i = line_source.search(rx_star_slash);
                     if (i >= 0) {
                         return;
                     }
-                    j = source_line.search(rx_slash_star);
+                    j = line_source.search(rx_slash_star);
                     if (j >= 0) {
 
 // cause: "/*/*"
@@ -6144,9 +6201,9 @@ function jslint(
                         warn_at("nested_comment", line, column + j);
                     }
                 }
-                array.push(source_line);
-                source_line = next_line();
-                if (source_line === undefined) {
+                array.push(line_source);
+                line_source = line_next();
+                if (line_source === undefined) {
 
 // cause: "/*"
 
@@ -6154,7 +6211,7 @@ function jslint(
                 }
                 return next();
             }());
-            snippet = source_line.slice(0, i);
+            snippet = line_source.slice(0, i);
             j = snippet.search(rx_slash_star_or_slash);
             if (j >= 0) {
 
@@ -6164,7 +6221,7 @@ function jslint(
             }
             array.push(snippet);
             column += i + 2;
-            source_line = source_line.slice(i + 2);
+            line_source = line_source.slice(i + 2);
             return comment(array);
         }
 
@@ -6181,21 +6238,21 @@ function jslint(
 // object, so it is likely that we can get away with it. We avoided the worst
 // cases by eliminating automatic semicolon insertion.
 
-            if (prior.identifier) {
-                if (!prior.dot) {
-                    if (prior.id === "return") {
+            if (token_before_slash.identifier) {
+                if (!token_before_slash.dot) {
+                    if (token_before_slash.id === "return") {
                         return regexp();
                     }
                     if (
-                        prior.id === "(begin)"
-                        || prior.id === "case"
-                        || prior.id === "delete"
-                        || prior.id === "in"
-                        || prior.id === "instanceof"
-                        || prior.id === "new"
-                        || prior.id === "typeof"
-                        || prior.id === "void"
-                        || prior.id === "yield"
+                        token_before_slash.id === "(begin)"
+                        || token_before_slash.id === "case"
+                        || token_before_slash.id === "delete"
+                        || token_before_slash.id === "in"
+                        || token_before_slash.id === "instanceof"
+                        || token_before_slash.id === "new"
+                        || token_before_slash.id === "typeof"
+                        || token_before_slash.id === "void"
+                        || token_before_slash.id === "yield"
                     ) {
                         the_token = regexp();
 
@@ -6213,7 +6270,7 @@ function jslint(
                     }
                 }
             } else {
-                last = prior.id[prior.id.length - 1];
+                last = token_before_slash.id[token_before_slash.id.length - 1];
                 if ("(,=:?[".indexOf(last) >= 0) {
                     return regexp();
                 }
@@ -6226,18 +6283,15 @@ function jslint(
                     return the_token;
                 }
             }
-            if (source_line[0] === "=") {
+            if (line_source[0] === "=") {
                 column += 1;
-                source_line = source_line.slice(1);
+                line_source = line_source.slice(1);
                 snippet = "/=";
                 warn_at("unexpected_a", line, column, "/=");
             }
         }
-        return make(snippet);
+        return token_create(snippet);
     }
-
-// The jslint function itself.
-
     try {
         option_object = Object.assign(empty(), option_object);
         global_array = Object.assign(empty(), global_array);
@@ -6251,8 +6305,6 @@ function jslint(
             }
         });
 
-// 1. Tokenize source into ast.
-
 // tokenize takes a source and produces from it an array of token objects.
 // JavaScript is notoriously difficult to tokenize because of the horrible
 // interactions between automatic semicolon insertion, regular expression
@@ -6260,25 +6312,26 @@ function jslint(
 // automatic semicolon insertion and nested megastring literals, which allows
 // full tokenization to precede parsing.
 
-// Split source into lines at the carriage return/linefeed.
+// PHASE 1. split the <source> by newlines into <line_array>.
 
-        lines = String("\n" + source).split(
+        line_array = String("\n" + source).split(
             /\n|\r\n?/
-        ).map(function (source_line) {
+        ).map(function (line_source) {
             return {
-                source_line
+                line_source
             };
         });
-        tokens = [];
+
+// PHASE 2. lex <line_array> into an array of <token_array>.
 
 // Scan first line for "#!" and ignore it.
 
-        if (lines[fudge].source_line.startsWith("#!")) {
+        if (line_array[line_fudge].line_source.startsWith("#!")) {
             line += 1;
-            shebang = true;
+            mode_shebang = true;
         }
-        token_frst = lex();
-        json_mode = token_frst.id === "{" || token_frst.id === "[";
+        token_1 = lex();
+        mode_json = token_1.id === "{" || token_1.id === "[";
 
 // This loop will be replaced with a recursive call to lex when ES6 has been
 // finished and widely deployed and adopted.
@@ -6289,10 +6342,10 @@ function jslint(
             }
         }
 
-// 2. Walk ast.
+// PHASE 3. Furcate the <token_array> into a parse <tree>.
 
         advance();
-        if (json_mode) {
+        if (mode_json) {
             tree = json_value();
             advance("(end)");
         } else {
@@ -6301,7 +6354,7 @@ function jslint(
 // be a semicolon to defend against a missing semicolon in the preceding file.
 
             if (option_object.browser) {
-                if (token_next.id === ";") {
+                if (token_nxt.id === ";") {
                     advance(";");
                 }
             } else {
@@ -6309,7 +6362,7 @@ function jslint(
 // If we are not in a browser, then the file form of strict pragma may be used.
 
                 if (
-                    token_next.value === "use strict"
+                    token_nxt.value === "use strict"
                 ) {
                     advance("(string)");
                     advance(";");
@@ -6318,9 +6371,14 @@ function jslint(
             tree = statements();
             advance("(end)");
             functionage = global;
+
+// PHASE 4. Walk the <tree>, traversing all of the nodes of the tree. It is a
+//          recursive traversal. Each node may be processed on the way down
+//          (preaction) and on the way up (postaction).
+
             walk_statement(tree);
 
-// 3. Re-walk ast validating whitespace.
+// PHASE 5. Check the whitespace between the <token_array>.
 
             if (warnings.length === 0) {
                 uninitialized_and_unused();
@@ -6342,24 +6400,27 @@ function jslint(
         if (option_object.test_internal_error) {
             assert_or_throw(undefined, "test_internal_error");
         }
-        early_stop = false;
+        mode_early_stop = false;
     } catch (e) {
-        e.early_stop = true;
+        e.mode_early_stop = true;
         e.message = "[JSLint was unable to finish]\n" + e.message;
         if (e.name !== "JSLintError") {
-            e.column = fudge;
-            e.line = fudge;
-            e.stack_trace = e.stack;
-            e.source_line = "";
-            warnings.push(e);
+            warnings.push(Object.assign(e, {
+                column: line_fudge,
+                line: line_fudge,
+                line_source: "",
+                stack_trace: e.stack
+            }));
         }
     }
 
-// Sort warnings by early_stop first, line, column respectively.
+// PHASE 6: sort and format <warnings>.
+
+// Sort warnings by mode_early_stop first, line, column respectively.
 
     warnings.sort(function (a, b) {
         return (
-            Boolean(b.early_stop) - Boolean(a.early_stop)
+            Boolean(b.mode_early_stop) - Boolean(a.mode_early_stop)
             || a.line - b.line
             || a.column - b.column
         );
@@ -6369,8 +6430,8 @@ function jslint(
     }).map(function ({
         column,
         line,
+        line_source,
         message,
-        source_line,
         stack_trace = ""
     }, ii, list) {
         list[ii].formatted_message = String(
@@ -6378,31 +6439,34 @@ function jslint(
             + " \u001b[31m" + message + "\u001b[39m"
             + " \u001b[90m\/\/ line " + line + ", column " + column
             + "\u001b[39m\n"
-            + ("    " + source_line.trim()).slice(0, 72) + "\n"
+            + ("    " + line_source.trim()).slice(0, 72) + "\n"
             + stack_trace
         ).trim();
     });
+
+// PHASE 7: return jslint result.
+
     return {
         directives,
         edition,
-        exports,
-        froms,
+        exports: export_object,
+        froms: import_from_array,
         functions,
         global,
         id: "(JSLint)",
-        json: json_mode,
-        lines,
-        module: module_mode === true,
-        ok: warnings.length === 0 && !early_stop,
+        json: mode_json,
+        lines: line_array,
+        module: mode_module === true,
+        ok: warnings.length === 0 && !mode_early_stop,
         option: option_object,
         property,
         shebang: (
-            shebang
-            ? lines[fudge].source_line
+            mode_shebang
+            ? line_array[line_fudge].line_source
             : undefined
         ),
-        stop: early_stop,
-        tokens,
+        stop: mode_early_stop,
+        tokens: token_array,
         tree,
         warnings
     };
@@ -6534,13 +6598,15 @@ async function cli({
 
 // Normalize file relative to process.cwd().
 
-    file = path.resolve(file) + path.sep;
-    if (file.startsWith(process.cwd() + path.sep)) {
-        file = file.replace(process.cwd() + path.sep, "").slice(0, -1) || ".";
+    file = path.resolve(file) + "/";
+    if (file.startsWith(process.cwd() + "/")) {
+        file = file.replace(process.cwd() + "/", "").slice(0, -1) || ".";
     }
     file = file.replace((
         /\\/g
-    ), "/");
+    ), "/").replace((
+        /\/$/g
+    ), "");
     if (source) {
         jslint_from_file({
             code: source,

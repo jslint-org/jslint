@@ -92,7 +92,14 @@ function noop() {
             "new Array(0);"
         ],
         async_await: [
-            "async function aa() {\n    await aa();\n}"
+            "async function aa() {\n    await aa();\n}",
+            "async function aa() {\n"
+            + "    try {\n"
+            + "        await aa();\n"
+            + "    } catch (err) {\n"
+            + "        await err();\n"
+            + "    }\n"
+            + "}\n"
         ],
         date: [
             "Date.getTime();",
@@ -173,14 +180,20 @@ function noop() {
             + "aa();\n"
         ],
         var: [
-            "let [...aa] = [...aa];",
             "let [\n    aa, bb = 0\n] = 0;",
-            "let {aa, bb} = 0;",
-            "let {\n    aa: bb\n} = 0;"
+            "let [...aa] = [...aa];",
+            "let {\n    aa: bb\n} = 0;",
+            "let {aa, bb} = 0;"
         ]
     }).forEach(function (codeList) {
+        let code0 = "";
         codeList.forEach(function (code) {
             let warnings;
+            // Assert codeList is sorted.
+            assertOrThrow(code0 < code, JSON.stringify([
+                code0, code
+            ], undefined, 4));
+            code0 = code;
             warnings = jslint(code).warnings;
             assertOrThrow(
                 warnings.length === 0,
@@ -204,7 +217,7 @@ function noop() {
     ), "gm"))).forEach(function ([
         match0, causeList, warning
     ]) {
-        let cause0;
+        let cause0 = "";
         let expectedWarningCode;
         let fnc;
         // debug match0
@@ -255,7 +268,6 @@ function noop() {
                 break;
             }
         }
-        cause0 = "";
         causeList.split(
             /\/\/\u0020cause:[\n|\u0020]/
         ).slice(1).forEach(function (cause) {
@@ -269,7 +281,7 @@ function noop() {
                     /^\/\/\u0020/gm
                 ), "")
             );
-            // Assert causes are sorted.
+            // Assert causeList is sorted.
             assertOrThrow(cause0 < cause, JSON.stringify([
                 cause0, cause
             ], undefined, 4));
