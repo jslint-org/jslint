@@ -3,14 +3,15 @@
 ## Todo
 - app - deploy jslint as chrome-extension.
 - jslint - add `for...of` syntax support.
-- jslint - remove unnecessary grammar-article "the" from documentations.
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning if case-statements are not sorted.
 - jslint - add new warning if const/let/var statements are not declared at top of function-scope.
 - jslint - add new warning if const/let/var statements are not sorted.
+- jslint - remove directive "eval" (use line-specific ignore-directive "//jslint-quiet" instead).
+- jslint - simplify comments/docs by removing unnecessary grammar-article "the".
+- jslint-refactor - group/localize code together by phases.
 - jslint-refactor - migrate recursive-loops to for/while loops.
     - inline functions number(), string().
-    - rename var regexp_seen to mode_regexp.
 - node - after node-v12 is deprecated, change `require("fs").promises` to `require("fs/promises")`.
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 - tests - update function warn_at() with assertion-check matching column with artifact.
@@ -25,9 +26,8 @@
     - remove unnecessary variables nr.
     - rename artifact-related variables a, b to let artifact_now, artifact_nxt.
     - rename functions make() to token_create().
-    - rename line-related variables from xxx_line to line_xxx.
-    - rename mode-related variables from xxx_mode to mode_xxx.
-    - rename token-related variables from xxx_token to token_xxx.
+    - reorganize/rename "global" variables by topical-prefixes:
+        artifact_xxx, export_xxx, from_xxx, import_xxx, line_xxx, mode_xxx, token_xxx
 - website - add ui-loader-animation.
 
 ## v2021.6.3

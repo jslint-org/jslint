@@ -98,7 +98,8 @@
     bad_set, bitwise, block, body, browser, c, calls, catch, closer,
     closure, code, column, concat, console_error, constant, context, convert,
     couch, create, d, dead, debug, default, devel, directive, directives,
-    disrupt, dot, duplicate_a, early_stop, edition, ellipsis, else, empty_block,
+    disrupt, dot, duplicate_a, mode_early_stop, edition, ellipsis, else,
+    empty_block,
     env, error, eval, every, exec, exit, expected_a, expected_a_at_b_c,
     expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
     expected_a_next_at_b, expected_digits_after_a, expected_four_digits,
@@ -482,11 +483,7 @@ function jslint(
 // The directive comments.
     const directives = [];
 // The exported names and values.
-    const exports = empty();
-// The array collecting all import-from strings.
-    const froms = [];
-// Fudge starting line and starting column to 1.
-    const fudge = 1;
+    const export_object = empty();
 // The array containing all of the functions.
     const functions = [];
 // The global object; the outermost context.
@@ -497,13 +494,17 @@ function jslint(
         from: 0,
         id: "(global)",
         level: 0,
-        line: fudge,
+        line: 1,
         live: [],
         loop: 0,
         switch: 0,
         thru: 0,
         try: 0
     };
+// The array collecting all import-from strings.
+    const import_from_array = [];
+// Fudge starting line and starting column to 1.
+    const line_fudge = 1;
 // The object containing the tallied property names.
     const property = empty();
 // The array of tokens.
@@ -518,8 +519,6 @@ function jslint(
     let char;
 // The column number of the next character.
     let column = 0;
-// true if JSLint cannot finish.
-    let early_stop = true;
 // The starting column number of the token.
     let from;
 // The starting column of megastring.
@@ -540,20 +539,20 @@ function jslint(
     let line_whole = "";
 // true if directives are still allowed.
     let mode_directive = true;
+// true if JSLint cannot finish.
+    let mode_early_stop = true;
 // true if parsing JSON.
     let mode_json = false;
 // true if currently parsing a megastring literal.
     let mode_mega = false;
 // true if import or export was used.
     let mode_module = false;
+// true if regular expression literal seen on this line.
+    let mode_regexp;
+// true if a #! was seen on the first line.
+    let mode_shebang = false;
 // "var" if using var; "let" if using let.
     let mode_var;
-// The previous token excluding comments.
-    let prior = global;
-// Regular expression literal seen on this line.
-    let regexp_seen;
-// true if a #! was seen on the first line.
-    let shebang = false;
 // A piece of string.
     let snippet = "";
 // The stack of functions.
@@ -564,6 +563,8 @@ function jslint(
     let tenure;
 // The first token.
     let token_1;
+// The previous token excluding comments.
+    let token_before_slash = global;
 // The current token being examined in the parse.
     let token_now = global;
 // The number of the next token.
@@ -604,7 +605,7 @@ function jslint(
 
 // Fudge column numbers in warning message.
 
-            column: column || fudge,
+            column: column || line_fudge,
             d,
             line,
             line_source: "",
@@ -662,7 +663,7 @@ function jslint(
             the_token.warning = warn_at(
                 code,
                 the_token.line,
-                (the_token.from || 0) + fudge,
+                (the_token.from || 0) + line_fudge,
                 a || artifact(the_token),
                 b,
                 c,
@@ -3047,13 +3048,13 @@ function jslint(
                 warn("unexpected_a");
             } else {
                 the_name.used += 1;
-                if (exports[the_id] !== undefined) {
+                if (export_object[the_id] !== undefined) {
 
 // cause: "let aa;export{aa,aa}"
 
                     warn("duplicate_a");
                 }
-                exports[the_id] = the_name;
+                export_object[the_id] = the_name;
             }
             advance();
             the_export.expression.push(the_thing);
@@ -3061,7 +3062,7 @@ function jslint(
 
         the_export.expression = [];
         if (token_nxt.id === "default") {
-            if (exports.default !== undefined) {
+            if (export_object.default !== undefined) {
 
 // cause: "export default 0;export default 0"
 
@@ -3085,7 +3086,7 @@ function jslint(
 
                 semicolon();
             }
-            exports.default = the_thing;
+            export_object.default = the_thing;
             the_export.expression.push(the_thing);
         } else {
             if (token_nxt.id === "function") {
@@ -3100,10 +3101,10 @@ function jslint(
 
 // cause: "let aa;export{aa};export function aa(){}"
 
-                if (exports[the_id] !== undefined) {
+                if (export_object[the_id] !== undefined) {
                     warn("duplicate_a", the_name);
                 }
-                exports[the_id] = the_thing;
+                export_object[the_id] = the_thing;
                 the_export.expression.push(the_thing);
                 the_thing.statement = false;
                 the_thing.arity = "unary";
@@ -3260,7 +3261,7 @@ function jslint(
 
                 warn("expected_string_a", string);
             }
-            froms.push(token_now.value);
+            import_from_array.push(token_now.value);
             advance(")");
             advance(".");
             advance("then");
@@ -3328,7 +3329,7 @@ function jslint(
 
             warn("bad_module_name_a", token_now);
         }
-        froms.push(token_now.value);
+        import_from_array.push(token_now.value);
         semicolon();
         return the_import;
     });
@@ -4687,8 +4688,8 @@ function jslint(
 
 // Fudge column numbers in warning message.
 
-                at + fudge,
-                right.from + fudge
+                at + line_fudge,
+                right.from + line_fudge
             );
         }
 
@@ -5188,7 +5189,7 @@ function jslint(
             && line_disable === undefined
             && !mode_json
             && token_1
-            && !regexp_seen
+            && !mode_regexp
         ) {
 
 // cause: "too_long"
@@ -5197,7 +5198,7 @@ function jslint(
         }
         column = 0;
         line += 1;
-        regexp_seen = false;
+        mode_regexp = false;
         line_source = undefined;
         line_whole = "";
         if (line_array[line] === undefined) {
@@ -5433,7 +5434,7 @@ function jslint(
 
             warn("expected_a_before_b", token_prv, "0", ".");
         }
-        if (prior.id === "." && the_token.identifier) {
+        if (token_before_slash.id === "." && the_token.identifier) {
             the_token.dot = true;
         }
 
@@ -5441,12 +5442,13 @@ function jslint(
 
         token_prv = the_token;
 
-// The prior token is a previous token that was not a comment. The prior token
+// The token_before_slash token is a previous token that was not a comment.
+// The token_before_slash token
 // is used to disambiguate "/", which can mean division or regular expression
 // literal.
 
         if (token_prv.id !== "(comment)") {
-            prior = token_prv;
+            token_before_slash = token_prv;
         }
         return the_token;
     }
@@ -5555,7 +5557,7 @@ function jslint(
         let mode_multi = false;
         let result;
         let value;
-        regexp_seen = true;
+        mode_regexp = true;
 
         function regexp_subklass() {
 
@@ -6226,21 +6228,21 @@ function jslint(
 // object, so it is likely that we can get away with it. We avoided the worst
 // cases by eliminating automatic semicolon insertion.
 
-            if (prior.identifier) {
-                if (!prior.dot) {
-                    if (prior.id === "return") {
+            if (token_before_slash.identifier) {
+                if (!token_before_slash.dot) {
+                    if (token_before_slash.id === "return") {
                         return regexp();
                     }
                     if (
-                        prior.id === "(begin)"
-                        || prior.id === "case"
-                        || prior.id === "delete"
-                        || prior.id === "in"
-                        || prior.id === "instanceof"
-                        || prior.id === "new"
-                        || prior.id === "typeof"
-                        || prior.id === "void"
-                        || prior.id === "yield"
+                        token_before_slash.id === "(begin)"
+                        || token_before_slash.id === "case"
+                        || token_before_slash.id === "delete"
+                        || token_before_slash.id === "in"
+                        || token_before_slash.id === "instanceof"
+                        || token_before_slash.id === "new"
+                        || token_before_slash.id === "typeof"
+                        || token_before_slash.id === "void"
+                        || token_before_slash.id === "yield"
                     ) {
                         the_token = regexp();
 
@@ -6258,7 +6260,7 @@ function jslint(
                     }
                 }
             } else {
-                last = prior.id[prior.id.length - 1];
+                last = token_before_slash.id[token_before_slash.id.length - 1];
                 if ("(,=:?[".indexOf(last) >= 0) {
                     return regexp();
                 }
@@ -6314,9 +6316,9 @@ function jslint(
 
 // Scan first line for "#!" and ignore it.
 
-        if (line_array[fudge].line_source.startsWith("#!")) {
+        if (line_array[line_fudge].line_source.startsWith("#!")) {
             line += 1;
-            shebang = true;
+            mode_shebang = true;
         }
         token_1 = lex();
         mode_json = token_1.id === "{" || token_1.id === "[";
@@ -6388,14 +6390,14 @@ function jslint(
         if (option_object.test_internal_error) {
             assert_or_throw(undefined, "test_internal_error");
         }
-        early_stop = false;
+        mode_early_stop = false;
     } catch (e) {
-        e.early_stop = true;
+        e.mode_early_stop = true;
         e.message = "[JSLint was unable to finish]\n" + e.message;
         if (e.name !== "JSLintError") {
             warnings.push(Object.assign(e, {
-                column: fudge,
-                line: fudge,
+                column: line_fudge,
+                line: line_fudge,
                 line_source: "",
                 stack_trace: e.stack
             }));
@@ -6404,11 +6406,11 @@ function jslint(
 
 // PHASE 6: sort and format <warnings>.
 
-// Sort warnings by early_stop first, line, column respectively.
+// Sort warnings by mode_early_stop first, line, column respectively.
 
     warnings.sort(function (a, b) {
         return (
-            Boolean(b.early_stop) - Boolean(a.early_stop)
+            Boolean(b.mode_early_stop) - Boolean(a.mode_early_stop)
             || a.line - b.line
             || a.column - b.column
         );
@@ -6437,23 +6439,23 @@ function jslint(
     return {
         directives,
         edition,
-        exports,
-        froms,
+        exports: export_object,
+        froms: import_from_array,
         functions,
         global,
         id: "(JSLint)",
         json: mode_json,
         lines: line_array,
         module: mode_module === true,
-        ok: warnings.length === 0 && !early_stop,
+        ok: warnings.length === 0 && !mode_early_stop,
         option: option_object,
         property,
         shebang: (
-            shebang
-            ? line_array[fudge].line_source
+            mode_shebang
+            ? line_array[line_fudge].line_source
             : undefined
         ),
-        stop: early_stop,
+        stop: mode_early_stop,
         tokens: token_array,
         tree,
         warnings
