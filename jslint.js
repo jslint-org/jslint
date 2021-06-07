@@ -90,8 +90,7 @@
 /*jslint node*/
 
 /*property
-    bind, cli, cwd, directive_quiet, endsWith, jslint, resolve, sep,
-    line_source,
+    bind, cli, cwd, directive_quiet, endsWith, jslint, line_source, resolve,
     unclosed_disable, unopened_enable, unordered,
     JSLINT_CLI, a, all, and, argv, arity, assign, b, bad_assignment_a,
     bad_directive_a, bad_get, bad_module_name_a, bad_option_a, bad_property_a,
@@ -158,6 +157,16 @@ function empty() {
 
     return Object.create(null);
 }
+
+function noop() {
+
+// This function will do nothing.
+
+    return;
+}
+
+// coverage-hack
+noop();
 
 function populate(array, object = empty(), value = true) {
 
@@ -3486,14 +3495,15 @@ function jslint(
         if (token_nxt.id === "catch") {
             advance("catch");
             the_catch = token_nxt;
-            ignored = "ignore";
+            the_catch.context = empty();
+            the_catch.is_async = functionage.is_async;
             the_try.catch = the_catch;
 
 // Create new function-scope for catch-parameter.
 
             stack.push(functionage);
             functionage = the_catch;
-            functionage.context = empty();
+            ignored = "ignore";
             if (token_nxt.id === "(") {
                 advance("(");
                 if (!token_nxt.identifier) {
@@ -6588,13 +6598,15 @@ async function cli({
 
 // Normalize file relative to process.cwd().
 
-    file = path.resolve(file) + path.sep;
-    if (file.startsWith(process.cwd() + path.sep)) {
-        file = file.replace(process.cwd() + path.sep, "").slice(0, -1) || ".";
+    file = path.resolve(file) + "/";
+    if (file.startsWith(process.cwd() + "/")) {
+        file = file.replace(process.cwd() + "/", "").slice(0, -1) || ".";
     }
     file = file.replace((
         /\\/g
-    ), "/");
+    ), "/").replace((
+        /\/$/g
+    ), "");
     if (source) {
         jslint_from_file({
             code: source,

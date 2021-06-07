@@ -7,7 +7,7 @@
 */
 
 /*property
-    addEventListener, ctrlKey, key, querySelector, source_line, stack_trace,
+    addEventListener, ctrlKey, key, querySelector, line_source, stack_trace,
     checked, closure, column, context, create, disable, display, edition,
     exports, filter, focus, forEach, froms, functions, getElementById,
     global, id, innerHTML, isArray, join, json, keys, length, level, line,
@@ -69,8 +69,8 @@ function error_report(data) {
     data.warnings.forEach(function ({
         column,
         line,
+        line_source,
         message,
-        source_line,
         stack_trace = ""
     }) {
         output.push(
@@ -81,7 +81,7 @@ function error_report(data) {
             "</address>",
             entityify(message),
             "</cite><samp>",
-            entityify(source_line + "\n" + stack_trace),
+            entityify(line_source + "\n" + stack_trace),
             "</samp>"
         );
     });

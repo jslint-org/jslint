@@ -18,6 +18,8 @@
 - website - replace current-editor with CodeMirror-editor and change programming-font-family from `Programma` to `Consolas, Menlo, monospace`.
 
 ## v2021.6.4-beta
+- bugfix - fix cli appending slash "/" to normalized filename.
+- bugfix - fix try-catch-block complaining about "Unexpected await" inside async-function.
 - jslint - add warning for unexpected ? in example `aa=/.{0}?/`.
 - jslint-refactor-1 - make "stateful" variables scoped outside of jslint() "stateless" by moving them into jslint().
 - jslint-refactor-2 - inline constants anticondition, bitwiseop, escapeable, and opener directly into code.
