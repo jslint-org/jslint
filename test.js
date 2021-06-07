@@ -74,6 +74,7 @@ function noop() {
         getset: true,
         long: true,
         node: true,
+        nomen: true,
         single: true,
         this: true,
         white: true
@@ -115,6 +116,8 @@ function noop() {
             "/*jslint eval*/\nnew Function();\neval();",
             "/*jslint getset*/\nlet aa = {get aa() {\n    return;\n}};",
             "/*jslint getset*/\nlet aa = {set aa(aa) {\n    return aa;\n}};",
+            "/*jslint nomen*/\nlet aa = aa._;",
+            "/*jslint single*/\nlet aa = 'aa';",
             "/*jslint this*/\nlet aa = this;",
             "/*jslint unordered*/\nlet {bb, aa} = 0;",
             "/*jslint white*/\n\t",
