@@ -90,7 +90,8 @@
 /*jslint node*/
 
 /*property
-    bind, cli, cwd, directive_quiet, endsWith, jslint, line_source, resolve,
+    bind, cli, cwd, directive_quiet, endsWith, jslint, line_source, name,
+    resolve,
     unclosed_disable, unopened_enable, unordered,
     JSLINT_CLI, a, all, and, argv, arity, assign, b, bad_assignment_a,
     bad_directive_a, bad_get, bad_module_name_a, bad_option_a, bad_property_a,
@@ -219,6 +220,7 @@ function jslint(
         for: true,
         getset: true,
         long: true,
+        name: true,
         node: [
             "Buffer", "clearImmediate", "clearInterval", "clearTimeout",
             "console", "exports", "module", "process", "require",
@@ -407,12 +409,6 @@ function jslint(
         [ a-z A-Z 0-9 _ $ ]*
     )$`;
     const rx_module = tag_regexp ` ^ [ a-z A-Z 0-9 _ $ : . @ \- \/ ]+ $ `;
-    const rx_bad_property = tag_regexp `
-        ^_
-      | \$
-      | Sync $
-      | _ $
-    `;
 // star slash
     const rx_star_slash = tag_regexp ` \* \/ `;
 // slash star
@@ -751,13 +747,22 @@ function jslint(
 
                     warn("unregistered_property_a", name);
                 }
-            } else {
-                if (name.identifier && rx_bad_property.test(id)) {
+            } else if (
+                !option_object.name
+                && name.identifier
+                && (
+                    // rx_bad_property
+                    /^_|\$|Sync$|_$/m
+                ).test(id)
+            ) {
 
+// cause: "aa.$"
 // cause: "aa._"
+// cause: "aa._aa"
+// cause: "aa.aaSync"
+// cause: "aa.aa_"
 
-                    warn("bad_property_a", name);
-                }
+                warn("bad_property_a", name);
             }
             property[id] = 1;
         }
@@ -6315,6 +6320,7 @@ function jslint(
 // PHASE 1. split the <source> by newlines into <line_array>.
 
         line_array = String("\n" + source).split(
+            // rx_crlf
             /\n|\r\n?/
         ).map(function (line_source) {
             return {

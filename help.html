@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta
@@ -428,6 +428,15 @@ a:active {
             <td><code>true</code> if a line can contain more than 80 characters.</td>
         </tr>
         <tr>
+            <td id="name">Tolerate bad property names</td>
+            <td><code>name</code></td>
+            <td>
+                <code>true</code> if bad property names like
+                <code>$, _foo, fooSync, foo_</code>
+                are allowed.
+            </td>
+        </tr>
+        <tr>
             <td id="node">Assume <a href="https://nodejs.org/">Node.js</a></td>
             <td><code>node</code></td>
             <td><code>true</code> if Node.js globals should be predefined. It
@@ -435,9 +444,10 @@ a:active {
                 It adds the same globals as this directive:
                 <blockquote><code>/*global </code>
     <div><code>
-        Buffer, clearImmediate, clearInterval, clearTimeout, console, exports,
-        module, process, require, setImmediate, setInterval, setTimeout, URL,
-        URLSearchParams, __dirname, __filename
+        Buffer, clearImmediate, clearInterval, clearTimeout,
+        console, exports, module, process, require,
+        setImmediate, setInterval, setTimeout, TextDecoder,
+        TextEncoder, URL, URLSearchParams, __dirname, __filename
 </code></div>
     <code>*/</code></blockquote></td>
         </tr>
@@ -481,7 +491,7 @@ a:active {
     <code>/*property*/</code> directive. It contains all of the names that were
     used with dot notation, subscript notation, and object literals to name the
     properties of objects. You can look through the list for misspellings. You
-    can copy the <code>/*property*/</code></code> directive to the top of your
+    can copy the <code>/*property*/</code> directive to the top of your
     script file. JSLint will check the spelling of all property
     names against the list. That way, you can have JSLint look for
     misspellings for you.</p>
