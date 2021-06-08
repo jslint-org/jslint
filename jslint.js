@@ -1312,7 +1312,7 @@ function jslint(
             warn_at(
                 "expected_a_b",
                 token_now.line,
-                token_now.thru,
+                token_now.thru + 1,
                 ";",
                 artifact(token_nxt)
             );
@@ -1366,7 +1366,14 @@ function jslint(
         first = token_now;
         first.statement = true;
         the_symbol = syntax[first.id];
-        if (the_symbol !== undefined && the_symbol.fud !== undefined) {
+        if (
+            the_symbol !== undefined
+            && the_symbol.fud !== undefined
+
+// Fixes issues #316, #317 - dynamic-import().
+
+            && !(the_symbol.id === "import" && token_nxt.id === "(")
+        ) {
             the_symbol.disrupt = false;
             the_symbol.statement = true;
             the_statement = the_symbol.fud();
@@ -3094,6 +3101,9 @@ function jslint(
 // cause: "export default {}"
 
                 warn("freeze_exports", the_thing);
+
+// Fixes issues #282 - optional-semicolon.
+
             } else {
 
 // cause: "export default Object.freeze({})"
@@ -3263,28 +3273,6 @@ function jslint(
     });
     stmt("import", function () {
         const the_import = token_now;
-        if (token_nxt.id === "(") {
-            the_import.arity = "unary";
-            the_import.constant = true;
-            the_import.statement = false;
-            advance("(");
-            const string = expression(0);
-            if (string.id !== "(string)") {
-
-// cause: "import(aa)"
-
-                warn("expected_string_a", string);
-            }
-            import_from_array.push(token_now.value);
-            advance(")");
-            advance(".");
-            advance("then");
-            advance("(");
-            the_import.expression = expression(0);
-            advance(")");
-            semicolon();
-            return the_import;
-        }
         let name;
         if (typeof mode_module === "object") {
 

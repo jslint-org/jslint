@@ -19,6 +19,8 @@
 
 ## v2021.6.4-beta
 - bugfix - fix cli appending slash "/" to normalized filename.
+- bugfix - fix issue #316, #317 - jslint complains about dynamic-import.
+- bugfix - fix off-by-one-column bug in missing-semicolon-warning.
 - bugfix - fix try-catch-block complaining about "Unexpected await" inside async-function.
 - directive - re-introduce `/*jslint name*/` to ignore "Bad property name" warning.
 - jslint - add warning for unexpected ? in example `aa=/.{0}?/`.

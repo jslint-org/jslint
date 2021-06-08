@@ -146,7 +146,8 @@ function noop() {
             "export default Object.freeze();",
             "import {aa, bb} from \"aa\";\naa(bb);",
             "import {} from \"aa\";",
-            "import(\"aa\").then(function () {\n    return;\n});"
+            "import(\"aa\").then(function () {\n    return;\n});",
+            "let aa = 0;\nimport(aa).then(aa).then(aa).catch(aa).finally(aa);"
         ],
         number: [
             "let aa = 0.0e0;",
