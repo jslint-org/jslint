@@ -428,6 +428,15 @@ a:active {
             <td><code>true</code> if a line can contain more than 80 characters.</td>
         </tr>
         <tr>
+            <td id="name">Tolerate bad property names</td>
+            <td><code>name</code></td>
+            <td>
+                <code>true</code> if bad property names like
+                <code>$, _foo, fooSync, foo_</code>
+                are allowed.
+            </td>
+        </tr>
+        <tr>
             <td id="node">Assume <a href="https://nodejs.org/">Node.js</a></td>
             <td><code>node</code></td>
             <td><code>true</code> if Node.js globals should be predefined. It
@@ -441,15 +450,6 @@ a:active {
         TextEncoder, URL, URLSearchParams, __dirname, __filename
 </code></div>
     <code>*/</code></blockquote></td>
-        </tr>
-        <tr>
-            <td id="nomen">Tolerate bad property names</td>
-            <td><code>nomen</code></td>
-            <td>
-                <code>true</code> if weird property names like
-                <code>$, _foo, fooSync, foo_</code>
-                are allowed.
-            </td>
         </tr>
         <tr>
             <td id="single">Tolerate single quote strings</td>

@@ -90,7 +90,7 @@
 /*jslint node*/
 
 /*property
-    bind, cli, cwd, directive_quiet, endsWith, jslint, line_source, nomen,
+    bind, cli, cwd, directive_quiet, endsWith, jslint, line_source, name,
     resolve,
     unclosed_disable, unopened_enable, unordered,
     JSLINT_CLI, a, all, and, argv, arity, assign, b, bad_assignment_a,
@@ -220,13 +220,13 @@ function jslint(
         for: true,
         getset: true,
         long: true,
+        name: true,
         node: [
             "Buffer", "clearImmediate", "clearInterval", "clearTimeout",
             "console", "exports", "module", "process", "require",
             "setImmediate", "setInterval", "setTimeout", "TextDecoder",
             "TextEncoder", "URL", "URLSearchParams", "__dirname", "__filename"
         ],
-        nomen: true,
         single: true,
         test_internal_error: true,
         this: true,
@@ -748,7 +748,7 @@ function jslint(
                     warn("unregistered_property_a", name);
                 }
             } else if (
-                !option_object.nomen
+                !option_object.name
                 && name.identifier
                 && (
                     // rx_bad_property
