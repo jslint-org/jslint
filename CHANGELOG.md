@@ -24,6 +24,7 @@
 - bugfix - fix try-catch-block complaining about "Unexpected await" inside async-function.
 - directive - re-introduce `/*jslint name*/` to ignore "Bad property name" warning.
 - jslint - add warning for unexpected ? in example `aa=/.{0}?/`.
+- jslint - add warning for unexpected-expr in example `async function aa(){await 0;}`.
 - jslint-refactor-1 - make "stateful" variables scoped outside of jslint() "stateless" by moving them into jslint().
 - jslint-refactor-2 - inline constants anticondition, bitwiseop, escapeable, and opener directly into code.
 - jslint-refactor-3 - inline regexp-functions quantifier(), ranges(), klass(), choice(), directly into code.

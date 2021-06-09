@@ -2507,14 +2507,11 @@ function jslint(
     }
 
     prefix("async", do_async);
-    prefix("function", do_function);
     prefix("await", function () {
-        let the_await;
-        the_await = token_now;
+        const the_await = token_now;
         if (!functionage.is_async) {
 
-// cause: "await"
-// cause: "function aa(){await 0;}"
+// cause: "function aa(){aa=await 0;}"
 
             return stop("unexpected_a", the_await);
         }
@@ -2522,6 +2519,7 @@ function jslint(
         the_await.expression = expression(150);
         return the_await;
     });
+    prefix("function", do_function);
 
     function fart(pl) {
         advance("=>");
@@ -2774,6 +2772,20 @@ function jslint(
         return block("naked");
     });
     stmt("async", do_async);
+    stmt("await", function () {
+        const the_await = token_now;
+        if (!functionage.is_async) {
+
+// cause: "await"
+// cause: "function aa(){await 0;}"
+
+            return stop("unexpected_a", the_await);
+        }
+        functionage.has_await = true;
+        the_await.block = expression(150);
+        semicolon();
+        return the_await;
+    });
     stmt("break", function () {
         const the_break = token_now;
         let the_label;
@@ -3716,13 +3728,14 @@ function jslint(
                     thing.arity !== "statement"
                     && thing.arity !== "assignment"
                     && thing.id !== "import"
-                    && thing.id !== "await"
                 ) {
 
 // cause: "!0"
 // cause: "+[]"
 // cause: "+new aa()"
 // cause: "0"
+// cause: "async function aa(){await 0;}"
+// cause: "typeof 0"
 
                     warn("unexpected_expression_a", thing);
                 }
