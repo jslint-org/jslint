@@ -114,7 +114,7 @@ function noop() {
             "let aa = aa().getTime();",
             "let aa = aa.aa().getTime();"
         ],
-        directives: [
+        directive: [
             "#!\n/*jslint browser:false, node*/\n\"use strict\";",
             "/*jslint bitwise*/\nlet aa = aa | 0;",
             "/*jslint browser*/\n;",
@@ -143,8 +143,14 @@ function noop() {
             "{\"aa\":[[],-0,null]}"
         ],
         label: [
-            "function aa() {\nbb:\n    while (true) {\n        if (true) {\n"
-            + "            break bb;\n        }\n    }\n}"
+            "function aa() {\n"
+            + "bb:\n"
+            + "    while (true) {\n"
+            + "        if (true) {\n"
+            + "            break bb;\n"
+            + "        }\n"
+            + "    }\n"
+            + "}\n"
         ],
         loop: [
             "function aa() {\n    do {\n        aa();\n    } while (aa());\n}"
@@ -164,6 +170,14 @@ function noop() {
         ],
         optional_chaining: [
             "let aa = aa?.bb?.cc;"
+        ],
+        param: [
+            "function aa({aa, bb}) {\n"
+            + "    return {aa, bb};\n"
+            + "}\n",
+            "function aa({constructor}) {\n"
+            + "    return {constructor};\n"
+            + "}\n"
         ],
         property: [
             "let aa = aa[`!`];"
@@ -194,8 +208,10 @@ function noop() {
         var: [
             "let [\n    aa, bb = 0\n] = 0;",
             "let [...aa] = [...aa];",
+            "let constructor = 0;",
             "let {\n    aa: bb\n} = 0;",
-            "let {aa, bb} = 0;"
+            "let {aa, bb} = 0;",
+            "let {constructor} = 0;"
         ]
     }).forEach(function (codeList) {
         let code0 = "";

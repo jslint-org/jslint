@@ -139,11 +139,13 @@ function assert_or_throw(passed, message) {
     if (passed) {
         return passed;
     }
-    throw new Error(`This was caused by a bug in JSLint.
+    throw new Error(
+        `This was caused by a bug in JSLint.
 Please open an issue with this stack-trace (and possible example-code) at
 https://github.com/jslint-org/jslint/issues.
 edition = "${edition}";
-${message}`);
+${message}`
+    );
 }
 
 function empty() {
@@ -849,6 +851,9 @@ function jslint(
         case "{":
             return (function json_object() {
                 const brace = token_nxt;
+
+// Explicit empty-object required to detect "__proto__".
+
                 const object = empty();
                 const properties = [];
                 brace.expression = properties;
@@ -2379,7 +2384,7 @@ function jslint(
                 name = token_nxt;
                 enroll(name, "variable", true);
                 the_function.name = Object.assign(name, {
-                    calls: {},
+                    calls: empty(),
                     init: true
                 });
                 advance();
@@ -2417,7 +2422,7 @@ function jslint(
 
         Object.assign(the_function, {
             async: the_function.async || 0,
-            context: {},
+            context: empty(),
             finally: 0,
             loop: 0,
             switch: 0,
@@ -6525,7 +6530,7 @@ async function cli({
         option = {},
         warnings = []
     }) {
-        option = Object.assign({}, option, {
+        option = Object.assign(empty(), option, {
             file
         });
         switch ((
