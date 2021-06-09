@@ -90,48 +90,44 @@
 /*jslint node*/
 
 /*property
-    bind, cli, cwd, directive_quiet, endsWith, jslint, line_source, name,
-    resolve,
-    unclosed_disable, unopened_enable, unordered,
-    JSLINT_CLI, a, all, and, argv, arity, assign, b, bad_assignment_a,
+    JSLINT_CLI, a, all, and, argv, arity, assign, async, b, bad_assignment_a,
     bad_directive_a, bad_get, bad_module_name_a, bad_option_a, bad_property_a,
-    bad_set, bitwise, block, body, browser, c, calls, catch, closer,
+    bad_set, bind, bitwise, block, body, browser, c, calls, catch, cli, closer,
     closure, code, column, concat, console_error, constant, context, convert,
-    couch, create, d, dead, debug, default, devel, directive, directives,
-    disrupt, dot, duplicate_a, mode_early_stop, edition, ellipsis, else,
-    empty_block,
-    env, error, eval, every, exec, exit, expected_a, expected_a_at_b_c,
-    expected_a_b, expected_a_b_from_c_d, expected_a_before_b,
-    expected_a_next_at_b, expected_digits_after_a, expected_four_digits,
+    couch, create, cwd, d, dead, debug, default, devel, directive,
+    directive_quiet, directives, disrupt, dot, duplicate_a, edition, ellipsis,
+    else, empty_block, endsWith, env, error, eval, every, exec, exit,
+    expected_a, expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d,
+    expected_a_before_b, expected_digits_after_a, expected_four_digits,
     expected_identifier_a, expected_line_break_a_b, expected_regexp_factor_a,
     expected_space_a_b, expected_statements_a, expected_string_a,
     expected_type_string_a, exports, expression, extra, file, finally, flag,
     for, forEach, formatted_message, free, freeze, freeze_exports, from, froms,
-    fud, function_in_loop, functions, g, getset, global, has_await, i,
-    id, identifier, import, inc, indexOf, infix_in, init, initial, isArray,
-    isNaN, is_async, join, json, keys, label, label_a, lbp, led, length, level,
-    line, line_offset, lines, live, long, loop, m, map, margin, match, message,
+    fud, function_in_loop, functions, getset, global, id, identifier, import,
+    inc, indexOf, infix_in, init, initial, isArray, isNaN, join, jslint, json,
+    keys, label, label_a, lbp, led, length, level, line, line_offset,
+    line_source, lines, live, long, loop, m, map, margin, match, max, message,
     misplaced_a, misplaced_directive_a, missing_await_statement,
-    missing_browser, missing_m, module, naked_block, name, names,
+    missing_browser, missing_m, mode_stop, module, naked_block, name, names,
     nested_comment, node, not_label_a, now, nr, nud, number_isNaN, ok, open,
     opening, option, out_of_scope_a, padStart, parameters, parent, pop,
     promises, property, push, quote, raw, readFile, readdir, redefinition_a_b,
-    repeat, replace, required_a_optional_b, reserved_a, role, search, shebang,
-    signature, single, slice, some, sort, source, split, stack, stack_trace,
-    startsWith, statement, stop, subscript_a, switch, test, test_internal_error,
-    then, this, thru, todo_comment, tokens, too_long, too_many_digits, tree,
-    trim, try, type, u, unclosed_comment, unclosed_mega, unclosed_string,
-    undeclared_a, unexpected_a, unexpected_a_after_b, unexpected_a_before_b,
-    unexpected_at_top_level_a, unexpected_char_a, unexpected_comment,
-    unexpected_directive_a, unexpected_expression_a, unexpected_label_a,
-    unexpected_parens, unexpected_space_a_b, unexpected_statement_a,
-    unexpected_trailing_space, unexpected_typeof_a, uninitialized_a,
-    unordered_a_b, unreachable_a,
-    unregistered_property_a, unused_a, use_double, use_open, use_spaces, used,
-    value, var_loop, var_switch, variable, versions, warning, warnings,
-    weird_condition_a, weird_expression_a, weird_loop, weird_relation_a, white,
-    wrap_condition, wrap_immediate, wrap_parameter, wrap_regexp, wrap_unary,
-    wrapped, writable, y
+    repeat, replace, required_a_optional_b, reserved_a, resolve, role, search,
+    shebang, signature, single, slice, some, sort, source, split, stack,
+    stack_trace, startsWith, statement, stop, subscript_a, switch, test,
+    test_internal_error, then, this, thru, todo_comment, tokens, too_long,
+    too_many_digits, tree, trim, try, type, unclosed_comment, unclosed_disable,
+    unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
+    unexpected_a_after_b, unexpected_a_before_b, unexpected_at_top_level_a,
+    unexpected_char_a, unexpected_comment, unexpected_directive_a,
+    unexpected_expression_a, unexpected_label_a, unexpected_parens,
+    unexpected_space_a_b, unexpected_statement_a, unexpected_trailing_space,
+    unexpected_typeof_a, uninitialized_a, unopened_enable, unordered,
+    unreachable_a, unregistered_property_a, unused_a, use_double, use_open,
+    use_spaces, used, value, var_loop, var_switch, variable, versions, warning,
+    warnings, weird_condition_a, weird_expression_a, weird_loop,
+    weird_relation_a, white, wrap_condition, wrap_immediate, wrap_parameter,
+    wrap_regexp, wrap_unary, wrapped, writable
 */
 
 const edition = "v2021.6.4-beta";
@@ -368,7 +364,6 @@ function jslint(
             "Directive '/*jslint-enable*/' was not opened "
             + "with '/*jslint-disable*/'."
         ),
-        unordered_a_b: "{a} '{b}' not listed in alphabetical order.",
         unreachable_a: "Unreachable '{a}'.",
         unregistered_property_a: "Unregistered property name '{a}'.",
         unused_a: "Unused '{a}'.",
@@ -493,6 +488,7 @@ function jslint(
     const functions = [];
 // The global object; the outermost context.
     const global = {
+        async: 0,
         body: true,
         context: empty(),
         finally: 0,
@@ -544,8 +540,6 @@ function jslint(
     let line_whole = "";
 // true if directives are still allowed.
     let mode_directive = true;
-// true if JSLint cannot finish.
-    let mode_early_stop = true;
 // true if parsing JSON.
     let mode_json = false;
 // true if currently parsing a megastring literal.
@@ -556,6 +550,8 @@ function jslint(
     let mode_regexp;
 // true if a #! was seen on the first line.
     let mode_shebang = false;
+// true if JSLint cannot finish.
+    let mode_stop = true;
 // "var" if using var; "let" if using let.
     let mode_var;
 // A piece of string.
@@ -2215,10 +2211,10 @@ function jslint(
 // cause: "function aa({bb,aa}){}"
 
                             warn(
-                                "unordered_a_b",
+                                "expected_a_before_b",
                                 subparam,
-                                "Parameter",
-                                artifact_nxt
+                                artifact_nxt,
+                                artifact_now
                             );
                         }
                         advance();
@@ -2366,7 +2362,7 @@ function jslint(
     }
 
     function do_function(the_function) {
-        let name;
+        let name = the_function && the_function.name;
         if (the_function === undefined) {
             the_function = token_now;
 
@@ -2382,24 +2378,22 @@ function jslint(
                 }
                 name = token_nxt;
                 enroll(name, "variable", true);
-                the_function.name = name;
-                name.init = true;
-                name.calls = empty();
+                the_function.name = Object.assign(name, {
+                    calls: {},
+                    init: true
+                });
                 advance();
             } else if (name === undefined) {
 
 // A function expression may have an optional name.
 
+                the_function.name = anon;
                 if (token_nxt.identifier) {
                     name = token_nxt;
                     the_function.name = name;
                     advance();
-                } else {
-                    the_function.name = anon;
                 }
             }
-        } else {
-            name = the_function.name;
         }
         the_function.level = functionage.level + 1;
         assert_or_throw(!mode_mega, `Expected !mode_mega.`);
@@ -2421,11 +2415,14 @@ function jslint(
 // Give the function properties for storing its names and for observing the
 // depth of loops and switches.
 
-        the_function.context = empty();
-        the_function.finally = 0;
-        the_function.loop = 0;
-        the_function.switch = 0;
-        the_function.try = 0;
+        Object.assign(the_function, {
+            async: the_function.async || 0,
+            context: {},
+            finally: 0,
+            loop: 0,
+            switch: 0,
+            try: 0
+        });
 
 // Push the current function context and establish a new one.
 
@@ -2493,11 +2490,12 @@ function jslint(
         let the_function;
         the_async = token_now;
         advance("function");
-        the_function = token_now;
-        the_function.is_async = true;
-        the_function.arity = the_async.arity;
+        the_function = Object.assign(token_now, {
+            arity: the_async.arity,
+            async: 1
+        });
         do_function();
-        if (!the_function.has_await) {
+        if (the_function.async === 1) {
 
 // cause: "async function aa(){}"
 
@@ -2506,19 +2504,29 @@ function jslint(
         return the_function;
     }
 
-    prefix("async", do_async);
-    prefix("await", function () {
+    function do_await() {
         const the_await = token_now;
-        if (!functionage.is_async) {
+        if (functionage.async === 0) {
 
+// cause: "await"
 // cause: "function aa(){aa=await 0;}"
+// cause: "function aa(){await 0;}"
 
-            return stop("unexpected_a", the_await);
+            warn("unexpected_a", the_await);
+        } else {
+            functionage.async += 1;
         }
-        functionage.has_await = true;
-        the_await.expression = expression(150);
+        if (the_await.arity === "statement") {
+            the_await.block = expression();
+            semicolon();
+        } else {
+            the_await.expression = expression();
+        }
         return the_await;
-    });
+    }
+
+    prefix("async", do_async);
+    prefix("await", do_await);
     prefix("function", do_function);
 
     function fart(pl) {
@@ -2649,7 +2657,12 @@ function jslint(
 
 // cause: "aa={bb,aa}"
 
-                    warn("unordered_a_b", name, "Property", artifact_nxt);
+                    warn(
+                        "expected_a_before_b",
+                        name,
+                        artifact_nxt,
+                        artifact_now
+                    );
                 }
                 if (
                     (name.id === "get" || name.id === "set")
@@ -2772,20 +2785,7 @@ function jslint(
         return block("naked");
     });
     stmt("async", do_async);
-    stmt("await", function () {
-        const the_await = token_now;
-        if (!functionage.is_async) {
-
-// cause: "await"
-// cause: "function aa(){await 0;}"
-
-            return stop("unexpected_a", the_await);
-        }
-        functionage.has_await = true;
-        the_await.block = expression(150);
-        semicolon();
-        return the_await;
-    });
+    stmt("await", do_await);
     stmt("break", function () {
         const the_break = token_now;
         let the_label;
@@ -2829,12 +2829,12 @@ function jslint(
 
     function do_var() {
         const the_statement = token_now;
-        const is_const = the_statement.id === "const";
+        const mode_const = the_statement.id === "const";
         the_statement.names = [];
 
 // A program may use var or let, but not both.
 
-        if (!is_const) {
+        if (!mode_const) {
             if (mode_var === undefined) {
                 mode_var = the_statement.id;
             } else if (the_statement.id !== mode_var) {
@@ -2889,10 +2889,10 @@ function jslint(
 // cause: "let{bb,aa}"
 
                         warn(
-                            "unordered_a_b",
+                            "expected_a_before_b",
                             name,
-                            "Parameter",
-                            artifact_nxt
+                            artifact_nxt,
+                            artifact_now
                         );
                     }
                     advance();
@@ -2907,12 +2907,12 @@ function jslint(
                         }
                         token_nxt.label = name;
                         the_statement.names.push(token_nxt);
-                        enroll(token_nxt, "variable", is_const);
+                        enroll(token_nxt, "variable", mode_const);
                         advance();
                         the_brace.open = true;
                     } else {
                         the_statement.names.push(name);
-                        enroll(name, "variable", is_const);
+                        enroll(name, "variable", mode_const);
                     }
                     name.dead = false;
                     name.init = true;
@@ -2950,7 +2950,7 @@ function jslint(
                     const name = token_nxt;
                     advance();
                     the_statement.names.push(name);
-                    enroll(name, "variable", is_const);
+                    enroll(name, "variable", mode_const);
                     name.dead = false;
                     name.init = true;
                     if (ellipsis) {
@@ -2979,8 +2979,8 @@ function jslint(
 
                     warn("unexpected_a", name);
                 }
-                enroll(name, "variable", is_const);
-                if (token_nxt.id === "=" || is_const) {
+                enroll(name, "variable", mode_const);
+                if (token_nxt.id === "=" || mode_const) {
                     advance("=");
                     name.dead = false;
                     name.init = true;
@@ -3501,7 +3501,7 @@ function jslint(
             advance("catch");
             the_catch = token_nxt;
             the_catch.context = empty();
-            the_catch.is_async = functionage.is_async;
+            the_catch.async = functionage.async;
             the_try.catch = the_catch;
 
 // Create new function-scope for catch-parameter.
@@ -3533,6 +3533,7 @@ function jslint(
 // Restore previous function-scope after catch-block.
 
             functionage = stack.pop();
+            functionage.async = Math.max(functionage.async, the_catch.async);
         } else {
 
 // cause: "try{}finally{break;}"
@@ -5829,17 +5830,6 @@ function jslint(
         char_after("/");
 
 // RegExp
-// Process dangling flag letters.
-
-        const allowed = {
-            g: true,
-            i: true,
-            m: true,
-            u: true,
-            y: true
-        };
-
-// RegExp
 // Create flag.
 
         const flag = empty();
@@ -5851,13 +5841,27 @@ function jslint(
             (char >= "a" && char <= "z\uffff")
             || (char >= "A" && char <= "Z\uffff")
         ) {
-            if (allowed[char] !== true) {
 
+// RegExp
+// Process dangling flag letters.
+
+            switch (!flag[char] && char) {
+            case "g":
+            case "i":
+            case "m":
+            case "u":
+            case "y":
+
+// cause: "aa=/./gimuy"
+
+                break;
+            default:
+
+// cause: "aa=/./gg"
 // cause: "aa=/./z"
 
                 warn_at("unexpected_a", line, column, char);
             }
-            allowed[char] = false;
             flag[char] = true;
             char_after();
         }
@@ -6407,9 +6411,9 @@ function jslint(
         if (option_object.test_internal_error) {
             assert_or_throw(undefined, "test_internal_error");
         }
-        mode_early_stop = false;
+        mode_stop = false;
     } catch (e) {
-        e.mode_early_stop = true;
+        e.mode_stop = true;
         e.message = "[JSLint was unable to finish]\n" + e.message;
         if (e.name !== "JSLintError") {
             warnings.push(Object.assign(e, {
@@ -6423,11 +6427,11 @@ function jslint(
 
 // PHASE 6: sort and format <warnings>.
 
-// Sort warnings by mode_early_stop first, line, column respectively.
+// Sort warnings by mode_stop first, line, column respectively.
 
     warnings.sort(function (a, b) {
         return (
-            Boolean(b.mode_early_stop) - Boolean(a.mode_early_stop)
+            Boolean(b.mode_stop) - Boolean(a.mode_stop)
             || a.line - b.line
             || a.column - b.column
         );
@@ -6464,7 +6468,7 @@ function jslint(
         json: mode_json,
         lines: line_array,
         module: mode_module === true,
-        ok: warnings.length === 0 && !mode_early_stop,
+        ok: warnings.length === 0 && !mode_stop,
         option: option_object,
         property,
         shebang: (
@@ -6472,7 +6476,7 @@ function jslint(
             ? line_array[line_fudge].line_source
             : undefined
         ),
-        stop: mode_early_stop,
+        stop: mode_stop,
         tokens: token_array,
         tree,
         warnings

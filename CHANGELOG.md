@@ -18,8 +18,10 @@
 - website - replace current-editor with CodeMirror-editor and change programming-font-family from `Programma` to `Consolas, Menlo, monospace`.
 
 ## v2021.6.4-beta
+- bugfix - fix await expression/statement inside catch-statement not registered by functionage.await.
 - bugfix - fix cli appending slash "/" to normalized filename.
 - bugfix - fix issue #316, #317 - jslint complains about dynamic-import.
+- bugfix - fix misleading warning describing alphabetical-order instead of ascii-order.
 - bugfix - fix off-by-one-column bug in missing-semicolon-warning.
 - bugfix - fix try-catch-block complaining about "Unexpected await" inside async-function.
 - directive - re-introduce `/*jslint name*/` to ignore "Bad property name" warning.

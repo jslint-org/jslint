@@ -96,6 +96,13 @@ function noop() {
             "async function aa() {\n    await aa();\n}",
             "async function aa() {\n"
             + "    try {\n"
+            + "        aa();\n"
+            + "    } catch (err) {\n"
+            + "        await err();\n"
+            + "    }\n"
+            + "}\n",
+            "async function aa() {\n"
+            + "    try {\n"
             + "        await aa();\n"
             + "    } catch (err) {\n"
             + "        await err();\n"
@@ -163,7 +170,8 @@ function noop() {
         ],
         regexp: [
             "function aa() {\n    return /./;\n}",
-            "let aa = /(?!.)(?:.)(?=.)/;"
+            "let aa = /(?!.)(?:.)(?=.)/;",
+            "let aa = /./gimuy;"
         ],
         ternary: [
             "let aa = (\n    aa()\n    ? 0\n    : 1\n) "
