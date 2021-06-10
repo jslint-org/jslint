@@ -37,6 +37,7 @@
         artifact_xxx, export_xxx, from_xxx, import_xxx, line_xxx, mode_xxx, token_xxx
 - jslint-refactor-5 - split jslint-core-logic into 5-phases.
     - move phase-sub-functions out of function-jslint().
+    - move global-vars into state-object, that can be passed between functions.
 - website - add ui-loader-animation.
 
 ## v2021.6.3
