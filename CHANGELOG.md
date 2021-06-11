@@ -40,6 +40,7 @@
     - move global-vars into state-object, that can be passed between functions.
     - migrate recursive-loops to while-loops in sub-function phase2_lex().
     - move remaining global-vars into sub-functions or hardcode.
+    - update functions artifact(), stop(), warn() with fallback-code `the_token = the_token || state.token_nxt;`.
 - website - add ui-loader-animation.
 
 ## v2021.6.3
