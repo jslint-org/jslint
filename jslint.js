@@ -88,6 +88,7 @@
 /*jslint debug, node*/
 
 /*property
+    index,
     directive_list, export_dict, function_list, import_list, line_list,
     mode_json, mode_module, mode_property, mode_shebang,
     global_list, option_dict, property_dict, source, syntax_dict, tenure,
@@ -400,31 +401,8 @@ const rx_identifier = tag_regexp ` ^(
     [ a-z A-Z 0-9 _ $ ]*
 )$`;
 const rx_module = tag_regexp ` ^ [ a-z A-Z 0-9 _ $ : . @ \- \/ ]+ $ `;
-// star slash
-const rx_star_slash = tag_regexp ` \* \/ `;
-// slash star
-const rx_slash_star = tag_regexp ` \/ \* `;
-// slash star or ending slash
-const rx_slash_star_or_slash = tag_regexp ` \/ \* | \/ $ `;
-// uncompleted work comment
-const rx_todo = tag_regexp ` \b (?:
-    todo
-  | TO \s? DO
-  | HACK
-) \b `;
 // tab
 const rx_tab = /\t/g;
-// directive
-const rx_directive = tag_regexp ` ^ (
-    jslint
-  | property
-  | global
-) \s+ ( .* ) $ `;
-const rx_directive_part = tag_regexp ` ^ (
-    [ a-z A-Z $ _ ] [ a-z A-Z 0-9 $ _ ]*
-) (?:
-    : \s* ( true | false )
-)? ,? \s* ( .* ) $ `;
 // token
 const rx_token = tag_regexp ` ^ (
     (\s+)
@@ -463,8 +441,6 @@ const rx_digits = /^[0-9]*/;
 const rx_hexs = /^[0-9A-F]*/i;
 const rx_octals = /^[0-7]*/;
 const rx_bits = /^[01]*/;
-// mega
-const rx_mega = /[`\\]|\$\{/;
 // JSON number
 const rx_JSON_number = tag_regexp ` ^
     -?
@@ -764,7 +740,71 @@ function phase2_lex(state) {
     let token_prv = token_global;       // The previous token including
                                         // comments.
 
-    function line_next() {
+// Most tokens, including the identifiers, operators, and punctuators, can be
+// found with a regular expression. Regular expressions cannot correctly match
+// regular expression literals, so we will match those the hard way. String
+// literals and number literals can be matched by regular expressions, but they
+// don't provide good warnings. The functions char_after, char_before,
+// read_digits, and char_after_escape help in the parsing of literals.
+
+    function char_after(match) {
+
+// Get the next character from the source line. Remove it from the line_source,
+// and append it to the snippet. Optionally check that the previous character
+// matched an expected value.
+
+        if (match !== undefined && char !== match) {
+            return (
+                char === ""
+
+// cause: "aa=/[/"
+
+                ? stop_at("expected_a", state, line, column - 1, match, char)
+
+// cause: "aa=/aa{/"
+
+                : stop_at("expected_a_b", state, line, column, match, char)
+            );
+        }
+        char = line_source.slice(0, 1);
+        line_source = line_source.slice(1);
+        snippet += char || " ";
+        column += 1;
+        return char;
+    }
+
+    function char_before() {
+
+// Back up one character by moving a character from the end of the snippet to
+// the front of the line_source.
+
+        char = snippet.slice(-1);
+        line_source = char + line_source;
+        column -= char.length;
+
+// Remove last character from snippet.
+
+        snippet = snippet.slice(0, -1);
+        return char;
+    }
+
+    function read_digits(rx, quiet) {
+        const digits = line_source.match(rx)[0];
+        const length = digits.length;
+        if (!quiet && length === 0) {
+
+// cause: "0x"
+
+            warn_at("expected_digits_after_a", state, line, column, snippet);
+        }
+        column += length;
+        line_source = line_source.slice(length);
+        snippet += digits;
+        char_after();
+        return length;
+    }
+
+    function read_line() {
 
 // Put the next line of source in line_source. If the line contains tabs,
 // replace them with spaces and give a warning. Also warn if the line contains
@@ -849,138 +889,6 @@ function phase2_lex(state) {
         return line_source;
     }
 
-// Most tokens, including the identifiers, operators, and punctuators, can be
-// found with a regular expression. Regular expressions cannot correctly match
-// regular expression literals, so we will match those the hard way. String
-// literals and number literals can be matched by regular expressions, but they
-// don't provide good warnings. The functions char_after, char_before,
-// read_some_digits, and char_after_escape help in the parsing of literals.
-
-    function char_after(match) {
-
-// Get the next character from the source line. Remove it from the line_source,
-// and append it to the snippet. Optionally check that the previous character
-// matched an expected value.
-
-        if (match !== undefined && char !== match) {
-            return (
-                char === ""
-
-// cause: "aa=/[/"
-
-                ? stop_at("expected_a", state, line, column - 1, match, char)
-
-// cause: "aa=/aa{/"
-
-                : stop_at("expected_a_b", state, line, column, match, char)
-            );
-        }
-        char = line_source.slice(0, 1);
-        line_source = line_source.slice(1);
-        snippet += char || " ";
-        column += 1;
-        return char;
-    }
-
-    function char_before() {
-
-// Back up one character by moving a character from the end of the snippet to
-// the front of the line_source.
-
-        char = snippet.slice(-1);
-        line_source = char + line_source;
-        column -= char.length;
-
-// Remove last character from snippet.
-
-        snippet = snippet.slice(0, -1);
-        return char;
-    }
-
-    function read_some_digits(rx, quiet) {
-        const digits = line_source.match(rx)[0];
-        const length = digits.length;
-        if (!quiet && length === 0) {
-
-// cause: "0x"
-
-            warn_at("expected_digits_after_a", state, line, column, snippet);
-        }
-        column += length;
-        line_source = line_source.slice(length);
-        snippet += digits;
-        char_after();
-        return length;
-    }
-
-    function char_after_escape(extra) {
-
-// Validate char after escape "\\".
-
-        char_after("\\");
-        switch (char) {
-        case "":
-
-// cause: "\"\\"
-
-            return stop_at("unclosed_string", state, line, column);
-        case "/":
-        case "\\":
-        case "`":
-        case "b":
-        case "f":
-        case "n":
-        case "r":
-        case "t":
-            return char_after();
-        case "u":
-            if (char_after("u") === "{") {
-                if (state.mode_json) {
-
-// cause: "[\"\\u{12345}\"]"
-
-                    warn_at("unexpected_a", state, line, column, char);
-                }
-                if (read_some_digits(rx_hexs) > 5) {
-
-// cause: "\"\\u{123456}\""
-
-                    warn_at("too_many_digits", state, line, column);
-                }
-                if (char !== "}") {
-
-// cause: "\"\\u{12345\""
-
-                    stop_at(
-                        "expected_a_before_b",
-                        state,
-                        line,
-                        column,
-                        "}",
-                        char
-                    );
-                }
-                return char_after();
-            }
-            char_before();
-            if (read_some_digits(rx_hexs, true) < 4) {
-
-// cause: "\"\\u0\""
-
-                warn_at("expected_four_digits", state, line, column);
-            }
-            return;
-        default:
-            if (extra && extra.indexOf(char) >= 0) {
-                return char_after();
-            }
-
-// cause: "\"\\0\""
-
-            warn_at("unexpected_a_before_b", state, line, column, "\\", char);
-        }
-    }
-
     function token_create(id, value, identifier) {
 
 // Create the token object and append it to token_list.
@@ -1054,17 +962,219 @@ function phase2_lex(state) {
         return the_token;
     }
 
-    function parse_directive(the_comment, body) {
+    function char_after_escape(extra) {
+
+// Validate char after escape "\\".
+
+        char_after("\\");
+        switch (char) {
+        case "":
+
+// cause: "\"\\"
+
+            return stop_at("unclosed_string", state, line, column);
+        case "/":
+        case "\\":
+        case "`":
+        case "b":
+        case "f":
+        case "n":
+        case "r":
+        case "t":
+            return char_after();
+        case "u":
+            if (char_after("u") === "{") {
+                if (state.mode_json) {
+
+// cause: "[\"\\u{12345}\"]"
+
+                    warn_at("unexpected_a", state, line, column, char);
+                }
+                if (read_digits(rx_hexs) > 5) {
+
+// cause: "\"\\u{123456}\""
+
+                    warn_at("too_many_digits", state, line, column);
+                }
+                if (char !== "}") {
+
+// cause: "\"\\u{12345\""
+
+                    stop_at(
+                        "expected_a_before_b",
+                        state,
+                        line,
+                        column,
+                        "}",
+                        char
+                    );
+                }
+                return char_after();
+            }
+            char_before();
+            if (read_digits(rx_hexs, true) < 4) {
+
+// cause: "\"\\u0\""
+
+                warn_at("expected_four_digits", state, line, column);
+            }
+            return;
+        default:
+            if (extra && extra.indexOf(char) >= 0) {
+                return char_after();
+            }
+
+// cause: "\"\\0\""
+
+            warn_at("unexpected_a_before_b", state, line, column, "\\", char);
+        }
+    }
+
+    function lex_comment() {
+        let allowed;
+        let body;
+        let ii = 0;
+        let jj = 0;
+        let match;
+        let name;
+        let the_comment;
+        let value;
+
+// Create a comment object. Comments are not allowed in JSON text. Comments can
+// include directives and notices of incompletion.
+
+// Create token from comment //....
+
+        if (snippet === "//") {
+            snippet = line_source;
+            line_source = "";
+            the_comment = token_create("(comment)", snippet);
+            if (mode_mega) {
+
+// cause: "`${//}`"
+
+                warn("unexpected_comment", state, the_comment, "`");
+            }
+
+// Create token from comment /*...*/.
+
+        } else {
+            snippet = [];
+            if (line_source[0] === "/") {
+
+// cause: "/*/"
+
+                warn_at("unexpected_a", state, line, column + ii, "/");
+            }
+
+// Lex/loop through each line until "*/".
+
+            while (true) {
+                if (line_source > "") {
+                    // rx_star_slash
+                    ii = line_source.indexOf("*/");
+                    if (ii >= 0) {
+                        break;
+                    }
+                    // rx_slash_star
+                    jj = line_source.indexOf("/*");
+                    if (jj >= 0) {
+
+// cause: "/*/*"
+
+                        warn_at("nested_comment", state, line, column + jj);
+                    }
+                }
+                snippet.push(line_source);
+                line_source = read_line();
+                if (line_source === undefined) {
+
+// cause: "/*"
+
+                    return stop_at("unclosed_comment", state, line, column);
+                }
+            }
+            jj = line_source.slice(0, ii).search(
+                // rx_slash_star_or_slash
+                /\/\*|\/$/
+            );
+            if (jj >= 0) {
+
+// cause: "/*/**/"
+
+                warn_at("nested_comment", state, line, column + jj);
+            }
+            snippet.push(line_source.slice(0, ii));
+            snippet = snippet.join(" ");
+            column += ii + 2;
+            line_source = line_source.slice(ii + 2);
+            the_comment = token_create("(comment)", snippet);
+        }
+
+// Uncompleted work comment.
+
+        if (
+            !option_dict.devel
+            && (
+                // rx_todo
+                /\b(?:todo|TO\s?DO|HACK)\b/
+            ).test(snippet)
+        ) {
+
+// cause: "//\u0074odo"
+
+            warn("todo_comment", state, the_comment);
+        }
+
+// Lex directives in comment.
+
+        match = snippet.match(
+            // rx_directive
+            /^(jslint|property|global)\s+(.*)$/
+        );
+        if (!match) {
+            return the_comment;
+        }
+        directive_list.push(the_comment);
+        if (!mode_directive) {
+
+// cause: "0\n/*global aa*/"
+
+            warn_at("misplaced_directive_a", state, line, from, match[1]);
+            return the_comment;
+        }
+        the_comment.directive = match[1];
+        body = match[2];
+        // lex_directive();
 
 // JSLint recognizes three directives that can be encoded in comments. This
 // function processes one item, and calls itself recursively to process the
 // next one.
 
-        const result = body.match(rx_directive_part);
-        if (result) {
-            let allowed;
-            const name = result[1];
-            const value = result[2];
+// Lex/loop throught each directive in /*...*/
+
+        while (true) {
+            match = body.match(
+                // rx_directive_part
+                /^([a-zA-Z$_][a-zA-Z0-9$_]*)(?::\s*(true|false))?,?\s*(.*)$/
+            );
+            if (!match) {
+                if (body) {
+
+// cause: "/*jslint !*/"
+
+                    return stop(
+                        "bad_directive_a",
+                        state,
+                        the_comment,
+                        body
+                    );
+                }
+                break;
+            }
+            [
+                name, value, body
+            ] = match.slice(1);
             if (the_comment.directive === "jslint") {
                 allowed = allowed_option[name];
                 if (
@@ -1114,49 +1224,176 @@ function phase2_lex(state) {
                 global_list[name] = false;
                 state.mode_module = the_comment;
             }
-            return parse_directive(the_comment, result[3]);
-        }
-        if (body) {
-
-// cause: "/*jslint !*/"
-
-            return stop("bad_directive_a", state, the_comment, body);
-        }
-    }
-
-    function comment(snippet) {
-
-// Create a comment object. Comments are not allowed in JSON text. Comments can
-// include directives and notices of incompletion.
-
-        const the_comment = token_create("(comment)", snippet);
-        let result;
-        if (Array.isArray(snippet)) {
-            snippet = snippet.join(" ");
-        }
-        if (!option_dict.devel && rx_todo.test(snippet)) {
-
-// cause: "//\u0074odo"
-
-            warn("todo_comment", state, the_comment);
-        }
-        result = snippet.match(rx_directive);
-        if (result) {
-            if (!mode_directive) {
-
-// cause: "0\n/*global aa*/"
-
-                warn_at("misplaced_directive_a", state, line, from, result[1]);
-            } else {
-                the_comment.directive = result[1];
-                parse_directive(the_comment, result[2]);
-            }
-            directive_list.push(the_comment);
         }
         return the_comment;
     }
 
-    function regexp() {
+    function lex_megastring() {
+        let id;
+        let match;
+
+// The token is a megastring. We don't allow any kind of mega nesting.
+
+        if (mode_mega) {
+
+// cause: "`${`"
+
+            return stop_at("expected_a_b", state, line, column, "}", "`");
+        }
+        from_mega = from;
+        line_mega = line;
+        mode_mega = true;
+        snippet = "";
+
+// Parsing a mega literal is tricky. First create a ` token.
+
+        token_create("`");
+        from += 1;
+
+// Then loop, building up a string, possibly from many lines, until seeing
+// the end of file, a closing `, or a ${ indicting an expression within the
+// string.
+
+        while (true) {
+            match = line_source.match(
+                //rx_mega
+                /[`\\]|\$\{/
+            ) || {
+                "0": "",
+                index: 0
+            };
+            snippet += line_source.slice(0, match.index);
+            column += match.index;
+            line_source = line_source.slice(match.index);
+            match = match[0];
+            switch (match) {
+            case "${":
+
+// if either ` or ${ was found, then the preceding joins the snippet to become
+// a string token.
+
+                token_create("(string)", snippet).quote = "`";
+                snippet = "";
+
+// If ${, then create tokens that will become part of an expression until
+// a } token is made.
+
+                column += 2;
+                token_create("${");
+                line_source = line_source.slice(2);
+
+// Lex/loop through each token inside megastring-expression `${...}`.
+
+                while (true) {
+                    id = lex_token().id;
+                    if (id === "{") {
+
+// cause: "`${{"
+
+                        return stop_at(
+                            "expected_a_b",
+                            state,
+                            line,
+                            column,
+                            "}",
+                            "{"
+                        );
+                    }
+                    if (id === "}") {
+                        break;
+                    }
+                }
+                break;
+            case "\\":
+                snippet += line_source.slice(0, 2);
+                line_source = line_source.slice(2);
+                column += 2;
+                break;
+            case "`":
+
+// if either ` or ${ was found, then the preceding joins the snippet to become
+// a string token.
+
+                token_create("(string)", snippet).quote = "`";
+                snippet = "";
+
+// Terminate megastring with `.
+
+                line_source = line_source.slice(1);
+                column += 1;
+                mode_mega = false;
+                return token_create("`");
+            default:
+
+// If neither ` nor ${ is seen, then the whole line joins the snippet.
+
+                snippet += line_source + "\n";
+                if (read_line() === undefined) {
+
+// cause: "`"
+
+                    return stop_at(
+                        "unclosed_mega",
+                        state,
+                        line_mega,
+                        from_mega
+                    );
+                }
+            }
+        }
+    }
+
+    function lex_number() {
+        const mode_0 = snippet === "0";
+        char_after();
+        switch (mode_0 && char) {
+        case "b":
+            read_digits(rx_bits);
+            break;
+        case "o":
+            read_digits(rx_octals);
+            break;
+        case "x":
+            read_digits(rx_hexs);
+            break;
+        default:
+            if (char === ".") {
+                read_digits(rx_digits);
+            }
+            if (char === "E" || char === "e") {
+                char_after();
+                if (char !== "+" && char !== "-") {
+                    char_before();
+                }
+                read_digits(rx_digits);
+            }
+        }
+
+// If the next character after a number is a digit or letter, then something
+// unexpected is going on.
+
+        if (
+            (char >= "0" && char <= "9")
+            || (char >= "a" && char <= "z")
+            || (char >= "A" && char <= "Z")
+        ) {
+
+// cause: "0a"
+
+            return stop_at(
+                "unexpected_a_after_b",
+                state,
+                line,
+                column,
+                snippet.slice(-1),
+                snippet.slice(0, -1)
+            );
+        }
+        char_before();
+        return token_create("(number)", snippet);
+    }
+
+    function lex_regexp() {
 
 // Regexp
 // Parse a regular expression literal.
@@ -1394,7 +1631,7 @@ function phase2_lex(state) {
                     }
                     break;
                 case "{":
-                    if (read_some_digits(rx_digits, true) === 0) {
+                    if (read_digits(rx_digits, true) === 0) {
 
 // cause: "aa=/aa{/"
 
@@ -1411,7 +1648,7 @@ function phase2_lex(state) {
 
 // cause: "aa=/.{,/"
 
-                        read_some_digits(rx_digits, true);
+                        read_digits(rx_digits, true);
                     }
                     if (char_after("}") === "?") {
 
@@ -1506,15 +1743,90 @@ function phase2_lex(state) {
         return result;
     }
 
-    function string(quote) {
+    function lex_slash_or_regexp() {
+
+// The / can be a division operator or the beginning of a regular expression
+// literal. It is not possible to know which without doing a complete parse.
+// We want to complete the tokenization before we begin to parse, so we will
+// estimate. This estimator can fail in some cases. For example, it cannot
+// know if "}" is ending a block or ending an object literal, so it can
+// behave incorrectly in that case; it is not meaningful to divide an
+// object, so it is likely that we can get away with it. We avoided the worst
+// cases by eliminating automatic semicolon insertion.
+
+        let the_token;
+        if (token_before_slash.identifier) {
+            if (!token_before_slash.dot) {
+                if (token_before_slash.id === "return") {
+                    return lex_regexp();
+                }
+                if (
+                    token_before_slash.id === "(begin)"
+                    || token_before_slash.id === "case"
+                    || token_before_slash.id === "delete"
+                    || token_before_slash.id === "in"
+                    || token_before_slash.id === "instanceof"
+                    || token_before_slash.id === "new"
+                    || token_before_slash.id === "typeof"
+                    || token_before_slash.id === "void"
+                    || token_before_slash.id === "yield"
+                ) {
+                    the_token = lex_regexp();
+
+// cause: "/./"
+// cause: "case /./"
+// cause: "delete /./"
+// cause: "in /./"
+// cause: "instanceof /./"
+// cause: "new /./"
+// cause: "typeof /./"
+// cause: "void /./"
+// cause: "yield /./"
+
+                    return stop("unexpected_a", state, the_token);
+                }
+            }
+        } else {
+            if ("(,=:?[".indexOf(
+                token_before_slash.id.slice(-1)
+            ) >= 0) {
+                return lex_regexp();
+            }
+            if ("!&|{};~+-*%/^<>".indexOf(
+                token_before_slash.id.slice(-1)
+            ) >= 0) {
+                the_token = lex_regexp();
+
+// cause: "!/./"
+
+                warn("wrap_regexp", state, the_token);
+                return the_token;
+            }
+        }
+        if (line_source[0] === "=") {
+            column += 1;
+            line_source = line_source.slice(1);
+            snippet = "/=";
+            warn_at("unexpected_a", state, line, column, "/=");
+        }
+        return token_create(snippet);
+    }
+
+    function lex_string(quote) {
 
 // Create a string token.
 
         let the_token;
+        if (!option_dict.single && quote === "'") {
+
+// cause: "''"
+
+            warn_at("use_double", state, line, column);
+        }
         snippet = "";
         char_after();
 
-// Parse/loop through each character in "...".
+// Lex/loop through each character in "...".
 
         while (true) {
             switch (char) {
@@ -1549,388 +1861,97 @@ function phase2_lex(state) {
         }
     }
 
-    function frack() {
-        if (char === ".") {
-            read_some_digits(rx_digits);
-        }
-        if (char === "E" || char === "e") {
-            char_after();
-            if (char !== "+" && char !== "-") {
-                char_before();
-            }
-            read_some_digits(rx_digits);
-        }
-    }
+    function lex_token() {
+        let match;
 
-    function number() {
-        if (snippet === "0") {
-            char_after();
-            if (char === ".") {
-                frack();
-            } else if (char === "b") {
-                read_some_digits(rx_bits);
-            } else if (char === "o") {
-                read_some_digits(rx_octals);
-            } else if (char === "x") {
-                read_some_digits(rx_hexs);
-            }
-        } else {
-            char_after();
-            frack();
-        }
+// Lex/loop through each whitespace.
 
-// If the next character after a number is a digit or letter, then something
-// unexpected is going on.
+        while (true) {
 
-        if (
-            (char >= "0" && char <= "9")
-            || (char >= "a" && char <= "z")
-            || (char >= "A" && char <= "Z")
-        ) {
+// Lex/loop through each blank-line.
 
-// cause: "0a"
-
-            return stop_at(
-                "unexpected_a_after_b",
-                state,
-                line,
-                column,
-                snippet.slice(-1),
-                snippet.slice(0, -1)
-            );
-        }
-        char_before();
-        return token_create("(number)", snippet);
-    }
-
-    function lex() {
-        let comment_list;
-        let i = 0;
-        let j = 0;
-        let result;
-        let the_token;
-
-// This should properly be a tail recursive function, but sadly, conformant
-// implementations of ES6 are still rare. This is the ideal code:
-
-//      if (!line_source) {
-//          line_source = line_next();
-//          from = 0;
-//          return (
-//              line_source === undefined
-//              ? (
-//                  mode_mega
-//                  ? stop_at("unclosed_mega", state, line_mega, from_mega)
-//                  : token_create("(end)")
-//              )
-//              : lex()
-//          );
-//      }
-
-// Unfortunately, incompetent JavaScript engines will sometimes fail to execute
-// it correctly. So for now, we do it the old fashioned way.
-
-// Loop through blank lines.
-
-        while (!line_source) {
-            line_source = line_next();
-            from = 0;
-            if (line_source === undefined) {
-                return (
-                    mode_mega
+            while (!line_source) {
+                line_source = read_line();
+                from = 0;
+                if (line_source === undefined) {
+                    return (
+                        mode_mega
 
 // cause: "`${//}`"
 
-                    ? stop_at("unclosed_mega", state, line_mega, from_mega)
-                    : line_disable !== undefined
+                        ? stop_at("unclosed_mega", state, line_mega, from_mega)
+                        : line_disable !== undefined
 
 // cause: "/*jslint-disable*/"
 
-                    ? stop_at("unclosed_disable", state, line_disable)
-                    : token_create("(end)")
-                );
+                        ? stop_at("unclosed_disable", state, line_disable)
+                        : token_create("(end)")
+                    );
+                }
             }
-        }
+            from = column;
+            match = line_source.match(rx_token);
 
-        from = column;
-        result = line_source.match(rx_token);
+// match[1] token
+// match[2] whitespace
+// match[3] identifier
+// match[4] number
+// match[5] rest
 
-// result[1] token
-// result[2] whitespace
-// result[3] identifier
-// result[4] number
-// result[5] rest
-
-        if (!result) {
+            if (!match) {
 
 // cause: "#"
 
-            return stop_at(
-                "unexpected_char_a",
-                state,
-                line,
-                column,
-                line_source[0]
-            );
-        }
-
-        snippet = result[1];
-        column += snippet.length;
-        line_source = result[5];
-
-// Whitespace was matched. Call lex again to get more.
-
-        if (result[2]) {
-            return lex();
+                return stop_at(
+                    "unexpected_char_a",
+                    state,
+                    line,
+                    column,
+                    line_source[0]
+                );
+            }
+            snippet = match[1];
+            column += snippet.length;
+            line_source = match[5];
+            if (!match[2]) {
+                break;
+            }
         }
 
 // The token is an identifier.
 
-        if (result[3]) {
+        if (match[3]) {
             return token_create(snippet, undefined, true);
         }
 
 // Create token from number.
 
-        if (result[4]) {
-            return number(snippet);
+        if (match[4]) {
+            return lex_number();
         }
 
-// Create token from string.
+// Create token from string "..." or '...'.
 
-        if (snippet === "\"") {
-            return string(snippet);
-        }
-        if (snippet === "'") {
-            if (!option_dict.single) {
-
-// cause: "''"
-
-                warn_at("use_double", state, line, column);
-            }
-            return string(snippet);
+        if (snippet === "\"" || snippet === "'") {
+            return lex_string(snippet);
         }
 
-// The token is a megastring. We don't allow any kind of mega nesting.
+// Create token from megastring `...`.
 
         if (snippet === "`") {
-            if (mode_mega) {
-
-// cause: "`${`"
-
-                return stop_at("expected_a_b", state, line, column, "}", "`");
-            }
-            snippet = "";
-            from_mega = from;
-            line_mega = line;
-            mode_mega = true;
-
-// Parsing a mega literal is tricky. First create a ` token.
-
-            token_create("`");
-            from += 1;
-
-// Then loop, building up a string, possibly from many lines, until seeing
-// the end of file, a closing `, or a ${ indicting an expression within the
-// string.
-
-            (function part() {
-                const at = line_source.search(rx_mega);
-
-// If neither ` nor ${ is seen, then the whole line joins the snippet.
-
-                if (at < 0) {
-                    snippet += line_source + "\n";
-                    return (
-                        line_next() === undefined
-
-// cause: "`"
-
-                        ? stop_at("unclosed_mega", state, line_mega, from_mega)
-                        : part()
-                    );
-                }
-                snippet += line_source.slice(0, at);
-                column += at;
-                line_source = line_source.slice(at);
-                if (line_source[0] === "\\") {
-                    snippet += line_source.slice(0, 2);
-                    line_source = line_source.slice(2);
-                    column += 2;
-                    return part();
-                }
-
-// if either ` or ${ was found, then the preceding joins the snippet to become
-// a string token.
-
-                token_create("(string)", snippet).quote = "`";
-                snippet = "";
-
-// If ${, then create tokens that will become part of an expression until
-// a } token is made.
-
-                if (line_source[0] === "$") {
-                    column += 2;
-                    token_create("${");
-                    line_source = line_source.slice(2);
-                    (function expr() {
-                        const id = lex().id;
-                        if (id === "{") {
-
-// cause: "`${{"
-
-                            return stop_at(
-                                "expected_a_b",
-                                state,
-                                line,
-                                column,
-                                "}",
-                                "{"
-                            );
-                        }
-                        if (id !== "}") {
-                            return expr();
-                        }
-                    }());
-                    return part();
-                }
-            }());
-            line_source = line_source.slice(1);
-            column += 1;
-            mode_mega = false;
-            return token_create("`");
+            return lex_megastring();
         }
 
-// The token is a // comment.
+// Create token from comment /*...*/ or //....
 
-        if (snippet === "//") {
-            snippet = line_source;
-            line_source = "";
-            the_token = comment(snippet);
-            if (mode_mega) {
-
-// cause: "`${//}`"
-
-                warn("unexpected_comment", state, the_token, "`");
-            }
-            return the_token;
+        if (snippet === "/*" || snippet === "//") {
+            return lex_comment();
         }
 
-// The token is a /* comment.
-
-        if (snippet === "/*") {
-            comment_list = [];
-            if (line_source[0] === "/") {
-
-// cause: "/*/"
-
-                warn_at("unexpected_a", state, line, column + i, "/");
-            }
-            (function next() {
-                if (line_source > "") {
-                    i = line_source.search(rx_star_slash);
-                    if (i >= 0) {
-                        return;
-                    }
-                    j = line_source.search(rx_slash_star);
-                    if (j >= 0) {
-
-// cause: "/*/*"
-
-                        warn_at("nested_comment", state, line, column + j);
-                    }
-                }
-                comment_list.push(line_source);
-                line_source = line_next();
-                if (line_source === undefined) {
-
-// cause: "/*"
-
-                    return stop_at("unclosed_comment", state, line, column);
-                }
-                return next();
-            }());
-            snippet = line_source.slice(0, i);
-            j = snippet.search(rx_slash_star_or_slash);
-            if (j >= 0) {
-
-// cause: "/*/**/"
-
-                warn_at("nested_comment", state, line, column + j);
-            }
-            comment_list.push(snippet);
-            column += i + 2;
-            line_source = line_source.slice(i + 2);
-            return comment(comment_list);
-        }
-
-// The token is a slash.
+// Create token from slash /.
 
         if (snippet === "/") {
-
-// The / can be a division operator or the beginning of a regular expression
-// literal. It is not possible to know which without doing a complete parse.
-// We want to complete the tokenization before we begin to parse, so we will
-// estimate. This estimator can fail in some cases. For example, it cannot
-// know if "}" is ending a block or ending an object literal, so it can
-// behave incorrectly in that case; it is not meaningful to divide an
-// object, so it is likely that we can get away with it. We avoided the worst
-// cases by eliminating automatic semicolon insertion.
-
-            if (token_before_slash.identifier) {
-                if (!token_before_slash.dot) {
-                    if (token_before_slash.id === "return") {
-                        return regexp();
-                    }
-                    if (
-                        token_before_slash.id === "(begin)"
-                        || token_before_slash.id === "case"
-                        || token_before_slash.id === "delete"
-                        || token_before_slash.id === "in"
-                        || token_before_slash.id === "instanceof"
-                        || token_before_slash.id === "new"
-                        || token_before_slash.id === "typeof"
-                        || token_before_slash.id === "void"
-                        || token_before_slash.id === "yield"
-                    ) {
-                        the_token = regexp();
-
-// cause: "/./"
-// cause: "case /./"
-// cause: "delete /./"
-// cause: "in /./"
-// cause: "instanceof /./"
-// cause: "new /./"
-// cause: "typeof /./"
-// cause: "void /./"
-// cause: "yield /./"
-
-                        return stop("unexpected_a", state, the_token);
-                    }
-                }
-            } else {
-                if ("(,=:?[".indexOf(
-                    token_before_slash.id.slice(-1)
-                ) >= 0) {
-                    return regexp();
-                }
-                if ("!&|{};~+-*%/^<>".indexOf(
-                    token_before_slash.id.slice(-1)
-                ) >= 0) {
-                    the_token = regexp();
-
-// cause: "!/./"
-
-                    warn("wrap_regexp", state, the_token);
-                    return the_token;
-                }
-            }
-            if (line_source[0] === "=") {
-                column += 1;
-                line_source = line_source.slice(1);
-                snippet = "/=";
-                warn_at("unexpected_a", state, line, column, "/=");
-            }
+            return lex_slash_or_regexp();
         }
         return token_create(snippet);
     }
@@ -1941,14 +1962,13 @@ function phase2_lex(state) {
         line += 1;
         state.mode_shebang = true;
     }
-    token_1 = lex();
+    token_1 = lex_token();
     state.mode_json = token_1.id === "{" || token_1.id === "[";
 
-// This loop will be replaced with a recursive call to lex when ES6 has been
-// finished and widely deployed and adopted.
+// Lex/loop through each token until (end).
 
     while (true) {
-        if (lex().id === "(end)") {
+        if (lex_token().id === "(end)") {
             break;
         }
     }
@@ -3233,11 +3253,11 @@ function phase3_parse(state) {
         let optional;
         if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
             (function parameter() {
+                let artifact_now;
+                let artifact_nxt = "";
                 let ellipsis = false;
                 let param;
                 if (token_nxt.id === "{") {
-                    let artifact_now;
-                    let artifact_nxt = "";
                     if (optional !== undefined) {
 
 // cause: "function aa(aa=0,{}){}"
@@ -3269,7 +3289,7 @@ function phase3_parse(state) {
                         }
                         survey(subparam);
                         artifact_now = artifact_nxt;
-                        artifact_nxt = artifact(subparam);
+                        artifact_nxt = `parameter ${artifact(subparam)}`;
                         if (
                             !option_dict.unordered
                             && artifact_now > artifact_nxt
@@ -3725,12 +3745,12 @@ function phase3_parse(state) {
     });
     prefix("`", do_tick);
     prefix("{", function () {
+        let artifact_now;
+        let artifact_nxt = "";
         const seen = empty();
         const the_brace = token_now;
         the_brace.expression = [];
         if (token_nxt.id !== "}") {
-            let artifact_now;
-            let artifact_nxt = "";
 
 // Parse/loop through each property in {...}.
 
@@ -3742,7 +3762,7 @@ function phase3_parse(state) {
                 let value;
                 advance();
                 artifact_now = artifact_nxt;
-                artifact_nxt = artifact(name);
+                artifact_nxt = `property ${artifact(name)}`;
                 if (
                     !option_dict.unordered
                     && artifact_now > artifact_nxt
@@ -3968,9 +3988,9 @@ function phase3_parse(state) {
             warn("var_loop", state, the_statement);
         }
         (function next() {
+            let artifact_now;
+            let artifact_nxt = "";
             if (token_nxt.id === "{" && the_statement.id !== "var") {
-                let artifact_now;
-                let artifact_nxt = "";
                 const the_brace = token_nxt;
                 advance("{");
                 (function pair() {
@@ -3983,7 +4003,7 @@ function phase3_parse(state) {
                     const name = token_nxt;
                     survey(name);
                     artifact_now = artifact_nxt;
-                    artifact_nxt = artifact(name);
+                    artifact_nxt = `identifier ${artifact(name)}`;
                     if (
                         !option_dict.unordered
                         && artifact_now > artifact_nxt

@@ -38,6 +38,7 @@
 - jslint-refactor-5 - split jslint-core-logic into 5-phases.
     - move phase-sub-functions out of function-jslint().
     - move global-vars into state-object, that can be passed between functions.
+    - migrate recursive-loops to while-loops in sub-function phase2_lex().
 - website - add ui-loader-animation.
 
 ## v2021.6.3
