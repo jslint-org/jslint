@@ -64,14 +64,14 @@ node jslint.mjs .
 
 # stderr:
 #
-# jslint - 20ms - ./CHANGELOG.md
-# jslint - 20ms - ./README.md
-# jslint - 20ms - ./browser.js
-# jslint - 20ms - ./function.html
-# jslint - 20ms - ./image-jslint.html
-# jslint - 20ms - ./index.html
-# jslint - 20ms - ./package.json
-# jslint - 20ms - ./test.js
+# jslint - 25ms - ./CHANGELOG.md
+# jslint - 25ms - ./README.md
+# jslint - 25ms - ./browser.js
+# jslint - 25ms - ./function.html
+# jslint - 25ms - ./image-jslint.html
+# jslint - 25ms - ./index.html
+# jslint - 25ms - ./package.json
+# jslint - 25ms - ./test.js
 # jslint - 50ms - ./ci.sh
 # jslint - 50ms - ./help.html
 # jslint - 150ms - ./jslint.mjs
