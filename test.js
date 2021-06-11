@@ -269,6 +269,8 @@ function noop() {
             + "|stop_at"
             + "|warn"
             + "|warn_at"
+            + "|warn_if_unordered"
+            + "|warn_if_unordered_case_statement"
             + ")"
             + "\\\u0028\\s*?\"?"
             + "(\\S[^\n\"]+)"
@@ -293,6 +295,10 @@ function noop() {
                 break;
             case "semicolon":
                 expectedWarningCode = "expected_a_b";
+                break;
+            case "warn_if_unordered":
+            case "warn_if_unordered_case_statement":
+                expectedWarningCode = "expected_a_b_before_c_d";
                 break;
             }
         }

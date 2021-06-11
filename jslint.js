@@ -85,9 +85,10 @@
 
 // WARNING: JSLint will hurt your feelings.
 
-/*jslint debug, node*/
+/*jslint node*/
 
 /*property
+    filter, order, reduce, stringify, token,
     JSLINT_CLI, a, all, allowed_option, argv, arity, artifact, assign, async, b,
     bind, bitwise, block, body, browser, c, calls, catch, closer, closure, code,
     column, concat, console_error, constant, context, convert, couch, create,
@@ -139,6 +140,13 @@ function empty() {
 // 'constructor' are completely avoided.
 
     return Object.create(null);
+}
+
+function identity(val) {
+
+// This function will return <val>.
+
+    return val;
 }
 
 function noop() {
@@ -889,17 +897,24 @@ function jslint_phase2_lex(state) {
 // Match a character in a character class.
 
             switch (char) {
-            case "\\":
-                char_after_escape("BbDdSsWw-[]^");
-                return true;
             case "":
                 return false;
+            case " ":
+
+// cause: "aa=/[ ]/"
+
+                warn_at("expected_a_b", line, column, "\\u0020", " ");
+                char_after();
+                return true;
             case "-":
                 return false;
             case "/":
                 return false;
             case "[":
                 return false;
+            case "\\":
+                char_after_escape("BbDdSsWw-[]^");
+                return true;
             case "]":
                 return false;
             case "^":
@@ -912,13 +927,6 @@ function jslint_phase2_lex(state) {
 // cause: "aa=/[\\\\]]/"
 
                 return false;
-            case " ":
-
-// cause: "aa=/[ ]/"
-
-                warn_at("expected_a_b", line, column, "\\u0020", " ");
-                char_after();
-                return true;
             case "`":
                 if (mode_mega) {
 
@@ -943,9 +951,9 @@ function jslint_phase2_lex(state) {
             while (true) {
                 switch (char) {
                 case "":
+                case ")":
                 case "/":
                 case "]":
-                case ")":
 
 // RegExp
 // Break while-loop in regexp_choice().
@@ -972,6 +980,19 @@ function jslint_phase2_lex(state) {
 // }
 
                     return;
+                case " ":
+
+// cause: "aa=/ /"
+
+                    warn_at("expected_a_b", line, column, "\\s", " ");
+                    char_after();
+                    break;
+                case "$":
+                    if (line_source[0] !== "/") {
+                        mode_multi = true;
+                    }
+                    char_after();
+                    break;
                 case "(":
 
 // RegExp
@@ -998,6 +1019,27 @@ function jslint_phase2_lex(state) {
 
                     regexp_choice();
                     char_after(")");
+                    break;
+                case "*":
+
+// cause: "aa=/.**/"
+
+                    warn_at("expected_a_before_b", line, column, "\\", char);
+                    char_after();
+                    break;
+                case "+":
+
+// cause: "aa=/+/"
+
+                    warn_at("expected_a_before_b", line, column, "\\", char);
+                    char_after();
+                    break;
+                case "?":
+
+// cause: "aa=/?/"
+
+                    warn_at("expected_a_before_b", line, column, "\\", char);
+                    char_after();
                     break;
                 case "[":
 
@@ -1047,14 +1089,15 @@ function jslint_phase2_lex(state) {
                     char_after("]");
                     break;
                 case "\\":
+
+// cause: "aa=/\\/"
+
                     char_after_escape("BbDdSsWw^${}[]():=!.|*+?");
                     break;
-                case "?":
-                case "+":
-                case "*":
-                case "}":
-                case "{":
-                    warn_at("expected_a_before_b", line, column, "\\", char);
+                case "^":
+                    if (snippet !== "^") {
+                        mode_multi = true;
+                    }
                     char_after();
                     break;
                 case "`":
@@ -1066,23 +1109,18 @@ function jslint_phase2_lex(state) {
                     }
                     char_after();
                     break;
-                case " ":
+                case "{":
 
-// cause: "aa=/ /"
+// cause: "aa=/{/"
 
-                    warn_at("expected_a_b", line, column, "\\s", " ");
+                    warn_at("expected_a_before_b", line, column, "\\", char);
                     char_after();
                     break;
-                case "$":
-                    if (line_source[0] !== "/") {
-                        mode_multi = true;
-                    }
-                    char_after();
-                    break;
-                case "^":
-                    if (snippet !== "^") {
-                        mode_multi = true;
-                    }
+                case "}":
+
+// cause: "aa=/}/"
+
+                    warn_at("expected_a_before_b", line, column, "\\", char);
                     char_after();
                     break;
                 default:
@@ -1309,14 +1347,6 @@ function jslint_phase2_lex(state) {
 
         while (true) {
             switch (char) {
-            case quote:
-
-// Remove last character from snippet.
-
-                snippet = snippet.slice(0, -1);
-                the_token = token_create("(string)", snippet);
-                the_token.quote = quote;
-                return the_token;
             case "":
 
 // cause: "\""
@@ -1334,6 +1364,14 @@ function jslint_phase2_lex(state) {
                 }
                 char_after("`");
                 break;
+            case quote:
+
+// Remove last character from snippet.
+
+                snippet = snippet.slice(0, -1);
+                the_token = token_create("(string)", snippet);
+                the_token.quote = quote;
+                return the_token;
             default:
                 char_after();
             }
@@ -1501,6 +1539,68 @@ function jslint_phase3_parse(state) {
                                         // the parse.
     let token_nxt = token_global;       // The next token to be examined in
                                         // <token_list>.
+
+    function warn_if_unordered(type, token_list) {
+
+// This function will warn if <token_list> is unordered.
+
+        token_list.reduce(function (aa, token) {
+            const bb = artifact(token);
+            if (!option_dict.unordered && aa > bb) {
+                warn("expected_a_b_before_c_d", token, type, bb, type, aa);
+            }
+            return bb;
+        }, "");
+    }
+
+    function warn_if_unordered_case_statement(case_list) {
+
+// This function will warn if <case_list> is unordered.
+
+        case_list.filter(identity).map(function (token) {
+            switch (token.identifier || token.id) {
+            case "(number)":
+                return {
+                    order: 1,
+                    token,
+                    type: "number",
+                    value: Number(artifact(token))
+                };
+            case "(string)":
+                return {
+                    order: 2,
+                    token,
+                    type: "string",
+                    value: artifact(token)
+                };
+            case true:
+                return {
+                    order: 3,
+                    token,
+                    type: "identifier",
+                    value: artifact(token)
+                };
+            }
+        }).reduce(function (aa, bb) {
+            if (
+                aa && bb
+                && (
+                    aa.order > bb.order
+                    || (aa.order === bb.order && aa.value > bb.value)
+                )
+            ) {
+                warn(
+                    "expected_a_b_before_c_d",
+                    bb.token,
+                    `case-${bb.type}`,
+                    bb.value,
+                    `case-${aa.type}`,
+                    aa.value
+                );
+            }
+            return bb;
+        });
+    }
 
     function advance(id, match) {
 
@@ -1923,7 +2023,7 @@ function jslint_phase3_parse(state) {
 
         while (true) {
             switch (token_nxt.id) {
-            case "}":
+            case "(end)":
                 return statement_list;
             case "case":
                 return statement_list;
@@ -1931,8 +2031,7 @@ function jslint_phase3_parse(state) {
                 return statement_list;
             case "else":
                 return statement_list;
-            case "(end)":
-                return statement_list;
+            case "}":
 
 // cause: ";"
 // cause: "case"
@@ -1940,6 +2039,7 @@ function jslint_phase3_parse(state) {
 // cause: "else"
 // cause: "}"
 
+                return statement_list;
             }
             a_statement = parse_statement();
             statement_list.push(a_statement);
@@ -2750,8 +2850,6 @@ function jslint_phase3_parse(state) {
         let optional;
         if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
             (function parameter() {
-                let artifact_now;
-                let artifact_nxt = "";
                 let ellipsis = false;
                 let param;
                 if (token_nxt.id === "{") {
@@ -2780,22 +2878,6 @@ function jslint_phase3_parse(state) {
                             return stop("expected_identifier_a");
                         }
                         survey(subparam);
-                        artifact_now = artifact_nxt;
-                        artifact_nxt = `parameter ${artifact(subparam)}`;
-                        if (
-                            !option_dict.unordered
-                            && artifact_now > artifact_nxt
-                        ) {
-
-// cause: "function aa({bb,aa}){}"
-
-                            warn(
-                                "expected_a_before_b",
-                                subparam,
-                                artifact_nxt,
-                                artifact_now
-                            );
-                        }
                         advance();
                         signature.push(subparam.id);
                         if (token_nxt.id === ":") {
@@ -2828,7 +2910,11 @@ function jslint_phase3_parse(state) {
                             return subparameter();
                         }
                     }());
+
+// cause: "function aa({bb,aa}){}"
+
                     list.push(param);
+                    warn_if_unordered("parameter", param.names);
                     advance("}");
                     signature.push("}");
                     if (token_nxt.id === ",") {
@@ -3219,8 +3305,6 @@ function jslint_phase3_parse(state) {
     });
     prefix("`", do_tick);
     prefix("{", function () {
-        let artifact_now;
-        let artifact_nxt = "";
         const seen = empty();
         const the_brace = token_now;
         the_brace.expression = [];
@@ -3235,22 +3319,6 @@ function jslint_phase3_parse(state) {
                 let name = token_nxt;
                 let value;
                 advance();
-                artifact_now = artifact_nxt;
-                artifact_nxt = `property ${artifact(name)}`;
-                if (
-                    !option_dict.unordered
-                    && artifact_now > artifact_nxt
-                ) {
-
-// cause: "aa={bb,aa}"
-
-                    warn(
-                        "expected_a_before_b",
-                        name,
-                        artifact_nxt,
-                        artifact_now
-                    );
-                }
                 if (
                     (name.id === "get" || name.id === "set")
                     && token_nxt.identifier
@@ -3355,6 +3423,17 @@ function jslint_phase3_parse(state) {
                 advance(",");
             }
         }
+
+// cause: "aa={bb,aa}"
+
+        warn_if_unordered(
+            "property",
+            the_brace.expression.map(function ({
+                label
+            }) {
+                return label;
+            })
+        );
         advance("}");
         return the_brace;
     });
@@ -3450,8 +3529,6 @@ function jslint_phase3_parse(state) {
             warn("var_loop", the_statement);
         }
         (function next() {
-            let artifact_now;
-            let artifact_nxt = "";
             if (token_nxt.id === "{" && the_statement.id !== "var") {
                 const the_brace = token_nxt;
                 advance("{");
@@ -3464,22 +3541,6 @@ function jslint_phase3_parse(state) {
                     }
                     const name = token_nxt;
                     survey(name);
-                    artifact_now = artifact_nxt;
-                    artifact_nxt = `variable ${artifact(name)}`;
-                    if (
-                        !option_dict.unordered
-                        && artifact_now > artifact_nxt
-                    ) {
-
-// cause: "let{bb,aa}"
-
-                        warn(
-                            "expected_a_before_b",
-                            name,
-                            artifact_nxt,
-                            artifact_now
-                        );
-                    }
                     advance();
                     if (token_nxt.id === ":") {
                         advance(":");
@@ -3514,6 +3575,10 @@ function jslint_phase3_parse(state) {
                         return pair();
                     }
                 }());
+
+// cause: "let{bb,aa}"
+
+                warn_if_unordered("variable", the_statement.names);
                 advance("}");
                 advance("=");
                 the_statement.expression = parse_expression(0);
@@ -4003,6 +4068,14 @@ function jslint_phase3_parse(state) {
                     return minor();
                 }
             }());
+
+// cause: switch(0){case "aa":case 0:break;}
+// cause: switch(0){case "bb":case "aa":break;}
+// cause: switch(0){case 1:case 0:break;}
+// cause: switch(0){case aa:case "aa":break;}
+// cause: switch(0){case bb:case aa:break;}
+
+            warn_if_unordered_case_statement(the_case.expression);
             stmts = parse_statements();
             if (stmts.length < 1) {
 
@@ -4025,6 +4098,18 @@ function jslint_phase3_parse(state) {
                 return major();
             }
         }());
+
+// cause: switch(0){case "aa":break;case 0:break;}
+// cause: switch(0){case "bb":break;case "aa":break;}
+// cause: switch(0){case 1:break;case 0:break;}
+// cause: switch(0){case aa:break;case "aa":break;}
+// cause: switch(0){case bb:break;case aa:break;}
+
+        warn_if_unordered_case_statement(the_cases.map(function ({
+            expression
+        }) {
+            return expression[0];
+        }));
         dups = undefined;
         if (token_nxt.id === "default") {
             const the_default = token_nxt;
@@ -4180,6 +4265,75 @@ function jslint_phase3_parse(state) {
         state.token_tree = (function parse_json() {
             let negative;
             switch (token_nxt.id) {
+            case "(number)":
+                if (!rx_json_number.test(token_nxt.value)) {
+
+// cause: "[0x0]"
+
+                    warn("unexpected_a");
+                }
+                advance();
+                return token_now;
+            case "(string)":
+                if (token_nxt.quote !== "\"") {
+
+// cause: "['']"
+
+                    warn("unexpected_a", token_nxt, token_nxt.quote);
+                }
+                advance();
+                return token_now;
+            case "-":
+                negative = token_nxt;
+                negative.arity = "unary";
+                advance("-");
+                advance("(number)");
+                if (!rx_json_number.test(token_now.value)) {
+
+// cause: "[-0x0]"
+
+                    warn("unexpected_a", token_now);
+                }
+                negative.expression = token_now;
+                return negative;
+            case "[":
+
+// cause: "[]"
+
+                return (function json_list() {
+                    const bracket = token_nxt;
+                    const elements = [];
+                    bracket.expression = elements;
+                    advance("[");
+                    if (token_nxt.id !== "]") {
+                        while (true) {
+                            elements.push(parse_json());
+                            if (token_nxt.id !== ",") {
+
+// cause: "[0,0]"
+
+                                break;
+                            }
+                            advance(",");
+                        }
+                    }
+                    advance("]", bracket);
+                    return bracket;
+                }());
+            case "false":
+                advance();
+                return token_now;
+            case "null":
+                advance();
+                return token_now;
+            case "true":
+
+// cause: "[false]"
+// cause: "[null]"
+// cause: "[true]"
+
+                advance();
+                return token_now;
             case "{":
                 return (function json_object() {
                     const brace = token_nxt;
@@ -4236,75 +4390,6 @@ function jslint_phase3_parse(state) {
                     advance("}", brace);
                     return brace;
                 }());
-            case "[":
-
-// cause: "[]"
-
-                return (function json_list() {
-                    const bracket = token_nxt;
-                    const elements = [];
-                    bracket.expression = elements;
-                    advance("[");
-                    if (token_nxt.id !== "]") {
-                        while (true) {
-                            elements.push(parse_json());
-                            if (token_nxt.id !== ",") {
-
-// cause: "[0,0]"
-
-                                break;
-                            }
-                            advance(",");
-                        }
-                    }
-                    advance("]", bracket);
-                    return bracket;
-                }());
-            case "false":
-                advance();
-                return token_now;
-            case "null":
-                advance();
-                return token_now;
-            case "true":
-
-// cause: "[false]"
-// cause: "[null]"
-// cause: "[true]"
-
-                advance();
-                return token_now;
-            case "(number)":
-                if (!rx_json_number.test(token_nxt.value)) {
-
-// cause: "[0x0]"
-
-                    warn("unexpected_a");
-                }
-                advance();
-                return token_now;
-            case "(string)":
-                if (token_nxt.quote !== "\"") {
-
-// cause: "['']"
-
-                    warn("unexpected_a", token_nxt, token_nxt.quote);
-                }
-                advance();
-                return token_now;
-            case "-":
-                negative = token_nxt;
-                negative.arity = "unary";
-                advance("-");
-                advance("(number)");
-                if (!rx_json_number.test(token_now.value)) {
-
-// cause: "[-0x0]"
-
-                    warn("unexpected_a", token_now);
-                }
-                negative.expression = token_now;
-                return negative;
             default:
 
 // cause: "[undefined]"
@@ -4785,6 +4870,7 @@ function jslint_phase4_walk(state) {
     }
 
     function postaction_function(thing) {
+        delete functionage.async;
         delete functionage.finally;
         delete functionage.loop;
         delete functionage.switch;
@@ -5115,10 +5201,14 @@ function jslint_phase4_walk(state) {
             || thing.expression[1].constant === true
         ) {
 
+// cause: "aa=(()=>0)&&(()=>0)"
 // cause: "aa=(``?``:``)&&(``?``:``)"
-// cause: "aa=/./&&0"
+// cause: "aa=/./&&/./"
 // cause: "aa=0&&0"
+// cause: "aa=[]&&[]"
 // cause: "aa=`${0}`&&`${0}`"
+// cause: "aa=function aa(){}&&function aa(){}"
+// cause: "aa={}&&{}"
 
             warn("weird_condition_a", thing);
         }
@@ -6169,12 +6259,15 @@ function jslint(
     function is_weird(thing) {
         switch (thing.id) {
         case "(regexp)":
+            return true;
         case "=>":
-        case "function":
-        case "{":
             return true;
         case "[":
             return thing.arity === "unary";
+        case "function":
+            return true;
+        case "{":
+            return true;
         default:
             return false;
         }
@@ -6354,6 +6447,9 @@ function jslint(
             break;
         case "expected_a_b":
             mm = `Expected '${a}' and instead saw '${b}'.`;
+            break;
+        case "expected_a_b_before_c_d":
+            mm = `Expected ${a} '${b}' before ${c} '${d}'.`;
             break;
         case "expected_a_b_from_c_d":
             mm = (
