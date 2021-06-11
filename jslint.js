@@ -88,52 +88,32 @@
 /*jslint debug, node*/
 
 /*property
-    index,
-    directive_list, export_dict, function_list, import_list, line_list,
-    mode_json, mode_module, mode_property, mode_shebang,
-    global_list, option_dict, property_dict, source, syntax_dict, tenure,
-    token_global, token_list, token_tree, warning_list,
-    JSLINT_CLI, a, all, and, argv, arity, assign, async, b, bad_assignment_a,
-    bad_directive_a, bad_get, bad_module_name_a, bad_option_a, bad_property_a,
-    bad_set, bind, bitwise, block, body, browser, c, calls, catch, cli, closer,
-    closure, code, column, concat, console_error, constant, context, convert,
-    couch, create, cwd, d, dead, debug, default, devel, directive,
-    directive_quiet, directives, disrupt, dot, duplicate_a, edition, ellipsis,
-    else, empty_block, endsWith, env, error, eval, every, exec, exit,
-    expected_a, expected_a_at_b_c, expected_a_b, expected_a_b_from_c_d,
-    expected_a_before_b, expected_digits_after_a, expected_four_digits,
-    expected_identifier_a, expected_line_break_a_b, expected_regexp_factor_a,
-    expected_space_a_b, expected_statements_a, expected_string_a,
-    expected_type_string_a, exports, expression, extra, file, finally, flag,
-    for, forEach, formatted_message, free, freeze, freeze_exports, from, froms,
-    fud, function_in_loop, functions, getset, global, id, identifier, import,
-    inc, indexOf, infix_in, init, initial, isArray, isNaN, join, jslint, json,
-    keys, label, label_a, lbp, led, length, level, line, line_offset,
+    JSLINT_CLI, a, all, allowed_option, argv, arity, artifact, assign, async, b,
+    bind, bitwise, block, body, browser, c, calls, catch, closer, closure, code,
+    column, concat, console_error, constant, context, convert, couch, create,
+    cwd, d, dead, debug, default, devel, directive, directive_list,
+    directive_quiet, directives, disrupt, dot, edition, ellipsis, else,
+    endsWith, env, error, eval, every, exec, exit, export_dict, exports,
+    expression, extra, file, finally, flag, for, forEach, formatted_message,
+    free, freeze, from, froms, fud, function_list, functions, getset, global,
+    global_list, id, identifier, import, import_list, inc, index, indexOf, init,
+    initial, isArray, isNaN, is_equal, is_weird, join, jslint, jslint_cli, json,
+    keys, label, lbp, led, length, level, line, line_list, line_offset,
     line_source, lines, live, long, loop, m, map, margin, match, max, message,
-    misplaced_a, misplaced_directive_a, missing_await_statement,
-    missing_browser, missing_m, mode_stop, module, naked_block, name, names,
-    nested_comment, node, not_label_a, now, nr, nud, number_isNaN, ok, open,
-    opening, option, out_of_scope_a, padStart, parameters, parent, pop,
-    promises, property, push, quote, raw, readFile, readdir, redefinition_a_b,
-    repeat, replace, required_a_optional_b, reserved_a, resolve, role, search,
-    shebang, signature, single, slice, some, sort, source, split, stack,
-    stack_trace, startsWith, statement, stop, subscript_a, switch, test,
-    test_internal_error, then, this, thru, todo_comment, tokens, too_long,
-    too_many_digits, tree, trim, try, type, unclosed_comment, unclosed_disable,
-    unclosed_mega, unclosed_string, undeclared_a, unexpected_a,
-    unexpected_a_after_b, unexpected_a_before_b, unexpected_at_top_level_a,
-    unexpected_char_a, unexpected_comment, unexpected_directive_a,
-    unexpected_expression_a, unexpected_label_a, unexpected_parens,
-    unexpected_space_a_b, unexpected_statement_a, unexpected_trailing_space,
-    unexpected_typeof_a, uninitialized_a, unopened_enable, unordered,
-    unreachable_a, unregistered_property_a, unused_a, use_double, use_open,
-    use_spaces, used, value, var_loop, var_switch, variable, versions, warning,
-    warnings, weird_condition_a, weird_expression_a, weird_loop,
-    weird_relation_a, white, wrap_condition, wrap_immediate, wrap_parameter,
-    wrap_regexp, wrap_unary, wrapped, writable
+    mode_json, mode_module, mode_property, mode_shebang, mode_stop, module,
+    name, names, node, now, nr, nud, ok, open, opening, option, option_dict,
+    padStart, parameters, parent, pop, promises, property, property_dict, push,
+    quote, readFile, readdir, repeat, replace, resolve, role, search, shebang,
+    signature, single, slice, some, sort, source, split, stack, stack_trace,
+    startsWith, statement, stop, stop_at, switch, syntax_dict, tenure, test,
+    test_internal_error, then, this, thru, token_global, token_list, token_tree,
+    tokens, tree, trim, try, type, unordered, used, value, variable, versions,
+    warn, warn_at, warning, warning_list, warnings, white, wrapped, writable
 */
 
 const edition = "v2021.6.4-beta";
+
+const line_fudge = 1;   // Fudge starting line and starting column to 1.
 
 function assert_or_throw(passed, message) {
 
@@ -180,546 +160,70 @@ function populate(array, object = empty(), value = true) {
     return object;
 }
 
-const allowed_option = {
-
-// These are the options that are recognized in the option object or that may
-// appear in a /*jslint*/ directive. Most options will have a boolean value,
-// usually true. Some options will also predefine some number of global
-// variables.
-
-    bitwise: true,
-    browser: [
-        "caches", "CharacterData", "clearInterval", "clearTimeout",
-        "document",
-        "DocumentType", "DOMException", "Element", "Event", "event",
-        "fetch",
-        "FileReader", "FontFace", "FormData", "history",
-        "IntersectionObserver",
-        "localStorage", "location", "MutationObserver", "name", "navigator",
-        "screen", "sessionStorage", "setInterval", "setTimeout", "Storage",
-        "TextDecoder", "TextEncoder", "URL", "window", "Worker",
-        "XMLHttpRequest"
-    ],
-    convert: true,
-    couch: [
-        "emit", "getRow", "isArray", "log", "provides", "registerType",
-        "require", "send", "start", "sum", "toJSON"
-    ],
-    debug: true,
-    devel: [
-        "alert", "confirm", "console", "prompt"
-    ],
-    eval: true,
-    for: true,
-    getset: true,
-    long: true,
-    name: true,
-    node: [
-        "Buffer", "clearImmediate", "clearInterval", "clearTimeout",
-        "console", "exports", "module", "process", "require",
-        "setImmediate", "setInterval", "setTimeout", "TextDecoder",
-        "TextEncoder", "URL", "URLSearchParams", "__dirname", "__filename"
-    ],
-    single: true,
-    test_internal_error: true,
-    this: true,
-    unordered: true,
-    white: true
-};
-
-// The relational operators.
-
-const relationop = populate([
-    "!=", "!==", "==", "===", "<", "<=", ">", ">="
-]);
-
-// This is the set of infix operators that require a space on each side.
-
-const spaceop = populate([
-    "!=", "!==", "%", "%=", "&", "&=", "&&", "*", "*=", "+=", "-=", "/",
-    "/=", "<", "<=", "<<", "<<=", "=", "==", "===", "=>", ">", ">=",
-    ">>", ">>=", ">>>", ">>>=", "^", "^=", "|", "|=", "||"
-]);
-
-const standard = [
-
-// These are the globals that are provided by the language standard.
-
-    "Array", "ArrayBuffer", "Boolean", "DataView", "Date", "Error",
-    "EvalError",
-    "Float32Array", "Float64Array", "Generator", "GeneratorFunction",
-    "Int16Array", "Int32Array", "Int8Array", "Intl", "JSON", "Map", "Math",
-    "Number", "Object", "Promise", "Proxy", "RangeError", "ReferenceError",
-    "Reflect", "RegExp", "Set", "String", "Symbol", "SyntaxError", "System",
-    "TypeError", "URIError", "Uint16Array", "Uint32Array", "Uint8Array",
-    "Uint8ClampedArray", "WeakMap", "WeakSet", "decodeURI",
-    "decodeURIComponent", "encodeURI", "encodeURIComponent", "globalThis",
-    "import", "parseFloat", "parseInt"
-];
-
-const bundle = {
-
-// The bundle contains the raw text messages that are generated by jslint. It
-// seems that they are all error messages and warnings. There are no "Atta
-// boy!" or "You are so awesome!" messages. There is no positive reinforcement
-// or encouragement. This relentless negativity can undermine self-esteem and
-// wound the inner child. But if you accept it as sound advice rather than as
-// personal criticism, it can make your programs better.
-
-    and: "The '&&' subexpression should be wrapped in parens.",
-    bad_assignment_a: "Bad assignment to '{a}'.",
-    bad_directive_a: "Bad directive '{a}'.",
-    bad_get: "A get function takes no parameters.",
-    bad_module_name_a: "Bad module name '{a}'.",
-    bad_option_a: "Bad option '{a}'.",
-    bad_property_a: "Bad property name '{a}'.",
-    bad_set: "A set function takes one parameter.",
-    duplicate_a: "Duplicate '{a}'.",
-    empty_block: "Empty block.",
-    expected_a: "Expected '{a}'.",
-    expected_a_at_b_c: "Expected '{a}' at column {b}, not column {c}.",
-    expected_a_b: "Expected '{a}' and instead saw '{b}'.",
-    expected_a_b_from_c_d: (
-        "Expected '{a}' to match '{b}' from line {c} and instead saw '{d}'."
-    ),
-    expected_a_before_b: "Expected '{a}' before '{b}'.",
-    expected_digits_after_a: "Expected digits after '{a}'.",
-    expected_four_digits: "Expected four digits after '\\u'.",
-    expected_identifier_a: "Expected an identifier and instead saw '{a}'.",
-    expected_line_break_a_b: (
-        "Expected a line break between '{a}' and '{b}'."
-    ),
-    expected_regexp_factor_a: (
-        "Expected a regexp factor and instead saw '{a}'."
-    ),
-    expected_space_a_b: "Expected one space between '{a}' and '{b}'.",
-    expected_statements_a: "Expected statements before '{a}'.",
-    expected_string_a: "Expected a string and instead saw '{a}'.",
-    expected_type_string_a: "Expected a type string and instead saw '{a}'.",
-    freeze_exports: (
-        "Expected 'Object.freeze('. All export values should be frozen."
-    ),
-    function_in_loop: "Don't create functions within a loop.",
-    infix_in: (
-        "Unexpected 'in'. Compare with undefined, "
-        + "or use the hasOwnProperty method instead."
-    ),
-    label_a: "'{a}' is a statement label.",
-    misplaced_a: "Place '{a}' at the outermost level.",
-    misplaced_directive_a: (
-        "Place the '/*{a}*/' directive before the first statement."
-    ),
-    missing_await_statement: "Expected await statement in async function.",
-    missing_browser: "/*global*/ requires the Assume a browser option.",
-    missing_m: "Expected 'm' flag on a multiline regular expression.",
-    naked_block: "Naked block.",
-    nested_comment: "Nested comment.",
-    not_label_a: "'{a}' is not a label.",
-    number_isNaN: "Use Number.isNaN function to compare with NaN.",
-    out_of_scope_a: "'{a}' is out of scope.",
-    redefinition_a_b: "Redefinition of '{a}' from line {b}.",
-    required_a_optional_b: (
-        "Required parameter '{a}' after optional parameter '{b}'."
-    ),
-    reserved_a: "Reserved name '{a}'.",
-    subscript_a: "['{a}'] is better written in dot notation.",
-    todo_comment: "Unexpected TODO comment.",
-    too_long: "Line is longer than 80 characters.",
-    too_many_digits: "Too many digits.",
-    unclosed_comment: "Unclosed comment.",
-    unclosed_disable: (
-        "Directive '/*jslint-disable*/' was not closed "
-        + "with '/*jslint-enable*/'."
-    ),
-    unclosed_mega: "Unclosed mega literal.",
-    unclosed_string: "Unclosed string.",
-    undeclared_a: "Undeclared '{a}'.",
-    unexpected_a: "Unexpected '{a}'.",
-    unexpected_a_after_b: "Unexpected '{a}' after '{b}'.",
-    unexpected_a_before_b: "Unexpected '{a}' before '{b}'.",
-    unexpected_at_top_level_a: "Expected '{a}' to be in a function.",
-    unexpected_char_a: "Unexpected character '{a}'.",
-    unexpected_comment: "Unexpected comment.",
-    unexpected_directive_a: (
-        "When using modules, don't use directive '/*{a}'."
-    ),
-    unexpected_expression_a: (
-        "Unexpected expression '{a}' in statement position."
-    ),
-    unexpected_label_a: "Unexpected label '{a}'.",
-    unexpected_parens: "Don't wrap function literals in parens.",
-    unexpected_space_a_b: "Unexpected space between '{a}' and '{b}'.",
-    unexpected_statement_a: (
-        "Unexpected statement '{a}' in expression position."
-    ),
-    unexpected_trailing_space: "Unexpected trailing space.",
-    unexpected_typeof_a: (
-        "Unexpected 'typeof'. Use '===' to compare directly with {a}."
-    ),
-    uninitialized_a: "Uninitialized '{a}'.",
-    unopened_enable: (
-        "Directive '/*jslint-enable*/' was not opened "
-        + "with '/*jslint-disable*/'."
-    ),
-    unreachable_a: "Unreachable '{a}'.",
-    unregistered_property_a: "Unregistered property name '{a}'.",
-    unused_a: "Unused '{a}'.",
-    use_double: "Use double quotes, not single quotes.",
-    use_open: (
-        "Wrap a ternary expression in parens, "
-        + "with a line break after the left paren."
-    ),
-    use_spaces: "Use spaces, not tabs.",
-    var_loop: "Don't declare variables in a loop.",
-    var_switch: "Don't declare variables in a switch.",
-    weird_condition_a: "Weird condition '{a}'.",
-    weird_expression_a: "Weird expression '{a}'.",
-    weird_loop: "Weird loop.",
-    weird_relation_a: "Weird relation '{a}'.",
-    wrap_condition: "Wrap the condition in parens.",
-    wrap_immediate: (
-        "Wrap an immediate function invocation in parentheses to assist "
-        + "the reader in understanding that the expression is the result "
-        + "of a function, and not the function itself."
-    ),
-    wrap_parameter: "Wrap the parameter in parens.",
-    wrap_regexp: "Wrap this regexp in parens to avoid confusion.",
-    wrap_unary: "Wrap the unary expression in parens."
-};
-
-// Regular expression literals:
-
-function tag_regexp(strings) {
-    return new RegExp(strings.raw[0].replace(/\s/g, ""));
-}
-
-// supplant {variables}
-const rx_supplant = /\{([^{}]*)\}/g;
-// identifier
-const rx_identifier = tag_regexp ` ^(
-    [ a-z A-Z _ $ ]
-    [ a-z A-Z 0-9 _ $ ]*
-)$`;
-const rx_module = tag_regexp ` ^ [ a-z A-Z 0-9 _ $ : . @ \- \/ ]+ $ `;
-// tab
-const rx_tab = /\t/g;
-// token
-const rx_token = tag_regexp ` ^ (
-    (\s+)
-  | (
-      [ a-z A-Z _ $ ]
-      [ a-z A-Z 0-9 _ $ ]*
-    )
-  | [
-      ( ) { } \[ \] , : ; ' " ~ \`
-  ]
-  | \? [ ? . ]?
-  | = (?:
-        = =?
-      | >
-    )?
-  | \.+
-  | \* [ * \/ = ]?
-  | \/ [ * \/ ]?
-  | \+ [ = + ]?
-  | - [ = \- ]?
-  | [ \^ % ] =?
-  | & [ & = ]?
-  | \| [ | = ]?
-  | >{1,3} =?
-  | < <? =?
-  | ! (?:
-        !
-      | = =?
-    )?
-  | (
-        0
-      | [ 1-9 ] [ 0-9 ]*
-    )
-) ( .* ) $ `;
-const rx_digits = /^[0-9]*/;
-const rx_hexs = /^[0-9A-F]*/i;
-const rx_octals = /^[0-7]*/;
-const rx_bits = /^[01]*/;
-// JSON number
-const rx_JSON_number = tag_regexp ` ^
-    -?
-    (?: 0 | [ 1-9 ] \d* )
-    (?: \. \d* )?
-    (?: [ e E ] [ \- + ]? \d+ )?
-$ `;
-// initial cap
-const rx_cap = /^[A-Z]/;
-
-const line_fudge = 1;   // Fudge starting line and starting column to 1.
-
-// Error reportage functions:
-
-function artifact(the_token) {
-
-// Return a string representing an artifact.
-
-    assert_or_throw(
-        the_token !== undefined,
-        "Expected the_token !== undefined."
-    );
-// Probably deadcode.
-// if (the_token === undefined) {
-//     the_token = token_nxt;
-// }
-    return (
-        (the_token.id === "(string)" || the_token.id === "(number)")
-        ? String(the_token.value)
-        : the_token.id
-    );
-}
-
-function warn_at(code, state, line, column, a, b, c, d) {
-
-// Report an error at some line and column of the program. The warning object
-// resembles an exception.
-
-    const warning = Object.assign(empty(), {
-        a,
-        b,
-        c,
-        code,
-
-// Fudge column numbers in warning message.
-
-        column: column || line_fudge,
-        d,
-        line,
-        line_source: "",
-        name: "JSLintError"
-    }, state.line_list[line]);
-    warning.message = bundle[code].replace(rx_supplant, function (
-        ignore,
-        filling
-    ) {
-        assert_or_throw(
-            warning[filling] !== undefined,
-            "Expected warning[filling] !== undefined."
-        );
-
-// Probably deadcode.
-// return (
-//     replacement !== undefined
-//     ? replacement
-//     : found
-// );
-
-        return warning[filling];
-    });
-
-// Include stack_trace for jslint to debug itself for errors.
-
-    if (state.option_dict.debug) {
-        warning.stack_trace = new Error().stack;
-    }
-    if (warning.directive_quiet) {
-
-// cause: "0 //jslint-quiet"
-
-        return warning;
-    }
-    state.warning_list.push(warning);
-    return warning;
-}
-
-function stop_at(code, state, line, column, a, b, c, d) {
-
-// Same as warn_at, except that it stops the analysis.
-
-    throw warn_at(code, state, line, column, a, b, c, d);
-}
-
-function warn(code, state, the_token, a, b, c, d) {
-
-// Same as warn_at, except the warning will be associated with a specific token.
-// If there is already a warning on this token, suppress the new one. It is
-// likely that the first warning will be the most meaningful.
-
-    assert_or_throw(
-        the_token !== undefined,
-        "Expected the_token !== undefined."
-    );
-// Probably deadcode.
-// if (the_token === undefined) {
-//     the_token = token_nxt;
-// }
-    if (the_token.warning === undefined) {
-        the_token.warning = warn_at(
-            code,
-            state,
-            the_token.line,
-            (the_token.from || 0) + line_fudge,
-            a || artifact(the_token),
-            b,
-            c,
-            d
-        );
-        return the_token.warning;
-    }
-}
-
-function stop(code, state, the_token, a, b, c, d) {
-
-// Similar to warn and stop_at. If the token already had a warning, that
-// warning will be replaced with this new one. It is likely that the stopping
-// warning will be the more meaningful.
-
-    assert_or_throw(
-        the_token !== undefined,
-        "Expected the_token !== undefined."
-    );
-// Probably deadcode.
-// if (the_token === undefined) {
-//     the_token = token_nxt;
-// }
-    delete the_token.warning;
-    throw warn(code, state, the_token, a, b, c, d);
-}
-
-function is_weird(thing) {
-    return (
-        thing.id === "(regexp)"
-        || thing.id === "{"
-        || thing.id === "=>"
-        || thing.id === "function"
-        || (thing.id === "[" && thing.arity === "unary")
-    );
-}
-
-function are_similar(a, b) {
-    let a_string;
-    let b_string;
-
-// cause: "0&&0"
-
-    assert_or_throw(!(a === b), `Expected !(a === b).`);
-
-// Probably deadcode.
-// if (a === b) {
-//     return true;
-// }
-
-    if (Array.isArray(a)) {
-        return (
-            Array.isArray(b)
-            && a.length === b.length
-            && a.every(function (value, index) {
-
-// cause: "`${0}`&&`${0}`"
-
-                return are_similar(value, b[index]);
-            })
-        );
-    }
-    assert_or_throw(!Array.isArray(b), `Expected !Array.isArray(b).`);
-
-// Probably deadcode.
-// if (Array.isArray(b)) {
-//     return false;
-// }
-
-    if (a.id === "(number)" && b.id === "(number)") {
-        return a.value === b.value;
-    }
-    if (a.id === "(string)") {
-        a_string = a.value;
-    } else if (a.id === "`" && a.constant) {
-        a_string = a.value[0];
-    }
-    if (b.id === "(string)") {
-        b_string = b.value;
-    } else if (b.id === "`" && b.constant) {
-        b_string = b.value[0];
-    }
-    if (typeof a_string === "string") {
-        return a_string === b_string;
-    }
-    if (is_weird(a) || is_weird(b)) {
-        return false;
-    }
-    if (a.arity === b.arity && a.id === b.id) {
-
-// cause: "aa.bb&&aa.bb"
-
-        if (a.id === ".") {
-            return (
-                are_similar(a.expression, b.expression)
-                && are_similar(a.name, b.name)
-            );
-        }
-
-// cause: "+0&&+0"
-
-        if (a.arity === "unary") {
-            return are_similar(a.expression, b.expression);
-        }
-        if (a.arity === "binary") {
-
-// cause: "aa[0]&&aa[0]"
-
-            return (
-                a.id !== "("
-                && are_similar(a.expression[0], b.expression[0])
-                && are_similar(a.expression[1], b.expression[1])
-            );
-        }
-        if (a.arity === "ternary") {
-
-// cause: "aa=(``?``:``)&&(``?``:``)"
-
-            return (
-                are_similar(a.expression[0], b.expression[0])
-                && are_similar(a.expression[1], b.expression[1])
-                && are_similar(a.expression[2], b.expression[2])
-            );
-        }
-        assert_or_throw(
-            !(a.arity === "function" || a.arity === "regexp"),
-            `Expected !(a.arity === "function" || a.arity === "regexp").`
-        );
-
-// Probably deadcode.
-// if (a.arity === "function" || a.arity === "regexp") {
-//     return false;
-// }
-
-// cause: "undefined&&undefined"
-
-        return true;
-    }
-
-// cause: "null&&undefined"
-
-    return false;
-}
-
-
-function phase1_split() {
+function jslint_phase1_split() {
 
 // PHASE 1. Split <source> by newlines into <line_list>.
 
     return;
 }
 
-
-function phase2_lex(state) {
+function jslint_phase2_lex(state) {
 
 // PHASE 2. Lex <line_list> into <token_list>.
 
     const {
+        allowed_option,
+        artifact,
         directive_list,
         global_list,
         line_list,
         option_dict,
+        stop,
+        stop_at,
         tenure,
         token_global,
-        token_list
+        token_list,
+        warn,
+        warn_at
     } = state;
+    const rx_bits = (
+        /^[01]*/
+    );
+    const rx_digits = (
+        /^[0-9]*/
+    );
+    const rx_hexs = (
+        /^[0-9A-F]*/i
+    );
+    const rx_octals = (
+        /^[0-7]*/
+    );
+    const rx_tab = (
+        /\t/g
+    );
+    const rx_token = new RegExp(
+        "^("
+        + "(\\s+)"
+        + "|([a-zA-Z_$][a-zA-Z0-9_$]*)"
+        + "|[(){}\\[\\],:;'\"~\\`]"
+        + "|\\?[?.]?"
+        + "|=(?:==?|>)?"
+        + "|\\.+"
+        + "|\\*[*\\/=]?"
+        + "|\\/[*\\/]?"
+        + "|\\+[=+]?"
+        + "|-[=\\-]?"
+        + "|[\\^%]=?"
+        + "|&[&=]?"
+        + "|\\"
+        + "|[|=]?"
+        + "|>{1,3}=?"
+        + "|<<?=?"
+        + "|!(?:!|==?)?"
+        + "|(0|[1-9][0-9]*)"
+        + ")"
+        + "(.*)$"
+    );
     let char;           // A popular character.
     let column = 0;     // The column number of the next character.
     let from;           // The starting column number of the token.
@@ -759,11 +263,11 @@ function phase2_lex(state) {
 
 // cause: "aa=/[/"
 
-                ? stop_at("expected_a", state, line, column - 1, match, char)
+                ? stop_at("expected_a", line, column - 1, match, char)
 
 // cause: "aa=/aa{/"
 
-                : stop_at("expected_a_b", state, line, column, match, char)
+                : stop_at("expected_a_b", line, column, match, char)
             );
         }
         char = line_source.slice(0, 1);
@@ -795,7 +299,7 @@ function phase2_lex(state) {
 
 // cause: "0x"
 
-            warn_at("expected_digits_after_a", state, line, column, snippet);
+            warn_at("expected_digits_after_a", line, column, snippet);
         }
         column += length;
         line_source = line_source.slice(length);
@@ -822,7 +326,7 @@ function phase2_lex(state) {
 
 // cause: "too_long"
 
-            warn_at("too_long", state, line);
+            warn_at("too_long", line);
         }
         column = 0;
         line += 1;
@@ -850,7 +354,7 @@ function phase2_lex(state) {
 
 // cause: "/*jslint-enable*/"
 
-                stop_at("unopened_enable", state, line);
+                stop_at("unopened_enable", line);
             }
             line_disable = undefined;
         } else if (line_source.endsWith(" //jslint-quiet")) {
@@ -871,7 +375,7 @@ function phase2_lex(state) {
 
 // cause: "\t"
 
-                warn_at("use_spaces", state, line, at);
+                warn_at("use_spaces", line, at);
             }
             line_source = line_source.replace(rx_tab, " ");
         }
@@ -879,12 +383,7 @@ function phase2_lex(state) {
 
 // cause: " "
 
-            warn_at(
-                "unexpected_trailing_space",
-                state,
-                line,
-                line_source.length - 1
-            );
+            warn_at("unexpected_trailing_space", line, line_source.length - 1);
         }
         return line_source;
     }
@@ -931,7 +430,6 @@ function phase2_lex(state) {
 
             warn(
                 "expected_space_a_b",
-                state,
                 the_token,
                 artifact(token_prv),
                 artifact(the_token)
@@ -941,7 +439,7 @@ function phase2_lex(state) {
 
 // cause: ".0"
 
-            warn("expected_a_before_b", state, token_prv, "0", ".");
+            warn("expected_a_before_b", token_prv, "0", ".");
         }
         if (token_before_slash.id === "." && the_token.identifier) {
             the_token.dot = true;
@@ -972,15 +470,25 @@ function phase2_lex(state) {
 
 // cause: "\"\\"
 
-            return stop_at("unclosed_string", state, line, column);
+            return stop_at("unclosed_string", line, column);
         case "/":
+            return char_after();
         case "\\":
+            return char_after();
         case "`":
+            return char_after();
         case "b":
+            return char_after();
         case "f":
+            return char_after();
         case "n":
+            return char_after();
         case "r":
+            return char_after();
         case "t":
+
+// cause: "\"\\/\\\\\\`\\b\\f\\n\\r\\t\""
+
             return char_after();
         case "u":
             if (char_after("u") === "{") {
@@ -988,26 +496,19 @@ function phase2_lex(state) {
 
 // cause: "[\"\\u{12345}\"]"
 
-                    warn_at("unexpected_a", state, line, column, char);
+                    warn_at("unexpected_a", line, column, char);
                 }
                 if (read_digits(rx_hexs) > 5) {
 
 // cause: "\"\\u{123456}\""
 
-                    warn_at("too_many_digits", state, line, column);
+                    warn_at("too_many_digits", line, column);
                 }
                 if (char !== "}") {
 
 // cause: "\"\\u{12345\""
 
-                    stop_at(
-                        "expected_a_before_b",
-                        state,
-                        line,
-                        column,
-                        "}",
-                        char
-                    );
+                    stop_at("expected_a_before_b", line, column, "}", char);
                 }
                 return char_after();
             }
@@ -1016,7 +517,7 @@ function phase2_lex(state) {
 
 // cause: "\"\\u0\""
 
-                warn_at("expected_four_digits", state, line, column);
+                warn_at("expected_four_digits", line, column);
             }
             return;
         default:
@@ -1026,7 +527,7 @@ function phase2_lex(state) {
 
 // cause: "\"\\0\""
 
-            warn_at("unexpected_a_before_b", state, line, column, "\\", char);
+            warn_at("unexpected_a_before_b", line, column, "\\", char);
         }
     }
 
@@ -1053,7 +554,7 @@ function phase2_lex(state) {
 
 // cause: "`${//}`"
 
-                warn("unexpected_comment", state, the_comment, "`");
+                warn("unexpected_comment", the_comment, "`");
             }
 
 // Create token from comment /*...*/.
@@ -1064,7 +565,7 @@ function phase2_lex(state) {
 
 // cause: "/*/"
 
-                warn_at("unexpected_a", state, line, column + ii, "/");
+                warn_at("unexpected_a", line, column + ii, "/");
             }
 
 // Lex/loop through each line until "*/".
@@ -1082,7 +583,7 @@ function phase2_lex(state) {
 
 // cause: "/*/*"
 
-                        warn_at("nested_comment", state, line, column + jj);
+                        warn_at("nested_comment", line, column + jj);
                     }
                 }
                 snippet.push(line_source);
@@ -1091,7 +592,7 @@ function phase2_lex(state) {
 
 // cause: "/*"
 
-                    return stop_at("unclosed_comment", state, line, column);
+                    return stop_at("unclosed_comment", line, column);
                 }
             }
             jj = line_source.slice(0, ii).search(
@@ -1102,7 +603,7 @@ function phase2_lex(state) {
 
 // cause: "/*/**/"
 
-                warn_at("nested_comment", state, line, column + jj);
+                warn_at("nested_comment", line, column + jj);
             }
             snippet.push(line_source.slice(0, ii));
             snippet = snippet.join(" ");
@@ -1123,7 +624,7 @@ function phase2_lex(state) {
 
 // cause: "//\u0074odo"
 
-            warn("todo_comment", state, the_comment);
+            warn("todo_comment", the_comment);
         }
 
 // Lex directives in comment.
@@ -1140,7 +641,7 @@ function phase2_lex(state) {
 
 // cause: "0\n/*global aa*/"
 
-            warn_at("misplaced_directive_a", state, line, from, match[1]);
+            warn_at("misplaced_directive_a", line, from, match[1]);
             return the_comment;
         }
         the_comment.directive = match[1];
@@ -1163,12 +664,7 @@ function phase2_lex(state) {
 
 // cause: "/*jslint !*/"
 
-                    return stop(
-                        "bad_directive_a",
-                        state,
-                        the_comment,
-                        body
-                    );
+                    return stop("bad_directive_a", the_comment, body);
                 }
                 break;
             }
@@ -1197,14 +693,14 @@ function phase2_lex(state) {
 // } else if (value === "false") {
 //     option_dict[name] = false;
 // } else {
-//     warn("bad_option_a", state, the_comment, name + ":" + value);
+//     warn("bad_option_a", the_comment, name + ":" + value);
 
                     }
                 } else {
 
 // cause: "/*jslint undefined*/"
 
-                    warn("bad_option_a", state, the_comment, name);
+                    warn("bad_option_a", the_comment, name);
                 }
             } else if (the_comment.directive === "property") {
                 state.mode_property = true;
@@ -1214,12 +710,7 @@ function phase2_lex(state) {
 
 // cause: "/*global aa:false*/"
 
-                    warn(
-                        "bad_option_a",
-                        state,
-                        the_comment,
-                        name + ":" + value
-                    );
+                    warn("bad_option_a", the_comment, name + ":" + value);
                 }
                 global_list[name] = false;
                 state.mode_module = the_comment;
@@ -1238,7 +729,7 @@ function phase2_lex(state) {
 
 // cause: "`${`"
 
-            return stop_at("expected_a_b", state, line, column, "}", "`");
+            return stop_at("expected_a_b", line, column, "}", "`");
         }
         from_mega = from;
         line_mega = line;
@@ -1290,14 +781,7 @@ function phase2_lex(state) {
 
 // cause: "`${{"
 
-                        return stop_at(
-                            "expected_a_b",
-                            state,
-                            line,
-                            column,
-                            "}",
-                            "{"
-                        );
+                        return stop_at("expected_a_b", line, column, "}", "{");
                     }
                     if (id === "}") {
                         break;
@@ -1332,12 +816,7 @@ function phase2_lex(state) {
 
 // cause: "`"
 
-                    return stop_at(
-                        "unclosed_mega",
-                        state,
-                        line_mega,
-                        from_mega
-                    );
+                    return stop_at("unclosed_mega", line_mega, from_mega);
                 }
             }
         }
@@ -1382,7 +861,6 @@ function phase2_lex(state) {
 
             return stop_at(
                 "unexpected_a_after_b",
-                state,
                 line,
                 column,
                 snippet.slice(-1),
@@ -1414,17 +892,30 @@ function phase2_lex(state) {
                 char_after_escape("BbDdSsWw-[]^");
                 return true;
             case "":
-            case "[":
-            case "]":
-            case "/":
-            case "^":
+                return false;
             case "-":
+                return false;
+            case "/":
+                return false;
+            case "[":
+                return false;
+            case "]":
+                return false;
+            case "^":
+
+// cause: "aa=/[-]/"
+// cause: "aa=/[.^]/"
+// cause: "aa=/[/"
+// cause: "aa=/[\\\\/]/"
+// cause: "aa=/[\\\\[]/"
+// cause: "aa=/[\\\\]]/"
+
                 return false;
             case " ":
 
 // cause: "aa=/[ ]/"
 
-                warn_at("expected_a_b", state, line, column, "\\u0020", " ");
+                warn_at("expected_a_b", line, column, "\\u0020", " ");
                 char_after();
                 return true;
             case "`":
@@ -1432,7 +923,7 @@ function phase2_lex(state) {
 
 // cause: "`${/[`]/}`"
 
-                    warn_at("unexpected_a", state, line, column, "`");
+                    warn_at("unexpected_a", line, column, "`");
                 }
                 char_after();
                 return true;
@@ -1462,13 +953,7 @@ function phase2_lex(state) {
 
 // cause: "/ /"
 
-                        warn_at(
-                            "expected_regexp_factor_a",
-                            state,
-                            line,
-                            column,
-                            char
-                        );
+                        warn_at("expected_regexp_factor_a", line, column, char);
                     }
 
 // RegExp
@@ -1504,14 +989,7 @@ function phase2_lex(state) {
 // cause: "aa=/(:)/"
 // cause: "aa=/?/"
 
-                        warn_at(
-                            "expected_a_before_b",
-                            state,
-                            line,
-                            column,
-                            "?",
-                            ":"
-                        );
+                        warn_at("expected_a_before_b", line, column, "?", ":");
                     }
 
 // RegExp
@@ -1543,7 +1021,6 @@ function phase2_lex(state) {
 
                                     return stop_at(
                                         "unexpected_a",
-                                        state,
                                         line,
                                         column - 1,
                                         "-"
@@ -1559,7 +1036,6 @@ function phase2_lex(state) {
 
                         warn_at(
                             "expected_a_before_b",
-                            state,
                             line,
                             column,
                             "\\",
@@ -1577,14 +1053,7 @@ function phase2_lex(state) {
                 case "*":
                 case "}":
                 case "{":
-                    warn_at(
-                        "expected_a_before_b",
-                        state,
-                        line,
-                        column,
-                        "\\",
-                        char
-                    );
+                    warn_at("expected_a_before_b", line, column, "\\", char);
                     char_after();
                     break;
                 case "`":
@@ -1592,7 +1061,7 @@ function phase2_lex(state) {
 
 // cause: "`${/`/}`"
 
-                        warn_at("unexpected_a", state, line, column, "`");
+                        warn_at("unexpected_a", line, column, "`");
                     }
                     char_after();
                     break;
@@ -1600,7 +1069,7 @@ function phase2_lex(state) {
 
 // cause: "aa=/ /"
 
-                    warn_at("expected_a_b", state, line, column, "\\s", " ");
+                    warn_at("expected_a_b", line, column, "\\s", " ");
                     char_after();
                     break;
                 case "$":
@@ -1623,10 +1092,22 @@ function phase2_lex(state) {
 // Match an optional quantifier.
 
                 switch (char) {
-                case "?":
                 case "*":
+                    if (char_after("*") === "?") {
+                        char_after("?");
+                    }
+                    break;
                 case "+":
-                    if (char_after() === "?") {
+                    if (char_after("+") === "?") {
+                        char_after("?");
+                    }
+                    break;
+                case "?":
+                    if (char_after("?") === "?") {
+
+// cause: "aa=/.??/"
+
+                        warn_at("unexpected_a", line, column, char);
                         char_after("?");
                     }
                     break;
@@ -1635,14 +1116,7 @@ function phase2_lex(state) {
 
 // cause: "aa=/aa{/"
 
-                        warn_at(
-                            "expected_a_before_b",
-                            state,
-                            line,
-                            column,
-                            "0",
-                            ","
-                        );
+                        warn_at("expected_a_before_b", line, column, "0", ",");
                     }
                     if (char === ",") {
 
@@ -1654,7 +1128,7 @@ function phase2_lex(state) {
 
 // cause: "aa=/.{0}?/"
 
-                        warn_at("unexpected_a", state, line, column, char);
+                        warn_at("unexpected_a", line, column, char);
                         char_after("?");
                     }
                     break;
@@ -1673,7 +1147,7 @@ function phase2_lex(state) {
 
 // cause: "aa=/=/"
 
-            warn_at("expected_a_before_b", state, line, column, "\\", "=");
+            warn_at("expected_a_before_b", line, column, "\\", "=");
         }
         regexp_choice();
 
@@ -1706,9 +1180,13 @@ function phase2_lex(state) {
 
             switch (!flag[char] && char) {
             case "g":
+                break;
             case "i":
+                break;
             case "m":
+                break;
             case "u":
+                break;
             case "y":
 
 // cause: "aa=/./gimuy"
@@ -1719,7 +1197,7 @@ function phase2_lex(state) {
 // cause: "aa=/./gg"
 // cause: "aa=/./z"
 
-                warn_at("unexpected_a", state, line, column, char);
+                warn_at("unexpected_a", line, column, char);
             }
             flag[char] = true;
             char_after();
@@ -1729,7 +1207,7 @@ function phase2_lex(state) {
 
 // cause: "aa=/.//"
 
-            return stop_at("unexpected_a", state, line, from, char);
+            return stop_at("unexpected_a", line, from, char);
         }
         result = token_create("(regexp)", char);
         result.flag = flag;
@@ -1738,7 +1216,7 @@ function phase2_lex(state) {
 
 // cause: "aa=/$^/"
 
-            warn_at("missing_m", state, line, column);
+            warn_at("missing_m", line, column);
         }
         return result;
     }
@@ -1783,7 +1261,7 @@ function phase2_lex(state) {
 // cause: "void /./"
 // cause: "yield /./"
 
-                    return stop("unexpected_a", state, the_token);
+                    return stop("unexpected_a", the_token);
                 }
             }
         } else {
@@ -1799,7 +1277,7 @@ function phase2_lex(state) {
 
 // cause: "!/./"
 
-                warn("wrap_regexp", state, the_token);
+                warn("wrap_regexp", the_token);
                 return the_token;
             }
         }
@@ -1807,7 +1285,7 @@ function phase2_lex(state) {
             column += 1;
             line_source = line_source.slice(1);
             snippet = "/=";
-            warn_at("unexpected_a", state, line, column, "/=");
+            warn_at("unexpected_a", line, column, "/=");
         }
         return token_create(snippet);
     }
@@ -1821,7 +1299,7 @@ function phase2_lex(state) {
 
 // cause: "''"
 
-            warn_at("use_double", state, line, column);
+            warn_at("use_double", line, column);
         }
         snippet = "";
         char_after();
@@ -1842,7 +1320,7 @@ function phase2_lex(state) {
 
 // cause: "\""
 
-                return stop_at("unclosed_string", state, line, column);
+                return stop_at("unclosed_string", line, column);
             case "\\":
                 char_after_escape(quote);
                 break;
@@ -1851,7 +1329,7 @@ function phase2_lex(state) {
 
 // cause: "`${\"`\"}`"
 
-                    warn_at("unexpected_a", state, line, column, "`");
+                    warn_at("unexpected_a", line, column, "`");
                 }
                 char_after("`");
                 break;
@@ -1879,12 +1357,12 @@ function phase2_lex(state) {
 
 // cause: "`${//}`"
 
-                        ? stop_at("unclosed_mega", state, line_mega, from_mega)
+                        ? stop_at("unclosed_mega", line_mega, from_mega)
                         : line_disable !== undefined
 
 // cause: "/*jslint-disable*/"
 
-                        ? stop_at("unclosed_disable", state, line_disable)
+                        ? stop_at("unclosed_disable", line_disable)
                         : token_create("(end)")
                     );
                 }
@@ -1904,7 +1382,6 @@ function phase2_lex(state) {
 
                 return stop_at(
                     "unexpected_char_a",
-                    state,
                     line,
                     column,
                     line_source[0]
@@ -1974,8 +1451,7 @@ function phase2_lex(state) {
     }
 }
 
-
-function phase3_parse(state) {
+function jslint_phase3_parse(state) {
 
 // PHASE 3. Parse <token_list> into <token_tree> using the Pratt-parser.
 
@@ -1994,17 +1470,28 @@ function phase3_parse(state) {
 // Specialized tokens may have additional properties.
 
     const {
+        artifact,
         export_dict,
         function_list,
         import_list,
+        is_equal,
         option_dict,
         property_dict,
+        stop,
         syntax_dict,
         tenure,
         token_global,
-        token_list
+        token_list,
+        warn,
+        warn_at
     } = state;
     const function_stack = [];  // The stack of functions.
+    const rx_identifier = (
+        /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/
+    );
+    const rx_json_number = (
+        /^-?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][\-+]?\d+)?$/
+    );
     let anon = "anonymous";     // The guessed name for anonymous functions.
     let functionage = token_global;     // The current function.
     let mode_var;               // "var" if using var; "let" if using let.
@@ -2037,19 +1524,12 @@ function phase3_parse(state) {
 
 // cause: "()"
 
-                ? stop(
-                    "expected_a_b",
-                    state,
-                    token_nxt,
-                    id,
-                    artifact(token_nxt)
-                )
+                ? stop("expected_a_b", token_nxt, id, artifact(token_nxt))
 
 // cause: "{\"aa\":0"
 
                 : stop(
                     "expected_a_b_from_c_d",
-                    state,
                     token_nxt,
                     id,
                     artifact(match),
@@ -2075,7 +1555,7 @@ function phase3_parse(state) {
 
 // cause: "[//]"
 
-                warn("unexpected_a", state, token_nxt);
+                warn("unexpected_a", token_nxt);
             }
         }
     }
@@ -2111,7 +1591,7 @@ function phase3_parse(state) {
 
 // cause: "let undefined"
 
-            warn("reserved_a", state, name);
+            warn("reserved_a", name);
         } else {
 
 // Has the name been enrolled in this context?
@@ -2121,13 +1601,7 @@ function phase3_parse(state) {
 
 // cause: "let aa;let aa"
 
-                warn(
-                    "redefinition_a_b",
-                    state,
-                    name,
-                    name.id,
-                    earlier.line
-                );
+                warn("redefinition_a_b", name, name.id, earlier.line);
 
 // Has the name been enrolled in an outer context?
 
@@ -2144,7 +1618,7 @@ function phase3_parse(state) {
 
 // cause: "let ignore;function aa(ignore){}"
 
-                            warn("unexpected_a", state, name);
+                            warn("unexpected_a", name);
                         }
                     } else {
                         if (
@@ -2161,7 +1635,6 @@ function phase3_parse(state) {
 
                             warn(
                                 "redefinition_a_b",
-                                state,
                                 name,
                                 name.id,
                                 earlier.line
@@ -2223,7 +1696,7 @@ function phase3_parse(state) {
 // cause: "!"
 // cause: "let aa=`${}`;"
 
-            return stop("unexpected_a", state, token_now);
+            return stop("unexpected_a", token_now);
         }
 
 // Parse/loop through each symbol in expression.
@@ -2262,27 +1735,57 @@ function phase3_parse(state) {
 
 // cause: "while((0)){}"
 
-            warn("unexpected_a", state, the_paren);
+            warn("unexpected_a", the_paren);
         }
 
 // Check for anticondition.
 
         switch (the_value.id) {
         case "%":
+            warn("unexpected_a", the_value);
+            break;
         case "&":
+            warn("unexpected_a", the_value);
+            break;
         case "(number)":
+            warn("unexpected_a", the_value);
+            break;
         case "(string)":
+            warn("unexpected_a", the_value);
+            break;
         case "*":
+            warn("unexpected_a", the_value);
+            break;
         case "+":
+            warn("unexpected_a", the_value);
+            break;
         case "-":
+            warn("unexpected_a", the_value);
+            break;
         case "/":
+            warn("unexpected_a", the_value);
+            break;
         case "<<":
+            warn("unexpected_a", the_value);
+            break;
         case ">>":
+            warn("unexpected_a", the_value);
+            break;
         case ">>>":
+            warn("unexpected_a", the_value);
+            break;
         case "?":
+            warn("unexpected_a", the_value);
+            break;
         case "^":
+            warn("unexpected_a", the_value);
+            break;
         case "typeof":
+            warn("unexpected_a", the_value);
+            break;
         case "|":
+            warn("unexpected_a", the_value);
+            break;
         case "~":
 
 // cause: "if(\"aa\"){}"
@@ -2302,7 +1805,7 @@ function phase3_parse(state) {
 // cause: "if(typeof 0){}"
 // cause: "if(~0){}"
 
-            warn("unexpected_a", state, the_value);
+            warn("unexpected_a", the_value);
             break;
         }
         return the_value;
@@ -2320,7 +1823,6 @@ function phase3_parse(state) {
 
             warn_at(
                 "expected_a_b",
-                state,
                 token_now.line,
                 token_now.thru + 1,
                 ";",
@@ -2347,7 +1849,7 @@ function phase3_parse(state) {
 
 // cause: "ignore:"
 
-                warn("unexpected_a", state, the_label);
+                warn("unexpected_a", the_label);
             }
             advance(":");
             if (
@@ -2368,7 +1870,7 @@ function phase3_parse(state) {
 
 // cause: "aa:"
 
-            warn("unexpected_label_a", state, the_label);
+            warn("unexpected_label_a", the_label);
         }
 
 // Parse the statement.
@@ -2396,7 +1898,7 @@ function phase3_parse(state) {
 
 // cause: "(0)"
 
-                warn("unexpected_a", state, first);
+                warn("unexpected_a", first);
             }
             semicolon();
         }
@@ -2420,11 +1922,22 @@ function phase3_parse(state) {
         while (true) {
             switch (token_nxt.id) {
             case "}":
+                return statement_list;
             case "case":
+                return statement_list;
             case "default":
+                return statement_list;
             case "else":
+                return statement_list;
             case "(end)":
                 return statement_list;
+
+// cause: ";"
+// cause: "case"
+// cause: "default"
+// cause: "else"
+// cause: "}"
+
             }
             a_statement = parse_statement();
             statement_list.push(a_statement);
@@ -2432,7 +1945,7 @@ function phase3_parse(state) {
 
 // cause: "while(0){break;0;}"
 
-                warn("unreachable_a", state, a_statement);
+                warn("unreachable_a", a_statement);
             }
             disrupt = a_statement.disrupt;
         }
@@ -2446,7 +1959,7 @@ function phase3_parse(state) {
 
 // cause: "while(0){}"
 
-            warn("unexpected_at_top_level_a", state, thing);
+            warn("unexpected_at_top_level_a", thing);
         }
     }
 
@@ -2485,7 +1998,7 @@ function phase3_parse(state) {
 
 // cause: "function aa(){}"
 
-                warn("empty_block", state, the_block);
+                warn("empty_block", the_block);
             }
             the_block.disrupt = false;
         } else {
@@ -2513,7 +2026,7 @@ function phase3_parse(state) {
 
 // cause: "0=0"
 
-            warn("bad_assignment_a", state, the_thing);
+            warn("bad_assignment_a", the_thing);
             return false;
         }
         return true;
@@ -2544,7 +2057,7 @@ function phase3_parse(state) {
                 || (id !== "." && id !== "?." && id !== "(" && id !== "[")
             )
         ) {
-            warn("unexpected_a", state, right || token_nxt);
+            warn("unexpected_a", right || token_nxt);
             return false;
         }
         return true;
@@ -2590,7 +2103,7 @@ function phase3_parse(state) {
                 || right.arity === "pre"
                 || right.arity === "post"
             ) {
-                warn("unexpected_a", state, right);
+                warn("unexpected_a", right);
             }
             mutation_check(left);
             return the_token;
@@ -2734,7 +2247,7 @@ function phase3_parse(state) {
 
 // cause: "let aa={0:0}"
 
-            return stop("expected_identifier_a", state, name);
+            return stop("expected_identifier_a", name);
         }
 
 // If we have seen this name before, increment its count.
@@ -2752,7 +2265,7 @@ function phase3_parse(state) {
 
 // cause: "/*property aa*/\naa.bb"
 
-                    warn("unregistered_property_a", state, name);
+                    warn("unregistered_property_a", name);
                 }
             } else if (
                 !option_dict.name
@@ -2769,7 +2282,7 @@ function phase3_parse(state) {
 // cause: "aa.aaSync"
 // cause: "aa.aa_"
 
-                warn("bad_property_a", state, name);
+                warn("bad_property_a", name);
             }
             property_dict[id] = 1;
         }
@@ -2792,7 +2305,7 @@ function phase3_parse(state) {
 
 // cause: "0?0:0"
 
-                warn("use_open", state, the_token);
+                warn("use_open", the_token);
             }
             return the_token;
         };
@@ -2835,7 +2348,7 @@ function phase3_parse(state) {
 
 // cause: "arguments"
 
-        warn("unexpected_a", state, token_now);
+        warn("unexpected_a", token_now);
         return token_now;
     });
     constant("eval", "function", function () {
@@ -2843,18 +2356,12 @@ function phase3_parse(state) {
 
 // cause: "eval"
 
-            warn("unexpected_a", state, token_now);
+            warn("unexpected_a", token_now);
         } else if (token_nxt.id !== "(") {
 
 // cause: "/*jslint eval*/\neval"
 
-            warn(
-                "expected_a_before_b",
-                state,
-                token_nxt,
-                "(",
-                artifact(token_nxt)
-            );
+            warn("expected_a_before_b", token_nxt, "(", artifact(token_nxt));
         }
         return token_now;
     });
@@ -2864,18 +2371,12 @@ function phase3_parse(state) {
 
 // cause: "Function()"
 
-            warn("unexpected_a", state, token_now);
+            warn("unexpected_a", token_now);
         } else if (token_nxt.id !== "(") {
 
 // cause: "/*jslint eval*/\nFunction"
 
-            warn(
-                "expected_a_before_b",
-                state,
-                token_nxt,
-                "(",
-                artifact(token_nxt)
-            );
+            warn("expected_a_before_b", token_nxt, "(", artifact(token_nxt));
         }
         return token_now;
     });
@@ -2883,7 +2384,7 @@ function phase3_parse(state) {
 
 // cause: "ignore"
 
-        warn("unexpected_a", state, token_now);
+        warn("unexpected_a", token_now);
         return token_now;
     });
     constant("Infinity", "number", Infinity);
@@ -2891,14 +2392,14 @@ function phase3_parse(state) {
 
 // cause: "isFinite"
 
-        warn("expected_a_b", state, token_now, "Number.isFinite", "isFinite");
+        warn("expected_a_b", token_now, "Number.isFinite", "isFinite");
         return token_now;
     });
     constant("isNaN", "function", function () {
 
 // cause: "isNaN(0)"
 
-        warn("number_isNaN", state, token_now);
+        warn("number_isNaN", token_now);
         return token_now;
     });
     constant("NaN", "number", NaN);
@@ -2908,7 +2409,7 @@ function phase3_parse(state) {
 
 // cause: "this"
 
-            warn("unexpected_a", state, token_now);
+            warn("unexpected_a", token_now);
         }
         return token_now;
     });
@@ -2998,7 +2499,7 @@ function phase3_parse(state) {
 
 // cause: "aa((0))"
 
-                warn("unexpected_a", state, the_paren);
+                warn("unexpected_a", the_paren);
             }
             if (the_argument.id === "(") {
                 the_argument.wrapped = true;
@@ -3044,7 +2545,7 @@ function phase3_parse(state) {
 
 // cause: "aa.0"
 
-            stop("expected_identifier_a", state, token_nxt);
+            stop("expected_identifier_a", token_nxt);
         }
         advance();
         survey(name);
@@ -3092,7 +2593,7 @@ function phase3_parse(state) {
 
 // cause: "aa?.0"
 
-            stop("expected_identifier_a", state, token_nxt);
+            stop("expected_identifier_a", token_nxt);
         }
         advance();
         survey(name);
@@ -3112,7 +2613,7 @@ function phase3_parse(state) {
 
 // cause: "aa[`aa`]"
 
-                warn("subscript_a", state, the_subscript, name);
+                warn("subscript_a", the_subscript, name);
             }
         }
 
@@ -3127,7 +2628,7 @@ function phase3_parse(state) {
 
 // cause: "aa=>0"
 
-        return stop("wrap_parameter", state, left);
+        return stop("wrap_parameter", left);
     });
 
     function do_tick() {
@@ -3209,13 +2710,13 @@ function phase3_parse(state) {
 
 // cause: "/="
 
-        stop("expected_a_b", state, token_now, "/\\=", "/=");
+        stop("expected_a_b", token_now, "/\\=", "/=");
     });
     prefix("=>", function () {
 
 // cause: "=>0"
 
-        return stop("expected_a_before_b", state, token_now, "()", "=>");
+        return stop("expected_a_before_b", token_now, "()", "=>");
     });
     prefix("new", function () {
         const the_new = token_now;
@@ -3224,13 +2725,7 @@ function phase3_parse(state) {
 
 // cause: "new aa"
 
-            warn(
-                "expected_a_before_b",
-                state,
-                token_nxt,
-                "()",
-                artifact(token_nxt)
-            );
+            warn("expected_a_before_b", token_nxt, "()", artifact(token_nxt));
         }
         the_new.expression = right;
         return the_new;
@@ -3242,7 +2737,7 @@ function phase3_parse(state) {
 // cause: "void"
 // cause: "void 0"
 
-        warn("unexpected_a", state, the_void);
+        warn("unexpected_a", the_void);
         the_void.expression = parse_expression(0);
         return the_void;
     });
@@ -3264,7 +2759,6 @@ function phase3_parse(state) {
 
                         warn(
                             "required_a_optional_b",
-                            state,
                             token_nxt,
                             token_nxt.id,
                             optional.id
@@ -3281,11 +2775,7 @@ function phase3_parse(state) {
 // cause: "function aa(aa=0,{}){}"
 // cause: "function aa({0}){}"
 
-                            return stop(
-                                "expected_identifier_a",
-                                state,
-                                token_nxt
-                            );
+                            return stop("expected_identifier_a", token_nxt);
                         }
                         survey(subparam);
                         artifact_now = artifact_nxt;
@@ -3299,7 +2789,6 @@ function phase3_parse(state) {
 
                             warn(
                                 "expected_a_before_b",
-                                state,
                                 subparam,
                                 artifact_nxt,
                                 artifact_now
@@ -3318,7 +2807,6 @@ function phase3_parse(state) {
 
                                 return stop(
                                     "expected_identifier_a",
-                                    state,
                                     token_nxt
                                 );
                             }
@@ -3353,7 +2841,6 @@ function phase3_parse(state) {
 
                         warn(
                             "required_a_optional_b",
-                            state,
                             token_nxt,
                             token_nxt.id,
                             optional.id
@@ -3369,11 +2856,7 @@ function phase3_parse(state) {
 
 // cause: "function aa(aa=0,[]){}"
 
-                            return stop(
-                                "expected_identifier_a",
-                                state,
-                                token_nxt
-                            );
+                            return stop("expected_identifier_a", token_nxt);
                         }
                         advance();
                         param.names.push(subparam);
@@ -3408,7 +2891,6 @@ function phase3_parse(state) {
 
                             warn(
                                 "required_a_optional_b",
-                                state,
                                 token_nxt,
                                 token_nxt.id,
                                 optional.id
@@ -3419,7 +2901,7 @@ function phase3_parse(state) {
 
 // cause: "function aa(0){}"
 
-                        return stop("expected_identifier_a", state, token_nxt);
+                        return stop("expected_identifier_a", token_nxt);
                     }
                     param = token_nxt;
                     list.push(param);
@@ -3439,7 +2921,6 @@ function phase3_parse(state) {
 
                                 warn(
                                     "required_a_optional_b",
-                                    state,
                                     param,
                                     param.id,
                                     optional.id
@@ -3473,7 +2954,7 @@ function phase3_parse(state) {
 // cause: "function(){}"
 // cause: "function*aa(){}"
 
-                    return stop("expected_identifier_a", state, token_nxt);
+                    return stop("expected_identifier_a", token_nxt);
                 }
                 name = token_nxt;
                 enroll(name, "variable", true);
@@ -3499,7 +2980,7 @@ function phase3_parse(state) {
 //  assert_or_throw(!mode_mega, `Expected !mode_mega.`);
 //  Probably deadcode.
 //  if (mode_mega) {
-//      warn("unexpected_a", state, the_function);
+//      warn("unexpected_a", the_function);
 //  }
 
 // Don't create functions in loops. It is inefficient, and it can lead to
@@ -3509,7 +2990,7 @@ function phase3_parse(state) {
 
 // cause: "while(0){aa.map(function(){});}"
 
-            warn("function_in_loop", state, the_function);
+            warn("function_in_loop", the_function);
         }
 
 // Give the function properties for storing its names and for observing the
@@ -3529,10 +3010,7 @@ function phase3_parse(state) {
         function_stack.push(functionage);
         function_list.push(the_function);
         functionage = the_function;
-        if (
-            the_function.arity !== "statement"
-            && typeof name === "object"
-        ) {
+        if (the_function.arity !== "statement" && typeof name === "object") {
 
 // cause: "let aa=function bb(){return;};"
 
@@ -3569,7 +3047,7 @@ function phase3_parse(state) {
 
 // cause: "function aa(){}0"
 
-            return stop("unexpected_a", state, token_nxt);
+            return stop("unexpected_a", token_nxt);
         }
         if (
             token_nxt.id === "."
@@ -3579,7 +3057,7 @@ function phase3_parse(state) {
 
 // cause: "function aa(){}\n[]"
 
-            warn("unexpected_a", state, token_nxt);
+            warn("unexpected_a", token_nxt);
         }
 
 // Restore the previous context.
@@ -3602,7 +3080,7 @@ function phase3_parse(state) {
 
 // cause: "async function aa(){}"
 
-            warn("missing_await_statement", state, the_function);
+            warn("missing_await_statement", the_function);
         }
         return the_function;
     }
@@ -3615,7 +3093,7 @@ function phase3_parse(state) {
 // cause: "function aa(){aa=await 0;}"
 // cause: "function aa(){await 0;}"
 
-            warn("unexpected_a", state, the_await);
+            warn("unexpected_a", the_await);
         } else {
             functionage.async += 1;
         }
@@ -3644,7 +3122,7 @@ function phase3_parse(state) {
 
 // cause: "while(0){aa.map(()=>0);}"
 
-            warn("function_in_loop", state, the_fart);
+            warn("function_in_loop", the_fart);
         }
 
 // Give the function properties storing its names and for observing the depth
@@ -3672,7 +3150,7 @@ function phase3_parse(state) {
 
 // cause: "()=>{}"
 
-            warn("expected_a_b", state, the_fart, "function", "=>");
+            warn("expected_a_b", the_fart, "function", "=>");
             the_fart.block = block("body");
         } else {
             the_fart.expression = parse_expression(0);
@@ -3709,7 +3187,7 @@ function phase3_parse(state) {
 
 // cause: "((0))"
 
-            warn("unexpected_a", state, the_paren);
+            warn("unexpected_a", the_paren);
         }
         the_value.wrapped = true;
         advance(")", the_paren);
@@ -3720,23 +3198,17 @@ function phase3_parse(state) {
 // cause: "([])=>0"
 // cause: "({})=>0"
 
-                    warn(
-                        "expected_a_before_b",
-                        state,
-                        the_paren,
-                        "function",
-                        "("
-                    );
+                    warn("expected_a_before_b", the_paren, "function", "(");
 
 // cause: "([])=>0"
 // cause: "({})=>0"
 
-                    return stop("expected_a_b", state, token_nxt, "{", "=>");
+                    return stop("expected_a_b", token_nxt, "{", "=>");
                 }
 
 // cause: "(0)=>0"
 
-                return stop("expected_identifier_a", state, the_value);
+                return stop("expected_identifier_a", the_value);
             }
             the_paren.expression = [the_value];
             return fart([the_paren.expression, "(" + the_value.id + ")"]);
@@ -3772,7 +3244,6 @@ function phase3_parse(state) {
 
                     warn(
                         "expected_a_before_b",
-                        state,
                         name,
                         artifact_nxt,
                         artifact_now
@@ -3786,7 +3257,7 @@ function phase3_parse(state) {
 
 // cause: "aa={get aa(){}}"
 
-                        warn("unexpected_a", state, name);
+                        warn("unexpected_a", name);
                     }
                     extra = name.id;
                     full = extra + " " + token_nxt.id;
@@ -3797,7 +3268,7 @@ function phase3_parse(state) {
 
 // cause: "aa={get aa(){},get aa(){}}"
 
-                        warn("duplicate_a", state, name);
+                        warn("duplicate_a", name);
                     }
                     seen[id] = false;
                     seen[full] = true;
@@ -3807,7 +3278,7 @@ function phase3_parse(state) {
 
 // cause: "aa={aa,aa}"
 
-                        warn("duplicate_a", state, name);
+                        warn("duplicate_a", name);
                     }
                     seen[id] = true;
                 }
@@ -3856,12 +3327,7 @@ function phase3_parse(state) {
 
 // cause: "aa={aa:aa}"
 
-                            warn(
-                                "unexpected_a",
-                                state,
-                                the_colon,
-                                ": " + name.id
-                            );
+                            warn("unexpected_a", the_colon, ": " + name.id);
                         }
                     }
                     value.label = name;
@@ -3895,7 +3361,7 @@ function phase3_parse(state) {
 
 // cause: ";"
 
-        warn("unexpected_a", state, token_now);
+        warn("unexpected_a", token_now);
         return token_now;
     });
     stmt("{", function () {
@@ -3903,7 +3369,7 @@ function phase3_parse(state) {
 // cause: ";{}"
 // cause: "class aa{}"
 
-        warn("naked_block", state, token_now);
+        warn("naked_block", token_now);
         return block("naked");
     });
     stmt("async", do_async);
@@ -3918,7 +3384,7 @@ function phase3_parse(state) {
 
 // cause: "break"
 
-            warn("unexpected_a", state, the_break);
+            warn("unexpected_a", the_break);
         }
         the_break.disrupt = true;
         if (token_nxt.identifier && token_now.line === token_nxt.line) {
@@ -3932,12 +3398,12 @@ function phase3_parse(state) {
 
 // cause: "aa:{function aa(aa){break aa;}}"
 
-                    warn("out_of_scope_a", state, token_nxt);
+                    warn("out_of_scope_a", token_nxt);
                 } else {
 
 // cause: "aa:{break aa;}"
 
-                    warn("not_label_a", state, token_nxt);
+                    warn("not_label_a", token_nxt);
                 }
             } else {
                 the_label.used += 1;
@@ -3963,13 +3429,7 @@ function phase3_parse(state) {
 
 // cause: "let aa;var aa"
 
-                warn(
-                    "expected_a_b",
-                    state,
-                    the_statement,
-                    mode_var,
-                    the_statement.id
-                );
+                warn("expected_a_b", the_statement, mode_var, the_statement.id);
             }
         }
 
@@ -3979,13 +3439,13 @@ function phase3_parse(state) {
 
 // cause: "switch(0){case 0:var aa}"
 
-            warn("var_switch", state, the_statement);
+            warn("var_switch", the_statement);
         }
         if (functionage.loop > 0 && the_statement.id === "var") {
 
 // cause: "while(0){var aa;}"
 
-            warn("var_loop", state, the_statement);
+            warn("var_loop", the_statement);
         }
         (function next() {
             let artifact_now;
@@ -3998,12 +3458,12 @@ function phase3_parse(state) {
 
 // cause: "let {0}"
 
-                        return stop("expected_identifier_a", state, token_nxt);
+                        return stop("expected_identifier_a", token_nxt);
                     }
                     const name = token_nxt;
                     survey(name);
                     artifact_now = artifact_nxt;
-                    artifact_nxt = `identifier ${artifact(name)}`;
+                    artifact_nxt = `variable ${artifact(name)}`;
                     if (
                         !option_dict.unordered
                         && artifact_now > artifact_nxt
@@ -4013,7 +3473,6 @@ function phase3_parse(state) {
 
                         warn(
                             "expected_a_before_b",
-                            state,
                             name,
                             artifact_nxt,
                             artifact_now
@@ -4027,11 +3486,7 @@ function phase3_parse(state) {
 // cause: "let {aa:0}"
 // cause: "let {aa:{aa}}"
 
-                            return stop(
-                                "expected_identifier_a",
-                                state,
-                                token_nxt
-                            );
+                            return stop("expected_identifier_a", token_nxt);
                         }
                         token_nxt.label = name;
                         the_statement.names.push(token_nxt);
@@ -4073,7 +3528,7 @@ function phase3_parse(state) {
 
 // cause: "let[]"
 
-                        return stop("expected_identifier_a", state, token_nxt);
+                        return stop("expected_identifier_a", token_nxt);
                     }
                     const name = token_nxt;
                     advance();
@@ -4105,7 +3560,7 @@ function phase3_parse(state) {
 
 // cause: "let ignore;function aa(ignore) {}"
 
-                    warn("unexpected_a", state, name);
+                    warn("unexpected_a", name);
                 }
                 enroll(name, "variable", mode_const);
                 if (token_nxt.id === "=" || mode_const) {
@@ -4120,7 +3575,7 @@ function phase3_parse(state) {
 // cause: "let 0"
 // cause: "var{aa:{aa}}"
 
-                return stop("expected_identifier_a", state, token_nxt);
+                return stop("expected_identifier_a", token_nxt);
             }
         }());
         semicolon();
@@ -4135,11 +3590,11 @@ function phase3_parse(state) {
 // cause: "continue"
 // cause: "function aa(){while(0){try{}finally{continue}}}"
 
-            warn("unexpected_a", state, the_continue);
+            warn("unexpected_a", the_continue);
         }
         not_top_level(the_continue);
         the_continue.disrupt = true;
-        warn("unexpected_a", state, the_continue);
+        warn("unexpected_a", the_continue);
         advance(";");
         return the_continue;
     });
@@ -4149,7 +3604,7 @@ function phase3_parse(state) {
 
 // cause: "debugger"
 
-            warn("unexpected_a", state, the_debug);
+            warn("unexpected_a", the_debug);
         }
         semicolon();
         return the_debug;
@@ -4164,7 +3619,7 @@ function phase3_parse(state) {
 
 // cause: "delete 0"
 
-            stop("expected_a_b", state, the_value, ".", artifact(the_value));
+            stop("expected_a_b", the_value, ".", artifact(the_value));
         }
         the_token.expression = the_value;
         semicolon();
@@ -4182,7 +3637,7 @@ function phase3_parse(state) {
 
 // cause: "function aa(){do{break;}while(0)}"
 
-            warn("weird_loop", state, the_do);
+            warn("weird_loop", the_do);
         }
         functionage.loop -= 1;
         return the_do;
@@ -4198,7 +3653,7 @@ function phase3_parse(state) {
 
 // cause: "export {}"
 
-                stop("expected_identifier_a", state, token_nxt);
+                stop("expected_identifier_a", token_nxt);
             }
             the_id = token_nxt.id;
             the_name = token_global.context[the_id];
@@ -4206,14 +3661,14 @@ function phase3_parse(state) {
 
 // cause: "export {aa}"
 
-                warn("unexpected_a", state, token_nxt);
+                warn("unexpected_a", token_nxt);
             } else {
                 the_name.used += 1;
                 if (export_dict[the_id] !== undefined) {
 
 // cause: "let aa;export{aa,aa}"
 
-                    warn("duplicate_a", state, token_nxt);
+                    warn("duplicate_a", token_nxt);
                 }
                 export_dict[the_id] = the_name;
             }
@@ -4227,7 +3682,7 @@ function phase3_parse(state) {
 
 // cause: "export default 0;export default 0"
 
-                warn("duplicate_a", state, token_nxt);
+                warn("duplicate_a", token_nxt);
             }
             advance("default");
             the_thing = parse_expression(0);
@@ -4240,7 +3695,7 @@ function phase3_parse(state) {
 
 // cause: "export default {}"
 
-                warn("freeze_exports", state, the_thing);
+                warn("freeze_exports", the_thing);
 
 // Fixes issues #282 - optional-semicolon.
 
@@ -4257,7 +3712,7 @@ function phase3_parse(state) {
 
 // cause: "export function aa(){}"
 
-                warn("freeze_exports", state, token_nxt);
+                warn("freeze_exports", token_nxt);
                 the_thing = parse_statement();
                 the_name = the_thing.name;
                 the_id = the_name.id;
@@ -4266,7 +3721,7 @@ function phase3_parse(state) {
 // cause: "let aa;export{aa};export function aa(){}"
 
                 if (export_dict[the_id] !== undefined) {
-                    warn("duplicate_a", state, the_name);
+                    warn("duplicate_a", the_name);
                 }
                 export_dict[the_id] = the_thing;
                 the_export.expression.push(the_thing);
@@ -4282,7 +3737,7 @@ function phase3_parse(state) {
 // cause: "export let"
 // cause: "export var"
 
-                warn("unexpected_a", state, token_nxt);
+                warn("unexpected_a", token_nxt);
                 parse_statement();
             } else if (token_nxt.id === "{") {
 
@@ -4302,7 +3757,7 @@ function phase3_parse(state) {
 
 // cause: "export"
 
-                stop("unexpected_a", state, token_nxt);
+                stop("unexpected_a", token_nxt);
             }
         }
         state.mode_module = true;
@@ -4315,7 +3770,7 @@ function phase3_parse(state) {
 
 // cause: "for"
 
-            warn("unexpected_a", state, the_for);
+            warn("unexpected_a", the_for);
         }
         not_top_level(the_for);
         functionage.loop += 1;
@@ -4328,7 +3783,7 @@ function phase3_parse(state) {
 
 // cause: "for(;;){}"
 
-            return stop("expected_a_b", state, the_for, "while (", "for (;");
+            return stop("expected_a_b", the_for, "while (", "for (;");
         }
         if (
             token_nxt.id === "var"
@@ -4338,7 +3793,7 @@ function phase3_parse(state) {
 
 // cause: "for(const aa in aa){}"
 
-            return stop("unexpected_a", state, token_nxt);
+            return stop("unexpected_a", token_nxt);
         }
         first = parse_expression(0);
         if (first.id === "in") {
@@ -4346,11 +3801,11 @@ function phase3_parse(state) {
 
 // cause: "for(0 in aa){}"
 
-                warn("bad_assignment_a", state, first.expression[0]);
+                warn("bad_assignment_a", first.expression[0]);
             }
             the_for.name = first.expression[0];
             the_for.expression = first.expression[1];
-            warn("expected_a_b", state, the_for, "Object.keys", "for in");
+            warn("expected_a_b", the_for, "Object.keys", "for in");
         } else {
             the_for.initial = first;
             advance(";");
@@ -4361,7 +3816,7 @@ function phase3_parse(state) {
 
 // cause: "for(aa;aa;aa++){}"
 
-                warn("expected_a_b", state, the_for.inc, "+= 1", "++");
+                warn("expected_a_b", the_for.inc, "+= 1", "++");
             }
         }
         advance(")");
@@ -4370,7 +3825,7 @@ function phase3_parse(state) {
 
 // cause: "/*jslint for*/\nfunction aa(bb,cc){for(0;0;0){break;}}"
 
-            warn("weird_loop", state, the_for);
+            warn("weird_loop", the_for);
         }
         functionage.loop -= 1;
         return the_for;
@@ -4405,7 +3860,7 @@ function phase3_parse(state) {
 
 // cause: "if(0){break;}else{}"
 
-                    warn("unexpected_a", state, the_else);
+                    warn("unexpected_a", the_else);
                 }
             }
         }
@@ -4420,7 +3875,6 @@ function phase3_parse(state) {
 
             warn(
                 "unexpected_directive_a",
-                state,
                 state.mode_module,
                 state.mode_module.directive
             );
@@ -4433,7 +3887,7 @@ function phase3_parse(state) {
 
 // cause: "import ignore from \"aa\""
 
-                warn("unexpected_a", state, name);
+                warn("unexpected_a", name);
             }
             enroll(name, "variable", true);
             the_import.name = name;
@@ -4446,7 +3900,7 @@ function phase3_parse(state) {
 
 // cause: "import {"
 
-                        stop("expected_identifier_a", state, token_nxt);
+                        stop("expected_identifier_a", token_nxt);
                     }
                     name = token_nxt;
                     advance();
@@ -4454,7 +3908,7 @@ function phase3_parse(state) {
 
 // cause: "import {ignore} from \"aa\""
 
-                        warn("unexpected_a", state, name);
+                        warn("unexpected_a", name);
                     }
                     enroll(name, "variable", true);
                     names.push(name);
@@ -4470,11 +3924,14 @@ function phase3_parse(state) {
         advance("from");
         advance("(string)");
         the_import.import = token_now;
-        if (!rx_module.test(token_now.value)) {
+        if (!(
+            // rx_module
+            /^[a-zA-Z0-9_$:.@\-\/]+$/
+        ).test(token_now.value)) {
 
 // cause: "import aa from \"!aa\""
 
-            warn("bad_module_name_a", state, token_now);
+            warn("bad_module_name_a", token_now);
         }
         import_list.push(token_now.value);
         semicolon();
@@ -4488,7 +3945,7 @@ function phase3_parse(state) {
 
 // cause: "function aa(){try{}finally{return;}}"
 
-            warn("unexpected_a", state, the_return);
+            warn("unexpected_a", the_return);
         }
         the_return.disrupt = true;
         if (token_nxt.id !== ";" && the_return.line === token_nxt.line) {
@@ -4509,7 +3966,7 @@ function phase3_parse(state) {
 
 // cause: "function aa(){try{}finally{switch(0){}}}"
 
-            warn("unexpected_a", state, the_switch);
+            warn("unexpected_a", the_switch);
         }
         functionage.switch += 1;
         advance("(");
@@ -4530,12 +3987,12 @@ function phase3_parse(state) {
                 token_now.switch = true;
                 const exp = parse_expression(0);
                 if (dups.some(function (thing) {
-                    return are_similar(thing, exp);
+                    return is_equal(thing, exp);
                 })) {
 
 // cause: "switch(0){case 0:break;case 0:break}"
 
-                    warn("unexpected_a", state, exp);
+                    warn("unexpected_a", exp);
                 }
                 dups.push(exp);
                 the_case.expression.push(exp);
@@ -4549,7 +4006,7 @@ function phase3_parse(state) {
 
 // cause: "switch(0){case 0:}"
 
-                warn("expected_statements_a", state, token_nxt);
+                warn("expected_statements_a", token_nxt);
                 return;
             }
             the_case.block = stmts;
@@ -4562,7 +4019,6 @@ function phase3_parse(state) {
             } else {
                 warn(
                     "expected_a_before_b",
-                    state,
                     token_nxt,
                     "break;",
                     artifact(token_nxt)
@@ -4583,7 +4039,7 @@ function phase3_parse(state) {
 
 // cause: "switch(0){case 0:break;default:}"
 
-                warn("unexpected_a", state, the_default);
+                warn("unexpected_a", the_default);
                 the_disrupt = false;
             } else {
                 const the_last = the_switch.else[
@@ -4596,7 +4052,7 @@ function phase3_parse(state) {
 
 // cause: "switch(0){case 0:break;default:break;}"
 
-                    warn("unexpected_a", state, the_last);
+                    warn("unexpected_a", the_last);
                     the_last.disrupt = false;
                 }
                 the_disrupt = the_disrupt && the_last.disrupt;
@@ -4618,7 +4074,7 @@ function phase3_parse(state) {
 
 // cause: "try{throw 0}catch(){}"
 
-            warn("unexpected_a", state, the_throw);
+            warn("unexpected_a", the_throw);
         }
         return the_throw;
     });
@@ -4631,7 +4087,7 @@ function phase3_parse(state) {
 
 // cause: "try{try{}catch(){}}catch(){}"
 
-            warn("unexpected_a", state, the_try);
+            warn("unexpected_a", the_try);
         }
         functionage.try += 1;
         the_try.block = block();
@@ -4654,7 +4110,7 @@ function phase3_parse(state) {
 
 // cause: "try{}catch(){}"
 
-                    return stop("expected_identifier_a", state, token_nxt);
+                    return stop("expected_identifier_a", token_nxt);
                 }
                 if (token_nxt.id !== "ignore") {
                     ignored = undefined;
@@ -4682,7 +4138,6 @@ function phase3_parse(state) {
 
             warn(
                 "expected_a_before_b",
-                state,
                 token_nxt,
                 "catch",
                 artifact(token_nxt)
@@ -4711,7 +4166,7 @@ function phase3_parse(state) {
 
 // cause: "function aa(){while(0){break;}}"
 
-            warn("weird_loop", state, the_while);
+            warn("weird_loop", the_while);
         }
         functionage.loop -= 1;
         return the_while;
@@ -4720,7 +4175,7 @@ function phase3_parse(state) {
 
 // cause: "with"
 
-        stop("unexpected_a", state, token_now);
+        stop("unexpected_a", token_now);
     });
 
     ternary("?", ":");
@@ -4757,7 +4212,6 @@ function phase3_parse(state) {
 
                                 warn(
                                     "unexpected_a",
-                                    state,
                                     token_nxt,
                                     token_nxt.quote
                                 );
@@ -4768,12 +4222,12 @@ function phase3_parse(state) {
 
 // cause: "{\"aa\":0,\"aa\":0}"
 
-                                warn("duplicate_a", state, token_now);
+                                warn("duplicate_a", token_now);
                             } else if (token_now.value === "__proto__") {
 
 // cause: "{\"__proto__\":0}"
 
-                                warn("bad_property_a", state, token_now);
+                                warn("bad_property_a", token_now);
                             } else {
                                 object[token_now.value] = token_now;
                             }
@@ -4814,9 +4268,13 @@ function phase3_parse(state) {
                     advance("]", bracket);
                     return bracket;
                 }());
-            case "true":
             case "false":
+                advance();
+                return token_now;
             case "null":
+                advance();
+                return token_now;
+            case "true":
 
 // cause: "[false]"
 // cause: "[null]"
@@ -4825,11 +4283,11 @@ function phase3_parse(state) {
                 advance();
                 return token_now;
             case "(number)":
-                if (!rx_JSON_number.test(token_nxt.value)) {
+                if (!rx_json_number.test(token_nxt.value)) {
 
 // cause: "[0x0]"
 
-                    warn("unexpected_a", state, token_nxt);
+                    warn("unexpected_a", token_nxt);
                 }
                 advance();
                 return token_now;
@@ -4838,7 +4296,7 @@ function phase3_parse(state) {
 
 // cause: "['']"
 
-                    warn("unexpected_a", state, token_nxt, token_nxt.quote);
+                    warn("unexpected_a", token_nxt, token_nxt.quote);
                 }
                 advance();
                 return token_now;
@@ -4847,11 +4305,11 @@ function phase3_parse(state) {
                 negative.arity = "unary";
                 advance("-");
                 advance("(number)");
-                if (!rx_JSON_number.test(token_now.value)) {
+                if (!rx_json_number.test(token_now.value)) {
 
 // cause: "[-0x0]"
 
-                    warn("unexpected_a", state, token_now);
+                    warn("unexpected_a", token_now);
                 }
                 negative.expression = token_now;
                 return negative;
@@ -4859,7 +4317,7 @@ function phase3_parse(state) {
 
 // cause: "[undefined]"
 
-                stop("unexpected_a", state, token_nxt);
+                stop("unexpected_a", token_nxt);
             }
         }());
         advance("(end)");
@@ -4890,23 +4348,29 @@ function phase3_parse(state) {
     advance("(end)");
 }
 
-
-function phase4_walk(state) {
+function jslint_phase4_walk(state) {
 
 // PHASE 4. Walk <token_tree>, traversing all of the nodes of the tree. It is a
 //          recursive traversal. Each node may be processed on the way down
 //          (preaction) and on the way up (postaction).
 
     const {
+        artifact,
         global_list,
+        is_equal,
+        is_weird,
         option_dict,
         syntax_dict,
-        token_global
+        token_global,
+        warn
     } = state;
-    const function_stack = [];  // The stack of functions.
     const block_stack = [];     // The stack of blocks.
+    const function_stack = [];  // The stack of functions.
     const posts = empty();
     const pres = empty();
+    const relationop = populate([       // The relational operators.
+        "!=", "!==", "==", "===", "<", "<=", ">", ">="
+    ]);
     let blockage = token_global;        // The current block.
     let functionage = token_global;     // The current function.
     let postaction;
@@ -5001,7 +4465,7 @@ function phase4_walk(state) {
 
 // cause: "if(0){import aa from \"aa\";}"
 
-            warn("misplaced_a", state, the_thing);
+            warn("misplaced_a", the_thing);
         }
     }
 
@@ -5027,7 +4491,7 @@ function phase4_walk(state) {
 // cause: "aa=++aa"
 // cause: "aa=--aa"
 
-                    warn("unexpected_a", state, thing);
+                    warn("unexpected_a", thing);
                 } else if (
 
 // cause: "aa=0"
@@ -5038,7 +4502,7 @@ function phase4_walk(state) {
 
 // cause: "aa[aa=0]"
 
-                    warn("unexpected_statement_a", state, thing);
+                    warn("unexpected_statement_a", thing);
                 }
                 postamble(thing);
             }
@@ -5060,7 +4524,7 @@ function phase4_walk(state) {
 
 // cause: "0&&0"
 
-                        warn("unexpected_expression_a", state, thing);
+                        warn("unexpected_expression_a", thing);
                     }
                 } else if (
                     thing.arity !== "statement"
@@ -5075,7 +4539,7 @@ function phase4_walk(state) {
 // cause: "async function aa(){await 0;}"
 // cause: "typeof 0"
 
-                    warn("unexpected_expression_a", state, thing);
+                    warn("unexpected_expression_a", thing);
                 }
                 walk_statement(thing.block);
                 walk_statement(thing.else);
@@ -5115,7 +4579,7 @@ function phase4_walk(state) {
 // cause: "class aa{}"
 // cause: "let aa=0;try{aa();}catch(bb){bb();}bb();"
 
-                        warn("undeclared_a", state, thing);
+                        warn("undeclared_a", thing);
                         return;
                     }
                     the_variable = {
@@ -5135,7 +4599,7 @@ function phase4_walk(state) {
 
 // cause: "aa:while(0){aa;}"
 
-                warn("label_a", state, thing);
+                warn("label_a", thing);
             }
             if (
                 the_variable.dead
@@ -5148,7 +4612,7 @@ function phase4_walk(state) {
 
 // cause: "function aa(){bb();}\nfunction bb(){}"
 
-                warn("out_of_scope_a", state, thing);
+                warn("out_of_scope_a", thing);
             }
             return the_variable;
         }
@@ -5170,7 +4634,7 @@ function phase4_walk(state) {
 
 // cause: "if(0){function aa(){}\n}"
 
-            warn("unexpected_a", state, thing);
+            warn("unexpected_a", thing);
         }
         function_stack.push(functionage);
         block_stack.push(blockage);
@@ -5186,14 +4650,14 @@ function phase4_walk(state) {
 
 // cause: "/*jslint getset*/\naa={get aa(aa){}}"
 
-                warn("bad_get", state, thing);
+                warn("bad_get", thing);
             }
         } else if (thing.extra === "set") {
             if (thing.parameters.length !== 1) {
 
 // cause: "/*jslint getset*/\naa={set aa(){}}"
 
-                warn("bad_set", state, thing);
+                warn("bad_set", thing);
             }
         }
         thing.parameters.forEach(function (name) {
@@ -5213,17 +4677,41 @@ function phase4_walk(state) {
 
         switch (!option_dict.bitwise && thing.id) {
         case "&":
+            warn("unexpected_a", thing);
+            break;
         case "&=":
+            warn("unexpected_a", thing);
+            break;
         case "<<":
+            warn("unexpected_a", thing);
+            break;
         case "<<=":
+            warn("unexpected_a", thing);
+            break;
         case ">>":
+            warn("unexpected_a", thing);
+            break;
         case ">>=":
+            warn("unexpected_a", thing);
+            break;
         case ">>>":
+            warn("unexpected_a", thing);
+            break;
         case ">>>=":
+            warn("unexpected_a", thing);
+            break;
         case "^":
+            warn("unexpected_a", thing);
+            break;
         case "^=":
+            warn("unexpected_a", thing);
+            break;
         case "|":
+            warn("unexpected_a", thing);
+            break;
         case "|=":
+            warn("unexpected_a", thing);
+            break;
         case "~":
 
 // cause: "0&0"
@@ -5240,7 +4728,7 @@ function phase4_walk(state) {
 // cause: "0|=0"
 // cause: "~0"
 
-            warn("unexpected_a", state, thing);
+            warn("unexpected_a", thing);
             break;
         }
         if (
@@ -5258,7 +4746,7 @@ function phase4_walk(state) {
 
 // cause: "0<0<0"
 
-            warn("unexpected_a", state, thing);
+            warn("unexpected_a", thing);
         }
     }
 
@@ -5301,7 +4789,7 @@ function phase4_walk(state) {
                 return;
             }
         }
-        warn("bad_assignment_a", state, name);
+        warn("bad_assignment_a", name);
     }
 
     function postaction_function(thing) {
@@ -5314,7 +4802,7 @@ function phase4_walk(state) {
 
 // cause: "aa=(function(){})"
 
-            warn("unexpected_parens", state, thing);
+            warn("unexpected_parens", thing);
         }
         return pop_block();
     }
@@ -5334,14 +4822,14 @@ function phase4_walk(state) {
 
 // cause: "NaN===NaN"
 
-                warn("number_isNaN", state, thing);
+                warn("number_isNaN", thing);
             } else if (left.id === "typeof") {
                 if (right.id !== "(string)") {
                     if (right.id !== "typeof") {
 
 // cause: "typeof 0===0"
 
-                        warn("expected_string_a", state, right);
+                        warn("expected_string_a", right);
                     }
                 } else {
                     const value = right.value;
@@ -5349,7 +4837,7 @@ function phase4_walk(state) {
 
 // cause: "typeof aa===\"undefined\""
 
-                        warn("unexpected_typeof_a", state, right, value);
+                        warn("unexpected_typeof_a", right, value);
                     } else if (
                         value !== "boolean"
                         && value !== "function"
@@ -5361,7 +4849,7 @@ function phase4_walk(state) {
 
 // cause: "typeof 0===\"aa\""
 
-                        warn("expected_type_string_a", state, right, value);
+                        warn("expected_type_string_a", right, value);
                     }
                 }
             }
@@ -5371,13 +4859,13 @@ function phase4_walk(state) {
 
 // cause: "0==0"
 
-        warn("expected_a_b", state, thing, "===", "==");
+        warn("expected_a_b", thing, "===", "==");
     });
     preaction("binary", "!=", function (thing) {
 
 // cause: "0!=0"
 
-        warn("expected_a_b", state, thing, "!==", "!=");
+        warn("expected_a_b", thing, "!==", "!=");
     });
     preaction("binary", "=>", preaction_function);
     preaction("binary", "||", function (thing) {
@@ -5386,7 +4874,7 @@ function phase4_walk(state) {
 
 // cause: "0&&0||0"
 
-                warn("and", state, thang);
+                warn("and", thang);
             }
         });
     });
@@ -5417,13 +4905,13 @@ function phase4_walk(state) {
 
 // cause: "aa in aa"
 
-        warn("infix_in", state, thing);
+        warn("infix_in", thing);
     });
     preaction("binary", "instanceof", function (thing) {
 
 // cause: "0 instanceof 0"
 
-        warn("unexpected_a", state, thing);
+        warn("unexpected_a", thing);
     });
     preaction("statement", "{", function (thing) {
         block_stack.push(blockage);
@@ -5439,7 +4927,7 @@ function phase4_walk(state) {
 
 // cause: "const aa=0;for(aa in aa){}"
 
-                    warn("bad_assignment_a", state, thing.name);
+                    warn("bad_assignment_a", thing.name);
                 }
             }
         }
@@ -5476,7 +4964,7 @@ function phase4_walk(state) {
                 || right.id === "undefined"
                 || Number.isNaN(right.value)
             ) {
-                warn("unexpected_a", state, right);
+                warn("unexpected_a", right);
             }
         }
     });
@@ -5521,7 +5009,6 @@ function phase4_walk(state) {
 
                     warn(
                         "expected_a_b",
-                        state,
                         lvalue.expression,
                         "delete",
                         "undefined"
@@ -5531,7 +5018,7 @@ function phase4_walk(state) {
         } else {
             if (lvalue.arity === "variable") {
                 if (!lvalue.variable || lvalue.variable.writable !== true) {
-                    warn("bad_assignment_a", state, lvalue);
+                    warn("bad_assignment_a", lvalue);
                 }
             }
             const right = syntax_dict[thing.expression[1].id];
@@ -5550,7 +5037,7 @@ function phase4_walk(state) {
 
 // cause: "aa+=undefined"
 
-                warn("unexpected_a", state, thing.expression[1]);
+                warn("unexpected_a", thing.expression[1]);
             }
         }
     });
@@ -5561,7 +5048,7 @@ function phase4_walk(state) {
             if (
                 is_weird(thing.expression[0])
                 || is_weird(thing.expression[1])
-                || are_similar(thing.expression[0], thing.expression[1])
+                || is_equal(thing.expression[0], thing.expression[1])
                 || (
                     thing.expression[0].constant === true
                     && thing.expression[1].constant === true
@@ -5570,7 +5057,7 @@ function phase4_walk(state) {
 
 // cause: "if(0===0){0}"
 
-                warn("weird_relation_a", state, thing);
+                warn("weird_relation_a", thing);
             }
         }
         if (thing.id === "+") {
@@ -5579,12 +5066,12 @@ function phase4_walk(state) {
 
 // cause: "\"\"+0"
 
-                    warn("expected_a_b", state, thing, "String(...)", "\"\" +");
+                    warn("expected_a_b", thing, "String(...)", "\"\" +");
                 } else if (thing.expression[1].value === "") {
 
 // cause: "0+\"\""
 
-                    warn("expected_a_b", state, thing, "String(...)", "+ \"\"");
+                    warn("expected_a_b", thing, "String(...)", "+ \"\"");
                 }
             }
         } else if (thing.id === "[") {
@@ -5592,20 +5079,20 @@ function phase4_walk(state) {
 
 // cause: "aa=window[0]"
 
-                warn("weird_expression_a", state, thing, "window[...]");
+                warn("weird_expression_a", thing, "window[...]");
             }
             if (thing.expression[0].id === "self") {
 
 // cause: "aa=self[0]"
 
-                warn("weird_expression_a", state, thing, "self[...]");
+                warn("weird_expression_a", thing, "self[...]");
             }
         } else if (thing.id === "." || thing.id === "?.") {
             if (thing.expression.id === "RegExp") {
 
 // cause: "aa=RegExp.aa"
 
-                warn("weird_expression_a", state, thing);
+                warn("weird_expression_a", thing);
             }
         } else if (thing.id !== "=>" && thing.id !== "(") {
             right = thing.expression[1];
@@ -5618,7 +5105,7 @@ function phase4_walk(state) {
 
 // cause: "0- -0"
 
-                warn("wrap_unary", state, right);
+                warn("wrap_unary", right);
             }
             if (
                 thing.expression[0].constant === true
@@ -5631,28 +5118,29 @@ function phase4_walk(state) {
     postaction("binary", "&&", function (thing) {
         if (
             is_weird(thing.expression[0])
-            || are_similar(thing.expression[0], thing.expression[1])
+            || is_equal(thing.expression[0], thing.expression[1])
             || thing.expression[0].constant === true
             || thing.expression[1].constant === true
         ) {
 
 // cause: "aa=(``?``:``)&&(``?``:``)"
+// cause: "aa=/./&&0"
 // cause: "aa=0&&0"
 // cause: "aa=`${0}`&&`${0}`"
 
-            warn("weird_condition_a", state, thing);
+            warn("weird_condition_a", thing);
         }
     });
     postaction("binary", "||", function (thing) {
         if (
             is_weird(thing.expression[0])
-            || are_similar(thing.expression[0], thing.expression[1])
+            || is_equal(thing.expression[0], thing.expression[1])
             || thing.expression[0].constant === true
         ) {
 
 // cause: "aa=0||0"
 
-            warn("weird_condition_a", state, thing);
+            warn("weird_condition_a", thing);
         }
     });
     postaction("binary", "=>", postaction_function);
@@ -5669,7 +5157,7 @@ function phase4_walk(state) {
 
 // cause: "aa=function(){}()"
 
-                warn("wrap_immediate", state, thing);
+                warn("wrap_immediate", thing);
             }
         } else if (left.identifier) {
             if (the_new !== undefined) {
@@ -5687,13 +5175,13 @@ function phase4_walk(state) {
 // cause: "new Symbol()"
 // cause: "new aa()"
 
-                    warn("unexpected_a", state, the_new);
+                    warn("unexpected_a", the_new);
                 } else if (left.id === "Function") {
                     if (!option_dict.eval) {
 
 // cause: "new Function()"
 
-                        warn("unexpected_a", state, left, "new Function");
+                        warn("unexpected_a", left, "new Function");
                     }
                 } else if (left.id === "Array") {
                     arg = thing.expression;
@@ -5701,7 +5189,7 @@ function phase4_walk(state) {
 
 // cause: "new Array()"
 
-                        warn("expected_a_b", state, left, "[]", "new Array");
+                        warn("expected_a_b", left, "[]", "new Array");
                     }
                 } else if (left.id === "Object") {
 
@@ -5709,7 +5197,6 @@ function phase4_walk(state) {
 
                     warn(
                         "expected_a_b",
-                        state,
                         left,
                         "Object.create(null)",
                         "new Object"
@@ -5727,13 +5214,7 @@ function phase4_walk(state) {
 
 // cause: "let Aa=Aa()"
 
-                    warn(
-                        "expected_a_before_b",
-                        state,
-                        left,
-                        "new",
-                        artifact(left)
-                    );
+                    warn("expected_a_before_b", left, "new", artifact(left));
                 }
             }
         } else if (left.id === ".") {
@@ -5744,19 +5225,21 @@ function phase4_walk(state) {
 
                 cack = !cack;
             }
-            if (rx_cap.test(left.name.id) !== cack) {
+            if ((
+                // rx_cap
+                /^[A-Z]/
+            ).test(left.name.id) !== cack) {
                 if (the_new !== undefined) {
 
 // cause: "new Date.UTC()"
 
-                    warn("unexpected_a", state, the_new);
+                    warn("unexpected_a", the_new);
                 } else {
 
 // cause: "let Aa=Aa.Aa()"
 
                     warn(
                         "expected_a_before_b",
-                        state,
                         left.expression,
                         "new",
                         left.name.id
@@ -5778,7 +5261,6 @@ function phase4_walk(state) {
 
                             warn(
                                 "expected_a_b",
-                                state,
                                 new_date,
                                 "Date.now()",
                                 "new Date().getTime()"
@@ -5794,13 +5276,13 @@ function phase4_walk(state) {
 
 // cause: "aa=RegExp[0]"
 
-            warn("weird_expression_a", state, thing);
+            warn("weird_expression_a", thing);
         }
         if (is_weird(thing.expression[1])) {
 
 // cause: "aa[[0]]"
 
-            warn("weird_expression_a", state, thing.expression[1]);
+            warn("weird_expression_a", thing.expression[1]);
         }
     });
     postaction("statement", "{", pop_block);
@@ -5848,19 +5330,19 @@ function phase4_walk(state) {
         if (
             is_weird(thing.expression[0])
             || thing.expression[0].constant === true
-            || are_similar(thing.expression[1], thing.expression[2])
+            || is_equal(thing.expression[1], thing.expression[2])
         ) {
-            warn("unexpected_a", state, thing);
-        } else if (are_similar(thing.expression[0], thing.expression[1])) {
+            warn("unexpected_a", thing);
+        } else if (is_equal(thing.expression[0], thing.expression[1])) {
 
 // cause: "aa?aa:0"
 
-            warn("expected_a_b", state, thing, "||", "?");
-        } else if (are_similar(thing.expression[0], thing.expression[2])) {
+            warn("expected_a_b", thing, "||", "?");
+        } else if (is_equal(thing.expression[0], thing.expression[2])) {
 
 // cause: "aa?0:aa"
 
-            warn("expected_a_b", state, thing, "&&", "?");
+            warn("expected_a_b", thing, "&&", "?");
         } else if (
             thing.expression[1].id === "true"
             && thing.expression[2].id === "false"
@@ -5868,7 +5350,7 @@ function phase4_walk(state) {
 
 // cause: "aa?true:false"
 
-            warn("expected_a_b", state, thing, "!!", "?");
+            warn("expected_a_b", thing, "!!", "?");
         } else if (
             thing.expression[1].id === "false"
             && thing.expression[2].id === "true"
@@ -5876,7 +5358,7 @@ function phase4_walk(state) {
 
 // cause: "aa?false:true"
 
-            warn("expected_a_b", state, thing, "!", "?");
+            warn("expected_a_b", thing, "!", "?");
         } else if (
             thing.expression[0].wrapped !== true
             && (
@@ -5887,7 +5369,7 @@ function phase4_walk(state) {
 
 // cause: "(aa&&!aa?0:1)"
 
-            warn("wrap_condition", state, thing.expression[0]);
+            warn("wrap_condition", thing.expression[0]);
         }
     });
     postaction("unary", function (thing) {
@@ -5899,14 +5381,14 @@ function phase4_walk(state) {
             }
         } else if (thing.id === "!") {
             if (thing.expression.constant === true) {
-                warn("unexpected_a", state, thing);
+                warn("unexpected_a", thing);
             }
         } else if (thing.id === "!!") {
             if (!option_dict.convert) {
 
 // cause: "!!0"
 
-                warn("expected_a_b", state, thing, "Boolean(...)", "!!");
+                warn("expected_a_b", thing, "Boolean(...)", "!!");
             }
         } else if (
             thing.id !== "["
@@ -5926,34 +5408,41 @@ function phase4_walk(state) {
 
 // cause: "aa=+0"
 
-            warn("expected_a_b", state, thing, "Number(...)", "+");
+            warn("expected_a_b", thing, "Number(...)", "+");
         }
         if (right.id === "(" && right.expression[0].id === "new") {
-            warn("unexpected_a_before_b", state, thing, "+", "new");
+            warn("unexpected_a_before_b", thing, "+", "new");
         } else if (
             right.constant
             || right.id === "{"
             || (right.id === "[" && right.arity !== "binary")
         ) {
-            warn("unexpected_a", state, thing, "+");
+            warn("unexpected_a", thing, "+");
         }
     });
 
     walk_statement(state.token_tree);
 }
 
-
-function phase5_whitage(state) {
+function jslint_phase5_whitage(state) {
 
 // PHASE 5. Check whitespace between tokens in <token_list>.
 
     const {
+        artifact,
         function_list,
         option_dict,
         token_global,
-        token_list
+        token_list,
+        warn
     } = state;
     const function_stack = [];  // The stack of functions.
+    const spaceop = populate([  // This is the set of infix operators that
+                                // require a space on each side.
+        "!=", "!==", "%", "%=", "&", "&=", "&&", "*", "*=", "+=", "-=", "/",
+        "/=", "<", "<=", "<<", "<<=", "=", "==", "===", "=>", ">", ">=",
+        ">>", ">>=", ">>>", ">>>=", "^", "^=", "|", "|=", "||"
+    ]);
     let closer = "(end)";
 
 // free = false
@@ -5996,7 +5485,6 @@ function phase5_whitage(state) {
 
         warn(
             "expected_a_at_b_c",
-            state,
             right,
             artifact(right),
 
@@ -6040,12 +5528,12 @@ function phase5_whitage(state) {
 // cause: "/*jslint node*/\nlet aa;"
 // cause: "function aa(aa){return;}"
 
-                        warn("unused_a", state, name);
+                        warn("unused_a", name);
                     } else if (!name.init) {
 
 // cause: "/*jslint node*/\nlet aa;aa();"
 
-                        warn("uninitialized_a", state, name);
+                        warn("uninitialized_a", name);
                     }
                 }
             }
@@ -6069,7 +5557,6 @@ function phase5_whitage(state) {
 
                 warn(
                     "unexpected_space_a_b",
-                    state,
                     right,
                     artifact(left),
                     artifact(right)
@@ -6129,7 +5616,6 @@ function phase5_whitage(state) {
         ) {
             warn(
                 "unexpected_space_a_b",
-                state,
                 right,
                 artifact(left),
                 artifact(right)
@@ -6142,7 +5628,6 @@ function phase5_whitage(state) {
             if (left.thru + 1 !== right.from && nr_comments_skipped === 0) {
                 warn(
                     "expected_space_a_b",
-                    state,
                     right,
                     artifact(left),
                     artifact(right)
@@ -6157,13 +5642,7 @@ function phase5_whitage(state) {
 
     function one_space_only() {
         if (left.line !== right.line || left.thru + 1 !== right.from) {
-            warn(
-                "expected_space_a_b",
-                state,
-                right,
-                artifact(left),
-                artifact(right)
-            );
+            warn("expected_space_a_b", right, artifact(left), artifact(right));
         }
     }
 
@@ -6325,7 +5804,6 @@ function phase5_whitage(state) {
 
                             warn(
                                 "expected_line_break_a_b",
-                                state,
                                 right,
                                 artifact(left),
                                 artifact(right)
@@ -6439,7 +5917,7 @@ function phase5_whitage(state) {
 
 // cause: "let aa = (aa ? 0 : 1);"
 
-                            warn("use_open", state, right);
+                            warn("use_open", right);
                         }
                     } else if (
                         right.arity === "binary"
@@ -6584,6 +6062,52 @@ function jslint(
 
 // The jslint function itself.
 
+    const allowed_option = {
+
+// These are the options that are recognized in the option object or that may
+// appear in a /*jslint*/ directive. Most options will have a boolean value,
+// usually true. Some options will also predefine some number of global
+// variables.
+
+        bitwise: true,
+        browser: [
+            "caches", "CharacterData", "clearInterval", "clearTimeout",
+            "document",
+            "DocumentType", "DOMException", "Element", "Event", "event",
+            "fetch",
+            "FileReader", "FontFace", "FormData", "history",
+            "IntersectionObserver",
+            "localStorage", "location", "MutationObserver", "name", "navigator",
+            "screen", "sessionStorage", "setInterval", "setTimeout", "Storage",
+            "TextDecoder", "TextEncoder", "URL", "window", "Worker",
+            "XMLHttpRequest"
+        ],
+        convert: true,
+        couch: [
+            "emit", "getRow", "isArray", "log", "provides", "registerType",
+            "require", "send", "start", "sum", "toJSON"
+        ],
+        debug: true,
+        devel: [
+            "alert", "confirm", "console", "prompt"
+        ],
+        eval: true,
+        for: true,
+        getset: true,
+        long: true,
+        name: true,
+        node: [
+            "Buffer", "clearImmediate", "clearInterval", "clearTimeout",
+            "console", "exports", "module", "process", "require",
+            "setImmediate", "setInterval", "setTimeout", "TextDecoder",
+            "TextEncoder", "URL", "URLSearchParams", "__dirname", "__filename"
+        ],
+        single: true,
+        test_internal_error: true,
+        this: true,
+        unordered: true,
+        white: true
+    };
     const directive_list = []; // The directive comments.
     const export_dict = empty(); // The exported names and values.
     const function_list = []; // The array containing all of the functions.
@@ -6600,6 +6124,19 @@ function jslint(
     });
     const property_dict = empty();      // The object containing the tallied
                                         // property names.
+    const standard = [          // These are the globals that are provided by
+                                // the language standard.
+        "Array", "ArrayBuffer", "Boolean", "DataView", "Date", "Error",
+        "EvalError",
+        "Float32Array", "Float64Array", "Generator", "GeneratorFunction",
+        "Int16Array", "Int32Array", "Int8Array", "Intl", "JSON", "Map", "Math",
+        "Number", "Object", "Promise", "Proxy", "RangeError", "ReferenceError",
+        "Reflect", "RegExp", "Set", "String", "Symbol", "SyntaxError", "System",
+        "TypeError", "URIError", "Uint16Array", "Uint32Array", "Uint8Array",
+        "Uint8ClampedArray", "WeakMap", "WeakSet", "decodeURI",
+        "decodeURIComponent", "encodeURI", "encodeURIComponent", "globalThis",
+        "import", "parseFloat", "parseInt"
+    ];
     const state = empty();      // jslint state-object to be passed between
                                 // jslint functions.
     const syntax_dict = empty();        // The object containing the parser.
@@ -6612,7 +6149,7 @@ function jslint(
         from: 0,
         id: "(global)",
         level: 0,
-        line: 1,
+        line: line_fudge,
         live: [],
         loop: 0,
         switch: 0,
@@ -6622,6 +6159,520 @@ function jslint(
     const token_list = [];      // The array of tokens.
     const warning_list = [];    // The array collecting all generated warnings.
     let mode_stop = false;      // true if JSLint cannot finish.
+
+// Error reportage functions:
+
+    function artifact(the_token) {
+
+// Return a string representing an artifact.
+
+        assert_or_throw(
+            the_token !== undefined,
+            "Expected the_token !== undefined."
+        );
+// Probably deadcode.
+// if (the_token === undefined) {
+//     the_token = token_nxt;
+// }
+        return (
+            (the_token.id === "(string)" || the_token.id === "(number)")
+            ? String(the_token.value)
+            : the_token.id
+        );
+    }
+
+    function is_weird(thing) {
+        switch (thing.id) {
+        case "(regexp)":
+        case "=>":
+        case "function":
+        case "{":
+            return true;
+        case "[":
+            return thing.arity === "unary";
+        default:
+            return false;
+        }
+    }
+
+    function is_equal(aa, bb) {
+        let aa_value;
+        let bb_value;
+
+// cause: "0&&0"
+
+        assert_or_throw(!(aa === bb), `Expected !(aa === bb).`);
+
+// Probably deadcode.
+// if (aa === bb) {
+//     return true;
+// }
+
+        if (Array.isArray(aa)) {
+            return (
+                Array.isArray(bb)
+                && aa.length === bb.length
+                && aa.every(function (value, index) {
+
+// cause: "`${0}`&&`${0}`"
+
+                    return is_equal(value, bb[index]);
+                })
+            );
+        }
+        assert_or_throw(!Array.isArray(bb), `Expected !Array.isArray(bb).`);
+
+// Probably deadcode.
+// if (Array.isArray(bb)) {
+//     return false;
+// }
+
+        if (aa.id === "(number)" && bb.id === "(number)") {
+            return aa.value === bb.value;
+        }
+        if (aa.id === "(string)") {
+            aa_value = aa.value;
+        } else if (aa.id === "`" && aa.constant) {
+            aa_value = aa.value[0];
+        }
+        if (bb.id === "(string)") {
+            bb_value = bb.value;
+        } else if (bb.id === "`" && bb.constant) {
+            bb_value = bb.value[0];
+        }
+        if (typeof aa_value === "string") {
+            return aa_value === bb_value;
+        }
+        if (is_weird(aa) || is_weird(bb)) {
+            return false;
+        }
+        if (aa.arity === bb.arity && aa.id === bb.id) {
+
+// cause: "aa.bb&&aa.bb"
+
+            if (aa.id === ".") {
+                return (
+                    is_equal(aa.expression, bb.expression)
+                    && is_equal(aa.name, bb.name)
+                );
+            }
+
+// cause: "+0&&+0"
+
+            if (aa.arity === "unary") {
+                return is_equal(aa.expression, bb.expression);
+            }
+            if (aa.arity === "binary") {
+
+// cause: "aa[0]&&aa[0]"
+
+                return (
+                    aa.id !== "("
+                    && is_equal(aa.expression[0], bb.expression[0])
+                    && is_equal(aa.expression[1], bb.expression[1])
+                );
+            }
+            if (aa.arity === "ternary") {
+
+// cause: "aa=(``?``:``)&&(``?``:``)"
+
+                return (
+                    is_equal(aa.expression[0], bb.expression[0])
+                    && is_equal(aa.expression[1], bb.expression[1])
+                    && is_equal(aa.expression[2], bb.expression[2])
+                );
+            }
+            assert_or_throw(
+                !(aa.arity === "function" || aa.arity === "regexp"),
+                `Expected !(aa.arity === "function" || aa.arity === "regexp").`
+            );
+
+// Probably deadcode.
+// if (aa.arity === "function" || aa.arity === "regexp") {
+//     return false;
+// }
+
+// cause: "undefined&&undefined"
+
+            return true;
+        }
+
+// cause: "null&&undefined"
+
+        return false;
+    }
+
+    function warn_at(code, line, column, a, b, c, d) {
+
+// Report an error at some line and column of the program. The warning object
+// resembles an exception.
+
+        const warning = Object.assign(empty(), {
+            a,
+            b,
+            c,
+            code,
+
+// Fudge column numbers in warning message.
+
+            column: column || line_fudge,
+            d,
+            line,
+            line_source: "",
+            name: "JSLintError"
+        }, line_list[line]);
+        let mm;
+        switch (code) {
+
+// The bundle contains the raw text messages that are generated by jslint. It
+// seems that they are all error messages and warnings. There are no "Atta
+// boy!" or "You are so awesome!" messages. There is no positive reinforcement
+// or encouragement. This relentless negativity can undermine self-esteem and
+// wound the inner child. But if you accept it as sound advice rather than as
+// personal criticism, it can make your programs better.
+
+        case "and":
+            mm = `The '&&' subexpression should be wrapped in parens.`;
+            break;
+        case "bad_assignment_a":
+            mm = `Bad assignment to '${a}'.`;
+            break;
+        case "bad_directive_a":
+            mm = `Bad directive '${a}'.`;
+            break;
+        case "bad_get":
+            mm = `A get function takes no parameters.`;
+            break;
+        case "bad_module_name_a":
+            mm = `Bad module name '${a}'.`;
+            break;
+        case "bad_option_a":
+            mm = `Bad option '${a}'.`;
+            break;
+        case "bad_property_a":
+            mm = `Bad property name '${a}'.`;
+            break;
+        case "bad_set":
+            mm = `A set function takes one parameter.`;
+            break;
+        case "duplicate_a":
+            mm = `Duplicate '${a}'.`;
+            break;
+        case "empty_block":
+            mm = `Empty block.`;
+            break;
+        case "expected_a":
+            mm = `Expected '${a}'.`;
+            break;
+        case "expected_a_at_b_c":
+            mm = `Expected '${a}' at column ${b}, not column ${c}.`;
+            break;
+        case "expected_a_b":
+            mm = `Expected '${a}' and instead saw '${b}'.`;
+            break;
+        case "expected_a_b_from_c_d":
+            mm = (
+                `Expected '${a}' to match '${b}' from line ${c}`
+                + ` and instead saw '${d}'.`
+            );
+            break;
+        case "expected_a_before_b":
+            mm = `Expected '${a}' before '${b}'.`;
+            break;
+        case "expected_digits_after_a":
+            mm = `Expected digits after '${a}'.`;
+            break;
+        case "expected_four_digits":
+            mm = `Expected four digits after '\\u'.`;
+            break;
+        case "expected_identifier_a":
+            mm = `Expected an identifier and instead saw '${a}'.`;
+            break;
+        case "expected_line_break_a_b":
+            mm = `Expected a line break between '${a}' and '${b}'.`;
+            break;
+        case "expected_regexp_factor_a":
+            mm = `Expected a regexp factor and instead saw '${a}'.`;
+            break;
+        case "expected_space_a_b":
+            mm = `Expected one space between '${a}' and '${b}'.`;
+            break;
+        case "expected_statements_a":
+            mm = `Expected statements before '${a}'.`;
+            break;
+        case "expected_string_a":
+            mm = `Expected a string and instead saw '${a}'.`;
+            break;
+        case "expected_type_string_a":
+            mm = `Expected a type string and instead saw '${a}'.`;
+            break;
+        case "freeze_exports":
+            mm = (
+                `Expected 'Object.freeze('. All export values should be frozen.`
+            );
+            break;
+        case "function_in_loop":
+            mm = `Don't create functions within a loop.`;
+            break;
+        case "infix_in":
+            mm = (
+                `Unexpected 'in'. Compare with undefined,`
+                + ` or use the hasOwnProperty method instead.`
+            );
+            break;
+        case "label_a":
+            mm = `'${a}' is a statement label.`;
+            break;
+        case "misplaced_a":
+            mm = `Place '${a}' at the outermost level.`;
+            break;
+        case "misplaced_directive_a":
+            mm = `Place the '/*${a}*/' directive before the first statement.`;
+            break;
+        case "missing_await_statement":
+            mm = `Expected await statement in async function.`;
+            break;
+        case "missing_browser":
+            mm = `/*global*/ requires the Assume a browser option.`;
+            break;
+        case "missing_m":
+            mm = `Expected 'm' flag on a multiline regular expression.`;
+            break;
+        case "naked_block":
+            mm = `Naked block.`;
+            break;
+        case "nested_comment":
+            mm = `Nested comment.`;
+            break;
+        case "not_label_a":
+            mm = `'${a}' is not a label.`;
+            break;
+        case "number_isNaN":
+            mm = `Use Number.isNaN function to compare with NaN.`;
+            break;
+        case "out_of_scope_a":
+            mm = `'${a}' is out of scope.`;
+            break;
+        case "redefinition_a_b":
+            mm = `Redefinition of '${a}' from line ${b}.`;
+            break;
+        case "required_a_optional_b":
+            mm = `Required parameter '${a}' after optional parameter '${b}'.`;
+            break;
+        case "reserved_a":
+            mm = `Reserved name '${a}'.`;
+            break;
+        case "subscript_a":
+            mm = `['${a}'] is better written in dot notation.`;
+            break;
+        case "todo_comment":
+            mm = `Unexpected TODO comment.`;
+            break;
+        case "too_long":
+            mm = `Line is longer than 80 characters.`;
+            break;
+        case "too_many_digits":
+            mm = `Too many digits.`;
+            break;
+        case "unclosed_comment":
+            mm = `Unclosed comment.`;
+            break;
+        case "unclosed_disable":
+            mm = (
+                `Directive '/*jslint-disable*/' was not closed`
+                + ` with '/*jslint-enable*/'.`
+            );
+            break;
+        case "unclosed_mega":
+            mm = `Unclosed mega literal.`;
+            break;
+        case "unclosed_string":
+            mm = `Unclosed string.`;
+            break;
+        case "undeclared_a":
+            mm = `Undeclared '${a}'.`;
+            break;
+        case "unexpected_a":
+            mm = `Unexpected '${a}'.`;
+            break;
+        case "unexpected_a_after_b":
+            mm = `Unexpected '${a}' after '${b}'.`;
+            break;
+        case "unexpected_a_before_b":
+            mm = `Unexpected '${a}' before '${b}'.`;
+            break;
+        case "unexpected_at_top_level_a":
+            mm = `Expected '${a}' to be in a function.`;
+            break;
+        case "unexpected_char_a":
+            mm = `Unexpected character '${a}'.`;
+            break;
+        case "unexpected_comment":
+            mm = `Unexpected comment.`;
+            break;
+        case "unexpected_directive_a":
+            mm = `When using modules, don't use directive '/\u002a${a}'.`;
+            break;
+        case "unexpected_expression_a":
+            mm = `Unexpected expression '${a}' in statement position.`;
+            break;
+        case "unexpected_label_a":
+            mm = `Unexpected label '${a}'.`;
+            break;
+        case "unexpected_parens":
+            mm = `Don't wrap function literals in parens.`;
+            break;
+        case "unexpected_space_a_b":
+            mm = `Unexpected space between '${a}' and '${b}'.`;
+            break;
+        case "unexpected_statement_a":
+            mm = `Unexpected statement '${a}' in expression position.`;
+            break;
+        case "unexpected_trailing_space":
+            mm = `Unexpected trailing space.`;
+            break;
+        case "unexpected_typeof_a":
+            mm = (
+                `Unexpected 'typeof'. Use '===' to compare directly with ${a}.`
+            );
+            break;
+        case "uninitialized_a":
+            mm = `Uninitialized '${a}'.`;
+            break;
+        case "unopened_enable":
+            mm = (
+                `Directive '/*jslint-enable*/' was not opened`
+                + ` with '/*jslint-disable*/'.`
+            );
+            break;
+        case "unreachable_a":
+            mm = `Unreachable '${a}'.`;
+            break;
+        case "unregistered_property_a":
+            mm = `Unregistered property name '${a}'.`;
+            break;
+        case "unused_a":
+            mm = `Unused '${a}'.`;
+            break;
+        case "use_double":
+            mm = `Use double quotes, not single quotes.`;
+            break;
+        case "use_open":
+            mm = (
+                `Wrap a ternary expression in parens,`
+                + ` with a line break after the left paren.`
+            );
+            break;
+        case "use_spaces":
+            mm = `Use spaces, not tabs.`;
+            break;
+        case "var_loop":
+            mm = `Don't declare variables in a loop.`;
+            break;
+        case "var_switch":
+            mm = `Don't declare variables in a switch.`;
+            break;
+        case "weird_condition_a":
+            mm = `Weird condition '${a}'.`;
+            break;
+        case "weird_expression_a":
+            mm = `Weird expression '${a}'.`;
+            break;
+        case "weird_loop":
+            mm = `Weird loop.`;
+            break;
+        case "weird_relation_a":
+            mm = `Weird relation '${a}'.`;
+            break;
+        case "wrap_condition":
+            mm = `Wrap the condition in parens.`;
+            break;
+        case "wrap_immediate":
+            mm = (
+                `Wrap an immediate function invocation in parentheses to assist`
+                + ` the reader in understanding that the expression is the`
+                + ` result of a function, and not the function itself.`
+            );
+            break;
+        case "wrap_parameter":
+            mm = `Wrap the parameter in parens.`;
+            break;
+        case "wrap_regexp":
+            mm = `Wrap this regexp in parens to avoid confusion.`;
+            break;
+        case "wrap_unary":
+            mm = `Wrap the unary expression in parens.`;
+            break;
+        }
+        warning.message = mm;
+
+// Include stack_trace for jslint to debug itself for errors.
+
+        if (option_dict.debug) {
+            warning.stack_trace = new Error().stack;
+        }
+        if (warning.directive_quiet) {
+
+// cause: "0 //jslint-quiet"
+
+            return warning;
+        }
+        warning_list.push(warning);
+        return warning;
+    }
+
+    function stop_at(code, line, column, a, b, c, d) {
+
+// Same as warn_at, except that it stops the analysis.
+
+        throw warn_at(code, line, column, a, b, c, d);
+    }
+
+    function warn(code, the_token, a, b, c, d) {
+
+// Same as warn_at, except the warning will be associated with a specific token.
+// If there is already a warning on this token, suppress the new one. It is
+// likely that the first warning will be the most meaningful.
+
+        assert_or_throw(
+            the_token !== undefined,
+            "Expected the_token !== undefined."
+        );
+// Probably deadcode.
+// if (the_token === undefined) {
+//     the_token = token_nxt;
+// }
+        if (the_token.warning === undefined) {
+            the_token.warning = warn_at(
+                code,
+                the_token.line,
+                (the_token.from || 0) + line_fudge,
+                a || artifact(the_token),
+                b,
+                c,
+                d
+            );
+            return the_token.warning;
+        }
+    }
+
+    function stop(code, the_token, a, b, c, d) {
+
+// Similar to warn and stop_at. If the token already had a warning, that
+// warning will be replaced with this new one. It is likely that the stopping
+// warning will be the more meaningful.
+
+        assert_or_throw(
+            the_token !== undefined,
+            "Expected the_token !== undefined."
+        );
+// Probably deadcode.
+// if (the_token === undefined) {
+//     the_token = token_nxt;
+// }
+        delete the_token.warning;
+        throw warn(code, the_token, a, b, c, d);
+    }
 
     try {
 
@@ -6645,11 +6696,15 @@ function jslint(
         });
 
         Object.assign(state, {
+            allowed_option,
+            artifact,
             directive_list,
             export_dict,
             function_list,
             global_list,
             import_list,
+            is_equal,
+            is_weird,
             line_list,
             mode_json: false,           // true if parsing JSON.
             mode_module: false,         // true if import or export was used.
@@ -6659,37 +6714,41 @@ function jslint(
             option_dict,
             property_dict,
             source,
+            stop,
+            stop_at,
             syntax_dict,
             tenure,
             token_global,
             token_list,
+            warn,
+            warn_at,
             warning_list
         });
 
 // PHASE 1. Split <source> by newlines into <line_list>.
 
-        phase1_split(state);
+        jslint_phase1_split(state);
 
 // PHASE 2. Lex <line_list> into <token_list>.
 
-        phase2_lex(state);
+        jslint_phase2_lex(state);
 
 // PHASE 3. Parse <token_list> into <token_tree> using the Pratt-parser.
 
-        phase3_parse(state);
+        jslint_phase3_parse(state);
 
 // PHASE 4. Walk <token_tree>, traversing all of the nodes of the tree. It is a
 //          recursive traversal. Each node may be processed on the way down
 //          (preaction) and on the way up (postaction).
 
         if (!state.mode_json) {
-            phase4_walk(state);
+            jslint_phase4_walk(state);
         }
 
 // PHASE 5. Check whitespace between tokens in <token_list>.
 
         if (!state.mode_json && warning_list.length === 0) {
-            phase5_whitage(state);
+            jslint_phase5_whitage(state);
         }
 
         if (!option_dict.browser) {
@@ -6698,7 +6757,7 @@ function jslint(
 
 // cause: "/*global aa*/"
 
-                    warn("missing_browser", state, comment);
+                    warn("missing_browser", comment);
                 }
             });
         }
@@ -6724,14 +6783,14 @@ function jslint(
 
 // Sort warning_list by mode_stop first, line, column respectively.
 
-    warning_list.sort(function (a, b) {
+    warning_list.sort(function (aa, bb) {
         return (
-            Boolean(b.mode_stop) - Boolean(a.mode_stop)
-            || a.line - b.line
-            || a.column - b.column
+            Boolean(bb.mode_stop) - Boolean(aa.mode_stop)
+            || aa.line - bb.line
+            || aa.column - bb.column
         );
 
-// Update each warning with a formatted_message ready for use by cli.
+// Update each warning with formatted_message ready-for-use by jslint_cli.
 
     }).map(function ({
         column,
@@ -6776,7 +6835,7 @@ function jslint(
     };
 }
 
-async function cli({
+async function jslint_cli({
     console_error,
     file,
     option,
@@ -6920,7 +6979,7 @@ async function cli({
         return;
     }
 
-// cli - jslint directory.
+// jslint_cli - jslint directory.
 
     try {
         data = await fs.promises.readdir(file, "utf8");
@@ -6967,7 +7026,7 @@ async function cli({
         return exit_code;
     }
 
-// cli - jslint file.
+// jslint_cli - jslint file.
 
     try {
         data = await fs.promises.readFile(file, "utf8");
@@ -6982,7 +7041,7 @@ async function cli({
     });
     return exit_code;
 }
-jslint.cli = Object.freeze(cli);
+jslint.jslint_cli = Object.freeze(jslint_cli);
 jslint.jslint = Object.freeze(jslint.bind(undefined));
 export default Object.freeze(jslint);
 
@@ -7004,9 +7063,9 @@ if (
     )
 ) {
 
-// run cli
+// run jslint_cli
 
-    cli({
+    jslint_cli({
         file: process.argv[2]
     }).then(function (exit_code) {
         process.exit(exit_code);

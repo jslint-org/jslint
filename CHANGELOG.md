@@ -39,6 +39,7 @@
     - move phase-sub-functions out of function-jslint().
     - move global-vars into state-object, that can be passed between functions.
     - migrate recursive-loops to while-loops in sub-function phase2_lex().
+    - move remaining global-vars into sub-functions or hardcode.
 - website - add ui-loader-animation.
 
 ## v2021.6.3
