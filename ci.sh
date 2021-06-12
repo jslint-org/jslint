@@ -143,6 +143,35 @@ process.exit(
     # screenshot live-web-demo
     shBrowserScreenshot \
         https://jslint-org.github.io/jslint/branch-beta/index.html
+    # screenshot install - download
+    shRunWithScreenshotTxt sh -c '
+curl -# -L https://www.jslint.com/jslint.js > jslint.mjs
+'
+    mv .build/shRunWithScreenshotTxt.svg .build/screenshot-install-download.svg
+    # screenshot install - cli-file
+    printf "console.log('hello world');\n" > hello.js
+    shRunWithScreenshotTxt sh -c '
+node jslint.mjs hello.js
+' || true
+    mv .build/shRunWithScreenshotTxt.svg .build/screenshot-install-cli-file.svg
+    # screenshot install - import
+    shRunWithScreenshotTxt node --input-type=module -e '
+/*jslint devel*/
+import jslint from "./jslint.mjs";
+let code = "console.log(\u0027hello world\u0027);\n";
+let result = jslint(code);
+result.warnings.forEach(function ({
+    formatted_message
+}) {
+    console.error(formatted_message);
+});
+' || true
+    mv .build/shRunWithScreenshotTxt.svg .build/screenshot-install-import.svg
+    # screenshot install - cli-dir
+    shRunWithScreenshotTxt sh -c '
+node jslint.mjs .
+' || true
+    mv .build/shRunWithScreenshotTxt.svg .build/screenshot-install-cli-dir.svg
     # screenshot files
     shRunWithScreenshotTxt shGitLsTree
     mv .build/shRunWithScreenshotTxt.svg .build/screenshot-files.svg
@@ -217,6 +246,8 @@ shCiBase() {(set -e
     mkdir -p .test-dir.js
     # coverage-hack - test jslint's ignore-file handling-behavior
     touch .test-min.js
+    # coverage-hack - test jslint's esm handling-behavior
+    touch .test.mjs
     # test jslint's cli handling-behavior
     ./jslint.js .
     (set -e

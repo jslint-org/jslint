@@ -4,7 +4,6 @@
 - app - deploy jslint as chrome-extension.
 - jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
-- jslint - add new warning if case-statements are not sorted.
 - jslint - add new warning if const/let/var statements are not declared at top of function-scope.
 - jslint - add new warning if const/let/var statements are not sorted.
 - jslint - remove directive "eval" (use line-specific ignore-directive "//jslint-quiet" instead).
@@ -24,6 +23,8 @@
 - bugfix - fix off-by-one-column bug in missing-semicolon-warning.
 - bugfix - fix try-catch-block complaining about "Unexpected await" inside async-function.
 - directive - re-introduce `/*jslint name*/` to ignore "Bad property name" warning.
+- doc - add install-screenshots.
+- jslint - add new warning if case-statements are not sorted.
 - jslint - add warning for unexpected ? in example `aa=/.{0}?/`.
 - jslint - add warning for unexpected-expr in example `async function aa(){await 0;}`.
 - jslint-refactor-1 - make "stateful" variables scoped outside of jslint() "stateless" by moving them into jslint().
