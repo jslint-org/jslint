@@ -1544,9 +1544,12 @@ function jslint_phase3_parse(state) {
 
 // This function will warn if <token_list> is unordered.
 
+        if (option_dict.unordered) {
+            return;
+        }
         token_list.reduce(function (aa, token) {
             const bb = artifact(token);
-            if (!option_dict.unordered && aa > bb) {
+            if (aa > bb) {
                 warn("expected_a_b_before_c_d", token, type, bb, type, aa);
             }
             return bb;
@@ -1557,6 +1560,9 @@ function jslint_phase3_parse(state) {
 
 // This function will warn if <case_list> is unordered.
 
+        if (option_dict.unordered) {
+            return;
+        }
         case_list.filter(identity).map(function (token) {
             switch (token.identifier || token.id) {
             case "(number)":
@@ -7061,10 +7067,15 @@ async function jslint_cli({
                 /\.\w+?$|$/m
             ).exec(file2)[0]) {
             case ".html":
+                break;
             case ".js":
+                break;
             case ".json":
+                break;
             case ".md":
+                break;
             case ".mjs":
+                break;
             case ".sh":
                 break;
             default:

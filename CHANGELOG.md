@@ -23,6 +23,7 @@
 - bugfix - fix off-by-one-column bug in missing-semicolon-warning.
 - bugfix - fix try-catch-block complaining about "Unexpected await" inside async-function.
 - directive - re-introduce `/*jslint name*/` to ignore "Bad property name" warning.
+- doc - add install-screenshots.
 - jslint - add new warning if case-statements are not sorted.
 - jslint - add warning for unexpected ? in example `aa=/.{0}?/`.
 - jslint - add warning for unexpected-expr in example `async function aa(){await 0;}`.

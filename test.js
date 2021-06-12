@@ -126,6 +126,19 @@ function noop() {
             "/*jslint name*/\nlet aa = aa._;",
             "/*jslint single*/\nlet aa = 'aa';",
             "/*jslint this*/\nlet aa = this;",
+            (
+                "/*jslint unordered*/\n"
+                + "function aa({bb, aa}) {\n"
+                + "    switch (aa) {\n"
+                + "    case 1:\n"
+                + "        break;\n"
+                + "    case 0:\n"
+                + "        break;\n"
+                + "    default:\n"
+                + "        return {bb, aa};\n"
+                + "    }\n"
+                + "}\n"
+            ),
             "/*jslint unordered*/\nlet {bb, aa} = 0;",
             "/*jslint white*/\n\t",
             "/*property aa bb*/"

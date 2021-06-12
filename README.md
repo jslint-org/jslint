@@ -1,7 +1,12 @@
+[<img align="left" height="100" src="image-jslint-256x256.png"/>](https://github.com/jslint-org/jslint)
+
+
 # JSLint, The JavaScript Code Quality Tool
 
-Douglas Crockford
-douglas@crockford.com
+&nbsp;
+
+Douglas Crockford <douglas@crockford.com>
+
 
 # Status
 | Branch | [master<br>(v2021.6.3)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
@@ -11,71 +16,72 @@ douglas@crockford.com
 | Demo | [<img src="image-window-maximize-regular.svg" height="30">](https://jslint-org.github.io/jslint/branch-master/index.html) | [<img src="image-window-maximize-regular.svg" height="30">](https://jslint-org.github.io/jslint/branch-beta/index.html) | [<img src="image-window-maximize-regular.svg" height="30">](https://jslint-org.github.io/jslint/branch-alpha/index.html) |
 | Artifacts | [<img src="image-folder-open-solid.svg" height="30">](https://github.com/jslint-org/jslint/tree/gh-pages/branch-master/.build) | [<img src="image-folder-open-solid.svg" height="30">](https://github.com/jslint-org/jslint/tree/gh-pages/branch-beta/.build) | [<img src="image-folder-open-solid.svg" height="30">](https://github.com/jslint-org/jslint/tree/gh-pages/branch-alpha/.build) |
 
+
 # Web Demo
 - https://www.jslint.com/
 
 [![screenshot](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-browser-_2fjslint_2fbranch-beta_2findex.html.png)](https://jslint-org.github.io/jslint/index.html)
 
+
 # Install
 ### 1. To install, just download and rename https://www.jslint.com/jslint.js to `jslint.mjs`:
 ```shell
 #!/bin/sh
-curl -L https://www.jslint.com/jslint.js > jslint.mjs
+
+curl -# -L https://www.jslint.com/jslint.js > jslint.mjs
 ```
+- shell output
+
+![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-download.svg)
 
 ### 2. To run `jslint.mjs` from command-line:
 ```shell
 #!/bin/sh
+
+printf "console.log('hello world');\n" > hello.js
+
 node jslint.mjs hello.js
-
-# stderr:
-#
-# jslint hello.js
-# 1 Undeclared 'console'. // line 1, column 1
-#     console.log('hello world');
-# 2 Use double quotes, not single quotes. // line 1, column 13
-#     console.log('hello world');
 ```
+- shell output
 
-### 3. To load `jslint.mjs` as es-module:
-```javascript
+![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-cli-file.svg)
+
+### 3. To import `jslint.mjs` as es-module:
+```shell
+#!/bin/sh
+
+node --input-type=module -e '
 /*jslint devel*/
 import jslint from "./jslint.mjs";
-let code = "console.log('hello world');\n";
+let code = "console.log(\u0027hello world\u0027);\n";
 let result = jslint(code);
 result.warnings.forEach(function ({
     formatted_message
 }) {
     console.error(formatted_message);
 });
-
-// stderr:
-//
-// 1 Undeclared 'console'. // line 1, column 1
-//     console.log('hello world');
-// 2 Use double quotes, not single quotes. // line 1, column 13
-//     console.log('hello world');
+'
 ```
+- shell output
+
+![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-import.svg)
 
 ### 4. To jslint entire directory:
 ```shell
 #!/bin/sh
-node jslint.mjs .
 
-# stderr:
-#
-# jslint - 25ms - ./CHANGELOG.md
-# jslint - 25ms - ./README.md
-# jslint - 25ms - ./browser.js
-# jslint - 25ms - ./function.html
-# jslint - 25ms - ./image-jslint.html
-# jslint - 25ms - ./index.html
-# jslint - 25ms - ./package.json
-# jslint - 25ms - ./test.js
-# jslint - 50ms - ./ci.sh
-# jslint - 50ms - ./help.html
-# jslint - 150ms - ./jslint.mjs
+node jslint.mjs .
 ```
+- shell output
+
+![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-cli-dir.svg)
+
+<!-- coverage-hack
+```javascript
+"use strict";
+```
+-->
+
 
 # Description
 - [jslint.js](jslint.js) contains the jslint function. It parses and analyzes a source file, returning an object with information about the file. It can also take an object that sets options.
@@ -104,8 +110,10 @@ readability, and frees you to express yourself in ways that matter. JSLint here
 plays the part of a stern but benevolent editor, helping you to get the style
 right so that you can focus your creative energy where it is most needed.
 
+
 # Files
 ![screenshot-files.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-files.svg)
+
 
 # Changelog
 - [Full CHANGELOG.md](CHANGELOG.md)
