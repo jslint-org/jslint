@@ -145,7 +145,7 @@ process.exit(
         https://jslint-org.github.io/jslint/branch-beta/index.html
     # screenshot install - download
     shRunWithScreenshotTxt sh -c '
-curl -# -L https://www.jslint.com/jslint.js > jslint.mjs
+curl -L https://www.jslint.com/jslint.js > jslint.mjs
 '
     mv .build/shRunWithScreenshotTxt.svg .build/screenshot-install-download.svg
     # screenshot install - cli-file

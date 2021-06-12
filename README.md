@@ -28,11 +28,8 @@ Douglas Crockford <douglas@crockford.com>
 ```shell
 #!/bin/sh
 
-curl -# -L https://www.jslint.com/jslint.js > jslint.mjs
+curl -L https://www.jslint.com/jslint.js > jslint.mjs
 ```
-- shell output
-
-![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-download.svg)
 
 ### 2. To run `jslint.mjs` from command-line:
 ```shell
