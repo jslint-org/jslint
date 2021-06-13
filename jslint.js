@@ -113,7 +113,7 @@
     writable
 */
 
-const edition = "v2021.6.4-beta";
+const edition = "v2021.6.12";
 
 const line_fudge = 1;   // Fudge starting line and starting column to 1.
 

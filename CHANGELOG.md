@@ -15,7 +15,7 @@
 - tests - update function warn_at() with assertion-check matching column with artifact.
 - website - replace current-editor with CodeMirror-editor and change programming-font-family from `Programma` to `Consolas, Menlo, monospace`.
 
-## v2021.6.4-beta
+## v2021.6.12
 - bugfix - fix await expression/statement inside catch-statement not registered by functionage.await.
 - bugfix - fix cli appending slash "/" to normalized filename.
 - bugfix - fix issue #316, #317 - jslint complains about dynamic-import.
