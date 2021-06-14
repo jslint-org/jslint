@@ -19,21 +19,22 @@
 <link
     rel="icon"
     type="image/png"
-    href="image-jslint-512.svg"
+    href="asset-image-jslint-512.svg"
 />
 <title>JSLint:&nbsp;The&nbsp;JavaScript&nbsp;Code Quality Tool</title>
+<link rel="stylesheet" href="asset-codemirror-5.58.3-rollup.css">
 <style>
 @font-face {
     font-display: swap;
     font-family: "Programma";
     font-weight: bold;
-    src: url("font-programma-bold.woff2") format("woff2");
+    src: url("asset-font-programma-bold.woff2") format("woff2");
 }
 @font-face {
     font-display: swap;
     font-family: "Daley";
     font-weight: bold;
-    src: url("font-daley-bold.woff2") format("woff2");
+    src: url("asset-font-daley-bold.woff2") format("woff2");
 }
 
 body {
@@ -140,38 +141,27 @@ a:link {
     width: 3em;
 }
 
-#JSLINT_ textarea {
-    border: 0;
-    background-color: white;
-    border: 0;
-    font-family: Programma, monospace;
-    font-size: 100%;
-    font-weight: bold;
-    resize: none;
+#JSLINT_ textarea,
+#JSLINT_ .CodeMirror pre.CodeMirror-line,
+#JSLINT_ .CodeMirror pre.CodeMirror-line-like {
+    font-family: consolas, menlo, monospace;
+    font-size: 12px;
 }
 
-#JSLINT_ textarea::selection {
-    background-color: yellow;
+#JSLINT_ textarea::selection,
+#JSLINT_ .CodeMirror-selected {
+    background-color: wheat;
     color: black;
 }
 
-#JSLINT_NUMBER {
-    color: darkgray;
-    display: inline-block;
-    height: 4in;
-    margin: 2%;
-    margin-right: 0;
-    overflow: hidden;
-    padding-right: 0.5%;
-    text-align: right;
-    white-space: pre;
-    width: 4%;
+#JSLINT_ .CodeMirror .cm-trailingspace {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAACCAYAAAB/qH1jAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QUXCToH00Y1UgAAACFJREFUCNdjPMDBUc/AwNDAAAFMTAwMDA0OP34wQgX/AQBYgwYEx4f9lQAAAABJRU5ErkJggg==");
+    background-position: bottom left;
+    background-repeat: repeat-x;
 }
 
 #JSLINT_SOURCE {
-    color: black;
     display: inline-block;
-    font-size: 100%;
     height: 4in;
     margin: 2%;
     margin-left: 0;
@@ -182,11 +172,12 @@ a:link {
     width: 91%;
 }
 
-#JSLINT_PROPERTY {
-    background-color: honeydew;
+#JSLINT_ textarea {
+    background-color: white;
     border: 0;
     margin: 2%;
     padding: 0.5%;
+    resize: none;
     white-space: pre;
     width: 95%;
 }
@@ -423,10 +414,11 @@ style="
     justify-content: center;
     left: 50%;
     margin: -50px 0 0 -100px;
-    opacity: 0.95;
+    opacity: 0.85;
     position: fixed;
     top: 40%;
     width: 200px;
+    z-index: 99;
 ">
 <div style="">
     linting
@@ -448,10 +440,6 @@ style="
 </div>
 <div id="JSLINT_">
   <fieldset><legend>Source</legend><textarea
-      id="JSLINT_NUMBER"
-      rows="18"
-      readonly
-  ></textarea><textarea
       id="JSLINT_SOURCE"
       rows="18"
       autofocus
@@ -460,7 +448,6 @@ style="
   ></textarea></fieldset>
   <div class="center">
       <button name=JSLint title="Ctrl + Enter">JSLint</button>
-      <button name=clear>clear</button>
       <button name=options id=JSLINT_CLEAR_OPTIONS>clear options</button>
   </div>
   <fieldset id=JSLINT_OPTIONS><legend>Options</legend>
@@ -475,22 +462,24 @@ style="
       <div><label><input title=convert type=checkbox>conversion operators</label></div>
       <div><label><input title=eval type=checkbox>eval</label></div>
       <div><label><input title=for type=checkbox>for statement</label></div>
+    </div>
+    <div>&nbsp;
       <div><label><input title=getset type=checkbox>get and set</label></div>
       <div><label><input title=long type=checkbox>long lines</label></div>
       <div><label><input title=name type=checkbox>bad property names</label></div>
       <div><label><input title=single type=checkbox>single quote strings</label></div>
+    </div>
+    <div>&nbsp;
       <div><label><input title=this type=checkbox>this</label></div>
-      <div><label><input title=unordered type=checkbox>unordered case/param/prop</label></div>
+      <div><label><input title=unordered type=checkbox>unordered stuff</label></div>
       <div><label><input title=white type=checkbox>whitespace mess</label></div>
     </div>
-    <div>Global variables...
-      <textarea
-        id=JSLINT_GLOBAL
-        title=global
-        spellcheck="false"
-        placeholder="imported globals here"
+    <textarea
+      id=JSLINT_GLOBAL
+      title=global
+      spellcheck="false"
+      placeholder="imported globals here"
     ></textarea>
-    </div>
   </fieldset>
   <fieldset id="JSLINT_WARNINGS">
     <legend>Warnings</legend>
@@ -505,5 +494,6 @@ style="
     <div id="JSLINT_REPORT_LIST"></div>
   </fieldset>
 </div>
+<script src="asset-codemirror-5.58.3-rollup.js"></script>
 <script src="browser.js" type="module"></script>
 </body></html>

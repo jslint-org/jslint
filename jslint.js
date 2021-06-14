@@ -88,6 +88,7 @@
 /*jslint node*/
 
 /*property
+    global_dict,
     execArgv, fileURLToPath, filter, meta, order, reduce, stringify, token, url,
     JSLINT_CLI, a, all, allowed_option, argv, arity, artifact, assign, async, b,
     bind, bitwise, block, body, browser, c, calls, catch, closer, closure, code,
@@ -184,7 +185,7 @@ function jslint_phase2_lex(state) {
         allowed_option,
         artifact,
         directive_list,
-        global_list,
+        global_dict,
         line_list,
         option_dict,
         stop,
@@ -689,7 +690,7 @@ function jslint_phase2_lex(state) {
                     if (value === "true" || value === undefined) {
                         option_dict[name] = true;
                         if (Array.isArray(allowed)) {
-                            populate(allowed, global_list, false);
+                            populate(allowed, global_dict, false);
                         }
                     } else {
                         assert_or_throw(
@@ -721,7 +722,7 @@ function jslint_phase2_lex(state) {
 
                     warn("bad_option_a", the_comment, name + ":" + value);
                 }
-                global_list[name] = false;
+                global_dict[name] = false;
                 state.mode_module = the_comment;
             }
         }
@@ -4439,7 +4440,7 @@ function jslint_phase4_walk(state) {
 
     const {
         artifact,
-        global_list,
+        global_dict,
         is_equal,
         is_weird,
         option_dict,
@@ -4656,7 +4657,7 @@ function jslint_phase4_walk(state) {
 // If so, add it to the global context.
 
                 if (the_variable === undefined) {
-                    if (global_list[thing.id] === undefined) {
+                    if (global_dict[thing.id] === undefined) {
 
 // cause: "aa"
 // cause: "class aa{}"
@@ -6196,11 +6197,13 @@ function jslint(
         unordered: true,
         white: true
     };
-    const directive_list = []; // The directive comments.
-    const export_dict = empty(); // The exported names and values.
-    const function_list = []; // The array containing all of the functions.
-    const import_list = []; // The array collecting all import-from strings.
-    const line_list = String( // The array containing source lines.
+    const directive_list = [];          // The directive comments.
+    const export_dict = empty();        // The exported names and values.
+    const function_list = [];   // The array containing all of the functions.
+    const global_dict = empty();        // The object containing the global
+                                        // declarations.
+    const import_list = [];     // The array collecting all import-from strings.
+    const line_list = String(   // The array containing source lines.
         "\n" + source
     ).split(
         // rx_crlf
@@ -6757,13 +6760,13 @@ function jslint(
 // full tokenization to precede parsing.
 
         option_dict = Object.assign(empty(), option_dict);
-        global_list = Object.assign(empty(), global_list);
-        populate(standard, global_list, false);
+        populate(global_list, global_dict, false);
+        populate(standard, global_dict, false);
         Object.keys(option_dict).forEach(function (name) {
             if (option_dict[name] === true) {
                 const allowed = allowed_option[name];
                 if (Array.isArray(allowed)) {
-                    populate(allowed, global_list, false);
+                    populate(allowed, global_dict, false);
                 }
             }
         });
@@ -6774,7 +6777,7 @@ function jslint(
             directive_list,
             export_dict,
             function_list,
-            global_list,
+            global_dict,
             import_list,
             is_equal,
             is_weird,
