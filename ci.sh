@@ -11,6 +11,7 @@
 # git ls-remote --heads origin
 # git update-index --chmod=+x aa.js
 # head CHANGELOG.md -n50
+# ln -f jslint.js ~/jslint.mjs
 # openssl rand -base64 32 # random key
 # sh ci.sh shCiBranchPromote origin alpha beta
 # sh ci.sh shRunWithScreenshotTxt head -n50 CHANGELOG.md
@@ -323,15 +324,17 @@ import moduleUrl from "url";
     Array.from(
         await moduleFs.promises.readdir(".")
     ).forEach(async function (file) {
+        var data;
         if (!(
             /.\.html$|.\.md$/m
         ).test(file)) {
             return;
         }
-        var data = await moduleFs.promises.readFile(file, "utf8");
+        data = await moduleFs.promises.readFile(file, "utf8");
         data.replace((
             /\bhttps?:\/\/.*?(?:[\s")\]]|$)/gm
         ), function (url) {
+            var req;
             url = url.slice(0, -1).replace((
                 /[\u0022\u0027]/g
             ), "").replace((
@@ -353,7 +356,7 @@ import moduleUrl from "url";
                 return "";
             }
             dict[url] = true;
-            var req = moduleHttps.request(moduleUrl.parse(
+            req = moduleHttps.request(moduleUrl.parse(
                 url
             ), function (res) {
                 console.error(
@@ -647,12 +650,13 @@ import moduleUrl from "url";
             return;
         }
         moduleFs.readFile(file, function (err, data) {
+            var contentType;
             if (err) {
                 res.statusCode = 404;
                 res.end();
                 return;
             }
-            var contentType = contentTypeDict[(
+            contentType = contentTypeDict[(
                 /^\/$|\.[^.]*?$|$/m
             ).exec(file)[0]];
             if (contentType) {
@@ -1412,6 +1416,11 @@ body {
         }, ii) {
             var coverageLevel;
             var coveragePct;
+            var fill;
+            var str1;
+            var str2;
+            var xx1;
+            var xx2;
             coveragePct = Math.floor(10000 * linesCovered / linesTotal || 0);
             coverageLevel = (
                 coveragePct >= 8000
@@ -1424,7 +1433,7 @@ body {
                 /..$/m
             ), ".$&");
             if (!lineList && ii === 0) {
-                var fill = (
+                fill = (
                     // red
                     "#" + Math.round(
                         (100 - Number(coveragePct)) * 2.21
@@ -1436,10 +1445,10 @@ body {
                     + // blue
                     "00"
                 );
-                var str1 = "coverage";
-                var str2 = coveragePct + " %";
-                var xx1 = 6 * str1.length + 20;
-                var xx2 = 6 * str2.length + 20;
+                str1 = "coverage";
+                str2 = coveragePct + " %";
+                xx1 = 6 * str1.length + 20;
+                xx2 = 6 * str2.length + 20;
                 // fs - write coverage-badge.svg
                 moduleFs.promises.writeFile((
                     DIR_COVERAGE + "/coverage-badge.svg"

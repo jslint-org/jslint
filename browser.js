@@ -7,12 +7,15 @@
 */
 
 /*property
-    CodeMirror,
+    CodeMirror, Tab,
+    extraKeys,
     fromTextArea,
-    getValue,
+    getOption, getValue,
     indentUnit, indentWithTabs,
+    jslint_result,
     lineNumbers, lineWrapping,
     matchBrackets, mode,
+    repeat, replaceSelection,
     setValue, showTrailingSpace,
     addEventListener, ctrlKey, key, querySelector, line_source, stack_trace,
     checked, closure, column, context, create, disable, display, edition,
@@ -37,11 +40,11 @@ const elem_property_fieldset = document.getElementById(
 );
 const elem_report_field = document.getElementById("JSLINT_REPORT");
 const elem_report_list = document.getElementById("JSLINT_REPORT_LIST");
+const elem_source = document.getElementById("JSLINT_SOURCE");
+const elem_warnings_list = document.getElementById("JSLINT_WARNINGS_LIST");
 const rx_amp = /&/g;
 const rx_gt = />/g;
 const rx_lt = /</g;
-const elem_source = document.getElementById("JSLINT_SOURCE");
-const elem_warnings_list = document.getElementById("JSLINT_WARNINGS_LIST");
 let editor;
 
 function entityify(string) {
@@ -106,6 +109,9 @@ function function_report(data) {
 //     <dt>DETAIL</dt><dd>NAMES</dd>
 // </dl>
 
+    let exports;
+    let froms;
+    let global;
     let mode = (
         data.module
         ? "module"
@@ -136,9 +142,9 @@ function function_report(data) {
     if (data.functions.length === 0) {
         output.push("<center>There are no functions.</center>");
     }
-    let global = Object.keys(data.global.context).sort();
-    let froms = data.froms.sort();
-    let exports = Object.keys(data.exports).sort();
+    global = Object.keys(data.global.context).sort();
+    froms = data.froms.sort();
+    exports = Object.keys(data.exports).sort();
     if (global.length + froms.length + exports.length > 0) {
         output.push("<dl class=level0>");
         detail(mode, global);
@@ -151,6 +157,7 @@ function function_report(data) {
         data.functions.forEach(function (the_function) {
             let context = the_function.context;
             let list = Object.keys(context);
+            let params;
             output.push(
                 "<dl class=level",
                 entityify(the_function.level),
@@ -162,14 +169,17 @@ function function_report(data) {
                     ? entityify(the_function.signature) + " =>"
                     : (
                         typeof the_function.name === "string"
-                        ? "<b>«" + entityify(the_function.name) + "»</b>"
+                        ? (
+                            "<b>\u00ab" + entityify(the_function.name)
+                            + "\u00bb</b>"
+                        )
                         : "<b>" + entityify(the_function.name.id) + "</b>"
                     )
                 ) + entityify(the_function.signature),
                 "</dfn>"
             );
             if (Array.isArray(the_function.parameters)) {
-                let params = [];
+                params = [];
                 the_function.parameters.forEach(function extract(name) {
                     if (name.id === "{" || name.id === "[") {
                         name.names.forEach(extract);
@@ -230,9 +240,9 @@ function property_directive(data) {
 
 // Produce the /*property*/ directive.
 
+    let length = 1111;
     let not_first = false;
     let output = ["/*property"];
-    let length = 1111;
     let properties = Object.keys(data.property);
 
     properties.sort().forEach(function (key) {
@@ -260,6 +270,9 @@ function clear_options() {
 }
 
 function call_jslint() {
+    let global_string;
+    let option;
+    let result;
 
 // Show ui-loader-animation.
 
@@ -267,7 +280,7 @@ function call_jslint() {
 
 // First build the option object.
 
-    let option = Object.create(null);
+    option = Object.create(null);
     elem_boxes.forEach(function (node) {
         if (node.checked) {
             option[node.title] = true;
@@ -276,8 +289,8 @@ function call_jslint() {
 
 // Call JSLint with the source text, the options, and the predefined globals.
 
-    let global_string = elem_global.value;
-    let result = jslint(
+    global_string = elem_global.value;
+    result = jslint(
         editor.getValue(),
         option,
         (
@@ -289,20 +302,18 @@ function call_jslint() {
         )
     );
 
+// Debug result.
+
+    globalThis.jslint_result = result;
+
 // Generate the reports.
-
-    let error_html = error_report(result);
-    let function_html = function_report(result);
-    let property_text = property_directive(result);
-
 // Display the reports.
 
-    elem_warnings_list.innerHTML = error_html;
-
-    elem_report_list.innerHTML = function_html;
+    elem_warnings_list.innerHTML = error_report(result);
+    elem_report_list.innerHTML = function_report(result);
     elem_report_field.style.display = "block";
     elem_source.select();
-    elem_property.value = property_text;
+    elem_property.value = property_directive(result);
     elem_property_fieldset.style.display = "block";
     elem_property.scrollTop = 0;
 
@@ -329,6 +340,11 @@ document.getElementById("JSLINT_CLEAR_OPTIONS").onclick = clear_options;
 editor = globalThis.CodeMirror.fromTextArea(document.querySelector(
     "#JSLINT_SOURCE"
 ), {
+    extraKeys: {
+        Tab: function (editor) {
+            editor.replaceSelection("    ");
+        }
+    },
     indentUnit: 4,
     indentWithTabs: false,
     lineNumbers: true,

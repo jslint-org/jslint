@@ -18,7 +18,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Web Demo
-- https://www.jslint.com/
+- https://www.jslint.com
 
 [![screenshot](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-browser-_2fjslint_2fbranch-beta_2findex.html.png)](https://jslint-org.github.io/jslint/index.html)
 
