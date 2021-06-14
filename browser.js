@@ -7,6 +7,13 @@
 */
 
 /*property
+    CodeMirror,
+    fromTextArea,
+    getValue,
+    indentUnit, indentWithTabs,
+    lineNumbers, lineWrapping,
+    matchBrackets, mode,
+    setValue, showTrailingSpace,
     addEventListener, ctrlKey, key, querySelector, line_source, stack_trace,
     checked, closure, column, context, create, disable, display, edition,
     exports, filter, focus, forEach, froms, functions, getElementById,
@@ -24,7 +31,6 @@ import jslint from "./jslint.js";
 
 const elem_boxes = document.querySelectorAll("[type=checkbox]");
 const elem_global = document.getElementById("JSLINT_GLOBAL");
-const elem_number = document.getElementById("JSLINT_NUMBER");
 const elem_property = document.getElementById("JSLINT_PROPERTY");
 const elem_property_fieldset = document.getElementById(
     "JSLINT_PROPERTYFIELDSET"
@@ -36,6 +42,7 @@ const rx_gt = />/g;
 const rx_lt = /</g;
 const elem_source = document.getElementById("JSLINT_SOURCE");
 const elem_warnings_list = document.getElementById("JSLINT_WARNINGS_LIST");
+let editor;
 
 function entityify(string) {
 
@@ -245,22 +252,11 @@ function property_directive(data) {
     return output.join("");
 }
 
-function show_numbers() {
-    elem_number.value = elem_source.value.split(
-        /\n|\r\n?/
-    ).map(function (
-        ignore,
-        index
-    ) {
-        return index + 1;
-    }).join("\n");
-}
-
 function clear_options() {
     elem_boxes.forEach(function (node) {
         node.checked = false;
     });
-    elem_global.innerHTML = "";
+    elem_global.value = "";
 }
 
 function call_jslint() {
@@ -282,7 +278,7 @@ function call_jslint() {
 
     let global_string = elem_global.value;
     let result = jslint(
-        elem_source.value,
+        editor.getValue(),
         option,
         (
             global_string === ""
@@ -317,26 +313,6 @@ function call_jslint() {
     }, 500);
 }
 
-function clear() {
-    elem_source.focus();
-    elem_source.value = "";
-    call_jslint();
-}
-
-elem_source.onchange = function (ignore) {
-    show_numbers();
-};
-
-elem_source.onscroll = function () {
-    let ss = elem_source.scrollTop;
-    elem_number.scrollTop = ss;
-    let sn = elem_number.scrollTop;
-    if (ss > sn) {
-        show_numbers();
-        elem_number.scrollTop = ss;
-    }
-};
-
 document.addEventListener("keydown", function (evt) {
     if (evt.ctrlKey && evt.key === "Enter") {
         call_jslint();
@@ -347,15 +323,23 @@ document.querySelectorAll("[name='JSLint']").forEach(function (node) {
     node.onclick = call_jslint;
 });
 
-document.querySelectorAll("[name='clear']").forEach(function (node) {
-    node.onclick = clear;
-});
-
 document.getElementById("JSLINT_CLEAR_OPTIONS").onclick = clear_options;
 
-elem_source.value = `#!/usr/bin/env node
+// init codemirror editor
+editor = globalThis.CodeMirror.fromTextArea(document.querySelector(
+    "#JSLINT_SOURCE"
+), {
+    indentUnit: 4,
+    indentWithTabs: false,
+    lineNumbers: true,
+    lineWrapping: true,
+    matchBrackets: true,
+    mode: "text/javascript",
+    showTrailingSpace: true
+});
+editor.setValue(`#!/usr/bin/env node
 /*jslint node*/
-import jslint from "./jslint.mjs";
+import jslint from \u0022./jslint.mjs\u0022;
 import https from "https";
 
 /*jslint-disable*/
@@ -385,6 +369,6 @@ eval( //jslint-quiet
     }) {
         console.error(formatted_message);
     });
-}());`;
-elem_source.onchange();
+}());
+`);
 call_jslint();

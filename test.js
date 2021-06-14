@@ -77,8 +77,92 @@ function noop() {
         node: true,
         single: true,
         this: true,
+        unordered: true,
         white: true
     }).warnings.length === 0);
+    [
+        [
+            "let aa = aa | 0;", {bitwise: true}, []
+        ], [
+            ";\naa(new XMLHttpRequest());", {browser: true}, ["aa"]
+        ], [
+            "let aa = \"aa\" + 0;", {convert: true}, []
+        ], [
+            "registerType();", {couch: true}, []
+        ], [
+            "", {debug: true}, []
+        ], [
+            "debugger;", {devel: true}, []
+        ], [
+            "new Function();\neval();", {eval: true}, []
+        ], [
+            (
+                "function aa(aa) {\n"
+                + "    for (aa = 0; aa < 0; aa += 1) {\n"
+                + "        aa();\n"
+                + "    }\n"
+                + "}\n"
+            ), {for: true}, []
+        ], [
+            "let aa = {get aa() {\n    return;\n}};", {getset: true}, []
+        ], [
+            "let aa = {set aa(aa) {\n    return aa;\n}};", {getset: true}, []
+        ], [
+            "/".repeat(100), {long: true}, []
+        ], [
+            "let aa = aa._;", {name: true}, []
+        ], [
+            "require();", {node: true}, []
+        ], [
+            "let aa = 'aa';", {single: true}, []
+        ], [
+            "let aa = this;", {this: true}, []
+        ], [
+            (
+                "function aa({bb, aa}) {\n"
+                + "    switch (aa) {\n"
+                + "    case 1:\n"
+                + "        break;\n"
+                + "    case 0:\n"
+                + "        break;\n"
+                + "    default:\n"
+                + "        return {bb, aa};\n"
+                + "    }\n"
+                + "}\n"
+            ), {unordered: true}, []
+        ], [
+            "let {bb, aa} = 0;", {unordered: true}, []
+        ], [
+            "\t", {white: true}, []
+        ]
+    ].forEach(function ([
+        source, option_dict, global_list
+    ]) {
+        assertOrThrow(
+            jslint(source, option_dict, global_list).warnings.length === 0,
+            JSON.stringify([
+                source, option_dict, global_list
+            ])
+        );
+        source = (
+            "/*jslint\n"
+            + JSON.stringify(option_dict).slice(1, -1).replace((
+                /"/g
+            ), "") + "\n"
+            + "*/\n"
+            + (
+                global_list.length === 0
+                ? ""
+                : (
+                    "/*global\n"
+                    + global_list.join(",") + "\n"
+                    + "*/\n"
+                )
+            )
+            + source
+        );
+        assertOrThrow(jslint(source).warnings.length === 0, source);
+    });
     assertOrThrow(jslint("", {
         test_internal_error: true
     }).warnings.length === 1);
@@ -116,31 +200,6 @@ function noop() {
         ],
         directive: [
             "#!\n/*jslint browser:false, node*/\n\"use strict\";",
-            "/*jslint bitwise*/\nlet aa = aa | 0;",
-            "/*jslint browser*/\n;",
-            "/*jslint debug*/\n",
-            "/*jslint devel*/\ndebugger;",
-            "/*jslint eval*/\nnew Function();\neval();",
-            "/*jslint getset*/\nlet aa = {get aa() {\n    return;\n}};",
-            "/*jslint getset*/\nlet aa = {set aa(aa) {\n    return aa;\n}};",
-            "/*jslint name*/\nlet aa = aa._;",
-            "/*jslint single*/\nlet aa = 'aa';",
-            "/*jslint this*/\nlet aa = this;",
-            (
-                "/*jslint unordered*/\n"
-                + "function aa({bb, aa}) {\n"
-                + "    switch (aa) {\n"
-                + "    case 1:\n"
-                + "        break;\n"
-                + "    case 0:\n"
-                + "        break;\n"
-                + "    default:\n"
-                + "        return {bb, aa};\n"
-                + "    }\n"
-                + "}\n"
-            ),
-            "/*jslint unordered*/\nlet {bb, aa} = 0;",
-            "/*jslint white*/\n\t",
             "/*property aa bb*/"
         ],
         fart: [

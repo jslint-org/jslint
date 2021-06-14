@@ -53,7 +53,7 @@ import moduleUrl from "url";
     }
     file = moduleUrl.parse(url).pathname;
     // remove prefix $PWD from file
-    if (String(file + "/").indexOf(process.cwd() + "/") === 0) {
+    if (String(file + "/").startsWith(process.cwd() + "/")) {
         file = file.replace(process.cwd(), "");
     }
     file = ".build/screenshot-browser-" + encodeURIComponent(file).replace((
@@ -121,7 +121,7 @@ process.exit(Number(
     # init .git/config
     git config --local user.email "github-actions@users.noreply.github.com"
     git config --local user.name "github-actions"
-    # screenshot image-jslint
+    # screenshot asset-image-jslint
     shImageJslintCreate &
     # screenshot live-web-demo
     shBrowserScreenshot \
@@ -163,6 +163,13 @@ node jslint.mjs .
     mv .build/shRunWithScreenshotTxt.svg .build/screenshot-changelog.svg
     # add dir .build
     git add -f .build
+    # invalidate website cache
+    sed -i \
+        -E "s/((href|src)=\"[^\"]*\.(css|js|mjs))\"/\1?aa=$(date +"%s")\"/g" \
+        index.html
+    sed -i \
+        -E "s/^(import .* from \".*\.(js|mjs))\";$/\1?aa=$(date +"%s")\";/g" \
+        browser.js
     git commit -am "add dir .build"
     # checkout branch-gh-pages
     git checkout -b gh-pages
@@ -336,7 +343,7 @@ import moduleUrl from "url";
             ), String(
                 process.env.GITHUB_REPOSITORY || "jslint-org/jslint"
             ).replace("/", ".github.io/"));
-            if (url.indexOf("http://") === 0) {
+            if (url.startsWith("http://")) {
                 throw new Error(
                     "shDirHttplinkValidate - insecure link " + url
                 );
@@ -368,8 +375,11 @@ import moduleUrl from "url";
         data.replace((
             /(\bhref=|\bsrc=|\burl\(|\[[^]*?\]\()("?.*?)(?:[")\]]|$)/gm
         ), function (ignore, linkType, url) {
-            if (linkType[0] !== "[") {
+            if (!linkType.startsWith("[")) {
                 url = url.slice(1);
+            }
+            if (url.startsWith("data:")) {
+                return;
             }
             // ignore duplicate-link
             if (dict.hasOwnProperty(url)) {
@@ -379,7 +389,7 @@ import moduleUrl from "url";
             if (!(
                 /^https?|^mailto:|^[#\/]/m
             ).test(url)) {
-                moduleFs.stat(url, function (ignore, exists) {
+                moduleFs.stat(url.split("?")[0], function (ignore, exists) {
                     console.error(
                         "shDirHttplinkValidate " + Boolean(exists) + " " + url
                     );
@@ -631,7 +641,7 @@ import moduleUrl from "url";
         // resolve file
         file = modulePath.resolve(file);
         // security - disable parent-directory lookup
-        if (file.indexOf(process.cwd() + modulePath.sep) !== 0) {
+        if (!file.startsWith(process.cwd() + modulePath.sep)) {
             res.statusCode = 404;
             res.end();
             return;
@@ -786,7 +796,7 @@ shImageJslintCreate() {(set -e
 <head>
 <title>logo</title>
 <style>
-/* sh ci.sh shBrowserScreenshot image-jslint.html --window-size=512x512 */
+/* sh ci.sh shBrowserScreenshot asset-image-jslint.html --window-size=512x512 */
 /* csslint box-model:false */
 /* csslint ignore:start */
 *,
@@ -797,7 +807,7 @@ shImageJslintCreate() {(set -e
 @font-face {
     font-family: Daley;
     font-weight: bold;
-    src: url("font-daley-bold.woff2") format("woff2");
+    src: url("asset-font-daley-bold.woff2") format("woff2");
 }
 /* csslint ignore:end */
 body,
@@ -832,16 +842,16 @@ div {
 <div class="text2">Lint</div>
 </div>
 </body>
-</html>\n' > .build/image-jslint-512.html
-    # screenshot image-jslint-512.png
-    shBrowserScreenshot .build/image-jslint-512.html \
+</html>\n' > .build/asset-image-jslint-512.html
+    # screenshot asset-image-jslint-512.png
+    shBrowserScreenshot .build/asset-image-jslint-512.html \
         "--window-size=512x512" \
-        "-screenshot=.build/image-jslint-512.png"
+        "-screenshot=.build/asset-image-jslint-512.png"
     # create various smaller thumbnails
     for SIZE in 32 64 128 256
     do
-        convert -resize "${SIZE}x${SIZE}" .build/image-jslint-512.png \
-            ".build/image-jslint-$SIZE.png"
+        convert -resize "${SIZE}x${SIZE}" .build/asset-image-jslint-512.png \
+            ".build/asset-image-jslint-$SIZE.png"
     done
     # convert to svg @ https://convertio.co/png-svg/
 )}
@@ -951,8 +961,8 @@ import modulePath from "path";
         /^\/\*jslint-disable\*\/\n\/\*\nshRawLibFetch\n(\{\n[\S\s]*?\n\})([\S\s]*?)\n\*\/\n/m
     ).exec(await moduleFs.promises.readFile(process.argv[1], "utf8"));
     // JSON.parse match1 with comment
-    fetchList = JSON.parse(matchObj)[1].fetchList;
-    replaceList = JSON.parse(matchObj)[1].replaceList || [];
+    fetchList = JSON.parse(matchObj[1]).fetchList;
+    replaceList = JSON.parse(matchObj[1]).replaceList || [];
     // init repoDict, fetchList
     repoDict = {};
     fetchList.forEach(function (elem) {
@@ -1624,7 +1634,7 @@ ${String(count).padStart(7, " ")}
         var linesTotal;
         var pathname;
         var src;
-        if (url.indexOf("file:///") !== 0) {
+        if (!url.startsWith("file:///")) {
             return;
         }
         pathname = url.replace((
@@ -1635,8 +1645,8 @@ ${String(count).padStart(7, " ")}
             /\\\\/g
         ), "/");
         if (
-            pathname.indexOf(cwd) !== 0
-            || pathname.indexOf(cwd + "[") === 0
+            !pathname.startsWith(cwd)
+            || pathname.startsWith(cwd + "[")
             || (
                 process.env.npm_config_mode_coverage !== "all"
                 && pathname.indexOf("/node_modules/") >= 0

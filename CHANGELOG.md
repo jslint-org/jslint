@@ -14,11 +14,13 @@
 - node - after node-v12 is deprecated, change `require("fs").promises` to `require("fs/promises")`.
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 - tests - update function warn_at() with assertion-check matching column with artifact.
-- website - replace current-editor with CodeMirror-editor and change programming-font-family from `Programma` to `Consolas, Menlo, monospace`.
 
 ## v2021.6.14-beta
+- bugfix - fix global_list being ignored by jslint.
 - ci - migrate ci-scripts from cjs to esm.
-- website - replace .png logo with .svg logo
+- website - invalidate url-cache with each deployment.
+- website - replace .png logo with .svg logo.
+- website - replace current-editor with CodeMirror-editor and change programming-font-family from `Programma` to `consolas, menlo, monospace`.
 
 ## v2021.6.12
 - bugfix - fix await expression/statement inside catch-statement not registered by functionage.await.
