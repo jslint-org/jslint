@@ -3,36 +3,44 @@
 # sh one-liner
 #
 # git branch -d -r origin/aa
+# git config --global diff.algorithm histogram
 # git fetch origin alpha beta master && git fetch upstream alpha beta master
+# git fetch origin alpha beta master --tags
 # git fetch upstream "refs/tags/*:refs/tags/*"
+# git ls-files --stage | sort
+# git ls-remote --heads origin
+# git update-index --chmod=+x aa.js
 # head CHANGELOG.md -n50
+# openssl rand -base64 32 # random key
 # sh ci.sh shCiBranchPromote origin alpha beta
 # sh ci.sh shRunWithScreenshotTxt head -n50 CHANGELOG.md
+# vim rgx-lowercase \L\1\e
 
 shBrowserScreenshot() {(set -e
 # this function will run headless-chrome to screenshot url $1 with
 # window-size $2
-    node -e '
+    node --input-type=module -e '
+import moduleChildProcess from "child_process";
+import modulePath from "path";
+import moduleUrl from "url";
 // init debugInline
-if (!globalThis.debugInline) {
-    let consoleError;
-    consoleError = console.error;
-    globalThis.debugInline = function (...argList) {
-    /*
-     * this function will both print <argList> to stderr
-     * and return <argList>[0]
-     */
+(function () {
+    var consoleError = console.error;
+    globalThis.debugInline = globalThis.debugInline || function (...argList) {
+
+// this function will both print <argList> to stderr and return <argList>[0]
+
         consoleError("\n\ndebugInline");
         consoleError(...argList);
         consoleError("\n");
         return argList[0];
     };
-}
+}());
 (function () {
     "use strict";
-    let file;
-    let timeStart;
-    let url;
+    var file;
+    var timeStart;
+    var url;
     if (process.platform !== "linux") {
         return;
     }
@@ -41,83 +49,56 @@ if (!globalThis.debugInline) {
     if (!(
         /^\w+?:/
     ).test(url)) {
-        url = require("path").resolve(url);
+        url = modulePath.resolve(url);
     }
-    file = require("url").parse(url).pathname;
+    file = moduleUrl.parse(url).pathname;
     // remove prefix $PWD from file
     if (String(file + "/").indexOf(process.cwd() + "/") === 0) {
         file = file.replace(process.cwd(), "");
     }
     file = ".build/screenshot-browser-" + encodeURIComponent(file).replace((
         /%/g
-    ), "_").toLowerCase();
-    process.on("exit", function (exitCode) {
-        if (typeof exitCode === "object" && exitCode) {
-            console.error(exitCode);
-            exitCode = 1;
-        }
-        console.error(
-            "shBrowserScreenshot"
-            + "\n  - url - " + url
-            + "\n  - wrote - " + file + ".html"
-            + "\n  - wrote - " + file + ".png"
-            + "\n  - timeElapsed - " + (Date.now() - timeStart) + " ms"
-            + "\n  - EXIT_CODE=" + exitCode
-        );
-    });
-    [
-        ".html", ".png"
-    ].forEach(function (extname) {
-        let argList;
-        let child;
-        argList = Array.from([
+    ), "_").toLowerCase() + ".png";
+    moduleChildProcess.spawn(
+        (
+            process.platform === "darwin"
+            ? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+            : process.platform === "win32"
+            ? "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+            : "/usr/bin/google-chrome-stable"
+        ),
+        [
             "--headless",
             "--ignore-certificate-errors",
             "--incognito",
+            "--screenshot",
             "--timeout=30000",
             "--user-data-dir=/dev/null",
-            "--window-size=" + (process.argv[2] || "800x600"),
-            (
-                extname === ".html"
-                ? "--dump-dom"
-                : ""
-            ),
-            (
-                extname === ".png"
-                ? "--screenshot"
-                : ""
-            ),
-            (
-                extname === ".png"
-                ? "-screenshot=" + file + ".png"
-                : ""
-            ),
+            "--window-size=800x600",
+            "-screenshot=" + file,
             (
                 (process.getuid && process.getuid() === 0)
                 ? "--no-sandbox"
                 : ""
             ),
             url
-        ]).filter(function (elem) {
+        ].concat(process.argv.filter(function (elem) {
+            return elem.startsWith("-");
+        })).filter(function (elem) {
             return elem;
-        });
-        // debug argList
-        // console.error(argList);
-        child = require("child_process").spawn((
-            process.platform === "darwin"
-            ? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-            : process.platform === "win32"
-            ? "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
-            : "/usr/bin/google-chrome-stable"
-        ), argList, {
+        }),
+        {
             stdio: [
-                "ignore", "pipe", 2
+                "ignore", 1, 2
             ]
-        });
-        child.stdout.pipe(
-            extname === ".html"
-            ? require("fs").createWriteStream(file + ".html")
-            : process.stdout
+        }
+    ).on("exit", function (exitCode) {
+        console.error(
+            "shBrowserScreenshot"
+            + "\n  - url - " + url
+            + "\n  - wrote - " + file
+            + "\n  - timeElapsed - " + (Date.now() - timeStart) + " ms"
+            + "\n  - EXIT_CODE=" + exitCode
         );
     });
 }());
@@ -127,12 +108,12 @@ if (!globalThis.debugInline) {
 shCiArtifactUpload() {(set -e
 # this function will upload build-artifacts to branch-gh-pages
     local BRANCH
-    export NODE_OPTIONS="--unhandled-rejections=strict"
-    node -e '
-process.exit(
+    local SIZE
+    node --input-type=module -e '
+process.exit(Number(
     `${process.version.split(".")[0]}.${process.arch}.${process.platform}` !==
     process.env.CI_NODE_VERSION_ARCH_PLATFORM
-);
+));
 ' || return 0
     # init $BRANCH
     BRANCH="$(git rev-parse --abbrev-ref HEAD)"
@@ -140,6 +121,8 @@ process.exit(
     # init .git/config
     git config --local user.email "github-actions@users.noreply.github.com"
     git config --local user.name "github-actions"
+    # screenshot image-jslint
+    shImageJslintCreate &
     # screenshot live-web-demo
     shBrowserScreenshot \
         https://jslint-org.github.io/jslint/branch-beta/index.html
@@ -158,8 +141,8 @@ node jslint.mjs hello.js
     shRunWithScreenshotTxt node --input-type=module -e '
 /*jslint devel*/
 import jslint from "./jslint.mjs";
-let code = "console.log(\u0027hello world\u0027);\n";
-let result = jslint(code);
+var code = "console.log(\u0027hello world\u0027);\n";
+var result = jslint(code);
 result.warnings.forEach(function ({
     formatted_message
 }) {
@@ -240,7 +223,6 @@ node jslint.mjs .
 
 shCiBase() {(set -e
 # this function will run base-ci
-    export NODE_OPTIONS="--unhandled-rejections=strict"
     # run test with coverage-report
     # coverage-hack - test jslint's invalid-file handling-behavior
     mkdir -p .test-dir.js
@@ -256,19 +238,20 @@ shCiBase() {(set -e
         shRunWithCoverage node test.js .
     )
     # update version from CHANGELOG.md
-    node -e '
+    node --input-type=module -e '
+import moduleFs from "fs";
 (async function () {
     "use strict";
-    let dict;
-    let versionBeta;
-    let versionMaster;
+    var dict;
+    var versionBeta;
+    var versionMaster;
     dict = {};
     await Promise.all([
         "CHANGELOG.md",
         "README.md",
         "jslint.js"
     ].map(async function (file) {
-        dict[file] = await require("fs").promises.readFile(file, "utf8");
+        dict[file] = await moduleFs.promises.readFile(file, "utf8");
     }));
     Array.from(dict["CHANGELOG.md"].matchAll(
         /\n##\u0020(v\d\d\d\d\.\d\d?\.\d\d?(.*?)?)\n/g
@@ -299,7 +282,7 @@ shCiBase() {(set -e
     }) {
         if (src !== src0) {
             console.error(`update file ${file}`);
-            require("fs").promises.writeFile(file, src);
+            moduleFs.promises.writeFile(file, src);
         }
     });
 }());
@@ -323,19 +306,22 @@ shCiBranchPromote() {(set -e
 
 shDirHttplinkValidate() {(set -e
 # this function will validate http-links embedded in .html and .md files
-    node -e '
+    node --input-type=module -e '
+import moduleFs from "fs";
+import moduleHttps from "https";
+import moduleUrl from "url";
 (async function () {
     "use strict";
-    let dict = {};
+    var dict = {};
     Array.from(
-        await require("fs").promises.readdir(".")
+        await moduleFs.promises.readdir(".")
     ).forEach(async function (file) {
         if (!(
             /.\.html$|.\.md$/m
         ).test(file)) {
             return;
         }
-        let data = await require("fs").promises.readFile(file, "utf8");
+        var data = await moduleFs.promises.readFile(file, "utf8");
         data.replace((
             /\bhttps?:\/\/.*?(?:[\s")\]]|$)/gm
         ), function (url) {
@@ -360,7 +346,7 @@ shDirHttplinkValidate() {(set -e
                 return "";
             }
             dict[url] = true;
-            let req = require("https").request(require("url").parse(
+            var req = moduleHttps.request(moduleUrl.parse(
                 url
             ), function (res) {
                 console.error(
@@ -393,7 +379,7 @@ shDirHttplinkValidate() {(set -e
             if (!(
                 /^https?|^mailto:|^[#\/]/m
             ).test(url)) {
-                require("fs").stat(url, function (ignore, exists) {
+                moduleFs.stat(url, function (ignore, exists) {
                     console.error(
                         "shDirHttplinkValidate " + Boolean(exists) + " " + url
                     );
@@ -439,14 +425,15 @@ shGitLsTree() {(set -e
 # example use:
 # shGitLsTree | sort -rk3 # sort by date
 # shGitLsTree | sort -rk4 # sort by size
-    node -e '
+    node --input-type=module -e '
+import moduleChildProcess from "child_process";
 (async function () {
     "use strict";
-    let result;
+    var result;
     // get file, mode, size
     result = await new Promise(function (resolve) {
         result = "";
-        require("child_process").spawn("git", [
+        moduleChildProcess.spawn("git", [
             "ls-tree", "-lr", "HEAD"
         ], {
             encoding: "utf8",
@@ -482,7 +469,7 @@ shGitLsTree() {(set -e
     // get date
     result.forEach(function (elem) {
         result[0].size += elem.size;
-        require("child_process").spawn("git", [
+        moduleChildProcess.spawn("git", [
             "log", "--max-count=1", "--format=%at", elem.file
         ], {
             stdio: [
@@ -495,8 +482,8 @@ shGitLsTree() {(set -e
         });
     });
     process.on("exit", function () {
-        let iiPad;
-        let sizePad;
+        var iiPad;
+        var sizePad;
         iiPad = String(result.length).length + 1;
         sizePad = String(Math.ceil(result[0].size / 1024)).length;
         process.stdout.write(result.map(function (elem, ii) {
@@ -516,6 +503,684 @@ shGitLsTree() {(set -e
 ' # "'
 )}
 
+shHttpFileServer() {(set -e
+# this function will run simple node http-file-server on port $PORT
+    if [ ! "$npm_config_mode_auto_restart" ]
+    then
+        local EXIT_CODE
+        EXIT_CODE=0
+        export npm_config_mode_auto_restart=1
+        while true
+        do
+            printf "\n"
+            git diff --color 2>/dev/null | cat || true
+            printf "\nshHttpFileServer - (re)starting $*\n"
+            (shHttpFileServer "$@") || EXIT_CODE="$?"
+            printf "process exited with code $EXIT_CODE\n"
+            # if $EXIT_CODE != 77, then exit process
+            # http://en.wikipedia.org/wiki/Unix_signal
+            if [ "$EXIT_CODE" != 77 ]
+            then
+                break
+            fi
+            # else restart process after 1 second
+            sleep 1
+        done
+        return
+    fi
+    node --input-type=module -e '
+import moduleChildProcess from "child_process";
+import moduleFs from "fs";
+import moduleHttp from "http";
+import modulePath from "path";
+import moduleRepl from "repl";
+import moduleUrl from "url";
+// init debugInline
+(function () {
+    var consoleError = console.error;
+    globalThis.debugInline = globalThis.debugInline || function (...argList) {
+
+// this function will both print <argList> to stderr and return <argList>[0]
+
+        consoleError("\n\ndebugInline");
+        consoleError(...argList);
+        consoleError("\n");
+        return argList[0];
+    };
+}());
+(function jslintDir() {
+/*
+ * this function will jslint current-directory
+ */
+    "use strict";
+    moduleFs.stat((
+        process.env.HOME + "/jslint.mjs"
+    ), function (ignore, exists) {
+        if (exists) {
+            moduleChildProcess.spawn("node", [
+                process.env.HOME + "/jslint.mjs", "."
+            ], {
+                stdio: [
+                    "ignore", 1, 2
+                ]
+            });
+        }
+    });
+}());
+(async function httpFileServer() {
+/*
+ * this function will start http-file-server
+ */
+    "use strict";
+    var contentTypeDict = {
+        ".bmp": "image/bmp",
+        ".css": "text/css; charset=utf-8",
+        ".gif": "image/gif",
+        ".htm": "text/html; charset=utf-8",
+        ".html": "text/html; charset=utf-8",
+        ".jpe": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".jpg": "image/jpeg",
+        ".js": "application/javascript; charset=utf-8",
+        ".json": "application/json; charset=utf-8",
+        ".md": "text/markdown; charset=utf-8",
+        ".mjs": "application/javascript; charset=utf-8",
+        ".pdf": "application/pdf",
+        ".png": "image/png",
+        ".svg": "image/svg+xml; charset=utf-8",
+        ".txt": "text/plain; charset=utf-8",
+        ".wasm": "application/wasm",
+        ".xml": "application/xml; charset=utf-8",
+        "/": "text/html; charset=utf-8"
+    };
+    if (process.argv[1]) {
+        await import("file://" + modulePath.resolve(process.argv[1]));
+    }
+    process.env.PORT = process.env.PORT || "8080";
+    console.error("http-file-server listening on port " + process.env.PORT);
+    moduleHttp.createServer(function (req, res) {
+        var file;
+        var pathname;
+        var timeStart;
+        // init timeStart
+        timeStart = Date.now();
+        // init pathname
+        pathname = moduleUrl.parse(req.url).pathname;
+        // debug - serverLog
+        res.on("close", function () {
+            if (pathname === "/favicon.ico") {
+                return;
+            }
+            console.error(
+                "serverLog - " +
+                new Date(timeStart).toISOString() + " - " +
+                (Date.now() - timeStart) + "ms - " +
+                (res.statusCode || 0) + " " + req.method + " " + pathname
+            );
+        });
+        // debug - echo request
+        if (pathname === "/echo") {
+            res.write(JSON.stringify(req.headers, undefined, 4) + "\n");
+            req.pipe(res);
+            return;
+        }
+        // replace trailing "/" with "/index.html"
+        file = pathname.slice(1).replace((
+            /\/$/
+        ), "/index.html");
+        // resolve file
+        file = modulePath.resolve(file);
+        // security - disable parent-directory lookup
+        if (file.indexOf(process.cwd() + modulePath.sep) !== 0) {
+            res.statusCode = 404;
+            res.end();
+            return;
+        }
+        moduleFs.readFile(file, function (err, data) {
+            if (err) {
+                res.statusCode = 404;
+                res.end();
+                return;
+            }
+            var contentType = contentTypeDict[(
+                /^\/$|\.[^.]*?$|$/m
+            ).exec(file)[0]];
+            if (contentType) {
+                res.setHeader("content-type", contentType);
+            }
+            res.end(data);
+        });
+    }).listen(process.env.PORT);
+}());
+(function replStart() {
+/*
+ * this function will start repl-debugger
+ */
+    "use strict";
+    var that;
+    // start repl
+    that = moduleRepl.start({
+        useGlobal: true
+    });
+    // init history
+    that.setupHistory(modulePath.resolve(
+        process.env.HOME + "/.node_repl_history"
+    ), function () {
+        return;
+    });
+    // save eval-function
+    that.evalDefault = that.eval;
+    // hook custom-eval-function
+    that.eval = function (script, context, file, onError) {
+        script.replace((
+            /^(\S+)\u0020(.*?)\n/
+        ), function (ignore, match1, match2) {
+            switch (match1) {
+            // syntax-sugar - run shell-cmd
+            case "$":
+                switch (match2.split(" ").slice(0, 2).join(" ")) {
+                // syntax-sugar - run git diff
+                case "git diff":
+                    match2 += " --color";
+                    break;
+                // syntax-sugar - run git log
+                case "git log":
+                    match2 += " -n 10";
+                    break;
+                // syntax-sugar - run ll
+                case "ll":
+                    match2 = "ls -Fal";
+                    break;
+                }
+                match2 = match2.replace((
+                    /^git\u0020/
+                ), "git --no-pager ");
+                // run shell-cmd
+                console.error("$ " + match2);
+                moduleChildProcess.spawn(match2, {
+                    shell: true,
+                    stdio: [
+                        "ignore", 1, 2
+                    ]
+                // print exitCode
+                }).on("exit", function (exitCode) {
+                    console.error("$ EXIT_CODE=" + exitCode);
+                    that.evalDefault("\n", context, file, onError);
+                });
+                script = "\n";
+                break;
+            // syntax-sugar - map text with charCodeAt
+            case "charCode":
+                console.error(
+                    match2.split("").map(function (chr) {
+                        return (
+                            "\\u" +
+                            chr.charCodeAt(0).toString(16).padStart(4, 0)
+                        );
+                    }).join("")
+                );
+                script = "\n";
+                break;
+            // syntax-sugar - sort chr
+            case "charSort":
+                console.error(JSON.stringify(match2.split("").sort().join("")));
+                script = "\n";
+                break;
+            // syntax-sugar - list obj-keys, sorted by item-type
+            // console.error(Object.keys(global).map(function(key){return(typeof global[key]===\u0027object\u0027&&global[key]&&global[key]===global[key]?\u0027global\u0027:typeof global[key])+\u0027 \u0027+key;}).sort().join(\u0027\n\u0027)) //jslint-quiet
+            case "keys":
+                script = (
+                    "console.error(Object.keys(" + match2 +
+                    ").map(function(key){return(" +
+                    "typeof " + match2 + "[key]===\u0027object\u0027&&" +
+                    match2 + "[key]&&" +
+                    match2 + "[key]===global[key]" +
+                    "?\u0027global\u0027" +
+                    ":typeof " + match2 + "[key]" +
+                    ")+\u0027 \u0027+key;" +
+                    "}).sort().join(\u0027\\n\u0027))\n"
+                );
+                break;
+            // syntax-sugar - print String(val)
+            case "print":
+                script = "console.error(String(" + match2 + "))\n";
+                break;
+            }
+        });
+        // eval script
+        that.evalDefault(script, context, file, onError);
+    };
+}());
+(function watchDir() {
+/*
+ * this function will watch current-directory for changes
+ */
+    "use strict";
+    moduleFs.readdir(".", function (ignore, fileList) {
+        fileList.forEach(function (file) {
+            if (file[0] === ".") {
+                return;
+            }
+            moduleFs.stat(file, function (ignore, stats) {
+                if (!(stats && stats.isFile())) {
+                    return;
+                }
+                moduleFs.watchFile(file, {
+                    interval: 1000,
+                    persistent: false
+                }, function () {
+                    console.error("watchFile - modified - " + file);
+                    setTimeout(process.exit.bind(undefined, 77), 1000);
+                });
+            });
+        });
+    });
+}());
+' "$@" # '
+)}
+
+shImageJslintCreate() {(set -e
+# this function will create .png logo of jslint
+    printf '<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>logo</title>
+<style>
+/* sh ci.sh shBrowserScreenshot image-jslint.html --window-size=512x512 */
+/* csslint box-model:false */
+/* csslint ignore:start */
+*,
+*:after,
+*:before {
+    box-sizing: border-box;
+}
+@font-face {
+    font-family: Daley;
+    font-weight: bold;
+    src: url("font-daley-bold.woff2") format("woff2");
+}
+/* csslint ignore:end */
+body,
+div {
+    margin: 0;
+}
+.container1 {
+    background: antiquewhite;
+    border: 16px solid darkslategray;
+    border-radius: 96px;
+    color: darkslategray;
+    font-family: Daley;
+    height: 512px;
+    margin: 0;
+    width: 512px;
+    zoom: 100%%;
+}
+.text1 {
+    font-size: 256px;
+    margin-left: 40px;
+    margin-top: 24px;
+}
+.text2 {
+    font-size: 192px;
+    margin-left: 56px;
+}
+</style>
+</head>
+<body>
+<div class="container1">
+<div class="text1">JS</div>
+<div class="text2">Lint</div>
+</div>
+</body>
+</html>\n' > .build/image-jslint-512.html
+    # screenshot image-jslint-512.png
+    shBrowserScreenshot .build/image-jslint-512.html \
+        "--window-size=512x512" \
+        "-screenshot=.build/image-jslint-512.png"
+    # create various smaller thumbnails
+    for SIZE in 32 64 128 256
+    do
+        convert -resize "${SIZE}x${SIZE}" .build/image-jslint-512.png \
+            ".build/image-jslint-$SIZE.png"
+    done
+    # convert to svg @ https://convertio.co/png-svg/
+)}
+
+shJsonNormalize() {(set -e
+# this function will
+# 1. read json-data from file $1
+# 2. normalize json-data
+# 3. write normalized json-data back to file $1
+    node --input-type=module -e '
+import moduleFs from "fs";
+(async function () {
+    "use strict";
+    function objectDeepCopyWithKeysSorted(obj) {
+
+// this function will recursively deep-copy <obj> with keys sorted
+
+        var sorted;
+        if (typeof obj !== "object" || !obj) {
+            return obj;
+        }
+
+// recursively deep-copy list with child-keys sorted
+
+        if (Array.isArray(obj)) {
+            return obj.map(objectDeepCopyWithKeysSorted);
+        }
+
+// recursively deep-copy obj with keys sorted
+
+        sorted = {};
+        Object.keys(obj).sort().forEach(function (key) {
+            sorted[key] = objectDeepCopyWithKeysSorted(obj[key]);
+        });
+        return sorted;
+    }
+    function identity(val) {
+
+// This function will return <val>.
+
+        return val;
+    }
+    console.error("shJsonNormalize - " + process.argv[1]);
+    moduleFs.promises.writeFile(
+        process.argv[1],
+        JSON.stringify(
+            objectDeepCopyWithKeysSorted(
+                JSON.parse(
+                    identity(
+                        await moduleFs.promises.readFile(
+                            process.argv[1],
+                            "utf8"
+                        )
+                    ).replace((
+                        /^\ufeff/
+                    ), "")
+                )
+            ),
+            undefined,
+            4
+        ) + "\n"
+    );
+}());
+' "$1" # '
+)}
+
+shRawLibFetch() {(set -e
+# this function will fetch raw-lib from $1
+    node --input-type=module -e '
+import moduleChildProcess from "child_process";
+import moduleFs from "fs";
+import moduleHttps from "https";
+import modulePath from "path";
+// init debugInline
+(function () {
+    var consoleError = console.error;
+    globalThis.debugInline = globalThis.debugInline || function (...argList) {
+
+// this function will both print <argList> to stderr and return <argList>[0]
+
+        consoleError("\n\ndebugInline");
+        consoleError(...argList);
+        consoleError("\n");
+        return argList[0];
+    };
+}());
+(async function () {
+    "use strict";
+    var fetchList;
+    var matchObj;
+    var replaceList;
+    var repoDict;
+    function pipeToBuffer(res, dict, key) {
+    /*
+     * this function will concat data from <res> to <dict>[<key>]
+     */
+        var data;
+        data = [];
+        res.on("data", function (chunk) {
+            data.push(chunk);
+        }).on("end", function () {
+            dict[key] = Buffer.concat(data);
+        });
+    }
+    // init matchObj
+    matchObj = (
+        /^\/\*jslint-disable\*\/\n\/\*\nshRawLibFetch\n(\{\n[\S\s]*?\n\})([\S\s]*?)\n\*\/\n/m
+    ).exec(await moduleFs.promises.readFile(process.argv[1], "utf8"));
+    // JSON.parse match1 with comment
+    fetchList = JSON.parse(matchObj)[1].fetchList;
+    replaceList = JSON.parse(matchObj)[1].replaceList || [];
+    // init repoDict, fetchList
+    repoDict = {};
+    fetchList.forEach(function (elem) {
+        if (!elem.url) {
+            return;
+        }
+        elem.prefix = elem.url.split("/").slice(0, 7).join("/");
+        // fetch dateCommitted
+        if (!repoDict.hasOwnProperty(elem.prefix)) {
+            repoDict[elem.prefix] = true;
+            moduleHttps.request(elem.prefix.replace(
+                "/blob/",
+                "/commits/"
+            ), function (res) {
+                pipeToBuffer(res, elem, "dateCommitted");
+            }).end();
+        }
+        // fetch file
+        if (elem.node) {
+            pipeToBuffer(moduleChildProcess.spawn("node", [
+                "-e", elem.node
+            ], {
+                stdio: [
+                    "ignore", "pipe", 2
+                ]
+            }).stdout, elem, "data");
+            return;
+        }
+        if (elem.sh) {
+            pipeToBuffer(moduleChildProcess.spawn(elem.sh, {
+                shell: true,
+                stdio: [
+                    "ignore", "pipe", 2
+                ]
+            }).stdout, elem, "data");
+            return;
+        }
+        moduleHttps.get(elem.url2 || elem.url.replace(
+            "https://github.com/",
+            "https://raw.githubusercontent.com/"
+        ).replace("/blob/", "/"), function (res) {
+            // http-redirect
+            if (res.statusCode === 302) {
+                moduleHttps.get(res.headers.location, function (res) {
+                    pipeToBuffer(res, elem, "data");
+                });
+                return;
+            }
+            pipeToBuffer(res, elem, "data");
+        });
+    });
+    // parse fetched data
+    process.on("exit", function () {
+        var header;
+        var result0;
+        var result;
+        result = "";
+        fetchList.forEach(function (elem, ii, list) {
+            var prefix;
+            if (!elem.url) {
+                return;
+            }
+            // init prefix
+            prefix = "exports_" + modulePath.dirname(elem.url).replace(
+                "https://github.com/",
+                ""
+            ).replace((
+                /\/blob\/[^\/]*/
+            ), "/").replace((
+                /\W/g
+            ), "_").replace((
+                /(_)_+|_+$/g
+            ), "$1");
+            list[ii].exports = prefix + "_" + modulePath.basename(
+                elem.url
+            ).replace((
+                /\.js$/
+            ), "").replace((
+                /\W/g
+            ), "_");
+            if (elem.dataUriType) {
+                return;
+            }
+            if (elem.dateCommitted) {
+                result += (
+                    "\n\n\n/*\n" +
+                    "repo " + elem.prefix.replace("/blob/", "/tree/") + "\n" +
+                    "committed " + (
+                        /\b\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ\b/
+                    ).exec(elem.dateCommitted.toString())[0] + "\n" +
+                    "*/"
+                );
+            }
+            // mangle module.exports
+            result += (
+                "\n\n\n/*\nfile " + elem.url + "\n*/\n" +
+                elem.data.toString().trim()
+            );
+        });
+        result = (
+            "\n" + result.trim() +
+            "\n\n\n/*\nfile none\n*/\n/*jslint-enable*/\n"
+        );
+        // comment #!
+        result = result.replace((
+            /^#!/gm
+        ), "// $&");
+        // normalize newline
+        result = result.replace((
+            /\r\n|\r/g
+        ), "\n");
+        // remove trailing-whitespace
+        result = result.replace((
+            /[\t\u0020]+$/gm
+        ), "");
+        // remove leading-newline before ket
+        result = result.replace((
+            /\n+?(\n\u0020*?\})/g
+        ), "$1");
+        // eslint - no-multiple-empty-lines
+        // https://github.com/eslint/eslint/blob/v7.2.0/docs/rules/no-multiple-empty-lines.md //jslint-quiet
+        result = result.replace((
+            /\n{4,}/g
+        ), "\n\n\n");
+        // replace from replaceList
+        replaceList.forEach(function ({
+            aa,
+            bb,
+            flags
+        }) {
+            result0 = result;
+            result = result.replace(new RegExp(aa, flags), bb);
+            if (result0 === result) {
+                throw new Error(
+                    "shRawLibFetch - cannot find-and-replace snippet " +
+                    JSON.stringify(aa)
+                );
+            }
+        });
+        // init header
+        header = (
+            matchObj.input.slice(0, matchObj.index) +
+            "/*jslint-disable*/\n/*\nshRawLibFetch\n" +
+            JSON.stringify(JSON.parse(matchObj[1]), undefined, 4) + "\n" +
+            matchObj[2].split("\n\n").filter(function (elem) {
+                return elem.trim();
+            }).map(function (elem) {
+                return elem.trim().replace((
+                    /\*\//g
+                ), "*\\\\/").replace((
+                    /\/\*/g
+                ), "/\\\\*") + "\n";
+            }).sort().join("\n") + "*/\n\n"
+        );
+        // replace from header-diff
+        header.replace((
+            /((?:^-.*?\n)+?)((?:^\+.*?\n)+)/gm
+        ), function (ignore, aa, bb) {
+            aa = "\n" + aa.replace((
+                /^-/gm
+            ), "").replace((
+                /\*\\\\\//g
+            ), "*/").replace((
+                /\/\\\\\*/g
+            ), "/*");
+            bb = "\n" + bb.replace((
+                /^\+/gm
+            ), "").replace((
+                /\*\\\\\//g
+            ), "*/").replace((
+                /\/\\\\\*/g
+            ), "/*");
+            result0 = result;
+            // disable $-escape in replacement-string
+            result = result.replace(aa, function () {
+                return bb;
+            });
+            if (result0 === result) {
+                throw new Error(
+                    "shRawLibFetch - cannot find-and-replace snippet " +
+                    JSON.stringify(aa)
+                );
+            }
+            return "";
+        });
+        // inline dataUri
+        fetchList.forEach(function ({
+            data,
+            dataUriType,
+            exports
+        }) {
+            if (!dataUriType) {
+                return;
+            }
+            data = (
+                "data:" + dataUriType + ";base64," +
+                data.toString("base64")
+            );
+            result0 = result;
+            result = result.replace(
+                new RegExp("^" + exports + "$", "gm"),
+                // disable $-escape in replacement-string
+                function () {
+                    return data;
+                }
+            );
+            if (result0 === result) {
+                throw new Error(
+                    "shRawLibFetch - cannot find-and-replace snippet " +
+                    JSON.stringify(exports)
+                );
+            }
+        });
+        // init footer
+        result = header + result;
+        matchObj.input.replace((
+            /\n\/\*\nfile\u0020none\n\*\/\n\/\*jslint-enable\*\/\n([\S\s]+)/
+        ), function (ignore, match1) {
+            result += "\n\n" + match1.trim() + "\n";
+        });
+        // write to file
+        moduleFs.writeFileSync(process.argv[1], result); //jslint-quiet
+    });
+}());
+' "$@" # '
+    git diff 2>/dev/null || true
+)}
+
 shRunWithCoverage() {(set -e
 # this function will run nodejs command $@ with v8-coverage
 # and create coverage-report .build/coverage/index.html
@@ -529,39 +1194,38 @@ shRunWithCoverage() {(set -e
     ) || EXIT_CODE="$?"
     if [ "$EXIT_CODE" = 0 ]
     then
-        node -e '
-/*jslint bitwise*/
+        node --input-type=module -e '
+import moduleFs from "fs";
+import modulePath from "path";
 // init debugInline
-if (!globalThis.debugInline) {
-    let consoleError;
-    consoleError = console.error;
-    globalThis.debugInline = function (...argList) {
-    /*
-     * this function will both print <argList> to stderr
-     * and return <argList>[0]
-     */
+(function () {
+    var consoleError = console.error;
+    globalThis.debugInline = globalThis.debugInline || function (...argList) {
+
+// this function will both print <argList> to stderr and return <argList>[0]
+
         consoleError("\n\ndebugInline");
         consoleError(...argList);
         consoleError("\n");
         return argList[0];
     };
-}
+}());
 (async function () {
     "use strict";
-    let DIR_COVERAGE = process.env.DIR_COVERAGE;
-    let cwd;
-    let data;
-    let fileDict;
+    var DIR_COVERAGE = process.env.DIR_COVERAGE;
+    var cwd;
+    var data;
+    var fileDict;
     async function htmlRender({
         fileList,
         lineList,
         pathname
     }) {
-        let html;
-        let padLines;
-        let padPathname;
-        let txt;
-        let txtBorder;
+        var html;
+        var padLines;
+        var padPathname;
+        var txt;
+        var txtBorder;
         function stringHtmlSafe(str) {
         /*
          * this function will make <str> html-safe
@@ -610,7 +1274,7 @@ body {
 }
 .coverage td span {
     display: inline-block;
-    width: 100%;
+    width: 100%%;
 }
 .coverage .content {
     padding: 0 5px;
@@ -736,9 +1400,9 @@ body {
             linesTotal,
             pathname
         }, ii) {
-            let coverageLevel;
-            let coveragePct;
-            coveragePct = Math.floor(10000 * linesCovered / linesTotal | 0);
+            var coverageLevel;
+            var coveragePct;
+            coveragePct = Math.floor(10000 * linesCovered / linesTotal || 0);
             coverageLevel = (
                 coveragePct >= 8000
                 ? "coverageHigh"
@@ -750,7 +1414,7 @@ body {
                 /..$/m
             ), ".$&");
             if (!lineList && ii === 0) {
-                let fill = (
+                var fill = (
                     // red
                     "#" + Math.round(
                         (100 - Number(coveragePct)) * 2.21
@@ -762,12 +1426,12 @@ body {
                     + // blue
                     "00"
                 );
-                let str1 = "coverage";
-                let str2 = coveragePct + " %";
-                let xx1 = 6 * str1.length + 20;
-                let xx2 = 6 * str2.length + 20;
+                var str1 = "coverage";
+                var str2 = coveragePct + " %";
+                var xx1 = 6 * str1.length + 20;
+                var xx2 = 6 * str2.length + 20;
                 // fs - write coverage-badge.svg
-                require("fs").promises.writeFile((
+                moduleFs.promises.writeFile((
                     DIR_COVERAGE + "/coverage-badge.svg"
                 ), String(`
 <svg height="20" width="${xx1 + xx2}" xmlns="http://www.w3.org/2000/svg">
@@ -776,7 +1440,7 @@ body {
 <g
     fill="#fff"
     font-family="dejavu sans, verdana, geneva, sans-serif"
-    font-size="11px"
+    font-size="11"
     font-weight="bold"
     text-anchor="middle"
 >
@@ -837,10 +1501,10 @@ body {
                 line,
                 startOffset
             }, ii) {
-                let chunk;
-                let inHole;
-                let lineId;
-                let lineHtml;
+                var chunk;
+                var inHole;
+                var lineId;
+                var lineHtml;
                 lineHtml = "";
                 lineId = "line_" + (ii + 1);
                 switch (count) {
@@ -918,30 +1582,30 @@ ${String(count).padStart(7, " ")}
 </body>
 </html>`;
         html += "\n";
-        await require("fs").promises.mkdir(require("path").dirname(pathname), {
+        await moduleFs.promises.mkdir(modulePath.dirname(pathname), {
             recursive: true
         });
         // fs - write *.html
-        require("fs").promises.writeFile(pathname + ".html", html);
+        moduleFs.promises.writeFile(pathname + ".html", html);
         if (lineList) {
             return;
         }
         // fs - write coverage.txt
         console.error("\n" + txt);
-        require("fs").promises.writeFile((
+        moduleFs.promises.writeFile((
             DIR_COVERAGE + "/coverage-report.txt"
         ), txt);
     }
-    data = await require("fs").promises.readdir(DIR_COVERAGE);
+    data = await moduleFs.promises.readdir(DIR_COVERAGE);
     await Promise.all(data.map(async function (file) {
         if ((
             /^coverage-.*?\.json$/
         ).test(file)) {
-            data = await require("fs").promises.readFile((
+            data = await moduleFs.promises.readFile((
                 DIR_COVERAGE + file
             ), "utf8");
             // fs - rename to coverage-v8.json
-            require("fs").promises.rename(
+            moduleFs.promises.rename(
                 DIR_COVERAGE + file,
                 DIR_COVERAGE + "coverage-v8.json"
             );
@@ -955,11 +1619,11 @@ ${String(count).padStart(7, " ")}
         functions,
         url
     }) {
-        let lineList;
-        let linesCovered;
-        let linesTotal;
-        let pathname;
-        let src;
+        var lineList;
+        var linesCovered;
+        var linesTotal;
+        var pathname;
+        var src;
         if (url.indexOf("file:///") !== 0) {
             return;
         }
@@ -981,7 +1645,7 @@ ${String(count).padStart(7, " ")}
             return;
         }
         pathname = pathname.replace(cwd, "");
-        src = await require("fs").promises.readFile(pathname, "utf8");
+        src = await moduleFs.promises.readFile(pathname, "utf8");
         lineList = [{}];
         src.replace((
             /^.*$/gm
@@ -1047,8 +1711,8 @@ ${String(count).padStart(7, " ")}
         }) {
             return count > 0;
         }).length;
-        await require("fs").promises.mkdir((
-            require("path").dirname(DIR_COVERAGE + pathname)
+        await moduleFs.promises.mkdir((
+            modulePath.dirname(DIR_COVERAGE + pathname)
         ), {
             recursive: true
         });
@@ -1107,14 +1771,15 @@ shRunWithScreenshotTxt() {(set -e
         unset shRunWithScreenshotTxtAfter
     fi
     # format text-output
-    node -e '
+    node --input-type=module -e '
+import moduleFs from "fs";
 (async function () {
     "use strict";
-    let result = await require("fs").promises.readFile(
+    var result = await moduleFs.promises.readFile(
         process.argv[1] + ".txt",
         "utf8"
     );
-    let yy = 10;
+    var yy = 10;
     // remove ansi escape-code
     result = result.replace((
         /\u001b.*?m/g
@@ -1131,7 +1796,7 @@ shRunWithScreenshotTxt() {(set -e
     ), "\n").trimEnd();
     // 96-column wordwrap
     result = result.split("\n").map(function (line) {
-        let wordwrap = line.slice(0, 96).padEnd(96, " ");
+        var wordwrap = line.slice(0, 96).padEnd(96, " ");
         line = line.slice(96);
         while (line) {
             wordwrap += "\\\n  " + line.slice(0, 96 - 2).padEnd(96 - 2, " ");
@@ -1158,19 +1823,19 @@ shRunWithScreenshotTxt() {(set -e
 >${line}</tspan>\n`;
     }).join("");
     result = String(`
-  <svg height="${yy + 20}px" width="800px" xmlns="http://www.w3.org/2000/svg">
-<rect height="${yy + 20}px" fill="#222" width="800px"></rect>
+  <svg height="${yy + 20}" width="800" xmlns="http://www.w3.org/2000/svg">
+<rect height="${yy + 20}" fill="#222" width="800"></rect>
 <text
     fill="#7f7"
     font-family="consolas, menlo, monospace"
-    font-size="14px"
+    font-size="14"
     xml:space="preserve"
 >
 ${result}
 </text>
 </svg>
     `).trim() + "\n";
-    require("fs").promises.writeFile(process.argv[1], result);
+    moduleFs.promises.writeFile(process.argv[1], result);
 }());
 ' "$SCREENSHOT_SVG" # "'
     printf "shRunWithScreenshotTxt - wrote - $SCREENSHOT_SVG\n"
@@ -1181,9 +1846,10 @@ ${result}
 
 # run $@
 (set -e
+    export NODE_OPTIONS="--unhandled-rejections=strict"
     case "$(uname)" in
     MSYS*)
-        if [ "$IS_WINPTY" ]
+        if [ "$IS_WINPTY" ] || [ "$1" = shHttpFileServer ]
         then
             "$@"
         else

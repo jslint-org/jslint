@@ -1,4 +1,4 @@
-[<img align="left" height="100" src="image-jslint-256x256.png"/>](https://github.com/jslint-org/jslint)
+[<img align="left" height="100" src="image-jslint-512.svg"/>](https://github.com/jslint-org/jslint)
 
 
 # JSLint, The JavaScript Code Quality Tool

@@ -6,6 +6,7 @@
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning if const/let/var statements are not declared at top of function-scope.
 - jslint - add new warning if const/let/var statements are not sorted.
+- jslint - include explicit commonjs (jslint.cjs) and es-module (jslint.mjs) variants of jslint.
 - jslint - remove directive "eval" (use line-specific ignore-directive "//jslint-quiet" instead).
 - jslint - simplify comments/docs by removing unnecessary grammar-article "the".
 - jslint-refactor - migrate recursive-loops to for/while loops.
@@ -14,6 +15,10 @@
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 - tests - update function warn_at() with assertion-check matching column with artifact.
 - website - replace current-editor with CodeMirror-editor and change programming-font-family from `Programma` to `Consolas, Menlo, monospace`.
+
+## v2021.6.14-beta
+- ci - migrate ci-scripts from cjs to esm.
+- website - replace .png logo with .svg logo
 
 ## v2021.6.12
 - bugfix - fix await expression/statement inside catch-statement not registered by functionage.await.

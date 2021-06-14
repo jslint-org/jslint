@@ -88,7 +88,7 @@
 /*jslint node*/
 
 /*property
-    filter, order, reduce, stringify, token,
+    execArgv, fileURLToPath, filter, meta, order, reduce, stringify, token, url,
     JSLINT_CLI, a, all, allowed_option, argv, arity, artifact, assign, async, b,
     bind, bitwise, block, body, browser, c, calls, catch, closer, closure, code,
     column, concat, console_error, constant, context, convert, couch, create,
@@ -113,7 +113,7 @@
     writable
 */
 
-const edition = "v2021.6.12";
+const edition = "v2021.6.14-beta";
 
 const line_fudge = 1;   // Fudge starting line and starting column to 1.
 
@@ -6918,8 +6918,8 @@ async function jslint_cli({
 
 // This function will run jslint from nodejs-cli.
 
-    const fs = await import("fs");
-    const path = await import("path");
+    const module_fs = await import("fs");
+    const module_path = await import("path");
     let data;
     let exit_code;
 
@@ -7035,7 +7035,7 @@ async function jslint_cli({
 
 // Normalize file relative to process.cwd().
 
-    file = path.resolve(file) + "/";
+    file = module_path.resolve(file) + "/";
     if (file.startsWith(process.cwd() + "/")) {
         file = file.replace(process.cwd() + "/", "").slice(0, -1) || ".";
     }
@@ -7056,7 +7056,7 @@ async function jslint_cli({
 // jslint_cli - jslint directory.
 
     try {
-        data = await fs.promises.readdir(file, "utf8");
+        data = await module_fs.promises.readdir(file, "utf8");
     } catch (ignore) {}
     if (data) {
         await Promise.all(data.map(async function (file2) {
@@ -7082,7 +7082,7 @@ async function jslint_cli({
                 return;
             }
             try {
-                code = await fs.promises.readFile(file2, "utf8");
+                code = await module_fs.promises.readFile(file2, "utf8");
             } catch (ignore) {
                 return;
             }
@@ -7108,7 +7108,7 @@ async function jslint_cli({
 // jslint_cli - jslint file.
 
     try {
-        data = await fs.promises.readFile(file, "utf8");
+        data = await module_fs.promises.readFile(file, "utf8");
     } catch (err) {
         console_error(err);
         return 1;
@@ -7124,29 +7124,36 @@ jslint.jslint_cli = Object.freeze(jslint_cli);
 jslint.jslint = Object.freeze(jslint.bind(undefined));
 export default Object.freeze(jslint);
 
-// feature-detect nodejs-cli
+(async function () {
 
-if (
-    typeof process === "object"
+// Feature-detect nodejs-cli.
 
-//  uncomment when nodejs v12 is no longer used in ci
-//  && typeof process?.versions?.node === "string"
+    if (
+        typeof process === "object" && process && process.versions
+        && typeof process.versions.node === "string"
+        && process.execArgv.indexOf("--eval") === -1
+        && process.execArgv.indexOf("-e") === -1
+        && (
+            (
+                /[\/|\\]jslint(?:\.[cm]?js)?$/m
+            ).test(process.argv[1])
+            || process.env.JSLINT_CLI === "1"
+        )
+        && (
+            identity(await import("url")).fileURLToPath(import.meta.url)
+            === identity(await import("path")).resolve(process.argv[1])
+            || process.env.JSLINT_CLI === "1"
+        )
+    ) {
 
-    && process && process.versions
-    && typeof process.versions.node === "string"
-    && (
-        (
-            /[\/|\\]jslint\.m?js$/m
-        ).test(process.argv[1])
-        || process.env.JSLINT_CLI === "1"
-    )
-) {
+// Run jslint_cli.
 
-// run jslint_cli
-
-    jslint_cli({
-        file: process.argv[2]
-    }).then(function (exit_code) {
-        process.exit(exit_code);
-    });
-}
+        jslint_cli({
+            file: process.argv[2]
+        }).then(function (exit_code) {
+            if (exit_code !== 0) {
+                process.exit(exit_code);
+            }
+        });
+    }
+}());

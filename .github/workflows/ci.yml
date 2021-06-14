@@ -1,6 +1,6 @@
-# this workflow will run nodejs coverages and tests and
-# upload build-artifacts to branch-gh-pages
-name: CI
+# this workflow will run nodejs coverages and tests
+# and upload build-artifacts to branch-gh-pages
+name: ci
 on:
   push:
     branches:
