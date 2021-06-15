@@ -62,24 +62,6 @@ function noop() {
 /*
  * this function will test jslint's option handling-behavior
  */
-    assertOrThrow(jslint("", {
-        bitwise: true,
-        browser: true,
-        convert: true,
-        couch: true,
-        debug: true,
-        devel: true,
-        eval: true,
-        for: true,
-        getset: true,
-        long: true,
-        name: true,
-        node: true,
-        single: true,
-        this: true,
-        unordered: true,
-        white: true
-    }).warnings.length === 0);
     [
         [
             "let aa = aa | 0;", {bitwise: true}, []
@@ -132,6 +114,15 @@ function noop() {
             ), {unordered: true}, []
         ], [
             "let {bb, aa} = 0;", {unordered: true}, []
+        ], [
+            (
+                "function aa() {\n"
+                + "    if (aa) {\n"
+                + "        let bb = 0;\n"
+                + "        return bb;\n"
+                + "    }\n"
+                + "}\n"
+            ), {variable: true}, []
         ], [
             "\t", {white: true}, []
         ]
