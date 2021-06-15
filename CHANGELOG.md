@@ -6,6 +6,7 @@
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning if const/let/var statements are not sorted.
 - jslint - include explicit commonjs (jslint.cjs) and es-module (jslint.mjs) variants of jslint.
+- jslint - reintroduce directive `/*jslint indent2*/` - allow 2-space indent.
 - jslint - remove directive "eval" (use line-specific ignore-directive "//jslint-quiet" instead).
 - jslint - simplify comments/docs by removing unnecessary grammar-article "the".
 - jslint-refactor - migrate recursive-loops to for/while loops.

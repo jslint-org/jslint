@@ -250,14 +250,14 @@ function jslint_phase2_lex(state) {
     let line_whole = "";        // The whole line source string.
     let mode_directive = true;  // true if directives are still allowed.
     let mode_mega = false;      // true if currently parsing a megastring
-                                // literal.
+                                //     literal.
     let mode_regexp;    // true if regular expression literal seen on this line.
     let snippet = "";   // A piece of string.
     let token_1;        // The first token.
     let token_before_slash = token_global;      // The previous token excluding
-                                                // comments.
+                                                //     comments.
     let token_prv = token_global;       // The previous token including
-                                        // comments.
+                                        //     comments.
 
 // Most tokens, including the identifiers, operators, and punctuators, can be
 // found with a regular expression. Regular expressions cannot correctly match
@@ -1545,9 +1545,9 @@ function jslint_phase3_parse(state) {
     let mode_var;               // "var" if using var; "let" if using let.
     let token_ii = 0;           // The number of the next token.
     let token_now = token_global;       // The current token being examined in
-                                        // the parse.
+                                        //     the parse.
     let token_nxt = token_global;       // The next token to be examined in
-                                        // <token_list>.
+                                        //     <token_list>.
 
     function warn_if_unordered(type, token_list) {
 
@@ -3564,6 +3564,7 @@ function jslint_phase3_parse(state) {
             break;
         default:
 
+// cause: "/*jslint beta*/\nconsole.log();let aa=0;"
 // cause: "/*jslint beta*/\nfunction aa(){aa();let aa=0;}"
 // cause: "/*jslint beta*/\nfunction aa(){try{aa();}catch(aa){let aa=0;}}"
 
@@ -5611,7 +5612,7 @@ function jslint_phase5_whitage(state) {
         warn
     } = state;
     const spaceop = populate([  // This is the set of infix operators that
-                                // require a space on each side.
+                                //     require a space on each side.
         "!=", "!==", "%", "%=", "&", "&=", "&&", "*", "*=", "+=", "-=", "/",
         "/=", "<", "<=", "<<", "<<=", "=", "==", "===", "=>", ">", ">=",
         ">>", ">>=", ">>>", ">>>=", "^", "^=", "|", "|=", "||"
@@ -6230,7 +6231,7 @@ function jslint(
     source = "",        // A text to analyze, a string or an array of strings.
     option_dict = empty(),  // An object whose keys correspond to option names.
     global_list = []    // An array of strings containing global variables that
-                        // the file is allowed readonly access.
+                        //     the file is allowed readonly access.
 ) {
 
 // The jslint function itself.
@@ -6242,9 +6243,9 @@ function jslint(
 // usually true. Some options will also predefine some number of global
 // variables.
 
-        beta: true,     // Enable features currently in beta.
-        bitwise: true,  // Allow bitwise-operators.
-        browser: [      // Assume browser-environment.
+        beta: true,             // Enable experimental features.
+        bitwise: true,          // Allow bitwise operators.
+        browser: [              // Assume browser environment.
             "CharacterData",
             "DOMException",
             "DocumentType",
@@ -6278,21 +6279,21 @@ function jslint(
             "setTimeout",
             "window"
         ],
-        convert: true,          // Allow conversion-operators.
-        couch: [                // Assume couchdb-environment.
+        convert: true,          // Allow conversion operators.
+        couch: [                // Assume CouchDb environment.
             "emit", "getRow", "isArray", "log", "provides", "registerType",
             "require", "send", "start", "sum", "toJSON"
         ],
-        debug: true,            // Include jslint stack-trace in warning.
-        devel: [                // Allow logging-functions.
+        debug: true,            // Include jslint stack-trace in warnings.
+        devel: [                // Allow console.log() and friends.
             "alert", "confirm", "console", "prompt"
         ],
-        eval: true,             // Allow Function() and eval().
+        eval: true,             // Allow eval().
         for: true,              // Allow for-statement.
         getset: true,           // Allow get() and set().
-        long: true,             // Allow long lines.
-        name: true,             // Allow bad property names.
-        node: [                 // Assume node-environment.
+        long: true,             // Allow long-lines.
+        name: true,             // Allow weird property-names.
+        node: [                 // Assume Node.js environment.
             "Buffer",
             "TextDecoder",
             "TextEncoder",
@@ -6314,12 +6315,12 @@ function jslint(
         ],
         single: true,           // Allow single-quote strings.
         test_internal_error: true,      // Test jslint's internal-error
-                                        // handling-ability.
-        this: true,             // Allow this.
+                                        //     handling-ability.
+        this: true,             // Allow 'this'.
         unordered: true,        // Allow unordered cases, params, properties.
         variable: true,         // Allow unordered variable-declarations that
-                                // are not at top of function-scope.
-        white: true             // Allow whitespace mess.
+                                //     are not at top of function-scope.
+        white: true             // Allow messy whitespace.
     };
     const catch_list = [];      // The array containing all catch-blocks.
     const catch_stack = [       // The stack of catch-blocks.
@@ -6332,7 +6333,7 @@ function jslint(
     const function_list = [];   // The array containing all functions.
     const function_stack = [];  // The stack of functions.
     const global_dict = empty();        // The object containing the global
-                                        // declarations.
+                                        //     declarations.
     const import_list = [];     // The array collecting all import-from strings.
     const line_list = String(   // The array containing source lines.
         "\n" + source
@@ -6345,9 +6346,9 @@ function jslint(
         };
     });
     const property_dict = empty();      // The object containing the tallied
-                                        // property names.
+                                        //     property names.
     const standard = [          // These are the globals that are provided by
-                                // the language standard.
+                                //     the language standard.
         "Array",
         "ArrayBuffer",
         "Boolean",

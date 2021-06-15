@@ -354,15 +354,41 @@ editor = globalThis.CodeMirror.fromTextArea(document.querySelector(
     showTrailingSpace: true
 });
 editor.setValue(`#!/usr/bin/env node
-/*jslint node*/
+
+/*jslint beta node*/
+
 import jslint from \u0022./jslint.mjs\u0022;
 import https from "https";
 
+// Optional directives.
+// .... /*jslint beta*/ .......... Enable experimental features.
+// .... /*jslint bitwise*/ ....... Allow bitwise operators.
+// .... /*jslint browser*/ ....... Assume browser environment.
+// .... /*jslint convert*/ ....... Allow conversion operators.
+// .... /*jslint couch*/ ......... Assume CouchDb environment.
+// .... /*jslint debug*/ ......... Include jslint stack-trace in warnings.
+// .... /*jslint devel*/ ......... Allow console.log() and friends.
+// .... /*jslint eval*/ .......... Allow eval().
+// .... /*jslint for*/ ........... Allow for-statement.
+// .... /*jslint getset*/ ........ Allow get() and set().
+// .... /*jslint long*/ .......... Allow long-lines.
+// .... /*jslint name*/ .......... Allow weird property-names.
+// .... /*jslint node*/ .......... Assume Node.js environment.
+// .... /*jslint single*/ ........ Allow single-quote strings.
+// .... /*jslint test_internal_error*/ ... Test jslint's internal-error
+// ........................................... handling-ability.
+// .... /*jslint this*/ .......... Allow 'this'.
+// .... /*jslint unordered*/ ..... Allow unordered cases, params, properties.
+// .... /*jslint variable*/ ...... Allow unordered variable-declarations that
+// ................................... are not at top of function-scope.
+// .... /*jslint white: true...... Allow messy whitespace.
+
 /*jslint-disable*/
-// TODO: jslint this code-block in the future.
+// TODO: jslint this code-block in future.
 console.log('hello world');
 /*jslint-enable*/
 
+// Suppress warnings on next-line.
 eval( //jslint-quiet
     "console.log('hello world');"
 );

@@ -453,34 +453,39 @@ style="
       <button name=options id=JSLINT_CLEAR_OPTIONS>clear options</button>
   </div>
   <fieldset id=JSLINT_OPTIONS><legend>Options</legend>
-    <div>Assume...
-      <div><label><input title=devel type=checkbox>in development</label></div>
+    <div>Env...
       <div><label><input title=browser type=checkbox>browser</label></div>
-      <div><label><input title=couch type=checkbox>CouchDB</label></div>
-      <div><label><input title=node type=checkbox>Node.js</label></div>
+      <div><label><input title=couch type=checkbox>couch</label></div>
+      <div><label><input title=devel type=checkbox>devel</label></div>
+      <div><label><input title=node type=checkbox>node</label></div>
     </div>
-    <div>Tolerate...
-      <div><label><input title=bitwise type=checkbox>bitwise operators</label></div>
-      <div><label><input title=convert type=checkbox>conversion operators</label></div>
+    <div>Allow...
+      <div><label><input title=beta type=checkbox>beta</label></div>
+      <div><label><input title=bitwise type=checkbox>bitwise</label></div>
+      <div><label><input title=convert type=checkbox>convert</label></div>
+      <div><label><input title=debug type=checkbox>debug</label></div>
+    </div>
+    <div>&nbsp;
       <div><label><input title=eval type=checkbox>eval</label></div>
-      <div><label><input title=for type=checkbox>for statement</label></div>
+      <div><label><input title=for type=checkbox>for</label></div>
+      <div><label><input title=getset type=checkbox>getset</label></div>
+      <div><label><input title=long type=checkbox>long</label></div>
     </div>
     <div>&nbsp;
-      <div><label><input title=getset type=checkbox>get and set</label></div>
-      <div><label><input title=long type=checkbox>long lines</label></div>
-      <div><label><input title=name type=checkbox>bad property names</label></div>
-      <div><label><input title=single type=checkbox>single quote strings</label></div>
-    </div>
-    <div>&nbsp;
+      <div><label><input title=name type=checkbox>name</label></div>
+      <div><label><input title=single type=checkbox>single</label></div>
       <div><label><input title=this type=checkbox>this</label></div>
-      <div><label><input title=unordered type=checkbox>unordered stuff</label></div>
-      <div><label><input title=white type=checkbox>whitespace mess</label></div>
+      <div><label><input title=unordered type=checkbox>unordered</label></div>
+    </div>
+    <div>&nbsp;
+      <div><label><input title=variable type=checkbox>variable</label></div>
+      <div><label><input title=white type=checkbox>white</label></div>
     </div>
     <textarea
       id=JSLINT_GLOBAL
       title=global
       spellcheck="false"
-      placeholder="imported globals here"
+      placeholder="imported globals (e.g. atob, btoa)"
     ></textarea>
   </fieldset>
   <fieldset id="JSLINT_WARNINGS">
