@@ -129,12 +129,14 @@ function noop() {
     ].forEach(function ([
         source, option_dict, global_list
     ]) {
+        // test jslint's option handling-behavior
         assertOrThrow(
             jslint(source, option_dict, global_list).warnings.length === 0,
-            JSON.stringify([
+            "jslint(" + JSON.stringify([
                 source, option_dict, global_list
-            ])
+            ]) + ")"
         );
+        // test jslint's directive handling-behavior
         source = (
             "/*jslint\n"
             + JSON.stringify(option_dict).slice(1, -1).replace((
@@ -269,6 +271,7 @@ function noop() {
             + "aa();\n"
         ],
         var: [
+            "\"use strict\";\nvar aa = 0;",
             "let [\n    aa, bb = 0\n] = 0;",
             "let [...aa] = [...aa];",
             "let constructor = 0;",

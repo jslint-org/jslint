@@ -24,6 +24,11 @@
 <title>JSLint:&nbsp;The&nbsp;JavaScript&nbsp;Code Quality Tool</title>
 <link rel="stylesheet" href="asset-codemirror-5.58.3-rollup.css">
 <style>
+/*csslint
+    ids:false,
+    overqualified-elements: false
+*/
+/*csslint ignore:start*/
 @font-face {
     font-display: swap;
     font-family: "Programma";
@@ -36,99 +41,201 @@
     font-weight: bold;
     src: url("asset-font-daley-bold.woff2") format("woff2");
 }
+@keyframes uiLoaderEllipsis1 {
+    from {
+        opacity: 0;
+    }
+    25% {
+        opacity: 1;
+    }
+}
+@keyframes uiLoaderEllipsis2 {
+    from {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+@keyframes uiLoaderEllipsis3 {
+    from {
+        opacity: 0;
+    }
+    75% {
+        opacity: 1;
+    }
+}
+/*csslint ignore:end*/
+body,
+#JSLINT_ button {
+    font-family: daley, sans-serif;
+}
+.center {
+    text-align: center;
+}
+.uiLoaderEllipsis span {
+    animation: uiLoaderEllipsis1 1s infinite steps(1);
+}
+.uiLoaderEllipsis span:first-child + span {
+    animation-name: uiLoaderEllipsis2;
+}
+.uiLoaderEllipsis span:first-child + span + span {
+    animation-name: uiLoaderEllipsis3;
+}
+#JSLINT_ address,
+#JSLINT_ dt,
+#JSLINT_WARNINGS cite {
+    font-family: serif;
+}
+#JSLINT_ dd,
+#JSLINT_ dfn,
+#JSLINT_WARNINGS samp {
+    font-family: programma, monospace;
+}
+#JSLINT_ label {
+    font-family: sans-serif;
+}
+#JSLINT_ textarea,
+#JSLINT_ .CodeMirror pre.CodeMirror-line,
+#JSLINT_ .CodeMirror pre.CodeMirror-line-like {
+    font-family: monospace;
+    font-size: 12px;
+}
 
+
+a:link {
+    color: black;
+}
+a:visited {
+    color: #69565c;
+}
 body {
     background-color: antiquewhite;
     color: black;
-    font-family: "Daley", sans-serif;
     margin: 0;
     padding: 0;
 }
-
-#JSLINT_TITLEBOX {
-    font-family: "Daley", sans-serif;
-    margin: 10px 40px 0 40px;
-    padding: 0;
-}
-
-#JSLINT_TITLEBOX ul {
+#JSLINT_ address {
+    color: black;
+    display: block;
     float: right;
-    font-size: 12pt;
-}
-
-#JSLINT_TITLEBOX div {
-    color: darkslategray;
-    float: left;
-    font-size: 48pt;
-}
-
-#JSLINT_ fieldset {
-    background-color: gainsboro;
-    border: 0;
-    clear: both;
-    margin-bottom: 1em;
-    margin-left: 40px;
-    margin-right: 40px;
-    margin-top: 1em;
-    padding: 0;
-    width: auto;
-}
-#JSLINT_  legend {
-    background-color: darkslategray;
-    border: 0;
-    color: white;
-    font-size: 100%;
-    font-style: normal;
-    font-weight: normal;
-    margin: 0;
-    padding-bottom: 0.25em;
-    padding-left: 0;
-    padding-right: 0;
-    padding-top: 0.25em;
-    text-align: center;
-    width: 100%;
+    font-size: 90%;
+    margin-left: 1em;
 }
 #JSLINT_ button {
     background-color: darkslategray;
     border: 0;
     color: white;
     cursor: pointer;
-    font-family: "Daley", sans-serif;
     font-size: 100%;
     font-style: normal;
     margin-left: 1em;
     margin-right: 1em;
-    padding-left: 1em;
-    padding-right: 1em;
-    padding-bottom: 0.25em;
-    padding-top: 0.25em;
+    padding: 0.25em 1em;
     text-align: center;
 }
-#JSLINT_ button:hover {
-    background-color: slategray;
-    color: white;
-    border: 0;
-}
-
 #JSLINT_ button:active {
     border: 0;
     color: black;
 }
-
-#JSLINT_ button:disabled {
-    background-color: gray;
+#JSLINT_ button:hover {
+    background-color: slategray;
     border: 0;
-    color: gainsboro;
+    color: white;
 }
-
-a:visited {
-    color: #69565c;
+#JSLINT_ dd {
+    color: black;
+    display: block;
+    font-weight: bold;
+    margin-left: 8em;
+    padding-bottom: 2pt;
 }
-
-a:link {
+#JSLINT_ dfn {
+    color: black;
+    display: block;
+    font-size: 100%;
+    font-style: normal;
+    font-weight: bold;
+    margin-bottom: 2pt;
+}
+#JSLINT_ dl {
+    background-color: cornsilk;
+    color: white;
+    margin: 0;
+    padding: 2pt 1em;
+}
+#JSLINT_ dl.level0 {
+    background-color: white;
     color: black;
 }
-
+#JSLINT_ dl.level1 {
+    /* yellow */
+    background-color: #ffffe0;
+    color: black;
+    margin-left: 1em;
+}
+#JSLINT_ dl.level2 {
+    /* green */
+    background-color: #e0ffe0;
+    color: black;
+    margin-left: 2em;
+}
+#JSLINT_ dl.level3 {
+    /* blue */
+    background-color: #D0D0ff;
+    color: black;
+    margin-left: 3em;
+}
+#JSLINT_ dl.level4 {
+    /* purple */
+    background-color: #ffe0ff;
+    color: black;
+    margin-left: 4em;
+}
+#JSLINT_ dl.level5 {
+    /* red */
+    background-color: #ffe0e0;
+    color: black;
+    margin-left: 5em;
+}
+#JSLINT_ dl.level6 {
+    /* orange */
+    background-color: #ffe390;
+    color: black;
+    margin-left: 6em;
+}
+#JSLINT_ dl.level7 {
+    /* gray */
+    background-color: #e0e0e0;
+    color: black;
+    margin-left: 7em;
+}
+#JSLINT_ dl.level8 {
+    color: black;
+    margin-left: 8em;
+}
+#JSLINT_ dl.level9 {
+    color: black;
+    margin-left: 9em;
+}
+#JSLINT_ dt {
+    color: black;
+    display: block;
+    float: left;
+    font-size: 75%;
+    font-style: italic;
+    margin: 0;
+    text-align: right;
+    width: 8em;
+}
+#JSLINT_ fieldset {
+    background-color: gainsboro;
+    border: 0;
+    clear: both;
+    margin: 1em 40px;
+    padding: 0;
+    width: auto;
+}
 #JSLINT_ input[type="text"] {
     background-color: white;
     border: 0;
@@ -140,38 +247,22 @@ a:link {
     text-align: right;
     width: 3em;
 }
-
-#JSLINT_ textarea,
-#JSLINT_ .CodeMirror pre.CodeMirror-line,
-#JSLINT_ .CodeMirror pre.CodeMirror-line-like {
-    font-family: consolas, menlo, monospace;
-    font-size: 12px;
+#JSLINT_ label {
+    font-size: 90%;
+    padding-left: 0.25em;
 }
-
-#JSLINT_ textarea::selection,
-#JSLINT_ .CodeMirror-selected {
-    background-color: wheat;
-    color: black;
+#JSLINT_ legend {
+    background-color: darkslategray;
+    border: 0;
+    color: white;
+    font-size: 100%;
+    font-style: normal;
+    font-weight: normal;
+    margin: 0;
+    padding: 0.25em 0;
+    text-align: center;
+    width: 100%;
 }
-
-#JSLINT_ .CodeMirror .cm-trailingspace {
-    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAACCAYAAAB/qH1jAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QUXCToH00Y1UgAAACFJREFUCNdjPMDBUc/AwNDAAAFMTAwMDA0OP34wQgX/AQBYgwYEx4f9lQAAAABJRU5ErkJggg==");
-    background-position: bottom left;
-    background-repeat: repeat-x;
-}
-
-#JSLINT_SOURCE {
-    display: inline-block;
-    height: 4in;
-    margin: 2%;
-    margin-left: 0;
-    margin-right: 0;
-    overflow: auto;
-    padding-left: 0.5%;
-    white-space: pre;
-    width: 91%;
-}
-
 #JSLINT_ textarea {
     border: 0;
     margin: 2%;
@@ -180,193 +271,78 @@ a:link {
     white-space: pre;
     width: 95%;
 }
-
+#JSLINT_ textarea::selection,
+#JSLINT_ .CodeMirror-selected {
+    background-color: wheat;
+    color: black;
+}
+#JSLINT_ .CodeMirror .cm-trailingspace {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAACCAYAAAB/qH1jAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QUXCToH00Y1UgAAACFJREFUCNdjPMDBUc/AwNDAAAFMTAwMDA0OP34wQgX/AQBYgwYEx4f9lQAAAABJRU5ErkJggg==");
+    background-position: bottom left;
+    background-repeat: repeat-x;
+}
 #JSLINT_GLOBAL {
     white-space: normal;
     width: 95%;
 }
-#JSLINT_ label {
-    font-family: sans-serif;
-    font-size: 90%;
-    padding-left: 0.25em;
-}
-#JSLINT_OPTIONS>div {
+#JSLINT_OPTIONS > div {
     float: left;
     margin: 0.5em;
-}
-
-#JSLINT_ address {
-    color: black;
-    display: block;
-    float: right;
-    font-family: serif;
-    font-size: 90%;
-    margin-left: 1em;
-}
-#JSLINT_ dl {
-    background-color: cornsilk;
-    color: white;
-    margin: 0;
-    padding-bottom: 2pt;
-    padding-left: 1em;
-    padding-right: 1em;
-    padding-top: 2pt;
-}
-#JSLINT_ dfn {
-    color: black;
-    display: block;
-    font-family: Programma, monospace;
-    font-size: 100%;
-    font-style: normal;
-    font-weight: bold;
-    margin-bottom: 2pt;
-}
-#JSLINT_ dt {
-    color: black;
-    display: block;
-    float: left;
-    font-family: serif;
-    font-size: 75%;
-    font-style: italic;
-    margin: 0;
-    width: 8em;
-    text-align: right;
-}
-#JSLINT_ dd {
-    color: black;
-    display: block;
-    font-family: Programma, monospace;
-    font-weight: bold;
-    margin-left: 8em;
-    padding-bottom: 2pt;
 }
 #JSLINT_PROPERTY {
     background-color: honeydew;
 }
-#JSLINT_WARNINGS>legend {
-    background-color: indianred;
+#JSLINT_REPORT center {
+    margin-top: 1em;
 }
-#JSLINT_WARNINGS>div {
-    background-color: pink;
+#JSLINT_REPORT > div {
     padding: 1em;
+}
+#JSLINT_TITLEBOX {
+    margin: 10px 40px 0 40px;
+    padding: 0;
+}
+#JSLINT_TITLEBOX div {
+    color: darkslategray;
+    float: left;
+    font-size: 48pt;
+}
+#JSLINT_TITLEBOX ul {
+    float: right;
+    font-size: 12pt;
 }
 #JSLINT_WARNINGS cite {
     color: black;
     display: block;
-    font-family: serif;
     font-size: 100%;
     font-style: normal;
-    margin-bottom: 4pt;
-    margin-left: 20pt;
-    margin-right: 20pt;
-    margin-top: 4pt;
+    margin: 4pt 20px;
     overflow-x: hidden;
 }
-#JSLINT_WARNINGS samp {
-    background-color: lavenderblush;
-    color: black;
-    display: block;
-    font-family: Programma, monospace;
-    font-size: 100%;
-    font-style: normal;
-    font-weight: bold;
-    padding: 4pt;
-    margin-bottom: 0;
-    margin-left: 16pt;
-    margin-right: 16pt;
-    margin-top: 0;
-    white-space: pre-wrap;
-}
-
-#JSLINT_REPORT center {
-    margin-top: 1em;
-}
-
 #JSLINT_WARNINGS dl address {
     color: black;
     display: inline;
     float: none;
     font-size: 80%;
-    margin: 0;
 }
-
-#JSLINT_REPORT>div {
+#JSLINT_WARNINGS samp {
+    background-color: lavenderblush;
+    color: black;
+    display: block;
+    font-size: 100%;
+    font-style: normal;
+    font-weight: bold;
+    margin: 0 16pt;
+    padding: 4pt;
+    white-space: pre-wrap;
+}
+#JSLINT_WARNINGS > div {
+    background-color: pink;
     padding: 1em;
 }
-
-#JSLINT_ dl.level0 {
-    color: black;
-    background-color: white;
+#JSLINT_WARNINGS > legend {
+    background-color: indianred;
 }
-
-#JSLINT_ dl.level1 {
-    color: black;
-    background-color: #ffffe0;  /* yellow */
-    margin-left: 1em;
-}
-
-#JSLINT_ dl.level2 {
-    color: black;
-    background-color: #e0ffe0;  /* green */
-    margin-left: 2em;
-}
-
-#JSLINT_ dl.level3 {
-    color: black;
-    background-color: #D0D0ff;  /* blue */
-    margin-left: 3em;
-}
-
-#JSLINT_ dl.level4 {
-    background-color: #ffe0ff;  /* purple */
-    color: black;
-    margin-left: 4em;
-}
-
-#JSLINT_ dl.level5 {
-    background-color: #ffe0e0;  /* red */
-    color: black;
-    margin-left: 5em;
-}
-
-#JSLINT_ dl.level6 {
-    background-color: #ffe390;  /* orange */
-    color: black;
-    margin-left: 6em;
-}
-
-#JSLINT_ dl.level7 {
-    background-color: #e0e0e0;  /* gray */
-    color: black;
-    margin-left: 7em;
-}
-
-#JSLINT_ dl.level8 {
-    color: black;
-    margin-left: 8em;
-}
-
-#JSLINT_ dl.level9 {
-    color: black;
-    margin-left: 9em;
-}
-
-.center {
-    text-align: center;
-}
-
-.uiLoaderEllipsis span {
-    animation: uiLoaderEllipsis1 1s infinite steps(1);
-}
-.uiLoaderEllipsis span:first-child + span {
-    animation-name: uiLoaderEllipsis2;
-}
-.uiLoaderEllipsis span:first-child + span + span {
-    animation-name: uiLoaderEllipsis3;
-}
-@keyframes uiLoaderEllipsis1 { from { opacity: 0; } 25% { opacity: 1; } }
-@keyframes uiLoaderEllipsis2 { from { opacity: 0; } 50% { opacity: 1; } }
-@keyframes uiLoaderEllipsis3 { from { opacity: 0; } 75% { opacity: 1; } }
 </style>
 </head>
 <body>

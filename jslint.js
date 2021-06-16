@@ -3530,45 +3530,40 @@ function jslint_phase3_parse(state) {
         const the_variable = token_now;
         const mode_const = the_variable.id === "const";
         switch (
-            Boolean(
-                option_dict.beta
-                && !option_dict.variable
-                && functionage.last_statement
-            )
+            Boolean(functionage.last_statement)
             && functionage.last_statement.id
         ) {
         case "const":
-
-// cause: "/*jslint beta*/\nfunction aa(){const aa=0;const bb=0;}"
-
             break;
         case "import":
 
-// cause: "/*jslint beta*/\nimport aa from \"aa\";\nlet bb=0;"
+// cause: "import aa from \"aa\";\nlet bb=0;"
 
             break;
         case "let":
-
-// cause: "/*jslint beta*/\nfunction aa(){let aa=0;let bb=0;}"
-
             break;
         case "var":
 
-// cause: "/*jslint beta*/\nfunction aa(){var aa=0;var bb=0;}"
+// cause: "const aa=0;const bb=0;"
+// cause: "let aa=0;let bb=0;"
+// cause: "var aa=0;var bb=0;"
 
             break;
         case false:
-
-// cause: "/*jslint beta*/\nfunction aa(){var aa=0;var bb=0;}"
-
             break;
         default:
+            if (
+                (option_dict.beta && !option_dict.variable)
+                || the_variable.id === "var"
+            ) {
 
 // cause: "/*jslint beta*/\nconsole.log();let aa=0;"
-// cause: "/*jslint beta*/\nfunction aa(){aa();let aa=0;}"
-// cause: "/*jslint beta*/\nfunction aa(){try{aa();}catch(aa){let aa=0;}}"
+// cause: "console.log();var aa=0;"
+// cause: "try{aa();}catch(aa){var aa=0;}"
+// cause: "while(0){var aa;}"
 
-            warn("var_on_top", token_now);
+                warn("var_on_top", token_now);
+            }
         }
         the_variable.names = [];
 
@@ -3592,12 +3587,6 @@ function jslint_phase3_parse(state) {
 // cause: "switch(0){case 0:var aa}"
 
             warn("var_switch", the_variable);
-        }
-        if (functionage.loop > 0 && the_variable.id === "var") {
-
-// cause: "while(0){var aa;}"
-
-            warn("var_loop", the_variable);
         }
         (function next() {
             let name;
@@ -6318,8 +6307,8 @@ function jslint(
                                         //     handling-ability.
         this: true,             // Allow 'this'.
         unordered: true,        // Allow unordered cases, params, properties.
-        variable: true,         // Allow unordered variable-declarations that
-                                //     are not at top of function-scope.
+        variable: true,         // Allow unordered const and let declarations
+                                //     that are not at top of function-scope.
         white: true             // Allow messy whitespace.
     };
     const catch_list = [];      // The array containing all catch-blocks.
@@ -6563,7 +6552,7 @@ function jslint(
 // Report an error at some line and column of the program. The warning object
 // resembles an exception.
 
-        const warning = Object.assign(empty(), {
+        const warning = Object.assign({
             a,
             b,
             c,
@@ -6825,11 +6814,8 @@ function jslint(
         case "use_spaces":
             mm = `Use spaces, not tabs.`;
             break;
-        case "var_loop":
-            mm = `Don't declare variables in a loop.`;
-            break;
         case "var_on_top":
-            mm = `Move const, let, var declarations to top of function-scope.`;
+            mm = `Move variable declaration to top of function or script.`;
             break;
         case "var_switch":
             mm = `Don't declare variables in a switch.`;
@@ -7152,7 +7138,7 @@ async function jslint_cli({
         option = {},
         warnings = []
     }) {
-        option = Object.assign(empty(), option, {
+        option = Object.assign({}, option, {
             file
         });
         switch ((
@@ -7169,7 +7155,7 @@ async function jslint_cli({
                     code: match1,
                     file: file + ".<script>.js",
                     line_offset: string_line_count(code.slice(0, ii)) + 1,
-                    option: Object.assign(empty(), {
+                    option: Object.assign({
                         browser: true
                     }, option)
                 });
@@ -7203,7 +7189,7 @@ async function jslint_cli({
                     code: match1,
                     file: file + ".<node -e>.js",
                     line_offset: string_line_count(code.slice(0, ii)) + 1,
-                    option: Object.assign(empty(), {
+                    option: Object.assign({
                         node: true
                     }, option)
                 });
