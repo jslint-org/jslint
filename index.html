@@ -70,9 +70,6 @@ body,
 #JSLINT_ button {
     font-family: daley, sans-serif;
 }
-.center {
-    text-align: center;
-}
 .uiLoaderEllipsis span {
     animation: uiLoaderEllipsis1 1s infinite steps(1);
 }
@@ -117,7 +114,6 @@ body {
 }
 #JSLINT_ address {
     color: black;
-    display: block;
     float: right;
     font-size: 90%;
     margin-left: 1em;
@@ -145,7 +141,6 @@ body {
 }
 #JSLINT_ dd {
     color: black;
-    display: block;
     font-weight: bold;
     margin-left: 8em;
     padding-bottom: 2pt;
@@ -220,7 +215,6 @@ body {
 }
 #JSLINT_ dt {
     color: black;
-    display: block;
     float: left;
     font-size: 75%;
     font-style: italic;
@@ -417,51 +411,49 @@ style="
     </ul>
 </div>
 <div id="JSLINT_">
-  <fieldset><legend>Source</legend><textarea
-      id="JSLINT_SOURCE"
-      rows="18"
-      autofocus
-      spellcheck="false"
-      placeholder="// Paste JavaScript source or JSON text here."
-  ></textarea></fieldset>
-  <div class="center">
-      <button name=JSLint title="Ctrl + Enter">JSLint</button>
-      <button name=options id=JSLINT_CLEAR_OPTIONS>clear options</button>
+  <fieldset><legend>Source</legend>
+      <textarea id="JSLINT_SOURCE"></textarea>
+  </fieldset>
+  <div style="text-align: center;">
+      <p id="JSLINT_EDITION"></p>
+      <button name="JSLint" title="Ctrl + Enter">JSLint</button>
+      <button name="clear_source">Clear</button>
+      <button name="clear_options">Clear options</button>
   </div>
-  <fieldset id=JSLINT_OPTIONS><legend>Options</legend>
+  <fieldset id="JSLINT_OPTIONS"><legend>Options</legend>
     <div>Env...
-      <div><label><input title=browser type=checkbox>browser</label></div>
-      <div><label><input title=couch type=checkbox>couch</label></div>
-      <div><label><input title=devel type=checkbox>devel</label></div>
-      <div><label><input title=node type=checkbox>node</label></div>
+      <div><label><input title="browser" type="checkbox">browser</label></div>
+      <div><label><input title="couch" type="checkbox">couch</label></div>
+      <div><label><input title="devel" type="checkbox">devel</label></div>
+      <div><label><input title="node" type="checkbox">node</label></div>
     </div>
     <div>Allow...
-      <div><label><input title=beta type=checkbox>beta</label></div>
-      <div><label><input title=bitwise type=checkbox>bitwise</label></div>
-      <div><label><input title=convert type=checkbox>convert</label></div>
-      <div><label><input title=debug type=checkbox>debug</label></div>
+      <div><label><input title="beta" type="checkbox">beta</label></div>
+      <div><label><input title="bitwise" type="checkbox">bitwise</label></div>
+      <div><label><input title="convert" type="checkbox">convert</label></div>
+      <div><label><input title="debug" type="checkbox">debug</label></div>
     </div>
     <div>&nbsp;
-      <div><label><input title=eval type=checkbox>eval</label></div>
-      <div><label><input title=for type=checkbox>for</label></div>
-      <div><label><input title=getset type=checkbox>getset</label></div>
-      <div><label><input title=long type=checkbox>long</label></div>
+      <div><label><input title="eval" type="checkbox">eval</label></div>
+      <div><label><input title="for" type="checkbox">for</label></div>
+      <div><label><input title="getset" type="checkbox">getset</label></div>
+      <div><label><input title="long" type="checkbox">long</label></div>
     </div>
     <div>&nbsp;
-      <div><label><input title=name type=checkbox>name</label></div>
-      <div><label><input title=single type=checkbox>single</label></div>
-      <div><label><input title=this type=checkbox>this</label></div>
-      <div><label><input title=unordered type=checkbox>unordered</label></div>
+      <div><label><input title="name" type="checkbox">name</label></div>
+      <div><label><input title="single" type="checkbox">single</label></div>
+      <div><label><input title="this" type="checkbox">this</label></div>
+      <div><label><input title="unordered" type="checkbox">unordered</label></div>
     </div>
     <div>&nbsp;
-      <div><label><input title=variable type=checkbox>variable</label></div>
-      <div><label><input title=white type=checkbox>white</label></div>
+      <div><label><input title="variable" type="checkbox">variable</label></div>
+      <div><label><input title="white" type="checkbox">white</label></div>
     </div>
     <textarea
-      id=JSLINT_GLOBAL
-      title=global
-      spellcheck="false"
+      id="JSLINT_GLOBAL"
       placeholder="imported globals (e.g. atob, btoa)"
+      spellcheck="false"
+      title="global"
     ></textarea>
   </fieldset>
   <fieldset id="JSLINT_WARNINGS">

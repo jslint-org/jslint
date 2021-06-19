@@ -7,8 +7,9 @@
 - jslint - add new warning if const/let/var statements are not sorted.
 - jslint - include explicit commonjs (jslint.cjs) and es-module (jslint.mjs) variants of jslint.
 - jslint - reintroduce directive `/*jslint indent2*/` - allow 2-space indent.
-- jslint - remove directive "eval" (use line-specific ignore-directive "//jslint-quiet" instead).
+- jslint - remove directive `/*jslint eval*/` (use line-specific ignore-directive "//jslint-quiet" instead).
 - jslint - simplify comments/docs by removing unnecessary grammar-article "the".
+- jslint - try to improve parser to be able to parse jquery.js without stopping.
 - jslint-refactor - migrate recursive-loops to for/while loops.
 - node - after node-v12 is deprecated, change `require("fs").promises` to `require("fs/promises")`.
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.

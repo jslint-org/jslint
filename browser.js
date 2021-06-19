@@ -3,27 +3,20 @@
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
 /*jslint
+    beta
     browser
 */
 
 /*property
-    CodeMirror, Tab,
-    extraKeys,
-    fromTextArea,
-    getOption, getValue,
-    indentUnit, indentWithTabs,
-    jslint_result,
-    lineNumbers, lineWrapping,
-    matchBrackets, mode,
-    repeat, replaceSelection,
-    setValue, showTrailingSpace,
-    addEventListener, ctrlKey, key, querySelector, line_source, stack_trace,
-    checked, closure, column, context, create, disable, display, edition,
-    exports, filter, focus, forEach, froms, functions, getElementById,
-    global, id, innerHTML, isArray, join, json, keys, length, level, line,
-    lines, map, message, module, name, names, onchange, onclick, onscroll,
-    option, parameters, parent, property, push, querySelectorAll, replace, role,
-    scrollTop, select, signature, sort, split, stop, style, title, trim, value,
+    CodeMirror, Tab, addEventListener, checked, closure, column, context,
+    create, ctrlKey, display, edition, exports, extraKeys, filter, forEach,
+    fromTextArea, froms, functions, getElementById, getValue, global, id,
+    indentUnit, indentWithTabs, innerHTML, isArray, join, jslint_result, json,
+    key, keys, length, level, line, lineNumbers, lineWrapping, line_source,
+    matchBrackets, message, metaKey, mode, module, name, names, onclick,
+    parameters, parent, property, push, querySelector, querySelectorAll,
+    replace, replaceSelection, role, scrollTop, setValue, showTrailingSpace,
+    signature, sort, split, stack_trace, stop, style, textContent, title, value,
     warnings
 */
 
@@ -32,37 +25,19 @@ import jslint from "./jslint.js";
 // This is the web script companion file for JSLint. It includes code for
 // interacting with the browser and displaying the reports.
 
-const elem_boxes = document.querySelectorAll("[type=checkbox]");
-const elem_global = document.getElementById("JSLINT_GLOBAL");
-const elem_property = document.getElementById("JSLINT_PROPERTY");
-const elem_property_fieldset = document.getElementById(
-    "JSLINT_PROPERTYFIELDSET"
-);
-const elem_report_field = document.getElementById("JSLINT_REPORT");
-const elem_report_list = document.getElementById("JSLINT_REPORT_LIST");
-const elem_source = document.getElementById("JSLINT_SOURCE");
-const elem_warnings_list = document.getElementById("JSLINT_WARNINGS_LIST");
-const rx_amp = /&/g;
-const rx_gt = />/g;
-const rx_lt = /</g;
 let editor;
 
 function entityify(string) {
 
 // Replace & < > with less destructive entities.
 
-    return String(
-        string
-    ).replace(
-        rx_amp,
-        "&amp;"
-    ).replace(
-        rx_lt,
-        "&lt;"
-    ).replace(
-        rx_gt,
-        "&gt;"
-    );
+    return String(string).replace((
+        /&/g
+    ), "&amp;").replace((
+        /</g
+    ), "&lt;").replace((
+        />/g
+    ), "&gt;");
 }
 
 function error_report(data) {
@@ -228,11 +203,6 @@ function function_report(data) {
             output.push("</dl>");
         });
     }
-    output.push(
-        "<center>JSLint edition ",
-        entityify(data.edition),
-        "</center>"
-    );
     return output.join("");
 }
 
@@ -262,13 +232,6 @@ function property_directive(data) {
     return output.join("");
 }
 
-function clear_options() {
-    elem_boxes.forEach(function (node) {
-        node.checked = false;
-    });
-    elem_global.value = "";
-}
-
 function call_jslint() {
     let global_string;
     let option;
@@ -276,20 +239,20 @@ function call_jslint() {
 
 // Show ui-loader-animation.
 
-    document.querySelector("#uiLoader1").style.display = "flex";
+    document.getElementById("uiLoader1").style.display = "flex";
 
 // First build the option object.
 
     option = Object.create(null);
-    elem_boxes.forEach(function (node) {
-        if (node.checked) {
-            option[node.title] = true;
+    document.querySelectorAll("input[type=checkbox]").forEach(function (elem) {
+        if (elem.checked) {
+            option[elem.title] = true;
         }
     });
 
 // Call JSLint with the source text, the options, and the predefined globals.
 
-    global_string = elem_global.value;
+    global_string = document.getElementById("JSLINT_GLOBAL").value;
     result = jslint(
         editor.getValue(),
         option,
@@ -309,36 +272,49 @@ function call_jslint() {
 // Generate the reports.
 // Display the reports.
 
-    elem_warnings_list.innerHTML = error_report(result);
-    elem_report_list.innerHTML = function_report(result);
-    elem_report_field.style.display = "block";
-    elem_source.select();
-    elem_property.value = property_directive(result);
-    elem_property_fieldset.style.display = "block";
-    elem_property.scrollTop = 0;
+    document.getElementById(
+        "JSLINT_WARNINGS_LIST"
+    ).innerHTML = error_report(result);
+    document.getElementById(
+        "JSLINT_REPORT_LIST"
+    ).innerHTML = function_report(result);
+    document.getElementById(
+        "JSLINT_PROPERTY"
+    ).value = property_directive(result);
+    document.getElementById("JSLINT_PROPERTY").scrollTop = 0;
 
 // Hide ui-loader-animation.
 
     setTimeout(function () {
-        document.querySelector("#uiLoader1").style.display = "none";
+        document.getElementById("uiLoader1").style.display = "none";
     }, 500);
 }
 
+// Init edition.
+document.getElementById("JSLINT_EDITION").textContent = (
+    `Edition: ${jslint.edition}`
+);
+
+// Init event-handling.
 document.addEventListener("keydown", function (evt) {
-    if (evt.ctrlKey && evt.key === "Enter") {
+    if ((evt.ctrlKey || evt.metaKey) && evt.key === "Enter") {
         call_jslint();
     }
 });
+document.querySelector("button[name='JSLint']").onclick = call_jslint;
+document.querySelector("button[name='clear_source']").onclick = function () {
+    editor.setValue("");
+};
+document.querySelector("button[name='clear_options']").onclick = function () {
+    document.querySelectorAll("input[type=checkbox]").forEach(function (elem) {
+        elem.checked = false;
+    });
+    document.getElementById("JSLINT_GLOBAL").value = "";
+};
 
-document.querySelectorAll("[name='JSLint']").forEach(function (node) {
-    node.onclick = call_jslint;
-});
-
-document.getElementById("JSLINT_CLEAR_OPTIONS").onclick = clear_options;
-
-// init codemirror editor
-editor = globalThis.CodeMirror.fromTextArea(document.querySelector(
-    "#JSLINT_SOURCE"
+// Init CodeMirror editor.
+editor = globalThis.CodeMirror.fromTextArea(document.getElementById(
+    "JSLINT_SOURCE"
 ), {
     extraKeys: {
         Tab: function (editor) {

@@ -166,10 +166,10 @@ node jslint.mjs .
     git add -f .build
     # invalidate website cache
     sed -i \
-        -E "s/((href|src)=\"[^\"]*\.(css|js|mjs))\"/\1?aa=$(date +"%s")\"/g" \
+        -E "s/((href|src)=\"[^\"]*\.(css|js|mjs))\"/\1?tt=$(date +"%s")\"/g" \
         index.html
     sed -i \
-        -E "s/^(import .* from \".*\.(js|mjs))\";$/\1?aa=$(date +"%s")\";/g" \
+        -E "s/^(import .* from \".*\.(js|mjs))\";$/\1?tt=$(date +"%s")\";/g" \
         browser.js
     git commit -am "add dir .build"
     # checkout branch-gh-pages
