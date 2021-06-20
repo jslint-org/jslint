@@ -109,6 +109,7 @@ import moduleUrl from "url";
 shCiArtifactUpload() {(set -e
 # this function will upload build-artifacts to branch-gh-pages
     local BRANCH
+    local CACHEKEY
     local SIZE
     node --input-type=module -e '
 process.exit(Number(
@@ -162,15 +163,14 @@ node jslint.mjs .
     # screenshot changelog
     shRunWithScreenshotTxt head -n50 CHANGELOG.md
     mv .build/shRunWithScreenshotTxt.svg .build/screenshot-changelog.svg
+    # invalidate website-cache
+    CACHEKEY="$(tr -dc 0-9_a-z </dev/urandom | head -c 4)"
+    sed -i -E "s/((href|src)=\"[^\"]*\.(css|js|mjs))\"/\1?cc=$CACHEKEY\"/g" \
+        index.html
+    sed -i -E "s/^(import .* from \".*\.(js|mjs))\";$/\1?cc=$CACHEKEY\";/g" \
+        browser.js
     # add dir .build
     git add -f .build
-    # invalidate website cache
-    sed -i \
-        -E "s/((href|src)=\"[^\"]*\.(css|js|mjs))\"/\1?tt=$(date +"%s")\"/g" \
-        index.html
-    sed -i \
-        -E "s/^(import .* from \".*\.(js|mjs))\";$/\1?tt=$(date +"%s")\";/g" \
-        browser.js
     git commit -am "add dir .build"
     # checkout branch-gh-pages
     git checkout -b gh-pages

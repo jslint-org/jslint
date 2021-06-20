@@ -22,7 +22,11 @@
     href="asset-image-jslint-512.svg"
 />
 <title>JSLint:&nbsp;The&nbsp;JavaScript&nbsp;Code Quality Tool</title>
-<link rel="stylesheet" href="asset-codemirror-5.58.3-rollup.css">
+<!-- Google PageSpeed - reduce Largest Contentful Paint -->
+<link rel="preload" href="asset-codemirror-v5.58.3-rollup.js">
+<link rel="modulepreload" href="browser.js">
+<link rel="modulepreload" href="jslint.js">
+<link rel="stylesheet" href="asset-codemirror-v5.58.3-rollup.css">
 <style>
 /*csslint
     ids:false,
@@ -412,10 +416,11 @@ style="
 </div>
 <div id="JSLINT_">
   <fieldset><legend>Source</legend>
-      <textarea id="JSLINT_SOURCE"></textarea>
+      <!-- Google PageSpeed - reduce Cumulative Layout Shift -->
+      <textarea id="JSLINT_SOURCE" style="height: 300px;"></textarea>
   </fieldset>
   <div style="text-align: center;">
-      <p id="JSLINT_EDITION"></p>
+      <p id="JSLINT_EDITION">&nbsp;</p>
       <button name="JSLint" title="Ctrl + Enter">JSLint</button>
       <button name="clear_source">Clear</button>
       <button name="clear_options">Clear options</button>
@@ -469,6 +474,6 @@ style="
     <div id="JSLINT_REPORT_LIST"></div>
   </fieldset>
 </div>
-<script src="asset-codemirror-5.58.3-rollup.js"></script>
+<script src="asset-codemirror-v5.58.3-rollup.js"></script>
 <script src="browser.js" type="module"></script>
 </body></html>
