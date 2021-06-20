@@ -8,6 +8,7 @@
 */
 
 /*property
+    click,
     CodeMirror, Tab, addEventListener, checked, closure, column, context,
     create, ctrlKey, display, edition, exports, extraKeys, filter, forEach,
     fromTextArea, froms, functions, getElementById, getValue, global, id,
@@ -290,46 +291,57 @@ function call_jslint() {
     }, 500);
 }
 
+window.addEventListener("load", function () {
+
 // Init edition.
-document.getElementById("JSLINT_EDITION").textContent = (
-    `Edition: ${jslint.edition}`
-);
+
+    document.getElementById("JSLINT_EDITION").textContent = (
+        `Edition: ${jslint.edition}`
+    );
 
 // Init event-handling.
-document.addEventListener("keydown", function (evt) {
-    if ((evt.ctrlKey || evt.metaKey) && evt.key === "Enter") {
-        call_jslint();
-    }
-});
-document.querySelector("button[name='JSLint']").onclick = call_jslint;
-document.querySelector("button[name='clear_source']").onclick = function () {
-    editor.setValue("");
-};
-document.querySelector("button[name='clear_options']").onclick = function () {
-    document.querySelectorAll("input[type=checkbox]").forEach(function (elem) {
-        elem.checked = false;
+
+    document.addEventListener("keydown", function (evt) {
+        if ((evt.ctrlKey || evt.metaKey) && evt.key === "Enter") {
+            call_jslint();
+        }
     });
-    document.getElementById("JSLINT_GLOBAL").value = "";
-};
+    document.querySelector("button[name='JSLint']").onclick = call_jslint;
+    document.querySelector(
+        "button[name='clear_source']"
+    ).onclick = function () {
+        editor.setValue("");
+    };
+    document.querySelector(
+        "button[name='clear_options']"
+    ).onclick = function () {
+        document.querySelectorAll(
+            "input[type=checkbox]"
+        ).forEach(function (elem) {
+            elem.checked = false;
+        });
+        document.getElementById("JSLINT_GLOBAL").value = "";
+    };
 
 // Init CodeMirror editor.
-editor = globalThis.CodeMirror.fromTextArea(document.getElementById(
-    "JSLINT_SOURCE"
-), {
-    extraKeys: {
-        Tab: function (editor) {
-            editor.replaceSelection("    ");
-        }
-    },
-    indentUnit: 4,
-    indentWithTabs: false,
-    lineNumbers: true,
-    lineWrapping: true,
-    matchBrackets: true,
-    mode: "text/javascript",
-    showTrailingSpace: true
-});
-editor.setValue(`#!/usr/bin/env node
+
+    editor = globalThis.CodeMirror.fromTextArea(document.getElementById(
+        "JSLINT_SOURCE"
+    ), {
+        extraKeys: {
+            Tab: function (editor) {
+                editor.replaceSelection("    ");
+            }
+        },
+        indentUnit: 4,
+        indentWithTabs: false,
+        lineNumbers: true,
+        lineWrapping: true,
+        matchBrackets: true,
+        mode: "text/javascript",
+        showTrailingSpace: true
+    });
+    editor.setValue(`#!/usr/bin/env node
 
 /*jslint beta node*/
 
@@ -389,4 +401,5 @@ eval( //jslint-quiet
     });
 }());
 `);
-call_jslint();
+    document.querySelector("button[name='JSLint']").click();
+});

@@ -23,7 +23,7 @@
 />
 <title>JSLint:&nbsp;The&nbsp;JavaScript&nbsp;Code Quality Tool</title>
 <!-- Google PageSpeed - reduce Largest Contentful Paint -->
-<link rel="preload" href="asset-codemirror-v5.58.3-rollup.js">
+<link as="script" rel="preload" href="asset-codemirror-v5.58.3-rollup.js">
 <link rel="modulepreload" href="browser.js">
 <link rel="modulepreload" href="jslint.js">
 <link rel="stylesheet" href="asset-codemirror-v5.58.3-rollup.css">
@@ -397,7 +397,7 @@ style="
     z-index: 99;
 ">
 <div style="">
-    linting
+    Linting
     <span class="uiLoaderEllipsis">
         <span>.</span>
         <span>.</span>
@@ -416,8 +416,17 @@ style="
 </div>
 <div id="JSLINT_">
   <fieldset><legend>Source</legend>
-      <!-- Google PageSpeed - reduce Cumulative Layout Shift -->
-      <textarea id="JSLINT_SOURCE" style="height: 300px;"></textarea>
+
+<!-- Google PageSpeed - reduce Cumulative Layout Shift -->
+
+    <textarea id="JSLINT_SOURCE"
+style="
+    border: 0;
+    height: 300px;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+"></textarea>
   </fieldset>
   <div style="text-align: center;">
       <p id="JSLINT_EDITION">&nbsp;</p>
@@ -474,6 +483,6 @@ style="
     <div id="JSLINT_REPORT_LIST"></div>
   </fieldset>
 </div>
-<script src="asset-codemirror-v5.58.3-rollup.js"></script>
+<script defer src="asset-codemirror-v5.58.3-rollup.js"></script>
 <script src="browser.js" type="module"></script>
 </body></html>

@@ -109,7 +109,6 @@ import moduleUrl from "url";
 shCiArtifactUpload() {(set -e
 # this function will upload build-artifacts to branch-gh-pages
     local BRANCH
-    local CACHEKEY
     local SIZE
     node --input-type=module -e '
 process.exit(Number(
@@ -163,12 +162,55 @@ node jslint.mjs .
     # screenshot changelog
     shRunWithScreenshotTxt head -n50 CHANGELOG.md
     mv .build/shRunWithScreenshotTxt.svg .build/screenshot-changelog.svg
-    # invalidate website-cache
-    CACHEKEY="$(tr -dc 0-9_a-z </dev/urandom | head -c 4)"
-    sed -i -E "s/((href|src)=\"[^\"]*\.(css|js|mjs))\"/\1?cc=$CACHEKEY\"/g" \
-        index.html
-    sed -i -E "s/^(import .* from \".*\.(js|mjs))\";$/\1?cc=$CACHEKEY\";/g" \
-        browser.js
+    # seo - invalidate cached-assets and inline css
+    node --input-type=module -e '
+import moduleFs from "fs";
+var cacheKey = Math.random().toString(36).slice(-4);
+(async function () {
+    var result = await moduleFs.promises.readFile("browser.js", "utf8");
+
+// Invalidate cached-assets.
+
+    result = result.replace((
+        /^import\u0020.+?\u0020from\u0020".+?\.(?:js|mjs)\b/gm
+    ), function (match0) {
+        return `${match0}?cc=${cacheKey}`;
+    });
+
+// Write file.
+
+    await moduleFs.promises.writeFile("browser.js", result);
+}());
+(async function () {
+    var result = await moduleFs.promises.readFile("index.html", "utf8");
+
+// Invalidate cached-assets.
+
+    result = result.replace((
+        /\b(?:href|src)=".+?\.(?:css|js|mjs)\b/g
+    ), function (match0) {
+        return `${match0}?cc=${cacheKey}`;
+    });
+
+// Inline css-assets.
+
+    result.replace((
+        /<link\u0020rel="stylesheet"\u0020href="([^"]+?)">/g
+    ), async function (match0, url) {
+        var data = await moduleFs.promises.readFile(url.split("?")[0], "utf8");
+        result = result.replace(match0, function () {
+            return `<style>\n${data.trim()}\n</style>`;
+        });
+        return "";
+    });
+
+// Write file.
+
+    process.on("exit", function () {
+        moduleFs.writeFileSync("index.html", result); //jslint-quiet
+    });
+}());
+' # '
     # add dir .build
     git add -f .build
     git commit -am "add dir .build"
@@ -603,6 +645,7 @@ import moduleUrl from "url";
         ".svg": "image/svg+xml; charset=utf-8",
         ".txt": "text/plain; charset=utf-8",
         ".wasm": "application/wasm",
+        ".woff2": "font/woff2",
         ".xml": "application/xml; charset=utf-8",
         "/": "text/html; charset=utf-8"
     };
