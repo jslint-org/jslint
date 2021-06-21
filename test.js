@@ -115,6 +115,8 @@ function noop() {
         ], [
             "let {bb, aa} = 0;", {unordered: true}, []
         ], [
+            "let bb = 0;\nlet aa = 0;", {beta: true, variable: true}, []
+        ], [
             (
                 "function aa() {\n"
                 + "    if (aa) {\n"
@@ -122,7 +124,7 @@ function noop() {
                 + "        return bb;\n"
                 + "    }\n"
                 + "}\n"
-            ), {variable: true}, []
+            ), {beta: true, variable: true}, []
         ], [
             "\t", {white: true}, []
         ]

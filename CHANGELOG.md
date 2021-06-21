@@ -22,6 +22,7 @@
 - jslint - add new directive `/*jslint beta*/` - enable features currently in beta.
 - jslint - add new directive `/*jslint variable*/` - allow unordered variable-declarations that are not at top of function-scope.
 - jslint - add new warning if const/let/var statements are not declared at top of function-scope.
+- jslint - add new warning if const/let/var statements are unordered.
 - website - invalidate url-cache with each deployment.
 - website - replace .png logo with .svg logo.
 - website - replace current-editor with CodeMirror-editor and change programming-font-family from `Programma` to `consolas, menlo, monospace`.
