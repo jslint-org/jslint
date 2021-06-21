@@ -284,6 +284,7 @@ shCiBase() {(set -e
     ./jslint.js .
     (set -e
         # coverage-hack - test jslint's cli handling-behavior
+        export JSLINT_BETA=1
         export JSLINT_CLI=1
         shRunWithCoverage node test.js .
     )

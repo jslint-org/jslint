@@ -88,6 +88,7 @@
 /*jslint beta, node*/
 
 /*property
+    JSLINT_BETA,
     beta,
     catch_list, catch_stack, cli,
     function_stack,
@@ -119,7 +120,7 @@
     writable
 */
 
-const edition = "v2021.6.14-beta";
+const edition = "v2021.6.22";
 
 const line_fudge = 1;   // Fudge starting line and starting column to 1.
 
@@ -6285,7 +6286,7 @@ function jslint(
 // usually true. Some options will also predefine some number of global
 // variables.
 
-        beta: true,             // Enable experimental features.
+        beta: true,             // Enable extra warnings currently in beta.
         bitwise: true,          // Allow bitwise operators.
         browser: [              // Assume browser environment.
             "CharacterData",
@@ -6333,8 +6334,8 @@ function jslint(
         eval: true,             // Allow eval().
         for: true,              // Allow for-statement.
         getset: true,           // Allow get() and set().
-        long: true,             // Allow long-lines.
-        name: true,             // Allow weird property-names.
+        long: true,             // Allow long lines.
+        name: true,             // Allow weird property names.
         node: [                 // Assume Node.js environment.
             "Buffer",
             "TextDecoder",
@@ -7221,7 +7222,7 @@ async function jslint_cli({
 // Recursively jslint embedded "```javascript\n...\n```".
 
             code.replace((
-                /^```javascript\n([\S\s]*?\n)```$/gm
+                /^```(?:javascript|js)\n([\S\s]*?\n)```$/gm
             ), function (ignore, match1, ii) {
                 jslint_from_file({
                     code: match1,
@@ -7244,6 +7245,12 @@ async function jslint_cli({
                     file: file + ".<node -e>.js",
                     line_offset: string_line_count(code.slice(0, ii)) + 1,
                     option: Object.assign({
+                        beta: Boolean(
+                            process.env.JSLINT_BETA
+                            && !(
+                                /0|false|null|undefined/
+                            ).test(process.env.JSLINT_BETA)
+                        ),
                         node: true
                     }, option)
                 });
