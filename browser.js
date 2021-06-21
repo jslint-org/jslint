@@ -291,7 +291,7 @@ function call_jslint() {
     }, 500);
 }
 
-window.addEventListener("load", function () {
+(function () {
 
 // Init edition.
 
@@ -366,7 +366,8 @@ import https from "https";
 // .... /*jslint test_internal_error*/ ... Test jslint's internal-error
 // ........................................... handling-ability.
 // .... /*jslint this*/ .......... Allow 'this'.
-// .... /*jslint unordered*/ ..... Allow unordered cases, params, properties.
+// .... /*jslint unordered*/ ..... Allow unordered cases, params, properties,
+// ................................... and variables.
 // .... /*jslint variable*/ ...... Allow unordered const and let declarations
 // ................................... that are not at top of function-scope.
 // .... /*jslint white: true...... Allow messy whitespace.
@@ -402,4 +403,4 @@ eval( //jslint-quiet
 }());
 `);
     document.querySelector("button[name='JSLint']").click();
-});
+}());

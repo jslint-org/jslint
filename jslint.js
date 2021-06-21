@@ -2422,7 +2422,8 @@ function jslint_phase3_parse(state) {
         const the_symbol = symbol(id1, 30);
         the_symbol.led = function (left) {
             const the_token = token_now;
-            const second = parse_expression(20);
+            let second;
+            second = parse_expression(20);
             advance(id2);
             token_now.arity = "ternary";
             the_token.arity = "ternary";
@@ -2641,7 +2642,8 @@ function jslint_phase3_parse(state) {
     });
     infix(".", 170, function (left) {
         const the_token = token_now;
-        const name = token_nxt;
+        let name;
+        name = token_nxt;
         if (
             (
                 left.id !== "(string)"
@@ -2684,7 +2686,8 @@ function jslint_phase3_parse(state) {
     });
     infix("?.", 170, function (left) {
         const the_token = token_now;
-        const name = token_nxt;
+        let name;
+        name = token_nxt;
         if (
             (
                 left.id !== "(string)"
@@ -2732,8 +2735,8 @@ function jslint_phase3_parse(state) {
     });
     infix("[", 170, function (left) {
         const the_token = token_now;
-        const the_subscript = parse_expression(0);
         let name;
+        let the_subscript = parse_expression(0);
         if (the_subscript.id === "(string)" || the_subscript.id === "`") {
             name = survey(the_subscript);
             if (rx_identifier.test(name)) {
@@ -2847,7 +2850,8 @@ function jslint_phase3_parse(state) {
     });
     prefix("new", function () {
         const the_new = token_now;
-        const right = parse_expression(160);
+        let right;
+        right = parse_expression(160);
         if (token_nxt.id !== "(") {
 
 // cause: "new aa"
@@ -3336,8 +3340,8 @@ function jslint_phase3_parse(state) {
         let full;
         let id;
         let name;
-        let value;
         let the_colon;
+        let value;
         the_brace.expression = [];
         if (token_nxt.id !== "}") {
 
@@ -3525,16 +3529,18 @@ function jslint_phase3_parse(state) {
 
     function parse_var() {
         const the_variable = token_now;
-        const mode_const = the_variable.id === "const";
         let ellipsis;
+        let mode_const = the_variable.id === "const";
         let name;
         let the_brace;
         let the_bracket;
+        let variable_prv;
         switch (
             Boolean(functionage.last_statement)
             && functionage.last_statement.id
         ) {
         case "const":
+            variable_prv = functionage.last_statement;
             break;
         case "import":
 
@@ -3542,6 +3548,7 @@ function jslint_phase3_parse(state) {
 
             break;
         case "let":
+            variable_prv = functionage.last_statement;
             break;
         case "var":
 
@@ -3549,6 +3556,7 @@ function jslint_phase3_parse(state) {
 // cause: "let aa=0;let bb=0;"
 // cause: "var aa=0;var bb=0;"
 
+            variable_prv = functionage.last_statement;
             break;
         case false:
             break;
@@ -3645,7 +3653,7 @@ function jslint_phase3_parse(state) {
 
 // cause: "let{bb,aa}"
 
-                warn_if_unordered("variable", the_variable.names);
+                warn_if_unordered(the_variable.id, the_variable.names);
                 advance("}");
                 advance("=");
                 the_variable.expression = parse_expression(0);
@@ -3725,6 +3733,33 @@ function jslint_phase3_parse(state) {
 
             warn("expected_a_b", token_nxt, ";", ",");
             advance(",");
+        }
+
+// Warn if variable declarations are unordered.
+
+        if (
+            (
+                option_dict.beta
+                && !option_dict.unordered
+                && !option_dict.variable
+            )
+            && variable_prv
+            && (
+                (variable_prv.id + " " + variable_prv.names[0].id)
+                > (the_variable.id + " " + the_variable.names[0].id)
+            )
+        ) {
+
+// cause: "/*jslint beta*/\nlet bb;let aa;"
+
+            warn(
+                "expected_a_b_before_c_d",
+                the_variable,
+                the_variable.id,
+                the_variable.names[0].id,
+                variable_prv.id,
+                variable_prv.names[0].id
+            );
         }
         semicolon();
         return the_variable;
@@ -6324,7 +6359,8 @@ function jslint(
         test_internal_error: true,      // Test jslint's internal-error
                                         //     handling-ability.
         this: true,             // Allow 'this'.
-        unordered: true,        // Allow unordered cases, params, properties.
+        unordered: true,        // Allow unordered cases, params, properties,
+                                //     and variables.
         variable: true,         // Allow unordered const and let declarations
                                 //     that are not at top of function-scope.
         white: true             // Allow messy whitespace.
