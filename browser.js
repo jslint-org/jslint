@@ -349,7 +349,7 @@ import jslint from \u0022./jslint.mjs\u0022;
 import https from "https";
 
 // Optional directives.
-// .... /*jslint beta*/ .......... Enable experimental features.
+// .... /*jslint beta*/ .......... Enable extra warnings currently in beta.
 // .... /*jslint bitwise*/ ....... Allow bitwise operators.
 // .... /*jslint browser*/ ....... Assume browser environment.
 // .... /*jslint convert*/ ....... Allow conversion operators.
@@ -359,8 +359,8 @@ import https from "https";
 // .... /*jslint eval*/ .......... Allow eval().
 // .... /*jslint for*/ ........... Allow for-statement.
 // .... /*jslint getset*/ ........ Allow get() and set().
-// .... /*jslint long*/ .......... Allow long-lines.
-// .... /*jslint name*/ .......... Allow weird property-names.
+// .... /*jslint long*/ .......... Allow long lines.
+// .... /*jslint name*/ .......... Allow weird property names.
 // .... /*jslint node*/ .......... Assume Node.js environment.
 // .... /*jslint single*/ ........ Allow single-quote strings.
 // .... /*jslint test_internal_error*/ ... Test jslint's internal-error

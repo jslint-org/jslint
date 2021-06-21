@@ -14,10 +14,11 @@
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 - tests - update function warn_at() with assertion-check matching column with artifact.
 
-## v2021.6.14-beta
+## v2021.6.22
 - bugfix - fix global_list being ignored by jslint.
 - bugfix - fix no-warning when exception in catch-block is unused.
 - ci - migrate ci-scripts from cjs to esm.
+- cli - add env-variable \$JSLINT_BETA.
 - jslint - add new directive `/*jslint beta*/` - enable features currently in beta.
 - jslint - add new directive `/*jslint variable*/` - allow unordered variable-declarations that are not at top of function-scope.
 - jslint - add new warning if const/let/var statements are not declared at top of function-scope.
