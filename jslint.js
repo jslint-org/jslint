@@ -3735,7 +3735,7 @@ function jslint_phase3_parse(state) {
             advance(",");
         }
 
-// warn if variable declarations are unordered.
+// Warn if variable declarations are unordered.
 
         if (
             (

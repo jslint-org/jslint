@@ -4,7 +4,6 @@
 - app - deploy jslint as chrome-extension.
 - jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
-- jslint - add new warning if const/let/var statements are not sorted.
 - jslint - include explicit commonjs (jslint.cjs) and es-module (jslint.mjs) variants of jslint.
 - jslint - reintroduce directive `/*jslint indent2*/` - allow 2-space indent.
 - jslint - remove directive `/*jslint eval*/` (use line-specific ignore-directive "//jslint-quiet" instead).
