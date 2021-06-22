@@ -24,8 +24,8 @@
 <title>JSLint:&nbsp;The&nbsp;JavaScript&nbsp;Code Quality Tool</title>
 <!-- Google PageSpeed - reduce Largest Contentful Paint -->
 <link as="script" rel="preload" href="asset-codemirror-v5.58.3-rollup.js">
-<link rel="modulepreload" href="browser.js">
-<link rel="modulepreload" href="jslint.js">
+<link rel="modulepreload" href="browser.mjs">
+<link rel="modulepreload" href="jslint.mjs">
 <link rel="stylesheet" href="asset-codemirror-v5.58.3-rollup.css">
 <style>
 /*csslint
@@ -484,5 +484,12 @@ style="
   </fieldset>
 </div>
 <script defer src="asset-codemirror-v5.58.3-rollup.js"></script>
-<script src="browser.js" type="module"></script>
+<script src="browser.mjs" type="module"></script>
+<!-- coverage-hack -->
+<script>
+(function () {
+    return;
+}());
+</script>
+<!-- coverage-hack -->
 </body></html>

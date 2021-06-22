@@ -4,7 +4,6 @@
 - app - deploy jslint as chrome-extension.
 - jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
-- jslint - include explicit commonjs (jslint.cjs) and es-module (jslint.mjs) variants of jslint.
 - jslint - reintroduce directive `/*jslint indent2*/` - allow 2-space indent.
 - jslint - remove directive `/*jslint eval*/` (use line-specific ignore-directive "//jslint-quiet" instead).
 - jslint - simplify comments/docs by removing unnecessary grammar-article "the".
@@ -13,6 +12,10 @@
 - node - after node-v12 is deprecated, change `require("fs").promises` to `require("fs/promises")`.
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 - tests - update function warn_at() with assertion-check matching column with artifact.
+
+## v2021.6.24-beta
+- ci - include explicit commonjs (jslint.cjs) and es-module (jslint.mjs) variants of jslint.
+- jslint - rename files *.js to *.mjs for better integration with nodejs.
 
 ## v2021.6.22
 - bugfix - fix global_list being ignored by jslint.

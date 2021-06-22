@@ -24,11 +24,11 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Install
-### 1. To install, just download and rename https://www.jslint.com/jslint.js to `jslint.mjs`:
+### 1. To install, just download https://www.jslint.com/jslint.mjs:
 ```shell
 #!/bin/sh
 
-curl -L https://www.jslint.com/jslint.js > jslint.mjs
+curl -L https://www.jslint.com/jslint.mjs > jslint.mjs
 ```
 
 ### 2. To run `jslint.mjs` from command-line:
@@ -81,11 +81,11 @@ node jslint.mjs .
 
 
 # Description
-- [jslint.js](jslint.js) contains the jslint function. It parses and analyzes a source file, returning an object with information about the file. It can also take an object that sets options.
+- [jslint.mjs](jslint.mjs) contains the jslint function. It parses and analyzes a source file, returning an object with information about the file. It can also take an object that sets options.
 
-- [index.html](index.html) runs the jslint.js function in a web page. The page also depends on `browser.js`.
+- [index.html](index.html) runs the jslint.mjs function in a web page. The page also depends on `browser.mjs`.
 
-- [browser.js](browser.js) runs the web user interface and generates the results reports in HTML.
+- [browser.mjs](browser.mjs) runs the web user interface and generates the results reports in HTML.
 
 - [help.html](help.html) describes JSLint's usage. Please [read it](https://jslint-org.github.io/jslint/help.html).
 

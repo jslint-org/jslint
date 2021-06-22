@@ -16,3 +16,6 @@ undefined
 !.gitconfig
 !.github
 !.gitignore
+
+jslint.cjs
+jslint.js

@@ -11,7 +11,7 @@
 # git ls-remote --heads origin
 # git update-index --chmod=+x aa.js
 # head CHANGELOG.md -n50
-# ln -f jslint.js ~/jslint.mjs
+# ln -f jslint.mjs ~/jslint.mjs
 # openssl rand -base64 32 # random key
 # sh ci.sh shCiBranchPromote origin alpha beta
 # sh ci.sh shRunWithScreenshotTxt head -n50 CHANGELOG.md
@@ -127,11 +127,6 @@ process.exit(Number(
     # screenshot live-web-demo
     shBrowserScreenshot \
         https://jslint-org.github.io/jslint/branch-beta/index.html
-    # screenshot install - download
-    shRunWithScreenshotTxt sh -c '
-curl -L https://www.jslint.com/jslint.js > jslint.mjs
-'
-    mv .build/shRunWithScreenshotTxt.svg .build/screenshot-install-download.svg
     # screenshot install - cli-file
     printf "console.log('hello world');\n" > hello.js
     shRunWithScreenshotTxt sh -c '
@@ -167,7 +162,7 @@ node jslint.mjs .
 import moduleFs from "fs";
 var cacheKey = Math.random().toString(36).slice(-4);
 (async function () {
-    var result = await moduleFs.promises.readFile("browser.js", "utf8");
+    var result = await moduleFs.promises.readFile("browser.mjs", "utf8");
 
 // Invalidate cached-assets.
 
@@ -179,7 +174,7 @@ var cacheKey = Math.random().toString(36).slice(-4);
 
 // Write file.
 
-    await moduleFs.promises.writeFile("browser.js", result);
+    await moduleFs.promises.writeFile("browser.mjs", result);
 }());
 (async function () {
     var result = await moduleFs.promises.readFile("index.html", "utf8");
@@ -212,7 +207,7 @@ var cacheKey = Math.random().toString(36).slice(-4);
 }());
 ' # '
     # add dir .build
-    git add -f .build
+    git add -f .build jslint.cjs jslint.js
     git commit -am "add dir .build"
     # checkout branch-gh-pages
     git checkout -b gh-pages
@@ -273,20 +268,27 @@ var cacheKey = Math.random().toString(36).slice(-4);
 
 shCiBase() {(set -e
 # this function will run base-ci
+    # create jslint.cjs
+    cp jslint.mjs jslint.js
+    cat jslint.mjs | sed \
+        -e "s|^// module.exports = |module.exports = |" \
+        -e "s|^export default Object.freeze(|// &|" \
+        -e "s|^import_meta_url = |// &|" \
+        > jslint.cjs
     # run test with coverage-report
     # coverage-hack - test jslint's invalid-file handling-behavior
     mkdir -p .test-dir.js
-    # coverage-hack - test jslint's ignore-file handling-behavior
-    touch .test-min.js
-    # coverage-hack - test jslint's esm handling-behavior
-    touch .test.mjs
     # test jslint's cli handling-behavior
-    ./jslint.js .
+    printf "./jslint.cjs .\n"
+    chmod 755 jslint.cjs
+    ./jslint.cjs .
+    printf "./jslint.mjs .\n"
+    ./jslint.mjs .
+    printf "node test.mjs\n"
     (set -e
         # coverage-hack - test jslint's cli handling-behavior
         export JSLINT_BETA=1
-        export JSLINT_CLI=1
-        shRunWithCoverage node test.js .
+        shRunWithCoverage node test.mjs
     )
     # update version from CHANGELOG.md
     node --input-type=module -e '
@@ -300,7 +302,7 @@ import moduleFs from "fs";
     await Promise.all([
         "CHANGELOG.md",
         "README.md",
-        "jslint.js"
+        "jslint.mjs"
     ].map(async function (file) {
         dict[file] = await moduleFs.promises.readFile(file, "utf8");
     }));
@@ -320,11 +322,11 @@ import moduleFs from "fs";
             ), versionMaster),
             src0: dict["README.md"]
         }, {
-            file: "jslint.js",
-            src: dict["jslint.js"].replace((
+            file: "jslint.mjs",
+            src: dict["jslint.mjs"].replace((
                 /^const\u0020edition\u0020=\u0020".*?";$/m
             ), `const edition = "${versionBeta}";`),
-            src0: dict["jslint.js"]
+            src0: dict["jslint.mjs"]
         }
     ].forEach(function ({
         file,
@@ -375,7 +377,7 @@ import moduleUrl from "url";
         }
         data = await moduleFs.promises.readFile(file, "utf8");
         data.replace((
-            /\bhttps?:\/\/.*?(?:[\s")\]]|$)/gm
+            /\bhttps?:\/\/.*?(?:[\s"):\]]|$)/gm
         ), function (url) {
             var req;
             url = url.slice(0, -1).replace((

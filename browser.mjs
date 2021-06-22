@@ -1,4 +1,4 @@
-// browser.js
+// browser.mjs
 // 2018-06-16
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
@@ -21,7 +21,7 @@
     warnings
 */
 
-import jslint from "./jslint.js";
+import jslint from "./jslint.mjs";
 
 // This is the web script companion file for JSLint. It includes code for
 // interacting with the browser and displaying the reports.
@@ -385,7 +385,7 @@ eval( //jslint-quiet
 (async function () {
     let result;
     result = await new Promise(function (resolve) {
-        https.request("https://www.jslint.com/jslint.js", function (res) {
+        https.request("https://www.jslint.com/jslint.mjs", function (res) {
             result = "";
             res.on("data", function (chunk) {
                 result += chunk;
