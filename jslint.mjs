@@ -94,8 +94,7 @@
     function_stack,
     global_dict,
     last_statement,
-    main, mode_force,
-    nodejs_process,
+    main, mode_force, mode_noop,
     process_exit,
     toString,
     variable,
@@ -2839,6 +2838,13 @@ function jslint_phase3_parse(state) {
                     break;
                 }
                 advance(",");
+                if (token_nxt.id === "]") {
+
+// cause: let aa=[0,]
+
+                    warn("unexpected_a", token_now);
+                    break;
+                }
             }
         }
         advance("]");
@@ -3460,6 +3466,13 @@ function jslint_phase3_parse(state) {
 // cause: aa={"aa":0,"bb":0}
 
                 advance(",");
+                if (token_nxt.id === "}") {
+
+// cause: let aa={aa:0,}
+
+                    warn("unexpected_a", token_now);
+                    break;
+                }
             }
         }
 
@@ -7210,7 +7223,7 @@ async function jslint_cli({
     console_error,
     file,
     mode_force,
-    nodejs_process,
+    mode_noop,
     option,
     process_exit,
     source
@@ -7305,10 +7318,10 @@ async function jslint_cli({
                     line_offset: string_line_count(code.slice(0, ii)) + 1,
                     option: Object.assign({
                         beta: Boolean(
-                            nodejs_process.env.JSLINT_BETA
+                            process.env.JSLINT_BETA
                             && !(
                                 /0|false|null|undefined/
-                            ).test(nodejs_process.env.JSLINT_BETA)
+                            ).test(process.env.JSLINT_BETA)
                         ),
                         node: true
                     }, option)
@@ -7340,13 +7353,12 @@ async function jslint_cli({
 
 // Feature-detect nodejs.
 
-    if (mode_force) {
-        nodejs_process = typeof process === "object" && process;
-    }
     if (!(
-        nodejs_process
-        && nodejs_process.versions
-        && typeof nodejs_process.versions.node === "string"
+        typeof process === "object"
+        && process
+        && process.versions
+        && typeof process.versions.node === "string"
+        && !mode_noop
     )) {
         return exit_code;
     }
@@ -7354,7 +7366,7 @@ async function jslint_cli({
     module_fs = await import("fs");
     module_path = await import("path");
     module_url = await import("url");
-    process_exit = process_exit || nodejs_process.exit;
+    process_exit = process_exit || process.exit;
     if (!(
 
 // Feature-detect nodejs-cjs-cli.
@@ -7365,30 +7377,30 @@ async function jslint_cli({
 // Feature-detect nodejs-esm-cli.
 
         : (
-            nodejs_process.execArgv.indexOf("--eval") === -1
-            && nodejs_process.execArgv.indexOf("-e") === -1
+            process.execArgv.indexOf("--eval") === -1
+            && process.execArgv.indexOf("-e") === -1
             && (
                 (
                     /[\/|\\]jslint(?:\.[cm]?js)?$/m
-                ).test(nodejs_process.argv[1])
+                ).test(process.argv[1])
                 || mode_force
             )
             && module_url.fileURLToPath(import_meta_url)
-            === module_path.resolve(nodejs_process.argv[1])
+            === module_path.resolve(process.argv[1])
         )
     ) && !mode_force) {
         return exit_code;
     }
 
-// Normalize file relative to nodejs_process.cwd().
+// Normalize file relative to process.cwd().
 
-    file = file || nodejs_process.argv[2];
+    file = file || process.argv[2];
     if (!file) {
         return;
     }
     file = module_path.resolve(file) + "/";
-    if (file.startsWith(nodejs_process.cwd() + "/")) {
-        file = file.replace(nodejs_process.cwd() + "/", "").slice(0, -1) || ".";
+    if (file.startsWith(process.cwd() + "/")) {
+        file = file.replace(process.cwd() + "/", "").slice(0, -1) || ".";
     }
     file = file.replace((
         /\\/g
@@ -7488,9 +7500,8 @@ import_meta_url = import.meta.url;
 // Run jslint_cli.
 
 (function () {
-    let cjs_module = {};
-    let cjs_require = {};
-    let nodejs_process = {};
+    let cjs_module;
+    let cjs_require;
 
 // Coverage-hack.
 // Init commonjs builtins in try-catch-block in case we're in es-module-mode.
@@ -7499,12 +7510,10 @@ import_meta_url = import.meta.url;
         cjs_module = module;
     } catch (ignore) {}
     try {
-        nodejs_process = process;
         cjs_require = require;
     } catch (ignore) {}
     jslint_cli({
         cjs_module,
-        cjs_require,
-        nodejs_process
+        cjs_require
     });
 }());

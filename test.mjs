@@ -30,6 +30,7 @@ function noop() {
     }
     // test null handling-behavior
     jslint.cli({
+        mode_noop: true,
         process_exit: processExit0
     });
     // test file handling-behavior
@@ -147,7 +148,7 @@ function noop() {
         ], [
             "let {bb, aa} = 0;", {unordered: true}, []
         ], [
-            "let bb = 0;\nlet aa = 0;", {beta: true, variable: true}, []
+            "let bb = 0;\nlet aa = 0;", {variable: true}, []
         ], [
             (
                 "function aa() {\n"
@@ -156,13 +157,14 @@ function noop() {
                 + "        return bb;\n"
                 + "    }\n"
                 + "}\n"
-            ), {beta: true, variable: true}, []
+            ), {variable: true}, []
         ], [
             "\t", {white: true}, []
         ]
     ].forEach(function ([
         source, option_dict, global_list
     ]) {
+        option_dict.beta = true;
         // test jslint's option handling-behavior
         assertOrThrow(
             jslint(source, option_dict, global_list).warnings.length === 0,
