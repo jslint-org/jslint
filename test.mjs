@@ -1,6 +1,6 @@
 /*jslint node*/
 import fs from "fs";
-import jslint from "./jslint.js";
+import jslint from "./jslint.mjs";
 
 function assertOrThrow(passed, msg) {
 /*
@@ -22,29 +22,62 @@ function noop() {
 /*
  * this function will test jslint's cli handling-behavior
  */
-    process.exit = function (exitCode) {
-        assertOrThrow(!exitCode, exitCode);
-    };
+    function processExit0(exitCode) {
+        assertOrThrow(exitCode === 0, exitCode);
+    }
+    function processExit1(exitCode) {
+        assertOrThrow(exitCode === 1, exitCode);
+    }
+    // test null handling-behavior
     jslint.cli({
-        file: "jslint.js"
+        mode_noop: true,
+        process_exit: processExit0
     });
+    // test file handling-behavior
+    jslint.cli({
+        file: "jslint.mjs",
+        mode_force: true,
+        process_exit: processExit0
+
+    });
+    // test file-dir handling-behavior
+    jslint.cli({
+        file: ".",
+        mode_force: true,
+        process_exit: processExit0
+    });
+    // test file-error handling-behavior
     jslint.cli({
         // suppress error
         console_error: noop,
-        file: "undefined"
+        file: "undefined",
+        mode_force: true,
+        process_exit: processExit1
     });
+    // test file-undefined handling-behavior
+    jslint.cli({
+        mode_force: true,
+        process_exit: processExit0
+    });
+    // test cjs handling-behavior
+    jslint.cli({
+        cjs_module: {
+            exports: {}
+        },
+        cjs_require: {},
+        process_exit: processExit0
+    });
+    // test syntax-error handling-behavior
     jslint.cli({
         // suppress error
         console_error: noop,
-        file: "syntax_error.js",
+        file: "syntax-error.js",
+        mode_force: true,
         option: {
             debug: true
         },
+        process_exit: processExit1,
         source: "syntax error"
-    });
-    jslint.cli({
-        file: "aa.html",
-        source: "<script>\nlet aa = 0;\n</script>\n"
     });
 }());
 
@@ -115,7 +148,7 @@ function noop() {
         ], [
             "let {bb, aa} = 0;", {unordered: true}, []
         ], [
-            "let bb = 0;\nlet aa = 0;", {beta: true, variable: true}, []
+            "let bb = 0;\nlet aa = 0;", {variable: true}, []
         ], [
             (
                 "function aa() {\n"
@@ -124,13 +157,14 @@ function noop() {
                 + "        return bb;\n"
                 + "    }\n"
                 + "}\n"
-            ), {beta: true, variable: true}, []
+            ), {variable: true}, []
         ], [
             "\t", {white: true}, []
         ]
     ].forEach(function ([
         source, option_dict, global_list
     ]) {
+        option_dict.beta = true;
         // test jslint's option handling-behavior
         assertOrThrow(
             jslint(source, option_dict, global_list).warnings.length === 0,
@@ -305,7 +339,7 @@ function noop() {
  * malformed <code>
  */
     Array.from(String(
-        await fs.promises.readFile("jslint.js", "utf8")
+        await fs.promises.readFile("jslint.mjs", "utf8")
     ).matchAll(new RegExp((
         "\\s*?"
         + "(\\/\\/\\s*?cause:.*?\\n(?:\\/\\/.*?\\n)*?)"
