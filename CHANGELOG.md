@@ -2,6 +2,7 @@
 
 ## Todo
 - app - deploy jslint as chrome-extension.
+- cli - add command `report`.
 - jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
 - jslint - reintroduce directive `/*jslint indent2*/` - allow 2-space indent.
@@ -16,6 +17,7 @@
 
 ## v2021.6.24-beta
 - breaking-change - rename files *.js to *.mjs for better integration with nodejs.
+- ci - auto-screenshot example-shell-commands in README.md.
 - ci - include explicit commonjs (jslint.cjs) and es-module (jslint.mjs) variants of jslint.
 
 ## v2021.6.22

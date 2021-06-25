@@ -14,7 +14,7 @@
 # ln -f jslint.mjs ~/jslint.mjs
 # openssl rand -base64 32 # random key
 # sh ci.sh shCiBranchPromote origin alpha beta
-# sh ci.sh shRunWithScreenshotTxt head -n50 CHANGELOG.md
+# sh ci.sh shRunWithScreenshotTxt .build/screenshot-changelog.svg head -n50 CHANGELOG.md
 # vim rgx-lowercase \L\1\e
 
 shBrowserScreenshot() {(set -e
@@ -124,39 +124,77 @@ process.exit(Number(
     git config --local user.name "github-actions"
     # screenshot asset-image-jslint
     shImageJslintCreate &
-    # screenshot live-web-demo
+    # screenshot web-demo
     shBrowserScreenshot \
         https://jslint-org.github.io/jslint/branch-beta/index.html
-    # screenshot install - cli-file
-    printf "console.log('hello world');\n" > hello.js
-    shRunWithScreenshotTxt sh -c '
-node jslint.mjs hello.js
-' || true
-    mv .build/shRunWithScreenshotTxt.svg .build/screenshot-install-cli-file.svg
-    # screenshot install - import
-    shRunWithScreenshotTxt node --input-type=module -e '
-/*jslint devel*/
-import jslint from "./jslint.mjs";
-var code = "console.log(\u0027hello world\u0027);\n";
-var result = jslint(code);
-result.warnings.forEach(function ({
-    formatted_message
-}) {
-    console.error(formatted_message);
-});
-' || true
-    mv .build/shRunWithScreenshotTxt.svg .build/screenshot-install-import.svg
-    # screenshot install - cli-dir
-    shRunWithScreenshotTxt sh -c '
-node jslint.mjs .
-' || true
-    mv .build/shRunWithScreenshotTxt.svg .build/screenshot-install-cli-dir.svg
-    # screenshot files
-    shRunWithScreenshotTxt shGitLsTree
-    mv .build/shRunWithScreenshotTxt.svg .build/screenshot-files.svg
-    # screenshot changelog
-    shRunWithScreenshotTxt head -n50 CHANGELOG.md
-    mv .build/shRunWithScreenshotTxt.svg .build/screenshot-changelog.svg
+    node --input-type=module -e '
+import moduleFs from "fs";
+import moduleChildProcess from "child_process";
+(async function () {
+    "use strict";
+    [
+        // parallel-task - screenshot files
+        [
+            "shRunWithScreenshotTxt",
+            ".build/screenshot-files.svg",
+            "shGitLsTree"
+        ],
+        // parallel-task - screenshot changelog
+        [
+            "shRunWithScreenshotTxt",
+            ".build/screenshot-changelog.svg",
+            "head",
+            "-n50",
+            "CHANGELOG.md"
+        ]
+    ].forEach(function (argList) {
+        moduleChildProcess.spawn("./ci.sh", argList, {
+            stdio: [
+                "ignore", 1, 2
+            ]
+        }).on("exit", function (exitCode) {
+            if (exitCode) {
+                process.exit(exitCode);
+            }
+        });
+    });
+    // parallel-task - screenshot example-shell-commands in README.md
+    Array.from(String(
+        await moduleFs.promises.readFile("README.md", "utf8")
+    ).matchAll(
+        /\n```shell\u0020<!--\u0020shRunWithScreenshotTxt\u0020(.*?)\u0020-->\n([\S\s]*?\n)```\n/g
+    )).forEach(async function ([
+        ignore, file, script
+    ]) {
+        await moduleFs.promises.writeFile(file + ".sh", (
+            "printf \u0027"
+            + script.trim().replace((
+                /[%\\]/gm
+            ), "$&$&").replace((
+                /\u0027/g
+            ), "\u0027\"\u0027\"\u0027").replace((
+                /^/gm
+            ), "> ")
+            + "\n\n\n\u0027\n"
+            + script
+        ));
+        moduleChildProcess.spawn(
+            "./ci.sh",
+            [
+                "shRunWithScreenshotTxt",
+                file,
+                "sh",
+                file + ".sh"
+            ],
+            {
+                stdio: [
+                    "ignore", 1, 2
+                ]
+            }
+        );
+    });
+}());
+' # '
     # seo - invalidate cached-assets and inline css
     node --input-type=module -e '
 import moduleFs from "fs";
@@ -632,6 +670,7 @@ import moduleUrl from "url";
     "use strict";
     var contentTypeDict = {
         ".bmp": "image/bmp",
+        ".cjs": "application/javascript; charset=utf-8",
         ".css": "text/css; charset=utf-8",
         ".gif": "image/gif",
         ".htm": "text/html; charset=utf-8",
@@ -648,6 +687,7 @@ import moduleUrl from "url";
         ".svg": "image/svg+xml; charset=utf-8",
         ".txt": "text/plain; charset=utf-8",
         ".wasm": "application/wasm",
+        ".woff": "font/woff",
         ".woff2": "font/woff2",
         ".xml": "application/xml; charset=utf-8",
         "/": "text/html; charset=utf-8"
@@ -841,7 +881,8 @@ import moduleUrl from "url";
 
 shImageJslintCreate() {(set -e
 # this function will create .png logo of jslint
-    printf '<!DOCTYPE html>
+    echo '
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <title>logo</title>
@@ -866,23 +907,32 @@ div {
 }
 .container1 {
     background: antiquewhite;
-    border: 16px solid darkslategray;
+    border: 24px solid darkslategray;
     border-radius: 96px;
     color: darkslategray;
     font-family: Daley;
     height: 512px;
     margin: 0;
+    position: relative;
     width: 512px;
-    zoom: 100%%;
+    zoom: 100%;
+/*
+    background: transparent;
+    border: 24px solid black;
+    color: black;
+*/
 }
 .text1 {
     font-size: 256px;
-    margin-left: 40px;
-    margin-top: 24px;
+    left: 44px;
+    position: absolute;
+    top: 32px;
 }
 .text2 {
+    bottom: 8px;
     font-size: 192px;
-    margin-left: 56px;
+    left: 44px;
+    position: absolute;
 }
 </style>
 </head>
@@ -892,16 +942,20 @@ div {
 <div class="text2">Lint</div>
 </div>
 </body>
-</html>\n' > .build/asset-image-jslint-512.html
+</html>
+' > .build/asset-image-jslint-512.html
+    cp asset-font-daley-bold.woff2 .build
     # screenshot asset-image-jslint-512.png
     shBrowserScreenshot .build/asset-image-jslint-512.html \
-        "--window-size=512x512" \
-        "-screenshot=.build/asset-image-jslint-512.png"
+        --window-size=512x512 \
+        -screenshot=.build/asset-image-jslint-512.png
     # create various smaller thumbnails
     for SIZE in 32 64 128 256
     do
         convert -resize "${SIZE}x${SIZE}" .build/asset-image-jslint-512.png \
             ".build/asset-image-jslint-$SIZE.png"
+        printf \
+"shImageJslintCreate - wrote - .build/asset-image-jslint-$SIZE.png\n" 1>&2
     done
     # convert to svg @ https://convertio.co/png-svg/
 )}
@@ -965,7 +1019,7 @@ import moduleFs from "fs";
         ) + "\n"
     );
 }());
-' "$1" # '
+' "$@" # '
 )}
 
 shRawLibFetch() {(set -e
@@ -1334,7 +1388,7 @@ body {
 }
 .coverage td span {
     display: inline-block;
-    width: 100%%;
+    width: 100%;
 }
 .coverage .content {
     padding: 0 5px;
@@ -1819,8 +1873,8 @@ shRunWithScreenshotTxt() {(set -e
 # https://www.cnx-software.com/2011/09/22/how-to-convert-a-command-line-result-into-an-image-in-linux/
     local EXIT_CODE
     EXIT_CODE=0
-    export SCREENSHOT_SVG=.build/shRunWithScreenshotTxt.svg
-    rm -f "$SCREENSHOT_SVG"
+    export SCREENSHOT_SVG="$1"
+    shift
     printf "0\n" > "$SCREENSHOT_SVG.exit_code"
     printf "shRunWithScreenshotTxt - ($* 2>&1)\n" 1>&2
     # run "$@" with screenshot
@@ -1829,12 +1883,6 @@ shRunWithScreenshotTxt() {(set -e
     ) | tee "$SCREENSHOT_SVG.txt"
     EXIT_CODE="$(cat "$SCREENSHOT_SVG.exit_code")"
     printf "shRunWithScreenshotTxt - EXIT_CODE=$EXIT_CODE\n" 1>&2
-    # run shRunWithScreenshotTxtAfter
-    if (type shRunWithScreenshotTxtAfter > /dev/null 2>&1)
-    then
-        eval shRunWithScreenshotTxtAfter
-        unset shRunWithScreenshotTxtAfter
-    fi
     # format text-output
     node --input-type=module -e '
 import moduleFs from "fs";
@@ -1849,12 +1897,14 @@ import moduleFs from "fs";
     result = result.replace((
         /\u001b.*?m/g
     ), "");
+    /*
     // format unicode
     result = result.replace((
         /\\u[0-9a-f]{4}/g
     ), function (match0) {
         return String.fromCharCode("0x" + match0.slice(-4));
     });
+    */
     // normalize "\r\n"
     result = result.replace((
         /\r\n?/

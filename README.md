@@ -13,7 +13,7 @@ Douglas Crockford <douglas@crockford.com>
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jslint-org/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/jslint-org/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/jslint-org/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://jslint-org.github.io/jslint/branch-master/.build/coverage/coverage-badge.svg)](https://jslint-org.github.io/jslint/branch-master/.build/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-beta/.build/coverage/coverage-badge.svg)](https://jslint-org.github.io/jslint/branch-beta/.build/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-alpha/.build/coverage/coverage-badge.svg)](https://jslint-org.github.io/jslint/branch-alpha/.build/coverage/index.html) |
-| Demo | [<img src="asset-image-window-maximize-regular.svg" height="30">](https://jslint-org.github.io/jslint/branch-master/index.html) | [<img src="asset-image-window-maximize-regular.svg" height="30">](https://jslint-org.github.io/jslint/branch-beta/index.html) | [<img src="asset-image-window-maximize-regular.svg" height="30">](https://jslint-org.github.io/jslint/branch-alpha/index.html) |
+| Demo | [<img src="asset-image-jslint-512.svg" height="32">](https://jslint-org.github.io/jslint/branch-master/index.html) | [<img src="asset-image-jslint-512.svg" height="32">](https://jslint-org.github.io/jslint/branch-beta/index.html) | [<img src="asset-image-jslint-512.svg" height="32">](https://jslint-org.github.io/jslint/branch-alpha/index.html) |
 | Artifacts | [<img src="asset-image-folder-open-solid.svg" height="30">](https://github.com/jslint-org/jslint/tree/gh-pages/branch-master/.build) | [<img src="asset-image-folder-open-solid.svg" height="30">](https://github.com/jslint-org/jslint/tree/gh-pages/branch-beta/.build) | [<img src="asset-image-folder-open-solid.svg" height="30">](https://github.com/jslint-org/jslint/tree/gh-pages/branch-alpha/.build) |
 
 
@@ -32,7 +32,7 @@ curl -L https://www.jslint.com/jslint.mjs > jslint.mjs
 ```
 
 ### 2. To run `jslint.mjs` from command-line:
-```shell
+```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-cli-file.svg -->
 #!/bin/sh
 
 printf "console.log('hello world');\n" > hello.js
@@ -44,7 +44,7 @@ node jslint.mjs hello.js
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-cli-file.svg)
 
 ### 3. To import `jslint.mjs` as es-module:
-```shell
+```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-import.svg -->
 #!/bin/sh
 
 node --input-type=module -e '
@@ -66,7 +66,7 @@ result.warnings.forEach(function ({
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-import.svg)
 
 ### 4. To jslint entire directory:
-```shell
+```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-cli-dir.svg -->
 #!/bin/sh
 
 node jslint.mjs .
