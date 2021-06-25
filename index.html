@@ -8,19 +8,8 @@
     to be run from a web browser. It can accept a source program and analyze
     it without sending it over the network."
 />
-<meta
-    name="author"
-    content="Douglas Crockford"
-/>
-<meta
-    name="date"
-    content="2020-10-23"
-/>
-<link
-    rel="icon"
-    type="image/png"
-    href="asset-image-jslint-512.svg"
-/>
+<meta name="author" content="Douglas Crockford"/>
+<link rel="icon" type="image/png" href="asset-image-jslint-512.svg"/>
 <title>JSLint:&nbsp;The&nbsp;JavaScript&nbsp;Code Quality Tool</title>
 <!-- Google PageSpeed - reduce Largest Contentful Paint -->
 <link as="script" rel="preload" href="asset-codemirror-v5.58.3-rollup.js">
@@ -69,10 +58,19 @@
         opacity: 1;
     }
 }
+*,
+*:after,
+*:before {
+    border: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 /*csslint ignore:end*/
 body,
 #JSLINT_ button {
     font-family: daley, sans-serif;
+    font-size: 100%;
 }
 .uiLoaderEllipsis span {
     animation: uiLoaderEllipsis1 1s infinite steps(1);
@@ -111,223 +109,170 @@ a:visited {
     color: #69565c;
 }
 body {
-    background-color: antiquewhite;
-    color: black;
-    margin: 0;
-    padding: 0;
+    background: antiquewhite;
 }
 #JSLINT_ address {
-    color: black;
     float: right;
     font-size: 90%;
-    margin-left: 1em;
+    margin-left: 16px;
 }
 #JSLINT_ button {
-    background-color: darkslategray;
-    border: 0;
+    background: darkslategray;
     color: white;
     cursor: pointer;
-    font-size: 100%;
     font-style: normal;
-    margin-left: 1em;
-    margin-right: 1em;
-    padding: 0.25em 1em;
+    margin: 0 16px;
+    padding: 0.25em 16px;
     text-align: center;
 }
 #JSLINT_ button:active {
-    border: 0;
     color: black;
 }
 #JSLINT_ button:hover {
-    background-color: slategray;
-    border: 0;
+    background: slategray;
     color: white;
 }
 #JSLINT_ dd {
-    color: black;
     font-weight: bold;
     margin-left: 8em;
     padding-bottom: 2pt;
 }
 #JSLINT_ dfn {
-    color: black;
     display: block;
-    font-size: 100%;
     font-style: normal;
     font-weight: bold;
     margin-bottom: 2pt;
 }
 #JSLINT_ dl {
-    background-color: cornsilk;
-    color: white;
-    margin: 0;
-    padding: 2pt 1em;
+    background: cornsilk;
+    padding: 2pt 16px;
 }
 #JSLINT_ dl.level0 {
-    background-color: white;
-    color: black;
+    background: white;
 }
 #JSLINT_ dl.level1 {
     /* yellow */
-    background-color: #ffffe0;
-    color: black;
-    margin-left: 1em;
+    background: #ffffe0;
+    margin-left: 16px;
 }
 #JSLINT_ dl.level2 {
     /* green */
-    background-color: #e0ffe0;
-    color: black;
+    background: #e0ffe0;
     margin-left: 2em;
 }
 #JSLINT_ dl.level3 {
     /* blue */
-    background-color: #D0D0ff;
-    color: black;
+    background: #D0D0ff;
     margin-left: 3em;
 }
 #JSLINT_ dl.level4 {
     /* purple */
-    background-color: #ffe0ff;
-    color: black;
+    background: #ffe0ff;
     margin-left: 4em;
 }
 #JSLINT_ dl.level5 {
     /* red */
-    background-color: #ffe0e0;
-    color: black;
+    background: #ffe0e0;
     margin-left: 5em;
 }
 #JSLINT_ dl.level6 {
     /* orange */
-    background-color: #ffe390;
-    color: black;
+    background: #ffe390;
     margin-left: 6em;
 }
 #JSLINT_ dl.level7 {
     /* gray */
-    background-color: #e0e0e0;
-    color: black;
+    background: #e0e0e0;
     margin-left: 7em;
 }
 #JSLINT_ dl.level8 {
-    color: black;
     margin-left: 8em;
 }
 #JSLINT_ dl.level9 {
-    color: black;
     margin-left: 9em;
 }
 #JSLINT_ dt {
-    color: black;
     float: left;
     font-size: 75%;
     font-style: italic;
-    margin: 0;
     text-align: right;
     width: 8em;
 }
-#JSLINT_ fieldset {
-    background-color: gainsboro;
-    border: 0;
+#JSLINT_ fieldset,
+#JSLINT_ > div {
     clear: both;
-    margin: 1em 40px;
-    padding: 0;
+    margin: 16px 40px;
     width: auto;
 }
-#JSLINT_ input[type="text"] {
-    background-color: white;
-    border: 0;
-    color: black;
-    margin-bottom: 0.2em;
-    margin-right: 0.5em;
-    padding-left: 0.5em;
-    padding-right: 0.5em;
-    text-align: right;
-    width: 3em;
+#JSLINT_ fieldset {
+    background: gainsboro;
 }
 #JSLINT_ label {
     font-size: 90%;
     padding-left: 0.25em;
 }
 #JSLINT_ legend {
-    background-color: darkslategray;
-    border: 0;
+    background: darkslategray;
     color: white;
-    font-size: 100%;
     font-style: normal;
     font-weight: normal;
-    margin: 0;
     padding: 0.25em 0;
     text-align: center;
     width: 100%;
 }
 #JSLINT_ textarea {
-    border: 0;
     margin: 2%;
     padding: 0.5%;
     resize: none;
     white-space: pre;
-    width: 95%;
+    width: 96%;
 }
 #JSLINT_ textarea::selection,
 #JSLINT_ .CodeMirror-selected {
-    background-color: wheat;
-    color: black;
+    background: wheat;
 }
 #JSLINT_ .CodeMirror .cm-trailingspace {
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAACCAYAAAB/qH1jAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QUXCToH00Y1UgAAACFJREFUCNdjPMDBUc/AwNDAAAFMTAwMDA0OP34wQgX/AQBYgwYEx4f9lQAAAABJRU5ErkJggg==");
     background-position: bottom left;
     background-repeat: repeat-x;
 }
-#JSLINT_GLOBAL {
-    white-space: normal;
-    width: 95%;
+#JSLINT_OPTIONS input[type=checkbox] {
+    margin-right: 5px;
 }
 #JSLINT_OPTIONS > div {
     float: left;
-    margin: 0.5em;
+    line-height: 20px;
+    margin: 8px 8px 0 8px;
 }
 #JSLINT_PROPERTY {
-    background-color: honeydew;
+    background: honeydew;
 }
 #JSLINT_REPORT center {
-    margin-top: 1em;
+    margin-top: 16px;
 }
 #JSLINT_REPORT > div {
-    padding: 1em;
+    padding: 16px;
 }
 #JSLINT_TITLEBOX {
-    margin: 10px 40px 0 40px;
-    padding: 0;
-}
-#JSLINT_TITLEBOX div {
     color: darkslategray;
-    float: left;
-    font-size: 48pt;
 }
-#JSLINT_TITLEBOX ul {
-    float: right;
-    font-size: 12pt;
+#JSLINT_TITLEBOX li {
+    line-height: 20px;
 }
 #JSLINT_WARNINGS cite {
-    color: black;
     display: block;
-    font-size: 100%;
     font-style: normal;
     margin: 4pt 20px;
     overflow-x: hidden;
 }
 #JSLINT_WARNINGS dl address {
-    color: black;
     display: inline;
     float: none;
     font-size: 80%;
 }
 #JSLINT_WARNINGS samp {
-    background-color: lavenderblush;
-    color: black;
+    background: lavenderblush;
     display: block;
-    font-size: 100%;
     font-style: normal;
     font-weight: bold;
     margin: 0 16pt;
@@ -335,11 +280,11 @@ body {
     white-space: pre-wrap;
 }
 #JSLINT_WARNINGS > div {
-    background-color: pink;
-    padding: 1em;
+    background: pink;
+    padding: 16px;
 }
 #JSLINT_WARNINGS > legend {
-    background-color: indianred;
+    background: indianred;
 }
 </style>
 </head>
@@ -348,10 +293,8 @@ body {
 style="
     height: 100px;
     left: 0;
-    margin: 0;
     opacity: 0.75;
     overflow: hidden;
-    padding: 0;
     position: absolute;
     top: 0;
     width: 200px;
@@ -360,23 +303,19 @@ style="
     <div
 style="
     background: darkslategray;
-    font-size: 13px;
+    font-size: 12px;
     height: 20px;
     line-height: 20px;
     opacity: 0.75;
     overflow: visible;
     position: absolute;
-    right: 60px;
+    right: 65px;
     text-align: center;
-    top: 30px;
+    top: 25px;
     transform: rotate(-45deg);
     width: 100%;
 ">
-    <a
-        href="https://github.com/jslint-org/jslint"
-        style="color: #fff;"
-        target="_blank"
-    >
+    <a href="https://github.com/jslint-org/jslint" style="color: white;">
     fork on github
     </a>
     </div>
@@ -396,7 +335,7 @@ style="
     width: 200px;
     z-index: 99;
 ">
-<div style="">
+<div>
     Linting
     <span class="uiLoaderEllipsis">
         <span>.</span>
@@ -405,83 +344,79 @@ style="
     </span>
     </div>
 </div>
+<div id="JSLINT_">
 <div id="JSLINT_TITLEBOX">
-    <div>JSLint</div>
-    <ul>
-        <li><a href="help.html">Read the instructions.</a></li>
-        <li><a href="https://www.amazon.com/dp/1949815005/wrrrldwideweb" target="_blank">
-<i>How JavaScript Works</i> by Douglas Crockford.
-  </a></li>
+    <div style="float: left; margin-bottom: 16px;">
+    <div style="font-size: 50px;">JSLint</div>
+    <div id="JSLINT_EDITION" style="font-size: 14px;">&nbsp;</div>
+    </div>
+    <ul style="float: right;">
+    <li><a href="help.html">Read the instructions.</a></li>
+    <li><a href="https://www.amazon.com/dp/1949815005/wrrrldwideweb"><i>How JavaScript Works</i> by Douglas Crockford.</a></li>
+    <li><a href="https://github.com/jslint-org/jslint/issues">Report a bug.</a></li>
     </ul>
 </div>
-<div id="JSLINT_">
-  <fieldset><legend>Source</legend>
+<fieldset>
+    <legend>Source</legend>
 
 <!-- Google PageSpeed - reduce Cumulative Layout Shift -->
 
-    <textarea id="JSLINT_SOURCE"
-style="
-    border: 0;
-    height: 300px;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-"></textarea>
-  </fieldset>
-  <div style="text-align: center;">
-      <p id="JSLINT_EDITION">&nbsp;</p>
-      <button name="JSLint" title="Ctrl + Enter">JSLint</button>
-      <button name="clear_source">Clear</button>
-      <button name="clear_options">Clear options</button>
-  </div>
-  <fieldset id="JSLINT_OPTIONS"><legend>Options</legend>
+    <textarea id="JSLINT_SOURCE" style="height: 300px; width: 100%;"></textarea>
+</fieldset>
+<div style="text-align: center;">
+    <button name="JSLint" title="Ctrl + Enter">JSLint</button>
+    <button name="clear_source">Clear</button>
+    <button name="clear_options">Clear options</button>
+</div>
+<fieldset id="JSLINT_OPTIONS"><legend>Options</legend>
     <div>Env...
-      <div><label><input title="browser" type="checkbox">browser</label></div>
-      <div><label><input title="couch" type="checkbox">couch</label></div>
-      <div><label><input title="devel" type="checkbox">devel</label></div>
-      <div><label><input title="node" type="checkbox">node</label></div>
+        <div><label><input title="browser" type="checkbox">browser</label></div>
+        <div><label><input title="couch" type="checkbox">couch</label></div>
+        <div><label><input title="devel" type="checkbox">devel</label></div>
+        <div><label><input title="node" type="checkbox">node</label></div>
     </div>
     <div>Allow...
-      <div><label><input title="beta" type="checkbox">beta</label></div>
-      <div><label><input title="bitwise" type="checkbox">bitwise</label></div>
-      <div><label><input title="convert" type="checkbox">convert</label></div>
-      <div><label><input title="debug" type="checkbox">debug</label></div>
+        <div><label><input title="beta" type="checkbox">beta</label></div>
+        <div><label><input title="bitwise" type="checkbox">bitwise</label></div>
+        <div><label><input title="convert" type="checkbox">convert</label></div>
+        <div><label><input title="debug" type="checkbox">debug</label></div>
     </div>
     <div>&nbsp;
-      <div><label><input title="eval" type="checkbox">eval</label></div>
-      <div><label><input title="for" type="checkbox">for</label></div>
-      <div><label><input title="getset" type="checkbox">getset</label></div>
-      <div><label><input title="long" type="checkbox">long</label></div>
+        <div><label><input title="eval" type="checkbox">eval</label></div>
+        <div><label><input title="for" type="checkbox">for</label></div>
+        <div><label><input title="getset" type="checkbox">getset</label></div>
+        <div><label><input title="long" type="checkbox">long</label></div>
     </div>
     <div>&nbsp;
-      <div><label><input title="name" type="checkbox">name</label></div>
-      <div><label><input title="single" type="checkbox">single</label></div>
-      <div><label><input title="this" type="checkbox">this</label></div>
-      <div><label><input title="unordered" type="checkbox">unordered</label></div>
+        <div><label><input title="name" type="checkbox">name</label></div>
+        <div><label><input title="single" type="checkbox">single</label></div>
+        <div><label><input title="this" type="checkbox">this</label></div>
+        <div><label><input title="unordered" type="checkbox">unordered</label></div>
     </div>
     <div>&nbsp;
-      <div><label><input title="variable" type="checkbox">variable</label></div>
-      <div><label><input title="white" type="checkbox">white</label></div>
+        <div><label><input title="variable" type="checkbox">variable</label></div>
+        <div><label><input title="white" type="checkbox">white</label></div>
     </div>
     <textarea
-      id="JSLINT_GLOBAL"
-      placeholder="imported globals (e.g. atob, btoa)"
-      spellcheck="false"
-      title="global"
+        id="JSLINT_GLOBAL"
+        placeholder="imported globals (e.g. atob, btoa)"
+        spellcheck="false"
+        style="white-space: normal;"
+        title="global"
     ></textarea>
-  </fieldset>
-  <fieldset id="JSLINT_WARNINGS">
+</fieldset>
+<fieldset id="JSLINT_WARNINGS">
     <legend>Warnings</legend>
     <div id="JSLINT_WARNINGS_LIST"></div>
-  </fieldset>
-  <fieldset id="JSLINT_PROPERTYFIELDSET">
+</fieldset>
+<fieldset id="JSLINT_PROPERTYdiv">
     <legend>Property Directive</legend>
     <textarea id="JSLINT_PROPERTY" rows="8" readonly></textarea>
-  </fieldset>
-  <fieldset id="JSLINT_REPORT">
+</fieldset>
+<fieldset id="JSLINT_REPORT">
     <legend>Function Report</legend>
     <div id="JSLINT_REPORT_LIST"></div>
-  </fieldset>
+</fieldset>
 </div>
 <script defer src="asset-codemirror-v5.58.3-rollup.js"></script>
 <script src="browser.mjs" type="module"></script>
