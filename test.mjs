@@ -1,5 +1,5 @@
 /*jslint node*/
-import fs from "fs";
+import moduleFs from "fs";
 import jslint from "./jslint.mjs";
 
 function assertOrThrow(passed, msg) {
@@ -7,7 +7,7 @@ function assertOrThrow(passed, msg) {
  * this function will throw <msg> if <passed> is falsy
  */
     if (!passed) {
-        throw new Error(msg);
+        throw new Error(msg.slice(0, 1000));
     }
 }
 
@@ -91,10 +91,11 @@ function noop() {
     } catch (ignore) {}
 }());
 
-(function testCaseJslintOption() {
+(async function testCaseJslintOption() {
 /*
  * this function will test jslint's option handling-behavior
  */
+    let elemPrv = "";
     [
         [
             "let aa = aa | 0;", {bitwise: true}, []
@@ -123,6 +124,16 @@ function noop() {
         ], [
             "let aa = {set aa(aa) {\n    return aa;\n}};", {getset: true}, []
         ], [
+            String(
+                await moduleFs.promises.readFile("jslint.mjs", "utf8")
+            ).replace((
+                /\u0020{4}/g
+            ), "  ").replace("#!", "//"),
+            {indent2: true},
+            []
+        ], [
+            "function aa() {\n  return;\n}", {indent2: true}, []
+        ], [
             "/".repeat(100), {long: true}, []
         ], [
             "let aa = aa._;", {name: true}, []
@@ -148,8 +159,6 @@ function noop() {
         ], [
             "let {bb, aa} = 0;", {unordered: true}, []
         ], [
-            "let bb = 0;\nlet aa = 0;", {variable: true}, []
-        ], [
             (
                 "function aa() {\n"
                 + "    if (aa) {\n"
@@ -159,11 +168,21 @@ function noop() {
                 + "}\n"
             ), {variable: true}, []
         ], [
+            "let bb = 0;\nlet aa = 0;", {variable: true}, []
+        ], [
             "\t", {white: true}, []
         ]
     ].forEach(function ([
         source, option_dict, global_list
     ]) {
+        let elemNow = JSON.stringify([
+            option_dict, source, global_list
+        ]);
+        // Assert codeList is sorted.
+        assertOrThrow(elemPrv < elemNow, JSON.stringify([
+            elemPrv, elemNow
+        ], undefined, 4));
+        elemPrv = elemNow;
         option_dict.beta = true;
         // test jslint's option handling-behavior
         assertOrThrow(
@@ -316,14 +335,14 @@ function noop() {
             "let {constructor} = 0;"
         ]
     }).forEach(function (codeList) {
-        let code0 = "";
+        let elemPrv = "";
         codeList.forEach(function (code) {
             let warnings;
             // Assert codeList is sorted.
-            assertOrThrow(code0 < code, JSON.stringify([
-                code0, code
+            assertOrThrow(elemPrv < code, JSON.stringify([
+                elemPrv, code
             ], undefined, 4));
-            code0 = code;
+            elemPrv = code;
             warnings = jslint(code).warnings;
             assertOrThrow(
                 warnings.length === 0,
@@ -339,7 +358,7 @@ function noop() {
  * malformed <code>
  */
     Array.from(String(
-        await fs.promises.readFile("jslint.mjs", "utf8")
+        await moduleFs.promises.readFile("jslint.mjs", "utf8")
     ).matchAll(new RegExp((
         "\\s*?"
         + "(\\/\\/\\s*?cause:.*?\\n(?:\\/\\/.*?\\n)*?)"
@@ -347,7 +366,7 @@ function noop() {
     ), "gm"))).forEach(function ([
         match0, causeList, warning
     ]) {
-        let cause0 = "";
+        let elemPrv = "";
         let expectedWarningCode;
         let fnc;
         // debug match0
@@ -418,10 +437,10 @@ function noop() {
                 ), "")
             );
             // Assert causeList is sorted.
-            assertOrThrow(cause0 < cause, JSON.stringify([
-                cause0, cause
+            assertOrThrow(elemPrv < cause, JSON.stringify([
+                elemPrv, cause
             ], undefined, 4));
-            cause0 = cause;
+            elemPrv = cause;
             // Assert expectedWarningCode from cause.
             assertOrThrow(
                 jslint(cause).warnings.some(function ({
