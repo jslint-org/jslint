@@ -311,7 +311,7 @@ shCiBase() {(set -e
     cat jslint.mjs | sed \
         -e "s|^// module.exports = |module.exports = |" \
         -e "s|^export default Object.freeze(|// &|" \
-        -e "s|^import_meta_url = |// &|" \
+        -e "s|^jslint_import_meta_url = |// &|" \
         > jslint.cjs
     # run test with coverage-report
     # coverage-hack - test jslint's invalid-file handling-behavior
@@ -362,8 +362,8 @@ import moduleFs from "fs";
         }, {
             file: "jslint.mjs",
             src: dict["jslint.mjs"].replace((
-                /^const\u0020edition\u0020=\u0020".*?";$/m
-            ), `const edition = "${versionBeta}";`),
+                /^const\u0020jslint_edition\u0020=\u0020".*?";$/m
+            ), `const jslint_edition = "${versionBeta}";`),
             src0: dict["jslint.mjs"]
         }
     ].forEach(function ({

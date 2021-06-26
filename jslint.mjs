@@ -93,6 +93,7 @@
     catch_list, catch_stack, cjs_module, cjs_require, cli,
     function_stack,
     global_dict,
+    indent2,
     last_statement,
     main, mode_force, mode_noop,
     process_exit,
@@ -123,12 +124,10 @@
     writable
 */
 
-const edition = "v2021.6.24-beta";
-
-const line_fudge = 1;   // Fudge starting line and starting column to 1.
-
-let import_meta_url = "";
+const jslint_edition = "v2021.6.26-beta";
+const jslint_fudge = 1;   // Fudge starting line and starting column to 1.
 let jslint_export;
+let jslint_import_meta_url = "";
 
 function assert_or_throw(passed, message) {
 
@@ -141,8 +140,8 @@ function assert_or_throw(passed, message) {
         `This was caused by a bug in JSLint.
 Please open an issue with this stack-trace (and possible example-code) at
 https://github.com/jslint-org/jslint/issues.
-edition = "${edition}";
-${message}`
+edition = "${jslint_edition}";
+${String(message).slice(0, 1000)}`
     );
 }
 
@@ -1484,7 +1483,7 @@ function jslint_phase2_lex(state) {
 
 // Scan first line for "#!" and ignore it.
 
-    if (line_list[line_fudge].line_source.startsWith("#!")) {
+    if (line_list[jslint_fudge].line_source.startsWith("#!")) {
         line += 1;
         state.mode_shebang = true;
     }
@@ -5674,6 +5673,11 @@ function jslint_phase5_whitage(state) {
         token_list,
         warn
     } = state;
+    const mode_indent = (
+        option_dict.indent2
+        ? 2
+        : 4
+    );
     const spaceop = populate([  // This is the set of infix operators that
                                 //     require a space on each side.
         "!=", "!==", "%", "%=", "&", "&=", "&&", "*", "*=", "+=", "-=", "/",
@@ -5727,8 +5731,8 @@ function jslint_phase5_whitage(state) {
 
 // Fudge column numbers in warning message.
 
-            at + line_fudge,
-            right.from + line_fudge
+            at + jslint_fudge,
+            right.from + jslint_fudge
         );
     }
 
@@ -6009,7 +6013,7 @@ function jslint_phase5_whitage(state) {
 
                         free = closer === ")" && left.free;
                         open = true;
-                        margin += 4;
+                        margin += mode_indent;
                         if (right.role === "label") {
                             if (right.from !== 0) {
 
@@ -6026,7 +6030,7 @@ function jslint_phase5_whitage(state) {
                                 expected_at(0);
                             }
                         } else if (right.switch) {
-                            at_margin(-4);
+                            at_margin(-mode_indent);
                         } else {
                             at_margin(0);
                         }
@@ -6100,7 +6104,7 @@ function jslint_phase5_whitage(state) {
 // right must go at the margin, or if closed, a space between.
 
                     if (right.switch) {
-                        at_margin(-4);
+                        at_margin(-mode_indent);
                     } else if (right.role === "label") {
                         if (right.from !== 0) {
 
@@ -6354,6 +6358,7 @@ function jslint(
         eval: true,             // Allow eval().
         for: true,              // Allow for-statement.
         getset: true,           // Allow get() and set().
+        indent2: true,          // Allow 2-space indent.
         long: true,             // Allow long lines.
         name: true,             // Allow weird property names.
         node: [                 // Assume Node.js environment.
@@ -6519,7 +6524,7 @@ function jslint(
         from: 0,
         id: "(global)",
         level: 0,
-        line: line_fudge,
+        line: jslint_fudge,
         live: [],
         loop: 0,
         switch: 0,
@@ -6681,7 +6686,7 @@ function jslint(
 
 // Fudge column numbers in warning message.
 
-            column: column || line_fudge,
+            column: column || jslint_fudge,
             d,
             line,
             line_source: "",
@@ -7008,7 +7013,7 @@ function jslint(
             the_token.warning = warn_at(
                 code,
                 the_token.line,
-                (the_token.from || 0) + line_fudge,
+                (the_token.from || 0) + jslint_fudge,
                 a || artifact(the_token),
                 b,
                 c,
@@ -7152,8 +7157,8 @@ function jslint(
         err.mode_stop = true;
         if (err.name !== "JSLintError") {
             Object.assign(err, {
-                column: line_fudge,
-                line: line_fudge,
+                column: jslint_fudge,
+                line: jslint_fudge,
                 line_source: "",
                 stack_trace: err.stack
             });
@@ -7193,7 +7198,7 @@ function jslint(
 
     return {
         directives: directive_list,
-        edition,
+        edition: jslint_edition,
         exports: export_dict,
         froms: import_list,
         functions: function_list,
@@ -7207,7 +7212,7 @@ function jslint(
         property: property_dict,
         shebang: (
             state.mode_shebang
-            ? line_list[line_fudge].line_source
+            ? line_list[jslint_fudge].line_source
             : undefined
         ),
         stop: mode_stop,
@@ -7385,7 +7390,7 @@ async function jslint_cli({
                 ).test(process.argv[1])
                 || mode_force
             )
-            && module_url.fileURLToPath(import_meta_url)
+            && module_url.fileURLToPath(jslint_import_meta_url)
             === module_path.resolve(process.argv[1])
         )
     ) && !mode_force) {
@@ -7487,7 +7492,7 @@ async function jslint_cli({
 
 jslint_export = Object.freeze(Object.assign(jslint, {
     cli: Object.freeze(jslint_cli),
-    edition,
+    edition: jslint_edition,
     jslint: Object.freeze(jslint.bind(undefined))
 }));
 
@@ -7495,7 +7500,7 @@ jslint_export = Object.freeze(Object.assign(jslint, {
 
 // module.exports = jslint_export;
 export default Object.freeze(jslint_export);
-import_meta_url = import.meta.url;
+jslint_import_meta_url = import.meta.url;
 
 // Run jslint_cli.
 

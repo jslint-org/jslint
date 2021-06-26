@@ -2,13 +2,10 @@
 // 2018-06-16
 // Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
 
-/*jslint
-    beta
-    browser
-*/
+/*jslint beta, browser*/
 
 /*property
-    click,
+    click, search, test
     CodeMirror, Tab, addEventListener, checked, closure, column, context,
     create, ctrlKey, display, edition, exports, extraKeys, filter, forEach,
     fromTextArea, froms, functions, getElementById, getValue, global, id,
@@ -341,9 +338,15 @@ function call_jslint() {
         mode: "text/javascript",
         showTrailingSpace: true
     });
+    if ((
+        /\bmode_debug=1\b/
+    ).test(location.search)) {
+        return;
+    }
     editor.setValue(`#!/usr/bin/env node
 
-/*jslint beta node*/
+/*jslint browser, node*/
+/*global $, jQuery*/ //jslint-quiet
 
 import jslint from \u0022./jslint.mjs\u0022;
 import https from "https";
@@ -359,6 +362,7 @@ import https from "https";
 // .... /*jslint eval*/ .......... Allow eval().
 // .... /*jslint for*/ ........... Allow for-statement.
 // .... /*jslint getset*/ ........ Allow get() and set().
+// .... /*jslint indent2*/ ....... Allow 2-space indent.
 // .... /*jslint long*/ .......... Allow long lines.
 // .... /*jslint name*/ .......... Allow weird property names.
 // .... /*jslint node*/ .......... Assume Node.js environment.
@@ -379,7 +383,7 @@ console.log('hello world');
 
 // Suppress warnings on next-line.
 eval( //jslint-quiet
-    "console.log('hello world');"
+    "console.log(\\"hello world\\");"
 );
 
 (async function () {
