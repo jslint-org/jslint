@@ -6,6 +6,7 @@
 - jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
 - jslint - remove directive `/*jslint eval*/` (use line-specific ignore-directive "//jslint-quiet" instead).
+- jslint - require regexp to use open-form.
 - jslint - simplify comments/docs by removing unnecessary grammar-article "the".
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 - jslint-refactor - migrate recursive-loops to for/while loops.

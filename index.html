@@ -11,13 +11,16 @@
 <meta name="author" content="Douglas Crockford"/>
 <link rel="icon" type="image/png" href="asset-image-jslint-512.svg"/>
 <title>JSLint:&nbsp;The&nbsp;JavaScript&nbsp;Code Quality Tool</title>
-<!-- Google PageSpeed - reduce Largest Contentful Paint -->
+
+<!-- Google PageSpeed - Reduce Largest Contentful Paint. -->
+
 <link as="script" rel="preload" href="asset-codemirror-v5.58.3-rollup.js">
 <link rel="modulepreload" href="browser.mjs">
 <link rel="modulepreload" href="jslint.mjs">
 <link rel="stylesheet" href="asset-codemirror-v5.58.3-rollup.css">
 <style>
 /*csslint
+    box-model: false,
     ids:false,
     overqualified-elements: false
 */
@@ -122,30 +125,23 @@ body {
     cursor: pointer;
     font-style: normal;
     margin: 0 16px;
-    padding: 0.25em 16px;
+    padding: 4px 16px;
     text-align: center;
-}
-#JSLINT_ button:active {
-    color: black;
-}
-#JSLINT_ button:hover {
-    background: slategray;
-    color: white;
 }
 #JSLINT_ dd {
     font-weight: bold;
     margin-left: 8em;
-    padding-bottom: 2pt;
+    padding-bottom: 2px;
 }
 #JSLINT_ dfn {
     display: block;
     font-style: normal;
     font-weight: bold;
-    margin-bottom: 2pt;
+    padding-bottom: 2px;
 }
 #JSLINT_ dl {
     background: cornsilk;
-    padding: 2pt 16px;
+    padding: 4px 16px 0 16px;
 }
 #JSLINT_ dl.level0 {
     background: white;
@@ -207,6 +203,10 @@ body {
 #JSLINT_ fieldset {
     background: gainsboro;
 }
+#JSLINT_ fieldset > div {
+    padding: 16px;
+    width: 100%;
+}
 #JSLINT_ label {
     font-size: 90%;
     padding-left: 0.25em;
@@ -221,37 +221,42 @@ body {
     width: 100%;
 }
 #JSLINT_ textarea {
-    margin: 2%;
     padding: 0.5%;
     resize: none;
     white-space: pre;
-    width: 96%;
+    width: 100%;
 }
 #JSLINT_ textarea::selection,
 #JSLINT_ .CodeMirror-selected {
     background: wheat;
+}
+#JSLINT_ .CodeMirror {
+    padding: 0;
 }
 #JSLINT_ .CodeMirror .cm-trailingspace {
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAACCAYAAAB/qH1jAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QUXCToH00Y1UgAAACFJREFUCNdjPMDBUc/AwNDAAAFMTAwMDA0OP34wQgX/AQBYgwYEx4f9lQAAAABJRU5ErkJggg==");
     background-position: bottom left;
     background-repeat: repeat-x;
 }
-#JSLINT_OPTIONS input[type=checkbox] {
-    margin-right: 5px;
+#JSLINT_OPTIONS div[title],
+#JSLINT_OPTIONS div[title] input,
+#JSLINT_OPTIONS div[title] label {
+    cursor: pointer;
+    user-select: none;
 }
-#JSLINT_OPTIONS > div {
+#JSLINT_OPTIONS div[title] {
+    padding: 0 4px;
+}
+#JSLINT_OPTIONS div[title] input {
+    vertical-align: middle;
+}
+#JSLINT_OPTIONS > div > div {
     float: left;
     line-height: 20px;
-    margin: 8px 8px 0 8px;
+    margin: 0 16px 16px 0;
 }
 #JSLINT_PROPERTY {
     background: honeydew;
-}
-#JSLINT_REPORT center {
-    margin-top: 16px;
-}
-#JSLINT_REPORT > div {
-    padding: 16px;
 }
 #JSLINT_TITLEBOX {
     color: darkslategray;
@@ -262,8 +267,11 @@ body {
 #JSLINT_WARNINGS cite {
     display: block;
     font-style: normal;
-    margin: 4pt 20px;
+    margin-top: 16px;
     overflow-x: hidden;
+}
+#JSLINT_WARNINGS cite:nth-child(1) {
+    margin-top: 0;
 }
 #JSLINT_WARNINGS dl address {
     display: inline;
@@ -275,16 +283,24 @@ body {
     display: block;
     font-style: normal;
     font-weight: bold;
-    margin: 0 16pt;
-    padding: 4pt;
+    padding: 4px;
     white-space: pre-wrap;
 }
 #JSLINT_WARNINGS > div {
     background: pink;
-    padding: 16px;
 }
 #JSLINT_WARNINGS > legend {
     background: indianred;
+}
+
+#JSLINT_ button:hover,
+#JSLINT_OPTIONS div[title]:hover {
+    background: slategray;
+    color: white;
+}
+
+#JSLINT_ button:active {
+    color: black;
 }
 </style>
 </head>
@@ -359,47 +375,84 @@ style="
 <fieldset>
     <legend>Source</legend>
 
-<!-- Google PageSpeed - reduce Cumulative Layout Shift -->
+<!-- Google PageSpeed - Reduce Cumulative Layout Shift. -->
 
-    <textarea
-        id="JSLINT_SOURCE"
-        style="height: 297px; margin: 0; width: 100%;"
-    ></textarea>
+    <textarea id="JSLINT_SOURCE" style="height: 297px;"></textarea>
 </fieldset>
 <div style="text-align: center;">
     <button name="JSLint" title="Ctrl + Enter">JSLint</button>
     <button name="clear_source">Clear</button>
     <button name="clear_options">Clear options</button>
 </div>
-<fieldset id="JSLINT_OPTIONS"><legend>Options</legend>
+<fieldset id="JSLINT_OPTIONS">
+    <legend>Options</legend>
+    <div>
     <div>Env...
-        <div><label><input title="browser" type="checkbox">browser</label></div>
-        <div><label><input title="couch" type="checkbox">couch</label></div>
-        <div><label><input title="devel" type="checkbox">devel</label></div>
-        <div><label><input title="node" type="checkbox">node</label></div>
+        <div title="Assume browser environment.">
+        <input type="checkbox" value="browser"><label>browser</label>
+        </div>
+        <div title="Assume CouchDb environment.">
+        <input type="checkbox" value="couch"><label>couch</label>
+        </div>
+        <div title="Allow console.log() and friends.">
+        <input type="checkbox" value="devel"><label>devel</label>
+        </div>
+        <div title="Assume Node.js environment.">
+        <input type="checkbox" value="node"><label>node</label>
+        </div>
     </div>
     <div>Allow...
-        <div><label><input title="beta" type="checkbox">beta</label></div>
-        <div><label><input title="bitwise" type="checkbox">bitwise</label></div>
-        <div><label><input title="convert" type="checkbox">convert</label></div>
-        <div><label><input title="debug" type="checkbox">debug</label></div>
+        <div title="Enable experimental warnings.">
+        <input type="checkbox" value="beta"><label>beta</label>
+        </div>
+        <div title="Allow bitwise operators.">
+        <input type="checkbox" value="bitwise"><label>bitwise</label>
+        </div>
+        <div title="Allow conversion operators.">
+        <input type="checkbox" value="convert"><label>convert</label>
+        </div>
+        <div title="Include jslint stack-trace in warnings.">
+        <input type="checkbox" value="debug"><label>debug</label>
+        </div>
     </div>
     <div>&nbsp;
-        <div><label><input title="eval" type="checkbox">eval</label></div>
-        <div><label><input title="for" type="checkbox">for</label></div>
-        <div><label><input title="getset" type="checkbox">getset</label></div>
-        <div><label><input title="indent2" type="checkbox">indent2</label></div>
+        <div title="Allow eval().">
+        <input type="checkbox" value="eval"><label>eval</label>
+        </div>
+        <div title="Allow for-statement.">
+        <input type="checkbox" value="for"><label>for</label>
+        </div>
+        <div title="Allow get() and set().">
+        <input type="checkbox" value="getset"><label>getset</label>
+        </div>
+        <div title="Allow 2-space indent.">
+        <input type="checkbox" value="indent2"><label>indent2</label>
+        </div>
     </div>
     <div>&nbsp;
-        <div><label><input title="long" type="checkbox">long</label></div>
-        <div><label><input title="name" type="checkbox">name</label></div>
-        <div><label><input title="single" type="checkbox">single</label></div>
-        <div><label><input title="this" type="checkbox">this</label></div>
+        <div title="Allow long lines.">
+        <input type="checkbox" value="long"><label>long</label>
+        </div>
+        <div title="Allow weird property names.">
+        <input type="checkbox" value="name"><label>name</label>
+        </div>
+        <div title="Allow single-quote strings.">
+        <input type="checkbox" value="single"><label>single</label>
+        </div>
+        <div title="Allow 'this'.">
+        <input type="checkbox" value="this"><label>this</label>
+        </div>
     </div>
     <div>&nbsp;
-        <div><label><input title="unordered" type="checkbox">unordered</label></div>
-        <div><label><input title="variable" type="checkbox">variable</label></div>
-        <div><label><input title="white" type="checkbox">white</label></div>
+        <div title="Allow unordered cases, params, properties, and variables.">
+        <input type="checkbox" value="unordered"><label>unordered</label>
+        </div>
+        <div title="Allow unordered const and let declarations that are not at top of function-scope.">
+        <input type="checkbox" value="variable"><label>variable</label>
+        </div>
+        <div title="Allow messy whitespace.">
+        <input type="checkbox" value="white"><label>white</label>
+        </div>
     </div>
     <textarea
         id="JSLINT_GLOBAL"
@@ -408,14 +461,15 @@ style="
         style="white-space: normal;"
         title="global"
     ></textarea>
+    </div>
 </fieldset>
 <fieldset id="JSLINT_WARNINGS">
     <legend>Warnings</legend>
     <div id="JSLINT_WARNINGS_LIST"></div>
 </fieldset>
-<fieldset id="JSLINT_PROPERTYdiv">
+<fieldset>
     <legend>Property Directive</legend>
-    <textarea id="JSLINT_PROPERTY" rows="8" readonly></textarea>
+    <div><textarea id="JSLINT_PROPERTY" rows="8" readonly></textarea></div>
 </fieldset>
 <fieldset id="JSLINT_REPORT">
     <legend>Function Report</legend>

@@ -128,7 +128,7 @@ function noop() {
                 await moduleFs.promises.readFile("jslint.mjs", "utf8")
             ).replace((
                 /\u0020{4}/g
-            ), "  ").replace("#!", "//"),
+            ), "  "),
             {indent2: true},
             []
         ], [
@@ -178,7 +178,7 @@ function noop() {
         let elemNow = JSON.stringify([
             option_dict, source, global_list
         ]);
-        // Assert codeList is sorted.
+        // Assert list is sorted.
         assertOrThrow(elemPrv < elemNow, JSON.stringify([
             elemPrv, elemNow
         ], undefined, 4));
@@ -193,21 +193,17 @@ function noop() {
         );
         // test jslint's directive handling-behavior
         source = (
-            "/*jslint\n"
-            + JSON.stringify(option_dict).slice(1, -1).replace((
+            "/*jslint " + JSON.stringify(option_dict).slice(1, -1).replace((
                 /"/g
-            ), "") + "\n"
-            + "*/\n"
+            ), "") + "*/\n"
             + (
                 global_list.length === 0
                 ? ""
-                : (
-                    "/*global\n"
-                    + global_list.join(",") + "\n"
-                    + "*/\n"
-                )
+                : "/*global " + global_list.join(",") + "*/\n"
             )
-            + source
+            + source.replace((
+                /^#!/
+            ), "//")
         );
         assertOrThrow(jslint(source).warnings.length === 0, source);
     });
@@ -305,7 +301,8 @@ function noop() {
         regexp: [
             "function aa() {\n    return /./;\n}",
             "let aa = /(?!.)(?:.)(?=.)/;",
-            "let aa = /./gimuy;"
+            "let aa = /./gimuy;",
+            "let aa = /[\\--\\-]/;"
         ],
         ternary: [
             "let aa = (\n    aa()\n    ? 0\n    : 1\n) "
@@ -419,7 +416,7 @@ function noop() {
                 break;
             case "warn_if_unordered":
             case "warn_if_unordered_case_statement":
-                expectedWarningCode = "expected_a_b_before_c_d";
+                expectedWarningCode = "expected_a_b_ordered_before_c_d";
                 break;
             }
         }

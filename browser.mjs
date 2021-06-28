@@ -5,7 +5,8 @@
 /*jslint beta, browser*/
 
 /*property
-    click, search, test
+    closest, target, preventDefault, stopPropagation,
+    click, debug, search, test, trim,
     CodeMirror, Tab, addEventListener, checked, closure, column, context,
     create, ctrlKey, display, edition, exports, extraKeys, filter, forEach,
     fromTextArea, froms, functions, getElementById, getValue, global, id,
@@ -14,7 +15,7 @@
     matchBrackets, message, metaKey, mode, module, name, names, onclick,
     parameters, parent, property, push, querySelector, querySelectorAll,
     replace, replaceSelection, role, scrollTop, setValue, showTrailingSpace,
-    signature, sort, split, stack_trace, stop, style, textContent, title, value,
+    signature, sort, split, stack_trace, stop, style, textContent, value,
     warnings
 */
 
@@ -24,6 +25,7 @@ import jslint from "./jslint.mjs";
 // interacting with the browser and displaying the reports.
 
 let editor;
+let mode_debug;
 
 function entityify(string) {
 
@@ -242,9 +244,10 @@ function call_jslint() {
 // First build the option object.
 
     option = Object.create(null);
+    option.debug = mode_debug;
     document.querySelectorAll("input[type=checkbox]").forEach(function (elem) {
         if (elem.checked) {
-            option[elem.title] = true;
+            option[elem.value] = true;
         }
     });
 
@@ -255,7 +258,7 @@ function call_jslint() {
         editor.getValue(),
         option,
         (
-            global_string === ""
+            global_string.trim() === ""
             ? undefined
             : global_string.split(
                 /[\s,;'"]+/
@@ -300,6 +303,8 @@ function call_jslint() {
 
     document.addEventListener("keydown", function (evt) {
         if ((evt.ctrlKey || evt.metaKey) && evt.key === "Enter") {
+            evt.preventDefault();
+            evt.stopPropagation();
             call_jslint();
         }
     });
@@ -318,6 +323,20 @@ function call_jslint() {
             elem.checked = false;
         });
         document.getElementById("JSLINT_GLOBAL").value = "";
+    };
+    document.querySelector(
+        "#JSLINT_OPTIONS"
+    ).onclick = function (evt) {
+        let elem;
+        elem = evt.target.closest(
+            "#JSLINT_OPTIONS div[title]"
+        );
+        elem = elem && elem.querySelector("input[type=checkbox]");
+        if (elem && elem !== evt.target) {
+            evt.preventDefault();
+            evt.stopPropagation();
+            elem.checked = !elem.checked;
+        }
     };
 
 // Init CodeMirror editor.
@@ -338,9 +357,10 @@ function call_jslint() {
         mode: "text/javascript",
         showTrailingSpace: true
     });
-    if ((
-        /\bmode_debug=1\b/
-    ).test(location.search)) {
+    mode_debug = (
+        /\bdebug=1\b/
+    ).test(location.search);
+    if (mode_debug) {
         return;
     }
     editor.setValue(`#!/usr/bin/env node
@@ -348,11 +368,11 @@ function call_jslint() {
 /*jslint browser, node*/
 /*global $, jQuery*/ //jslint-quiet
 
-import jslint from \u0022./jslint.mjs\u0022;
 import https from "https";
+import jslint from \u0022./jslint.mjs\u0022;
 
 // Optional directives.
-// .... /*jslint beta*/ .......... Enable extra warnings currently in beta.
+// .... /*jslint beta*/ .......... Enable experimental warnings.
 // .... /*jslint bitwise*/ ....... Allow bitwise operators.
 // .... /*jslint browser*/ ....... Assume browser environment.
 // .... /*jslint convert*/ ....... Allow conversion operators.
