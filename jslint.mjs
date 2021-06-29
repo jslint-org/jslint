@@ -3118,6 +3118,9 @@ function jslint_phase3_parse(state) {
                 enroll(name, "variable", true);
                 the_function.name = Object.assign(name, {
                     calls: empty(),
+
+// Fixes issue #272 - function hoisting not allowed.
+
                     dead: false,
                     init: true
                 });
@@ -5145,6 +5148,7 @@ function jslint_phase4_walk(state) {
                 left_variable = parent.context[left.id];
                 if (
                     left_variable !== undefined
+                    // coverage-hack
                     // && left_variable.dead
                     && left_variable.parent === parent
                     && left_variable.calls !== undefined
