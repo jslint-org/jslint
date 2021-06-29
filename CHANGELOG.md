@@ -5,13 +5,13 @@
 - cli - add command `report`.
 - jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
-- jslint - remove directive `/*jslint eval*/` (use line-specific ignore-directive "//jslint-quiet" instead).
+- jslint - add new warning against using do-statment.
+- jslint - add syntax-support for continue-label-statement.
 - jslint - require regexp to use open-form.
 - jslint - simplify comments/docs by removing unnecessary grammar-article "the".
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 - jslint-refactor - migrate recursive-loops to for/while loops.
 - merge function.html and help.html into README.md
-- node - after node-v12 is deprecated, change `require("fs").promises` to `require("fs/promises")`.
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 - tests - update function warn_at() with assertion-check matching column with artifact.
 
@@ -19,7 +19,9 @@
 - breaking-change - rename files *.js to *.mjs for better integration with nodejs.
 - ci - auto-screenshot example-shell-commands in README.md.
 - ci - include explicit commonjs (jslint.cjs) and es-module (jslint.mjs) variants of jslint.
+- jslint - disable out-of-scope warning for functions.
 - jslint - reintroduce directive `/*jslint indent2*/` - allow 2-space indent.
+- website - create codemirror-plugin to highlight jslint-warnings in editor.
 
 ## v2021.6.22
 - bugfix - fix global_list being ignored by jslint.

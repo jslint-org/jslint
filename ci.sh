@@ -38,7 +38,6 @@ import moduleUrl from "url";
     };
 }());
 (function () {
-    "use strict";
     var file;
     var timeStart;
     var url;
@@ -131,7 +130,6 @@ process.exit(Number(
 import moduleFs from "fs";
 import moduleChildProcess from "child_process";
 (async function () {
-    "use strict";
     [
         // parallel-task - screenshot files
         [
@@ -228,11 +226,22 @@ var cacheKey = Math.random().toString(36).slice(-4);
 // Inline css-assets.
 
     result.replace((
-        /<link\u0020rel="stylesheet"\u0020href="([^"]+?)">/g
+        /\n<link\u0020rel="stylesheet"\u0020href="([^"]+?)">\n/g
     ), async function (match0, url) {
         var data = await moduleFs.promises.readFile(url.split("?")[0], "utf8");
         result = result.replace(match0, function () {
-            return `<style>\n${data.trim()}\n</style>`;
+            return `\n<style>\n${data.trim()}\n</style>\n`;
+        });
+        return "";
+    });
+    result.replace((
+        `\n<style id="#JSLINT_REPORT_STYLE"></style>\n`
+    ), async function (match0) {
+        var data = await moduleFs.promises.readFile("browser.mjs", "utf8");
+        result = result.replace(match0, function () {
+            return data.match(
+                /\n<style\sid="#JSLINT_REPORT_STYLE">\n[\S\s]*?\n<\/style>\n/
+            )[0];
         });
         return "";
     });
@@ -332,7 +341,9 @@ shCiBase() {(set -e
     node --input-type=module -e '
 import moduleFs from "fs";
 (async function () {
-    "use strict";
+
+// Update edition in README.md, jslint.mjs from CHANGELOG.md
+
     var dict;
     var versionBeta;
     var versionMaster;
@@ -402,7 +413,6 @@ import moduleFs from "fs";
 import moduleHttps from "https";
 import moduleUrl from "url";
 (async function () {
-    "use strict";
     var dict = {};
     Array.from(
         await moduleFs.promises.readdir(".")
@@ -524,7 +534,6 @@ shGitLsTree() {(set -e
     node --input-type=module -e '
 import moduleChildProcess from "child_process";
 (async function () {
-    "use strict";
     var result;
     // get file, mode, size
     result = await new Promise(function (resolve) {
@@ -648,7 +657,6 @@ import moduleUrl from "url";
 /*
  * this function will jslint current-directory
  */
-    "use strict";
     moduleFs.stat((
         process.env.HOME + "/jslint.mjs"
     ), function (ignore, exists) {
@@ -667,7 +675,6 @@ import moduleUrl from "url";
 /*
  * this function will start http-file-server
  */
-    "use strict";
     var contentTypeDict = {
         ".bmp": "image/bmp",
         ".cjs": "application/javascript; charset=utf-8",
@@ -756,7 +763,6 @@ import moduleUrl from "url";
 /*
  * this function will start repl-debugger
  */
-    "use strict";
     var that;
     // start repl
     that = moduleRepl.start({
@@ -855,7 +861,6 @@ import moduleUrl from "url";
 /*
  * this function will watch current-directory for changes
  */
-    "use strict";
     moduleFs.readdir(".", function (ignore, fileList) {
         fileList.forEach(function (file) {
             if (file[0] === ".") {
@@ -968,7 +973,6 @@ shJsonNormalize() {(set -e
     node --input-type=module -e '
 import moduleFs from "fs";
 (async function () {
-    "use strict";
     function objectDeepCopyWithKeysSorted(obj) {
 
 // this function will recursively deep-copy <obj> with keys sorted
@@ -1043,7 +1047,6 @@ import modulePath from "path";
     };
 }());
 (async function () {
-    "use strict";
     var fetchList;
     var matchObj;
     var replaceList;
@@ -1325,7 +1328,6 @@ import modulePath from "path";
     };
 }());
 (async function () {
-    "use strict";
     var DIR_COVERAGE = process.env.DIR_COVERAGE;
     var cwd;
     var data;
@@ -1887,7 +1889,6 @@ shRunWithScreenshotTxt() {(set -e
     node --input-type=module -e '
 import moduleFs from "fs";
 (async function () {
-    "use strict";
     var result = await moduleFs.promises.readFile(
         process.argv[1] + ".txt",
         "utf8"

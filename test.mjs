@@ -322,6 +322,9 @@ function noop() {
             + "}\n"
             + "aa();\n"
         ],
+        use_strict: [
+            "function aa() {\n    \"use strict\";\n    return;\n}"
+        ],
         var: [
             "\"use strict\";\nvar aa = 0;",
             "let [\n    aa, bb = 0\n] = 0;",

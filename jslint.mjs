@@ -3118,6 +3118,7 @@ function jslint_phase3_parse(state) {
                 enroll(name, "variable", true);
                 the_function.name = Object.assign(name, {
                     calls: empty(),
+                    dead: false,
                     init: true
                 });
                 advance();
@@ -4850,15 +4851,15 @@ function jslint_phase4_walk(state) {
                 warn("label_a", thing);
             }
             if (
-                the_variable.dead
-                && (
+                (
                     the_variable.calls === undefined
                     || functionage.name === undefined
                     || the_variable.calls[functionage.name.id] === undefined
                 )
+                && the_variable.dead
             ) {
 
-// cause: "function aa(){bb();}\nfunction bb(){}"
+// cause: "let aa;if(aa){let bb;}bb;"
 
                 warn("out_of_scope_a", thing);
             }
@@ -5144,11 +5145,10 @@ function jslint_phase4_walk(state) {
                 left_variable = parent.context[left.id];
                 if (
                     left_variable !== undefined
-                    && left_variable.dead
+                    // && left_variable.dead
                     && left_variable.parent === parent
                     && left_variable.calls !== undefined
-                    && left_variable.calls[functionage.name.id]
-                    !== undefined
+                    && left_variable.calls[functionage.name.id] !== undefined
                 ) {
                     left_variable.dead = false;
                 }

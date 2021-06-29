@@ -14,10 +14,11 @@
 
 <!-- Google PageSpeed - Reduce Largest Contentful Paint. -->
 
-<link as="script" rel="preload" href="asset-codemirror-v5.58.3-rollup.js">
+<link as="script" rel="preload" href="asset-codemirror-rollup.js">
 <link rel="modulepreload" href="browser.mjs">
 <link rel="modulepreload" href="jslint.mjs">
-<link rel="stylesheet" href="asset-codemirror-v5.58.3-rollup.css">
+<link rel="stylesheet" href="asset-codemirror-rollup.css">
+<style id="#JSLINT_REPORT_STYLE"></style>
 <style>
 /*csslint
     box-model: false,
@@ -25,18 +26,6 @@
     overqualified-elements: false
 */
 /*csslint ignore:start*/
-@font-face {
-    font-display: swap;
-    font-family: "Programma";
-    font-weight: bold;
-    src: url("asset-font-programma-bold.woff2") format("woff2");
-}
-@font-face {
-    font-display: swap;
-    font-family: "Daley";
-    font-weight: bold;
-    src: url("asset-font-daley-bold.woff2") format("woff2");
-}
 @keyframes uiLoaderEllipsis1 {
     from {
         opacity: 0;
@@ -61,47 +50,43 @@
         opacity: 1;
     }
 }
-*,
-*:after,
-*:before {
-    border: 0;
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
+.JSLINT_ .CodeMirror .cm-trailingspace,
+.JSLINT_ .CodeMirror-lint-mark-warning {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9sJDw4cOCW1/KIAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAAHElEQVQI12NggIL/DAz/GdA5/xkY/qPKMDAwAADLZwf5rvm+LQAAAABJRU5ErkJggg==");
+    background-position: bottom left;
+    background-repeat: repeat-x;
 }
 /*csslint ignore:end*/
+
+/* Google PageSpeed - Reduce Cumulative Layout Shift. */
+
+#JSLINT_SOURCE {
+    height: 297px;
+    overflow-y: scroll;
+}
+
+
 body,
-#JSLINT_ button {
+.JSLINT_ button {
     font-family: daley, sans-serif;
     font-size: 100%;
 }
-.uiLoaderEllipsis span {
-    animation: uiLoaderEllipsis1 1s infinite steps(1);
-}
-.uiLoaderEllipsis span:first-child + span {
-    animation-name: uiLoaderEllipsis2;
-}
-.uiLoaderEllipsis span:first-child + span + span {
-    animation-name: uiLoaderEllipsis3;
-}
-#JSLINT_ address,
-#JSLINT_ dt,
-#JSLINT_WARNINGS cite {
-    font-family: serif;
-}
-#JSLINT_ dd,
-#JSLINT_ dfn,
-#JSLINT_WARNINGS samp {
-    font-family: programma, monospace;
-}
-#JSLINT_ label {
+.JSLINT_ label {
     font-family: sans-serif;
 }
-#JSLINT_ textarea,
-#JSLINT_ .CodeMirror pre.CodeMirror-line,
-#JSLINT_ .CodeMirror pre.CodeMirror-line-like {
+.JSLINT_ .CodeMirror pre.CodeMirror-line,
+.JSLINT_ .CodeMirror pre.CodeMirror-line-like {
     font-family: monospace;
     font-size: 12px;
+}
+.JSLINT_ .uiLoaderEllipsis span {
+    animation: uiLoaderEllipsis1 1s infinite steps(1);
+}
+.JSLINT_ .uiLoaderEllipsis span:first-child + span {
+    animation-name: uiLoaderEllipsis2;
+}
+.JSLINT_ .uiLoaderEllipsis span:first-child + span + span {
+    animation-name: uiLoaderEllipsis3;
 }
 
 
@@ -111,15 +96,7 @@ a:link {
 a:visited {
     color: #69565c;
 }
-body {
-    background: antiquewhite;
-}
-#JSLINT_ address {
-    float: right;
-    font-size: 90%;
-    margin-left: 16px;
-}
-#JSLINT_ button {
+.JSLINT_ button {
     background: darkslategray;
     color: white;
     cursor: pointer;
@@ -128,115 +105,30 @@ body {
     padding: 4px 16px;
     text-align: center;
 }
-#JSLINT_ dd {
-    font-weight: bold;
-    margin-left: 8em;
-    padding-bottom: 2px;
-}
-#JSLINT_ dfn {
-    display: block;
-    font-style: normal;
-    font-weight: bold;
-    padding-bottom: 2px;
-}
-#JSLINT_ dl {
-    background: cornsilk;
-    padding: 4px 16px 0 16px;
-}
-#JSLINT_ dl.level0 {
-    background: white;
-}
-#JSLINT_ dl.level1 {
-    /* yellow */
-    background: #ffffe0;
-    margin-left: 16px;
-}
-#JSLINT_ dl.level2 {
-    /* green */
-    background: #e0ffe0;
-    margin-left: 2em;
-}
-#JSLINT_ dl.level3 {
-    /* blue */
-    background: #D0D0ff;
-    margin-left: 3em;
-}
-#JSLINT_ dl.level4 {
-    /* purple */
-    background: #ffe0ff;
-    margin-left: 4em;
-}
-#JSLINT_ dl.level5 {
-    /* red */
-    background: #ffe0e0;
-    margin-left: 5em;
-}
-#JSLINT_ dl.level6 {
-    /* orange */
-    background: #ffe390;
-    margin-left: 6em;
-}
-#JSLINT_ dl.level7 {
-    /* gray */
-    background: #e0e0e0;
-    margin-left: 7em;
-}
-#JSLINT_ dl.level8 {
-    margin-left: 8em;
-}
-#JSLINT_ dl.level9 {
-    margin-left: 9em;
-}
-#JSLINT_ dt {
-    float: left;
-    font-size: 75%;
-    font-style: italic;
-    text-align: right;
-    width: 8em;
-}
-#JSLINT_ fieldset,
-#JSLINT_ > div {
-    clear: both;
-    margin: 16px 40px;
-    width: auto;
-}
-#JSLINT_ fieldset {
-    background: gainsboro;
-}
-#JSLINT_ fieldset > div {
-    padding: 16px;
-    width: 100%;
-}
-#JSLINT_ label {
+.JSLINT_ label {
     font-size: 90%;
     padding-left: 0.25em;
 }
-#JSLINT_ legend {
-    background: darkslategray;
-    color: white;
-    font-style: normal;
-    font-weight: normal;
-    padding: 0.25em 0;
-    text-align: center;
-    width: 100%;
-}
-#JSLINT_ textarea {
-    padding: 0.5%;
-    resize: none;
-    white-space: pre;
-    width: 100%;
-}
-#JSLINT_ textarea::selection,
-#JSLINT_ .CodeMirror-selected {
+.JSLINT_ .CodeMirror-selected {
     background: wheat;
 }
-#JSLINT_ .CodeMirror {
+.JSLINT_ .CodeMirror {
     padding: 0;
 }
-#JSLINT_ .CodeMirror .cm-trailingspace {
-    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAACCAYAAAB/qH1jAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QUXCToH00Y1UgAAACFJREFUCNdjPMDBUc/AwNDAAAFMTAwMDA0OP34wQgX/AQBYgwYEx4f9lQAAAABJRU5ErkJggg==");
-    background-position: bottom left;
-    background-repeat: repeat-x;
+.JSLINT_ .CodeMirror-lint-marker {
+    background-position: 1px -1px;
+}
+#JSLINT_BUTTONS {
+    text-align: center;
+}
+#JSLINT_GLOBALS {
+    height: 40px;
+    white-space: normal;
+}
+#JSLINT_INPUT > div {
+    clear: both;
+    margin: 16px 40px;
+    width: auto;
 }
 #JSLINT_OPTIONS div[title],
 #JSLINT_OPTIONS div[title] input,
@@ -255,56 +147,25 @@ body {
     line-height: 20px;
     margin: 0 16px 16px 0;
 }
-#JSLINT_PROPERTY {
-    background: honeydew;
-}
 #JSLINT_TITLEBOX {
     color: darkslategray;
 }
 #JSLINT_TITLEBOX li {
     line-height: 20px;
 }
-#JSLINT_WARNINGS cite {
-    display: block;
-    font-style: normal;
-    margin-top: 16px;
-    overflow-x: hidden;
-}
-#JSLINT_WARNINGS cite:nth-child(1) {
-    margin-top: 0;
-}
-#JSLINT_WARNINGS dl address {
-    display: inline;
-    float: none;
-    font-size: 80%;
-}
-#JSLINT_WARNINGS samp {
-    background: lavenderblush;
-    display: block;
-    font-style: normal;
-    font-weight: bold;
-    padding: 4px;
-    white-space: pre-wrap;
-}
-#JSLINT_WARNINGS > div {
-    background: pink;
-}
-#JSLINT_WARNINGS > legend {
-    background: indianred;
-}
 
-#JSLINT_ button:hover,
+.JSLINT_ button:hover,
 #JSLINT_OPTIONS div[title]:hover {
     background: slategray;
     color: white;
 }
 
-#JSLINT_ button:active {
+.JSLINT_ button:active {
     color: black;
 }
 </style>
 </head>
-<body>
+<body class="JSLINT_">
 <div id="bannerFork1"
 style="
     height: 100px;
@@ -360,7 +221,7 @@ style="
     </span>
     </div>
 </div>
-<div id="JSLINT_">
+<div id="JSLINT_INPUT">
 <div id="JSLINT_TITLEBOX">
     <div style="float: left; margin-bottom: 16px;">
     <div style="font-size: 50px;">JSLint</div>
@@ -374,15 +235,12 @@ style="
 </div>
 <fieldset>
     <legend>Source</legend>
-
-<!-- Google PageSpeed - Reduce Cumulative Layout Shift. -->
-
-    <textarea id="JSLINT_SOURCE" style="height: 297px;"></textarea>
+    <textarea id="JSLINT_SOURCE"></textarea>
 </fieldset>
-<div style="text-align: center;">
+<div id="JSLINT_BUTTONS">
     <button name="JSLint" title="Ctrl + Enter">JSLint</button>
-    <button name="clear_source">Clear</button>
-    <button name="clear_options">Clear options</button>
+    <button name="clear_source">Clear Source</button>
+    <button name="clear_options">Clear Options</button>
 </div>
 <fieldset id="JSLINT_OPTIONS">
     <legend>Options</legend>
@@ -455,28 +313,16 @@ style="
         </div>
     </div>
     <textarea
-        id="JSLINT_GLOBAL"
+        id="JSLINT_GLOBALS"
         placeholder="imported globals (e.g. $, jQuery)"
         spellcheck="false"
-        style="white-space: normal;"
         title="global"
     ></textarea>
     </div>
 </fieldset>
-<fieldset id="JSLINT_WARNINGS">
-    <legend>Warnings</legend>
-    <div id="JSLINT_WARNINGS_LIST"></div>
-</fieldset>
-<fieldset>
-    <legend>Property Directive</legend>
-    <div><textarea id="JSLINT_PROPERTY" rows="8" readonly></textarea></div>
-</fieldset>
-<fieldset id="JSLINT_REPORT">
-    <legend>Function Report</legend>
-    <div id="JSLINT_REPORT_LIST"></div>
-</fieldset>
 </div>
-<script defer src="asset-codemirror-v5.58.3-rollup.js"></script>
+<div id="JSLINT_REPORT_HTML"></div>
+<script defer src="asset-codemirror-rollup.js"></script>
 <script src="browser.mjs" type="module"></script>
 <!-- coverage-hack -->
 <script>
