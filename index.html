@@ -61,23 +61,45 @@
 /* Google PageSpeed - Reduce Cumulative Layout Shift. */
 
 #JSLINT_SOURCE {
-    height: 297px;
-    overflow-y: scroll;
+    height: 298px;
 }
 
-
-body,
 .JSLINT_ button {
     font-family: daley, sans-serif;
-    font-size: 100%;
+    font-size: 14px;
 }
 .JSLINT_ label {
     font-family: sans-serif;
 }
-.JSLINT_ .CodeMirror pre.CodeMirror-line,
-.JSLINT_ .CodeMirror pre.CodeMirror-line-like {
+.JSLINT_ .CodeMirror {
     font-family: monospace;
-    font-size: 12px;
+}
+
+.JSLINT_ a:link {
+    color: black;
+}
+.JSLINT_ a:visited {
+    color: #69565c;
+}
+.JSLINT_ button {
+    background: darkslategray;
+    color: white;
+    cursor: pointer;
+    margin: 16px 16px 0 16px;
+    padding: 4px 16px;
+    text-align: center;
+}
+.JSLINT_ label {
+    padding-left: 4px;
+}
+.JSLINT_ .CodeMirror {
+    padding: 0;
+}
+.JSLINT_ .CodeMirror-lint-marker {
+    background-position: 1px -1px;
+}
+.JSLINT_ .CodeMirror-selected {
+    background: wheat;
 }
 .JSLINT_ .uiLoaderEllipsis span {
     animation: uiLoaderEllipsis1 1s infinite steps(1);
@@ -88,47 +110,17 @@ body,
 .JSLINT_ .uiLoaderEllipsis span:first-child + span + span {
     animation-name: uiLoaderEllipsis3;
 }
-
-
-a:link {
-    color: black;
-}
-a:visited {
-    color: #69565c;
-}
-.JSLINT_ button {
-    background: darkslategray;
-    color: white;
-    cursor: pointer;
-    font-style: normal;
-    margin: 0 16px;
-    padding: 4px 16px;
-    text-align: center;
-}
-.JSLINT_ label {
-    font-size: 90%;
-    padding-left: 0.25em;
-}
-.JSLINT_ .CodeMirror-selected {
-    background: wheat;
-}
-.JSLINT_ .CodeMirror {
-    padding: 0;
-}
-.JSLINT_ .CodeMirror-lint-marker {
-    background-position: 1px -1px;
-}
-#JSLINT_BUTTONS {
-    text-align: center;
-}
 #JSLINT_GLOBALS {
     height: 40px;
     white-space: normal;
 }
 #JSLINT_INPUT > div {
-    clear: both;
     margin: 16px 40px;
     width: auto;
+}
+#JSLINT_INPUT > #JSLINT_BUTTONS {
+    margin-top: -16px;
+    text-align: center;
 }
 #JSLINT_OPTIONS div[title],
 #JSLINT_OPTIONS div[title] input,
@@ -145,7 +137,7 @@ a:visited {
 #JSLINT_OPTIONS > div > div {
     float: left;
     line-height: 20px;
-    margin: 0 16px 16px 0;
+    padding: 0 16px 16px 0;
 }
 #JSLINT_TITLEBOX {
     color: darkslategray;
@@ -227,7 +219,7 @@ style="
     <div style="font-size: 50px;">JSLint</div>
     <div id="JSLINT_EDITION" style="font-size: 14px;">&nbsp;</div>
     </div>
-    <ul style="float: right;">
+    <ul style="float: right; font-size: 16px;">
     <li><a href="help.html">Read the instructions.</a></li>
     <li><a href="https://www.amazon.com/dp/1949815005/wrrrldwideweb"><i>How JavaScript Works</i> by Douglas Crockford.</a></li>
     <li><a href="https://github.com/jslint-org/jslint/issues">Report a bug.</a></li>

@@ -14,6 +14,7 @@
 - merge function.html and help.html into README.md
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 - tests - update function warn_at() with assertion-check matching column with artifact.
+- vim - add vim plugin.
 
 ## v2021.6.26-beta
 - breaking-change - rename files *.js to *.mjs for better integration with nodejs.

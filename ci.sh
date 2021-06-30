@@ -474,7 +474,7 @@ import moduleUrl from "url";
             if (!linkType.startsWith("[")) {
                 url = url.slice(1);
             }
-            if (url.startsWith("data:")) {
+            if (url.length === 0 || url.startsWith("data:")) {
                 return;
             }
             // ignore duplicate-link
@@ -963,6 +963,45 @@ div {
 "shImageJslintCreate - wrote - .build/asset-image-jslint-$SIZE.png\n" 1>&2
     done
     # convert to svg @ https://convertio.co/png-svg/
+)}
+
+shImageToDataUri() {(set -e
+# this function will convert image $1 to data-uri string
+    node --input-type=module -e '
+import moduleFs from "fs";
+import moduleHttps from "https";
+(async function () {
+    "use strict";
+    let file;
+    let result;
+    file = process.argv[1];
+    if ((
+        /^https:\/\//
+    ).test(file)) {
+        result = await new Promise(function (resolve) {
+            moduleHttps.get(file, function (res) {
+                let chunkList;
+                chunkList = [];
+                res.on("data", function (chunk) {
+                    chunkList.push(chunk);
+                }).on("end", function () {
+                    resolve(Buffer.concat(chunkList));
+                });
+            });
+        });
+    } else {
+        result = await moduleFs.promises.readFile(file);
+    }
+    result = String(
+        "data:image/" + file.match(
+            /\.[^.]*?$|$/m
+        )[0].slice(1) + ";base64," + result.toString("base64")
+    ).replace((
+        /.{72}/g
+    ), "$&\\\n");
+    console.log(result);
+}());
+' "$@" # '
 )}
 
 shJsonNormalize() {(set -e

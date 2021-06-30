@@ -11,10 +11,10 @@ shRawLibFetch
             "url": "https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/edit/matchbrackets.js"
         },
         {
-            "url": "https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/lint/lint.js"
+            "url": "https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/edit/trailingspace.js"
         },
         {
-            "url": "https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/edit/trailingspace.js"
+            "url": "https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/lint/lint.js"
         },
         {
             "url": "https://github.com/codemirror/CodeMirror/blob/5.62.0/mode/javascript/javascript.js"
@@ -10013,6 +10013,38 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/edit/matchbracke
 
 
 /*
+file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/edit/trailingspace.js
+*/
+// CodeMirror, copyright (c) by Marijn Haverbeke and others
+// Distributed under an MIT license: https://codemirror.net/LICENSE
+
+(function(mod) {
+  if (typeof exports == "object" && typeof module == "object") // CommonJS
+    mod(require("../../lib/codemirror"));
+  else if (typeof define == "function" && define.amd) // AMD
+    define(["../../lib/codemirror"], mod);
+  else // Plain browser env
+    mod(CodeMirror);
+})(function(CodeMirror) {
+  CodeMirror.defineOption("showTrailingSpace", false, function(cm, val, prev) {
+    if (prev == CodeMirror.Init) prev = false;
+    if (prev && !val)
+      cm.removeOverlay("trailingspace");
+    else if (!prev && val)
+      cm.addOverlay({
+        token: function(stream) {
+          for (var l = stream.string.length, i = l; i && /\s/.test(stream.string.charAt(i - 1)); --i) {}
+          if (i > stream.pos) { stream.pos = i; return null; }
+          stream.pos = l;
+          return "trailingspace";
+        },
+        name: "trailingspace"
+      });
+  });
+});
+
+
+/*
 file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/lint/lint.js
 */
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
@@ -10292,38 +10324,6 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/lint/lint.js
 
   CodeMirror.defineExtension("performLint", function() {
     startLinting(this);
-  });
-});
-
-
-/*
-file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/edit/trailingspace.js
-*/
-// CodeMirror, copyright (c) by Marijn Haverbeke and others
-// Distributed under an MIT license: https://codemirror.net/LICENSE
-
-(function(mod) {
-  if (typeof exports == "object" && typeof module == "object") // CommonJS
-    mod(require("../../lib/codemirror"));
-  else if (typeof define == "function" && define.amd) // AMD
-    define(["../../lib/codemirror"], mod);
-  else // Plain browser env
-    mod(CodeMirror);
-})(function(CodeMirror) {
-  CodeMirror.defineOption("showTrailingSpace", false, function(cm, val, prev) {
-    if (prev == CodeMirror.Init) prev = false;
-    if (prev && !val)
-      cm.removeOverlay("trailingspace");
-    else if (!prev && val)
-      cm.addOverlay({
-        token: function(stream) {
-          for (var l = stream.string.length, i = l; i && /\s/.test(stream.string.charAt(i - 1)); --i) {}
-          if (i > stream.pos) { stream.pos = i; return null; }
-          stream.pos = l;
-          return "trailingspace";
-        },
-        name: "trailingspace"
-      });
   });
 });
 
