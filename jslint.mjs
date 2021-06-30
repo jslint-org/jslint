@@ -7235,7 +7235,7 @@ function jslint(
     }, ii, list) {
         list[ii].formatted_message = String(
             String(ii + 1).padStart(3, " ")
-            + " \u001b[31m" + message + "\u001b[39m"
+            + ". \u001b[31m" + message + "\u001b[39m"
             + " \u001b[90m\/\/ line " + line + ", column " + column
             + "\u001b[39m\n"
             + ("    " + line_source.trim()).slice(0, 72) + "\n"

@@ -13,11 +13,12 @@
     editor,
     from,
     globals, gutters,
+    innerHTML,
     lint, lintOnChange,
     map, mode_stop,
     offsetWidth, onchange, onkeyup,
     performLint, preventDefault,
-    registerHelper, result,
+    registerHelper, result, reverse,
     search, setSize, severity, stopPropagation,
     target, test, to, trim,
     width,
@@ -278,94 +279,30 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 /*csslint ignore:end*/
 
 .JSLINT_ {
-    font-family: sans-serif;
+    font-family: daley, sans-serif;
     font-size: 14px;
 }
-.JSLINT_ address,
-.JSLINT_ cite,
-.JSLINT_ dt,
-.JSLINT_ textarea {
-    font-size: 12px;
-}
-.JSLINT_ legend,
+.JSLINT_ fieldset legend,
 .JSLINT_ .center {
     font-family: daley, sans-serif;
     font-size: 14px;
     text-align: center;
 }
-.JSLINT_ textarea,
-#JSLINT_REPORT_FUNCTIONS > div {
+.JSLINT_ fieldset textarea,
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS dt,
+.JSLINT_ #JSLINT_REPORT_WARNINGS samp {
+    font-size: 12px;
+}
+.JSLINT_ fieldset textarea,
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS > div {
     font-family: monospace;
+}
+.JSLINT_ fieldset > div {
+    font-family: sans-serif;
 }
 
 body {
     background: antiquewhite;
-}
-.JSLINT_ address {
-    float: right;
-}
-.JSLINT_ dd {
-    padding-left: 128px;
-}
-.JSLINT_ dfn {
-    display: block;
-    font-style: normal;
-    padding-bottom: 4px;
-}
-.JSLINT_ dl {
-    background: cornsilk;
-    padding: 8px 16px 4px 16px;
-}
-.JSLINT_ dl.level0 {
-    background: white;
-}
-.JSLINT_ dl.level1 {
-    /* yellow */
-    background: #ffffe0;
-    margin-left: 16px;
-}
-.JSLINT_ dl.level2 {
-    /* green */
-    background: #e0ffe0;
-    margin-left: 32px;
-}
-.JSLINT_ dl.level3 {
-    /* blue */
-    background: #D0D0ff;
-    margin-left: 48px;
-}
-.JSLINT_ dl.level4 {
-    /* purple */
-    background: #ffe0ff;
-    margin-left: 64px;
-}
-.JSLINT_ dl.level5 {
-    /* red */
-    background: #ffe0e0;
-    margin-left: 80px;
-}
-.JSLINT_ dl.level6 {
-    /* orange */
-    background: #ffe390;
-    margin-left: 96px;
-}
-.JSLINT_ dl.level7 {
-    /* gray */
-    background: #e0e0e0;
-    margin-left: 112px;
-}
-.JSLINT_ dl.level8 {
-    margin-left: 128px;
-}
-.JSLINT_ dl.level9 {
-    margin-left: 144px;
-}
-.JSLINT_ dt {
-    float: left;
-    font-style: italic;
-    padding-top: 2px;
-    text-align: right;
-    width: 100px;
 }
 .JSLINT_ fieldset {
     background: gainsboro;
@@ -373,53 +310,120 @@ body {
     margin: 16px 40px;
     width: auto;
 }
-.JSLINT_ fieldset > div {
-    padding: 16px;
-    width: 100%;
-    word-wrap: break-word;
+.JSLINT_ fieldset address {
+    float: right;
 }
-.JSLINT_ legend {
+.JSLINT_ fieldset legend {
     background: darkslategray;
     color: white;
     padding: 4px 0;
     width: 100%;
 }
-.JSLINT_ textarea {
+.JSLINT_ fieldset textarea {
     padding: 4px;
     resize: none;
     white-space: pre;
     width: 100%;
 }
-.JSLINT_ textarea::selection {
+.JSLINT_ fieldset textarea::selection {
     background: wheat;
 }
-#JSLINT_REPORT_PROPERTIES {
+.JSLINT_ fieldset > div {
+    padding: 16px;
+    width: 100%;
+    word-wrap: break-word;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS dd {
+    padding-left: 128px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS dfn {
+    display: block;
+    font-style: normal;
+    padding-bottom: 4px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS dl {
+    background: cornsilk;
+    padding: 8px 16px 4px 16px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS dl.level0 {
+    background: white;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS dl.level1 {
+    /* yellow */
+    background: #ffffe0;
+    margin-left: 16px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS dl.level2 {
+    /* green */
+    background: #e0ffe0;
+    margin-left: 32px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS dl.level3 {
+    /* blue */
+    background: #D0D0ff;
+    margin-left: 48px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS dl.level4 {
+    /* purple */
+    background: #ffe0ff;
+    margin-left: 64px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS dl.level5 {
+    /* red */
+    background: #ffe0e0;
+    margin-left: 80px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS dl.level6 {
+    /* orange */
+    background: #ffe390;
+    margin-left: 96px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS dl.level7 {
+    /* gray */
+    background: #e0e0e0;
+    margin-left: 112px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS dl.level8 {
+    margin-left: 128px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS dl.level9 {
+    margin-left: 144px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS dt {
+    float: left;
+    font-style: italic;
+    padding-top: 2px;
+    text-align: right;
+    width: 100px;
+}
+.JSLINT_ #JSLINT_REPORT_PROPERTIES {
     background: transparent;
 }
-#JSLINT_REPORT_PROPERTIES textarea {
+.JSLINT_ #JSLINT_REPORT_PROPERTIES textarea {
     background: honeydew;
     height: 100px;
 }
-#JSLINT_REPORT_WARNINGS cite {
+.JSLINT_ #JSLINT_REPORT_WARNINGS cite {
     display: block;
     margin: 16px 0 4px 0;
     overflow-x: hidden;
+    white-space: pre-line;
 }
-#JSLINT_REPORT_WARNINGS cite:nth-child(1) {
+.JSLINT_ #JSLINT_REPORT_WARNINGS cite:nth-child(1) {
     margin-top: 0;
 }
-#JSLINT_REPORT_WARNINGS samp {
+.JSLINT_ #JSLINT_REPORT_WARNINGS samp {
     background: lavenderblush;
     display: block;
     padding: 4px;
     white-space: pre-wrap;
 }
-#JSLINT_REPORT_WARNINGS > div {
+.JSLINT_ #JSLINT_REPORT_WARNINGS > div {
     background: pink;
     max-height: 400px;
     overflow-y: auto;
 }
-#JSLINT_REPORT_WARNINGS > legend {
+.JSLINT_ #JSLINT_REPORT_WARNINGS > legend {
     background: indianred;
 }
 </style>
@@ -437,11 +441,13 @@ body {
         message,
         stack_trace = ""
     }, ii) {
-        html += `<cite>`;
-        html += `<address>${entityify(line)}.${entityify(column)}</address>`;
-        html += entityify(`${ii + 1}. ${message}`);
-        html += `</cite>`;
-        html += `<samp>${entityify(line_source + "\n" + stack_trace)}</samp>`;
+        html += (
+            "<cite>"
+            + "<address>" + entityify(line + ": " + column) + "</address>"
+            + entityify((ii + 1) + ". " + message)
+            + "</cite>"
+            + "<samp>" + entityify(line_source + "\n" + stack_trace) + "</samp>"
+        );
     });
     if (warnings.length === 0) {
         html += `<div class="center">There are no warnings.</div>`;
@@ -516,11 +522,9 @@ body {
         let list = Object.keys(context);
         let params;
         html += (
-            "<dl class=level"
-            + entityify(level)
-            + "><address>"
-            + entityify(line)
-            + "</address><dfn>"
+            "<dl class=level" + entityify(level) + ">"
+            + "<address>" + entityify(line) + "</address>"
+            + "<dfn>"
             + (
                 name === "=>"
                 ? entityify(signature) + " =>"
@@ -613,12 +617,18 @@ body {
     return html;
 }
 
-function jslint_ui_call() {
+async function jslint_ui_call() {
 // This function will run jslint in browser and create html-reports.
 
 // Show ui-loader-animation.
 
-    document.getElementById("uiLoader1").style.display = "flex";
+    document.querySelector("#uiLoader1").style.display = "flex";
+
+// Wait awhile before running cpu-intensive linter so ui-loader doesn't jank.
+
+    await new Promise(function (resolve) {
+        setTimeout(resolve);
+    });
 
 // Execute linter.
 
@@ -635,22 +645,54 @@ function jslint_ui_call() {
 // Hide ui-loader-animation.
 
     setTimeout(function () {
-        document.getElementById("uiLoader1").style.display = "none";
+        document.querySelector("#uiLoader1").style.display = "none";
     }, 500);
 }
 
 function jslint_ui_onresize() {
-    let width = document.querySelector(
+    let content_width = document.querySelector(
         "#JSLINT_OPTIONS"
     ).offsetWidth;
+    let style_list = [];
+
+// Set explicit content-width for overflow to work properly.
+
     document.querySelectorAll(
         ".JSLINT_ fieldset > div"
     ).forEach(function (elem) {
         if (!elem.closest("#JSLINT_OPTIONS")) {
-            elem.style.width = width + "px";
+            elem.style.width = content_width + "px";
         }
     });
-    editor.setSize(width);
+    editor.setSize(content_width);
+
+// Debug css-style.
+
+    Array.from(document.querySelectorAll("style")).forEach(function (elem) {
+        elem.innerHTML.replace((
+            /\/\*[\S\s]*?\*\/|;|\}/g
+        ), "\n").replace((
+            /^([^\n\u0020@].*?)[,{:].*?$/gm
+        ), function (match0, match1) {
+            let ii;
+            try {
+                ii = document.querySelectorAll(match1).length;
+            } catch (err) {
+                console.error(match1 + "\n" + err); //jslint-quiet
+            }
+            if (ii <= 1 && !(
+                /^0\u0020(?:(body\u0020>\u0020)?(?:\.button|\.readonly|\.styleColorError|\.textarea|\.uiAnimateSlide|a|base64|body|code|div|input|pre|textarea)(?:,|\u0020\{))|^[1-9]\d*?\u0020#/m
+            ).test(ii + " " + match0)) {
+                style_list.push(ii + " " + match0);
+            }
+            return "";
+        });
+    });
+    style_list.sort().reverse().forEach(function (elem, ii, list) {
+        console.error( //jslint-quiet
+            "domStyleReportUnmatched " + (list.length - ii) + ". " + elem
+        );
+    });
 }
 
 (function () {
@@ -658,7 +700,7 @@ function jslint_ui_onresize() {
 
 // Init edition.
 
-    document.getElementById("JSLINT_EDITION").textContent = (
+    document.querySelector("#JSLINT_EDITION").textContent = (
         `Edition: ${jslint.edition}`
     );
 
@@ -669,8 +711,8 @@ function jslint_ui_onresize() {
 
 // Init CodeMirror editor.
 
-    editor = CodeMirror.fromTextArea(document.getElementById(
-        "JSLINT_SOURCE"
+    editor = CodeMirror.fromTextArea(document.querySelector(
+        "#JSLINT_SOURCE textarea"
     ), {
         extraKeys: {
             Tab: function (editor) {

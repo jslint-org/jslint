@@ -16,7 +16,6 @@
 <link rel="modulepreload" href="browser.mjs">
 <link rel="modulepreload" href="jslint.mjs">
 <link rel="stylesheet" href="asset-codemirror-rollup.css">
-<style id="#JSLINT_REPORT_STYLE"></style>
 <style>
 /*csslint
     box-model: false,
@@ -57,41 +56,25 @@
 /*csslint ignore:end*/
 
 /* Google PageSpeed - Reduce Cumulative Layout Shift. */
-#JSLINT_SOURCE {
+.JSLINT_ #JSLINT_SOURCE textarea {
     height: 298px;
 }
 
-.JSLINT_ button,
-#JSLINT_OPTIONS,
-#JSLINT_TITLEBOX {
+.JSLINT_ #JSLINT_BUTTONS button,
+.JSLINT_ #JSLINT_OPTIONS > div,
+.JSLINT_ #JSLINT_TITLEBOX {
     font-family: daley, sans-serif;
     font-size: 14px;
 }
-.JSLINT_ label {
+.JSLINT_ #JSLINT_OPTIONS label {
     font-family: sans-serif;
 }
-.JSLINT_ .CodeMirror,
-.JSLINT_ .CodeMirror pre {
+.JSLINT_ #JSLINT_SOURCE .CodeMirror,
+.JSLINT_ #JSLINT_SOURCE .CodeMirror pre {
     font-family: monospace;
     font-size: 12px;
 }
 
-.JSLINT_ a:link {
-    color: black;
-}
-.JSLINT_ a:visited {
-    color: #69565c;
-}
-.JSLINT_ button {
-    background: darkslategray;
-    color: white;
-    cursor: pointer;
-    margin: 16px 16px 0 16px;
-    padding: 4px 16px;
-}
-.JSLINT_ label {
-    padding-left: 4px;
-}
 .JSLINT_ .CodeMirror {
     padding: 0;
 }
@@ -110,51 +93,68 @@
 .JSLINT_ .uiLoaderEllipsis span:first-child + span + span {
     animation-name: uiLoaderEllipsis3;
 }
-#JSLINT_GLOBALS {
+.JSLINT_ #JSLINT_BUTTONS button {
+    background: darkslategray;
+    color: white;
+    cursor: pointer;
+    margin: 16px 16px 0 16px;
+    padding: 4px 16px;
+}
+.JSLINT_ #JSLINT_GLOBALS {
     height: 40px;
     white-space: normal;
 }
-#JSLINT_INPUT > div {
+.JSLINT_ #JSLINT_INPUT > div {
     margin: 16px 40px;
     width: auto;
 }
-#JSLINT_INPUT > #JSLINT_BUTTONS {
+.JSLINT_ #JSLINT_INPUT > #JSLINT_BUTTONS {
     margin-top: -16px;
 }
-#JSLINT_OPTIONS div[title],
-#JSLINT_OPTIONS div[title] input,
-#JSLINT_OPTIONS div[title] label {
+.JSLINT_ #JSLINT_OPTIONS div[title],
+.JSLINT_ #JSLINT_OPTIONS div[title] input,
+.JSLINT_ #JSLINT_OPTIONS div[title] label {
     cursor: pointer;
     user-select: none;
 }
-#JSLINT_OPTIONS div[title] {
+.JSLINT_ #JSLINT_OPTIONS div[title] {
     padding: 0 4px;
 }
-#JSLINT_OPTIONS div[title] input {
+.JSLINT_ #JSLINT_OPTIONS div[title] input {
     vertical-align: middle;
 }
-#JSLINT_OPTIONS > div > div {
+.JSLINT_ #JSLINT_OPTIONS label {
+    padding-left: 4px;
+}
+.JSLINT_ #JSLINT_OPTIONS > div > div {
     float: left;
     line-height: 20px;
     padding: 0 16px 16px 0;
 }
-#JSLINT_TITLEBOX {
+.JSLINT_ #JSLINT_TITLEBOX {
     color: darkslategray;
 }
-#JSLINT_TITLEBOX li {
+.JSLINT_ #JSLINT_TITLEBOX ul li {
     line-height: 20px;
 }
+.JSLINT_ #JSLINT_TITLEBOX ul li a:link {
+    color: black;
+}
+.JSLINT_ #JSLINT_TITLEBOX ul li a:visited {
+    color: #69565c;
+}
 
-.JSLINT_ button:hover,
-#JSLINT_OPTIONS div[title]:hover {
+.JSLINT_ #JSLINT_BUTTONS button:hover,
+.JSLINT_ #JSLINT_OPTIONS div[title]:hover {
     background: slategray;
     color: white;
 }
 
-.JSLINT_ button:active {
+.JSLINT_ #JSLINT_BUTTONS button:active {
     color: black;
 }
 </style>
+<style id="#JSLINT_REPORT_STYLE"></style>
 </head>
 <body class="JSLINT_">
 <div id="bannerFork1"
@@ -185,7 +185,7 @@ style="
 ">
     <a
         href="https://github.com/jslint-org/jslint"
-        style="color: white; font-family: daley, sans-serif"
+        style="color: white;"
     >
     fork on github
     </a>
@@ -196,7 +196,6 @@ style="
     background: lightslategray;
     color: white;
     display: none;
-    font-family: daley, sans-serif;
     height: 50px;
     justify-content: center;
     left: 50%;
@@ -228,9 +227,9 @@ style="
     <li><a href="https://github.com/jslint-org/jslint/issues">Report a bug.</a></li>
     </ul>
 </div>
-<fieldset>
+<fieldset id="JSLINT_SOURCE">
     <legend>Source</legend>
-    <textarea id="JSLINT_SOURCE"></textarea>
+    <textarea></textarea>
 </fieldset>
 <div class="center" id="JSLINT_BUTTONS">
     <button class="center" name="JSLint" title="Ctrl + Enter">JSLint</button>
@@ -311,7 +310,7 @@ style="
         id="JSLINT_GLOBALS"
         placeholder="imported globals (e.g. $, jQuery)"
         spellcheck="false"
-        title="global"
+        title="globals"
     ></textarea>
     </div>
 </fieldset>
