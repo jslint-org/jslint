@@ -305,8 +305,11 @@ function noop() {
             "let aa = /[\\--\\-]/;"
         ],
         ternary: [
-            "let aa = (\n    aa()\n    ? 0\n    : 1\n) "
-            + "&& (\n    aa()\n    ? 0\n    : 1\n);"
+            (
+                "let aa = (\n    aa()\n    ? 0\n    : 1\n) "
+                + "&& (\n    aa()\n    ? 0\n    : 1\n);"
+            ),
+            "let aa = (\n    aa()\n    ? `0`\n    : `1`\n);"
         ],
         try_catch: [
             "let aa = 0;\n"
@@ -321,6 +324,9 @@ function noop() {
             + "    aa = err;\n"
             + "}\n"
             + "aa();\n"
+        ],
+        use_strict: [
+            "function aa() {\n    \"use strict\";\n    return;\n}"
         ],
         var: [
             "\"use strict\";\nvar aa = 0;",

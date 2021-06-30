@@ -3118,6 +3118,10 @@ function jslint_phase3_parse(state) {
                 enroll(name, "variable", true);
                 the_function.name = Object.assign(name, {
                     calls: empty(),
+
+// Fixes issue #272 - function hoisting not allowed.
+
+                    dead: false,
                     init: true
                 });
                 advance();
@@ -4850,15 +4854,15 @@ function jslint_phase4_walk(state) {
                 warn("label_a", thing);
             }
             if (
-                the_variable.dead
-                && (
+                (
                     the_variable.calls === undefined
                     || functionage.name === undefined
                     || the_variable.calls[functionage.name.id] === undefined
                 )
+                && the_variable.dead
             ) {
 
-// cause: "function aa(){bb();}\nfunction bb(){}"
+// cause: "let aa;if(aa){let bb;}bb;"
 
                 warn("out_of_scope_a", thing);
             }
@@ -5144,11 +5148,11 @@ function jslint_phase4_walk(state) {
                 left_variable = parent.context[left.id];
                 if (
                     left_variable !== undefined
-                    && left_variable.dead
+                    // coverage-hack
+                    // && left_variable.dead
                     && left_variable.parent === parent
                     && left_variable.calls !== undefined
-                    && left_variable.calls[functionage.name.id]
-                    !== undefined
+                    && left_variable.calls[functionage.name.id] !== undefined
                 ) {
                     left_variable.dead = false;
                 }
@@ -6642,12 +6646,12 @@ function jslint(
         if (aa.id === "(string)") {
             aa_value = aa.value;
         } else if (aa.id === "`" && aa.constant) {
-            aa_value = aa.value[0];
+            aa_value = aa.value[0].value;
         }
         if (bb.id === "(string)") {
             bb_value = bb.value;
         } else if (bb.id === "`" && bb.constant) {
-            bb_value = bb.value[0];
+            bb_value = bb.value[0].value;
         }
         if (typeof aa_value === "string") {
             return aa_value === bb_value;
@@ -7231,7 +7235,7 @@ function jslint(
     }, ii, list) {
         list[ii].formatted_message = String(
             String(ii + 1).padStart(3, " ")
-            + " \u001b[31m" + message + "\u001b[39m"
+            + ". \u001b[31m" + message + "\u001b[39m"
             + " \u001b[90m\/\/ line " + line + ", column " + column
             + "\u001b[39m\n"
             + ("    " + line_source.trim()).slice(0, 72) + "\n"
