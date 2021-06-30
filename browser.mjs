@@ -276,8 +276,9 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     padding: 0;
 }
 /*csslint ignore:end*/
+
 .JSLINT_ {
-    font-family: daley, sans-serif;
+    font-family: sans-serif;
     font-size: 14px;
 }
 .JSLINT_ address,
@@ -285,6 +286,12 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 .JSLINT_ dt,
 .JSLINT_ textarea {
     font-size: 12px;
+}
+.JSLINT_ legend,
+.JSLINT_ .center {
+    font-family: daley, sans-serif;
+    font-size: 14px;
+    text-align: center;
 }
 .JSLINT_ textarea,
 #JSLINT_REPORT_FUNCTIONS > div {
@@ -375,7 +382,6 @@ body {
     background: darkslategray;
     color: white;
     padding: 4px 0;
-    text-align: center;
     width: 100%;
 }
 .JSLINT_ textarea {
@@ -422,7 +428,7 @@ body {
     html += `<legend>Report: Warnings</legend>`;
     html += `<div>`;
     if (stop) {
-        html += "<center>JSLint was unable to finish.</center>";
+        html += `<div class="center">JSLint was unable to finish.</div>`;
     }
     warnings.forEach(function ({
         column,
@@ -438,7 +444,7 @@ body {
         html += `<samp>${entityify(line_source + "\n" + stack_trace)}</samp>`;
     });
     if (warnings.length === 0) {
-        html += "<center>There are no warnings.</center>";
+        html += `<div class="center">There are no warnings.</div>`;
     }
     html += `</div>`;
     html += `</fieldset>`;
@@ -476,12 +482,12 @@ body {
     if (json) {
         return (
             warnings.length === 0
-            ? "<center>JSON: good.</center>"
-            : "<center>JSON: bad.</center>"
+            ? `<div class="center">JSON: good.</div>`
+            : `<div class="center">JSON: bad.</div>`
         );
     }
     if (functions.length === 0) {
-        html += "<center>There are no functions.</center>";
+        html += `<div class="center">There are no functions.</div>`;
     }
     exports = Object.keys(exports).sort();
     froms.sort();

@@ -6646,12 +6646,12 @@ function jslint(
         if (aa.id === "(string)") {
             aa_value = aa.value;
         } else if (aa.id === "`" && aa.constant) {
-            aa_value = aa.value[0];
+            aa_value = aa.value[0].value;
         }
         if (bb.id === "(string)") {
             bb_value = bb.value;
         } else if (bb.id === "`" && bb.constant) {
-            bb_value = bb.value[0];
+            bb_value = bb.value[0].value;
         }
         if (typeof aa_value === "string") {
             return aa_value === bb_value;

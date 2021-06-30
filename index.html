@@ -11,9 +11,7 @@
 <meta name="author" content="Douglas Crockford"/>
 <link rel="icon" type="image/png" href="asset-image-jslint-512.svg"/>
 <title>JSLint:&nbsp;The&nbsp;JavaScript&nbsp;Code Quality Tool</title>
-
 <!-- Google PageSpeed - Reduce Largest Contentful Paint. -->
-
 <link as="script" rel="preload" href="asset-codemirror-rollup.js">
 <link rel="modulepreload" href="browser.mjs">
 <link rel="modulepreload" href="jslint.mjs">
@@ -59,20 +57,23 @@
 /*csslint ignore:end*/
 
 /* Google PageSpeed - Reduce Cumulative Layout Shift. */
-
 #JSLINT_SOURCE {
     height: 298px;
 }
 
-.JSLINT_ button {
+.JSLINT_ button,
+#JSLINT_OPTIONS,
+#JSLINT_TITLEBOX {
     font-family: daley, sans-serif;
     font-size: 14px;
 }
 .JSLINT_ label {
     font-family: sans-serif;
 }
-.JSLINT_ .CodeMirror {
+.JSLINT_ .CodeMirror,
+.JSLINT_ .CodeMirror pre {
     font-family: monospace;
+    font-size: 12px;
 }
 
 .JSLINT_ a:link {
@@ -87,7 +88,6 @@
     cursor: pointer;
     margin: 16px 16px 0 16px;
     padding: 4px 16px;
-    text-align: center;
 }
 .JSLINT_ label {
     padding-left: 4px;
@@ -120,7 +120,6 @@
 }
 #JSLINT_INPUT > #JSLINT_BUTTONS {
     margin-top: -16px;
-    text-align: center;
 }
 #JSLINT_OPTIONS div[title],
 #JSLINT_OPTIONS div[title] input,
@@ -184,7 +183,10 @@ style="
     transform: rotate(-45deg);
     width: 100%;
 ">
-    <a href="https://github.com/jslint-org/jslint" style="color: white;">
+    <a
+        href="https://github.com/jslint-org/jslint"
+        style="color: white; font-family: daley"
+    >
     fork on github
     </a>
     </div>
@@ -229,10 +231,10 @@ style="
     <legend>Source</legend>
     <textarea id="JSLINT_SOURCE"></textarea>
 </fieldset>
-<div id="JSLINT_BUTTONS">
-    <button name="JSLint" title="Ctrl + Enter">JSLint</button>
-    <button name="clear_source">Clear Source</button>
-    <button name="clear_options">Clear Options</button>
+<div class="center" id="JSLINT_BUTTONS">
+    <button class="center" name="JSLint" title="Ctrl + Enter">JSLint</button>
+    <button class="center" name="clear_source">Clear Source</button>
+    <button class="center" name="clear_options">Clear Options</button>
 </div>
 <fieldset id="JSLINT_OPTIONS">
     <legend>Options</legend>
