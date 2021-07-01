@@ -17,6 +17,10 @@
 - tests - update function warn_at() with assertion-check matching column with artifact.
 - vim - add vim plugin.
 
+# v2021.7.1-beta
+- bugfix - fix website crashing when linting pure json-object.
+- jslint - comment out shebang in jslint.mjs so older ios devices can use website.
+
 # v2021.6.30
 - breaking-change - rename files *.js to *.mjs for better integration with nodejs.
 - ci - auto-screenshot example-shell-commands in README.md.

@@ -497,13 +497,16 @@ body {
     html += `<legend>Report: Functions</legend>`;
     html += `<div>`;
     if (json) {
-        return (
+
+// Bugfix - fix website crashing when linting pure json-object.
+// return (
+
+        html += (
             warnings.length === 0
             ? "<div class=\"center\">JSON: good.</div>"
             : "<div class=\"center\">JSON: bad.</div>"
         );
-    }
-    if (functions.length === 0) {
+    } else if (functions.length === 0) {
         html += `<div class="center">There are no functions.</div>`;
     }
     exports = Object.keys(exports).sort();

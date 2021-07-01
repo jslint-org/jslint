@@ -326,11 +326,11 @@ shCiBase() {(set -e
     # coverage-hack - test jslint's invalid-file handling-behavior
     mkdir -p .test-dir.js
     # test jslint's cli handling-behavior
-    printf "./jslint.cjs .\n"
+    printf "node jslint.cjs .\n"
     chmod 755 jslint.cjs
-    ./jslint.cjs .
-    printf "./jslint.mjs .\n"
-    ./jslint.mjs .
+    node jslint.cjs .
+    printf "node jslint.mjs .\n"
+    node jslint.mjs .
     printf "node test.mjs\n"
     (set -e
         # coverage-hack - test jslint's cli handling-behavior
