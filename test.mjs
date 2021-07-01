@@ -7,7 +7,7 @@ function assertOrThrow(passed, msg) {
  * this function will throw <msg> if <passed> is falsy
  */
     if (!passed) {
-        throw new Error(msg.slice(0, 1000));
+        throw new Error(String(msg).slice(0, 1000));
     }
 }
 
@@ -309,7 +309,7 @@ function noop() {
                 "let aa = (\n    aa()\n    ? 0\n    : 1\n) "
                 + "&& (\n    aa()\n    ? 0\n    : 1\n);"
             ),
-            "let aa = (\n    aa()\n    ? `0`\n    : `1`\n);"
+            "let aa = (\n    aa()\n    ? `${0}`\n    : `${1}`\n);"
         ],
         try_catch: [
             "let aa = 0;\n"
