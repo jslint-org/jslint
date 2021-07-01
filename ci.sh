@@ -327,7 +327,6 @@ shCiBase() {(set -e
     mkdir -p .test-dir.js
     # test jslint's cli handling-behavior
     printf "node jslint.cjs .\n"
-    chmod 755 jslint.cjs
     node jslint.cjs .
     printf "node jslint.mjs .\n"
     node jslint.mjs .

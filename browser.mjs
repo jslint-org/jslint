@@ -30,6 +30,7 @@
 /*jslint beta, browser*/
 
 /*property
+    dom_style_report_unmatched,
     CodeMirror, Pos, Tab, addEventListener, checked, click, closest, closure,
     column, context, ctrlKey, currentTarget, dispatchEvent, display, edition,
     editor, error, exports, extraKeys, filter, forEach, from, fromTextArea,
@@ -55,6 +56,38 @@ let jslint_option_dict = {
     lintOnChange: false
 };
 let mode_debug;
+
+function dom_style_report_unmatched() {
+
+// Debug css-style.
+
+    let style_list = [];
+    Array.from(document.querySelectorAll("style")).forEach(function (elem) {
+        elem.innerHTML.replace((
+            /\/\*[\S\s]*?\*\/|;|\}/g
+        ), "\n").replace((
+            /^([^\n\u0020@].*?)[,{:].*?$/gm
+        ), function (match0, match1) {
+            let ii;
+            try {
+                ii = document.querySelectorAll(match1).length;
+            } catch (err) {
+                console.error(match1 + "\n" + err); //jslint-quiet
+            }
+            if (ii <= 1 && !(
+                /^0\u0020(?:(body\u0020>\u0020)?(?:\.button|\.readonly|\.styleColorError|\.textarea|\.uiAnimateSlide|a|base64|body|code|div|input|pre|textarea)(?:,|\u0020\{))|^[1-9]\d*?\u0020#/m
+            ).test(ii + " " + match0)) {
+                style_list.push(ii + " " + match0);
+            }
+            return "";
+        });
+    });
+    style_list.sort().reverse().forEach(function (elem, ii, list) {
+        console.error( //jslint-quiet
+            "dom_style_report_unmatched " + (list.length - ii) + ". " + elem
+        );
+    });
+}
 
 function jslint_plugin_codemirror(CodeMirror) {
 
@@ -292,6 +325,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 .JSLINT_ {
     font-family: daley, sans-serif;
     font-size: 14px;
+    text-size-adjust: none;
 }
 .JSLINT_ fieldset legend,
 .JSLINT_ .center {
@@ -667,7 +701,6 @@ function jslint_ui_onresize() {
     let content_width = document.querySelector(
         "#JSLINT_OPTIONS"
     ).offsetWidth;
-    let style_list = [];
 
 // Set explicit content-width for overflow to work properly.
 
@@ -679,34 +712,6 @@ function jslint_ui_onresize() {
         }
     });
     editor.setSize(content_width);
-
-// Debug css-style.
-
-    Array.from(document.querySelectorAll("style")).forEach(function (elem) {
-        elem.innerHTML.replace((
-            /\/\*[\S\s]*?\*\/|;|\}/g
-        ), "\n").replace((
-            /^([^\n\u0020@].*?)[,{:].*?$/gm
-        ), function (match0, match1) {
-            let ii;
-            try {
-                ii = document.querySelectorAll(match1).length;
-            } catch (err) {
-                console.error(match1 + "\n" + err); //jslint-quiet
-            }
-            if (ii <= 1 && !(
-                /^0\u0020(?:(body\u0020>\u0020)?(?:\.button|\.readonly|\.styleColorError|\.textarea|\.uiAnimateSlide|a|base64|body|code|div|input|pre|textarea)(?:,|\u0020\{))|^[1-9]\d*?\u0020#/m
-            ).test(ii + " " + match0)) {
-                style_list.push(ii + " " + match0);
-            }
-            return "";
-        });
-    });
-    style_list.sort().reverse().forEach(function (elem, ii, list) {
-        console.error( //jslint-quiet
-            "domStyleReportUnmatched " + (list.length - ii) + ". " + elem
-        );
-    });
 }
 
 (function () {
@@ -883,4 +888,8 @@ eval( //jslint-quiet
 `);
     }
     document.querySelector("button[name='JSLint']").click();
+
+// Debug css-style.
+
+    window.dom_style_report_unmatched = dom_style_report_unmatched;
 }());
