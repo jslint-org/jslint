@@ -1,37 +1,48 @@
 // browser.mjs
-// 2018-06-16
-// Copyright (c) 2015 Douglas Crockford  (www.JSLint.com)
+// Original Author: Douglas Crockford (https://www.jslint.com).
+
+// This is free and unencumbered software released into the public domain.
+
+// Anyone is free to copy, modify, publish, use, compile, sell, or
+// distribute this software, either in source code form or as a compiled
+// binary, for any purpose, commercial or non-commercial, and by any
+// means.
+
+// In jurisdictions that recognize copyright laws, the author or authors
+// of this software dedicate any and all copyright interest in the
+// software to the public domain. We make this dedication for the benefit
+// of the public at large and to the detriment of our heirs and
+// successors. We intend this dedication to be an overt act of
+// relinquishment in perpetuity of all present and future rights to this
+// software under copyright law.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+// IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+// OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+// ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+// OTHER DEALINGS IN THE SOFTWARE.
+
+// For more information, please refer to <http://unlicense.org/>
+
 
 /*jslint beta, browser*/
 
 /*property
-    CodeMirror, Pos,
-    bind,
-    click, currentTarget,
-    closest,
-    debug, dispatchEvent,
-    editor,
-    from,
-    globals, gutters,
-    innerHTML,
-    lint, lintOnChange,
-    map, mode_stop,
-    offsetWidth, onchange, onkeyup,
-    performLint, preventDefault,
-    registerHelper, result, reverse,
-    search, setSize, severity, stopPropagation,
-    target, test, to, trim,
-    width,
-    CodeMirror, Tab, addEventListener, checked, closure, column, context,
-    create, ctrlKey, display, edition, exports, extraKeys, filter, forEach,
-    fromTextArea, froms, functions, getElementById, getValue, global, id,
-    indentUnit, indentWithTabs, outerHTML, isArray, join, jslint_result, json,
-    key, keys, length, level, line, lineNumbers, lineWrapping, line_source,
-    matchBrackets, message, metaKey, mode, module, name, names, onclick,
-    parameters, parent, property, push, querySelector, querySelectorAll,
-    replace, replaceSelection, role, scrollTop, setValue, showTrailingSpace,
-    signature, sort, split, stack_trace, stop, style, textContent, value,
-    warnings
+    CodeMirror, Pos, Tab, addEventListener, checked, click, closest, closure,
+    column, context, ctrlKey, currentTarget, dispatchEvent, display, edition,
+    editor, error, exports, extraKeys, filter, forEach, from, fromTextArea,
+    froms, functions, global, globals, gutters, id, indentUnit, indentWithTabs,
+    innerHTML, isArray, join, json, key, keys, length, level, line, lineNumbers,
+    lineWrapping, line_source, lint, lintOnChange, map, matchBrackets, message,
+    metaKey, mode, mode_stop, module, name, names, offsetWidth, onclick,
+    onkeyup, outerHTML, parameters, parent, performLint, preventDefault,
+    property, push, querySelector, querySelectorAll, registerHelper, replace,
+    replaceSelection, result, reverse, role, search, setSize, setValue,
+    severity, showTrailingSpace, signature, sort, split, stack_trace, stop,
+    stopPropagation, style, target, test, textContent, to, trim, value,
+    warnings, width
 */
 
 import jslint from "./jslint.mjs";
@@ -488,8 +499,8 @@ body {
     if (json) {
         return (
             warnings.length === 0
-            ? `<div class="center">JSON: good.</div>`
-            : `<div class="center">JSON: bad.</div>`
+            ? "<div class=\"center\">JSON: good.</div>"
+            : "<div class=\"center\">JSON: bad.</div>"
         );
     }
     if (functions.length === 0) {

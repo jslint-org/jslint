@@ -1,6 +1,6 @@
 # Changelog
 
-## Todo
+# Todo
 - app - deploy jslint as chrome-extension.
 - cli - add command `report`.
 - jslint - add `for...of` syntax support.
@@ -17,9 +17,8 @@
 - tests - update function warn_at() with assertion-check matching column with artifact.
 - vim - add vim plugin.
 
-## v2021.6.26-beta
+# v2021.6.30
 - breaking-change - rename files *.js to *.mjs for better integration with nodejs.
-- bugfix - fix function is_equal() always returning true when comparing string-literals.
 - ci - auto-screenshot example-shell-commands in README.md.
 - ci - include explicit commonjs (jslint.cjs) and es-module (jslint.mjs) variants of jslint.
 - jslint - disable out-of-scope warning for functions.
@@ -27,7 +26,7 @@
 - license - change license to public-domain/unlicense.
 - website - create codemirror-plugin to highlight jslint-warnings in editor.
 
-## v2021.6.22
+# v2021.6.22
 - bugfix - fix global_list being ignored by jslint.
 - bugfix - fix no-warning when exception in catch-block is unused.
 - ci - migrate ci-scripts from cjs to esm.
@@ -40,7 +39,7 @@
 - website - replace .png logo with .svg logo.
 - website - replace current-editor with CodeMirror-editor and change programming-font-family from `Programma` to `consolas, menlo, monospace`.
 
-## v2021.6.12
+# v2021.6.12
 - bugfix - fix await expression/statement inside catch-statement not registered by functionage.await.
 - bugfix - fix cli appending slash "/" to normalized filename.
 - bugfix - fix issue #316, #317 - jslint complains about dynamic-import.
@@ -69,7 +68,7 @@
     - update functions artifact(), stop(), warn() with fallback-code `the_token = the_token || state.token_nxt;`.
 - website - add ui-loader-animation.
 
-## v2021.6.3
+# v2021.6.3
 - breaking-change - hardcode `const fudge = 1`
 - breaking-change - remove little-used-feature allowing jslint to accept array-of-strings as source b/c internal lines-object has been changed from array-of-strings to array-of-objects.
 - doc - add svg changelog.
@@ -81,7 +80,7 @@
 - jslint - remove obsolete ie-era warning about duplicate names for caught-errors.
 - website - move options-ui to top of page after editor-ui
 
-## v2021.5.30
+# v2021.5.30
 - bugfix - fix issue #282 - fail to warn trailing semicolon in `export default Object.freeze({})`.
 - ci - 100% code-coverage!
 - ci - auto-update changelog in README.md from CHANGELOG.md.
@@ -100,7 +99,7 @@
 - tests - validate inline-multi-causes are sorted.
 - website - replace links `branch.xxx` with `branch-xxx`.
 
-## v2021.5.27
+# v2021.5.27
 - ci - fix expectedWarningCode not being validated.
 - ci - in windows, disable git-autocrlf.
 - deadcode - replace with assertion-check in function are_similar() - "if (a === b) { return true }".
@@ -112,7 +111,7 @@
 - style - refactor code moving infix-operators from post-position to pre-position in multiline statements.
 - website - add hotkey ctrl-enter to run jslint.
 
-## v2021.5.26
+# v2021.5.26
 - ci - fix ci silently failing in node-v12 and node-v14.
 - cli - add env var JSLINT_CLI to force-trigger cli in jslint.js (used for code-coverage of cli).
 - jslint - add "globalThis" to default globals.
@@ -126,7 +125,7 @@
 - website - load index.html with example code.
 - website - merge file report.js into browser.js.
 
-## v2021.5.23
+# v2021.5.23
 - doc - add section Changelog.
 - doc - update README.md with installation instructions.
 - cli - merge shell-function shJslintCli into jslint.js.
@@ -137,7 +136,7 @@
 - ci - validate non-http/file links in *.md files.
 - ci - add shell-functions shCiBranchPromote.
 
-## v2021.5.21
+# v2021.5.21
 - this ci-release does not change any core-functionality of file jslint.js.
 - doc - add file CHANGELOG.md.
 - ci - begin addng regression tests and improve code-coverage.
@@ -154,17 +153,17 @@
 - ci - ci now fails if jslint-check fails for any of the files in branches.
 - ci - add github-workflows to generate code-coverage for jslint.js.
 
-## v2020.11.6
+# v2020.11.6
 - last jslint version before jslint-org migration.
 
-## v2018.4.25
+# v2018.4.25
 - last jslint version written in commonjs.
 
-## v2017.11.6
+# v2017.11.6
 - last jslint version written in es5.
 
-## v2014.7.8
+# v2014.7.8
 - last jslint version before 2 year hiatus.
 
-## v2013.3.13
+# v2013.3.13
 - last jslint version that can lint .html and .css files.

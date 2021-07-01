@@ -94,40 +94,30 @@
 /*jslint beta, node*/
 
 /*property
-    JSLINT_BETA,
-    beta,
-    catch_list, catch_stack, cjs_module, cjs_require, cli,
-    function_stack,
-    global_dict,
-    indent2,
-    last_statement,
-    main, mode_force, mode_noop,
-    process_exit,
-    toString, trimRight,
-    variable,
-    execArgv, fileURLToPath, filter, meta, order, reduce, stringify, token, url,
-    a, all, allowed_option, argv, arity, artifact, assign, async, b,
-    bind, bitwise, block, body, browser, c, calls, catch, closer, closure, code,
-    column, concat, console_error, constant, context, convert, couch, create,
-    cwd, d, dead, debug, default, devel, directive, directive_list,
-    directive_quiet, directives, disrupt, dot, edition, ellipsis, else,
-    endsWith, env, error, eval, every, exec, exit, export_dict, exports,
-    expression, extra, file, finally, flag, for, forEach, formatted_message,
-    free, freeze, from, froms, fud, function_list, functions, getset, global,
-    global_list, id, identifier, import, import_list, inc, index, indexOf, init,
-    initial, isArray, isNaN, is_equal, is_weird, join, jslint, json,
-    keys, label, lbp, led, length, level, line, line_list, line_offset,
-    line_source, lines, live, long, loop, m, map, margin, match, max, message,
-    mode_json, mode_module, mode_property, mode_shebang, mode_stop, module,
-    name, names, node, now, nr, nud, ok, open, opening, option, option_dict,
-    padStart, parameters, parent, pop, promises, property, property_dict, push,
-    quote, readFile, readdir, repeat, replace, resolve, role, search, shebang,
-    signature, single, slice, some, sort, source, split, stack, stack_trace,
-    startsWith, statement, stop, stop_at, switch, syntax_dict, tenure, test,
-    test_internal_error, then, this, thru, token_global, token_list, token_nxt,
-    token_tree, tokens, tree, trim, try, type, unordered, used, value, variable,
-    versions, warn, warn_at, warning, warning_list, warnings, white, wrapped,
-    writable
+    JSLINT_BETA, a, all, allowed_option, argv, arity, artifact, assign, async,
+    b, beta, bind, bitwise, block, body, browser, c, calls, catch, catch_list,
+    catch_stack, cjs_module, cjs_require, cli, closer, closure, code, column,
+    concat, console_error, constant, context, convert, couch, create, cwd, d,
+    dead, debug, default, devel, directive, directive_list, directive_quiet,
+    directives, disrupt, dot, edition, ellipsis, else, endsWith, env, error,
+    eval, every, exec, execArgv, exit, export_dict, exports, expression, extra,
+    file, fileURLToPath, filter, finally, flag, for, forEach, formatted_message,
+    free, freeze, from, froms, fud, function_list, function_stack, functions,
+    getset, global, global_dict, id, identifier, import, import_list, inc,
+    indent2, index, indexOf, init, initial, isArray, isNaN, is_equal, is_weird,
+    join, jslint, json, keys, label, last_statement, lbp, led, length, level,
+    line, line_list, line_offset, line_source, lines, live, long, loop, m, main,
+    map, margin, match, message, meta, mode_force, mode_json, mode_module,
+    mode_noop, mode_property, mode_shebang, mode_stop, module, name, names,
+    node, now, nr, nud, ok, open, opening, option, option_dict, order, padStart,
+    parameters, parent, pop, process_exit, promises, property, property_dict,
+    push, quote, readFile, readdir, reduce, repeat, replace, resolve, role,
+    search, shebang, signature, single, slice, some, sort, source, split, stack,
+    stack_trace, startsWith, statement, stop, stop_at, switch, syntax_dict,
+    tenure, test, test_internal_error, this, thru, token, token_global,
+    token_list, token_nxt, token_tree, tokens, tree, trim, trimRight, try, type,
+    unordered, url, used, value, variable, versions, warn, warn_at, warning,
+    warning_list, warnings, white, wrapped, writable
 */
 
 let jslint_charset_ascii = (
@@ -139,7 +129,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2021.6.26-beta";
+let jslint_edition = "v2021.6.30";
 let jslint_export;              // The jslint object to be exported.
 let jslint_fudge = 1;           // Fudge starting line and starting column to 1.
 let jslint_import_meta_url = "";
@@ -6652,12 +6642,12 @@ function jslint(
         if (aa.id === "(string)") {
             aa_value = aa.value;
         } else if (aa.id === "`" && aa.constant) {
-            aa_value = aa.value[0].value;
+            aa_value = aa.value[0];
         }
         if (bb.id === "(string)") {
             bb_value = bb.value;
         } else if (bb.id === "`" && bb.constant) {
-            bb_value = bb.value[0].value;
+            bb_value = bb.value[0];
         }
         if (typeof aa_value === "string") {
             return aa_value === bb_value;

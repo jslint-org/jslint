@@ -356,7 +356,7 @@ import moduleFs from "fs";
         dict[file] = await moduleFs.promises.readFile(file, "utf8");
     }));
     Array.from(dict["CHANGELOG.md"].matchAll(
-        /\n##\u0020(v\d\d\d\d\.\d\d?\.\d\d?(.*?)?)\n/g
+        /\n\n#\u0020(v\d\d\d\d\.\d\d?\.\d\d?(.*?)?)\n/g
     )).slice(0, 2).forEach(function ([
         ignore, version, isBeta
     ]) {
@@ -373,8 +373,8 @@ import moduleFs from "fs";
         }, {
             file: "jslint.mjs",
             src: dict["jslint.mjs"].replace((
-                /^const\u0020jslint_edition\u0020=\u0020".*?";$/m
-            ), `const jslint_edition = "${versionBeta}";`),
+                /^let\u0020jslint_edition\u0020=\u0020".*?";$/m
+            ), `let jslint_edition = "${versionBeta}";`),
             src0: dict["jslint.mjs"]
         }
     ].forEach(function ({
