@@ -24,6 +24,7 @@
 - ci - include explicit commonjs (jslint.cjs) and es-module (jslint.mjs) variants of jslint.
 - jslint - disable out-of-scope warning for functions.
 - jslint - reintroduce directive `/*jslint indent2*/` - allow 2-space indent.
+- license - change license to public-domain/unlicense.
 - website - create codemirror-plugin to highlight jslint-warnings in editor.
 
 ## v2021.6.22
