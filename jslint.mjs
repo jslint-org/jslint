@@ -132,7 +132,7 @@ let jslint_charset_ascii = (
 let jslint_edition = "v2021.7.1-beta";
 let jslint_export;              // The jslint object to be exported.
 let jslint_fudge = 1;           // Fudge starting line and starting column to 1.
-let jslint_import_meta_url = "";
+let jslint_import_meta_url = "";        // import.meta.url used by cli.
 
 function assert_or_throw(passed, message) {
 

@@ -138,9 +138,16 @@ function jslint_report_html({
     let length_80 = 1111;
 
     function detail(title, list) {
-        if (Array.isArray(list) && list.length > 0) {
-            html += `<dt>${entityify(title)}</dt><dd>${list.join(", ")}</dd>`;
-        }
+        return (
+            (Array.isArray(list) && list.length > 0)
+            ? (
+                "<div>"
+                + "<dt>" + entityify(title) + "</dt>"
+                + "<dd>" + list.join(", ") + "</dd>"
+                + "</div>"
+            )
+            : ""
+        );
     }
 
     function entityify(str) {
@@ -325,6 +332,8 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 .JSLINT_ {
     font-family: daley, sans-serif;
     font-size: 14px;
+    -ms-text-size-adjust: none;
+    -webkit-text-size-adjust: none;
     text-size-adjust: none;
 }
 .JSLINT_ fieldset legend,
@@ -378,17 +387,9 @@ body {
     width: 100%;
     word-wrap: break-word;
 }
-.JSLINT_ #JSLINT_REPORT_FUNCTIONS dd {
-    padding-left: 128px;
-}
-.JSLINT_ #JSLINT_REPORT_FUNCTIONS dfn {
-    display: block;
-    font-style: normal;
-    padding-bottom: 4px;
-}
 .JSLINT_ #JSLINT_REPORT_FUNCTIONS dl {
     background: cornsilk;
-    padding: 8px 16px 4px 16px;
+    padding: 8px 16px;
 }
 .JSLINT_ #JSLINT_REPORT_FUNCTIONS dl.level0 {
     background: white;
@@ -434,10 +435,23 @@ body {
 .JSLINT_ #JSLINT_REPORT_FUNCTIONS dl.level9 {
     margin-left: 144px;
 }
-.JSLINT_ #JSLINT_REPORT_FUNCTIONS dt {
-    float: left;
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS dl dd {
+    line-height: 20px;
+    padding-left: 120px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS dl dfn {
+    display: block;
+    font-style: normal;
+    font-weight: bold;
+    line-height: 20px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS dl div {
+    position: relative
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS dl dt {
     font-style: italic;
-    padding-top: 2px;
+    line-height: 20px;
+    position: absolute;
     text-align: right;
     width: 100px;
 }
@@ -553,9 +567,9 @@ body {
     );
     if (global.length + froms.length + exports.length > 0) {
         html += "<dl class=level0>";
-        detail(module, global);
-        detail("import from", froms);
-        detail("export", exports);
+        html += detail(module, global);
+        html += detail("import from", froms);
+        html += detail("export", exports);
         html += "</dl>";
     }
     functions.forEach(function (the_function) {
@@ -578,11 +592,8 @@ body {
                 ? entityify(signature) + " =>"
                 : (
                     typeof name === "string"
-                    ? (
-                        "<b>\u00ab" + entityify(name)
-                        + "\u00bb</b>"
-                    )
-                    : "<b>" + entityify(name.id) + "</b>"
+                    ? "\u00ab" + entityify(name) + "\u00bb"
+                    : entityify(name.id)
                 )
             ) + entityify(signature)
             + "</dfn>"
@@ -606,33 +617,33 @@ body {
                 params.push(id);
             }
         });
-        detail("parameter", params.sort());
+        html += detail("parameter", params.sort());
         list.sort();
-        detail("variable", list.filter(function (id) {
+        html += detail("variable", list.filter(function (id) {
             return (
                 context[id].role === "variable"
                 && context[id].parent === the_function
             );
         }));
-        detail("exception", list.filter(function (id) {
+        html += detail("exception", list.filter(function (id) {
             return context[id].role === "exception";
         }));
-        detail("closure", list.filter(function (id) {
+        html += detail("closure", list.filter(function (id) {
             return (
                 context[id].closure === true
                 && context[id].parent === the_function
             );
         }));
-        detail("outer", list.filter(function (id) {
+        html += detail("outer", list.filter(function (id) {
             return (
                 context[id].parent !== the_function
                 && context[id].parent.id !== "(global)"
             );
         }));
-        detail(module, list.filter(function (id) {
+        html += detail(module, list.filter(function (id) {
             return context[id].parent.id === "(global)";
         }));
-        detail("label", list.filter(function (id) {
+        html += detail("label", list.filter(function (id) {
             return context[id].role === "label";
         }));
         html += "</dl>";
