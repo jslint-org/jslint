@@ -970,7 +970,6 @@ shImageToDataUri() {(set -e
 import moduleFs from "fs";
 import moduleHttps from "https";
 (async function () {
-    "use strict";
     let file;
     let result;
     file = process.argv[1];

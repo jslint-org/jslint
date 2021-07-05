@@ -31,6 +31,7 @@
 
 /*property
     dom_style_report_unmatched,
+    slice,
     CodeMirror, Pos, Tab, addEventListener, checked, click, closest, closure,
     column, context, ctrlKey, currentTarget, dispatchEvent, display, edition,
     editor, error, exports, extraKeys, filter, forEach, from, fromTextArea,
@@ -505,7 +506,9 @@ body {
             + "<address>" + entityify(line + ": " + column) + "</address>"
             + entityify((ii + 1) + ". " + message)
             + "</cite>"
-            + "<samp>" + entityify(line_source + "\n" + stack_trace) + "</samp>"
+            + "<samp>"
+            + entityify(line_source.slice(0, 400) + "\n" + stack_trace)
+            + "</samp>"
         );
     });
     if (warnings.length === 0) {
@@ -578,7 +581,10 @@ body {
             level,
             line,
             name,
-            parameters,
+
+// Bugfix - fix html-report from crashing if parameters is undefined.
+
+            parameters = [],
             signature
         } = the_function;
         let list = Object.keys(context);
@@ -682,24 +688,28 @@ async function jslint_ui_call() {
 // Show ui-loader-animation.
 
     document.querySelector("#uiLoader1").style.display = "flex";
+    try {
 
 // Wait awhile before running cpu-intensive linter so ui-loader doesn't jank.
 
-    await new Promise(function (resolve) {
-        setTimeout(resolve);
-    });
+        await new Promise(function (resolve) {
+            setTimeout(resolve);
+        });
 
 // Execute linter.
 
-    editor.performLint();
+        editor.performLint();
 
 // Generate the reports.
 // Display the reports.
 
-    document.querySelector(
-        "#JSLINT_REPORT_HTML"
-    ).outerHTML = jslint_report_html(jslint_option_dict.result);
-    jslint_ui_onresize();
+        document.querySelector(
+            "#JSLINT_REPORT_HTML"
+        ).outerHTML = jslint_report_html(jslint_option_dict.result);
+        jslint_ui_onresize();
+    } catch (err) {
+        console.error(err); //jslint-quiet
+    }
 
 // Hide ui-loader-animation.
 
@@ -897,6 +907,11 @@ eval( //jslint-quiet
     });
 }());
 `);
+    }
+    if (mode_debug) {
+        document.querySelector(
+            "#JSLINT_OPTIONS input[value=debug]"
+        ).click();
     }
     document.querySelector("button[name='JSLint']").click();
 

@@ -18,6 +18,7 @@
 - vim - add vim plugin.
 
 # v2021.7.1-beta
+- bugfix - fix website crashing from html-report if function.parameters is undefined.
 - bugfix - fix website crashing when linting pure json-object.
 - jslint - comment out shebang in jslint.mjs so older ios devices can use website.
 
