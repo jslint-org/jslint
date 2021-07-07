@@ -2,7 +2,10 @@
 
 # Todo
 - app - deploy jslint as chrome-extension.
+- ci - use badge to indicate release-version so README.md doesnt have to to be updated every release.
 - cli - add command `report`.
+- compatibility - align with eslint and jshint with new warning that operators should be place at end-of-line.
+- coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
 - jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning against using do-statment.
@@ -14,13 +17,14 @@
 - jslint-refactor - migrate recursive-loops to for/while loops.
 - merge function.html and help.html into README.md
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
-- tests - update function warn_at() with assertion-check matching column with artifact.
 - vim - add vim plugin.
 
 # v2021.7.1-beta
-- bugfix - fix website crashing from html-report if function.parameters is undefined.
+- bugfix - fix jslint not warning about function-redefinition when function is defined inside a call.
 - bugfix - fix website crashing when linting pure json-object.
 - jslint - comment out shebang in jslint.mjs so older ios devices can use website.
+- tests - revamp cause-based testing with more robust instrumentation.
+- tests - test column position in warnings are correct.
 
 # v2021.6.30
 - breaking-change - rename files *.js to *.mjs for better integration with nodejs.
