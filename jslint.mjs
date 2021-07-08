@@ -91,7 +91,7 @@
 
 // WARNING: JSLint will hurt your feelings.
 
-/*jslint beta, node*/
+/*jslint node*/
 
 /*property
     causes,
@@ -1598,6 +1598,7 @@ function jslint_phase3_parse(state) {
         warn_at
     } = state;
     let catchage = catch_stack[0];      // The current catch-block.
+    let function_level_list = [];
     let functionage = token_global;     // The current function.
     let mode_var;               // "var" if using var; "let" if using let.
     let rx_identifier = (
@@ -3303,6 +3304,10 @@ function jslint_phase3_parse(state) {
 
         function_stack.push(functionage);
         function_list.push(the_function);
+        function_level_list[the_function.level] = (
+            function_level_list[the_function.level] || []
+        );
+        function_level_list[the_function.level].push(the_function);
         functionage = the_function;
 
 // Parse the parameter list.
@@ -3565,12 +3570,6 @@ function jslint_phase3_parse(state) {
                     }
                     seen[id] = false;
                     seen[full] = true;
-                } else if (name.id === "`") {
-
-// test_cause:
-// ["aa={`aa`:0}", "prefix_lbrace", "unexpected_a", "`", 5]
-
-                    stop("unexpected_a", name);
                 } else {
                     id = survey(name);
                     if (typeof seen[id] === "boolean") {
@@ -3792,19 +3791,19 @@ function jslint_phase3_parse(state) {
         case "var":
 
 // test_cause:
-// ["const aa=0;const bb=0;", "parse_var", "declare", "", 0]
-// ["let aa=0;let bb=0;", "parse_var", "declare", "", 0]
-// ["var aa=0;var bb=0;", "parse_var", "declare", "", 0]
+// ["const aa=0;const bb=0;", "parse_var", "last_var", "const", 0]
+// ["let aa=0;let bb=0;", "parse_var", "last_var", "let", 0]
+// ["var aa=0;var bb=0;", "parse_var", "last_var", "var", 0]
 
-            test_cause("declare");
+            test_cause("last_var", functionage.last_statement.id);
             variable_prv = functionage.last_statement;
             break;
         case "import":
 
 // test_cause:
-// ["import aa from \"aa\";\nlet bb=0;", "parse_var", "import", "", 0]
+// ["import aa from \"aa\";\nlet bb=0;", "parse_var", "last_import", "", 0]
 
-            test_cause("import");
+            test_cause("last_import");
             break;
         case false:
             break;
@@ -4882,21 +4881,32 @@ function jslint_phase3_parse(state) {
         if (token_nxt.id === ";") {
             advance(";");
         }
-        state.token_tree = parse_statements();
-        advance("(end)");
-        return;
-    }
+    } else {
 
 // If we are not in a browser, then the file form of strict pragma may be used.
 
-    if (
-        token_nxt.value === "use strict"
-    ) {
-        advance("(string)");
-        advance(";");
+        if (token_nxt.value === "use strict") {
+            advance("(string)");
+            advance(";");
+        }
     }
     state.token_tree = parse_statements();
     advance("(end)");
+
+// Check functions are ordered.
+
+    function_level_list.forEach(function (list) {
+        check_ordered(
+            "function",
+            Array.from(list || []).map(function ({
+                name
+            }) {
+                return name;
+            }).filter(function (name) {
+                return option_dict.beta && name && name.id;
+            })
+        );
+    });
 }
 
 function jslint_phase4_walk(state) {
@@ -5329,7 +5339,7 @@ function jslint_phase4_walk(state) {
         blockage = block_stack.pop();
     }
 
-    function action_var(thing) {
+    function post_var(thing) {
         thing.names.forEach(function (name) {
             name.dead = false;
             if (name.expression !== undefined) {
@@ -5366,6 +5376,7 @@ function jslint_phase4_walk(state) {
     function post_function(thing) {
         delete functionage.async;
         delete functionage.finally;
+        delete functionage.last_statement;
         delete functionage.loop;
         delete functionage.switch;
         delete functionage.try;
@@ -5916,7 +5927,7 @@ function jslint_phase4_walk(state) {
         }
     });
     postaction("statement", "{", pop_block);
-    postaction("statement", "const", action_var);
+    postaction("statement", "const", post_var);
     postaction("statement", "export", post_export_import);
     postaction("statement", "for", function (thing) {
         walk_statement(thing.inc);
@@ -5939,7 +5950,7 @@ function jslint_phase4_walk(state) {
             return post_export_import(the_thing);
         }
     });
-    postaction("statement", "let", action_var);
+    postaction("statement", "let", post_var);
     postaction("statement", "try", function (thing) {
         if (thing.catch) {
             if (thing.catch.name) {
@@ -5955,7 +5966,7 @@ function jslint_phase4_walk(state) {
             catchage = catch_stack.pop();
         }
     });
-    postaction("statement", "var", action_var);
+    postaction("statement", "var", post_var);
     postaction("ternary", function post_ternary(thing) {
         if (
             is_weird(thing.expression[0])
