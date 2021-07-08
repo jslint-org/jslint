@@ -3565,6 +3565,12 @@ function jslint_phase3_parse(state) {
                     }
                     seen[id] = false;
                     seen[full] = true;
+                } else if (name.id === "`") {
+
+// test_cause:
+// ["aa={`aa`:0}", "prefix_lbrace", "unexpected_a", "`", 5]
+
+                    stop("unexpected_a", name);
                 } else {
                     id = survey(name);
                     if (typeof seen[id] === "boolean") {

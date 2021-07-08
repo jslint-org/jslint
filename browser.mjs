@@ -847,7 +847,7 @@ function jslint_ui_onresize() {
         editor.setValue(`#!/usr/bin/env node
 
 /*jslint browser, node*/
-/*global $, jQuery*/ //jslint-quiet
+/*global caches, indexedDb*/ //jslint-quiet
 
 import https from "https";
 import jslint from \u0022./jslint.mjs\u0022;
