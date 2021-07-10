@@ -8,6 +8,12 @@ on:
       - beta
       - master
       - sandbox
+  workflow_dispatch:
+    branches:
+      - alpha
+      - beta
+      - master
+      - sandbox
 # shCiBase - start
 jobs:
   build:
