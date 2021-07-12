@@ -14,7 +14,6 @@
 - jslint - require regexp to use open-form.
 - jslint - simplify comments/docs by removing unnecessary grammar-article "the".
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
-- jslint-refactor - migrate recursive-loops to for/while loops.
 - merge function.html and help.html into README.md
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 - vim - add vim plugin.
@@ -22,9 +21,11 @@
 # v2021.7.1-beta
 - bugfix - fix jslint not warning about function-redefinition when function is defined inside a call.
 - bugfix - fix website crashing when linting pure json-object.
+- jslint - add new beta-warning if functions are unordered.
 - jslint - add new warning disallowing string-literal as property-name, e.g. {`aa`:0}.
 - jslint - comment out shebang in jslint.mjs so older ios devices can use website.
-- tests - revamp cause-based testing with more robust instrumentation.
+- jslint-revamp - rearrange functions in jslint.mjs to comply with ordered-functions beta-warning.
+- jslint-revamp - revamp cause-based testing with more robust instrumentation.
 - tests - test artifact and column-position in warnings are correct.
 
 # v2021.6.30

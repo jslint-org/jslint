@@ -81,6 +81,157 @@ function noop() {
     });
 }());
 
+(function testCaseJslintCodeValidate() {
+/*
+ * this function will validate each code is valid in jslint
+ */
+    Object.values({
+        array: [
+            "new Array(0);"
+        ],
+        async_await: [
+            "async function aa() {\n    await aa();\n}",
+            "async function aa() {\n"
+            + "    try {\n"
+            + "        aa();\n"
+            + "    } catch (err) {\n"
+            + "        await err();\n"
+            + "    }\n"
+            + "}\n",
+            "async function aa() {\n"
+            + "    try {\n"
+            + "        await aa();\n"
+            + "    } catch (err) {\n"
+            + "        await err();\n"
+            + "    }\n"
+            + "}\n"
+        ],
+        date: [
+            "Date.getTime();",
+            "let aa = aa().getTime();",
+            "let aa = aa.aa().getTime();"
+        ],
+        directive: [
+            "#!\n/*jslint browser:false, node*/\n\"use strict\";",
+            "/*property aa bb*/"
+        ],
+        fart: [
+            "function aa() {\n    return () => 0;\n}"
+        ],
+        jslint_disable: [
+            "/*jslint-disable*/\n0\n/*jslint-enable*/"
+        ],
+        jslint_quiet: [
+            "0 //jslint-quiet"
+        ],
+        json: [
+            "{\"aa\":[[],-0,null]}"
+        ],
+        label: [
+            "function aa() {\n"
+            + "bb:\n"
+            + "    while (true) {\n"
+            + "        if (true) {\n"
+            + "            break bb;\n"
+            + "        }\n"
+            + "    }\n"
+            + "}\n"
+        ],
+        loop: [
+            "function aa() {\n    do {\n        aa();\n    } while (aa());\n}"
+        ],
+        module: [
+            "export default Object.freeze();",
+            "import {aa, bb} from \"aa\";\naa(bb);",
+            "import {} from \"aa\";",
+            "import(\"aa\").then(function () {\n    return;\n});",
+            "let aa = 0;\nimport(aa).then(aa).then(aa).catch(aa).finally(aa);"
+        ],
+        number: [
+            "let aa = 0.0e0;",
+            "let aa = 0b0;",
+            "let aa = 0o0;",
+            "let aa = 0x0;"
+        ],
+        optional_chaining: [
+            "let aa = aa?.bb?.cc;"
+        ],
+        param: [
+            "function aa({aa, bb}) {\n"
+            + "    return {aa, bb};\n"
+            + "}\n",
+            "function aa({constructor}) {\n"
+            + "    return {constructor};\n"
+            + "}\n"
+        ],
+        property: [
+            "let aa = aa[`!`];"
+        ],
+        regexp: [
+            "function aa() {\n    return /./;\n}",
+            "let aa = /(?!.)(?:.)(?=.)/;",
+            "let aa = /./gimuy;",
+            "let aa = /[\\--\\-]/;"
+        ],
+        ternary: [
+            (
+                "let aa = (\n    aa()\n    ? 0\n    : 1\n) "
+                + "&& (\n    aa()\n    ? 0\n    : 1\n);"
+            ),
+            "let aa = (\n    aa()\n    ? `${0}`\n    : `${1}`\n);"
+        ],
+        try_catch: [
+            "let aa = 0;\n"
+            + "try {\n"
+            + "    aa();\n"
+            + "} catch (err) {\n"
+            + "    aa = err;\n"
+            + "}\n"
+            + "try {\n"
+            + "    aa();\n"
+            + "} catch (err) {\n"
+            + "    aa = err;\n"
+            + "}\n"
+            + "aa();\n"
+        ],
+        use_strict: [
+            (
+                "\"use strict\";\n"
+                + "let aa = 0;\n"
+                + "function bb() {\n"
+                + "    \"use strict\";\n"
+                + "    return aa;\n"
+                + "}\n"
+            )
+        ],
+        var: [
+            "let [\n    aa, bb = 0\n] = 0;",
+            "let [...aa] = [...aa];",
+            "let constructor = 0;",
+            "let {\n    aa: bb\n} = 0;",
+            "let {aa, bb} = 0;",
+            "let {constructor} = 0;"
+        ]
+    }).forEach(function (codeList) {
+        let elemPrv = "";
+        codeList.forEach(function (code) {
+            let warnings;
+            // Assert codeList is sorted.
+            assertOrThrow(elemPrv < code, JSON.stringify([
+                elemPrv, code
+            ], undefined, 4));
+            elemPrv = code;
+            warnings = jslint(code, {
+                beta: true
+            }).warnings;
+            assertOrThrow(
+                warnings.length === 0,
+                JSON.stringify([code, warnings])
+            );
+        });
+    });
+}());
+
 (function testCaseJslintMisc() {
 /*
  * this function will test jslint's misc handling-behavior
@@ -210,149 +361,6 @@ function noop() {
     assertOrThrow(jslint("", {
         test_internal_error: true
     }).warnings.length === 1);
-}());
-
-(function testCaseJslintCodeValidate() {
-/*
- * this function will validate each code is valid in jslint
- */
-    Object.values({
-        array: [
-            "new Array(0);"
-        ],
-        async_await: [
-            "async function aa() {\n    await aa();\n}",
-            "async function aa() {\n"
-            + "    try {\n"
-            + "        aa();\n"
-            + "    } catch (err) {\n"
-            + "        await err();\n"
-            + "    }\n"
-            + "}\n",
-            "async function aa() {\n"
-            + "    try {\n"
-            + "        await aa();\n"
-            + "    } catch (err) {\n"
-            + "        await err();\n"
-            + "    }\n"
-            + "}\n"
-        ],
-        date: [
-            "Date.getTime();",
-            "let aa = aa().getTime();",
-            "let aa = aa.aa().getTime();"
-        ],
-        directive: [
-            "#!\n/*jslint browser:false, node*/\n\"use strict\";",
-            "/*property aa bb*/"
-        ],
-        fart: [
-            "function aa() {\n    return () => 0;\n}"
-        ],
-        jslint_disable: [
-            "/*jslint-disable*/\n0\n/*jslint-enable*/"
-        ],
-        jslint_quiet: [
-            "0 //jslint-quiet"
-        ],
-        json: [
-            "{\"aa\":[[],-0,null]}"
-        ],
-        label: [
-            "function aa() {\n"
-            + "bb:\n"
-            + "    while (true) {\n"
-            + "        if (true) {\n"
-            + "            break bb;\n"
-            + "        }\n"
-            + "    }\n"
-            + "}\n"
-        ],
-        loop: [
-            "function aa() {\n    do {\n        aa();\n    } while (aa());\n}"
-        ],
-        module: [
-            "export default Object.freeze();",
-            "import {aa, bb} from \"aa\";\naa(bb);",
-            "import {} from \"aa\";",
-            "import(\"aa\").then(function () {\n    return;\n});",
-            "let aa = 0;\nimport(aa).then(aa).then(aa).catch(aa).finally(aa);"
-        ],
-        number: [
-            "let aa = 0.0e0;",
-            "let aa = 0b0;",
-            "let aa = 0o0;",
-            "let aa = 0x0;"
-        ],
-        optional_chaining: [
-            "let aa = aa?.bb?.cc;"
-        ],
-        param: [
-            "function aa({aa, bb}) {\n"
-            + "    return {aa, bb};\n"
-            + "}\n",
-            "function aa({constructor}) {\n"
-            + "    return {constructor};\n"
-            + "}\n"
-        ],
-        property: [
-            "let aa = aa[`!`];"
-        ],
-        regexp: [
-            "function aa() {\n    return /./;\n}",
-            "let aa = /(?!.)(?:.)(?=.)/;",
-            "let aa = /./gimuy;",
-            "let aa = /[\\--\\-]/;"
-        ],
-        ternary: [
-            (
-                "let aa = (\n    aa()\n    ? 0\n    : 1\n) "
-                + "&& (\n    aa()\n    ? 0\n    : 1\n);"
-            ),
-            "let aa = (\n    aa()\n    ? `${0}`\n    : `${1}`\n);"
-        ],
-        try_catch: [
-            "let aa = 0;\n"
-            + "try {\n"
-            + "    aa();\n"
-            + "} catch (err) {\n"
-            + "    aa = err;\n"
-            + "}\n"
-            + "try {\n"
-            + "    aa();\n"
-            + "} catch (err) {\n"
-            + "    aa = err;\n"
-            + "}\n"
-            + "aa();\n"
-        ],
-        use_strict: [
-            "function aa() {\n    \"use strict\";\n    return;\n}"
-        ],
-        var: [
-            "\"use strict\";\nvar aa = 0;",
-            "let [\n    aa, bb = 0\n] = 0;",
-            "let [...aa] = [...aa];",
-            "let constructor = 0;",
-            "let {\n    aa: bb\n} = 0;",
-            "let {aa, bb} = 0;",
-            "let {constructor} = 0;"
-        ]
-    }).forEach(function (codeList) {
-        let elemPrv = "";
-        codeList.forEach(function (code) {
-            let warnings;
-            // Assert codeList is sorted.
-            assertOrThrow(elemPrv < code, JSON.stringify([
-                elemPrv, code
-            ], undefined, 4));
-            elemPrv = code;
-            warnings = jslint(code).warnings;
-            assertOrThrow(
-                warnings.length === 0,
-                JSON.stringify([code, warnings])
-            );
-        });
-    });
 }());
 
 (async function testCaseJslintWarningsValidate() {

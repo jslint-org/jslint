@@ -2,6 +2,7 @@
 name: on-pull-request
 on:
   - pull_request
+  - workflow_dispatch
 # shCiBase - start
 jobs:
   build:
