@@ -154,7 +154,7 @@
     color: black;
 }
 </style>
-<style id="#JSLINT_REPORT_STYLE"></style>
+<style class="JSLINT_REPORT_STYLE"></style>
 </head>
 <body class="JSLINT_">
 <div id="bannerFork1"
@@ -195,7 +195,7 @@ style="
     align-items: center;
     background: lightslategray;
     color: white;
-    display: none;
+    display: flex;
     height: 50px;
     justify-content: center;
     left: 50%;
@@ -206,14 +206,13 @@ style="
     width: 200px;
     z-index: 99;
 ">
-<div>
-    Linting
+    <div>Loading modules</div>
+    &nbsp;
     <span class="uiLoaderEllipsis">
         <span>.</span>
         <span>.</span>
         <span>.</span>
     </span>
-    </div>
 </div>
 <div id="JSLINT_INPUT">
 <div id="JSLINT_TITLEBOX">
@@ -243,8 +242,8 @@ style="
         <div title="Assume browser environment.">
         <input type="checkbox" value="browser"><label>browser</label>
         </div>
-        <div title="Assume CouchDb environment.">
-        <input type="checkbox" value="couch"><label>couch</label>
+        <div title="Include jslint stack-trace in warnings.">
+        <input type="checkbox" value="debug"><label>debug</label>
         </div>
         <div title="Allow console.log() and friends.">
         <input type="checkbox" value="devel"><label>devel</label>
@@ -263,45 +262,39 @@ style="
         <div title="Allow conversion operators.">
         <input type="checkbox" value="convert"><label>convert</label>
         </div>
-        <div title="Include jslint stack-trace in warnings.">
-        <input type="checkbox" value="debug"><label>debug</label>
-        </div>
-    </div>
-    <div>&nbsp;
-        <div title="Allow eval().">
-        <input type="checkbox" value="eval"><label>eval</label>
-        </div>
         <div title="Allow for-statement.">
         <input type="checkbox" value="for"><label>for</label>
         </div>
+    </div>
+    <div>&nbsp;
         <div title="Allow get() and set().">
         <input type="checkbox" value="getset"><label>getset</label>
         </div>
-        <div title="Allow 2-space indent.">
+        <div title="Use 2-space indent.">
         <input type="checkbox" value="indent2"><label>indent2</label>
         </div>
-    </div>
-    <div>&nbsp;
         <div title="Allow long lines.">
         <input type="checkbox" value="long"><label>long</label>
         </div>
         <div title="Allow weird property names.">
         <input type="checkbox" value="name"><label>name</label>
         </div>
+    </div>
+    <div>&nbsp;
         <div title="Allow single-quote strings.">
         <input type="checkbox" value="single"><label>single</label>
         </div>
         <div title="Allow 'this'.">
         <input type="checkbox" value="this"><label>this</label>
         </div>
-    </div>
-    <div>&nbsp;
         <div title="Allow unordered cases, params, properties, and variables.">
         <input type="checkbox" value="unordered"><label>unordered</label>
         </div>
         <div title="Allow unordered const and let declarations that are not at top of function-scope.">
         <input type="checkbox" value="variable"><label>variable</label>
         </div>
+    </div>
+    <div>&nbsp;
         <div title="Allow messy whitespace.">
         <input type="checkbox" value="white"><label>white</label>
         </div>

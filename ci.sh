@@ -130,6 +130,16 @@ process.exit(Number(
 import moduleFs from "fs";
 import moduleChildProcess from "child_process";
 (async function () {
+    var screenshotCurl = await moduleFs.promises.stat("jslint.mjs");
+    screenshotCurl = String(`
+echo "\
+% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                     Dload  Upload   Total   Spent    Left  Speed
+100  250k  100  250k    0     0   250k      0  0:00:01 --:--:--  0:00:01  250k\
+"
+    `).trim().replace((
+        /250/g
+    ), Math.floor(screenshotCurl.size / 1024));
     [
         // parallel-task - screenshot files
         [
@@ -174,7 +184,10 @@ import moduleChildProcess from "child_process";
                 /^/gm
             ), "> ")
             + "\n\n\n\u0027\n"
-            + script
+            + script.replace(
+                "curl -L https://www.jslint.com/jslint.mjs > jslint.mjs",
+                screenshotCurl
+            )
         ));
         moduleChildProcess.spawn(
             "./ci.sh",
@@ -193,67 +206,59 @@ import moduleChildProcess from "child_process";
     });
 }());
 ' # '
-    # seo - invalidate cached-assets and inline css
+    # seo - inline css-assets and invalidate cached-assets
     node --input-type=module -e '
 import moduleFs from "fs";
-var cacheKey = Math.random().toString(36).slice(-4);
 (async function () {
-    var result = await moduleFs.promises.readFile("browser.mjs", "utf8");
+    var cacheKey = Math.random().toString(36).slice(-4);
+    var fileDict = {};
+    await Promise.all([
+        "asset-codemirror-rollup.css",
+        "browser.mjs",
+        "index.html"
+    ].map(async function (file) {
+        fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
+    }));
+
+// Inline css-assets.
+
+    fileDict["index.html"] = fileDict["index.html"].replace((
+        "\n<link rel=\"stylesheet\" href=\"asset-codemirror-rollup.css\">\n"
+    ), function () {
+        return (
+            "\n<style>\n"
+            + fileDict["asset-codemirror-rollup.css"].trim()
+            + "\n</style>\n"
+        );
+    });
+    fileDict["index.html"] = fileDict["index.html"].replace((
+        "\n<style class=\"JSLINT_REPORT_STYLE\"></style>\n"
+    ), function () {
+        return fileDict["browser.mjs"].match(
+            /\n<style\sclass="JSLINT_REPORT_STYLE">\n[\S\s]*?\n<\/style>\n/
+        )[0];
+    });
 
 // Invalidate cached-assets.
 
-    result = result.replace((
+    fileDict["browser.mjs"] = fileDict["browser.mjs"].replace((
         /^import\u0020.+?\u0020from\u0020".+?\.(?:js|mjs)\b/gm
     ), function (match0) {
         return `${match0}?cc=${cacheKey}`;
     });
-
-// Write file.
-
-    await moduleFs.promises.writeFile("browser.mjs", result);
-}());
-(async function () {
-    var result = await moduleFs.promises.readFile("index.html", "utf8");
-
-// Invalidate cached-assets.
-
-    result = result.replace((
+    fileDict["index.html"] = fileDict["index.html"].replace((
         /\b(?:href|src)=".+?\.(?:css|js|mjs)\b/g
     ), function (match0) {
         return `${match0}?cc=${cacheKey}`;
     });
 
-// Inline css-assets.
-
-    result.replace((
-        /\n<link\u0020rel="stylesheet"\u0020href="([^"]+?)">\n/g
-    ), function (match0, url) {
-        var data = moduleFs.readFileSync( //jslint-quiet
-            url.split("?")[0],
-            "utf8"
-        );
-        result = result.replace(match0, function () {
-            return `\n<style>\n${data.trim()}\n</style>\n`;
-        });
-        return "";
-    });
-    result.replace((
-        `\n<style id="#JSLINT_REPORT_STYLE"></style>\n`
-    ), function (match0) {
-        var data = moduleFs.readFileSync("browser.mjs", "utf8"); //jslint-quiet
-        result = result.replace(match0, function () {
-            return data.match(
-                /\n<style\sid="#JSLINT_REPORT_STYLE">\n[\S\s]*?\n<\/style>\n/
-            )[0];
-        });
-        return "";
-    });
-
 // Write file.
 
-    process.on("exit", function () {
-        moduleFs.writeFileSync("index.html", result); //jslint-quiet
-    });
+    await Promise.all(Object.entries(fileDict).map(function ([
+        file, data
+    ]) {
+        moduleFs.promises.writeFile(file, data);
+    }));
 }());
 ' # '
     # add dir .build
@@ -427,7 +432,7 @@ import moduleUrl from "url";
         }
         data = await moduleFs.promises.readFile(file, "utf8");
         data.replace((
-            /\bhttps?:\/\/.*?(?:[\s"):\]]|$)/gm
+            /\bhttps?:\/\/.*?(?:[\s")\]]|[.:]?$)/gm
         ), function (url) {
             var req;
             url = url.slice(0, -1).replace((

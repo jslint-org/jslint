@@ -23,15 +23,24 @@ Douglas Crockford <douglas@crockford.com>
 [![screenshot](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-browser-_2fjslint_2fbranch-beta_2findex.html.png)](https://jslint-org.github.io/jslint/index.html)
 
 
+# Web Demo Archived
+- [Web Demo 2020 (can lint ES6)](https://www.jslint.com/branch-v2020.11.6/index.html)
+- [Web Demo 2014 (can lint ES5 only)](https://www.jslint.com/branch-v2014.7.8/jslint.html)
+- [Web Demo 2013 (can lint ES5, CSS, HTML)](https://www.jslint.com/branch-v2013.3.13/jslint.html)
+
+
 # Install
-### 1. To install, just download https://www.jslint.com/jslint.mjs:
-```shell
+## To install, just download and save https://www.jslint.com/jslint.mjs.
+```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-download.svg -->
 #!/bin/sh
 
 curl -L https://www.jslint.com/jslint.mjs > jslint.mjs
 ```
+- shell output
 
-### 2. To run `jslint.mjs` from command-line:
+![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-download.svg)
+
+## To run `jslint.mjs` from command-line:
 ```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-cli-file.svg -->
 #!/bin/sh
 
@@ -43,7 +52,7 @@ node jslint.mjs hello.js
 
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-cli-file.svg)
 
-### 3. To import `jslint.mjs` as es-module:
+## To import `jslint.mjs` as es-module:
 ```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-import.svg -->
 #!/bin/sh
 
@@ -68,7 +77,7 @@ result.warnings.forEach(function ({
 
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-import.svg)
 
-### 4. To jslint entire directory:
+## To jslint entire directory:
 ```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-cli-dir.svg -->
 #!/bin/sh
 
