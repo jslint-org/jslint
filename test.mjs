@@ -404,6 +404,7 @@ function noop() {
         causeList.split("\n").forEach(function (cause) {
             cause = JSON.parse(cause);
             tmp = jslint(cause[0], {
+                beta: true,
                 test_cause: true
             }).causes;
             // Validate cause.

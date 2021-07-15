@@ -95,10 +95,11 @@
 
 /*property
     causes,
+    global_list,
     max, min,
     stringify,
     test_cause,
-    JSLINT_BETA, a, all, allowed_option, argv, arity, artifact, assign, async,
+    JSLINT_BETA, a, all, argv, arity, artifact, assign, async,
     b, beta, bind, bitwise, block, body, browser, c, calls, catch, catch_list,
     catch_stack, cjs_module, cjs_require, cli, closer, closure, code, column,
     concat, console_error, constant, context, convert, couch, create, cwd, d,
@@ -121,7 +122,7 @@
     tenure, test, test_internal_error, this, thru, token, token_global,
     token_list, token_nxt, token_tree, tokens, tree, trim, trimRight, try, type,
     unordered, url, used, value, variable, versions, warn, warn_at, warning,
-    warning_list, warnings, white, wrapped, writable
+    warning_list, warnings, white, wrapped, readonly
 */
 
 let jslint_charset_ascii = (
@@ -180,101 +181,6 @@ function jslint(
 ) {
 
 // The jslint function itself.
-
-    let allowed_option = {
-
-// These are the options that are recognized in the option object or that may
-// appear in a /*jslint*/ directive. Most options will have a boolean value,
-// usually true. Some options will also predefine some number of global
-// variables.
-
-        beta: true,             // Enable experimental warnings.
-        bitwise: true,          // Allow bitwise operators.
-        browser: [              // Assume browser environment.
-            "CharacterData",
-            "DOMException",
-            "DocumentType",
-            "Element",
-            "Event",
-            "FileReader",
-            "FontFace",
-            "FormData",
-            "IntersectionObserver",
-            "MutationObserver",
-            "Storage",
-            "TextDecoder",
-            "TextEncoder",
-            "URL",
-            "Worker",
-            "XMLHttpRequest",
-            "clearInterval",
-            "clearTimeout",
-            "document",
-            "fetch",
-            "localStorage",
-            "location",
-            "navigator",
-            "screen",
-            "sessionStorage",
-            "setInterval",
-            "setTimeout",
-            "window"
-        ],
-        convert: true,          // Allow conversion operators.
-        couch: [                // Assume CouchDb environment.
-            "emit",
-            "getRow",
-            "isArray",
-            "log",
-            "provides",
-            "registerType",
-            "require",
-            "send",
-            "start",
-            "sum",
-            "toJSON"
-        ],
-        debug: true,            // Include jslint stack-trace in warnings.
-        devel: [                // Allow console.log() and friends.
-            "alert", "confirm", "console", "prompt"
-        ],
-        eval: true,             // Allow eval().
-        for: true,              // Allow for-statement.
-        getset: true,           // Allow get() and set().
-        indent2: true,          // Allow 2-space indent.
-        long: true,             // Allow long lines.
-        name: true,             // Allow weird property names.
-        node: [                 // Assume Node.js environment.
-            "Buffer",
-            "TextDecoder",
-            "TextEncoder",
-            "URL",
-            "URLSearchParams",
-            "__dirname",
-            "__filename",
-            "clearImmediate",
-            "clearInterval",
-            "clearTimeout",
-            "console",
-            "exports",
-            "module",
-            "process",
-            "require",
-            "setImmediate",
-            "setInterval",
-            "setTimeout"
-        ],
-        single: true,           // Allow single-quote strings.
-        test_cause: true,       // Test jslint's causes.
-        test_internal_error: true,      // Test jslint's internal-error
-                                        // ... handling-ability.
-        this: true,             // Allow 'this'.
-        unordered: true,        // Allow unordered cases, params, properties,
-                                // ... and variables.
-        variable: true,         // Allow unordered const and let declarations
-                                // ... that are not at top of function-scope.
-        white: true             // Allow messy whitespace.
-    };
     let catch_list = [];        // The array containing all catch-blocks.
     let catch_stack = [         // The stack of catch-blocks.
         {
@@ -302,102 +208,6 @@ function jslint(
     let mode_stop = false;      // true if JSLint cannot finish.
     let property_dict = empty();        // The object containing the tallied
                                         // ... property names.
-    let standard = [            // These are the globals that are provided by
-                                // ... the language standard.
-// node --input-type=module -e '
-// /*jslint beta node*/
-// import https from "https";
-// (async function () {
-//     var dict;
-//     var result = "";
-//     await new Promise(function (resolve) {
-//         https.get((
-//             "https://developer.mozilla.org"
-//             + "/en-US/docs/Web/JavaScript/Reference/Global_Objects"
-//         ), function (res) {
-//             res.on("data", function (chunk) {
-//                 result += chunk;
-//             }).on("end", resolve).setEncoding("utf8");
-//         });
-//     });
-//     dict = {
-//         import: true
-//     };
-//     result.replace(new RegExp((
-//         "href=\"\\/en-US\\/docs\\/Web\\/JavaScript\\/Reference"
-//         + "\\/Global_Objects\\/.*?<code>(\\w+).*?<\\/code>"
-//     ), "g"), function (ignore, key) {
-//         switch (globalThis.hasOwnProperty(key) && key) {
-//         case "escape":
-//         case "unescape":
-//         case "uneval":
-//         case false:
-//             break;
-//         default:
-//             dict[key] = true;
-//         }
-//     });
-//     console.log(JSON.stringify(Object.keys(dict).sort(), undefined, 4));
-// }());
-// '
-        "Array",
-        "ArrayBuffer",
-        "Atomics",
-        "BigInt",
-        "BigInt64Array",
-        "BigUint64Array",
-        "Boolean",
-        "DataView",
-        "Date",
-        "Error",
-        "EvalError",
-        "Float32Array",
-        "Float64Array",
-        "Function",
-        "Infinity",
-        "Int16Array",
-        "Int32Array",
-        "Int8Array",
-        "Intl",
-        "JSON",
-        "Map",
-        "Math",
-        "NaN",
-        "Number",
-        "Object",
-        "Promise",
-        "Proxy",
-        "RangeError",
-        "ReferenceError",
-        "Reflect",
-        "RegExp",
-        "Set",
-        "SharedArrayBuffer",
-        "String",
-        "Symbol",
-        "SyntaxError",
-        "TypeError",
-        "URIError",
-        "Uint16Array",
-        "Uint32Array",
-        "Uint8Array",
-        "Uint8ClampedArray",
-        "WeakMap",
-        "WeakSet",
-        "WebAssembly",
-        "decodeURI",
-        "decodeURIComponent",
-        "encodeURI",
-        "encodeURIComponent",
-        "eval",
-        "globalThis",
-        "import",
-        "isFinite",
-        "isNaN",
-        "parseFloat",
-        "parseInt",
-        "undefined"
-    ];
     let state = empty();        // jslint state-object to be passed between
                                 // jslint functions.
     let syntax_dict = empty();  // The object containing the parser.
@@ -806,6 +616,9 @@ function jslint(
         case "redefinition_a_b":
             mm = `Redefinition of '${a}' from line ${b}.`;
             break;
+        case "redefinition_global_a_b":
+            mm = `Redefinition of global ${a} variable '${b}'.`;
+            break;
         case "required_a_optional_b":
             mm = `Required parameter '${a}' after optional parameter '${b}'.`;
             break;
@@ -990,17 +803,7 @@ function jslint(
 // full tokenization to precede parsing.
 
         option_dict = Object.assign(empty(), option_dict);
-        populate(global_list, global_dict, false);
-        populate(standard, global_dict, false);
-        Object.keys(option_dict).forEach(function (name) {
-            const allowed = allowed_option[name];
-            if (option_dict[name] === true && Array.isArray(allowed)) {
-                populate(allowed, global_dict, false);
-            }
-        });
-
         Object.assign(state, {
-            allowed_option,
             artifact,
             catch_list,
             catch_stack,
@@ -1009,6 +812,7 @@ function jslint(
             function_list,
             function_stack,
             global_dict,
+            global_list,
             import_list,
             is_equal,
             is_weird,
@@ -1451,10 +1255,10 @@ function jslint_phase2_lex(state) {
 // PHASE 2. Lex <line_list> into <token_list>.
 
     let {
-        allowed_option,
         artifact,
         directive_list,
         global_dict,
+        global_list,
         line_list,
         option_dict,
         stop,
@@ -1643,14 +1447,10 @@ function jslint_phase2_lex(state) {
     }
 
     function lex_comment() {
-        let allowed;
         let body;
         let ii = 0;
         let jj = 0;
-        let match;
-        let name;
         let the_comment;
-        let value;
 
 // Create a comment object. Comments are not allowed in JSON text. Comments can
 // include directives and notices of incompletion.
@@ -1684,21 +1484,19 @@ function jslint_phase2_lex(state) {
 // Lex/loop through each line until "*/".
 
             while (true) {
-                if (line_source > "") {
-                    // rx_star_slash
-                    ii = line_source.indexOf("*/");
-                    if (ii >= 0) {
-                        break;
-                    }
-                    // rx_slash_star
-                    jj = line_source.indexOf("/*");
-                    if (jj >= 0) {
+                // rx_star_slash
+                ii = line_source.indexOf("*/");
+                if (ii >= 0) {
+                    break;
+                }
+                // rx_slash_star
+                ii = line_source.indexOf("/*");
+                if (ii >= 0) {
 
 // test_cause:
 // ["/*/*", "lex_comment", "nested_comment", "", 2]
 
-                        warn_at("nested_comment", line, column + jj);
-                    }
+                    warn_at("nested_comment", line, column + ii);
                 }
                 snippet.push(line_source);
                 line_source = read_line();
@@ -1746,11 +1544,13 @@ function jslint_phase2_lex(state) {
 
 // Lex directives in comment.
 
-        match = snippet.match(
+        [
+            the_comment.directive, body
+        ] = Array.from(snippet.match(
             // rx_directive
             /^(jslint|property|global)\s+(.*)$/
-        );
-        if (!match) {
+        ) || []).slice(1);
+        if (the_comment.directive === undefined) {
             return the_comment;
         }
         directive_list.push(the_comment);
@@ -1759,84 +1559,61 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["0\n/*global aa*/", "lex_comment", "misplaced_directive_a", "global", 1]
 
-            warn_at("misplaced_directive_a", line, from, match[1]);
+            warn_at("misplaced_directive_a", line, from, the_comment.directive);
             return the_comment;
         }
-        the_comment.directive = match[1];
-        body = match[2];
 
 // lex_directive();
 // JSLint recognizes three directives that can be encoded in comments. This
 // function processes one item, and calls itself recursively to process the
 // next one.
 
-// Lex/loop throught each directive in /*...*/
+// Lex/loop through each directive in /*...*/
 
-        while (true) {
-            match = body.match(
-                // rx_directive_part
-                /^([a-zA-Z$_][a-zA-Z0-9$_]*)(?::\s*(true|false))?,?\s*(.*)$/
-            );
-            if (!match) {
-                if (body) {
+        ii = 0;
+        body.replace((
+            // rx_directive_part
+            /([a-zA-Z$_][a-zA-Z0-9$_]*)(?::\s*(true|false))?,?\s*|$/g
+        ), function (match0, key, val, jj) {
+            if (ii !== jj) {
 
 // test_cause:
 // ["/*jslint !*/", "lex_comment", "bad_directive_a", "!", 1]
 
-                    return stop("bad_directive_a", the_comment, body);
-                }
-                break;
+                return stop("bad_directive_a", the_comment, body.slice(ii));
             }
-            [
-                name, value, body
-            ] = match.slice(1);
-            if (the_comment.directive === "jslint") {
-                allowed = allowed_option[name];
-                if (
-                    typeof allowed === "boolean"
-                    || typeof allowed === "object"
-                ) {
-                    if (value === "true" || value === undefined) {
-                        option_dict[name] = true;
-                        if (Array.isArray(allowed)) {
-                            populate(allowed, global_dict, false);
-                        }
-                    } else {
-
-// Probably deadcode.
-// } else if (value === "false") {
-//     option_dict[name] = false;
-// } else {
-//     warn("bad_option_a", the_comment, name + ":" + value);
-
-                        assert_or_throw(
-                            value === "false",
-                            `Expected value === "false".`
-                        );
-                        option_dict[name] = false;
-                    }
-                } else {
-
-// test_cause:
-// ["/*jslint undefined*/", "lex_comment", "bad_option_a", "undefined", 1]
-
-                    warn("bad_option_a", the_comment, name);
-                }
-            } else if (the_comment.directive === "property") {
-                state.mode_property = true;
-                tenure[name] = true;
-            } else if (the_comment.directive === "global") {
-                if (value) {
+            if (match0 === "") {
+                return "";
+            }
+            ii += match0.length;
+            switch (the_comment.directive) {
+            case "global":
+                if (val) {
 
 // test_cause:
 // ["/*global aa:false*/", "lex_comment", "bad_option_a", "aa:false", 1]
 
-                    warn("bad_option_a", the_comment, name + ":" + value);
+                    warn("bad_option_a", the_comment, key + ":" + val);
                 }
-                global_dict[name] = false;
+                global_dict[key] = "user-defined";
                 state.mode_module = the_comment;
+                break;
+            case "jslint":
+                if (!option_set_item(key, val !== "false")) {
+
+// test_cause:
+// ["/*jslint undefined*/", "lex_comment", "bad_option_a", "undefined", 1]
+
+                    warn("bad_option_a", the_comment, key);
+                }
+                break;
+            case "property":
+                state.mode_property = true;
+                tenure[key] = true;
+                break;
             }
-        }
+            return "";
+        });
         return the_comment;
     }
 
@@ -2610,6 +2387,295 @@ function jslint_phase2_lex(state) {
         return token_create(snippet);
     }
 
+    function option_set_item(key, val) {
+
+// These are the options that are recognized in the option object or that may
+// appear in a /*jslint*/ directive. Most options will have a boolean value,
+// usually true. Some options will also predefine some number of global
+// variables.
+
+        switch (key) {
+        case "beta":            // Enable experimental warnings.
+        case "bitwise":         // Allow bitwise operators.
+        case "browser":         // Assume browser environment.
+        case "convert":         // Allow conversion operators.
+        case "couch":           // Assume CouchDb environment.
+        case "debug":           // Include jslint stack-trace in warnings.
+        case "devel":           // Allow console.log() and friends.
+        case "ecma":            // Assume ECMAScript environment.
+        case "eval":            // Allow eval().
+        case "for":             // Allow for-statement.
+        case "getset":          // Allow get() and set().
+        case "indent2":         // Use 2-space indent.
+        case "long":            // Allow long lines.
+        case "name":            // Allow weird property names.
+        case "node":            // Assume Node.js environment.
+        case "single":          // Allow single-quote strings.
+        case "test_cause":      // Test jslint's causes.
+        case "test_internal_error":     // Test jslint's internal-error
+                                        // ... handling-ability.
+        case "this":            // Allow 'this'.
+        case "unordered":       // Allow unordered cases, params, properties,
+                                // ... and variables.
+        case "variable":        // Allow unordered const and let declarations
+                                // ... that are not at top of function-scope.
+        case "white":           // Allow messy whitespace.
+            option_dict[key] = val;
+            break;
+        default:
+            return false;
+        }
+
+// Initialize global-variables.
+
+        switch (val && key) {
+
+// Assign global browser variables to global_dict.
+// /*jslint beta, browser, devel*/
+// console.log(JSON.stringify(Array.from([
+//     ...
+// ]).filter(function (key) {
+//     return window.hasOwnProperty(key);
+// }), undefined, 4));
+
+        case "browser":
+            object_assign_from_list(global_dict, [
+
+// Shared with Node.js.
+
+                "AbortController",
+                "Event",
+                "EventTarget",
+                "MessageChannel",
+                "MessageEvent",
+                "MessagePort",
+                "TextDecoder",
+                "TextEncoder",
+                "URL",
+                "URLSearchParams",
+                "WebAssembly",
+                // "atob",
+                // "btoa",
+                "clearInterval",
+                "clearTimeout",
+                // "console",
+                "performance",
+                "queueMicrotask",
+                "setInterval",
+                "setTimeout",
+
+// Browser only.
+
+                // "CharacterData",
+                "DOMException",
+                // "DocumentType",
+                // "Element",
+                // "Event",
+                "FileReader",
+                // "FontFace",
+                "FormData",
+                "IntersectionObserver",
+                "MutationObserver",
+                // "Storage",
+                // "TextDecoder",
+                // "TextEncoder",
+                // "URL",
+                "Worker",
+                "XMLHttpRequest",
+                // "caches",
+                // "clearInterval",
+                // "clearTimeout",
+                "document",
+                // "event",
+                "fetch",
+                // "history",
+                "localStorage",
+                "location",
+                // "name",
+                "navigator",
+                // "screen",
+                "sessionStorage",
+                // "setInterval",
+                // "setTimeout",
+                "window"
+            ], "browser");
+            break;
+
+// https://docs.couchdb.org/en/stable/query-server/javascript.html#javascript
+
+        case "couch":
+            object_assign_from_list(global_dict, [
+                "emit",
+                "getRow",
+                "isArray",
+                "log",
+                "provides",
+                "registerType",
+                "require",
+                "send",
+                "start",
+                "sum",
+                "toJSON"
+            ], "CouchDb");
+            break;
+        case "devel":
+            object_assign_from_list(global_dict, [
+                "alert", "confirm", "console", "prompt"
+            ], "development");
+            break;
+
+// Assign global ECMAScript variables to global_dict.
+// /*jslint beta, node*/
+// import https from "https";
+// (async function () {
+//     let dict = {import: true};
+//     let result = "";
+//     await new Promise(function (resolve) {
+//         https.get((
+//             "https://raw.githubusercontent.com/mdn/content/main/files/"
+//             + "en-us/web/javascript/reference/global_objects/index.html"
+//         ), function (res) {
+//             res.on("data", function (chunk) {
+//                 result += chunk;
+//             }).on("end", resolve).setEncoding("utf8");
+//         });
+//     });
+//     result.replace((
+//         /<li>\{\{JSxRef\("(?:Global_Objects\/)?([^"\/]+?)"/g
+//     ), function (ignore, key) {
+//         if (globalThis.hasOwnProperty(key)) {
+//             dict[key] = true;
+//         }
+//         return "";
+//     });
+//     console.log(JSON.stringify(Object.keys(dict).sort(), undefined, 4));
+// }());
+
+        case "ecma":
+            object_assign_from_list(global_dict, [
+                "Array",
+                "ArrayBuffer",
+                "Atomics",
+                "BigInt",
+                "BigInt64Array",
+                "BigUint64Array",
+                "Boolean",
+                "DataView",
+                "Date",
+                "Error",
+                "EvalError",
+                "Float32Array",
+                "Float64Array",
+                "Function",
+                "Infinity",
+                "Int16Array",
+                "Int32Array",
+                "Int8Array",
+                "Intl",
+                "JSON",
+                "Map",
+                "Math",
+                "NaN",
+                "Number",
+                "Object",
+                "Promise",
+                "Proxy",
+                "RangeError",
+                "ReferenceError",
+                "Reflect",
+                "RegExp",
+                "Set",
+                "SharedArrayBuffer",
+                "String",
+                "Symbol",
+                "SyntaxError",
+                "TypeError",
+                "URIError",
+                "Uint16Array",
+                "Uint32Array",
+                "Uint8Array",
+                "Uint8ClampedArray",
+                "WeakMap",
+                "WeakSet",
+                "WebAssembly",
+                "decodeURI",
+                "decodeURIComponent",
+                "encodeURI",
+                "encodeURIComponent",
+                "eval",
+                "globalThis",
+                "import",
+                "isFinite",
+                "isNaN",
+                "parseFloat",
+                "parseInt",
+                "undefined"
+            ], "ECMAScript");
+            break;
+
+// Assign global Node.js variables to global_dict.
+// /*jslint beta, node*/
+// import https from "https";
+// (async function () {
+//     let dict = {};
+//     let result = "";
+//     await new Promise(function (resolve) {
+//         https.get((
+//             "https://raw.githubusercontent.com/nodejs/node/master/doc/api/"
+//             + "globals.md"
+//         ), function (res) {
+//             res.on("data", function (chunk) {
+//                 result += chunk;
+//             }).on("end", resolve).setEncoding("utf8");
+//         });
+//     });
+//     result.replace((
+//         /\n(?:\*\u0020\[`|##\u0020|##\u0020Class:\u0020)`\w+/g
+//     ), function (match0) {
+//         dict[match0.split("`")[1]] = true;
+//         return "";
+//     });
+//     console.log(JSON.stringify(Object.keys(dict).sort(), undefined, 4));
+// }());
+
+        case "node":
+            object_assign_from_list(global_dict, [
+                "AbortController",
+                "Buffer",
+                "Event",
+                "EventTarget",
+                "MessageChannel",
+                "MessageEvent",
+                "MessagePort",
+                "TextDecoder",
+                "TextEncoder",
+                "URL",
+                "URLSearchParams",
+                "WebAssembly",
+                "__dirname",
+                "__filename",
+                // "atob",
+                // "btoa",
+                "clearImmediate",
+                "clearInterval",
+                "clearTimeout",
+                "console",
+                "exports",
+                "global",
+                "module",
+                "performance",
+                "process",
+                "queueMicrotask",
+                "require",
+                "setImmediate",
+                "setInterval",
+                "setTimeout"
+            ], "Node.js");
+            break;
+        }
+        return true;
+    }
+
     function read_digits(rx, quiet) {
         let digits = line_source.match(rx)[0];
         let length = digits.length;
@@ -2792,6 +2858,14 @@ function jslint_phase2_lex(state) {
         return the_token;
     }
 
+// Init global_dict and option_dict.
+
+    option_set_item("ecma", true);
+    Object.keys(option_dict).sort().forEach(function (key) {
+        option_set_item(key, option_dict[key] === true);
+    });
+    object_assign_from_list(global_dict, global_list, "user-defined");
+
 // Scan first line for "#!" and ignore it.
 
     if (line_list[jslint_fudge].line_source.startsWith("#!")) {
@@ -2836,6 +2910,7 @@ function jslint_phase3_parse(state) {
         export_dict,
         function_list,
         function_stack,
+        global_dict,
         import_list,
         is_equal,
         option_dict,
@@ -3353,8 +3428,8 @@ function jslint_phase3_parse(state) {
 // function, label, parameter, or variable. We look for variable redefinition
 // because it causes confusion.
 
-        const id = name.id;
         let earlier;
+        let id = name.id;
 
 // Reserved words may not be enrolled.
 
@@ -3364,44 +3439,41 @@ function jslint_phase3_parse(state) {
 // ["let undefined", "enroll", "reserved_a", "undefined", 5]
 
             warn("reserved_a", name);
-        } else {
+            return;
+        }
 
 // Has the name been enrolled in this context?
 
-            earlier = functionage.context[id] || catchage.context[id];
-            if (earlier) {
+        earlier = functionage.context[id] || catchage.context[id];
+        if (earlier) {
 
 // test_cause:
 // ["let aa;let aa", "enroll", "redefinition_a_b", "1", 12]
 
-                warn("redefinition_a_b", name, name.id, earlier.line);
+            warn("redefinition_a_b", name, id, earlier.line);
+            return;
+        }
 
 // Has the name been enrolled in an outer context?
 
-            } else {
-                function_stack.forEach(function (value) {
-                    const item = value.context[id];
-                    if (item !== undefined) {
-                        earlier = item;
-                    }
-                });
-                if (earlier) {
-                    if (id === "ignore") {
-                        if (earlier.role === "variable") {
+        function_stack.forEach(function ({
+            context
+        }) {
+            earlier = context[id] || earlier;
+        });
+        if (earlier && id === "ignore") {
+            if (earlier.role === "variable") {
 
 // test_cause:
-// ["let ignore;function aa(ignore){}", "enroll", "unexpected_a", "ignore", 24]
+// ["let ignore;function aa(ignore){}", "enroll", "redefinition_a_b", "1", 24]
 
-                            warn("unexpected_a", name);
-                        }
-                    } else {
-                        if (
-                            (
-                                role !== "exception"
-                                || earlier.role !== "exception"
-                            )
-                            && role !== "parameter" && role !== "function"
-                        ) {
+                warn("redefinition_a_b", name, id, earlier.line);
+            }
+        } else if (
+            earlier
+            && role !== "parameter" && role !== "function"
+            && (role !== "exception" || earlier.role !== "exception")
+        ) {
 
 // test_cause:
 // ["
@@ -3409,33 +3481,34 @@ function jslint_phase3_parse(state) {
 // ", "enroll", "redefinition_a_b", "1", 31]
 // ["function aa(){var aa;}", "enroll", "redefinition_a_b", "1", 19]
 
-                            warn(
-                                "redefinition_a_b",
-                                name,
-                                name.id,
-                                earlier.line
-                            );
-                        }
-                    }
-                }
+            warn("redefinition_a_b", name, id, earlier.line);
+        } else if (
+            option_dict.beta
+            && global_dict[id]
+            && role !== "parameter"
+        ) {
+
+// test_cause:
+// ["let Array", "enroll", "redefinition_global_a_b", "Array", 5]
+
+            warn("redefinition_global_a_b", name, global_dict[id], id);
+        }
 
 // Enroll it.
 
-                Object.assign(name, {
-                    dead: true,
-                    init: false,
-                    parent: (
-                        role === "exception"
-                        ? catchage
-                        : functionage
-                    ),
-                    role,
-                    used: 0,
-                    writable: !readonly
-                });
-                name.parent.context[id] = name;
-            }
-        }
+        Object.assign(name, {
+            dead: true,
+            init: false,
+            parent: (
+                role === "exception"
+                ? catchage
+                : functionage
+            ),
+            readonly,
+            role,
+            used: 0
+        });
+        name.parent.context[id] = name;
     }
 
     function infix(bp, id, f) {
@@ -3457,8 +3530,7 @@ function jslint_phase3_parse(state) {
 
     function infix_dot(left) {
         const the_token = token_now;
-        let name;
-        name = token_nxt;
+        let name = token_nxt;
         if (
             (
                 left.id !== "(string)"
@@ -5728,10 +5800,7 @@ function jslint_phase3_parse(state) {
             ) {
 
 // test_cause:
-// ["
-// /*jslint beta*/
-// console.log();let aa=0;
-// ", "stmt_var", "var_on_top", "let", 15]
+// ["console.log();let aa=0;", "stmt_var", "var_on_top", "let", 15]
 // ["console.log();var aa=0;", "stmt_var", "var_on_top", "var", 15]
 // ["try{aa();}catch(aa){var aa=0;}", "stmt_var", "var_on_top", "var", 21]
 // ["while(0){var aa;}", "stmt_var", "var_on_top", "var", 10]
@@ -5904,18 +5973,9 @@ function jslint_phase3_parse(state) {
         ) {
 
 // test_cause:
-// ["
-// /*jslint beta*/
-// const bb=0;const aa=0;
-// ", "stmt_var", "expected_a_b_before_c_d", "aa", 12]
-// ["
-// /*jslint beta*/
-// let bb;let aa;
-// ", "stmt_var", "expected_a_b_before_c_d", "aa", 8]
-// ["
-// /*jslint beta*/
-// var bb;var aa;
-// ", "stmt_var", "expected_a_b_before_c_d", "aa", 8]
+// ["const bb=0;const aa=0;", "stmt_var", "expected_a_b_before_c_d", "aa", 12]
+// ["let bb;let aa;", "stmt_var", "expected_a_b_before_c_d", "aa", 8]
+// ["var bb;var aa;", "stmt_var", "expected_a_b_before_c_d", "aa", 8]
 
             warn(
                 "expected_a_b_before_c_d",
@@ -6270,9 +6330,12 @@ function jslint_phase4_walk(state) {
     let preaction;
     let preamble;
     let pres = empty();
-    let relationop = populate([         // The relational operators.
-        "!=", "!==", "==", "===", "<", "<=", ">", ">="
-    ]);
+
+// The relational operators.
+
+    let relationop = object_assign_from_list(empty(), [
+        "!=", "!==", "<", "<=", "==", "===", ">", ">="
+    ], true);
 
 // Ambulation of the parse tree.
 
@@ -6354,45 +6417,51 @@ function jslint_phase4_walk(state) {
     }
 
     function init_variable(name) {
-        const the_variable = lookup(name);
-        if (the_variable !== undefined) {
-            if (the_variable.writable) {
-                the_variable.init = true;
-                return;
-            }
+        let the_variable = lookup(name);
+        if (!the_variable || the_variable.readonly) {
+            warn("bad_assignment_a", name);
+            return;
         }
-        warn("bad_assignment_a", name);
+        the_variable.init = true;
     }
 
     function lookup(thing) {
+        let id = thing.id;
         let the_variable;
-        if (thing.arity === "variable") {
+        if (thing.arity !== "variable") {
+            return;
+        }
 
 // Look up the variable in the current context.
 
-            the_variable = (
-                functionage.context[thing.id] || catchage.context[thing.id]
-            );
+        the_variable = (
+            functionage.context[id] || catchage.context[id]
+        );
 
 // If it isn't local, search all the other contexts. If there are name
 // collisions, take the most recent.
 
-            if (the_variable === undefined) {
-                function_stack.forEach(function (outer) {
-                    const a_variable = outer.context[thing.id];
-                    if (
-                        a_variable !== undefined
-                        && a_variable.role !== "label"
-                    ) {
-                        the_variable = a_variable;
-                    }
-                });
+        if (the_variable && the_variable.role === "label") {
+
+// test_cause:
+// ["aa:while(0){aa;}", "lookup", "label_a", "aa", 13]
+
+            warn("label_a", thing);
+            return the_variable;
+        }
+        if (!the_variable) {
+            function_stack.forEach(function ({
+                context
+            }) {
+                if (context[id] && context[id].role !== "label") {
+                    the_variable = context[id];
+                }
+            });
 
 // If it isn't in any of those either, perhaps it is a predefined global.
 // If so, add it to the global context.
 
-                if (the_variable === undefined) {
-                    if (global_dict[thing.id] === undefined) {
+            if (!the_variable && global_dict[id] === undefined) {
 
 // test_cause:
 // ["aa", "lookup", "undeclared_a", "aa", 1]
@@ -6404,45 +6473,39 @@ function jslint_phase4_walk(state) {
 // let aa=0;try{aa();}catch(ignore){bb();}
 // ", "lookup", "undeclared_a", "bb", 34]
 
-                        warn("undeclared_a", thing);
-                        return;
-                    }
-                    the_variable = {
-                        dead: false,
-                        id: thing.id,
-                        init: true,
-                        parent: token_global,
-                        role: "variable",
-                        used: 0,
-                        writable: false
-                    };
-                    token_global.context[thing.id] = the_variable;
-                }
-                the_variable.closure = true;
-                functionage.context[thing.id] = the_variable;
-            } else if (the_variable.role === "label") {
-
-// test_cause:
-// ["aa:while(0){aa;}", "lookup", "label_a", "aa", 13]
-
-                warn("label_a", thing);
+                warn("undeclared_a", thing);
+                return;
             }
-            if (
-                (
-                    the_variable.calls === undefined
-                    || functionage.name === undefined
-                    || the_variable.calls[functionage.name.id] === undefined
-                )
-                && the_variable.dead
-            ) {
+            if (!the_variable) {
+                the_variable = {
+                    dead: false,
+                    id,
+                    init: true,
+                    parent: token_global,
+                    readonly: true,
+                    role: "variable",
+                    used: 0
+                };
+                token_global.context[id] = the_variable;
+            }
+            the_variable.closure = true;
+            functionage.context[id] = the_variable;
+        }
+        if (
+            (
+                the_variable.calls === undefined
+                || functionage.name === undefined
+                || the_variable.calls[functionage.name.id] === undefined
+            )
+            && the_variable.dead
+        ) {
 
 // test_cause:
 // ["let aa;if(aa){let bb;}bb;", "lookup", "out_of_scope_a", "bb", 23]
 
-                warn("out_of_scope_a", thing);
-            }
-            return the_variable;
+            warn("out_of_scope_a", thing);
         }
+        return the_variable;
     }
 
     function post_a(thing) {
@@ -6498,7 +6561,7 @@ function jslint_phase4_walk(state) {
             }
         } else {
             if (lvalue.arity === "variable") {
-                if (!lvalue.variable || lvalue.variable.writable !== true) {
+                if (!lvalue.variable || lvalue.variable.readonly) {
                     warn("bad_assignment_a", lvalue);
                 }
             }
@@ -7262,7 +7325,7 @@ function jslint_phase4_walk(state) {
             the_variable = lookup(thing.name);
             if (the_variable !== undefined) {
                 the_variable.init = true;
-                if (!the_variable.writable) {
+                if (the_variable.readonly) {
 
 // test_cause:
 // ["const aa=0;for(aa in aa){}", "pre_s_for", "bad_assignment_a", "aa", 16]
@@ -7494,12 +7557,14 @@ function jslint_phase5_whitage(state) {
     let open = true;
     let opening = true;
     let right;
-    let spaceop = populate([    // This is the set of infix operators that
-                                // ... require a space on each side.
-        "!=", "!==", "%", "%=", "&", "&=", "&&", "*", "*=", "+=", "-=", "/",
-        "/=", "<", "<=", "<<", "<<=", "=", "==", "===", "=>", ">", ">=",
-        ">>", ">>=", ">>>", ">>>=", "^", "^=", "|", "|=", "||"
-    ]);
+
+// This is the set of infix operators that require a space on each side.
+
+    let spaceop = object_assign_from_list(empty(), [
+        "!=", "!==", "%", "%=", "&", "&&", "&=", "*", "*=", "+=", "-=", "/",
+        "/=", "<", "<<", "<<=", "<=", "=", "==", "===", "=>", ">", ">=", ">>",
+        ">>=", ">>>", ">>>=", "^", "^=", "|", "|=", "||"
+    ], true);
 
     function at_margin(fit) {
         const at = margin + fit;
@@ -8114,24 +8179,23 @@ function noop() {
     return;
 }
 
-function populate(array, object = empty(), value = true) {
+function object_assign_from_list(dict, list, val) {
 
-// Augment an object by taking property names from an array of strings.
+// Assign each property-name from <list> to <dict>.
 
-    array.forEach(function (name) {
-        object[name] = value;
+    list.forEach(function (key) {
+        dict[key] = val;
     });
-    return object;
+    return dict;
 }
+
+// Export jslint as commonjs/es-module.
 
 jslint_export = Object.freeze(Object.assign(jslint, {
     cli: Object.freeze(jslint_cli),
     edition: jslint_edition,
     jslint: Object.freeze(jslint.bind(undefined))
 }));
-
-// Export jslint as commonjs/es-module.
-
 // module.exports = jslint_export;
 export default Object.freeze(jslint_export);
 jslint_import_meta_url = import.meta.url;
