@@ -30,7 +30,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Install
-## To install, just download and save https://www.jslint.com/jslint.mjs.
+## To install, just download https://www.jslint.com/jslint.mjs and save to file:
 ```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-download.svg -->
 #!/bin/sh
 
