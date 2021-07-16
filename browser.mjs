@@ -831,7 +831,6 @@ function jslint_ui_onresize() {
         case "clear_source":
             editor.setValue("");
             break;
-            // FIXME: If some of the options are checked before clicking the button, when toggling, those options aren't toggled along with the other checkboxes
             case "toggle_all_options":
                 document.querySelectorAll(
                     "#JSLINT_OPTIONS input[type=checkbox]"
