@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta
     name="description"
     content="JSLint, The JavaScript Code Quality Tool. This file allows JSLint
@@ -11,7 +12,7 @@
 <meta name="author" content="Douglas Crockford"/>
 <link rel="icon" type="image/png" href="asset-image-jslint-512.svg"/>
 <title>JSLint:&nbsp;The&nbsp;JavaScript&nbsp;Code Quality Tool</title>
-<!-- Google PageSpeed - Reduce Largest Contentful Paint. -->
+<!-- Google Lighthouse Performance - Reduce Largest Contentful Paint. -->
 <link as="script" rel="preload" href="asset-codemirror-rollup.js">
 <link rel="modulepreload" href="browser.mjs">
 <link rel="modulepreload" href="jslint.mjs">
@@ -55,8 +56,8 @@
 }
 /*csslint ignore:end*/
 
-/* Google PageSpeed - Reduce Cumulative Layout Shift. */
 .JSLINT_ #JSLINT_SOURCE textarea {
+/* Google Lighthouse Performance - Reduce Cumulative Layout Shift. */
     height: 298px;
 }
 
@@ -77,6 +78,11 @@
 
 .JSLINT_ .CodeMirror {
     padding: 0;
+}
+.JSLINT_ .CodeMirror-linenumber {
+/* Google Lighthouse Accessibility - Background and foreground colors do not */
+/* have a sufficient contrast ratio. */
+    color: darkslategray;
 }
 .JSLINT_ .CodeMirror-lint-marker {
     background-position: 1px -1px;
@@ -117,14 +123,13 @@
     cursor: pointer;
     user-select: none;
 }
-.JSLINT_ #JSLINT_OPTIONS div[title] {
-    padding: 0 4px;
-}
 .JSLINT_ #JSLINT_OPTIONS div[title] input {
+    margin: 0 4px 1px 0;
     vertical-align: middle;
+    zoom: 1.1;
 }
 .JSLINT_ #JSLINT_OPTIONS label {
-    padding-left: 4px;
+    padding: 4px;
 }
 .JSLINT_ #JSLINT_OPTIONS > div > div {
     float: left;
@@ -135,7 +140,7 @@
     color: darkslategray;
 }
 .JSLINT_ #JSLINT_TITLEBOX ul li {
-    line-height: 20px;
+    line-height: 28px;
 }
 .JSLINT_ #JSLINT_TITLEBOX ul li a:link {
     color: black;
@@ -220,7 +225,7 @@ style="
     <div style="font-size: 50px;">JSLint</div>
     <div id="JSLINT_EDITION" style="font-size: 14px;">&nbsp;</div>
     </div>
-    <ul style="float: right; font-size: 16px;">
+    <ul style="float: right; font-size: 14.5px; margin-top: -10px;">
     <li><a href="help.html">Read the instructions.</a></li>
     <li><a href="https://www.amazon.com/dp/1949815005/wrrrldwideweb"><i>How JavaScript Works</i> by Douglas Crockford.</a></li>
     <li><a href="https://github.com/jslint-org/jslint/issues">Report a bug or issue.</a></li>
@@ -240,63 +245,63 @@ style="
     <div>
     <div>Env...
         <div title="Assume browser environment.">
-        <input type="checkbox" value="browser"><label>browser</label>
+        <label><input type="checkbox" value="browser">browser</label>
         </div>
         <div title="Include jslint stack-trace in warnings.">
-        <input type="checkbox" value="debug"><label>debug</label>
+        <label><input type="checkbox" value="debug">debug</label>
         </div>
         <div title="Allow console.log() and friends.">
-        <input type="checkbox" value="devel"><label>devel</label>
+        <label><input type="checkbox" value="devel">devel</label>
         </div>
         <div title="Assume Node.js environment.">
-        <input type="checkbox" value="node"><label>node</label>
+        <label><input type="checkbox" value="node">node</label>
         </div>
     </div>
     <div>Allow...
         <div title="Enable experimental warnings.">
-        <input type="checkbox" value="beta"><label>beta</label>
+        <label><input type="checkbox" value="beta">beta</label>
         </div>
         <div title="Allow bitwise operators.">
-        <input type="checkbox" value="bitwise"><label>bitwise</label>
+        <label><input type="checkbox" value="bitwise">bitwise</label>
         </div>
         <div title="Allow conversion operators.">
-        <input type="checkbox" value="convert"><label>convert</label>
+        <label><input type="checkbox" value="convert">convert</label>
         </div>
         <div title="Allow for-statement.">
-        <input type="checkbox" value="for"><label>for</label>
+        <label><input type="checkbox" value="for">for</label>
         </div>
     </div>
     <div>&nbsp;
         <div title="Allow get() and set().">
-        <input type="checkbox" value="getset"><label>getset</label>
+        <label><input type="checkbox" value="getset">getset</label>
         </div>
         <div title="Use 2-space indent.">
-        <input type="checkbox" value="indent2"><label>indent2</label>
+        <label><input type="checkbox" value="indent2">indent2</label>
         </div>
         <div title="Allow long lines.">
-        <input type="checkbox" value="long"><label>long</label>
+        <label><input type="checkbox" value="long">long</label>
         </div>
         <div title="Allow weird property names.">
-        <input type="checkbox" value="name"><label>name</label>
+        <label><input type="checkbox" value="name">name</label>
         </div>
     </div>
     <div>&nbsp;
         <div title="Allow single-quote strings.">
-        <input type="checkbox" value="single"><label>single</label>
+        <label><input type="checkbox" value="single">single</label>
         </div>
         <div title="Allow 'this'.">
-        <input type="checkbox" value="this"><label>this</label>
+        <label><input type="checkbox" value="this">this</label>
         </div>
         <div title="Allow unordered cases, params, properties, and variables.">
-        <input type="checkbox" value="unordered"><label>unordered</label>
+        <label><input type="checkbox" value="unordered">unordered</label>
         </div>
         <div title="Allow unordered const and let declarations that are not at top of function-scope.">
-        <input type="checkbox" value="variable"><label>variable</label>
+        <label><input type="checkbox" value="variable">variable</label>
         </div>
     </div>
     <div>&nbsp;
         <div title="Allow messy whitespace.">
-        <input type="checkbox" value="white"><label>white</label>
+        <label><input type="checkbox" value="white">white</label>
         </div>
     </div>
     <textarea

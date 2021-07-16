@@ -241,7 +241,7 @@ function jslint(
         eval: true,             // Allow eval().
         for: true,              // Allow for-statement.
         getset: true,           // Allow get() and set().
-        indent2: true,          // Allow 2-space indent.
+        indent2: true,          // Use 2-space indent.
         long: true,             // Allow long lines.
         name: true,             // Allow weird property names.
         node: [                 // Assume Node.js environment.
