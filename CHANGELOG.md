@@ -8,7 +8,6 @@
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
 - jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
-- jslint - add new warning against redefining global-variables.
 - jslint - add new warning against using do-statment.
 - jslint - add new warning requiring paren around comma-separated concatenations.
 - jslint - add syntax-support for continue-label-statement.
@@ -24,6 +23,7 @@
 - bugfix - fix website crashing when linting pure json-object.
 - ci - fix race-condition when inlining css.
 - doc - update README.md with links to archived web-demos.
+- jslint - add new beta-warning against redefining global-variables.
 - jslint - add new beta-warning if functions are unordered.
 - jslint - add new warning disallowing string-literal as property-name, e.g. {`aa`:0}.
 - jslint - comment out shebang in jslint.mjs so older ios devices can use website.
