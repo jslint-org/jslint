@@ -432,7 +432,7 @@ import moduleUrl from "url";
         }
         data = await moduleFs.promises.readFile(file, "utf8");
         data.replace((
-            /\bhttps?:\/\/.*?(?:[\s")\]]|[.:]?$)/gm
+            /\bhttps?:\/\/.*?(?:[\s")\]]|\W?$)/gm
         ), function (url) {
             var req;
             url = url.slice(0, -1).replace((
