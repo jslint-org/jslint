@@ -181,6 +181,7 @@ function jslint(
 ) {
 
 // The jslint function itself.
+
     let catch_list = [];        // The array containing all catch-blocks.
     let catch_stack = [         // The stack of catch-blocks.
         {
