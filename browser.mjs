@@ -831,17 +831,17 @@ function jslint_ui_onresize() {
         case "clear_source":
             editor.setValue("");
             break;
-            case "toggle_all_options":
-                document.querySelectorAll(
-                    "#JSLINT_OPTIONS input[type=checkbox]"
-                ).forEach(function (elem) {
-                    if (elem.checked) {
-                        elem.checked = false;
-                    } else {
-                        elem.checked = true;
-                    }
-                });
-                break;
+        case "toggle_all_options":
+            document.querySelectorAll(
+                "#JSLINT_OPTIONS input[type=checkbox]"
+            ).forEach(function (elem) {
+                if (elem.checked) {
+                    elem.checked = false;
+                } else {
+                    elem.checked = true;
+                }
+            });
+            break;
         }
     };
     document.querySelector(
