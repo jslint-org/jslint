@@ -447,9 +447,7 @@ import moduleUrl from "url";
                 process.env.GITHUB_REPOSITORY || "jslint-org/jslint"
             ).replace("/", ".github.io/"));
             if (url.startsWith("http://")) {
-                throw new Error(
-                    "shDirHttplinkValidate - insecure link " + url
-                );
+                throw new Error("shDirHttplinkValidate - insecure link " + url);
             }
             // ignore duplicate-link
             if (dict.hasOwnProperty(url)) {

@@ -56,11 +56,6 @@
 }
 /*csslint ignore:end*/
 
-.JSLINT_ #JSLINT_SOURCE textarea {
-/* Google Lighthouse Performance - Reduce Cumulative Layout Shift. */
-    height: 298px;
-}
-
 .JSLINT_ #JSLINT_BUTTONS button,
 .JSLINT_ #JSLINT_OPTIONS > div,
 .JSLINT_ #JSLINT_TITLEBOX {
@@ -74,6 +69,61 @@
 .JSLINT_ #JSLINT_SOURCE .CodeMirror pre {
     font-family: monospace;
     font-size: 12px;
+}
+.skip-link {
+    background: darkslategray;
+    color: white;
+    left: 0;
+    opacity: 0.75;
+    padding: 4px;
+    position: absolute;
+    top: -40px;
+    z-index: 10;
+}
+.skip-link:focus {
+    top: 0;
+}
+#bannerFork1 {
+    height: 100px;
+    left: 0;
+    opacity: 0.75;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    width: 200px;
+    z-index: 1;
+}
+#bannerFork1 a {
+    color: white;
+}
+#bannerFork1 div {
+    background: darkslategray;
+    font-size: 12px;
+    height: 20px;
+    line-height: 20px;
+    opacity: 0.75;
+    overflow: visible;
+    position: absolute;
+    right: 65px;
+    text-align: center;
+    top: 25px;
+    transform: rotate(-45deg);
+    width: 100%;
+}
+#uiLoader1 {
+    align-items: center;
+    background: lightslategray;
+    color: white;
+    display: flex;
+    height: 50px;
+    justify-content: center;
+    left: 50%;
+    margin: -50px 0 0 -100px;
+    opacity: 0.85;
+    position: fixed;
+    top: 40%;
+    width: 200px;
+    z-index: 1;
 }
 
 .JSLINT_ .CodeMirror {
@@ -136,6 +186,10 @@
     line-height: 20px;
     padding: 0 16px 16px 0;
 }
+.JSLINT_ #JSLINT_SOURCE textarea {
+/* Google Lighthouse Performance - Reduce Cumulative Layout Shift. */
+    height: 298px;
+}
 .JSLINT_ #JSLINT_TITLEBOX {
     color: darkslategray;
 }
@@ -162,55 +216,13 @@
 <style class="JSLINT_REPORT_STYLE"></style>
 </head>
 <body class="JSLINT_">
-<div id="bannerFork1"
-style="
-    height: 100px;
-    left: 0;
-    opacity: 0.75;
-    overflow: hidden;
-    position: absolute;
-    top: 0;
-    width: 200px;
-    z-index: 99;
-">
-    <div
-style="
-    background: darkslategray;
-    font-size: 12px;
-    height: 20px;
-    line-height: 20px;
-    opacity: 0.75;
-    overflow: visible;
-    position: absolute;
-    right: 65px;
-    text-align: center;
-    top: 25px;
-    transform: rotate(-45deg);
-    width: 100%;
-">
-    <a
-        href="https://github.com/jslint-org/jslint"
-        style="color: white;"
-    >
-    fork on github
-    </a>
-    </div>
+<!-- Google Lighthouse Accessibility -->
+<!-- The page does not contain a heading, skip link, or landmark region -->
+<a class="skip-link" href="#JSLINT_INPUT">Skip to main</a>
+<div id="bannerFork1">
+    <div><a href="https://github.com/jslint-org/jslint">Fork on github</a></div>
 </div>
-<div id="uiLoader1" style="
-    align-items: center;
-    background: lightslategray;
-    color: white;
-    display: flex;
-    height: 50px;
-    justify-content: center;
-    left: 50%;
-    margin: -50px 0 0 -100px;
-    opacity: 0.85;
-    position: fixed;
-    top: 40%;
-    width: 200px;
-    z-index: 99;
-">
+<div id="uiLoader1">
     <div>Loading modules</div>
     &nbsp;
     <span class="uiLoaderEllipsis">
@@ -219,7 +231,7 @@ style="
         <span>.</span>
     </span>
 </div>
-<div id="JSLINT_INPUT">
+<main id="JSLINT_INPUT">
 <div id="JSLINT_TITLEBOX">
     <div style="float: left; margin-bottom: 16px;">
     <div style="font-size: 50px;">JSLint</div>
@@ -312,7 +324,7 @@ style="
     ></textarea>
     </div>
 </fieldset>
-</div>
+</main>
 <div id="JSLINT_REPORT_HTML"></div>
 <script defer src="asset-codemirror-rollup.js"></script>
 <script src="browser.mjs" type="module"></script>
