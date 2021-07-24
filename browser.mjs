@@ -873,10 +873,8 @@ function jslint_ui_onresize() {
     if (!mode_debug) {
         editor.setValue(String(`
 #!/usr/bin/env node
-
 /*jslint browser, node*/
 /*global caches, indexedDb*/ //jslint-quiet
-
 import https from "https";
 import jslint from \u0022./jslint.mjs\u0022;
 
@@ -885,6 +883,8 @@ import jslint from \u0022./jslint.mjs\u0022;
 /*jslint-enable*/
 
 eval("console.log(\\"hello world\\");"); //jslint-quiet
+
+eval("console.log(\\"hello world\\");");
 
 // Optional directives.
 // .... /*jslint beta*/ .......... Enable experimental warnings.

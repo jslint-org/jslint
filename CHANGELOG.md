@@ -18,7 +18,7 @@
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 - vim - add vim plugin.
 
-# v2021.7.1-beta
+# v2021.7.24
 - bugfix - fix jslint not warning about function-redefinition when function is defined inside a call.
 - bugfix - fix website crashing when linting pure json-object.
 - ci - fix race-condition when inlining css.
