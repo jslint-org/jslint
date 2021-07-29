@@ -830,6 +830,7 @@ function jslint_ui_onresize() {
             break;
         case "clear_source":
             editor.setValue("");
+            editor.focus();
             break;
         }
     };
