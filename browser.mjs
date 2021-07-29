@@ -551,7 +551,7 @@ body {
 // </dl>
 
     html += "<fieldset id=\"JSLINT_REPORT_FUNCTIONS\">\n";
-    html += "<legend>Report: Functions (" + functions.length +")</legend>\n";
+    html += "<legend>Report: Functions (" + functions.length + ")</legend>\n";
     html += "<div>\n";
     if (json) {
 
