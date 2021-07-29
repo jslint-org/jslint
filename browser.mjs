@@ -524,7 +524,7 @@ body {
 // Produce the /*property*/ directive.
 
     html += "<fieldset id=\"JSLINT_REPORT_PROPERTIES\">\n";
-    html += "<legend>Report: Properties</legend>\n";
+    html += "<legend>Report: Properties (" + Object.keys(property).length + ")" + "</legend>\n";
     html += "<label>\n";
     html += "<textarea readonly>";
     html += "/*property";
