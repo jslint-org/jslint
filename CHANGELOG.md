@@ -17,6 +17,10 @@
 - merge function.html and help.html into README.md
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 - vim - add vim plugin.
+- website - display number of warnings, properties, functions in report.
+
+# v2021.8.1-beta
+- website - fix uiLoader getting hidden behind highlighted text.
 
 # v2021.7.24
 - bugfix - fix jslint not warning about function-redefinition when function is defined inside a call.
