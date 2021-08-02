@@ -31,6 +31,7 @@
 
 /*property
     dom_style_report_unmatched,
+    focus,
     indentSelection,
     slice, somethingSelected,
     CodeMirror, Pos, Tab, addEventListener, checked, click, closest, closure,
@@ -730,6 +731,7 @@ async function jslint_ui_call() {
 
     setTimeout(function () {
         document.querySelector("#uiLoader1").style.display = "none";
+        editor.focus();
     }, 500);
 }
 
