@@ -501,7 +501,7 @@ body {
 </style>
             `).trim() + "\n";
     html += "<fieldset id=\"JSLINT_REPORT_WARNINGS\">\n";
-    html += "<legend>Report: Warnings</legend>\n";
+    html += "<legend>Report: Warnings (" + warnings.length + ")</legend>\n";
     html += "<div>\n";
     if (stop) {
         html += "<div class=\"center\">JSLint was unable to finish.</div>\n";
@@ -532,7 +532,11 @@ body {
 // Produce the /*property*/ directive.
 
     html += "<fieldset id=\"JSLINT_REPORT_PROPERTIES\">\n";
-    html += "<legend>Report: Properties</legend>\n";
+    html += (
+        "<legend>Report: Properties ("
+        + Object.keys(property).length
+        + ")</legend>\n"
+    );
     html += "<label>\n";
     html += "<textarea readonly>";
     html += "/*property";
@@ -564,7 +568,7 @@ body {
 // </div>
 
     html += "<fieldset id=\"JSLINT_REPORT_FUNCTIONS\">\n";
-    html += "<legend>Report: Functions</legend>\n";
+    html += "<legend>Report: Functions (" + functions.length + ")</legend>\n";
     html += "<div>\n";
     if (json) {
 
