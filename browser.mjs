@@ -747,7 +747,6 @@ async function jslint_ui_call() {
 
     setTimeout(function () {
         document.querySelector("#uiLoader1").style.display = "none";
-        editor.focus();
     }, 500);
 }
 
@@ -912,7 +911,7 @@ eval("console.log(\\"hello world\\");");
 // ................................... and variables.
 // .... /*jslint variable*/ ...... Allow unordered const and let declarations
 // ................................... that are not at top of function-scope.
-// .... /*jslint white: true...... Allow messy whitespace.
+// .... /*jslint white*/ ......... Allow messy whitespace.
 
 (async function () {
     let result = await new Promise(function (resolve) {
