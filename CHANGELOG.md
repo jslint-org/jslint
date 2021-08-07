@@ -19,6 +19,7 @@
 - vim - add vim plugin.
 
 # v2021.8.1-beta
+- warning - disable un-ergonomic warnings restricting directive-global (missing_browser and unexpected_directive_a).
 - website - display number of warnings, properties, functions in report.
 - website - fix uiLoader getting hidden behind highlighted text.
 

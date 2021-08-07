@@ -593,9 +593,12 @@ function jslint(
         case "missing_await_statement":
             mm = `Expected await statement in async function.`;
             break;
-        case "missing_browser":
-            mm = `/*global*/ requires the Assume a browser option.`;
-            break;
+
+// Disable warning "missing_browser".
+//         case "missing_browser":
+//             mm = `/*global*/ requires the Assume a browser option.`;
+//             break;
+
         case "missing_m":
             mm = `Expected 'm' flag on a multiline regular expression.`;
             break;
@@ -674,9 +677,12 @@ function jslint(
         case "unexpected_comment":
             mm = `Unexpected comment.`;
             break;
-        case "unexpected_directive_a":
-            mm = `When using modules, don't use directive '/\u002a${a}'.`;
-            break;
+
+// Disable warning "unexpected_directive_a".
+//         case "unexpected_directive_a":
+//             mm = `When using modules, don't use directive '/\u002a${a}'.`;
+//             break;
+
         case "unexpected_expression_a":
             mm = `Unexpected expression '${a}' in statement position.`;
             break;
@@ -890,17 +896,19 @@ function jslint(
             `function_stack.length === 0.`
         );
 
-        if (!option_dict.browser) {
-            directive_list.forEach(function (comment) {
-                if (comment.directive === "global") {
+// Disable warning "missing_browser".
+//         if (!option_dict.browser) {
+//             directive_list.forEach(function (comment) {
+//                 if (comment.directive === "global") {
+//
+// // test_cause:
+// // ["/*global aa*/", "jslint", "missing_browser", "(comment)", 1]
+//
+//                     warn("missing_browser", comment);
+//                 }
+//             });
+//         }
 
-// test_cause:
-// ["/*global aa*/", "jslint", "missing_browser", "(comment)", 1]
-
-                    warn("missing_browser", comment);
-                }
-            });
-        }
         if (option_dict.test_internal_error) {
             assert_or_throw(undefined, "test_internal_error");
         }
@@ -1597,7 +1605,10 @@ function jslint_phase2_lex(state) {
                     warn("bad_option_a", the_comment, key + ":" + val);
                 }
                 global_dict[key] = "user-defined";
-                state.mode_module = the_comment;
+
+// Disable warning "unexpected_directive_a".
+//                 state.mode_module = the_comment;
+
                 break;
             case "jslint":
                 if (!option_set_item(key, val !== "false")) {
@@ -5363,20 +5374,23 @@ function jslint_phase3_parse(state) {
         const the_import = token_now;
         let name;
         let names;
-        if (typeof state.mode_module === "object") {
 
-// test_cause:
-// ["
-// /*global aa*/
-// import aa from "aa"
-// ", "stmt_import", "unexpected_directive_a", "global", 1]
+// Disable warning "unexpected_directive_a".
+//         if (typeof state.mode_module === "object") {
+//
+// // test_cause:
+// // ["
+// // /*global aa*/
+// // import aa from "aa"
+// // ", "stmt_import", "unexpected_directive_a", "global", 1]
+//
+//             warn(
+//                 "unexpected_directive_a",
+//                 state.mode_module,
+//                 state.mode_module.directive
+//             );
+//         }
 
-            warn(
-                "unexpected_directive_a",
-                state.mode_module,
-                state.mode_module.directive
-            );
-        }
         state.mode_module = true;
         if (token_nxt.identifier) {
             name = token_nxt;
