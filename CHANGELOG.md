@@ -19,6 +19,8 @@
 - vim - add vim plugin.
 
 # v2021.8.1-beta
+- fs - rename file ci.sh to jslint_ci.sh.
+- license - add codemirror license to rollup-assets.
 - website - display number of warnings, properties, functions in report.
 - website - fix uiLoader getting hidden behind highlighted text.
 
