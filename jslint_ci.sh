@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# POSIX reference
+# http://pubs.opengroup.org/onlinepubs/9699919799/utilities/test.html
+# http://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
+
 # sh one-liner
 #
 # git branch -d -r origin/aa
@@ -13,8 +17,8 @@
 # head CHANGELOG.md -n50
 # ln -f jslint.mjs ~/jslint.mjs
 # openssl rand -base64 32 # random key
-# sh ci.sh shCiBranchPromote origin alpha beta
-# sh ci.sh shRunWithScreenshotTxt .build/screenshot-changelog.svg head -n50 CHANGELOG.md
+# sh jslint_ci.sh shCiBranchPromote origin alpha beta
+# sh jslint_ci.sh shRunWithScreenshotTxt .build/screenshot-changelog.svg head -n50 CHANGELOG.md
 # vim rgx-lowercase \L\1\e
 
 shBrowserScreenshot() {(set -e
@@ -26,7 +30,7 @@ import modulePath from "path";
 import moduleUrl from "url";
 // init debugInline
 (function () {
-    var consoleError = console.error;
+    let consoleError = console.error;
     globalThis.debugInline = globalThis.debugInline || function (...argList) {
 
 // this function will both print <argList> to stderr and return <argList>[0]
@@ -38,9 +42,9 @@ import moduleUrl from "url";
     };
 }());
 (function () {
-    var file;
-    var timeStart;
-    var url;
+    let file;
+    let timeStart;
+    let url;
     if (process.platform !== "linux") {
         return;
     }
@@ -130,7 +134,7 @@ process.exit(Number(
 import moduleFs from "fs";
 import moduleChildProcess from "child_process";
 (async function () {
-    var screenshotCurl = await moduleFs.promises.stat("jslint.mjs");
+    let screenshotCurl = await moduleFs.promises.stat("jslint.mjs");
     screenshotCurl = String(`
 echo "\
 % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
@@ -143,12 +147,14 @@ echo "\
     [
         // parallel-task - screenshot files
         [
+            "jslint_ci.sh",
             "shRunWithScreenshotTxt",
             ".build/screenshot-files.svg",
             "shGitLsTree"
         ],
         // parallel-task - screenshot changelog
         [
+            "jslint_ci.sh",
             "shRunWithScreenshotTxt",
             ".build/screenshot-changelog.svg",
             "head",
@@ -156,7 +162,7 @@ echo "\
             "CHANGELOG.md"
         ]
     ].forEach(function (argList) {
-        moduleChildProcess.spawn("./ci.sh", argList, {
+        moduleChildProcess.spawn("sh", argList, {
             stdio: [
                 "ignore", 1, 2
             ]
@@ -190,8 +196,9 @@ echo "\
             )
         ));
         moduleChildProcess.spawn(
-            "./ci.sh",
+            "sh",
             [
+                "jslint_ci.sh",
                 "shRunWithScreenshotTxt",
                 file,
                 "sh",
@@ -210,8 +217,8 @@ echo "\
     node --input-type=module -e '
 import moduleFs from "fs";
 (async function () {
-    var cacheKey = Math.random().toString(36).slice(-4);
-    var fileDict = {};
+    let cacheKey = Math.random().toString(36).slice(-4);
+    let fileDict = {};
     await Promise.all([
         "asset-codemirror-rollup.css",
         "browser.mjs",
@@ -351,9 +358,9 @@ import moduleFs from "fs";
 
 // Update edition in README.md, jslint.mjs from CHANGELOG.md
 
-    var dict;
-    var versionBeta;
-    var versionMaster;
+    let dict;
+    let versionBeta;
+    let versionMaster;
     dict = {};
     await Promise.all([
         "CHANGELOG.md",
@@ -420,11 +427,11 @@ import moduleFs from "fs";
 import moduleHttps from "https";
 import moduleUrl from "url";
 (async function () {
-    var dict = {};
+    let dict = {};
     Array.from(
         await moduleFs.promises.readdir(".")
     ).forEach(async function (file) {
-        var data;
+        let data;
         if (!(
             /.\.html$|.\.md$/m
         ).test(file)) {
@@ -434,7 +441,7 @@ import moduleUrl from "url";
         data.replace((
             /\bhttps?:\/\/.*?(?:[\s")\]]|\W?$)/gm
         ), function (url) {
-            var req;
+            let req;
             url = url.slice(0, -1).replace((
                 /[\u0022\u0027]/g
             ), "").replace((
@@ -539,7 +546,7 @@ shGitLsTree() {(set -e
     node --input-type=module -e '
 import moduleChildProcess from "child_process";
 (async function () {
-    var result;
+    let result;
     // get file, mode, size
     result = await new Promise(function (resolve) {
         result = "";
@@ -592,8 +599,8 @@ import moduleChildProcess from "child_process";
         });
     });
     process.on("exit", function () {
-        var iiPad;
-        var sizePad;
+        let iiPad;
+        let sizePad;
         iiPad = String(result.length).length + 1;
         sizePad = String(Math.ceil(result[0].size / 1024)).length;
         process.stdout.write(result.map(function (elem, ii) {
@@ -647,7 +654,7 @@ import moduleRepl from "repl";
 import moduleUrl from "url";
 // init debugInline
 (function () {
-    var consoleError = console.error;
+    let consoleError = console.error;
     globalThis.debugInline = globalThis.debugInline || function (...argList) {
 
 // this function will both print <argList> to stderr and return <argList>[0]
@@ -662,7 +669,7 @@ import moduleUrl from "url";
 /*
  * this function will start http-file-server
  */
-    var contentTypeDict = {
+    let contentTypeDict = {
         ".bmp": "image/bmp",
         ".cjs": "application/javascript; charset=utf-8",
         ".css": "text/css; charset=utf-8",
@@ -692,9 +699,9 @@ import moduleUrl from "url";
     process.env.PORT = process.env.PORT || "8080";
     console.error("http-file-server listening on port " + process.env.PORT);
     moduleHttp.createServer(function (req, res) {
-        var file;
-        var pathname;
-        var timeStart;
+        let file;
+        let pathname;
+        let timeStart;
         // init timeStart
         timeStart = Date.now();
         // init pathname
@@ -705,10 +712,10 @@ import moduleUrl from "url";
                 return;
             }
             console.error(
-                "serverLog - " +
-                new Date(timeStart).toISOString() + " - " +
-                (Date.now() - timeStart) + "ms - " +
-                (res.statusCode || 0) + " " + req.method + " " + pathname
+                "serverLog - "
+                + new Date(timeStart).toISOString() + " - "
+                + (Date.now() - timeStart) + "ms - "
+                + (res.statusCode || 0) + " " + req.method + " " + pathname
             );
         });
         // debug - echo request
@@ -730,7 +737,7 @@ import moduleUrl from "url";
             return;
         }
         moduleFs.readFile(file, function (err, data) {
-            var contentType;
+            let contentType;
             if (err) {
                 res.statusCode = 404;
                 res.end();
@@ -768,7 +775,7 @@ import moduleUrl from "url";
 /*
  * this function will start repl-debugger
  */
-    var that;
+    let that;
     // start repl
     that = moduleRepl.start({
         useGlobal: true
@@ -825,8 +832,8 @@ import moduleUrl from "url";
                 console.error(
                     match2.split("").map(function (chr) {
                         return (
-                            "\\u" +
-                            chr.charCodeAt(0).toString(16).padStart(4, 0)
+                            "\\u"
+                            + chr.charCodeAt(0).toString(16).padStart(4, 0)
                         );
                     }).join("")
                 );
@@ -841,15 +848,15 @@ import moduleUrl from "url";
             // console.error(Object.keys(global).map(function(key){return(typeof global[key]===\u0027object\u0027&&global[key]&&global[key]===global[key]?\u0027global\u0027:typeof global[key])+\u0027 \u0027+key;}).sort().join(\u0027\n\u0027)) //jslint-quiet
             case "keys":
                 script = (
-                    "console.error(Object.keys(" + match2 +
-                    ").map(function(key){return(" +
-                    "typeof " + match2 + "[key]===\u0027object\u0027&&" +
-                    match2 + "[key]&&" +
-                    match2 + "[key]===global[key]" +
-                    "?\u0027global\u0027" +
-                    ":typeof " + match2 + "[key]" +
-                    ")+\u0027 \u0027+key;" +
-                    "}).sort().join(\u0027\\n\u0027))\n"
+                    "console.error(Object.keys(" + match2
+                    + ").map(function(key){return("
+                    + "typeof " + match2 + "[key]===\u0027object\u0027&&"
+                    + match2 + "[key]&&"
+                    + match2 + "[key]===global[key]"
+                    + "?\u0027global\u0027"
+                    + ":typeof " + match2 + "[key]"
+                    + ")+\u0027 \u0027+key;"
+                    + "}).sort().join(\u0027\\n\u0027))\n"
                 );
                 break;
             // syntax-sugar - print String(val)
@@ -897,7 +904,7 @@ shImageJslintCreate() {(set -e
 <head>
 <title>logo</title>
 <style>
-/* sh ci.sh shBrowserScreenshot asset-image-jslint.html --window-size=512x512 */
+/* sh jslint_ci.sh shBrowserScreenshot asset-image-jslint.html --window-size=512x512 */
 /* csslint box-model:false */
 /* csslint ignore:start */
 *,
@@ -1026,7 +1033,7 @@ import moduleFs from "fs";
 
 // this function will recursively deep-copy <obj> with keys sorted
 
-        var sorted;
+        let sorted;
         if (typeof obj !== "object" || !obj) {
             return obj;
         }
@@ -1078,7 +1085,7 @@ import moduleHttps from "https";
 import modulePath from "path";
 // init debugInline
 (function () {
-    var consoleError = console.error;
+    let consoleError = console.error;
     globalThis.debugInline = globalThis.debugInline || function (...argList) {
 
 // this function will both print <argList> to stderr and return <argList>[0]
@@ -1090,15 +1097,15 @@ import modulePath from "path";
     };
 }());
 (async function () {
-    var fetchList;
-    var matchObj;
-    var replaceList;
-    var repoDict;
+    let fetchList;
+    let matchObj;
+    let replaceList;
+    let repoDict;
     function pipeToBuffer(res, dict, key) {
-    /*
-     * this function will concat data from <res> to <dict>[<key>]
-     */
-        var data;
+
+// This function will concat data from <res> to <dict>[<key>].
+
+        let data;
         data = [];
         res.on("data", function (chunk) {
             data.push(chunk);
@@ -1166,12 +1173,12 @@ import modulePath from "path";
     });
     // parse fetched data
     process.on("exit", function () {
-        var header;
-        var result;
-        var result0;
+        let header;
+        let result;
+        let result0;
         result = "";
         fetchList.forEach(function (elem, ii, list) {
-            var prefix;
+            let prefix;
             if (!elem.url) {
                 return;
             }
@@ -1198,23 +1205,31 @@ import modulePath from "path";
             }
             if (elem.dateCommitted) {
                 result += (
-                    "\n\n\n/*\n" +
-                    "repo " + elem.prefix.replace("/blob/", "/tree/") + "\n" +
-                    "committed " + (
+                    "\n\n\n/*\n"
+                    + "repo " + elem.prefix.replace("/blob/", "/tree/") + "\n"
+                    + "committed " + (
                         /\b\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ\b/
-                    ).exec(elem.dateCommitted.toString())[0] + "\n" +
-                    "*/"
+                    ).exec(elem.dateCommitted.toString())[0] + "\n"
+                    + "*/"
                 );
+            }
+            // comment /*...*/
+            if (elem.comment) {
+                elem.data = "/*\n" + elem.data.toString().trim().replace((
+                    /\/\*/g
+                ), "/\\*").replace((
+                    /\*\//g
+                ), "*\\/") + "\n*/";
             }
             // mangle module.exports
             result += (
-                "\n\n\n/*\nfile " + elem.url + "\n*/\n" +
-                elem.data.toString().trim()
+                "\n\n\n/*\nfile " + elem.url + "\n*/\n"
+                + elem.data.toString().trim()
             );
         });
         result = (
-            "\n" + result.trim() +
-            "\n\n\n/*\nfile none\n*/\n/*jslint-enable*/\n"
+            "\n" + result.trim()
+            + "\n\n\n/*\nfile none\n*/\n/*jslint-enable*/\n"
         );
         // comment #!
         result = result.replace((
@@ -1247,17 +1262,17 @@ import modulePath from "path";
             result = result.replace(new RegExp(aa, flags), bb);
             if (result0 === result) {
                 throw new Error(
-                    "shRawLibFetch - cannot find-and-replace snippet " +
-                    JSON.stringify(aa)
+                    "shRawLibFetch - cannot find-and-replace snippet "
+                    + JSON.stringify(aa)
                 );
             }
         });
         // init header
         header = (
-            matchObj.input.slice(0, matchObj.index) +
-            "/*jslint-disable*/\n/*\nshRawLibFetch\n" +
-            JSON.stringify(JSON.parse(matchObj[1]), undefined, 4) + "\n" +
-            matchObj[2].split("\n\n").filter(function (elem) {
+            matchObj.input.slice(0, matchObj.index)
+            + "/*jslint-disable*/\n/*\nshRawLibFetch\n"
+            + JSON.stringify(JSON.parse(matchObj[1]), undefined, 4) + "\n"
+            + matchObj[2].split("\n\n").filter(function (elem) {
                 return elem.trim();
             }).map(function (elem) {
                 return elem.trim().replace((
@@ -1292,8 +1307,8 @@ import modulePath from "path";
             });
             if (result0 === result) {
                 throw new Error(
-                    "shRawLibFetch - cannot find-and-replace snippet " +
-                    JSON.stringify(aa)
+                    "shRawLibFetch - cannot find-and-replace snippet "
+                    + JSON.stringify(aa)
                 );
             }
             return "";
@@ -1308,8 +1323,8 @@ import modulePath from "path";
                 return;
             }
             data = (
-                "data:" + dataUriType + ";base64," +
-                data.toString("base64")
+                "data:" + dataUriType + ";base64,"
+                + data.toString("base64")
             );
             result0 = result;
             result = result.replace(
@@ -1321,8 +1336,8 @@ import modulePath from "path";
             );
             if (result0 === result) {
                 throw new Error(
-                    "shRawLibFetch - cannot find-and-replace snippet " +
-                    JSON.stringify(exports)
+                    "shRawLibFetch - cannot find-and-replace snippet "
+                    + JSON.stringify(exports)
                 );
             }
         });
@@ -1359,7 +1374,7 @@ import moduleFs from "fs";
 import modulePath from "path";
 // init debugInline
 (function () {
-    var consoleError = console.error;
+    let consoleError = console.error;
     globalThis.debugInline = globalThis.debugInline || function (...argList) {
 
 // this function will both print <argList> to stderr and return <argList>[0]
@@ -1371,20 +1386,20 @@ import modulePath from "path";
     };
 }());
 (async function () {
-    var DIR_COVERAGE = process.env.DIR_COVERAGE;
-    var cwd;
-    var data;
-    var fileDict;
+    let DIR_COVERAGE = process.env.DIR_COVERAGE;
+    let cwd;
+    let data;
+    let fileDict;
     async function htmlRender({
         fileList,
         lineList,
         pathname
     }) {
-        var html;
-        var padLines;
-        var padPathname;
-        var txt;
-        var txtBorder;
+        let html;
+        let padLines;
+        let padPathname;
+        let txt;
+        let txtBorder;
         function stringHtmlSafe(str) {
         /*
          * this function will make <str> html-safe
@@ -1559,13 +1574,13 @@ body {
             linesTotal,
             pathname
         }, ii) {
-            var coverageLevel;
-            var coveragePct;
-            var fill;
-            var str1;
-            var str2;
-            var xx1;
-            var xx2;
+            let coverageLevel;
+            let coveragePct;
+            let fill;
+            let str1;
+            let str2;
+            let xx1;
+            let xx2;
             coveragePct = Math.floor(10000 * linesCovered / linesTotal || 0);
             coverageLevel = (
                 coveragePct >= 8000
@@ -1665,10 +1680,10 @@ body {
                 line,
                 startOffset
             }, ii) {
-                var chunk;
-                var inHole;
-                var lineHtml;
-                var lineId;
+                let chunk;
+                let inHole;
+                let lineHtml;
+                let lineId;
                 lineHtml = "";
                 lineId = "line_" + (ii + 1);
                 switch (count) {
@@ -1783,11 +1798,11 @@ ${String(count).padStart(7, " ")}
         functions,
         url
     }) {
-        var lineList;
-        var linesCovered;
-        var linesTotal;
-        var pathname;
-        var src;
+        let lineList;
+        let linesCovered;
+        let linesTotal;
+        let pathname;
+        let src;
         if (!url.startsWith("file:///")) {
             return;
         }
@@ -1932,11 +1947,11 @@ shRunWithScreenshotTxt() {(set -e
     node --input-type=module -e '
 import moduleFs from "fs";
 (async function () {
-    var result = await moduleFs.promises.readFile(
+    let result = await moduleFs.promises.readFile(
         process.argv[1] + ".txt",
         "utf8"
     );
-    var yy = 10;
+    let yy = 10;
     // remove ansi escape-code
     result = result.replace((
         /\u001b.*?m/g
@@ -1955,7 +1970,7 @@ import moduleFs from "fs";
     ), "\n").trimEnd();
     // 96-column wordwrap
     result = result.split("\n").map(function (line) {
-        var wordwrap = line.slice(0, 96).padEnd(96, " ");
+        let wordwrap = line.slice(0, 96).padEnd(96, " ");
         line = line.slice(96);
         while (line) {
             wordwrap += "\\\n  " + line.slice(0, 96 - 2).padEnd(96 - 2, " ");
@@ -2003,21 +2018,27 @@ ${result}
     return "$EXIT_CODE"
 )}
 
-# run $@
-(set -e
-    export NODE_OPTIONS="--unhandled-rejections=strict"
-    case "$(uname)" in
+shCiMain() {(set -e
+# this function will run $@
+    # run "$@" with winpty
+    export CI_UNAME="${CI_UNAME:-$(uname)}"
+    case "$CI_UNAME" in
     MSYS*)
-        if [ "$IS_WINPTY" ] || [ "$1" = shHttpFileServer ]
+        if [ ! "$CI_WINPTY" ] && [ "$1" != shHttpFileServer ]
         then
-            "$@"
-        else
-            export IS_WINPTY=1
-            winpty -Xallow-non-tty -Xplain sh ci.sh "$@"
+            export CI_WINPTY=1
+            winpty -Xallow-non-tty -Xplain sh jslint_ci.sh "$@"
+            return
         fi
         ;;
-    *)
-        "$@"
-        ;;
     esac
-)
+    # run "$@"
+    export NODE_OPTIONS="--unhandled-rejections=strict"
+    if [ -f ./.ci.sh ]
+    then
+        . ./.ci.sh "$@"
+    fi
+    "$@"
+)}
+
+shCiMain "$@"
