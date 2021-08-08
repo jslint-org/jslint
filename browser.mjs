@@ -880,7 +880,7 @@ function jslint_ui_onresize() {
         editor.setValue(String(`
 #!/usr/bin/env node
 /*jslint browser, node*/
-/*global caches, indexedDb*/ //jslint-quiet
+/*global caches, indexedDb*/
 import https from "https";
 import jslint from \u0022./jslint.mjs\u0022;
 
