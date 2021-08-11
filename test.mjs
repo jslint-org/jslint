@@ -28,36 +28,30 @@ function noop() {
     function processExit1(exitCode) {
         assertOrThrow(exitCode === 1, exitCode);
     }
-    // test null handling-behavior
+    // test null-case handling-behavior
     jslint.cli({
         mode_noop: true,
         process_exit: processExit0
     });
-    // test file handling-behavior
-    jslint.cli({
-        file: "jslint.mjs",
-        mode_force: true,
-        process_exit: processExit0
-
-    });
-    // test file-dir handling-behavior
-    jslint.cli({
-        file: ".",
-        mode_force: true,
-        process_exit: processExit0
+    [
+        ".",            // test dir handling-behavior
+        "jslint.mjs",   // test file handling-behavior
+        undefined       // test file-undefined handling-behavior
+    ].forEach(function (file) {
+        jslint.cli({
+            console_error: noop,        // suppress error
+            file,
+            mode_cli: true,
+            process_exit: processExit0
+        });
     });
     // test file-error handling-behavior
     jslint.cli({
         // suppress error
         console_error: noop,
         file: "undefined",
-        mode_force: true,
+        mode_cli: true,
         process_exit: processExit1
-    });
-    // test file-undefined handling-behavior
-    jslint.cli({
-        mode_force: true,
-        process_exit: processExit0
     });
     // test cjs handling-behavior
     jslint.cli({
@@ -72,10 +66,27 @@ function noop() {
         // suppress error
         console_error: noop,
         file: "syntax-error.js",
-        mode_force: true,
+        mode_cli: true,
         option: {
             debug: true
         },
+        process_exit: processExit1,
+        source: "syntax error"
+    });
+    // test vim-plugin handling-behavior
+    jslint.cli({
+        // suppress error
+        console_error: noop,
+        mode_cli: true,
+        option: {
+            debug: true
+        },
+        process_argv: [
+            "node",
+            "jslint.mjs",
+            "--mode-vim-plugin",
+            "syntax-error.js"
+        ],
         process_exit: processExit1,
         source: "syntax error"
     });
