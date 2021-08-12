@@ -107,17 +107,17 @@ function! s:JslintFile()
 "" this function will jslint file of current buffer
     let &l:makeprg = 'node "'
         \ . expand('~')
-        \ . '\jslint.mjs" "'
-        \ . fnamemodify(bufname("%"), ':p')
+        \ . '/jslint.mjs" "'
+        \ . fnamemodify(bufname('%'), ':p')
         \ . '" --mode-vim-plugin'
     let &l:errorformat = '%f:%n:%l:%c:%m'
-    :silent make!
+    silent make!
     cwindow
     redraw!
 endfunction
 
 "" init command JslintFile
-command! JslintFile :call s:JslintFile()
+command! JslintFile call s:JslintFile()
 
 "" auto-jslint file after saving
 augroup JslintFileAfterSave
