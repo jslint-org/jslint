@@ -134,7 +134,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2021.8.1-beta";
+let jslint_edition = "v2021.8.20";
 let jslint_export;              // The jslint object to be exported.
 let jslint_fudge = 1;           // Fudge starting line and starting column to 1.
 let jslint_import_meta_url = "";        // import.meta.url used by cli.

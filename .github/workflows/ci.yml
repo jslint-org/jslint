@@ -14,9 +14,9 @@ on:
       - beta
       - master
       - sandbox
-# shCiBase - start
 jobs:
-  build:
+# shCiBase - start
+  job1:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -32,7 +32,7 @@ jobs:
           - macos-latest
           - ubuntu-latest
           - windows-latest
-    name: node . v${{ matrix.node_version }} . ${{ matrix.architecture }} . ${{ matrix.os }}
+    name: job1 . node . v${{ matrix.node_version }} . ${{ matrix.architecture }} . ${{ matrix.os }}
     steps:
       # disable autocrlf in windows
       - run: git config --global core.autocrlf false
@@ -48,6 +48,7 @@ jobs:
       # run nodejs coverages and tests
       - run: sh jslint_ci.sh shCiBase
 # shCiBase - end
+# shCiArtifactUpload - start
       # fetch jslint_ci.sh from trusted source
       - run: git fetch origin alpha && git checkout origin/alpha jslint_ci.sh
       # upload build-artifacts to branch-gh-pages
@@ -55,3 +56,4 @@ jobs:
         env:
           CI_NODE_VERSION_ARCH_PLATFORM: v14.x64.linux
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+# shCiArtifactUpload - end
