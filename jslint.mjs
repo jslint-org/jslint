@@ -134,17 +134,17 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2021.8.20";
+let jslint_edition = "v2021.9.1-beta";
 let jslint_export;              // The jslint object to be exported.
 let jslint_fudge = 1;           // Fudge starting line and starting column to 1.
 let jslint_import_meta_url = "";        // import.meta.url used by cli.
 
-function assert_or_throw(passed, message) {
+function assert_or_throw(condition, message) {
 
-// This function will throw <message> if <passed> is falsy.
+// This function will throw <message> if <condition> is falsy.
 
-    if (passed) {
-        return passed;
+    if (condition) {
+        return condition;
     }
     throw new Error(
         `This was caused by a bug in JSLint.
@@ -1293,12 +1293,6 @@ function jslint_phase2_lex(state) {
                                 // ... literal.
     let mode_regexp;            // true if regular expression literal seen on
                                 // ... this line.
-    let rx_digits = (
-        /^[0-9]*/
-    );
-    let rx_hexs = (
-        /^[0-9A-F]*/i
-    );
     let rx_token = new RegExp(
         "^("
         + "(\\s+)"
@@ -1318,9 +1312,8 @@ function jslint_phase2_lex(state) {
         + "|>{1,3}=?"
         + "|<<?=?"
         + "|!(?:!|==?)?"
-        + "|(0|[1-9][0-9]*)"
-        + ")"
-        + "(.*)$"
+        + "|(0n?|[1-9][0-9]*n?)"
+        + ")(.*)$"
     );
     let snippet = "";           // A piece of string.
     let token_1;                // The first token.
@@ -1403,7 +1396,7 @@ function jslint_phase2_lex(state) {
 
                     warn_at("unexpected_a", line, column, char);
                 }
-                if (read_digits(rx_hexs) > 5) {
+                if (read_digits("x") > 5) {
 
 // test_cause:
 // ["\"\\u{123456}\"", "char_after_escape", "too_many_digits", "", 11]
@@ -1420,7 +1413,7 @@ function jslint_phase2_lex(state) {
                 return char_after();
             }
             char_before();
-            if (read_digits(rx_hexs, true) < 4) {
+            if (read_digits("x", true) < 4) {
 
 // test_cause:
 // ["\"\\u0\"", "char_after_escape", "expected_four_digits", "", 5]
@@ -1736,34 +1729,30 @@ function jslint_phase2_lex(state) {
     }
 
     function lex_number() {
-        let mode_0 = snippet === "0";
+        let prefix = snippet;
         char_after();
-        switch (mode_0 && char) {
+        switch (prefix === "0" && char) {
         case "b":
-            read_digits(
-                // rx_bits
-                /^[01]*/
-            );
-            break;
         case "o":
-            read_digits(
-                // rx_octals
-                /^[0-7]*/
-            );
-            break;
         case "x":
-            read_digits(rx_hexs);
+            read_digits(char);
+
+// Ignore BigInt suffix 'n'.
+
+            if (char === "n") {
+                char_after("n");
+            }
             break;
         default:
             if (char === ".") {
-                read_digits(rx_digits);
+                read_digits("d");
             }
             if (char === "E" || char === "e") {
-                char_after();
+                char_after(char);
                 if (char !== "+" && char !== "-") {
                     char_before();
                 }
-                read_digits(rx_digits);
+                read_digits("d");
             }
         }
 
@@ -2027,7 +2016,7 @@ function jslint_phase2_lex(state) {
                     }
                     break;
                 case "{":
-                    if (read_digits(rx_digits, true) === 0) {
+                    if (read_digits("d", true) === 0) {
 
 // test_cause:
 // ["aa=/aa{/", "lex_regexp_group", "expected_a_before_b", ",", 8]
@@ -2040,7 +2029,7 @@ function jslint_phase2_lex(state) {
 // ["aa=/.{,/", "lex_regexp_group", "comma", "", 0]
 
                         test_cause("comma");
-                        read_digits(rx_digits, true);
+                        read_digits("d", true);
                     }
                     if (char_after("}") === "?") {
 
@@ -2689,8 +2678,28 @@ function jslint_phase2_lex(state) {
         return true;
     }
 
-    function read_digits(rx, quiet) {
-        let digits = line_source.match(rx)[0];
+    function read_digits(mode, quiet) {
+        let digits = line_source.match(
+            mode === "b"
+            ? (
+                // rx_bits
+                /^[01]*/
+            )
+            : mode === "o"
+            ? (
+                // rx_octals
+                /^[0-7]*/
+            )
+            : mode === "x"
+            ? (
+                // rx_hexs
+                /^[0-9A-F]*/i
+            )
+            : (
+                // rx_digits
+                /^[0-9]*/
+            )
+        )[0];
         let length = digits.length;
         if (!quiet && length === 0) {
 
@@ -6765,6 +6774,7 @@ function jslint_phase4_walk(state) {
             if (the_new !== undefined) {
                 if (
                     left.id[0] > "Z"
+                    || left.id === "BigInt"
                     || left.id === "Boolean"
                     || left.id === "Number"
                     || left.id === "String"
@@ -6772,6 +6782,7 @@ function jslint_phase4_walk(state) {
                 ) {
 
 // test_cause:
+// ["new BigInt()", "post_b_lparen", "unexpected_a", "new", 1]
 // ["new Boolean()", "post_b_lparen", "unexpected_a", "new", 1]
 // ["new Number()", "post_b_lparen", "unexpected_a", "new", 1]
 // ["new String()", "post_b_lparen", "unexpected_a", "new", 1]
@@ -6812,6 +6823,7 @@ function jslint_phase4_walk(state) {
                 if (
                     left.id[0] >= "A"
                     && left.id[0] <= "Z"
+                    && left.id !== "BigInt"
                     && left.id !== "Boolean"
                     && left.id !== "Number"
                     && left.id !== "String"
@@ -7195,7 +7207,8 @@ function jslint_phase4_walk(state) {
 
                         warn("unexpected_typeof_a", right, value);
                     } else if (
-                        value !== "boolean"
+                        value !== "bigint"
+                        && value !== "boolean"
                         && value !== "function"
                         && value !== "number"
                         && value !== "object"
