@@ -1313,7 +1313,8 @@ function jslint_phase2_lex(state) {
         + "|<<?=?"
         + "|!(?:!|==?)?"
         + "|(0n?|[1-9][0-9]*n?)"
-        + ")(.*)$"
+        + ")"
+        + "(.*)$"
     );
     let snippet = "";           // A piece of string.
     let token_1;                // The first token.

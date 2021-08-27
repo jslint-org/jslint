@@ -2,12 +2,12 @@
 import moduleFs from "fs";
 import jslint from "./jslint.mjs";
 
-function assertOrThrow(cond, err) {
+function assertOrThrow(cond, msg) {
 /*
- * this function will throw <err> if <cond> is falsy
+ * this function will throw <msg> if <cond> is falsy
  */
     if (!cond) {
-        throw new Error(String(err).slice(0, 2000));
+        throw new Error(String(msg).slice(0, 2000));
     }
 }
 
