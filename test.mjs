@@ -2,11 +2,11 @@
 import moduleFs from "fs";
 import jslint from "./jslint.mjs";
 
-function assertOrThrow(passed, msg) {
+function assertOrThrow(cond, msg) {
 /*
- * this function will throw <msg> if <passed> is falsy
+ * this function will throw <msg> if <cond> is falsy
  */
-    if (!passed) {
+    if (!cond) {
         throw new Error(String(msg).slice(0, 2000));
     }
 }
@@ -105,6 +105,13 @@ function noop() {
             + "        await err();\n"
             + "    }\n"
             + "}\n"
+        ],
+        bigint: [
+            "let aa = 0b0n;\n",
+            "let aa = 0o0n;\n",
+            "let aa = 0x0n;\n",
+            "let aa = BigInt(0n);\n",
+            "let aa = typeof aa === \"bigint\";\n"
         ],
         date: [
             "Date.getTime();",

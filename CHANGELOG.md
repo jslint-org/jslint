@@ -18,6 +18,9 @@
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 - vim - add vim plugin.
 
+# v2021.9.1-beta
+- jslint - add bigint support.
+
 # v2021.8.20
 - warning - disable un-ergonomic warnings restricting directive-global (missing_browser and unexpected_directive_a).
 - fs - rename file ci.sh to jslint_ci.sh.
