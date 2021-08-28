@@ -96,7 +96,8 @@
 /*property
     causes,
     global_list,
-    max, min,
+    max, min, mode_vim_plugin,
+    process_argv,
     stringify,
     test_cause,
     JSLINT_BETA, a, all, argv, arity, artifact, assign, async,
@@ -112,7 +113,7 @@
     indent2, index, indexOf, init, initial, isArray, isNaN, is_equal, is_weird,
     join, jslint, json, keys, label, statement_prv, lbp, led, length, level,
     line, line_list, line_offset, line_source, lines, live, long, loop, m, main,
-    map, margin, match, message, meta, mode_force, mode_json, mode_module,
+    map, margin, match, message, meta, mode_cli, mode_json, mode_module,
     mode_noop, mode_property, mode_shebang, mode_stop, module, name, names,
     node, now, nr, nud, ok, open, opening, option, option_dict, order, padStart,
     parameters, parent, pop, process_exit, promises, property, property_dict,
@@ -914,7 +915,7 @@ function jslint(
         }
     } catch (err) {
         mode_stop = true;
-        err.message = "[JSLint was unable to finish]\n" + err.message;
+        err.message = "[JSLint was unable to finish] " + err.message;
         err.mode_stop = true;
         if (err.name !== "JSLintError") {
             Object.assign(err, {
@@ -989,9 +990,11 @@ async function jslint_cli({
     cjs_require,
     console_error,
     file,
-    mode_force,
+    mode_cli,
     mode_noop,
+    mode_vim_plugin,
     option,
+    process_argv,
     process_exit,
     source
 }) {
@@ -1087,7 +1090,27 @@ async function jslint_cli({
         if (warnings.length > 0) {
             exit_code = 1;
             console_error(
-                "\u001b[1mjslint " + file + "\u001b[22m\n"
+                mode_vim_plugin
+
+// Print warnings in format readable by vim.
+
+                ? warnings.slice(0, 10).map(function ({
+                    column,
+                    line,
+                    message
+                }, ii) {
+                    return (
+                        file
+                        + ":" + ii
+                        + ":" + line
+                        + ":" + column
+                        + ":" + message
+                    );
+                }).join("\n")
+
+// Print warnings in format readable by human.
+
+                : "\u001b[1mjslint " + file + "\u001b[22m\n"
                 + warnings.slice(0, 10).map(function ({
                     formatted_message
                 }) {
@@ -1133,6 +1156,7 @@ async function jslint_cli({
     module_fs = await import("fs");
     module_path = await import("path");
     module_url = await import("url");
+    process_argv = process_argv || process.argv;
     process_exit = process_exit || process.exit;
     if (!(
 
@@ -1149,19 +1173,31 @@ async function jslint_cli({
             && (
                 (
                     /[\/|\\]jslint(?:\.[cm]?js)?$/m
-                ).test(process.argv[1])
-                || mode_force
+                ).test(process_argv[1])
+                || mode_cli
             )
             && module_url.fileURLToPath(jslint_import_meta_url)
-            === module_path.resolve(process.argv[1])
+            === module_path.resolve(process_argv[1])
         )
-    ) && !mode_force) {
+    ) && !mode_cli) {
         return exit_code;
     }
 
+// Detect cli-option --mode-vim-plugin.
+
+    mode_vim_plugin = (
+        process_argv.slice(2).indexOf("--mode-vim-plugin") >= 0
+        || mode_vim_plugin
+    );
+
 // Normalize file relative to process.cwd().
 
-    file = file || process.argv[2];
+    process_argv.slice(2).some(function (arg) {
+        if (!arg.startsWith("-")) {
+            file = file || arg;
+            return true;
+        }
+    });
     if (!file) {
         return;
     }
