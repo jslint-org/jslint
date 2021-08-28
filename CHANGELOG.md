@@ -19,7 +19,7 @@
 
 # v2021.9.1-beta
 - jslint - add bigint support.
-- vim - add vim plugin.
+- vim - add vim-plugin and file jslint.vim.
 
 # v2021.8.20
 - warning - disable un-ergonomic warnings restricting directive-global (missing_browser and unexpected_directive_a).
