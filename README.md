@@ -93,6 +93,45 @@ node jslint.mjs .
 ```
 -->
 
+## To run jslint as vim-plugin:
+### 1. Download https://www.jslint.com/jslint.mjs and save to directory `$HOME`:
+```
+#!/bin/sh
+
+curl -L https://www.jslint.com/jslint.mjs > "$HOME/jslint.mjs"
+```
+
+### 2. Add code below to file `$HOME/.vimrc`:
+```vim
+function! s:JslintFile()
+"" this function will jslint file of current buffer
+    let &l:makeprg = 'node "'
+        \ . expand('~')
+        \ . '/jslint.mjs" "'
+        \ . fnamemodify(bufname('%'), ':p')
+        \ . '" --mode-vim-plugin'
+    let &l:errorformat = '%f:%n:%l:%c:%m'
+    silent make!
+    cwindow
+    redraw!
+endfunction
+
+"" init command JslintFile
+command! JslintFile call s:JslintFile()
+
+"" auto-jslint file after saving
+augroup JslintFileAfterSave
+    autocmd!
+    autocmd BufWritePost *.cjs,*.js,*.json,*.mjs JslintFile
+augroup END
+```
+
+### 3. Vim will now automatically run command `node "$HOME/jslint.mjs" foo.js` and show any warnings:
+- when files like `foo.cjs`, `foo.js`, `foo.json`, `foo.mjs` are saved,
+- or manually with vim-command `:JslintFile`
+
+![screenshot.png](asset-image-jslint-vim-plugin.png)
+
 
 # Description
 - [jslint.mjs](jslint.mjs) contains the jslint function. It parses and analyzes a source file, returning an object with information about the file. It can also take an object that sets options.
