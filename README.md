@@ -94,41 +94,23 @@ node jslint.mjs .
 -->
 
 ## To run jslint as vim-plugin:
-### 1. Download https://www.jslint.com/jslint.mjs and save to directory `$HOME`:
-```
+### 1. Download and save `jslint.mjs`, `jslint.vim` to directory `~/.vim/`
+### 2. Add vim command `:source ~/.vim/jslint.vim` to file `~/.vimrc`
+```shell
 #!/bin/sh
 
-curl -L https://www.jslint.com/jslint.mjs > "$HOME/jslint.mjs"
+# 1. Download and save `jslint.mjs`, `jslint.vim` to directory `~/.vim/`
+mkdir -p ~/.vim/
+curl -L https://www.jslint.com/jslint.mjs > "~/.vim/jslint.mjs"
+curl -L https://www.jslint.com/jslint.vim > "~/.vim/jslint.vim"
+
+# 2. Add vim command `:source ~/.vim/jslint.vim` to file `~/.vimrc`
+printf "\n:source ~/.vim/jslint.vim\n" >> ~/.vimrc
 ```
 
-### 2. Add code below to file `$HOME/.vimrc`:
-```vim
-function! s:JslintFile()
-"" this function will jslint file of current buffer
-    let &l:makeprg = 'node "'
-        \ . expand('~')
-        \ . '/jslint.mjs" "'
-        \ . fnamemodify(bufname('%'), ':p')
-        \ . '" --mode-vim-plugin'
-    let &l:errorformat = '%f:%n:%l:%c:%m'
-    silent make!
-    cwindow
-    redraw!
-endfunction
-
-"" init command JslintFile
-command! JslintFile call s:JslintFile()
-
-"" auto-jslint file after saving
-augroup JslintFileAfterSave
-    autocmd!
-    autocmd BufWritePost *.cjs,*.js,*.json,*.mjs JslintFile
-augroup END
-```
-
-### 3. Vim will now automatically run command `node "$HOME/jslint.mjs" foo.js` and show any warnings:
-- when files like `foo.cjs`, `foo.js`, `foo.json`, `foo.mjs` are saved,
-- or manually with vim-command `:JslintFile`
+### 3. You can now jslint files in vim (via nodejs):
+- with vim command `:JslintFileAfterSave`
+- with vim key-combo `<Ctrl-S> <Ctrl-J>`
 
 ![screenshot.png](asset-image-jslint-vim-plugin.png)
 
