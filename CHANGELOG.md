@@ -19,6 +19,7 @@
 
 # v2021.9.1-beta
 - jslint - add bigint support.
+- jslint - rename little-used directive `debug` to `trace` to avoid confusion with non-related directive `devel`.
 - vim - add vim-plugin and file jslint.vim.
 
 # v2021.8.20

@@ -68,7 +68,7 @@ function noop() {
         file: "syntax-error.js",
         mode_cli: true,
         option: {
-            debug: true
+            trace: true
         },
         process_exit: processExit1,
         source: "syntax error"
@@ -78,9 +78,6 @@ function noop() {
         // suppress error
         console_error: noop,
         mode_cli: true,
-        option: {
-            debug: true
-        },
         process_argv: [
             "node",
             "jslint.mjs",
@@ -117,6 +114,9 @@ function noop() {
             + "    }\n"
             + "}\n"
         ],
+
+// PR-351 - Add BigInt support.
+
         bigint: [
             "let aa = 0b0n;\n",
             "let aa = 0o0n;\n",
@@ -275,8 +275,6 @@ function noop() {
         ], [
             "registerType();", {couch: true}, []
         ], [
-            "", {debug: true}, []
-        ], [
             "debugger;", {devel: true}, []
         ], [
             "new Function();\neval();", {eval: true}, []
@@ -312,6 +310,8 @@ function noop() {
             "let aa = 'aa';", {single: true}, []
         ], [
             "let aa = this;", {this: true}, []
+        ], [
+            "", {trace: true}, []
         ], [
             (
                 "function aa({bb, aa}) {\n"

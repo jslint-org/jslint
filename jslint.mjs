@@ -99,12 +99,12 @@
     max, min, mode_vim_plugin,
     process_argv,
     stringify,
-    test_cause,
+    test_cause, trace,
     JSLINT_BETA, a, all, argv, arity, artifact, assign, async,
     b, beta, bind, bitwise, block, body, browser, c, calls, catch, catch_list,
     catch_stack, cjs_module, cjs_require, cli, closer, closure, code, column,
     concat, console_error, constant, context, convert, couch, create, cwd, d,
-    dead, debug, default, devel, directive, directive_list, directive_quiet,
+    dead, default, devel, directive, directive_list, directive_quiet,
     directives, disrupt, dot, edition, ellipsis, else, endsWith, env, error,
     eval, every, exec, execArgv, exit, export_dict, exports, expression, extra,
     file, fileURLToPath, filter, finally, flag, for, forEach, formatted_message,
@@ -595,7 +595,7 @@ function jslint(
             mm = `Expected await statement in async function.`;
             break;
 
-// Disable warning "missing_browser".
+// PR-347 - Disable warning "missing_browser".
 //         case "missing_browser":
 //             mm = `/*global*/ requires the Assume a browser option.`;
 //             break;
@@ -679,7 +679,7 @@ function jslint(
             mm = `Unexpected comment.`;
             break;
 
-// Disable warning "unexpected_directive_a".
+// PR-347 - Disable warning "unexpected_directive_a".
 //         case "unexpected_directive_a":
 //             mm = `When using modules, don't use directive '/\u002a${a}'.`;
 //             break;
@@ -784,9 +784,9 @@ function jslint(
         assert_or_throw(mm, code);
         warning.message = mm;
 
-// Include stack_trace for jslint to debug itself for errors.
+// PR-242 - Include stack_trace for jslint to debug itself for errors.
 
-        if (option_dict.debug) {
+        if (option_dict.trace) {
             warning.stack_trace = new Error().stack;
         }
         if (warning.directive_quiet) {
@@ -897,7 +897,7 @@ function jslint(
             `function_stack.length === 0.`
         );
 
-// Disable warning "missing_browser".
+// PR-347 - Disable warning "missing_browser".
 //         if (!option_dict.browser) {
 //             directive_list.forEach(function (comment) {
 //                 if (comment.directive === "global") {
@@ -1092,7 +1092,7 @@ async function jslint_cli({
             console_error(
                 mode_vim_plugin
 
-// Print warnings in format readable by vim.
+// PR-349 - Print warnings in format readable by vim.
 
                 ? warnings.slice(0, 10).map(function ({
                     column,
@@ -1183,7 +1183,7 @@ async function jslint_cli({
         return exit_code;
     }
 
-// Detect cli-option --mode-vim-plugin.
+// PR-349 - Detect cli-option --mode-vim-plugin.
 
     mode_vim_plugin = (
         process_argv.slice(2).indexOf("--mode-vim-plugin") >= 0
@@ -1348,6 +1348,9 @@ function jslint_phase2_lex(state) {
         + "|>{1,3}=?"
         + "|<<?=?"
         + "|!(?:!|==?)?"
+
+// PR-351 - Add BigInt support.
+
         + "|(0n?|[1-9][0-9]*n?)"
         + ")"
         + "(.*)$"
@@ -1636,7 +1639,7 @@ function jslint_phase2_lex(state) {
                 }
                 global_dict[key] = "user-defined";
 
-// Disable warning "unexpected_directive_a".
+// PR-347 - Disable warning "unexpected_directive_a".
 //                 state.mode_module = the_comment;
 
                 break;
@@ -1688,8 +1691,11 @@ function jslint_phase2_lex(state) {
 
         while (true) {
             match = line_source.match(
-                //rx_mega
-                /[`\\]|\$\{/
+
+// Vim-hack - vim-editor has trouble parsing '`' in regexp
+
+                // rx_mega
+                /[\u0060\\]|\$\{/
             ) || {
                 "0": "",
                 index: 0
@@ -1774,7 +1780,7 @@ function jslint_phase2_lex(state) {
         case "x":
             read_digits(char);
 
-// Ignore BigInt suffix 'n'.
+// PR-351 - Ignore BigInt suffix 'n'.
 
             if (char === "n") {
                 char_after("n");
@@ -2438,7 +2444,6 @@ function jslint_phase2_lex(state) {
         case "browser":         // Assume browser environment.
         case "convert":         // Allow conversion operators.
         case "couch":           // Assume CouchDb environment.
-        case "debug":           // Include jslint stack-trace in warnings.
         case "devel":           // Allow console.log() and friends.
         case "ecma":            // Assume ECMAScript environment.
         case "eval":            // Allow eval().
@@ -2453,6 +2458,7 @@ function jslint_phase2_lex(state) {
         case "test_internal_error":     // Test jslint's internal-error
                                         // ... handling-ability.
         case "this":            // Allow 'this'.
+        case "trace":           // Include jslint stack-trace in warnings.
         case "unordered":       // Allow unordered cases, params, properties,
                                 // ... and variables.
         case "variable":        // Allow unordered const and let declarations
@@ -4160,7 +4166,7 @@ function jslint_phase3_parse(state) {
             the_symbol !== undefined
             && the_symbol.fud !== undefined
 
-// Bugfix - Fixes issues #316, #317 - dynamic-import().
+// PR-318 - Bugfix - Fixes issues #316, #317 - dynamic-import().
 
             && !(the_symbol.id === "import" && token_nxt.id === "(")
         ) {
@@ -4359,7 +4365,7 @@ function jslint_phase3_parse(state) {
                 the_function.name = Object.assign(name, {
                     calls: empty(),
 
-// Bugfix - Fixes issue #272 - function hoisting not allowed.
+// PR-331 - Bugfix - Fixes issue #272 - function hoisting not allowed.
 
                     dead: false,
                     init: true
@@ -5197,7 +5203,7 @@ function jslint_phase3_parse(state) {
 
                 warn("freeze_exports", the_thing);
 
-// Bugfix - Fixes issues #282 - optional-semicolon.
+// PR-301 - Bugfix - Fixes issues #282 - optional-semicolon.
 
             } else {
 
@@ -5421,7 +5427,7 @@ function jslint_phase3_parse(state) {
         let name;
         let names;
 
-// Disable warning "unexpected_directive_a".
+// PR-347 - Disable warning "unexpected_directive_a".
 //         if (typeof state.mode_module === "object") {
 //
 // // test_cause:
@@ -5782,7 +5788,6 @@ function jslint_phase3_parse(state) {
 // ["try{}finally{break;}", "stmt_try", "expected_a_before_b", "finally", 6]
 
             warn("expected_a_before_b", token_nxt, "catch", artifact());
-
         }
         if (token_nxt.id === "finally") {
             functionage.finally += 1;
@@ -7301,7 +7306,7 @@ function jslint_phase4_walk(state) {
                 left_variable = parent.context[left.id];
                 if (
                     left_variable !== undefined
-                    // coverage-hack
+                    // Coverage-hack.
                     // && left_variable.dead
                     && left_variable.parent === parent
                     && left_variable.calls !== undefined
@@ -7615,6 +7620,9 @@ function jslint_phase5_whitage(state) {
     let left = token_global;
     let margin = 0;
     let mode_indent = (
+
+// PR-330 - Allow 2-space indent.
+
         option_dict.indent2
         ? 2
         : 4
