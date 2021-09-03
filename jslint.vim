@@ -25,4 +25,6 @@ endfunction
 command! -nargs=* -bang SaveAndJslint call SaveAndJslint("<bang>")
 
 "" map vim-key-combo "<ctrl-s> <ctrl-j>" to ":SaveAndJslint"
-nnoremap <c-s><c-j> :SaveAndJslint <cr>
+inoremap <c-s><c-j> <esc> :SaveAndJslint <cr>
+nnoremap <c-s><c-j> <esc> :SaveAndJslint <cr>
+vnoremap <c-s><c-j> <esc> :SaveAndJslint <cr>

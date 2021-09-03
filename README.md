@@ -24,9 +24,9 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Web Demo Archived
-- [Web Demo 2020 (can lint ES6)](https://www.jslint.com/branch-v2020.11.6/index.html)
-- [Web Demo 2014 (can lint ES5 only)](https://www.jslint.com/branch-v2014.7.8/jslint.html)
-- [Web Demo 2013 (can lint ES5, CSS, HTML)](https://www.jslint.com/branch-v2013.3.13/jslint.html)
+- [Web Demo 2020](https://www.jslint.com/branch-v2020.11.6/index.html)
+- [Web Demo 2014 (ES5 only)](https://www.jslint.com/branch-v2014.7.8/jslint.html)
+- [Web Demo 2013 (ES5, CSS, HTML)](https://www.jslint.com/branch-v2013.3.13/jslint.html)
 
 
 # Install
@@ -94,23 +94,12 @@ node jslint.mjs .
 -->
 
 ## To run jslint as vim-plugin:
-### 1. Download and save `jslint.mjs`, `jslint.vim` to directory `~/.vim/`
-### 2. Add vim-command `:source ~/.vim/jslint.vim` to file `~/.vimrc`
-```shell
-#!/bin/sh
-
-### 1. Download and save `jslint.mjs`, `jslint.vim` to directory `~/.vim/`
-mkdir -p ~/.vim/
-curl -L https://www.jslint.com/jslint.mjs > ~/.vim/jslint.mjs
-curl -L https://www.jslint.com/jslint.vim > ~/.vim/jslint.vim
-
-### 2. Add vim-command `:source ~/.vim/jslint.vim` to file `~/.vimrc`
-printf "\n:source ~/.vim/jslint.vim\n" >> ~/.vimrc
-```
-
-### 3. Vim can now jslint files (via nodejs):
-- with vim-command `:SaveAndJslint`
-- with vim-key-combo `<Ctrl-S> <Ctrl-J>`
+1. Download and save [`jslint.mjs`](https://www.jslint.com/jslint.mjs), [`jslint.vim`](https://www.jslint.com/jslint.vim) to directory `~/.vim/`
+2. Add vim-command `:source ~/.vim/jslint.vim` to file `~/.vimrc`
+3. Vim can now jslint files (via nodejs):
+    - with vim-command `:SaveAndJslint`
+    - with vim-key-combo `<Ctrl-S> <Ctrl-J>`
+- screenshot
 
 ![screenshot.png](asset-image-jslint-vim-plugin.png)
 
