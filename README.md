@@ -94,23 +94,12 @@ node jslint.mjs .
 -->
 
 ## To run jslint as vim-plugin:
-1. Download and save `jslint.mjs`, `jslint.vim` to directory `~/.vim/`
+1. Download and save [`jslint.mjs`](https://www.jslint.com/jslint.mjs), [`jslint.vim`](https://www.jslint.com/jslint.vim) to directory `~/.vim/`
 2. Add vim-command `:source ~/.vim/jslint.vim` to file `~/.vimrc`
-```shell
-#!/bin/sh
-
-# 1. Download and save `jslint.mjs`, `jslint.vim` to directory `~/.vim/`
-mkdir -p ~/.vim/
-curl -L https://www.jslint.com/jslint.mjs > ~/.vim/jslint.mjs
-curl -L https://www.jslint.com/jslint.vim > ~/.vim/jslint.vim
-
-# 2. Add vim-command `:source ~/.vim/jslint.vim` to file `~/.vimrc`
-printf "\n:source ~/.vim/jslint.vim\n" >> ~/.vimrc
-```
-
 3. Vim can now jslint files (via nodejs):
-- with vim-command `:SaveAndJslint`
-- with vim-key-combo `<Ctrl-S> <Ctrl-J>`
+    - with vim-command `:SaveAndJslint`
+    - with vim-key-combo `<Ctrl-S> <Ctrl-J>`
+- screenshot
 
 ![screenshot.png](asset-image-jslint-vim-plugin.png)
 
