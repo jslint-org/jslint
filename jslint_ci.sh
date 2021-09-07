@@ -106,52 +106,39 @@ import moduleUrl from "url";
         );
     });
 }());
-' "$@" # "'
+' "$@" # '
 )}
 
 shCiArtifactUpload() {(set -e
 # this function will upload build-artifacts to branch-gh-pages
     local BRANCH
-    local SIZE
     node --input-type=module -e '
 process.exit(Number(
-    `${process.version.split(".")[0]}.${process.arch}.${process.platform}` !==
-    process.env.CI_NODE_VERSION_ARCH_PLATFORM
+    `${process.version.split(".")[0]}.${process.arch}.${process.platform}`
+    !== process.env.CI_NODE_VERSION_ARCH_PLATFORM
 ));
 ' || return 0
-    # init $BRANCH
-    BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-    git pull --unshallow origin "$BRANCH"
     # init .git/config
     git config --local user.email "github-actions@users.noreply.github.com"
     git config --local user.name "github-actions"
-    # screenshot asset-image-jslint
-    shImageJslintCreate &
+    # init $BRANCH
+    BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+    git pull --unshallow origin "$BRANCH"
+    # init $UPSTREAM_OWNER
+    export UPSTREAM_OWNER="${UPSTREAM_OWNER:-jslint-org}"
+    # init $UPSTREAM_REPO
+    export UPSTREAM_REPO="${UPSTREAM_REPO:-jslint}"
+    # screenshot asset-image-logo
+    shImageLogoCreate &
     # screenshot web-demo
     shBrowserScreenshot \
-        https://jslint-org.github.io/jslint/branch-beta/index.html
+        "https://$UPSTREAM_OWNER.github.io/\
+$UPSTREAM_REPO/branch-beta/index.html"
+    # screenshot changelog and files
     node --input-type=module -e '
-import moduleFs from "fs";
 import moduleChildProcess from "child_process";
-(async function () {
-    let screenshotCurl = await moduleFs.promises.stat("jslint.mjs");
-    screenshotCurl = String(`
-echo "\
-% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                     Dload  Upload   Total   Spent    Left  Speed
-100  250k  100  250k    0     0   250k      0  0:00:01 --:--:--  0:00:01  250k\
-"
-    `).trim().replace((
-        /250/g
-    ), Math.floor(screenshotCurl.size / 1024));
+(function () {
     [
-        // parallel-task - screenshot files
-        [
-            "jslint_ci.sh",
-            "shRunWithScreenshotTxt",
-            ".build/screenshot-files.svg",
-            "shGitLsTree"
-        ],
         // parallel-task - screenshot changelog
         [
             "jslint_ci.sh",
@@ -160,6 +147,13 @@ echo "\
             "head",
             "-n50",
             "CHANGELOG.md"
+        ],
+        // parallel-task - screenshot files
+        [
+            "jslint_ci.sh",
+            "shRunWithScreenshotTxt",
+            ".build/screenshot-files.svg",
+            "shGitLsTree"
         ]
     ].forEach(function (argList) {
         moduleChildProcess.spawn("sh", argList, {
@@ -172,6 +166,26 @@ echo "\
             }
         });
     });
+}());
+' "$@" # '
+    # screenshot curl
+    if [ -f jslint.mjs ]
+    then
+        node --input-type=module -e '
+import moduleFs from "fs";
+import moduleChildProcess from "child_process";
+(async function () {
+    let screenshotCurl;
+    screenshotCurl = await moduleFs.promises.stat("jslint.mjs");
+    screenshotCurl = String(`
+echo "\
+% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                     Dload  Upload   Total   Spent    Left  Speed
+100  250k  100  250k    0     0   250k      0  0:00:01 --:--:--  0:00:01  250k\
+"
+    `).trim().replace((
+        /250/g
+    ), Math.floor(screenshotCurl.size / 1024));
     // parallel-task - screenshot example-shell-commands in README.md
     Array.from(String(
         await moduleFs.promises.readFile("README.md", "utf8")
@@ -212,7 +226,8 @@ echo "\
         );
     });
 }());
-' # '
+' "$@" # '
+    fi
     # seo - inline css-assets and invalidate cached-assets
     node --input-type=module -e '
 import moduleFs from "fs";
@@ -224,10 +239,14 @@ import moduleFs from "fs";
         "browser.mjs",
         "index.html"
     ].map(async function (file) {
-        fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
+        try {
+            fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
+        } catch (ignore) {
+            process.exit();
+        }
     }));
 
-// Inline css-assets.
+// inline css-assets
 
     fileDict["index.html"] = fileDict["index.html"].replace((
         "\n<link rel=\"stylesheet\" href=\"asset-codemirror-rollup.css\">\n"
@@ -267,17 +286,17 @@ import moduleFs from "fs";
         moduleFs.promises.writeFile(file, data);
     }));
 }());
-' # '
+' "$@" # '
+    git add -f jslint.cjs jslint.js || true
     # add dir .build
-    git add -f .build jslint.cjs jslint.js
+    git add -f .build
     git commit -am "add dir .build"
     # checkout branch-gh-pages
-    git checkout -b gh-pages
     git fetch origin gh-pages
-    git reset --hard origin/gh-pages
+    git checkout -b gh-pages origin/gh-pages
     # update dir branch-$BRANCH
     rm -rf "branch-$BRANCH"
-    mkdir "branch-$BRANCH"
+    mkdir -p "branch-$BRANCH"
     (set -e
         cd "branch-$BRANCH"
         git init -b branch1
@@ -288,14 +307,14 @@ import moduleFs from "fs";
     # update root-dir with branch-beta
     if [ "$BRANCH" = beta ]
     then
-        git rm -rf .build
+        rm -rf .build
         git checkout beta .
     fi
     # update README.md with branch-$BRANCH and $GITHUB_REPOSITORY
     sed -i \
         -e "s|/branch-[0-9A-Z_a-z]*/|/branch-$BRANCH/|g" \
-        -e "s|\bjslint-org/jslint\b|$GITHUB_REPOSITORY|g" \
-        -e "s|\bjslint-org\.github\.io/jslint\b|$(
+        -e "s|\b$UPSTREAM_OWNER/$UPSTREAM_REPO\b|$GITHUB_REPOSITORY|g" \
+        -e "s|\b$UPSTREAM_OWNER\.github\.io/$UPSTREAM_REPO\b|$(
             printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
         )|g" \
         "branch-$BRANCH/README.md"
@@ -351,13 +370,10 @@ shCiBase() {(set -e
         export JSLINT_BETA=1
         shRunWithCoverage node test.mjs
     )
-    # update version from CHANGELOG.md
+    # update edition in README.md, jslint.mjs from CHANGELOG.md
     node --input-type=module -e '
 import moduleFs from "fs";
 (async function () {
-
-// Update edition in README.md, jslint.mjs from CHANGELOG.md
-
     let dict;
     let versionBeta;
     let versionMaster;
@@ -402,7 +418,41 @@ import moduleFs from "fs";
         }
     });
 }());
-' # '
+' "$@" # '
+    # update table-of-contents in README.md
+    node --input-type=module -e '
+import moduleFs from "fs";
+(async function () {
+    let data = await moduleFs.promises.readFile("README.md", "utf8");
+    data = data.replace((
+        /\n#\u0020Table\u0020of\u0020Contents$[\S\s]*?\n\n\n/m
+    ), function () {
+        let ii = -1;
+        let toc = "\n# Table of Contents\n";
+        data.replace((
+            /\n\n\n#\u0020(.*)/g
+        ), function (ignore, match1) {
+            if (match1 === "Table of Contents") {
+                ii += 1;
+                return;
+            }
+            if (ii < 0) {
+                return;
+            }
+            ii += 1;
+            toc += ii + ". [" + match1 + "](#" + match1.toLowerCase().replace((
+                /[^\u0020\-0-9A-Z_a-z]/g
+            ), "").replace((
+                /\u0020/g
+            ), "-") + ")\n";
+            return "";
+        });
+        toc += "\n\n";
+        return toc;
+    });
+    await moduleFs.promises.writeFile("README.md", data);
+}());
+' "$@" # '
 )}
 
 shCiBranchPromote() {(set -e
@@ -513,7 +563,7 @@ import moduleUrl from "url";
         });
     });
 }());
-' # "'
+' "$@" # '
 )}
 
 shGitCmdWithGithubToken() {(set -e
@@ -617,7 +667,7 @@ import moduleChildProcess from "child_process";
         }).join(""));
     });
 }());
-' # "'
+' "$@" # '
 )}
 
 shHttpFileServer() {(set -e
@@ -896,15 +946,16 @@ import moduleUrl from "url";
 ' "$@" # '
 )}
 
-shImageJslintCreate() {(set -e
-# this function will create .png logo of jslint
+shImageLogoCreate() {(set -e
+# this function will create .png logo
+    local SIZE
     echo '
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <title>logo</title>
 <style>
-/* sh jslint_ci.sh shBrowserScreenshot asset-image-jslint.html --window-size=512x512 */
+/* sh jslint_ci.sh shBrowserScreenshot asset-image-logo.html --window-size=512x512 */
 /* csslint box-model:false */
 /* csslint ignore:start */
 *,
@@ -960,19 +1011,19 @@ div {
 </div>
 </body>
 </html>
-' > .build/asset-image-jslint-512.html
-    cp asset-font-daley-bold.woff2 .build
-    # screenshot asset-image-jslint-512.png
-    shBrowserScreenshot .build/asset-image-jslint-512.html \
+' > .build/asset-image-logo-512.html
+    cp asset-font-daley-bold.woff2 .build || true
+    # screenshot asset-image-logo-512.png
+    shBrowserScreenshot .build/asset-image-logo-512.html \
         --window-size=512x512 \
-        -screenshot=.build/asset-image-jslint-512.png
+        -screenshot=.build/asset-image-logo-512.png
     # create various smaller thumbnails
     for SIZE in 32 64 128 256
     do
-        convert -resize "${SIZE}x${SIZE}" .build/asset-image-jslint-512.png \
-            ".build/asset-image-jslint-$SIZE.png"
+        convert -resize "${SIZE}x${SIZE}" .build/asset-image-logo-512.png \
+            ".build/asset-image-logo-$SIZE.png"
         printf \
-"shImageJslintCreate - wrote - .build/asset-image-jslint-$SIZE.png\n" 1>&2
+"shImageLogoCreate - wrote - .build/asset-image-logo-$SIZE.png\n" 1>&2
     done
     # convert to svg @ https://convertio.co/png-svg/
 )}
@@ -1023,9 +1074,9 @@ shJsonNormalize() {(set -e
     node --input-type=module -e '
 import moduleFs from "fs";
 (async function () {
-    function identity(val) {
+    function noop(val) {
 
-// This function will return <val>.
+// this function will do nothing except return val
 
         return val;
     }
@@ -1058,7 +1109,7 @@ import moduleFs from "fs";
         JSON.stringify(
             objectDeepCopyWithKeysSorted(
                 JSON.parse(
-                    identity(
+                    noop(
                         await moduleFs.promises.readFile(
                             process.argv[1],
                             "utf8"
@@ -1208,7 +1259,7 @@ import modulePath from "path";
                     "\n\n\n/*\n"
                     + "repo " + elem.prefix.replace("/blob/", "/tree/") + "\n"
                     + "committed " + (
-                        /\b\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ\b/
+                        /\b\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ\b|$/
                     ).exec(elem.dateCommitted.toString())[0] + "\n"
                     + "*/"
                 );
@@ -1224,7 +1275,9 @@ import modulePath from "path";
             // mangle module.exports
             result += (
                 "\n\n\n/*\nfile " + elem.url + "\n*/\n"
+                + (elem.header || "")
                 + elem.data.toString().trim()
+                + (elem.footer || "")
             );
         });
         result = (
@@ -1363,6 +1416,7 @@ shRunWithCoverage() {(set -e
     EXIT_CODE=0
     export DIR_COVERAGE=.build/coverage/
     rm -rf "$DIR_COVERAGE"
+    mkdir -p "$DIR_COVERAGE"
     (set -e
         export NODE_V8_COVERAGE="$DIR_COVERAGE"
         "$@"
@@ -1492,6 +1546,9 @@ body {
 .coverage .coverageHigh{
     background: #9d9;
 }
+.coverage .coverageIgnore{
+    background: #ccc;
+}
 .coverage .coverageLow{
     background: #ebb;
 }
@@ -1536,20 +1593,24 @@ body {
 </thead>
 <tbody>`;
         if (!lineList) {
-            padLines = String("100.00 %").length;
+            padLines = String("(ignore) 100.00 %").length;
             padPathname = 32;
             fileList.unshift({
                 linesCovered: 0,
                 linesTotal: 0,
+                modeCoverageIgnoreFile: "",
                 pathname: "./"
             });
             fileList.slice(1).forEach(function ({
                 linesCovered,
                 linesTotal,
+                modeCoverageIgnoreFile,
                 pathname
             }) {
-                fileList[0].linesCovered += linesCovered;
-                fileList[0].linesTotal += linesTotal;
+                if (!modeCoverageIgnoreFile) {
+                    fileList[0].linesCovered += linesCovered;
+                    fileList[0].linesTotal += linesTotal;
+                }
                 padPathname = Math.max(padPathname, pathname.length + 2);
                 padLines = Math.max(
                     padLines,
@@ -1572,6 +1633,7 @@ body {
         fileList.forEach(function ({
             linesCovered,
             linesTotal,
+            modeCoverageIgnoreFile,
             pathname
         }, ii) {
             let coverageLevel;
@@ -1583,7 +1645,9 @@ body {
             let xx2;
             coveragePct = Math.floor(10000 * linesCovered / linesTotal || 0);
             coverageLevel = (
-                coveragePct >= 8000
+                modeCoverageIgnoreFile
+                ? "coverageIgnore"
+                : coveragePct >= 8000
                 ? "coverageHigh"
                 : coveragePct >= 5000
                 ? "coverageMedium"
@@ -1633,7 +1697,9 @@ body {
             txt += (
                 "| "
                 + String("./" + pathname).padEnd(padPathname, " ") + " | "
-                + String(coveragePct + " %").padStart(padLines, " ") + " |\n"
+                + String(
+                    modeCoverageIgnoreFile + " " + coveragePct + " %"
+                ).padStart(padLines, " ") + " |\n"
             );
             txt += (
                 "| " + "*".repeat(
@@ -1663,7 +1729,7 @@ body {
 </div>
 </td>
 <td style="text-align: right;">
-    ${coveragePct} %<br>
+    ${modeCoverageIgnoreFile} ${coveragePct} %<br>
     ${linesCovered} / ${linesTotal}
 </td>
 </tr>`;
@@ -1895,24 +1961,27 @@ ${String(count).padStart(7, " ")}
         ), {
             recursive: true
         });
-        await htmlRender({
-            fileList: [
-                {
-                    linesCovered,
-                    linesTotal,
-                    pathname
-                }
-            ],
-            lineList,
-            pathname: DIR_COVERAGE + pathname
-        });
         fileDict[pathname] = {
             lineList,
             linesCovered,
             linesTotal,
+            modeCoverageIgnoreFile: (
+                (
+                    /^\/\*mode-coverage-ignore-file\*\/$/m
+                ).test(src.slice(0, 65536))
+                ? "(ignore)"
+                : ""
+            ),
             pathname,
             src
         };
+        await htmlRender({
+            fileList: [
+                fileDict[pathname]
+            ],
+            lineList,
+            pathname: DIR_COVERAGE + pathname
+        });
     }));
     await htmlRender({
         fileList: Object.keys(fileDict).sort().map(function (pathname) {
@@ -1921,7 +1990,7 @@ ${String(count).padStart(7, " ")}
         pathname: DIR_COVERAGE + "index"
     });
 }());
-' # "'
+' "$@" # '
         find "$DIR_COVERAGE"
     fi
     printf "shRunWithCoverage - EXIT_CODE=$EXIT_CODE\n" 1>&2
@@ -2011,7 +2080,7 @@ ${result}
     `).trim() + "\n";
     moduleFs.promises.writeFile(process.argv[1], result);
 }());
-' "$SCREENSHOT_SVG" # "'
+' "$SCREENSHOT_SVG" # '
     printf "shRunWithScreenshotTxt - wrote - $SCREENSHOT_SVG\n"
     # cleanup
     rm "$SCREENSHOT_SVG.exit_code" "$SCREENSHOT_SVG.txt"
@@ -2037,6 +2106,11 @@ shCiMain() {(set -e
     if [ -f ./.ci.sh ]
     then
         . ./.ci.sh "$@"
+    fi
+    if [ "$npm_config_mode_coverage" ] && [ "$1" = "node" ]
+    then
+        shRunWithCoverage "$@"
+        return
     fi
     "$@"
 )}

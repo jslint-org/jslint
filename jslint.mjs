@@ -165,13 +165,6 @@ function empty() {
     return Object.create(null);
 }
 
-function identity(val) {
-
-// This function will return <val>.
-
-    return val;
-}
-
 function jslint(
     source = "",                // A text to analyze.
     option_dict = empty(),      // An object whose keys correspond to option
@@ -2721,19 +2714,19 @@ function jslint_phase2_lex(state) {
         return true;
     }
 
-    function read_digits(mode, quiet) {
+    function read_digits(base, quiet) {
         let digits = line_source.match(
-            mode === "b"
+            base === "b"
             ? (
                 // rx_bits
                 /^[01]*/
             )
-            : mode === "o"
+            : base === "o"
             ? (
                 // rx_octals
                 /^[0-7]*/
             )
-            : mode === "x"
+            : base === "x"
             ? (
                 // rx_hexs
                 /^[0-9A-F]*/i
@@ -2995,9 +2988,6 @@ function jslint_phase3_parse(state) {
     let rx_identifier = (
         /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/
     );
-    let rx_json_number = (
-        /^-?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][\-+]?\d+)?$/
-    );
     let token_ii = 0;           // The number of the next token.
     let token_now = token_global;       // The current token being examined in
                                         // ... the parse.
@@ -3236,7 +3226,7 @@ function jslint_phase3_parse(state) {
 
 // This function will warn if <case_list> is unordered.
 
-        case_list.filter(identity).map(function (token) {
+        case_list.filter(noop).map(function (token) {
             switch (token.identifier || token.id) {
             case "(number)":
                 return {
@@ -3967,14 +3957,23 @@ function jslint_phase3_parse(state) {
         let negative;
         switch (token_nxt.id) {
         case "(number)":
-            if (!rx_json_number.test(token_nxt.value)) {
+            if (!(
+
+// https://datatracker.ietf.org/doc/html/rfc7159#section-6
+// number = [ minus ] int [ frac ] [ exp ]
+
+                /^-?(?:0|[1-9]\d*?)(?:\.\d*?)?(?:[eE][+\-]?\d+?)?$/
+            ).test(token_nxt.value)) {
 
 // test_cause:
+// ["[-.0]", "parse_json", "unexpected_a", ".", 3]
+// ["[-0x0]", "parse_json", "unexpected_a", "0x0", 3]
+// ["[.0]", "parse_json", "unexpected_a", ".", 2]
 // ["[0x0]", "parse_json", "unexpected_a", "0x0", 2]
 
                 warn("unexpected_a");
             }
-            advance();
+            advance("(number)");
             return token_now;
         case "(string)":
             if (token_nxt.quote !== "\"") {
@@ -3984,21 +3983,16 @@ function jslint_phase3_parse(state) {
 
                 warn("unexpected_a", token_nxt, token_nxt.quote);
             }
-            advance();
+            advance("(string)");
             return token_now;
         case "-":
             negative = token_nxt;
             negative.arity = "unary";
             advance("-");
-            advance("(number)");
-            if (!rx_json_number.test(token_now.value)) {
 
-// test_cause:
-// ["[-0x0]", "parse_json", "unexpected_a", "0x0", 3]
+// Recurse parse_json().
 
-                warn("unexpected_a", token_now);
-            }
-            negative.expression = token_now;
+            negative.expression = parse_json();
             return negative;
         case "[":
 
@@ -4033,11 +4027,11 @@ function jslint_phase3_parse(state) {
         case "true":
 
 // test_cause:
-// ["[false]", "parse_json", "advance", "", 0]
-// ["[null]", "parse_json", "advance", "", 0]
-// ["[true]", "parse_json", "advance", "", 0]
+// ["[false]", "parse_json", "constant", "", 0]
+// ["[null]", "parse_json", "constant", "", 0]
+// ["[true]", "parse_json", "constant", "", 0]
 
-            test_cause("advance");
+            test_cause("constant");
             advance();
             return token_now;
         case "{":
@@ -8246,11 +8240,11 @@ function jslint_phase5_whitage(state) {
     });
 }
 
-function noop() {
+function noop(val) {
 
-// This function will do nothing.
+// This function will do nothing except return val.
 
-    return;
+    return val;
 }
 
 function object_assign_from_list(dict, list, val) {

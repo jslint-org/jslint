@@ -2,7 +2,6 @@
 
 # Todo
 - app - deploy jslint as chrome-extension.
-- ci - use badge to indicate release-version so README.md doesnt have to to be updated every release.
 - cli - add command `report`.
 - compatibility - align with eslint and jshint with new warning that operators should be place at end-of-line.
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
@@ -12,12 +11,12 @@
 - jslint - add new warning requiring paren around comma-separated concatenations.
 - jslint - add syntax-support for continue-label-statement.
 - jslint - require regexp to use open-form.
-- jslint - simplify comments/docs by removing unnecessary grammar-article "the".
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 - merge function.html and help.html into README.md
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 
 # v2021.9.1-beta
+- doc - auto-generate toc for README.md
 - jslint - add bigint support.
 - jslint - rename little-used directive `debug` to `trace` to avoid confusion with non-related directive `devel`.
 - vim - add vim-plugin and file jslint.vim.

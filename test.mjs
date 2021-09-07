@@ -11,11 +11,11 @@ function assertOrThrow(cond, msg) {
     }
 }
 
-function noop() {
+function noop(val) {
 /*
- * this function will do nothing
+ * this function will do nothing except return val
  */
-    return;
+    return val;
 }
 
 (function testCaseJslintCli() {
