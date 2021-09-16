@@ -1,12 +1,11 @@
 "" jslint.vim
-""
 "" jslint vim-plugin
 ""
-"" 1. Save this file and `jslint.mjs` to directory `~/.vim/`
-"" 2. Add vim-command `:source ~/.vim/jslint.vim` to file `~/.vimrc`
+"" 1. Save this file and "jslint.mjs" to directory "~/.vim/"
+"" 2. Add vim-command ":source ~/.vim/jslint.vim" to file "~/.vimrc"
 "" 3. Vim can now jslint files (via nodejs):
-""    - with vim-command `:SaveAndJslint`
-""    - with vim-key-combo `<Ctrl-S> <Ctrl-J>`
+""    - with vim-command ":SaveAndJslint"
+""    - with vim-key-combo "<Ctrl-S> <Ctrl-J>"
 
 "" this function will save current file and jslint it (via nodejs)
 function! SaveAndJslint(bang)
@@ -14,10 +13,8 @@ function! SaveAndJslint(bang)
     if a:bang == "!" | write! | else | write | endif
     "" jslint file (via nodejs)
     let &l:errorformat = "%f:%n:%l:%c:%m"
-    let &l:makeprg = " node"
-	    \ . " \"" . $HOME . "/.vim/jslint.mjs\""
+    let &l:makeprg = "node \"" . $HOME . "/.vim/jslint.mjs\" --mode-vim-plugin"
         \ . " \"" . fnamemodify(bufname("%"), ":p") . "\""
-        \ . " --mode-vim-plugin"
     silent make! | cwindow | redraw!
 endfunction
 
@@ -26,5 +23,4 @@ command! -nargs=* -bang SaveAndJslint call SaveAndJslint("<bang>")
 
 "" map vim-key-combo "<ctrl-s> <ctrl-j>" to ":SaveAndJslint"
 inoremap <c-s><c-j> <esc> :SaveAndJslint <cr>
-nnoremap <c-s><c-j> <esc> :SaveAndJslint <cr>
-vnoremap <c-s><c-j> <esc> :SaveAndJslint <cr>
+nnoremap <c-s><c-j> :SaveAndJslint <cr>
