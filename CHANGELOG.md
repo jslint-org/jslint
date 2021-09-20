@@ -15,11 +15,11 @@
 - merge function.html and help.html into README.md
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 
-# v2021.9.1-beta
-- doc - auto-generate toc for README.md
+# v2021.9.20
 - jslint - add bigint support.
-- jslint - rename little-used directive `debug` to `trace` to avoid confusion with non-related directive `devel`.
 - vim - add vim-plugin and file jslint.vim.
+- doc - auto-generate toc for README.md
+- jslint - rename little-used directive `debug` to `trace` to avoid confusion with non-related directive `devel`.
 
 # v2021.8.20
 - warning - disable un-ergonomic warnings restricting directive-global (missing_browser and unexpected_directive_a).
