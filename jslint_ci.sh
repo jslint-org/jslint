@@ -886,7 +886,7 @@ import modulePath from "path";
     Object.entries(dict).forEach(function ([
         file, data
     ]) {
-        moduleFs.promise.writeFile(file, data.join("\n"));
+        moduleFs.promises.writeFile(file, data.join("\n"));
     });
 }());
 ' "$@" # '

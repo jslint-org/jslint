@@ -135,7 +135,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2021.9.20";
+let jslint_edition = "v2021.10.1-beta";
 let jslint_export;              // The jslint object to be exported.
 let jslint_fudge = 1;           // Fudge starting line and starting column to 1.
 let jslint_import_meta_url = "";        // import.meta.url used by cli.
@@ -3269,7 +3269,7 @@ function jslint_phase3_parse(state) {
                 );
             }
             return bb;
-        });
+        }, undefined);
     }
 
     function condition() {
@@ -5623,10 +5623,16 @@ function jslint_phase3_parse(state) {
             if (stmts.length < 1) {
 
 // test_cause:
+// ["
+// switch(0){case 0:default:}
+// ", "stmt_switch", "expected_statements_a", "default", 18]
 // ["switch(0){case 0:}", "stmt_switch", "expected_statements_a", "}", 18]
 
                 warn("expected_statements_a");
-                return;
+
+// PR-356 - Bugfix - Fixes issue #358 - switch-statement crashes jslint.
+
+                break;
             }
             the_case.block = stmts;
             the_cases.push(the_case);
