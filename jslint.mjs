@@ -5630,7 +5630,7 @@ function jslint_phase3_parse(state) {
 
                 warn("expected_statements_a");
 
-// PR-356 - Bugfix - Fixes issue #358 - switch-statement crashes jslint.
+// PR-359 - Bugfix - Fixes issue #358 - switch-statement crashes jslint.
 
                 break;
             }
