@@ -3,17 +3,17 @@
 # Todo
 - app - deploy jslint as chrome-extension.
 - cli - add command `report`.
-- compatibility - align with eslint and jshint with new warning that operators should be place at end-of-line.
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
 - jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
-- jslint - add new warning against using do-statment.
 - jslint - add new warning requiring paren around comma-separated concatenations.
-- jslint - add syntax-support for continue-label-statement.
 - jslint - require regexp to use open-form.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 - merge function.html and help.html into README.md
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
+
+# v2021.10.1-beta
+- bugfix - fix issue #358 - switch-statement crashes jslint
 
 # v2021.9.20
 - jslint - add bigint support.
