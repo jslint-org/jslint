@@ -354,8 +354,6 @@ shCiBase() {(set -e
         -e "s|^jslint_import_meta_url = |// &|" \
         > jslint.cjs
     # run test with coverage-report
-    # coverage-hack - test jslint's invalid-file handling-behavior
-    mkdir -p .test-dir.js
     # test jslint's cli handling-behavior
     printf "node jslint.cjs .\n"
     node jslint.cjs .

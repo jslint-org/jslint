@@ -123,3 +123,8 @@ import moduleFs from "fs";
 ' "$@" # '
     git add -f jslint.cjs jslint.js || true
 )}
+
+(set -e
+    # coverage-hack - test jslint's invalid-file handling-behavior
+    mkdir -p .test-dir.js
+)

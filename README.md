@@ -21,7 +21,7 @@ Douglas Crockford <douglas@crockford.com>
 1. [Web Demo](#web-demo)
 2. [Web Demo Archived](#web-demo-archived)
 3. [JSLint Install](#jslint-install)
-4. [JSLint HTML Report](#jslint-html-report)
+4. [JSLint Report](#jslint-report)
 5. [JSLint Vim Plugin](#jslint-vim-plugin)
 6. [Description](#description)
 7. [Package Listing](#package-listing)
@@ -100,8 +100,8 @@ node jslint.mjs .
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-cli-dir.svg)
 
 
-# JSLint HTML Report
-### To create html-report from command-line:
+# JSLint Report
+### To create human-readable, html-report from command-line:
 ```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-cli-report.svg -->
 #!/bin/sh
 
@@ -118,7 +118,7 @@ node jslint.mjs --mode-report hello.js
 ![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-cli-report.png)
 
 
-### To create html-report programmatically:
+### To create human-readable, html-report programmatically:
 ```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-import-report.svg -->
 #!/bin/sh
 
@@ -142,10 +142,6 @@ import fs from "fs";
 - shell output
 
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-import-report.svg)
-
-- screenshot file `.jslint_report.html`
-
-![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-cli-report.png)
 
 
 # JSLint Vim Plugin

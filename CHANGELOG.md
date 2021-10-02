@@ -1,6 +1,7 @@
 # Changelog
 
 # Todo
+- cli - add cli-command `--mode-coverage-report`
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
 - fs - rename files with dashes to files with underscore
 - jslint - add `for...of` syntax support.
