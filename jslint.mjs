@@ -1165,7 +1165,7 @@ async function jslint_cli({
         return exit_code;
     }
 
-// PR-xxx - Add cli-option `--mode-report`.
+// PR-360 - Add cli-option `--mode-report`.
 
     mode_report = (
         process_argv.slice(2).indexOf("--mode-report") >= 0
