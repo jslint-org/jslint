@@ -1782,9 +1782,9 @@ body {
                 str2 = coveragePct + " %";
                 xx1 = 6 * str1.length + 20;
                 xx2 = 6 * str2.length + 20;
-                // fs - write coverage-badge.svg
+                // fs - write coverage_badge.svg
                 moduleFs.promises.writeFile((
-                    DIR_COVERAGE + "/coverage-badge.svg"
+                    DIR_COVERAGE + "/coverage_badge.svg"
                 ), String(`
 <svg height="20" width="${xx1 + xx2}" xmlns="http://www.w3.org/2000/svg">
 <rect fill="#555" height="20" width="${xx1 + xx2}"/>
@@ -1947,7 +1947,7 @@ ${String(count).padStart(7, " ")}
         // fs - write coverage.txt
         console.error("\n" + txt);
         moduleFs.promises.writeFile((
-            DIR_COVERAGE + "/coverage-report.txt"
+            DIR_COVERAGE + "/coverage_report.txt"
         ), txt);
     }
     data = await moduleFs.promises.readdir(DIR_COVERAGE);
@@ -1958,10 +1958,10 @@ ${String(count).padStart(7, " ")}
             data = await moduleFs.promises.readFile((
                 DIR_COVERAGE + file
             ), "utf8");
-            // fs - rename to coverage-v8.json
+            // fs - rename to coverage_v8.json
             moduleFs.promises.rename(
                 DIR_COVERAGE + file,
-                DIR_COVERAGE + "coverage-v8.json"
+                DIR_COVERAGE + "coverage_v8.json"
             );
         }
     }));
