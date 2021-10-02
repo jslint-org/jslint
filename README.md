@@ -20,11 +20,13 @@ Douglas Crockford <douglas@crockford.com>
 # Table of Contents
 1. [Web Demo](#web-demo)
 2. [Web Demo Archived](#web-demo-archived)
-3. [Install](#install)
-4. [Description](#description)
-5. [Package Listing](#package-listing)
-6. [Changelog](#changelog)
-7. [License](#license)
+3. [JSLint Install](#jslint-install)
+4. [JSLint HTML Report](#jslint-html-report)
+5. [JSLint Vim Plugin](#jslint-vim-plugin)
+6. [Description](#description)
+7. [Package Listing](#package-listing)
+8. [Changelog](#changelog)
+9. [License](#license)
 
 
 # Web Demo
@@ -39,8 +41,8 @@ Douglas Crockford <douglas@crockford.com>
 - [Web Demo 2013 (ES5, CSS, HTML)](https://www.jslint.com/branch-v2013.3.13/jslint.html)
 
 
-# Install
-## To install, just download https://www.jslint.com/jslint.mjs and save to file:
+# JSLint Install
+### To install, just download https://www.jslint.com/jslint.mjs and save to file:
 ```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-download.svg -->
 #!/bin/sh
 
@@ -50,7 +52,7 @@ curl -L https://www.jslint.com/jslint.mjs > jslint.mjs
 
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-download.svg)
 
-## To run `jslint.mjs` from command-line:
+### To run `jslint.mjs` from command-line:
 ```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-cli-file.svg -->
 #!/bin/sh
 
@@ -62,7 +64,7 @@ node jslint.mjs hello.js
 
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-cli-file.svg)
 
-## To import `jslint.mjs` as es-module:
+### To import `jslint.mjs` as es-module:
 ```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-import.svg -->
 #!/bin/sh
 
@@ -87,7 +89,7 @@ result.warnings.forEach(function ({
 
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-import.svg)
 
-## To jslint entire directory:
+### To jslint entire directory from command-line:
 ```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-cli-dir.svg -->
 #!/bin/sh
 
@@ -97,13 +99,57 @@ node jslint.mjs .
 
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-cli-dir.svg)
 
-<!-- coverage-hack
-```javascript
-"use strict";
-```
--->
 
-## To run jslint as vim-plugin:
+# JSLint HTML Report
+### To create html-report from command-line:
+```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-cli-report.svg -->
+#!/bin/sh
+
+printf "function foo() {console.log('hello world');}\n" > hello.js
+
+node jslint.mjs --mode-report hello.js
+```
+- shell output
+
+![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-cli-report.svg)
+
+- screenshot file `.jslint_report.html`
+
+![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-cli-report.png)
+
+
+### To create html-report programmatically:
+```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-import-report.svg -->
+#!/bin/sh
+
+node --input-type=module -e '
+
+/*jslint devel*/
+import jslint from "./jslint.mjs";
+import fs from "fs";
+(async function () {
+    let report;
+    let result;
+    let source = "function foo() {console.log(\u0027hello world\u0027);}\n";
+    result = jslint(source);
+    report = jslint.report(result);
+    await fs.promises.writeFile(".jslint_report.html", report);
+    console.error("jslint - created html-report .jslint_report.html");
+}());
+
+'
+```
+- shell output
+
+![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-import-report.svg)
+
+- screenshot file `.jslint_report.html`
+
+![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-cli-report.png)
+
+
+# JSLint Vim Plugin
+### To run jslint inside vim:
 1. Download and save [`jslint.mjs`](https://www.jslint.com/jslint.mjs), [`jslint.vim`](https://www.jslint.com/jslint.vim) to directory `~/.vim/`
 2. Add vim-command `:source ~/.vim/jslint.vim` to file `~/.vimrc`
 3. Vim can now jslint files (via nodejs):
@@ -117,9 +163,7 @@ node jslint.mjs .
 # Description
 - [jslint.mjs](jslint.mjs) contains the jslint function. It parses and analyzes a source file, returning an object with information about the file. It can also take an object that sets options.
 
-- [index.html](index.html) runs the jslint.mjs function in a web page. The page also depends on `browser.mjs`.
-
-- [browser.mjs](browser.mjs) runs the web user interface and generates the results reports in HTML.
+- [index.html](index.html) runs the jslint.mjs function in a web page.
 
 - [help.html](help.html) describes JSLint's usage. Please [read it](https://jslint-org.github.io/jslint/help.html).
 
