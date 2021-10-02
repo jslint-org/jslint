@@ -3,7 +3,6 @@
 # Todo
 - cli - add cli-command `--mode-coverage-report`
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
-- fs - rename files with dashes to files with underscore
 - jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning requiring paren around comma-separated concatenations.
@@ -13,6 +12,7 @@
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 
 # v2021.10.1-beta
+- fs - rename files with dashes to files with underscore
 - cli - add cli-option `--mode-report`
 - fs - merge file browser.mjs into index.html
 - jslint - disable linting of embedded javascript in markdown-files

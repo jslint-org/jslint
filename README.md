@@ -1,4 +1,4 @@
-[<img align="left" height="100" src="asset-image-logo-512.svg"/>](https://github.com/jslint-org/jslint)
+[<img align="left" height="100" src="asset_image_logo_512.svg"/>](https://github.com/jslint-org/jslint)
 
 
 # JSLint, The JavaScript Code Quality Tool
@@ -13,8 +13,8 @@ Douglas Crockford <douglas@crockford.com>
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jslint-org/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/jslint-org/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/jslint-org/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://jslint-org.github.io/jslint/branch-master/.build/coverage/coverage-badge.svg)](https://jslint-org.github.io/jslint/branch-master/.build/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-beta/.build/coverage/coverage-badge.svg)](https://jslint-org.github.io/jslint/branch-beta/.build/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-alpha/.build/coverage/coverage-badge.svg)](https://jslint-org.github.io/jslint/branch-alpha/.build/coverage/index.html) |
-| Demo | [<img src="asset-image-logo-512.svg" height="32">](https://jslint-org.github.io/jslint/branch-master/index.html) | [<img src="asset-image-logo-512.svg" height="32">](https://jslint-org.github.io/jslint/branch-beta/index.html) | [<img src="asset-image-logo-512.svg" height="32">](https://jslint-org.github.io/jslint/branch-alpha/index.html) |
-| Artifacts | [<img src="asset-image-folder-open-solid.svg" height="30">](https://github.com/jslint-org/jslint/tree/gh-pages/branch-master/.build) | [<img src="asset-image-folder-open-solid.svg" height="30">](https://github.com/jslint-org/jslint/tree/gh-pages/branch-beta/.build) | [<img src="asset-image-folder-open-solid.svg" height="30">](https://github.com/jslint-org/jslint/tree/gh-pages/branch-alpha/.build) |
+| Demo | [<img src="asset_image_logo_512.svg" height="32">](https://jslint-org.github.io/jslint/branch-master/index.html) | [<img src="asset_image_logo_512.svg" height="32">](https://jslint-org.github.io/jslint/branch-beta/index.html) | [<img src="asset_image_logo_512.svg" height="32">](https://jslint-org.github.io/jslint/branch-alpha/index.html) |
+| Artifacts | [<img src="asset_image_folder_open_solid.svg" height="30">](https://github.com/jslint-org/jslint/tree/gh-pages/branch-master/.build) | [<img src="asset_image_folder_open_solid.svg" height="30">](https://github.com/jslint-org/jslint/tree/gh-pages/branch-beta/.build) | [<img src="asset_image_folder_open_solid.svg" height="30">](https://github.com/jslint-org/jslint/tree/gh-pages/branch-alpha/.build) |
 
 
 # Table of Contents
@@ -32,7 +32,7 @@ Douglas Crockford <douglas@crockford.com>
 # Web Demo
 - https://www.jslint.com
 
-[![screenshot](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-browser-_2fjslint_2fbranch-beta_2findex.html.png)](https://jslint-org.github.io/jslint/index.html)
+[![screenshot](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot_browser__2fjslint_2fbranch-beta_2findex.html.png)](https://jslint-org.github.io/jslint/index.html)
 
 
 # Web Demo Archived
@@ -43,17 +43,17 @@ Douglas Crockford <douglas@crockford.com>
 
 # JSLint Install
 ### To install, just download https://www.jslint.com/jslint.mjs and save to file:
-```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-download.svg -->
+```shell <!-- shRunWithScreenshotTxt .build/screenshot_install_download.svg -->
 #!/bin/sh
 
 curl -L https://www.jslint.com/jslint.mjs > jslint.mjs
 ```
 - shell output
 
-![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-download.svg)
+![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot_install_download.svg)
 
 ### To run `jslint.mjs` from command-line:
-```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-cli-file.svg -->
+```shell <!-- shRunWithScreenshotTxt .build/screenshot_install_cli_file.svg -->
 #!/bin/sh
 
 printf "console.log('hello world');\n" > hello.js
@@ -62,10 +62,10 @@ node jslint.mjs hello.js
 ```
 - shell output
 
-![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-cli-file.svg)
+![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot_install_cli_file.svg)
 
 ### To import `jslint.mjs` as es-module:
-```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-import.svg -->
+```shell <!-- shRunWithScreenshotTxt .build/screenshot_install_import.svg -->
 #!/bin/sh
 
 node --input-type=module -e '
@@ -87,22 +87,22 @@ result.warnings.forEach(function ({
 ```
 - shell output
 
-![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-import.svg)
+![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot_install_import.svg)
 
 ### To jslint entire directory from command-line:
-```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-cli-dir.svg -->
+```shell <!-- shRunWithScreenshotTxt .build/screenshot_install_cli_dir.svg -->
 #!/bin/sh
 
 node jslint.mjs .
 ```
 - shell output
 
-![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-cli-dir.svg)
+![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot_install_cli_dir.svg)
 
 
 # JSLint Report
 ### To create human-readable, html-report from command-line:
-```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-cli-report.svg -->
+```shell <!-- shRunWithScreenshotTxt .build/screenshot_install_cli_report.svg -->
 #!/bin/sh
 
 printf "function foo() {console.log('hello world');}\n" > hello.js
@@ -111,15 +111,15 @@ node jslint.mjs --mode-report hello.js
 ```
 - shell output
 
-![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-cli-report.svg)
+![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot_install_cli_report.svg)
 
 - screenshot file `.jslint_report.html`
 
-![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-cli-report.png)
+![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot_install_cli_report.png)
 
 
 ### To create human-readable, html-report programmatically:
-```shell <!-- shRunWithScreenshotTxt .build/screenshot-install-import-report.svg -->
+```shell <!-- shRunWithScreenshotTxt .build/screenshot_install_import_report.svg -->
 #!/bin/sh
 
 node --input-type=module -e '
@@ -141,7 +141,7 @@ import fs from "fs";
 ```
 - shell output
 
-![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-install-import-report.svg)
+![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot_install_import_report.svg)
 
 
 # JSLint Vim Plugin
@@ -153,7 +153,7 @@ import fs from "fs";
     - with vim-key-combo `<Ctrl-S> <Ctrl-J>`
 - screenshot
 
-![screenshot.png](asset-image-jslint-vim-plugin.png)
+![screenshot.png](asset_image_jslint_vim_plugin.png)
 
 
 # Description
@@ -183,13 +183,13 @@ right so that you can focus your creative energy where it is most needed.
 
 
 # Package Listing
-![screenshot-files.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-files.svg)
+![screenshot_files.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot_files.svg)
 
 
 # Changelog
 - [Full CHANGELOG.md](CHANGELOG.md)
 
-![screenshot-changelog.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot-changelog.svg)
+![screenshot_changelog.svg](https://jslint-org.github.io/jslint/branch-beta/.build/screenshot_changelog.svg)
 
 
 # License

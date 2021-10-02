@@ -1,6 +1,6 @@
 shArtifactUploadCustom() {(set -e
 # this function will custom-upload build-artifacts to branch-gh-pages
-    # screenshot asset-image-logo
+    # screenshot asset_image_logo
     shImageLogoCreate &
     # screenshot install
     shBrowserScreenshot \
@@ -63,10 +63,10 @@ echo "\
     });
 }());
 ' "$@" # '
-    # screenshot asset-image-logo-512.png
+    # screenshot asset_image_logo_512.png
     shBrowserScreenshot .jslint_report.html \
         --window-size=512x512 \
-        -screenshot=.build/screenshot-install-cli-report.png
+        -screenshot=.build/screenshot_install_cli_report.png
     # seo - inline css-assets and invalidate cached-assets
     node --input-type=module -e '
 import moduleFs from "fs";
@@ -74,7 +74,7 @@ import moduleFs from "fs";
     let cacheKey = Math.random().toString(36).slice(-4);
     let fileDict = {};
     await Promise.all([
-        "asset-codemirror-rollup.css",
+        "asset_codemirror_rollup.css",
         "index.html",
         "jslint.mjs"
     ].map(async function (file) {
@@ -88,11 +88,11 @@ import moduleFs from "fs";
 // inline css-assets
 
     fileDict["index.html"] = fileDict["index.html"].replace((
-        "\n<link rel=\"stylesheet\" href=\"asset-codemirror-rollup.css\">\n"
+        "\n<link rel=\"stylesheet\" href=\"asset_codemirror_rollup.css\">\n"
     ), function () {
         return (
             "\n<style>\n"
-            + fileDict["asset-codemirror-rollup.css"].trim()
+            + fileDict["asset_codemirror_rollup.css"].trim()
             + "\n</style>\n"
         );
     });

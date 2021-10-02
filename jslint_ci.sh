@@ -18,7 +18,7 @@
 # ln -f jslint.mjs ~/jslint.mjs
 # openssl rand -base64 32 # random key
 # sh jslint_ci.sh shCiBranchPromote origin alpha beta
-# sh jslint_ci.sh shRunWithScreenshotTxt .build/screenshot-changelog.svg head -n50 CHANGELOG.md
+# sh jslint_ci.sh shRunWithScreenshotTxt .build/screenshot_changelog.svg head -n50 CHANGELOG.md
 # vim rgx-lowercase \L\1\e
 
 shBashrcDebianInit() {
@@ -178,7 +178,7 @@ import moduleUrl from "url";
     if (String(file + "/").startsWith(process.cwd() + "/")) {
         file = file.replace(process.cwd(), "");
     }
-    file = ".build/screenshot-browser-" + encodeURIComponent(file).replace((
+    file = ".build/screenshot_browser_" + encodeURIComponent(file).replace((
         /%/g
     ), "_").toLowerCase() + ".png";
     moduleChildProcess.spawn(
@@ -255,7 +255,7 @@ import moduleChildProcess from "child_process";
         [
             "jslint_ci.sh",
             "shRunWithScreenshotTxt",
-            ".build/screenshot-changelog.svg",
+            ".build/screenshot_changelog.svg",
             "head",
             "-n50",
             "CHANGELOG.md"
@@ -264,7 +264,7 @@ import moduleChildProcess from "child_process";
         [
             "jslint_ci.sh",
             "shRunWithScreenshotTxt",
-            ".build/screenshot-files.svg",
+            ".build/screenshot_files.svg",
             "shGitLsTree"
         ]
     ].forEach(function (argList) {
@@ -1054,7 +1054,7 @@ shImageLogoCreate() {(set -e
 <head>
 <title>logo</title>
 <style>
-/* sh jslint_ci.sh shBrowserScreenshot asset-image-logo.html --window-size=512x512 */
+/* sh jslint_ci.sh shBrowserScreenshot asset_image_logo.html --window-size=512x512 */
 /* csslint box-model:false */
 /* csslint ignore:start */
 *,
@@ -1065,7 +1065,7 @@ shImageLogoCreate() {(set -e
 @font-face {
     font-family: Daley;
     font-weight: bold;
-    src: url("asset-font-daley-bold.woff2") format("woff2");
+    src: url("asset_font_daley_bold.woff2") format("woff2");
 }
 /* csslint ignore:end */
 body,
@@ -1110,19 +1110,19 @@ div {
 </div>
 </body>
 </html>
-' > .build/asset-image-logo-512.html
-    cp asset-font-daley-bold.woff2 .build || true
-    # screenshot asset-image-logo-512.png
-    shBrowserScreenshot .build/asset-image-logo-512.html \
+' > .build/asset_image_logo_512.html
+    cp asset_font_daley_bold.woff2 .build || true
+    # screenshot asset_image_logo_512.png
+    shBrowserScreenshot .build/asset_image_logo_512.html \
         --window-size=512x512 \
-        -screenshot=.build/asset-image-logo-512.png
+        -screenshot=.build/asset_image_logo_512.png
     # create various smaller thumbnails
     for SIZE in 32 64 128 256
     do
-        convert -resize "${SIZE}x${SIZE}" .build/asset-image-logo-512.png \
-            ".build/asset-image-logo-$SIZE.png"
+        convert -resize "${SIZE}x${SIZE}" .build/asset_image_logo_512.png \
+            ".build/asset_image_logo_$SIZE.png"
         printf \
-"shImageLogoCreate - wrote - .build/asset-image-logo-$SIZE.png\n" 1>&2
+"shImageLogoCreate - wrote - .build/asset_image_logo_$SIZE.png\n" 1>&2
     done
     # convert to svg @ https://convertio.co/png-svg/
 )}

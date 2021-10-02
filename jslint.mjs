@@ -1233,7 +1233,7 @@ async function jslint_cli({
                 }
                 if (!(
                     !(
-                        /\b(?:lock|min|raw|rollup)\b/
+                        /(?:\b|_)(?:lock|min|raw|rollup)(?:\b|_)/
                     ).test(file2) && code && code.length < 1048576
                 )) {
                     return;
