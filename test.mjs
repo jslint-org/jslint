@@ -73,6 +73,75 @@ function noop(val) {
         process_exit: processExit1,
         source: "syntax error"
     });
+    // test report handling-behavior
+    jslint.cli({
+        // suppress error
+        console_error: noop,
+        mode_cli: true,
+        process_argv: [
+            "node",
+            "jslint.mjs",
+            "--mode-report",
+            "jslint.mjs"
+        ],
+        process_exit: processExit0
+    });
+    // test report-error handling-behavior
+    jslint.cli({
+        // suppress error
+        console_error: noop,
+        mode_cli: true,
+        process_argv: [
+            "node",
+            "jslint.mjs",
+            "--mode-report",
+            "syntax-error.js"
+        ],
+        process_exit: processExit1,
+        source: "syntax error"
+    });
+    // test report-json handling-behavior
+    jslint.cli({
+        // suppress error
+        console_error: noop,
+        mode_cli: true,
+        process_argv: [
+            "node",
+            "jslint.mjs",
+            "--mode-report",
+            "aa.json"
+        ],
+        process_exit: processExit0,
+        source: "[]"
+    });
+    // test report-misc handling-behavior
+    jslint.cli({
+        // suppress error
+        console_error: noop,
+        mode_cli: true,
+        process_argv: [
+            "node",
+            "jslint.mjs",
+            "--mode-report",
+            "aa.js"
+        ],
+        process_exit: processExit1,
+        source: "(aa)=>aa; function aa([aa]){}"
+    });
+    // test report-json-error handling-behavior
+    jslint.cli({
+        // suppress error
+        console_error: noop,
+        mode_cli: true,
+        process_argv: [
+            "node",
+            "jslint.mjs",
+            "--mode-report",
+            "aa.json"
+        ],
+        process_exit: processExit1,
+        source: "["
+    });
     // test vim-plugin handling-behavior
     jslint.cli({
         // suppress error

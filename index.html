@@ -14,7 +14,6 @@
 <title>JSLint:&nbsp;The&nbsp;JavaScript&nbsp;Code Quality Tool</title>
 <!-- Google Lighthouse Performance - Reduce Largest Contentful Paint. -->
 <link as="script" rel="preload" href="asset-codemirror-rollup.js">
-<link rel="modulepreload" href="browser.mjs">
 <link rel="modulepreload" href="jslint.mjs">
 <link rel="stylesheet" href="asset-codemirror-rollup.css">
 <style>
@@ -326,12 +325,360 @@
 </main>
 <div id="JSLINT_REPORT_HTML"></div>
 <script defer src="asset-codemirror-rollup.js"></script>
-<script src="browser.mjs" type="module"></script>
-<!-- coverage-hack -->
-<script>
+<script type="module">
+// browser.mjs
+// Original Author: Douglas Crockford (https://www.jslint.com).
+
+// This is free and unencumbered software released into the public domain.
+
+// Anyone is free to copy, modify, publish, use, compile, sell, or
+// distribute this software, either in source code form or as a compiled
+// binary, for any purpose, commercial or non-commercial, and by any
+// means.
+
+// In jurisdictions that recognize copyright laws, the author or authors
+// of this software dedicate any and all copyright interest in the
+// software to the public domain. We make this dedication for the benefit
+// of the public at large and to the detriment of our heirs and
+// successors. We intend this dedication to be an overt act of
+// relinquishment in perpetuity of all present and future rights to this
+// software under copyright law.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+// IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+// OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+// ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+// OTHER DEALINGS IN THE SOFTWARE.
+
+// For more information, please refer to <https://unlicense.org/>
+
+
+/*jslint beta, browser*/
+
+/*property
+    CodeMirror, Pos, Tab, addEventListener, checked, click, closest, column,
+    ctrlKey, currentTarget, dispatchEvent, display, dom_style_report_unmatched,
+    edition, editor, error, extraKeys, focus, forEach, from, fromTextArea,
+    globals, gutters, indentSelection, indentUnit, indentWithTabs, innerHTML,
+    jslint, key, length, line, lineNumbers, lineWrapping, lint, lintOnChange,
+    map, matchBrackets, message, metaKey, mode, mode_stop, name, offsetWidth,
+    onclick, onkeyup, outerHTML, performLint, preventDefault, push,
+    querySelector, querySelectorAll, registerHelper, replace, replaceSelection,
+    report, result, reverse, search, setSize, setValue, severity,
+    showTrailingSpace, somethingSelected, sort, split, stopPropagation, style,
+    target, test, textContent, to, trim, value, warnings, width
+*/
+
+import jslint from "./jslint.mjs";
+
+// This is the web script companion file for JSLint. It includes code for
+// interacting with the browser and displaying the reports.
+
+let editor;
+let jslint_option_dict = {
+    lintOnChange: false
+};
+let mode_debug;
+
+function dom_style_report_unmatched() {
+
+// Debug css-style.
+
+    let style_list = [];
+    Array.from(document.querySelectorAll("style")).forEach(function (elem) {
+        elem.innerHTML.replace((
+            /\/\*[\S\s]*?\*\/|;|\}/g
+        ), "\n").replace((
+            /^([^\n\u0020@].*?)[,{:].*?$/gm
+        ), function (match0, match1) {
+            let ii;
+            try {
+                ii = document.querySelectorAll(match1).length;
+            } catch (err) {
+                console.error(match1 + "\n" + err); //jslint-quiet
+            }
+            if (ii <= 1 && !(
+                /^0\u0020(?:(body\u0020>\u0020)?(?:\.button|\.readonly|\.styleColorError|\.textarea|\.uiAnimateSlide|a|base64|body|code|div|input|pre|textarea)(?:,|\u0020\{))|^[1-9]\d*?\u0020#/m
+            ).test(ii + " " + match0)) {
+                style_list.push(ii + " " + match0);
+            }
+            return "";
+        });
+    });
+    style_list.sort().reverse().forEach(function (elem, ii, list) {
+        console.error( //jslint-quiet
+            "dom_style_report_unmatched " + (list.length - ii) + ". " + elem
+        );
+    });
+}
+
+function jslint_plugin_codemirror(CodeMirror) {
+
+// This function will integrate jslint with CodeMirror's lint addon.
+// Requires CodeMirror and jslint.
+
+    CodeMirror.registerHelper("lint", "javascript", function (text, options) {
+        options.result = jslint.jslint(text, options, options.globals);
+        return options.result.warnings.map(function ({
+            column,
+            line,
+            message,
+            mode_stop
+        }) {
+            return {
+                from: CodeMirror.Pos(line - 1, column - 1), //jslint-quiet
+                message,
+                severity: (
+                    mode_stop
+                    ? "error"
+                    : "warning"
+                ),
+                to: CodeMirror.Pos(line - 1, column) //jslint-quiet
+            };
+        });
+    });
+}
+
+async function jslint_ui_call() {
+// This function will run jslint in browser and create html-reports.
+
+// Show ui-loader-animation.
+
+    document.querySelector("#uiLoader1 > div").textContent = "Linting";
+    document.querySelector("#uiLoader1").style.display = "flex";
+    try {
+
+// Wait awhile before running cpu-intensive linter so ui-loader doesn't jank.
+
+        await new Promise(function (resolve) {
+            setTimeout(resolve);
+        });
+
+// Update jslint_option_dict from ui-inputs.
+
+        document.querySelectorAll(
+            "#JSLINT_OPTIONS input[type=checkbox]"
+        ).forEach(function (elem) {
+            jslint_option_dict[elem.value] = elem.checked;
+        });
+
+// Execute linter.
+
+        editor.performLint();
+
+// Generate the reports.
+// Display the reports.
+
+        document.querySelector(
+            "#JSLINT_REPORT_HTML"
+        ).outerHTML = jslint.report(jslint_option_dict.result);
+        jslint_ui_onresize();
+    } catch (err) {
+        console.error(err); //jslint-quiet
+    }
+
+// Hide ui-loader-animation.
+
+    setTimeout(function () {
+        document.querySelector("#uiLoader1").style.display = "none";
+    }, 500);
+}
+
+function jslint_ui_onresize() {
+    let content_width = document.querySelector(
+        "#JSLINT_OPTIONS"
+    ).offsetWidth;
+
+// Set explicit content-width for overflow to work properly.
+
+    document.querySelectorAll(
+        ".JSLINT_ fieldset > div"
+    ).forEach(function (elem) {
+        if (!elem.closest("#JSLINT_OPTIONS")) {
+            elem.style.width = content_width + "px";
+        }
+    });
+    editor.setSize(content_width);
+}
+
 (function () {
-    return;
+    let CodeMirror = window.CodeMirror;
+
+// Init edition.
+
+    document.querySelector("#JSLINT_EDITION").textContent = (
+        "Edition: " + jslint.edition
+    );
+
+// Init mode_debug.
+    mode_debug = (
+        /\bdebug=1\b/
+    ).test(location.search);
+
+// Init CodeMirror editor.
+
+    editor = CodeMirror.fromTextArea(document.querySelector(
+        "#JSLINT_SOURCE textarea"
+    ), {
+        extraKeys: {
+            "Shift-Tab": "indentLess",
+            Tab: function (cm) {
+                if (cm.somethingSelected()) {
+                    cm.indentSelection("add");
+                    return;
+                }
+                cm.replaceSelection("    ");
+            }
+        },
+        gutters: ["CodeMirror-lint-markers"],
+        indentUnit: 4,
+        indentWithTabs: false,
+        lineNumbers: true,
+        lineWrapping: true,
+        lint: jslint_option_dict,
+        matchBrackets: true,
+        mode: "text/javascript",
+        showTrailingSpace: true
+    });
+    window.editor = editor;
+
+// Init CodeMirror linter.
+
+    jslint_plugin_codemirror(CodeMirror);
+
+// Init event-handling.
+
+    document.addEventListener("keydown", function (evt) {
+        switch ((evt.ctrlKey || evt.metaKey) && evt.key) {
+        case "Enter":
+        case "e":
+            evt.preventDefault();
+            evt.stopPropagation();
+            jslint_ui_call();
+            break;
+        }
+    });
+    document.querySelector(
+        "#JSLINT_BUTTONS"
+    ).onclick = function ({
+        target
+    }) {
+        switch (target.name) {
+        case "JSLint":
+            jslint_ui_call();
+            break;
+        case "clear_options":
+            document.querySelectorAll(
+                "#JSLINT_OPTIONS input[type=checkbox]"
+            ).forEach(function (elem) {
+                elem.checked = false;
+            });
+            document.querySelector("#JSLINT_GLOBALS").value = "";
+            document.querySelector("#JSLINT_OPTIONS").click();
+            document.querySelector("#JSLINT_GLOBALS").dispatchEvent(
+                new Event("keyup")
+            );
+            break;
+        case "clear_source":
+            editor.setValue("");
+            editor.focus();
+            break;
+        }
+    };
+    document.querySelector(
+        "#JSLINT_GLOBALS"
+    ).onkeyup = function ({
+        currentTarget
+    }) {
+        jslint_option_dict.globals = currentTarget.value.trim().split(
+            /[\s,;'"]+/
+        );
+    };
+    document.querySelector(
+        "#JSLINT_OPTIONS"
+    ).onclick = function (evt) {
+        let elem;
+        elem = evt.target.closest(
+            "#JSLINT_OPTIONS div[title]"
+        );
+        elem = elem && elem.querySelector("input[type=checkbox]");
+        if (elem && elem !== evt.target) {
+            evt.preventDefault();
+            evt.stopPropagation();
+            elem.checked = !elem.checked;
+        }
+    };
+    window.addEventListener("load", jslint_ui_onresize);
+    window.addEventListener("resize", jslint_ui_onresize);
+    if (!mode_debug) {
+        editor.setValue(String(`
+#!/usr/bin/env node
+/*jslint browser, node*/
+/*global caches, indexedDb*/
+import https from "https";
+import jslint from \u0022./jslint.mjs\u0022;
+
+/*jslint-disable*/
+    Syntax error.\u0020\u0020\u0020\u0020
+/*jslint-enable*/
+
+eval("console.log(\\"hello world\\");"); //jslint-quiet
+
+eval("console.log(\\"hello world\\");");
+
+// Optional directives.
+// .... /*jslint beta*/ .......... Enable experimental warnings.
+// .... /*jslint bitwise*/ ....... Allow bitwise operators.
+// .... /*jslint browser*/ ....... Assume browser environment.
+// .... /*jslint convert*/ ....... Allow conversion operators.
+// .... /*jslint devel*/ ......... Allow console.log() and friends.
+// .... /*jslint for*/ ........... Allow for-statement.
+// .... /*jslint getset*/ ........ Allow get() and set().
+// .... /*jslint indent2*/ ....... Use 2-space indent.
+// .... /*jslint long*/ .......... Allow long lines.
+// .... /*jslint name*/ .......... Allow weird property names.
+// .... /*jslint node*/ .......... Assume Node.js environment.
+// .... /*jslint single*/ ........ Allow single-quote strings.
+// .... /*jslint this*/ .......... Allow 'this'.
+// .... /*jslint trace*/ ......... Include jslint stack-trace in warnings.
+// .... /*jslint unordered*/ ..... Allow unordered cases, params, properties,
+// ................................... and variables.
+// .... /*jslint variable*/ ...... Allow unordered const and let declarations
+// ................................... that are not at top of function-scope.
+// .... /*jslint white*/ ......... Allow messy whitespace.
+
+(async function () {
+    let result = await new Promise(function (resolve) {
+        https.request("https://www.jslint.com/jslint.mjs", function (res) {
+            result = "";
+            res.on("data", function (chunk) {
+                result += chunk;
+            }).on("end", function () {
+                resolve(result);
+            }).setEncoding("utf8");
+        }).end();
+    });
+    result = jslint(result);
+    result.warnings.forEach(function ({
+        formatted_message
+    }) {
+        console.error(formatted_message);
+    });
+}());
+        `).trim() + "\n");
+    }
+    if (mode_debug) {
+        document.querySelector(
+            "#JSLINT_OPTIONS input[value=debug]"
+        ).click();
+    }
+    document.querySelector("button[name='JSLint']").click();
+
+// Debug css-style.
+
+    window.dom_style_report_unmatched = dom_style_report_unmatched;
 }());
 </script>
-<!-- coverage-hack -->
 </body></html>
