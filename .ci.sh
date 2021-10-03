@@ -66,7 +66,7 @@ echo "\
     # screenshot asset_image_logo_512.png
     shBrowserScreenshot .jslint_report.html \
         --window-size=512x512 \
-        -screenshot=.build/screenshot_install_cli_report.png
+        -screenshot=.artifact/screenshot_install_cli_report.png
     # seo - inline css-assets and invalidate cached-assets
     node --input-type=module -e '
 import moduleFs from "fs";

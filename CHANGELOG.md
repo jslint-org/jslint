@@ -12,6 +12,7 @@
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 
 # v2021.10.1-beta
+- ci - rename dir .build/ to .artifact/
 - fs - merge file asset_codemirror_rollup.css into index.html
 - fs - merge file function.html into help.html
 - fs - remove little-used font asset_font_programma_bold.woff2

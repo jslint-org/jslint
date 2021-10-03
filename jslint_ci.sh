@@ -18,7 +18,7 @@
 # ln -f jslint.mjs ~/jslint.mjs
 # openssl rand -base64 32 # random key
 # sh jslint_ci.sh shCiBranchPromote origin alpha beta
-# sh jslint_ci.sh shRunWithScreenshotTxt .build/screenshot_changelog.svg head -n50 CHANGELOG.md
+# sh jslint_ci.sh shRunWithScreenshotTxt .artifact/screenshot_changelog.svg head -n50 CHANGELOG.md
 # vim rgx-lowercase \L\1\e
 
 shBashrcDebianInit() {
@@ -178,7 +178,7 @@ import moduleUrl from "url";
     if (String(file + "/").startsWith(process.cwd() + "/")) {
         file = file.replace(process.cwd(), "");
     }
-    file = ".build/screenshot_browser_" + encodeURIComponent(file).replace((
+    file = ".artifact/screenshot_browser_" + encodeURIComponent(file).replace((
         /%/g
     ), "_").toLowerCase() + ".png";
     moduleChildProcess.spawn(
@@ -255,7 +255,7 @@ import moduleChildProcess from "child_process";
         [
             "jslint_ci.sh",
             "shRunWithScreenshotTxt",
-            ".build/screenshot_changelog.svg",
+            ".artifact/screenshot_changelog.svg",
             "head",
             "-n50",
             "CHANGELOG.md"
@@ -264,7 +264,7 @@ import moduleChildProcess from "child_process";
         [
             "jslint_ci.sh",
             "shRunWithScreenshotTxt",
-            ".build/screenshot_files.svg",
+            ".artifact/screenshot_files.svg",
             "shGitLsTree"
         ]
     ].forEach(function (argList) {
@@ -281,9 +281,9 @@ import moduleChildProcess from "child_process";
 }());
 ' "$@" # '
     shArtifactUploadCustom
-    # add dir .build
-    git add -f .build
-    git commit -am "add dir .build"
+    # add dir .artifact
+    git add -f .artifact
+    git commit -am "add dir .artifact"
     # checkout branch-gh-pages
     git fetch origin gh-pages
     git checkout -b gh-pages origin/gh-pages
@@ -300,7 +300,7 @@ import moduleChildProcess from "child_process";
     # update root-dir with branch-beta
     if [ "$BRANCH" = beta ]
     then
-        rm -rf .build
+        rm -rf .artifact
         git checkout beta .
     fi
     # update README.md with branch-$BRANCH and $GITHUB_REPOSITORY
@@ -1047,19 +1047,19 @@ div {
 </div>
 </body>
 </html>
-' > .build/asset_image_logo_512.html
-    cp asset_font_daley_bold.woff2 .build || true
+' > .artifact/asset_image_logo_512.html
+    cp asset_font_daley_bold.woff2 .artifact || true
     # screenshot asset_image_logo_512.png
-    shBrowserScreenshot .build/asset_image_logo_512.html \
+    shBrowserScreenshot .artifact/asset_image_logo_512.html \
         --window-size=512x512 \
-        -screenshot=.build/asset_image_logo_512.png
+        -screenshot=.artifact/asset_image_logo_512.png
     # create various smaller thumbnails
     for SIZE in 32 64 128 256
     do
-        convert -resize "${SIZE}x${SIZE}" .build/asset_image_logo_512.png \
-            ".build/asset_image_logo_$SIZE.png"
+        convert -resize "${SIZE}x${SIZE}" .artifact/asset_image_logo_512.png \
+            ".artifact/asset_image_logo_$SIZE.png"
         printf \
-"shImageLogoCreate - wrote - .build/asset_image_logo_$SIZE.png\n" 1>&2
+"shImageLogoCreate - wrote - .artifact/asset_image_logo_$SIZE.png\n" 1>&2
     done
     # convert to svg @ https://convertio.co/png-svg/
 )}
@@ -1457,10 +1457,10 @@ shRmDsStore() {(set -e
 
 shRunWithCoverage() {(set -e
 # this function will run nodejs command $@ with v8-coverage
-# and create coverage-report .build/coverage/index.html
+# and create coverage-report .artifact/coverage/index.html
     local EXIT_CODE
     EXIT_CODE=0
-    export DIR_COVERAGE=.build/coverage/
+    export DIR_COVERAGE=.artifact/coverage/
     rm -rf "$DIR_COVERAGE"
     mkdir -p "$DIR_COVERAGE"
     (set -e
