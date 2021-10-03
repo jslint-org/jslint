@@ -346,74 +346,7 @@ shArtifactUploadCustom() {(set -e
 
 shCiBase() {(set -e
 # this function will run base-ci
-    # create jslint.cjs
-    cp jslint.mjs jslint.js
-    cat jslint.mjs | sed \
-        -e "s|^// module.exports = |module.exports = |" \
-        -e "s|^export default Object.freeze(|// &|" \
-        -e "s|^jslint_import_meta_url = |// &|" \
-        > jslint.cjs
-    # run test with coverage-report
-    # test jslint's cli handling-behavior
-    printf "node jslint.cjs .\n"
-    node jslint.cjs .
-    printf "node jslint.mjs .\n"
-    node jslint.mjs .
-    printf "node test.mjs\n"
-    (set -e
-        # coverage-hack - test jslint's cli handling-behavior
-        export JSLINT_BETA=1
-        shRunWithCoverage node test.mjs
-    )
-    # update edition in README.md, jslint.mjs from CHANGELOG.md
-    node --input-type=module -e '
-import moduleFs from "fs";
-(async function () {
-    let dict;
-    let versionBeta;
-    let versionMaster;
-    dict = {};
-    await Promise.all([
-        "CHANGELOG.md",
-        "README.md",
-        "jslint.mjs"
-    ].map(async function (file) {
-        dict[file] = await moduleFs.promises.readFile(file, "utf8");
-    }));
-    Array.from(dict["CHANGELOG.md"].matchAll(
-        /\n\n#\u0020(v\d\d\d\d\.\d\d?\.\d\d?(.*?)?)\n/g
-    )).slice(0, 2).forEach(function ([
-        ignore, version, isBeta
-    ]) {
-        versionBeta = versionBeta || version;
-        versionMaster = versionMaster || (!isBeta && version);
-    });
-    [
-        {
-            file: "README.md",
-            src: dict["README.md"].replace((
-                /\bv\d\d\d\d\.\d\d?\.\d\d?\b/m
-            ), versionMaster),
-            src0: dict["README.md"]
-        }, {
-            file: "jslint.mjs",
-            src: dict["jslint.mjs"].replace((
-                /^let\u0020jslint_edition\u0020=\u0020".*?";$/m
-            ), `let jslint_edition = "${versionBeta}";`),
-            src0: dict["jslint.mjs"]
-        }
-    ].forEach(function ({
-        file,
-        src,
-        src0
-    }) {
-        if (src !== src0) {
-            console.error(`update file ${file}`);
-            moduleFs.promises.writeFile(file, src);
-        }
-    });
-}());
-' "$@" # '
+    shCiBaseCustom
     # update table-of-contents in README.md
     node --input-type=module -e '
 import moduleFs from "fs";
@@ -450,6 +383,10 @@ import moduleFs from "fs";
 ' "$@" # '
 )}
 
+shCiBaseCustom() {(set -e
+    return
+)}
+
 shCiBranchPromote() {(set -e
 # this function will promote branch $REMOTE/$BRANCH1 to branch $REMOTE/$BRANCH2
     local BRANCH1
@@ -477,7 +414,7 @@ import moduleUrl from "url";
         await moduleFs.promises.readdir(".")
     ).forEach(async function (file) {
         let data;
-        if (!(
+        if (file === "CHANGELOG.md" || !(
             /.\.html$|.\.md$/m
         ).test(file)) {
             return;

@@ -74,9 +74,7 @@ import moduleFs from "fs";
     let cacheKey = Math.random().toString(36).slice(-4);
     let fileDict = {};
     await Promise.all([
-        "asset_codemirror_rollup.css",
-        "index.html",
-        "jslint.mjs"
+        "index.html"
     ].map(async function (file) {
         try {
             fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
@@ -84,47 +82,105 @@ import moduleFs from "fs";
             process.exit();
         }
     }));
-
-// inline css-assets
-
-    fileDict["index.html"] = fileDict["index.html"].replace((
-        "\n<link rel=\"stylesheet\" href=\"asset_codemirror_rollup.css\">\n"
-    ), function () {
-        return (
-            "\n<style>\n"
-            + fileDict["asset_codemirror_rollup.css"].trim()
-            + "\n</style>\n"
-        );
-    });
-    fileDict["index.html"] = fileDict["index.html"].replace((
-        "\n<style class=\"JSLINT_REPORT_STYLE\"></style>\n"
-    ), function () {
-        return fileDict["jslint.mjs"].match(
-            /\n<style\sclass="JSLINT_REPORT_STYLE">\n[\S\s]*?\n<\/style>\n/
-        )[0];
-    });
-
-// invalidate cached-assets
-
+    // invalidate cached-assets
     fileDict["index.html"] = fileDict["index.html"].replace((
         /\b(?:href|src)=".+?\.(?:css|js|mjs)\b/g
     ), function (match0) {
         return `${match0}?cc=${cacheKey}`;
     });
-
-// write file
-
-    await Promise.all(Object.entries(fileDict).map(function ([
+    // write file
+    Object.entries(fileDict).map(function ([
         file, data
     ]) {
         moduleFs.promises.writeFile(file, data);
-    }));
+    });
 }());
 ' "$@" # '
     git add -f jslint.cjs jslint.js || true
 )}
 
-(set -e
+shCiBaseCustom() {(set -e
+# this function will run base-ci
+    # create jslint.cjs
+    cp jslint.mjs jslint.js
+    cat jslint.mjs | sed \
+        -e "s|^// module.exports = |module.exports = |" \
+        -e "s|^export default Object.freeze(|// &|" \
+        -e "s|^jslint_import_meta_url = |// &|" \
+        > jslint.cjs
+    # run test with coverage-report
     # coverage-hack - test jslint's invalid-file handling-behavior
     mkdir -p .test-dir.js
-)
+    # test jslint's cli handling-behavior
+    printf "node jslint.cjs .\n"
+    node jslint.cjs .
+    printf "node jslint.mjs .\n"
+    node jslint.mjs .
+    printf "node test.mjs\n"
+    (set -e
+        # coverage-hack - test jslint's cli handling-behavior
+        export JSLINT_BETA=1
+        shRunWithCoverage node test.mjs
+    )
+    # update edition in README.md, jslint.mjs from CHANGELOG.md
+    node --input-type=module -e '
+import moduleFs from "fs";
+(async function () {
+    let fileDict;
+    let versionBeta;
+    let versionMaster;
+    fileDict = {};
+    await Promise.all([
+        "CHANGELOG.md",
+        "README.md",
+        "index.html",
+        "jslint.mjs"
+    ].map(async function (file) {
+        fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
+    }));
+    Array.from(fileDict["CHANGELOG.md"].matchAll(
+        /\n\n#\u0020(v\d\d\d\d\.\d\d?\.\d\d?(.*?)?)\n/g
+    )).slice(0, 2).forEach(function ([
+        ignore, version, isBeta
+    ]) {
+        versionBeta = versionBeta || version;
+        versionMaster = versionMaster || (!isBeta && version);
+    });
+    [
+        {
+            file: "README.md",
+            src: fileDict["README.md"].replace((
+                /\bv\d\d\d\d\.\d\d?\.\d\d?\b/m
+            ), versionMaster),
+            src0: fileDict["README.md"]
+        }, {
+            file: "jslint.mjs",
+            // inline css-assets
+            src: fileDict["jslint.mjs"].replace((
+                /^let\u0020jslint_edition\u0020=\u0020".*?";$/m
+            ), `let jslint_edition = "${versionBeta}";`),
+            src0: fileDict["jslint.mjs"]
+        }, {
+            file: "index.html",
+            src: fileDict["index.html"].replace((
+                /\n<style\sclass="JSLINT_REPORT_STYLE">\n[\S\s]*?\n<\/style>\n/
+            ), function () {
+                return fileDict["jslint.mjs"].match(
+                    /\n<style\sclass="JSLINT_REPORT_STYLE">\n[\S\s]*?\n<\/style>\n/
+                )[0];
+            }),
+            src0: fileDict["index.html"]
+        }
+    ].forEach(function ({
+        file,
+        src,
+        src0
+    }) {
+        if (src !== src0) {
+            console.error(`update file ${file}`);
+            moduleFs.promises.writeFile(file, src);
+        }
+    });
+}());
+' "$@" # '
+)}

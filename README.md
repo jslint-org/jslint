@@ -163,8 +163,6 @@ import fs from "fs";
 
 - [help.html](help.html) describes JSLint's usage. Please [read it](https://jslint-org.github.io/jslint/help.html).
 
-- [function.html](function.html) describes the jslint function and the results it produces.
-
 JSLint can be run anywhere that JavaScript (or Java) can run.
 
 The place to express yourself in programming is in the quality of your ideas and
