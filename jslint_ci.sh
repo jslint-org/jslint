@@ -230,6 +230,7 @@ import moduleUrl from "url";
 shCiArtifactUpload() {(set -e
 # this function will upload build-artifacts to branch-gh-pages
     local BRANCH
+    local FILE
     node --input-type=module -e '
 process.exit(Number(
     `${process.version.split(".")[0]}.${process.arch}.${process.platform}`
@@ -302,6 +303,15 @@ import moduleChildProcess from "child_process";
     then
         rm -rf .artifact
         git checkout beta .
+        # update apidoc.html
+        for FILE in apidoc.html
+        do
+            if [ -f ".artifact/$FILE" ]
+            then
+                cp -a ".artifact/$FILE" .
+                git add -f "$FILE"
+            fi
+        done
     fi
     # update README.md with branch-$BRANCH and $GITHUB_REPOSITORY
     sed -i \
