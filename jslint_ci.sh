@@ -752,9 +752,9 @@ import moduleUrl from "url";
     };
 }());
 (async function httpFileServer() {
-/*
- * this function will start http-file-server
- */
+
+// this function will start http-file-server
+
     let contentTypeDict = {
         ".bmp": "image/bmp",
         ".cjs": "application/javascript; charset=utf-8",
@@ -840,9 +840,9 @@ import moduleUrl from "url";
     }).listen(process.env.PORT);
 }());
 (function jslintDir() {
-/*
- * this function will jslint current-directory
- */
+
+// this function will jslint current-directory
+
     moduleFs.stat((
         process.env.HOME + "/jslint.mjs"
     ), function (ignore, exists) {
@@ -858,9 +858,9 @@ import moduleUrl from "url";
     });
 }());
 (function replStart() {
-/*
- * this function will start repl-debugger
- */
+
+// this function will start repl-debugger
+
     let that;
     // start repl
     that = moduleRepl.start({
@@ -956,9 +956,9 @@ import moduleUrl from "url";
     };
 }());
 (function watchDir() {
-/*
- * this function will watch current-directory for changes
- */
+
+// this function will watch current-directory for changes
+
     moduleFs.readdir(".", function (ignore, fileList) {
         fileList.forEach(function (file) {
             if (file[0] === ".") {

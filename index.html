@@ -8,10 +8,10 @@
     content="JSLint, The JavaScript Code Quality Tool. This file allows JSLint
     to be run from a web browser. It can accept a source program and analyze
     it without sending it over the network."
-/>
-<meta name="author" content="Douglas Crockford"/>
-<link rel="icon" type="image/png" href="asset_image_logo_512.svg"/>
-<title>JSLint:&nbsp;The&nbsp;JavaScript&nbsp;Code Quality Tool</title>
+>
+<meta name="author" content="Douglas Crockford">
+<link rel="icon" type="image/png" href="asset_image_logo_512.svg">
+<title>JSLint: The JavaScript Code Quality Tool</title>
 <!-- Google Lighthouse Performance - Reduce Largest Contentful Paint. -->
 <link as="script" rel="preload" href="asset_codemirror_rollup.js">
 <link rel="modulepreload" href="jslint.mjs">
@@ -1175,9 +1175,10 @@ body {
 /*jslint beta, browser*/
 
 /*property
+    jslint_edition,
     CodeMirror, Pos, Tab, addEventListener, checked, click, closest, column,
     ctrlKey, currentTarget, dispatchEvent, display, dom_style_report_unmatched,
-    edition, editor, error, extraKeys, focus, forEach, from, fromTextArea,
+    editor, error, extraKeys, focus, forEach, from, fromTextArea,
     globals, gutters, indentSelection, indentUnit, indentWithTabs, innerHTML,
     jslint, key, length, line, lineNumbers, lineWrapping, lint, lintOnChange,
     map, matchBrackets, message, metaKey, mode, mode_stop, name, offsetWidth,
@@ -1326,7 +1327,7 @@ function jslint_ui_onresize() {
 // Init edition.
 
     document.querySelector("#JSLINT_EDITION").textContent = (
-        "Edition: " + jslint.edition
+        "Edition: " + jslint.jslint_edition
     );
 
 // Init mode_debug.
@@ -1477,7 +1478,7 @@ eval("console.log(\\"hello world\\");");
             }).setEncoding("utf8");
         }).end();
     });
-    result = jslint(result);
+    result = jslint.jslint(result);
     result.warnings.forEach(function ({
         formatted_message
     }) {

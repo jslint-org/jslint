@@ -3,6 +3,7 @@
 # Todo
 - cli - add cli-command `--mode-coverage-report`
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
+- jslint - replace regexp-warning against ` ` to regexp-warning against `\t`
 - jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning requiring paren around comma-separated concatenations.
@@ -12,6 +13,8 @@
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 
 # v2021.10.1-beta
+- doc - add api-documentation
+- jslint - relax regexp-warning against using 'space'
 - ci - rename dir .build/ to .artifact/
 - fs - merge file asset_codemirror_rollup.css into index.html
 - fs - merge file function.html into help.html

@@ -20,13 +20,14 @@ Douglas Crockford <douglas@crockford.com>
 # Table of Contents
 1. [Web Demo](#web-demo)
 2. [Web Demo Archived](#web-demo-archived)
-3. [JSLint Install](#jslint-install)
-4. [JSLint Report](#jslint-report)
-5. [JSLint Vim Plugin](#jslint-vim-plugin)
-6. [Description](#description)
-7. [Package Listing](#package-listing)
-8. [Changelog](#changelog)
-9. [License](#license)
+3. [Api Documentation](#api-documentation)
+4. [JSLint Install](#jslint-install)
+5. [JSLint Report](#jslint-report)
+6. [JSLint Vim Plugin](#jslint-vim-plugin)
+7. [Description](#description)
+8. [Package Listing](#package-listing)
+9. [Changelog](#changelog)
+10. [License](#license)
 
 
 # Web Demo
@@ -39,6 +40,12 @@ Douglas Crockford <douglas@crockford.com>
 - [Web Demo 2020](https://www.jslint.com/branch-v2020.11.6/index.html)
 - [Web Demo 2014 (ES5 only)](https://www.jslint.com/branch-v2014.7.8/jslint.html)
 - [Web Demo 2013 (ES5, CSS, HTML)](https://www.jslint.com/branch-v2013.3.13/jslint.html)
+
+
+# Api Documentation
+- https://jslint-org.github.io/jslint/branch-beta/.artifact/apidoc.html
+
+[![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fapidoc.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/apidoc.html)
 
 
 # JSLint Install
@@ -76,7 +83,7 @@ let globals = ["caches", "indexedDb"];
 let options = {browser: true};
 let result;
 let source = "console.log(\u0027hello world\u0027);\n";
-result = jslint(source, options, globals);
+result = jslint.jslint(source, options, globals);
 result.warnings.forEach(function ({
     formatted_message
 }) {
@@ -115,7 +122,7 @@ node jslint.mjs --mode-report hello.js
 
 - screenshot file `.jslint_report.html`
 
-![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_install_cli_report.png)
+![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.jslint_report.html.png)
 
 
 ### To create human-readable, html-report programmatically:
@@ -131,8 +138,8 @@ import fs from "fs";
     let report;
     let result;
     let source = "function foo() {console.log(\u0027hello world\u0027);}\n";
-    result = jslint(source);
-    report = jslint.report(result);
+    result = jslint.jslint(source);
+    report = jslint.jslint_report(result);
     await fs.promises.writeFile(".jslint_report.html", report);
     console.error("jslint - created html-report .jslint_report.html");
 }());
