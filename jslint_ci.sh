@@ -353,12 +353,12 @@ import moduleFs from "fs";
 (async function () {
     let data = await moduleFs.promises.readFile("README.md", "utf8");
     data = data.replace((
-        /\n#\u0020Table\u0020of\u0020Contents$[\S\s]*?\n\n\n/m
+        /\n# Table of Contents$[\S\s]*?\n\n\n/m
     ), function () {
         let ii = -1;
         let toc = "\n# Table of Contents\n";
         data.replace((
-            /\n\n\n#\u0020(.*)/g
+            /\n\n\n# (.*)/g
         ), function (ignore, match1) {
             if (match1 === "Table of Contents") {
                 ii += 1;
@@ -369,9 +369,9 @@ import moduleFs from "fs";
             }
             ii += 1;
             toc += ii + ". [" + match1 + "](#" + match1.toLowerCase().replace((
-                /[^\u0020\-0-9A-Z_a-z]/g
+                /[^ \-0-9A-Z_a-z]/g
             ), "").replace((
-                /\u0020/g
+                / /g
             ), "-") + ")\n";
             return "";
         });
@@ -381,6 +381,7 @@ import moduleFs from "fs";
     await moduleFs.promises.writeFile("README.md", data);
 }());
 ' "$@" # '
+    git diff
 )}
 
 shCiBaseCustom() {(set -e
@@ -574,7 +575,7 @@ import moduleChildProcess from "child_process";
         }).setEncoding("utf8");
     });
     result = Array.from(result.matchAll(
-        /^(\S+?)\u0020+?\S+?\u0020+?\S+?\u0020+?(\S+?)\t(\S+?)$/gm
+        /^(\S+?) +?\S+? +?\S+? +?(\S+?)\t(\S+?)$/gm
     )).map(function ([
         ignore, mode, size, file
     ]) {
@@ -752,9 +753,9 @@ import moduleUrl from "url";
     };
 }());
 (async function httpFileServer() {
-/*
- * this function will start http-file-server
- */
+
+// this function will start http-file-server
+
     let contentTypeDict = {
         ".bmp": "image/bmp",
         ".cjs": "application/javascript; charset=utf-8",
@@ -840,9 +841,9 @@ import moduleUrl from "url";
     }).listen(process.env.PORT);
 }());
 (function jslintDir() {
-/*
- * this function will jslint current-directory
- */
+
+// this function will jslint current-directory
+
     moduleFs.stat((
         process.env.HOME + "/jslint.mjs"
     ), function (ignore, exists) {
@@ -858,9 +859,9 @@ import moduleUrl from "url";
     });
 }());
 (function replStart() {
-/*
- * this function will start repl-debugger
- */
+
+// this function will start repl-debugger
+
     let that;
     // start repl
     that = moduleRepl.start({
@@ -877,7 +878,7 @@ import moduleUrl from "url";
     // hook custom-eval-function
     that.eval = function (script, context, file, onError) {
         script.replace((
-            /^(\S+)\u0020(.*?)\n/
+            /^(\S+) (.*?)\n/
         ), function (ignore, match1, match2) {
             switch (match1) {
             // syntax-sugar - run shell-cmd
@@ -897,7 +898,7 @@ import moduleUrl from "url";
                     break;
                 }
                 match2 = match2.replace((
-                    /^git\u0020/
+                    /^git /
                 ), "git --no-pager ");
                 // run shell-cmd
                 console.error("$ " + match2);
@@ -956,9 +957,9 @@ import moduleUrl from "url";
     };
 }());
 (function watchDir() {
-/*
- * this function will watch current-directory for changes
- */
+
+// this function will watch current-directory for changes
+
     moduleFs.readdir(".", function (ignore, fileList) {
         fileList.forEach(function (file) {
             if (file[0] === ".") {
@@ -1330,11 +1331,11 @@ import modulePath from "path";
         ), "\n");
         // remove trailing-whitespace
         result = result.replace((
-            /[\t\u0020]+$/gm
+            /[\t ]+$/gm
         ), "");
         // remove leading-newline before ket
         result = result.replace((
-            /\n+?(\n\u0020*?\})/g
+            /\n+?(\n *?\})/g
         ), "$1");
         // eslint - no-multiple-empty-lines
         // https://github.com/eslint/eslint/blob/v7.2.0/docs/rules/no-multiple-empty-lines.md //jslint-quiet
@@ -1433,7 +1434,7 @@ import modulePath from "path";
         // init footer
         result = header + result;
         matchObj.input.replace((
-            /\n\/\*\nfile\u0020none\n\*\/\n\/\*jslint-enable\*\/\n([\S\s]+)/
+            /\n\/\*\nfile none\n\*\/\n\/\*jslint-enable\*\/\n([\S\s]+)/
         ), function (ignore, match1) {
             result += "\n\n" + match1.trim() + "\n";
         });
@@ -1442,7 +1443,7 @@ import modulePath from "path";
     });
 }());
 ' "$@" # '
-    git diff 2>/dev/null || true
+    git diff
 )}
 
 shRmDsStore() {(set -e

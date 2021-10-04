@@ -1,4 +1,4 @@
-/*jslint node*/
+/*jslint beta, node*/
 import moduleFs from "fs";
 import jslint from "./jslint.mjs";
 
@@ -29,7 +29,7 @@ function noop(val) {
         assertOrThrow(exitCode === 1, exitCode);
     }
     // test null-case handling-behavior
-    jslint.cli({
+    jslint.jslint_cli({
         mode_noop: true,
         process_exit: processExit0
     });
@@ -38,31 +38,56 @@ function noop(val) {
         "jslint.mjs",   // test file handling-behavior
         undefined       // test file-undefined handling-behavior
     ].forEach(function (file) {
-        jslint.cli({
+        jslint.jslint_cli({
             console_error: noop,        // suppress error
             file,
             mode_cli: true,
             process_exit: processExit0
         });
     });
-    // test file-error handling-behavior
-    jslint.cli({
-        // suppress error
-        console_error: noop,
-        file: "undefined",
+    // test apidoc handling-behavior
+    jslint.jslint_cli({
         mode_cli: true,
-        process_exit: processExit1
+        process_argv: [
+            "node",
+            "jslint.mjs",
+            "jslint_apidoc",
+            JSON.stringify({
+                example_list: [
+                    "README.md",
+                    "test.mjs",
+                    "jslint.mjs"
+                ],
+                github_repo: "https://github.com/jslint-org/jslint",
+                module_list: [
+                    {
+                        pathname: "./jslint.mjs"
+                    }
+                ],
+                package_name: "JSLint",
+                version: jslint.jslint_edition
+            })
+        ],
+        process_exit: processExit0
     });
     // test cjs handling-behavior
-    jslint.cli({
+    jslint.jslint_cli({
         cjs_module: {
             exports: {}
         },
         cjs_require: {},
         process_exit: processExit0
     });
+    // test file-error handling-behavior
+    jslint.jslint_cli({
+        // suppress error
+        console_error: noop,
+        file: "undefined",
+        mode_cli: true,
+        process_exit: processExit1
+    });
     // test syntax-error handling-behavior
-    jslint.cli({
+    jslint.jslint_cli({
         // suppress error
         console_error: noop,
         file: "syntax-error.js",
@@ -74,7 +99,7 @@ function noop(val) {
         source: "syntax error"
     });
     // test report handling-behavior
-    jslint.cli({
+    jslint.jslint_cli({
         // suppress error
         console_error: noop,
         mode_cli: true,
@@ -87,7 +112,7 @@ function noop(val) {
         process_exit: processExit0
     });
     // test report-error handling-behavior
-    jslint.cli({
+    jslint.jslint_cli({
         // suppress error
         console_error: noop,
         mode_cli: true,
@@ -101,7 +126,7 @@ function noop(val) {
         source: "syntax error"
     });
     // test report-json handling-behavior
-    jslint.cli({
+    jslint.jslint_cli({
         // suppress error
         console_error: noop,
         mode_cli: true,
@@ -115,7 +140,7 @@ function noop(val) {
         source: "[]"
     });
     // test report-misc handling-behavior
-    jslint.cli({
+    jslint.jslint_cli({
         // suppress error
         console_error: noop,
         mode_cli: true,
@@ -129,7 +154,7 @@ function noop(val) {
         source: "(aa)=>aa; function aa([aa]){}"
     });
     // test report-json-error handling-behavior
-    jslint.cli({
+    jslint.jslint_cli({
         // suppress error
         console_error: noop,
         mode_cli: true,
@@ -143,7 +168,7 @@ function noop(val) {
         source: "["
     });
     // test vim-plugin handling-behavior
-    jslint.cli({
+    jslint.jslint_cli({
         // suppress error
         console_error: noop,
         mode_cli: true,
@@ -308,7 +333,7 @@ function noop(val) {
                 elemPrv, code
             ], undefined, 4));
             elemPrv = code;
-            warnings = jslint(code, {
+            warnings = jslint.jslint(code, {
                 beta: true
             }).warnings;
             assertOrThrow(
@@ -363,7 +388,7 @@ function noop(val) {
             String(
                 await moduleFs.promises.readFile("jslint.mjs", "utf8")
             ).replace((
-                /\u0020{4}/g
+                /    /g
             ), "  "),
             {indent2: true},
             []
@@ -424,8 +449,12 @@ function noop(val) {
         option_dict.beta = true;
         // test jslint's option handling-behavior
         assertOrThrow(
-            jslint(source, option_dict, global_list).warnings.length === 0,
-            "jslint(" + JSON.stringify([
+            jslint.jslint(
+                source,
+                option_dict,
+                global_list
+            ).warnings.length === 0,
+            "jslint.jslint(" + JSON.stringify([
                 source, option_dict, global_list
             ]) + ")"
         );
@@ -443,9 +472,9 @@ function noop(val) {
                 /^#!/
             ), "//")
         );
-        assertOrThrow(jslint(source).warnings.length === 0, source);
+        assertOrThrow(jslint.jslint(source).warnings.length === 0, source);
     });
-    assertOrThrow(jslint("", {
+    assertOrThrow(jslint.jslint("", {
         test_internal_error: true
     }).warnings.length === 1);
 }());
@@ -458,7 +487,7 @@ function noop(val) {
     String(
         await moduleFs.promises.readFile("jslint.mjs", "utf8")
     ).replace((
-        /(\n\s*?\/\/\s*?test_cause:\s*?)(\S[\S\s]*?\S)(\n\n\s*?)\u0020*?\S/g
+        /(\n\s*?\/\/\s*?test_cause:\s*?)(\S[\S\s]*?\S)(\n\n\s*?) *?\S/g
     ), function (match0, header, causeList, footer) {
         let tmp;
         // console.error(match0);
@@ -468,7 +497,7 @@ function noop(val) {
         assertOrThrow(footer === "\n\n", match0);
         // Validate causeList.
         causeList = causeList.replace((
-            /^\/\/\u0020/gm
+            /^\/\/ /gm
         ), "").replace((
             /^\["\n([\S\s]*?)\n"(,.*?)$/gm
         ), function (ignore, source, param) {
@@ -476,7 +505,7 @@ function noop(val) {
             assertOrThrow(source.length > (80 - 3), source);
             return source;
         }).replace((
-            /\u0020\/\/jslint-quiet$/gm
+            / \/\/jslint-quiet$/gm
         ), "");
         tmp = causeList.split("\n").map(function (cause) {
             return (
@@ -490,7 +519,7 @@ function noop(val) {
         assertOrThrow(causeList === tmp, "\n" + causeList + "\n\n" + tmp);
         causeList.split("\n").forEach(function (cause) {
             cause = JSON.parse(cause);
-            tmp = jslint(cause[0], {
+            tmp = jslint.jslint(cause[0], {
                 beta: true,
                 test_cause: true
             }).causes;

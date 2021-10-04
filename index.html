@@ -8,10 +8,10 @@
     content="JSLint, The JavaScript Code Quality Tool. This file allows JSLint
     to be run from a web browser. It can accept a source program and analyze
     it without sending it over the network."
-/>
-<meta name="author" content="Douglas Crockford"/>
-<link rel="icon" type="image/png" href="asset_image_logo_512.svg"/>
-<title>JSLint:&nbsp;The&nbsp;JavaScript&nbsp;Code Quality Tool</title>
+>
+<meta name="author" content="Douglas Crockford">
+<link rel="icon" type="image/png" href="asset_image_logo_512.svg">
+<title>JSLint: The JavaScript Code Quality Tool</title>
 <!-- Google Lighthouse Performance - Reduce Largest Contentful Paint. -->
 <link as="script" rel="preload" href="asset_codemirror_rollup.js">
 <link rel="modulepreload" href="jslint.mjs">
@@ -1175,15 +1175,16 @@ body {
 /*jslint beta, browser*/
 
 /*property
+    jslint_edition, jslint_report,
     CodeMirror, Pos, Tab, addEventListener, checked, click, closest, column,
     ctrlKey, currentTarget, dispatchEvent, display, dom_style_report_unmatched,
-    edition, editor, error, extraKeys, focus, forEach, from, fromTextArea,
+    editor, error, extraKeys, focus, forEach, from, fromTextArea,
     globals, gutters, indentSelection, indentUnit, indentWithTabs, innerHTML,
     jslint, key, length, line, lineNumbers, lineWrapping, lint, lintOnChange,
     map, matchBrackets, message, metaKey, mode, mode_stop, name, offsetWidth,
     onclick, onkeyup, outerHTML, performLint, preventDefault, push,
     querySelector, querySelectorAll, registerHelper, replace, replaceSelection,
-    report, result, reverse, search, setSize, setValue, severity,
+    result, reverse, search, setSize, setValue, severity,
     showTrailingSpace, somethingSelected, sort, split, stopPropagation, style,
     target, test, textContent, to, trim, value, warnings, width
 */
@@ -1208,7 +1209,7 @@ function dom_style_report_unmatched() {
         elem.innerHTML.replace((
             /\/\*[\S\s]*?\*\/|;|\}/g
         ), "\n").replace((
-            /^([^\n\u0020@].*?)[,{:].*?$/gm
+            /^([^\n @].*?)[,{:].*?$/gm
         ), function (match0, match1) {
             let ii;
             try {
@@ -1217,7 +1218,7 @@ function dom_style_report_unmatched() {
                 console.error(match1 + "\n" + err); //jslint-quiet
             }
             if (ii <= 1 && !(
-                /^0\u0020(?:(body\u0020>\u0020)?(?:\.button|\.readonly|\.styleColorError|\.textarea|\.uiAnimateSlide|a|base64|body|code|div|input|pre|textarea)(?:,|\u0020\{))|^[1-9]\d*?\u0020#/m
+                /^0 (?:(body > )?(?:\.button|\.readonly|\.styleColorError|\.textarea|\.uiAnimateSlide|a|base64|body|code|div|input|pre|textarea)(?:,| \{))|^[1-9]\d*? #/m
             ).test(ii + " " + match0)) {
                 style_list.push(ii + " " + match0);
             }
@@ -1290,7 +1291,7 @@ async function jslint_ui_call() {
 
         document.querySelector(
             "#JSLINT_REPORT_HTML"
-        ).outerHTML = jslint.report(jslint_option_dict.result);
+        ).outerHTML = jslint.jslint_report(jslint_option_dict.result);
         jslint_ui_onresize();
     } catch (err) {
         console.error(err); //jslint-quiet
@@ -1326,7 +1327,7 @@ function jslint_ui_onresize() {
 // Init edition.
 
     document.querySelector("#JSLINT_EDITION").textContent = (
-        "Edition: " + jslint.edition
+        "Edition: " + jslint.jslint_edition
     );
 
 // Init mode_debug.
@@ -1477,7 +1478,7 @@ eval("console.log(\\"hello world\\");");
             }).setEncoding("utf8");
         }).end();
     });
-    result = jslint(result);
+    result = jslint.jslint(result);
     result.warnings.forEach(function ({
         formatted_message
     }) {

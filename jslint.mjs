@@ -94,39 +94,36 @@
 /*jslint beta, node*/
 
 /*property
-    causes, console_log,
-    global_list,
-    log,
-    max, min, mode_report, mode_vim_plugin,
-    process_argv,
-    report,
-    stringify,
-    test_cause, trace,
-    writeFile,
-    JSLINT_BETA, a, all, argv, arity, artifact, assign, async,
-    b, beta, bind, bitwise, block, body, browser, c, calls, catch, catch_list,
-    catch_stack, cjs_module, cjs_require, cli, closer, closure, code, column,
-    concat, console_error, constant, context, convert, couch, create, cwd, d,
+    JSLINT_BETA, a, all, argv, arity, artifact, assign, async, b, beta, bitwise,
+    block, body, browser, c, calls, catch, catch_list, catch_stack, causes,
+    cjs_module, cjs_require, closer, closure, code, column, concat,
+    console_error, console_log, constant, context, convert, create, cwd, d,
     dead, default, devel, directive, directive_list, directive_quiet,
-    directives, disrupt, dot, edition, ellipsis, else, endsWith, env, error,
-    eval, every, exec, execArgv, exit, export_dict, exports, expression, extra,
-    file, fileURLToPath, filter, finally, flag, for, forEach, formatted_message,
-    free, freeze, from, froms, fud, function_list, function_stack, functions,
-    getset, global, global_dict, id, identifier, import, import_list, inc,
-    indent2, index, indexOf, init, initial, isArray, isNaN, is_equal, is_weird,
-    join, jslint, json, keys, label, statement_prv, lbp, led, length, level,
-    line, line_list, line_offset, line_source, lines, live, long, loop, m, main,
-    map, margin, match, message, meta, mode_cli, mode_json, mode_module,
-    mode_noop, mode_property, mode_shebang, mode_stop, module, name, names,
-    node, now, nr, nud, ok, open, opening, option, option_dict, order, padStart,
-    parameters, parent, pop, process_exit, promises, property, property_dict,
-    push, quote, readFile, readdir, reduce, repeat, replace, resolve, role,
-    search, shebang, signature, single, slice, some, sort, source, split, stack,
-    stack_trace, startsWith, statement, stop, stop_at, switch, syntax_dict,
-    tenure, test, test_internal_error, this, thru, token, token_global,
-    token_list, token_nxt, token_tree, tokens, tree, trim, trimRight, try, type,
-    unordered, url, used, value, variable, versions, warn, warn_at, warning,
-    warning_list, warnings, white, wrapped, readonly
+    directives, disrupt, dot, edition, elem_list, ellipsis, else, endsWith, env,
+    error, eval, every, example_list, exec, execArgv, exit, export_dict,
+    exports, expression, extra, file, fileURLToPath, filter, finally, flag, for,
+    forEach, formatted_message, free, freeze, from, froms, fud, function_list,
+    function_stack, functions, getset, github_repo, global, global_dict,
+    global_list, id, identifier, import, import_list, inc, indent2, index,
+    indexOf, init, initial, isArray, isNaN, is_equal, is_weird, join, jslint,
+    jslint_apidoc, jslint_cli, jslint_edition, jslint_phase1_split,
+    jslint_phase2_lex, jslint_phase3_parse, jslint_phase4_walk,
+    jslint_phase5_whitage, jslint_report, json, keys, label, lbp, led, length,
+    level, line, line_list, line_offset, line_source, lines, live, log, long,
+    loop, m, main, map, margin, match, max, message, meta, min, mkdir, mode_cli,
+    mode_json, mode_module, mode_noop, mode_property, mode_report, mode_shebang,
+    mode_stop, mode_vim_plugin, module, module_list, module_name, name, names,
+    node, now, nr, nud, ok, open, opening, option, option_dict, order,
+    package_name, padStart, parameters, parent, parse, pathname, pop,
+    process_argv, process_exit, promises, property, property_dict, push, quote,
+    readFile, readdir, readonly, recursive, reduce, repeat, replace, resolve,
+    role, search, shebang, signature, single, slice, some, sort, source, split,
+    stack, stack_trace, startsWith, statement, statement_prv, stop, stop_at,
+    stringify, switch, syntax_dict, tenure, test, test_cause,
+    test_internal_error, this, thru, toString, token, token_global, token_list,
+    token_nxt, token_tree, tokens, trace, tree, trim, trimEnd, trimRight, try,
+    type, unordered, url, used, value, variable, version, versions, warn,
+    warn_at, warning, warning_list, warnings, white, wrapped, writeFile
 */
 
 let jslint_charset_ascii = (
@@ -166,6 +163,19 @@ function empty() {
 // 'constructor' are completely avoided.
 
     return Object.create(null);
+}
+
+function html_escape(str) {
+
+// This function will make <str> html-safe by escaping & < >.
+
+    return String(str).replace((
+        /&/g
+    ), "&amp;").replace((
+        /</g
+    ), "&lt;").replace((
+        />/g
+    ), "&gt;");
 }
 
 function jslint(
@@ -413,9 +423,9 @@ function jslint(
         if (option_dict.test_cause) {
             cause_dict[JSON.stringify([
                 String(new Error().stack).replace((
-                    /^\u0020{4}at\u0020(?:file|stop|stop_at|test_cause|warn|warn_at)\b.*?\n/gm
+                    /^    at (?:file|stop|stop_at|test_cause|warn|warn_at)\b.*?\n/gm
                 ), "").match(
-                    /\n\u0020{4}at\u0020((?:Object\.\w+?_)?\w+?)\u0020/
+                    /\n    at ((?:Object\.\w+?_)?\w+?) /
                 )[1].replace((
                     /^Object\./
                 ), ""),
@@ -981,6 +991,336 @@ function jslint(
     };
 }
 
+// PR-362 - Add api-documentation.
+
+async function jslint_apidoc({
+    example_list,
+    github_repo,
+    module_list,
+    package_name,
+    version
+}) {
+
+// This function will create api-documentation from <module_list>.
+    let elem_ii = 0;
+    let html;
+    let module_fs = await import("fs");
+    let module_path = await import("path");
+
+    function elem_create(module_obj, module_name, key) {
+
+// This function will create apidoc-elem in given <module_obj>.
+
+        let example = "N/A";
+        let id = encodeURIComponent("apidoc.elem." + module_name + "." + key);
+        let name;
+        let signature;
+        let source;
+        name = html_escape((typeof module_obj[key]) + " " + key);
+        if (typeof module_obj[key] !== "function") {
+            return {
+                name,
+                signature: (`
+<a class="apidocElementLiA" href="#${id}">
+${name}
+</a>
+                `),
+                source: (`
+<li>
+    <h2>
+    <a href="#${id}" id="${id}">
+    ${name}
+    </a>
+    </h2>
+</li>
+                `)
+            };
+        }
+        // init source
+        source = html_escape(trim_start(module_obj[key].toString()));
+        // init signature
+        source = source.replace((
+            /(\([\S\s]*?\)) \{/
+        ), function (match0, match1) {
+            signature = html_escape(
+                match1.replace((
+                    / *?\/\*[\S\s]*?\*\/ */g
+                ), "").replace((
+                    / *?\/\/.*/g
+                ), "").replace((
+                    /\n{2,}/g
+                ), "\n")
+            );
+            return match0;
+        });
+        // init comment
+        source = source.replace((
+            /\n(?:\/\/.*?\n)+\n/
+        ), "<span class=\"apidocCodeCommentSpan\">$&</span>");
+        // init example
+        example_list.some(function (example2) {
+            example2.replace(
+                new RegExp((
+                    "((?:\\n.*?){8}(function )?)\\b"
+                    + key
+                    + "(\\((?:.*?\\n){8})"
+                ), "g"),
+                function (ignore, header, isDeclaration, footer) {
+                    if (!isDeclaration) {
+                        example = "..." + trim_start(
+                            html_escape(header)
+                            + "<span class=\"apidocCodeKeywordSpan\">"
+                            + html_escape(key)
+                            + "</span>"
+                            + html_escape(footer)
+                        ).trimEnd() + "\n...";
+                    }
+                    return "";
+                }
+            );
+            return example !== "N/A";
+        });
+        if (source.length > 2048) {
+            source = source.slice(0, 2048) + "...\n}\n";
+        }
+        return {
+            name,
+            signature: (`
+<a class="apidocElementLiA" href="#${id}">
+${name}<span class="apidocSignatureSpan">${signature}</span>
+</a>
+            `),
+            source: (`
+<li>
+    <h2>
+    <a href="#${id}" id="${id}">
+    ${name}<span class="apidocSignatureSpan">${signature}</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">${source}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">${example}</pre></li>
+            `)
+        };
+    }
+
+    function trim_start(str) {
+
+// This function will normalize whitespace before <str>.
+
+        let whitespace = "";
+        str.trim().replace((
+            /^ */gm
+        ), function (match0) {
+            if (whitespace === "" || match0.length < whitespace.length) {
+                whitespace = match0;
+            }
+            return "";
+        });
+        str = str.replace(new RegExp("^" + whitespace, "gm"), "");
+        return str;
+    }
+
+    // html-escape param
+    github_repo = html_escape(github_repo);
+    package_name = html_escape(package_name);
+    version = html_escape(version);
+    // init example_list
+    example_list = await Promise.all(example_list.map(async function (file) {
+
+// This function will read example from given file.
+
+        let result = await module_fs.promises.readFile(file, "utf8");
+        result = (
+            "\n\n\n\n\n\n\n\n"
+            // bug-workaround - truncate example to manageable size
+            + result.slice(0, 262144)
+            + "\n\n\n\n\n\n\n\n"
+        );
+        result = result.replace((
+            /\r\n*/g
+        ), "\n");
+        return result;
+    }));
+    // init module_list
+    module_list = await Promise.all(module_list.map(async function ({
+        pathname
+    }) {
+        let module_name = html_escape(JSON.stringify(pathname));
+        let module_obj = await import(pathname);
+        if (module_obj.default) {
+            module_obj = module_obj.default;
+        }
+        return {
+            elem_list: Object.keys(module_obj).map(function (key) {
+                return elem_create(module_obj, module_name, key);
+            }).sort(function (aa, bb) {
+                return (
+                    aa.name < bb.name
+                    ? -1
+                    : 1
+                );
+            }).map(function (elem) {
+                elem_ii += 1;
+                elem.signature = elem.signature.replace(
+                    ">",
+                    ">" + elem_ii + ". "
+                );
+                elem.source = elem.source.replace(
+                    "\">",
+                    "\">" + elem_ii + ". "
+                );
+                return elem;
+            }),
+            id: encodeURIComponent("apidoc.module." + module_name),
+            module_name
+        };
+    }));
+    html = (`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="${package_name} api documentation">
+<title>${package_name} apidoc</title>
+<style>
+/*csslint*/
+body {
+    border: 1px solid #777;
+    margin: 0;
+    padding: 20px;
+}
+.apidocCodeCommentSpan,
+.apidocCodeKeywordSpan {
+    background: royalblue;
+    color: white;
+}
+.apidocCodeCommentSpan {
+    display: block;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    font-size: 14px;
+    overflow-wrap: break-word;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocDiv {
+    color: #555;
+    font-family: sans-serif;
+}
+.apidocDiv a[href] {
+    color: royalblue;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocDiv li a {
+    display: inline-block;
+    padding: 8px 0;
+}
+.apidocDiv ul {
+    list-style: none;
+    padding-left: 20px;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleA {
+    font-size: 24px;
+    font-weight: bold;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #666;
+    white-space: pre-wrap;
+}
+</style>
+</head>
+<body>
+<div class="apidocDiv">
+<h1>API Doc for <a href="${github_repo}">${package_name} (${version})</a></h1>
+<div class="apidocSectionDiv">
+    <a href="#apidocTableOfContents1" id="apidocTableOfContents1">
+        <h1>Table of Contents</h1>
+    </a>
+    <ul>
+    `) + module_list.map(function ({
+        elem_list,
+        id,
+        module_name
+    }) {
+        return (
+            (`
+        <li>
+            <a class="apidocModuleA" href="#${id}">Module ${module_name}</a>
+            <ul>
+            `)
+            + elem_list.map(function ({
+                signature
+            }) {
+                return "<li>\n" + signature + "\n</li>\n";
+            }).join("")
+            + (`
+            </ul>
+        </li>
+            `)
+        );
+    }).join("") + (`
+    </ul>
+</div>
+    `) + module_list.map(function ({
+        elem_list,
+        id,
+        module_name
+    }) {
+        return (
+            (`
+<div class="apidocSectionDiv">
+    <h1><a href="#${id}" id="${id}">Module ${module_name}</a></h1>
+    <ul>
+            `)
+            + elem_list.map(function ({
+                source
+            }) {
+                return source;
+            }).join("")
+            + (`
+    </ul>
+</div>
+            `)
+        );
+    }).join("") + (`
+<div class="apidocFooterDiv">
+    [
+    This document was created with
+    <a href="https://github.com/jslint-org/jslint">JSLint</a>
+    ]
+</div>
+</div>
+</body>
+</html>
+    `);
+    html = html.trim().replace((
+        / +?$/gm
+    ), "") + "\n";
+    await module_fs.promises.mkdir(".artifact", {
+        recursive: true
+    });
+    await module_fs.promises.writeFile(".artifact/apidoc.html", html);
+    console.error(
+        "jslint - created apidoc "
+        + module_path.resolve(".artifact/apidoc.html")
+    );
+}
+
 async function jslint_cli({
     cjs_module,
     cjs_require,
@@ -1042,7 +1382,7 @@ async function jslint_cli({
 // Recursively jslint embedded "node -e '\n...\n'".
 
             code.replace((
-                /\bnode\u0020.*?-e\u0020'\n([\S\s]*?\n)'/gm
+                /\bnode .*? -e '\n([\S\s]*?\n)'/gm
             ), function (ignore, match1, ii) {
                 jslint_from_file({
                     code: match1,
@@ -1163,6 +1503,15 @@ async function jslint_cli({
         )
     ) && !mode_cli) {
         return exit_code;
+    }
+
+    switch (process_argv[2]) {
+
+// PR-362 - Add api-documentation.
+
+    case "jslint_apidoc":
+        await jslint_apidoc(JSON.parse(process_argv[3]));
+        return;
     }
 
 // PR-360 - Add cli-option `--mode-report`.
@@ -1859,13 +2208,14 @@ function jslint_phase2_lex(state) {
                         warn_at("unexpected_a", line, column - 1, "-");
                     }
                     return char_after("]");
-                case " ":
-
-// test_cause:
-// ["aa=/[ ]/", "lex_regexp_bracketed", "expected_a_b", " ", 6]
-
-                    warn_at("expected_a_b", line, column, "\\u0020", " ");
-                    break;
+// PR-362 - Relax regexp-warning against using <space>.
+//                 case " ":
+//
+// // test_cause:
+// // ["aa=/[ ]/", "lex_regexp_bracketed", "expected_a_b", " ", 6]
+//
+//                     warn_at("expected_a_b", line, column, "\\u0020", " ");
+//                     break;
                 case "-":
                 case "/":
                 case "[":
@@ -1936,14 +2286,16 @@ function jslint_phase2_lex(state) {
                 case "/":
                 case "]":
                     return;
-                case " ":
 
-// test_cause:
-// ["aa=/ /", "lex_regexp_group", "expected_a_b", " ", 5]
-
-                    warn_at("expected_a_b", line, column, "\\s", " ");
-                    char_after();
-                    break;
+// PR-362 - Relax regexp-warning against using <space>.
+//                 case " ":
+//
+// // test_cause:
+// // ["aa=/ /", "lex_regexp_group", "expected_a_b", " ", 5]
+//
+//                     warn_at("expected_a_b", line, column, "\\s", " ");
+//                     char_after();
+//                     break;
                 case "$":
                     if (line_source[0] !== "/") {
                         mode_regexp_multiline = true;
@@ -2481,6 +2833,7 @@ function jslint_phase2_lex(state) {
 // Shared with Node.js.
 
                 "AbortController",
+                "DOMException",
                 "Event",
                 "EventTarget",
                 "MessageChannel",
@@ -2504,7 +2857,6 @@ function jslint_phase2_lex(state) {
 // Browser only.
 
                 // "CharacterData",
-                "DOMException",
                 // "DocumentType",
                 // "Element",
                 // "Event",
@@ -2563,31 +2915,35 @@ function jslint_phase2_lex(state) {
 
 // These are the globals that are provided by the language standard.
 // Assign global ECMAScript variables to global_dict.
-// /*jslint beta, node*/
-// import https from "https";
-// (async function () {
-//     let dict = {import: true};
-//     let result = "";
-//     await new Promise(function (resolve) {
-//         https.get((
-//             "https://raw.githubusercontent.com/mdn/content/main/files/"
-//             + "en-us/web/javascript/reference/global_objects/index.html"
-//         ), function (res) {
-//             res.on("data", function (chunk) {
-//                 result += chunk;
-//             }).on("end", resolve).setEncoding("utf8");
-//         });
-//     });
-//     result.replace((
-//         /<li>\{\{JSxRef\("(?:Global_Objects\/)?([^"\/]+?)"/g
-//     ), function (ignore, key) {
-//         if (globalThis.hasOwnProperty(key)) {
-//             dict[key] = true;
-//         }
-//         return "";
-//     });
-//     console.log(JSON.stringify(Object.keys(dict).sort(), undefined, 4));
-// }());
+/*
+node --input-type=module -e '
+// /\*jslint beta, node*\/
+import https from "https";
+(async function () {
+    let dict = {import: true};
+    let result = "";
+    await new Promise(function (resolve) {
+        https.get((
+            "https://raw.githubusercontent.com/mdn/content/main/files/"
+            + "en-us/web/javascript/reference/global_objects/index.md"
+        ), function (res) {
+            res.on("data", function (chunk) {
+                result += chunk;
+            }).on("end", resolve).setEncoding("utf8");
+        });
+    });
+    result.replace((
+        /\n- \{\{JSxRef\("(?:Global_Objects\/)?([^"\/]+?)"/g
+    ), function (ignore, key) {
+        if (globalThis.hasOwnProperty(key)) {
+            dict[key] = true;
+        }
+        return "";
+    });
+    console.log(JSON.stringify(Object.keys(dict).sort(), undefined, 4));
+}());
+'
+*/
 
         case "ecma":
             object_assign_from_list(global_dict, [
@@ -2654,6 +3010,7 @@ function jslint_phase2_lex(state) {
 // Assign global Node.js variables to global_dict.
 /*
 node --input-type=module -e '
+// /\*jslint beta, node*\/
 import moduleHttps from "https";
 (async function () {
     let dict = {};
@@ -2669,7 +3026,7 @@ import moduleHttps from "https";
         });
     });
     result.replace((
-        /\n(?:\*\u0020\[`|##\u0020|##\u0020Class:\u0020)`\w+/g
+        /\n(?:\* \[`|## |## Class: )`\w+/g
     ), function (match0) {
         dict[match0.split("`")[1]] = true;
         return "";
@@ -8262,9 +8619,9 @@ function jslint_report({
     warnings
 }) {
 
-// This function will create html-reports for warnings, properties, and
-// functions from jslint's results.
-// example usage:
+// This function will create human-readable, html-report for warnings,
+// properties, and functions from jslint's results.
+// Example usage:
 //  let result = jslint("console.log('hello world')");
 //  let html = jslint_report(result);
 
@@ -8280,25 +8637,12 @@ function jslint_report({
 // <dt> and <dd> groups, <script>, <template> or <div> elements.
 
                 "<dl>"
-                + "<dt>" + entityify(title) + "</dt>"
+                + "<dt>" + html_escape(title) + "</dt>"
                 + "<dd>" + list.join(", ") + "</dd>"
                 + "</dl>"
             )
             : ""
         );
-    }
-
-    function entityify(str) {
-
-// Replace & < > with less destructive html-entities.
-
-        return String(str).replace((
-            /&/g
-        ), "&amp;").replace((
-            /</g
-        ), "&lt;").replace((
-            />/g
-        ), "&gt;");
     }
 
 // Produce the HTML Error Report.
@@ -8644,11 +8988,11 @@ body {
     }, ii) {
         html += (
             "<cite>"
-            + "<address>" + entityify(line + ": " + column) + "</address>"
-            + entityify((ii + 1) + ". " + message)
+            + "<address>" + html_escape(line + ": " + column) + "</address>"
+            + html_escape((ii + 1) + ". " + message)
             + "</cite>"
             + "<samp>"
-            + entityify(line_source.slice(0, 400) + "\n" + stack_trace)
+            + html_escape(line_source.slice(0, 400) + "\n" + stack_trace)
             + "</samp>\n"
         );
     });
@@ -8742,18 +9086,18 @@ body {
         let list = Object.keys(context);
         let params;
         html += (
-            "<div class=\"level level" + entityify(level) + "\">"
-            + "<address>" + entityify(line) + "</address>"
+            "<div class=\"level level" + html_escape(level) + "\">"
+            + "<address>" + html_escape(line) + "</address>"
             + "<dfn>"
             + (
                 name === "=>"
-                ? entityify(signature) + " =>"
+                ? html_escape(signature) + " =>"
                 : (
                     typeof name === "string"
-                    ? "\u00ab" + entityify(name) + "\u00bb"
-                    : entityify(name.id)
+                    ? "\u00ab" + html_escape(name) + "\u00bb"
+                    : html_escape(name.id)
                 )
-            ) + entityify(signature)
+            ) + html_escape(signature)
             + "</dfn>"
         );
         params = [];
@@ -8814,7 +9158,7 @@ body {
 
 function noop(val) {
 
-// This function will do nothing except return val.
+// This function will do nothing except return <val>.
 
     return val;
 }
@@ -8829,16 +9173,22 @@ function object_assign_from_list(dict, list, val) {
     return dict;
 }
 
-// Export jslint as commonjs/es-module.
+// Export jslint as cjs/esm.
 
 jslint_export = Object.freeze(Object.assign(jslint, {
-    cli: Object.freeze(jslint_cli),
-    edition: jslint_edition,
-    jslint: Object.freeze(jslint.bind(undefined)),
-    report: jslint_report
+    jslint,
+    jslint_apidoc,
+    jslint_cli,
+    jslint_edition,
+    jslint_phase1_split,
+    jslint_phase2_lex,
+    jslint_phase3_parse,
+    jslint_phase4_walk,
+    jslint_phase5_whitage,
+    jslint_report
 }));
-// module.exports = jslint_export;
-export default Object.freeze(jslint_export);
+// module.exports = jslint_export;              // Export jslint as cjs.
+export default Object.freeze(jslint_export);    // Export jslint as esm.
 jslint_import_meta_url = import.meta.url;
 
 // Run jslint_cli.

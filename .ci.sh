@@ -1,12 +1,35 @@
 shArtifactUploadCustom() {(set -e
 # this function will custom-upload build-artifacts to branch-gh-pages
-    # screenshot asset_image_logo
-    shImageLogoCreate &
+    # seo - inline css-assets and invalidate cached-assets
+    node --input-type=module -e '
+import moduleFs from "fs";
+(async function () {
+    let cacheKey = Math.random().toString(36).slice(-4);
+    let fileDict = {};
+    await Promise.all([
+        "index.html"
+    ].map(async function (file) {
+        try {
+            fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
+        } catch (ignore) {
+            process.exit();
+        }
+    }));
+    // invalidate cached-assets
+    fileDict["index.html"] = fileDict["index.html"].replace((
+        /\b(?:href|src)=".+?\.(?:css|js|mjs)\b/g
+    ), function (match0) {
+        return `${match0}?cc=${cacheKey}`;
+    });
+    // write file
+    Object.entries(fileDict).map(function ([
+        file, data
+    ]) {
+        moduleFs.promises.writeFile(file, data);
+    });
+}());
+' "$@" # '
     # screenshot install
-    shBrowserScreenshot \
-        "https://$UPSTREAM_OWNER.github.io/\
-$UPSTREAM_REPO/branch-beta/index.html"
-    # screenshot curl
     node --input-type=module -e '
 import moduleFs from "fs";
 import moduleChildProcess from "child_process";
@@ -26,7 +49,7 @@ echo "\
     Array.from(String(
         await moduleFs.promises.readFile("README.md", "utf8")
     ).matchAll(
-        /\n```shell\u0020<!--\u0020shRunWithScreenshotTxt\u0020(.*?)\u0020-->\n([\S\s]*?\n)```\n/g
+        /\n```shell <!-- shRunWithScreenshotTxt (.*?) -->\n([\S\s]*?\n)```\n/g
     )).forEach(async function ([
         ignore, file, script
     ]) {
@@ -63,39 +86,15 @@ echo "\
     });
 }());
 ' "$@" # '
-    # screenshot asset_image_logo_512.png
-    shBrowserScreenshot .jslint_report.html \
-        --window-size=512x512 \
-        -screenshot=.artifact/screenshot_install_cli_report.png
-    # seo - inline css-assets and invalidate cached-assets
-    node --input-type=module -e '
-import moduleFs from "fs";
-(async function () {
-    let cacheKey = Math.random().toString(36).slice(-4);
-    let fileDict = {};
-    await Promise.all([
-        "index.html"
-    ].map(async function (file) {
-        try {
-            fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
-        } catch (ignore) {
-            process.exit();
-        }
-    }));
-    // invalidate cached-assets
-    fileDict["index.html"] = fileDict["index.html"].replace((
-        /\b(?:href|src)=".+?\.(?:css|js|mjs)\b/g
-    ), function (match0) {
-        return `${match0}?cc=${cacheKey}`;
-    });
-    // write file
-    Object.entries(fileDict).map(function ([
-        file, data
-    ]) {
-        moduleFs.promises.writeFile(file, data);
-    });
-}());
-' "$@" # '
+    # screenshot asset_image_logo
+    shImageLogoCreate &
+    # screenshot web-demo
+    shBrowserScreenshot "https://$UPSTREAM_OWNER.github.io/\
+$UPSTREAM_REPO/branch-beta/index.html"
+    # screenshot jslint_apidoc
+    shBrowserScreenshot .artifact/apidoc.html
+    # screenshot jslint_report
+    shBrowserScreenshot .jslint_report.html --window-size=512x512
     git add -f jslint.cjs jslint.js || true
 )}
 
@@ -139,7 +138,7 @@ import moduleFs from "fs";
         fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
     }));
     Array.from(fileDict["CHANGELOG.md"].matchAll(
-        /\n\n#\u0020(v\d\d\d\d\.\d\d?\.\d\d?(.*?)?)\n/g
+        /\n\n# (v\d\d\d\d\.\d\d?\.\d\d?(.*?)?)\n/g
     )).slice(0, 2).forEach(function ([
         ignore, version, isBeta
     ]) {
@@ -157,7 +156,7 @@ import moduleFs from "fs";
             file: "jslint.mjs",
             // inline css-assets
             src: fileDict["jslint.mjs"].replace((
-                /^let\u0020jslint_edition\u0020=\u0020".*?";$/m
+                /^let jslint_edition = ".*?";$/m
             ), `let jslint_edition = "${versionBeta}";`),
             src0: fileDict["jslint.mjs"]
         }, {
