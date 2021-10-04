@@ -20,10 +20,10 @@ Douglas Crockford <douglas@crockford.com>
 # Table of Contents
 1. [Web Demo](#web-demo)
 2. [Web Demo Archived](#web-demo-archived)
-3. [Api Documentation](#api-documentation)
-4. [JSLint Install](#jslint-install)
-5. [JSLint Report](#jslint-report)
-6. [JSLint Vim Plugin](#jslint-vim-plugin)
+3. [API Doc](#api-doc)
+4. [Quickstart Install](#quickstart-install)
+5. [Quickstart Report](#quickstart-report)
+6. [Plugin Vim](#plugin-vim)
 7. [Description](#description)
 8. [Package Listing](#package-listing)
 9. [Changelog](#changelog)
@@ -42,13 +42,13 @@ Douglas Crockford <douglas@crockford.com>
 - [Web Demo 2013 (ES5, CSS, HTML)](https://www.jslint.com/branch-v2013.3.13/jslint.html)
 
 
-# Api Documentation
-- https://jslint-org.github.io/jslint/branch-beta/.artifact/apidoc.html
+# API Doc
+- https://www.jslint.com/apidoc.html
 
-[![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fapidoc.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/apidoc.html)
+[![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fapidoc.html.png)](https://www.jslint.com/apidoc.html)
 
 
-# JSLint Install
+# Quickstart Install
 ### To install, just download https://www.jslint.com/jslint.mjs and save to file:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_install_download.svg -->
 #!/bin/sh
@@ -107,7 +107,7 @@ node jslint.mjs .
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_install_cli_dir.svg)
 
 
-# JSLint Report
+# Quickstart Report
 ### To create human-readable, html-report from command-line:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_install_cli_report.svg -->
 #!/bin/sh
@@ -151,7 +151,7 @@ import fs from "fs";
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_install_import_report.svg)
 
 
-# JSLint Vim Plugin
+# Plugin Vim
 ### To run jslint inside vim:
 1. Download and save [`jslint.mjs`](https://www.jslint.com/jslint.mjs), [`jslint.vim`](https://www.jslint.com/jslint.vim) to directory `~/.vim/`
 2. Add vim-command `:source ~/.vim/jslint.vim` to file `~/.vimrc`

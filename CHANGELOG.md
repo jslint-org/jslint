@@ -3,7 +3,6 @@
 # Todo
 - cli - add cli-command `--mode-coverage-report`
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
-- jslint - replace regexp-warning against ` ` to regexp-warning against `\t`
 - jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning requiring paren around comma-separated concatenations.

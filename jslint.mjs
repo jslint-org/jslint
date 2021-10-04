@@ -423,9 +423,9 @@ function jslint(
         if (option_dict.test_cause) {
             cause_dict[JSON.stringify([
                 String(new Error().stack).replace((
-                    /^\u0020{4}at\u0020(?:file|stop|stop_at|test_cause|warn|warn_at)\b.*?\n/gm
+                    /^    at (?:file|stop|stop_at|test_cause|warn|warn_at)\b.*?\n/gm
                 ), "").match(
-                    /\n\u0020{4}at\u0020((?:Object\.\w+?_)?\w+?)\u0020/
+                    /\n    at ((?:Object\.\w+?_)?\w+?) /
                 )[1].replace((
                     /^Object\./
                 ), ""),
@@ -991,7 +991,7 @@ function jslint(
     };
 }
 
-// PR-xxx - Add api-documentation.
+// PR-362 - Add api-documentation.
 
 async function jslint_apidoc({
     example_list,
@@ -1009,9 +1009,9 @@ async function jslint_apidoc({
 
     function elem_create(module_obj, module_name, key) {
 
-// This function will create the apidoc-elem in given <module_obj>.
+// This function will create apidoc-elem in given <module_obj>.
 
-        let example;
+        let example = "N/A";
         let id = encodeURIComponent("apidoc.elem." + module_name + "." + key);
         let name;
         let signature;
@@ -1061,26 +1061,25 @@ ${name}
         example_list.some(function (example2) {
             example2.replace(
                 new RegExp(
-                    "((?:\\n.*?){8}(?:\\s\\s|\\S))\\b("
+                    "((?:\\n.*?){8}( function )?)\\b"
                     + key
-                    + ")(\\((?:.*?\\n){8})"
+                    + "(\\((?:.*?\\n){8})"
                 ),
-                function (ignore, match1, match2, match3) {
-                    example = "..." + trim_start(
-                        html_escape(match1)
-                        + "<span class=\"apidocCodeKeywordSpan\">"
-                        + html_escape(match2)
-                        + "</span>"
-                        + html_escape(match3)
-                    ).trimEnd() + "\n...";
+                function (ignore, header, isDeclaration, footer) {
+                    if (!isDeclaration) {
+                        example = "..." + trim_start(
+                            html_escape(header)
+                            + "<span class=\"apidocCodeKeywordSpan\">"
+                            + html_escape(key)
+                            + "</span>"
+                            + html_escape(footer)
+                        ).trimEnd() + "\n...";
+                    }
                     return "";
                 }
             );
-            return example;
+            return example !== "N/A";
         });
-        example = String(example).replace((
-            /^undefined$/
-        ), "N/A");
         if (source.length > 2048) {
             source = source.slice(0, 2048) + "...\n}\n";
         }
@@ -1129,7 +1128,7 @@ ${name}<span class="apidocSignatureSpan">${signature}</span>
     // init example_list
     example_list = await Promise.all(example_list.map(async function (file) {
 
-// This function will read the example from given file.
+// This function will read example from given file.
 
         let result = await module_fs.promises.readFile(file, "utf8");
         result = (
@@ -1209,7 +1208,7 @@ body {
 }
 .apidocDiv li a {
     display: inline-block;
-    padding: 10px 0;
+    padding: 8px 0;
 }
 .apidocCodeCommentSpan {
     background: royalblue;
@@ -1248,9 +1247,7 @@ body {
 </head>
 <body>
 <div class="apidocDiv">
-<h1>Api Documentation for
-    <a href="${github_repo}">${package_name} (${version})</a>
-</h1>
+<h1>API Doc for <a href="${github_repo}">${package_name} (${version})</a></h1>
 <div class="apidocSectionDiv">
     <a href="#apidocTableOfContents1" id="apidocTableOfContents1">
         <h1>Table of Contents</h1>
@@ -1288,18 +1285,16 @@ body {
         return (
             (`
 <div class="apidocSectionDiv">
-<h1><a href="#${id}" id="${id}">Module ${module_name}</a></h1>
-<ul>
+    <h1><a href="#${id}" id="${id}">Module ${module_name}</a></h1>
+    <ul>
             `)
             + elem_list.map(function ({
                 source
             }) {
-                return (`
-${source}
-                `);
+                return source;
             }).join("")
             + (`
-</ul>
+    </ul>
 </div>
             `)
         );
@@ -1388,7 +1383,7 @@ async function jslint_cli({
 // Recursively jslint embedded "node -e '\n...\n'".
 
             code.replace((
-                /\bnode\u0020.*?-e\u0020'\n([\S\s]*?\n)'/gm
+                /\bnode .*? -e '\n([\S\s]*?\n)'/gm
             ), function (ignore, match1, ii) {
                 jslint_from_file({
                     code: match1,
@@ -1513,7 +1508,7 @@ async function jslint_cli({
 
     switch (process_argv[2]) {
 
-// PR-xxx - Add api-documentation.
+// PR-362 - Add api-documentation.
 
     case "jslint_apidoc":
         await jslint_apidoc(JSON.parse(process_argv[3]));
@@ -2214,13 +2209,14 @@ function jslint_phase2_lex(state) {
                         warn_at("unexpected_a", line, column - 1, "-");
                     }
                     return char_after("]");
-                case " ":
-
-// test_cause:
-// ["aa=/[ ]/", "lex_regexp_bracketed", "expected_a_b", " ", 6]
-
-                    warn_at("expected_a_b", line, column, "\\u0020", " ");
-                    break;
+// PR-362 - Relax regexp-warning against using <space>.
+//                 case " ":
+//
+// // test_cause:
+// // ["aa=/[ ]/", "lex_regexp_bracketed", "expected_a_b", " ", 6]
+//
+//                     warn_at("expected_a_b", line, column, "\\u0020", " ");
+//                     break;
                 case "-":
                 case "/":
                 case "[":
@@ -2292,8 +2288,7 @@ function jslint_phase2_lex(state) {
                 case "]":
                     return;
 
-// PR-xxx - Relax regexp-warning against using 'space'.
-
+// PR-362 - Relax regexp-warning against using <space>.
 //                 case " ":
 //
 // // test_cause:

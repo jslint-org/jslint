@@ -49,7 +49,7 @@ echo "\
     Array.from(String(
         await moduleFs.promises.readFile("README.md", "utf8")
     ).matchAll(
-        /\n```shell\u0020<!--\u0020shRunWithScreenshotTxt\u0020(.*?)\u0020-->\n([\S\s]*?\n)```\n/g
+        /\n```shell <!-- shRunWithScreenshotTxt (.*?) -->\n([\S\s]*?\n)```\n/g
     )).forEach(async function ([
         ignore, file, script
     ]) {
@@ -138,7 +138,7 @@ import moduleFs from "fs";
         fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
     }));
     Array.from(fileDict["CHANGELOG.md"].matchAll(
-        /\n\n#\u0020(v\d\d\d\d\.\d\d?\.\d\d?(.*?)?)\n/g
+        /\n\n# (v\d\d\d\d\.\d\d?\.\d\d?(.*?)?)\n/g
     )).slice(0, 2).forEach(function ([
         ignore, version, isBeta
     ]) {
@@ -156,7 +156,7 @@ import moduleFs from "fs";
             file: "jslint.mjs",
             // inline css-assets
             src: fileDict["jslint.mjs"].replace((
-                /^let\u0020jslint_edition\u0020=\u0020".*?";$/m
+                /^let jslint_edition = ".*?";$/m
             ), `let jslint_edition = "${versionBeta}";`),
             src0: fileDict["jslint.mjs"]
         }, {

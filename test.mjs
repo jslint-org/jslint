@@ -388,7 +388,7 @@ function noop(val) {
             String(
                 await moduleFs.promises.readFile("jslint.mjs", "utf8")
             ).replace((
-                /\u0020{4}/g
+                /    /g
             ), "  "),
             {indent2: true},
             []
@@ -487,7 +487,7 @@ function noop(val) {
     String(
         await moduleFs.promises.readFile("jslint.mjs", "utf8")
     ).replace((
-        /(\n\s*?\/\/\s*?test_cause:\s*?)(\S[\S\s]*?\S)(\n\n\s*?)\u0020*?\S/g
+        /(\n\s*?\/\/\s*?test_cause:\s*?)(\S[\S\s]*?\S)(\n\n\s*?) *?\S/g
     ), function (match0, header, causeList, footer) {
         let tmp;
         // console.error(match0);
@@ -497,7 +497,7 @@ function noop(val) {
         assertOrThrow(footer === "\n\n", match0);
         // Validate causeList.
         causeList = causeList.replace((
-            /^\/\/\u0020/gm
+            /^\/\/ /gm
         ), "").replace((
             /^\["\n([\S\s]*?)\n"(,.*?)$/gm
         ), function (ignore, source, param) {
@@ -505,7 +505,7 @@ function noop(val) {
             assertOrThrow(source.length > (80 - 3), source);
             return source;
         }).replace((
-            /\u0020\/\/jslint-quiet$/gm
+            / \/\/jslint-quiet$/gm
         ), "");
         tmp = causeList.split("\n").map(function (cause) {
             return (
