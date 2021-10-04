@@ -1060,11 +1060,11 @@ ${name}
         // init example
         example_list.some(function (example2) {
             example2.replace(
-                new RegExp(
-                    "((?:\\n.*?){8}( function )?)\\b"
+                new RegExp((
+                    "((?:\\n.*?){8}(function )?)\\b"
                     + key
                     + "(\\((?:.*?\\n){8})"
-                ),
+                ), "g"),
                 function (ignore, header, isDeclaration, footer) {
                     if (!isDeclaration) {
                         example = "..." + trim_start(
@@ -1191,6 +1191,22 @@ body {
     margin: 0;
     padding: 20px;
 }
+.apidocCodeCommentSpan,
+.apidocCodeKeywordSpan {
+    background: royalblue;
+    color: white;
+}
+.apidocCodeCommentSpan {
+    display: block;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    font-size: 14px;
+    overflow-wrap: break-word;
+    padding: 5px;
+    white-space: pre-wrap;
+}
 .apidocDiv {
     color: #555;
     font-family: sans-serif;
@@ -1202,30 +1218,13 @@ body {
 .apidocDiv a[href]:hover {
     text-decoration: underline;
 }
-.apidocDiv ul {
-    list-style: none;
-    padding-left: 20px;
-}
 .apidocDiv li a {
     display: inline-block;
     padding: 8px 0;
 }
-.apidocCodeCommentSpan {
-    background: royalblue;
-    color: white;
-    display: block;
-}
-.apidocCodeKeywordSpan {
-    background: pink;
-    color: #900;
-}
-.apidocCodePre {
-    background: #eef;
-    border: 1px solid;
-    font-size: 14px;
-    overflow-wrap: break-word;
-    padding: 5px;
-    white-space: pre-wrap;
+.apidocDiv ul {
+    list-style: none;
+    padding-left: 20px;
 }
 .apidocFooterDiv {
     margin-top: 20px;
