@@ -1599,7 +1599,7 @@ async function jslint_cli({
         }));
         return;
 
-// PR-xxx - Add command jslint_report.
+// PR-363 - Add command jslint_report.
 
     case "jslint_report":
         mode_report = command[1];
@@ -6348,7 +6348,7 @@ function jslint_phase3_parse(state) {
                             return stop("expected_identifier_a");
                         }
 
-// PR-xxx - Bugfix - fix false-warning
+// PR-363 - Bugfix - fix false-warning
 // <uninitialized 'bb'> in code '/*jslint node*/\nlet {aa:bb} = {}; bb();'
 
                         // token_nxt.label = name;

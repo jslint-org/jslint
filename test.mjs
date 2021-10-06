@@ -333,7 +333,7 @@ function noop(val) {
         ],
         var: [
 
-// PR-xxx - Bugfix - add test against false-warning
+// PR-363 - Bugfix - add test against false-warning
 // <uninitialized 'bb'> in code '/*jslint node*/\nlet {aa:bb} = {}; bb();'
 
             "/*jslint node*/\n",
