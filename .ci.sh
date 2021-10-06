@@ -1,5 +1,7 @@
 shArtifactUploadCustom() {(set -e
 # this function will custom-upload build-artifacts to branch-gh-pages
+    # save jslint.cjs
+    git add -f jslint.cjs jslint.js || true
     # seo - inline css-assets and invalidate cached-assets
     node --input-type=module -e '
 import moduleFs from "fs";
@@ -29,7 +31,7 @@ import moduleFs from "fs";
     });
 }());
 ' "$@" # '
-    # screenshot install
+    # screenshot quickstart
     node --input-type=module -e '
 import moduleFs from "fs";
 import moduleChildProcess from "child_process";
@@ -94,33 +96,13 @@ $UPSTREAM_REPO/branch-beta/index.html"
     # screenshot jslint_apidoc
     shBrowserScreenshot .artifact/apidoc.html
     # screenshot jslint_report
-    shBrowserScreenshot .jslint_report.html --window-size=512x512
-    git add -f jslint.cjs jslint.js || true
+    shBrowserScreenshot .artifact/jslint_report.html
+    # screenshot jslint_run_with_coverage
+    shBrowserScreenshot .artifact/my_coverage/my_test2.mjs.html
 )}
 
 shCiBaseCustom() {(set -e
 # this function will run base-ci
-    # create jslint.cjs
-    cp jslint.mjs jslint.js
-    cat jslint.mjs | sed \
-        -e "s|^// module.exports = |module.exports = |" \
-        -e "s|^export default Object.freeze(|// &|" \
-        -e "s|^jslint_import_meta_url = |// &|" \
-        > jslint.cjs
-    # run test with coverage-report
-    # coverage-hack - test jslint's invalid-file handling-behavior
-    mkdir -p .test-dir.js
-    # test jslint's cli handling-behavior
-    printf "node jslint.cjs .\n"
-    node jslint.cjs .
-    printf "node jslint.mjs .\n"
-    node jslint.mjs .
-    printf "node test.mjs\n"
-    (set -e
-        # coverage-hack - test jslint's cli handling-behavior
-        export JSLINT_BETA=1
-        shRunWithCoverage node test.mjs
-    )
     # update edition in README.md, jslint.mjs from CHANGELOG.md
     node --input-type=module -e '
 import moduleFs from "fs";
@@ -150,15 +132,7 @@ import moduleFs from "fs";
             file: "README.md",
             src: fileDict["README.md"].replace((
                 /\bv\d\d\d\d\.\d\d?\.\d\d?\b/m
-            ), versionMaster),
-            src0: fileDict["README.md"]
-        }, {
-            file: "jslint.mjs",
-            // inline css-assets
-            src: fileDict["jslint.mjs"].replace((
-                /^let jslint_edition = ".*?";$/m
-            ), `let jslint_edition = "${versionBeta}";`),
-            src0: fileDict["jslint.mjs"]
+            ), versionMaster)
         }, {
             file: "index.html",
             src: fileDict["index.html"].replace((
@@ -167,14 +141,19 @@ import moduleFs from "fs";
                 return fileDict["jslint.mjs"].match(
                     /\n<style\sclass="JSLINT_REPORT_STYLE">\n[\S\s]*?\n<\/style>\n/
                 )[0];
-            }),
-            src0: fileDict["index.html"]
+            })
+        }, {
+            file: "jslint.mjs",
+            // inline css-assets
+            src: fileDict["jslint.mjs"].replace((
+                /^let jslint_edition = ".*?";$/m
+            ), `let jslint_edition = "${versionBeta}";`)
         }
     ].forEach(function ({
         file,
-        src,
-        src0
+        src
     }) {
+        let src0 = fileDict[file];
         if (src !== src0) {
             console.error(`update file ${file}`);
             moduleFs.promises.writeFile(file, src);
@@ -182,4 +161,25 @@ import moduleFs from "fs";
     });
 }());
 ' "$@" # '
+    # create jslint.cjs
+    cp jslint.mjs jslint.js
+    cat jslint.mjs | sed \
+        -e "s|^// module.exports = |module.exports = |" \
+        -e "s|^export default Object.freeze(|// &|" \
+        -e "s|^jslint_import_meta_url = |// &|" \
+        > jslint.cjs
+    # run test with coverage-report
+    # coverage-hack - test jslint's invalid-file handling-behavior
+    mkdir -p .test-dir.js
+    # test jslint's cli handling-behavior
+    printf "node jslint.cjs .\n"
+    node jslint.cjs .
+    printf "node jslint.mjs .\n"
+    node jslint.mjs .
+    printf "node test.mjs\n"
+    (set -e
+        # coverage-hack - test jslint's cli handling-behavior
+        export JSLINT_BETA=1
+        shRunWithCoverage node test.mjs
+    )
 )}

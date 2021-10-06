@@ -22,7 +22,7 @@ Douglas Crockford <douglas@crockford.com>
 2. [Web Demo Archived](#web-demo-archived)
 3. [API Doc](#api-doc)
 4. [Quickstart Install](#quickstart-install)
-5. [Quickstart Report](#quickstart-report)
+5. [Quickstart JSLint Report](#quickstart-jslint-report)
 6. [Plugin Vim](#plugin-vim)
 7. [Description](#description)
 8. [Package Listing](#package-listing)
@@ -107,25 +107,27 @@ node jslint.mjs .
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_install_cli_dir.svg)
 
 
-# Quickstart Report
-### To create human-readable, html-report from command-line:
+# Quickstart JSLint Report
+### To create a jslint-report from command-line:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_install_cli_report.svg -->
 #!/bin/sh
 
 printf "function foo() {console.log('hello world');}\n" > hello.js
 
-node jslint.mjs --mode-report hello.js
+node jslint.mjs \
+    jslint_report=.artifact/jslint_report.html \
+    hello.js
 ```
 - shell output
 
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_install_cli_report.svg)
 
-- screenshot file `.jslint_report.html`
+- screenshot file `.artifact/jslint_report.html`
 
-![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.jslint_report.html.png)
+![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fjslint_report.html.png)
 
 
-### To create human-readable, html-report programmatically:
+### To create a jslint-report programmatically:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_install_import_report.svg -->
 #!/bin/sh
 
@@ -140,8 +142,8 @@ import fs from "fs";
     let source = "function foo() {console.log(\u0027hello world\u0027);}\n";
     result = jslint.jslint(source);
     report = jslint.jslint_report(result);
-    await fs.promises.writeFile(".jslint_report.html", report);
-    console.error("jslint - created html-report .jslint_report.html");
+    await fs.promises.writeFile(".artifact/jslint_report.html", report);
+    console.error("wrote file .artifact/jslint_report.html");
 }());
 
 '

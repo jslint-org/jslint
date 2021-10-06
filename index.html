@@ -516,201 +516,6 @@ file none
 
 
 </style>
-<style>
-/*csslint
-    box-model: false,
-    ids:false,
-    overqualified-elements: false
-*/
-/*csslint ignore:start*/
-@keyframes uiLoaderEllipsis1 {
-    from {
-        opacity: 0;
-    }
-    25% {
-        opacity: 1;
-    }
-}
-@keyframes uiLoaderEllipsis2 {
-    from {
-        opacity: 0;
-    }
-    50% {
-        opacity: 1;
-    }
-}
-@keyframes uiLoaderEllipsis3 {
-    from {
-        opacity: 0;
-    }
-    75% {
-        opacity: 1;
-    }
-}
-.JSLINT_ .CodeMirror .cm-trailingspace,
-.JSLINT_ .CodeMirror-lint-mark-warning {
-    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9sJDw4cOCW1/KIAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAAHElEQVQI12NggIL/DAz/GdA5/xkY/qPKMDAwAADLZwf5rvm+LQAAAABJRU5ErkJggg==");
-    background-position: bottom left;
-    background-repeat: repeat-x;
-}
-/*csslint ignore:end*/
-
-.JSLINT_ #JSLINT_BUTTONS button,
-.JSLINT_ #JSLINT_OPTIONS > div,
-.JSLINT_ #JSLINT_TITLEBOX {
-    font-family: daley, sans-serif;
-    font-size: 14px;
-}
-.JSLINT_ #JSLINT_OPTIONS label {
-    font-family: sans-serif;
-}
-.JSLINT_ #JSLINT_SOURCE .CodeMirror,
-.JSLINT_ #JSLINT_SOURCE .CodeMirror pre {
-    font-family: monospace;
-    font-size: 12px;
-}
-.skip-link {
-    background: darkslategray;
-    color: white;
-    left: 0;
-    opacity: 0.75;
-    padding: 4px;
-    position: absolute;
-    top: -40px;
-}
-.skip-link:focus {
-    top: 0;
-}
-#bannerFork1 {
-    height: 100px;
-    left: 0;
-    opacity: 0.75;
-    overflow: hidden;
-    position: absolute;
-    top: 0;
-    width: 200px;
-    z-index: 1;
-}
-#bannerFork1 a {
-    color: white;
-}
-#bannerFork1 div {
-    background: darkslategray;
-    font-size: 12px;
-    height: 20px;
-    line-height: 20px;
-    opacity: 0.75;
-    overflow: visible;
-    position: absolute;
-    right: 65px;
-    text-align: center;
-    top: 25px;
-    transform: rotate(-45deg);
-    width: 100%;
-}
-#uiLoader1 {
-    align-items: center;
-    background: lightslategray;
-    color: white;
-    display: flex;
-    height: 50px;
-    justify-content: center;
-    left: 50%;
-    margin: -50px 0 0 -100px;
-    opacity: 0.85;
-    position: fixed;
-    top: 40%;
-    width: 200px;
-    z-index: 10;
-}
-
-.JSLINT_ .CodeMirror {
-    padding: 0;
-}
-.JSLINT_ .CodeMirror-linenumber {
-/* Google Lighthouse Accessibility - Background and foreground colors do not */
-/* have a sufficient contrast ratio. */
-    color: darkslategray;
-}
-.JSLINT_ .CodeMirror-lint-marker {
-    background-position: 1px -1px;
-}
-.JSLINT_ .CodeMirror-selected {
-    background: wheat;
-}
-.JSLINT_ .uiLoaderEllipsis span {
-    animation: uiLoaderEllipsis1 1s infinite steps(1);
-}
-.JSLINT_ .uiLoaderEllipsis span:first-child + span {
-    animation-name: uiLoaderEllipsis2;
-}
-.JSLINT_ .uiLoaderEllipsis span:first-child + span + span {
-    animation-name: uiLoaderEllipsis3;
-}
-.JSLINT_ #JSLINT_BUTTONS button {
-    background: darkslategray;
-    color: white;
-    cursor: pointer;
-    margin: 16px 16px 0 16px;
-    padding: 4px 16px;
-}
-.JSLINT_ #JSLINT_GLOBALS {
-    height: 40px;
-    white-space: normal;
-}
-.JSLINT_ #JSLINT_INPUT > div {
-    margin: 16px 40px;
-    width: auto;
-}
-.JSLINT_ #JSLINT_INPUT > #JSLINT_BUTTONS {
-    margin-top: -16px;
-}
-.JSLINT_ #JSLINT_OPTIONS div[title],
-.JSLINT_ #JSLINT_OPTIONS div[title] input,
-.JSLINT_ #JSLINT_OPTIONS div[title] label {
-    cursor: pointer;
-    user-select: none;
-}
-.JSLINT_ #JSLINT_OPTIONS div[title] input {
-    margin: 0 4px 1px 0;
-    vertical-align: middle;
-    zoom: 1.1;
-}
-.JSLINT_ #JSLINT_OPTIONS label {
-    padding: 4px;
-}
-.JSLINT_ #JSLINT_OPTIONS > div > div {
-    float: left;
-    line-height: 20px;
-    padding: 0 16px 16px 0;
-}
-.JSLINT_ #JSLINT_SOURCE textarea {
-/* Google Lighthouse Performance - Reduce Cumulative Layout Shift. */
-    height: 298px;
-}
-.JSLINT_ #JSLINT_TITLEBOX {
-    color: darkslategray;
-}
-.JSLINT_ #JSLINT_TITLEBOX ul li {
-    line-height: 28px;
-}
-.JSLINT_ #JSLINT_TITLEBOX ul li a:link {
-    color: black;
-}
-.JSLINT_ #JSLINT_TITLEBOX ul li a:visited {
-    color: #69565c;
-}
-
-.JSLINT_ #JSLINT_BUTTONS button:hover,
-.JSLINT_ #JSLINT_OPTIONS div[title]:hover {
-    background: slategray;
-    color: white;
-}
-
-.JSLINT_ #JSLINT_BUTTONS button:active {
-    color: black;
-}
-</style>
 <style class="JSLINT_REPORT_STYLE">
 /*csslint box-model: false, ids:false */
 /*csslint ignore:start*/
@@ -1002,6 +807,12 @@ body {
     background: honeydew;
     height: 100px;
 }
+.JSLINT_ #JSLINT_REPORT_TITLE {
+    color: darkslategray;
+    font-size: 32px;
+    padding-top: 16px;
+    text-align: center;
+}
 .JSLINT_ #JSLINT_REPORT_WARNINGS cite {
     display: block;
     margin: 16px 0 4px 0;
@@ -1027,6 +838,204 @@ body {
 /* have a sufficient contrast ratio. */
     /* background: indianred; */
     background: #b44;
+}
+</style>
+<style>
+/*csslint
+    box-model: false,
+    ids:false,
+    overqualified-elements: false
+*/
+/*csslint ignore:start*/
+@keyframes uiLoaderEllipsis1 {
+    from {
+        opacity: 0;
+    }
+    25% {
+        opacity: 1;
+    }
+}
+@keyframes uiLoaderEllipsis2 {
+    from {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+@keyframes uiLoaderEllipsis3 {
+    from {
+        opacity: 0;
+    }
+    75% {
+        opacity: 1;
+    }
+}
+.JSLINT_ .CodeMirror .cm-trailingspace,
+.JSLINT_ .CodeMirror-lint-mark-warning {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9sJDw4cOCW1/KIAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAAHElEQVQI12NggIL/DAz/GdA5/xkY/qPKMDAwAADLZwf5rvm+LQAAAABJRU5ErkJggg==");
+    background-position: bottom left;
+    background-repeat: repeat-x;
+}
+/*csslint ignore:end*/
+
+.JSLINT_ #JSLINT_BUTTONS button,
+.JSLINT_ #JSLINT_OPTIONS > div,
+.JSLINT_ #JSLINT_TITLEBOX {
+    font-family: daley, sans-serif;
+    font-size: 14px;
+}
+.JSLINT_ #JSLINT_OPTIONS label {
+    font-family: sans-serif;
+}
+.JSLINT_ #JSLINT_REPORT_TITLE {
+    display: none;
+}
+.JSLINT_ #JSLINT_SOURCE .CodeMirror,
+.JSLINT_ #JSLINT_SOURCE .CodeMirror pre {
+    font-family: monospace;
+    font-size: 12px;
+}
+.skip-link {
+    background: darkslategray;
+    color: white;
+    left: 0;
+    opacity: 0.75;
+    padding: 4px;
+    position: absolute;
+    top: -40px;
+}
+.skip-link:focus {
+    top: 0;
+}
+#bannerFork1 {
+    height: 100px;
+    left: 0;
+    opacity: 0.75;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    width: 200px;
+    z-index: 1;
+}
+#bannerFork1 a {
+    color: white;
+}
+#bannerFork1 div {
+    background: darkslategray;
+    font-size: 12px;
+    height: 20px;
+    line-height: 20px;
+    opacity: 0.75;
+    overflow: visible;
+    position: absolute;
+    right: 65px;
+    text-align: center;
+    top: 25px;
+    transform: rotate(-45deg);
+    width: 100%;
+}
+#uiLoader1 {
+    align-items: center;
+    background: lightslategray;
+    color: white;
+    display: flex;
+    height: 50px;
+    justify-content: center;
+    left: 50%;
+    margin: -50px 0 0 -100px;
+    opacity: 0.85;
+    position: fixed;
+    top: 40%;
+    width: 200px;
+    z-index: 10;
+}
+
+.JSLINT_ .CodeMirror {
+    padding: 0;
+}
+.JSLINT_ .CodeMirror-linenumber {
+/* Google Lighthouse Accessibility - Background and foreground colors do not */
+/* have a sufficient contrast ratio. */
+    color: darkslategray;
+}
+.JSLINT_ .CodeMirror-lint-marker {
+    background-position: 1px -1px;
+}
+.JSLINT_ .CodeMirror-selected {
+    background: wheat;
+}
+.JSLINT_ .uiLoaderEllipsis span {
+    animation: uiLoaderEllipsis1 1s infinite steps(1);
+}
+.JSLINT_ .uiLoaderEllipsis span:first-child + span {
+    animation-name: uiLoaderEllipsis2;
+}
+.JSLINT_ .uiLoaderEllipsis span:first-child + span + span {
+    animation-name: uiLoaderEllipsis3;
+}
+.JSLINT_ #JSLINT_BUTTONS button {
+    background: darkslategray;
+    color: white;
+    cursor: pointer;
+    margin: 16px 16px 0 16px;
+    padding: 4px 16px;
+}
+.JSLINT_ #JSLINT_GLOBALS {
+    height: 40px;
+    white-space: normal;
+}
+.JSLINT_ #JSLINT_INPUT > div {
+    margin: 16px 40px;
+    width: auto;
+}
+.JSLINT_ #JSLINT_INPUT > #JSLINT_BUTTONS {
+    margin-top: -16px;
+}
+.JSLINT_ #JSLINT_OPTIONS div[title],
+.JSLINT_ #JSLINT_OPTIONS div[title] input,
+.JSLINT_ #JSLINT_OPTIONS div[title] label {
+    cursor: pointer;
+    user-select: none;
+}
+.JSLINT_ #JSLINT_OPTIONS div[title] input {
+    margin: 0 4px 1px 0;
+    vertical-align: middle;
+    zoom: 1.1;
+}
+.JSLINT_ #JSLINT_OPTIONS label {
+    padding: 4px;
+}
+.JSLINT_ #JSLINT_OPTIONS > div > div {
+    float: left;
+    line-height: 20px;
+    padding: 0 16px 16px 0;
+}
+.JSLINT_ #JSLINT_SOURCE textarea {
+/* Google Lighthouse Performance - Reduce Cumulative Layout Shift. */
+    height: 298px;
+}
+.JSLINT_ #JSLINT_TITLEBOX {
+    color: darkslategray;
+}
+.JSLINT_ #JSLINT_TITLEBOX ul li {
+    line-height: 28px;
+}
+.JSLINT_ #JSLINT_TITLEBOX ul li a:link {
+    color: black;
+}
+.JSLINT_ #JSLINT_TITLEBOX ul li a:visited {
+    color: #69565c;
+}
+
+.JSLINT_ #JSLINT_BUTTONS button:hover,
+.JSLINT_ #JSLINT_OPTIONS div[title]:hover {
+    background: slategray;
+    color: white;
+}
+
+.JSLINT_ #JSLINT_BUTTONS button:active {
+    color: black;
 }
 </style>
 </head>
@@ -1489,7 +1498,7 @@ eval("console.log(\\"hello world\\");");
     }
     if (mode_debug) {
         document.querySelector(
-            "#JSLINT_OPTIONS input[value=debug]"
+            "#JSLINT_OPTIONS input[value=trace]"
         ).click();
     }
     document.querySelector("button[name='JSLint']").click();

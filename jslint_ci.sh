@@ -159,7 +159,9 @@ import moduleUrl from "url";
         return argList[0];
     };
 }());
-(function () {
+(async function () {
+    let child;
+    let exitCode;
     let file;
     let timeStart;
     let url;
@@ -181,7 +183,7 @@ import moduleUrl from "url";
     file = ".artifact/screenshot_browser_" + encodeURIComponent(file).replace((
         /%/g
     ), "_").toLowerCase() + ".png";
-    moduleChildProcess.spawn(
+    child = moduleChildProcess.spawn(
         (
             process.platform === "darwin"
             ? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
@@ -214,15 +216,17 @@ import moduleUrl from "url";
                 "ignore", 1, 2
             ]
         }
-    ).on("exit", function (exitCode) {
-        console.error(
-            "shBrowserScreenshot"
-            + "\n  - url - " + url
-            + "\n  - wrote - " + file
-            + "\n  - timeElapsed - " + (Date.now() - timeStart) + " ms"
-            + "\n  - EXIT_CODE=" + exitCode
-        );
+    );
+    exitCode = await new Promise(function (resolve) {
+        child.on("exit", resolve);
     });
+    console.error(
+        "shBrowserScreenshot"
+        + "\n  - url - " + url
+        + "\n  - wrote - " + file
+        + "\n  - timeElapsed - " + (Date.now() - timeStart) + " ms"
+        + "\n  - EXIT_CODE=" + exitCode
+    );
 }());
 ' "$@" # '
 )}
@@ -282,6 +286,12 @@ import moduleChildProcess from "child_process";
 }());
 ' "$@" # '
     shArtifactUploadCustom
+    # 1px-border around browser-screenshot
+    if (mogrify -version 2>&1 | grep -i imagemagick)
+    then
+        mogrify -shave 1x1 -bordercolor black -border 1 \
+            .artifact/screenshot_browser_*.png
+    fi
     # add dir .artifact
     git add -f .artifact
     git commit -am "add dir .artifact"

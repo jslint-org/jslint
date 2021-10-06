@@ -2,14 +2,10 @@
 import moduleFs from "fs";
 import jslint from "./jslint.mjs";
 
-function assertOrThrow(cond, msg) {
-/*
- * this function will throw <msg> if <cond> is falsy
- */
-    if (!cond) {
-        throw new Error(String(msg).slice(0, 2000));
-    }
-}
+let {
+    assert_or_throw: assertOrThrow,
+    debug_inline: debugInline
+} = jslint;
 
 function noop(val) {
 /*
@@ -17,6 +13,25 @@ function noop(val) {
  */
     return val;
 }
+
+(function testCaseFsXxx() {
+/*
+ * this function will test fs_xxx's handling-behavior
+ */
+    // test fs_rm_recursive handling-behavior
+    jslint.fs_rm_recursive(".artifact/fs_rm_recursive");
+    jslint.fs_rm_recursive(".artifact/fs_rm_recursive", {
+        process_version: "v12"
+    });
+    // test fs_write_file_with_parents handling-behavior
+    (async function () {
+        await jslint.fs_rm_recursive(".artifact/fs_write_file_with_parents");
+        await jslint.fs_write_file_with_parents(
+            ".artifact/fs_write_file_with_parents/aa/bb/cc",
+            "aa"
+        );
+    }());
+}());
 
 (function testCaseJslintCli() {
 /*
@@ -51,7 +66,7 @@ function noop(val) {
         process_argv: [
             "node",
             "jslint.mjs",
-            "jslint_apidoc",
+            "jslint_apidoc=.artifact/apidoc.html",
             JSON.stringify({
                 example_list: [
                     "README.md",
@@ -106,7 +121,7 @@ function noop(val) {
         process_argv: [
             "node",
             "jslint.mjs",
-            "--mode-report",
+            "jslint_report=.artifact/jslint_report.html",
             "jslint.mjs"
         ],
         process_exit: processExit0
@@ -119,7 +134,7 @@ function noop(val) {
         process_argv: [
             "node",
             "jslint.mjs",
-            "--mode-report",
+            "jslint_report=.artifact/jslint_report.html",
             "syntax-error.js"
         ],
         process_exit: processExit1,
@@ -133,7 +148,7 @@ function noop(val) {
         process_argv: [
             "node",
             "jslint.mjs",
-            "--mode-report",
+            "jslint_report=.artifact/jslint_report.html",
             "aa.json"
         ],
         process_exit: processExit0,
@@ -147,7 +162,7 @@ function noop(val) {
         process_argv: [
             "node",
             "jslint.mjs",
-            "--mode-report",
+            "jslint_report=.artifact/jslint_report.html",
             "aa.js"
         ],
         process_exit: processExit1,
@@ -161,7 +176,7 @@ function noop(val) {
         process_argv: [
             "node",
             "jslint.mjs",
-            "--mode-report",
+            "jslint_report=.artifact/jslint_report.html",
             "aa.json"
         ],
         process_exit: processExit1,
@@ -317,13 +332,25 @@ function noop(val) {
             )
         ],
         var: [
-            "let [\n    aa, bb = 0\n] = 0;",
-            "let [...aa] = [...aa];",
-            "let constructor = 0;",
-            "let {\n    aa: bb\n} = 0;",
-            "let {aa, bb} = 0;",
-            "let {constructor} = 0;"
-        ]
+
+// PR-xxx - Bugfix - add test against false-warning
+// <uninitialized 'bb'> in code '/*jslint node*/\nlet {aa:bb} = {}; bb();'
+
+            "/*jslint node*/\n",
+            ""
+        ].map(function (directive) {
+            return [
+                "let [\n    aa, bb = 0\n] = 0;\naa();\nbb();",
+                "let [...aa] = [...aa];\naa();",
+                "let constructor = 0;\nconstructor();",
+                "let {\n    aa: bb\n} = 0;\nbb();",
+                "let {\n    aa: bb,\n    bb: cc\n} = 0;\nbb();\ncc();",
+                "let {aa, bb} = 0;\naa();\nbb();",
+                "let {constructor} = 0;\nconstructor();"
+            ].map(function (code) {
+                return directive + code;
+            });
+        }).flat()
     }).forEach(function (codeList) {
         let elemPrv = "";
         codeList.forEach(function (code) {
@@ -342,16 +369,6 @@ function noop(val) {
             );
         });
     });
-}());
-
-(function testCaseJslintMisc() {
-/*
- * this function will test jslint's misc handling-behavior
- */
-    // test assertOrThrow's throw handling-behavior
-    try {
-        assertOrThrow(undefined, new Error());
-    } catch (ignore) {}
 }());
 
 (async function testCaseJslintOption() {
@@ -534,4 +551,20 @@ function noop(val) {
         });
         return "";
     });
+}());
+
+(function testCaseMisc() {
+/*
+ * this function will test misc handling-behavior
+ */
+
+    // test debugInline's handling-behavior
+    debugInline();
+    // test assertOrThrow's handling-behavior
+    try {
+        assertOrThrow(undefined, "undefined");
+    } catch (ignore) {}
+    try {
+        assertOrThrow(undefined, new Error());
+    } catch (ignore) {}
 }());
