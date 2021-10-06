@@ -165,7 +165,7 @@ let module_url;
 
 function assert_or_throw(condition, message) {
 
-// This function will throw <message> if <cond> is falsy.
+// This function will throw <message> if <condition> is falsy.
 
     if (!condition) {
         throw (
