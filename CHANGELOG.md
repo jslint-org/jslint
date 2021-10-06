@@ -1,7 +1,8 @@
 # Changelog
 
 # Todo
-- cli - add cli-command `--mode-coverage-report`
+- cli - add cli-command `jslint_coverage_report`
+- cli - change cli-option `--mode-vim-plugin` to cli-command `jslint_plugin_vim`
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
 - jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
@@ -12,17 +13,19 @@
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 
 # v2021.10.1-beta
-- doc - add api-documentation
-- jslint - relax regexp-warning against using 'space'
+- cli - change cli-option `--mode-report` to cli-command `jslint_report=<filename>`
+- bugfix - fix false warning `uninitialized 'bb'` in code `/*jslint node*/\nlet {aa:bb} = {}; bb();`
+- bugfix - fix issue #358 - switch-statement crashes jslint
 - ci - rename dir .build/ to .artifact/
+- deprecated - cli - add cli-option `--mode-report`
+- doc - add api-documentation
 - fs - merge file asset_codemirror_rollup.css into index.html
+- fs - merge file browser.mjs into index.html
 - fs - merge file function.html into help.html
 - fs - remove little-used font asset_font_programma_bold.woff2
 - fs - rename files with dashes to files with underscore
-- cli - add cli-option `--mode-report`
-- fs - merge file browser.mjs into index.html
 - jslint - disable linting of embedded javascript in markdown-files
-- bugfix - fix issue #358 - switch-statement crashes jslint
+- jslint - relax regexp-warning against using 'space'
 
 # v2021.9.20
 - jslint - add bigint support.

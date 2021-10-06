@@ -94,38 +94,56 @@
 /*jslint beta, node*/
 
 /*property
-    JSLINT_BETA, a, all, argv, arity, artifact, assign, async, b, beta, bitwise,
-    block, body, browser, c, calls, catch, catch_list, catch_stack, causes,
-    cjs_module, cjs_require, closer, closure, code, column, concat,
-    console_error, console_log, constant, context, convert, create, cwd, d,
-    dead, default, devel, directive, directive_list, directive_quiet,
-    directives, disrupt, dot, edition, elem_list, ellipsis, else, endsWith, env,
-    error, eval, every, example_list, exec, execArgv, exit, export_dict,
-    exports, expression, extra, file, fileURLToPath, filter, finally, flag, for,
-    forEach, formatted_message, free, freeze, from, froms, fud, function_list,
-    function_stack, functions, getset, github_repo, global, global_dict,
-    global_list, id, identifier, import, import_list, inc, indent2, index,
-    indexOf, init, initial, isArray, isNaN, is_equal, is_weird, join, jslint,
-    jslint_apidoc, jslint_cli, jslint_edition, jslint_phase1_split,
-    jslint_phase2_lex, jslint_phase3_parse, jslint_phase4_walk,
-    jslint_phase5_whitage, jslint_report, json, keys, label, lbp, led, length,
-    level, line, line_list, line_offset, line_source, lines, live, log, long,
-    loop, m, main, map, margin, match, max, message, meta, min, mkdir, mode_cli,
-    mode_json, mode_module, mode_noop, mode_property, mode_report, mode_shebang,
-    mode_stop, mode_vim_plugin, module, module_list, module_name, name, names,
-    node, now, nr, nud, ok, open, opening, option, option_dict, order,
-    package_name, padStart, parameters, parent, parse, pathname, pop,
-    process_argv, process_exit, promises, property, property_dict, push, quote,
-    readFile, readdir, readonly, recursive, reduce, repeat, replace, resolve,
-    role, search, shebang, signature, single, slice, some, sort, source, split,
-    stack, stack_trace, startsWith, statement, statement_prv, stop, stop_at,
-    stringify, switch, syntax_dict, tenure, test, test_cause,
+    JSLINT_BETA, a, all, argv, arity, artifact, assert_or_throw, assign, async,
+    b, beta, bitwise, block, body, browser, c, calls, catch, catch_list,
+    catch_stack, causes, cjs_module, cjs_require, closer, closure, code, column,
+    concat, console_error, console_log, constant, context, convert, create, cwd,
+    d, dead, debug_inline, default, devel, directive, directive_list,
+    directive_quiet, directives, dirname, disrupt, dot, edition, elem_list,
+    ellipsis, else, endsWith, env, error, eval, every, example_list, exec,
+    execArgv, exit, export_dict, exports, expression, extra, file,
+    fileURLToPath, filter, finally, flag, for, forEach, formatted_message, free,
+    freeze, from, froms, fs_rm_recursive, fs_write_file_with_parents, fud,
+    function_list, function_stack, functions, getset, github_repo, global,
+    global_dict, global_list, html_escape, id, identifier, import, import_list,
+    inc, indent2, index, indexOf, init, initial, isArray, isNaN, is_equal,
+    is_weird, join, jslint, jslint_apidoc, jslint_assert, jslint_charset_ascii,
+    jslint_cli, jslint_edition, jslint_phase1_split, jslint_phase2_lex,
+    jslint_phase3_parse, jslint_phase4_walk, jslint_phase5_whitage,
+    jslint_report, json, keys, label, lbp, led, length, level, line, line_list,
+    line_offset, line_source, lines, live, log, long, loop, m, main, map,
+    margin, match, max, message, meta, min, mkdir, mode_cli, mode_json,
+    mode_module, mode_noop, mode_property, mode_shebang, mode_stop, module,
+    module_fs_init, module_list, module_name, name, names, node, noop, now, nr,
+    nud, ok, open, opening, option, option_dict, order, package_name, padStart,
+    parameters, parent, parse, pathname, pop, process_argv, process_exit,
+    process_version, promises, property, property_dict, push, quote, readFile,
+    readdir, readonly, recursive, reduce, repeat, replace, resolve, rm, rmdir,
+    role, search, shebang, shift, signature, single, slice, some, sort, source,
+    split, stack, stack_trace, startsWith, statement, statement_prv, stop,
+    stop_at, stringify, switch, syntax_dict, tenure, test, test_cause,
     test_internal_error, this, thru, toString, token, token_global, token_list,
     token_nxt, token_tree, tokens, trace, tree, trim, trimEnd, trimRight, try,
-    type, unordered, url, used, value, variable, version, versions, warn,
-    warn_at, warning, warning_list, warnings, white, wrapped, writeFile
+    type, unlink, unordered, url, used, value, variable, version, versions,
+    warn, warn_at, warning, warning_list, warnings, white, wrapped, writeFile
 */
 
+// init debug_inline
+let debug_inline = (function () {
+    let console_error = function () {
+        return;
+    };
+    return function (...argv) {
+
+// This function will both print <argv> to stderr and return <argv>[0].
+
+        console_error("\n\ndebug_inline");
+        console_error(...argv);
+        console_error("\n");
+        console_error = console.error;
+        return argv[0];
+    };
+}());
 let jslint_charset_ascii = (
     "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007"
     + "\b\t\n\u000b\f\r\u000e\u000f"
@@ -139,21 +157,23 @@ let jslint_edition = "v2021.10.1-beta";
 let jslint_export;              // The jslint object to be exported.
 let jslint_fudge = 1;           // Fudge starting line and starting column to 1.
 let jslint_import_meta_url = "";        // import.meta.url used by cli.
+let module_child_process;
+let module_fs;
+let module_fs_init_resolve_list;
+let module_path;
+let module_url;
 
 function assert_or_throw(condition, message) {
 
 // This function will throw <message> if <condition> is falsy.
 
-    if (condition) {
-        return condition;
+    if (!condition) {
+        throw (
+            typeof message === "string"
+            ? new Error(message.slice(0, 2048))
+            : message
+        );
     }
-    throw new Error(
-        `This was caused by a bug in JSLint.
-Please open an issue with this stack-trace (and possible example-code) at
-https://github.com/jslint-org/jslint/issues.
-edition = "${jslint_edition}";
-${String(message).slice(0, 2000)}`
-    );
 }
 
 function empty() {
@@ -163,6 +183,57 @@ function empty() {
 // 'constructor' are completely avoided.
 
     return Object.create(null);
+}
+
+async function fs_rm_recursive(path, option_dict) {
+
+// This function will 'rm -r' <path>.
+
+    await module_fs_init();
+    console.error("rm -r path " + path);
+    if (((
+        option_dict && option_dict.process_version
+    ) || process.version) < "v14") {
+
+// Legacy rmdir for nodejs v12
+
+        await Promise.all([
+            module_fs.promises.unlink(path).catch(noop),
+            module_fs.promises.rmdir(path, {
+                recursive: true
+            }).catch(noop)
+        ]);
+        return;
+    }
+    await module_fs.promises.rm(path, {
+        recursive: true
+    }).catch(noop);
+}
+
+async function fs_write_file_with_parents(pathname, data) {
+
+// This function will write <data> to <pathname> and lazy-mkdirp if necessary.
+
+    await module_fs_init();
+
+// Try writing to pathname.
+
+    try {
+        await module_fs.promises.writeFile(pathname, data);
+    } catch (ignore) {
+
+// Lazy mkdirp.
+
+        await module_fs.promises.mkdir(module_path.dirname(pathname), {
+            recursive: true
+        });
+
+// Retry writing to pathname.
+
+        await module_fs.promises.writeFile(pathname, data);
+
+    }
+    console.error("wrote file " + pathname);
 }
 
 function html_escape(str) {
@@ -266,7 +337,7 @@ function jslint(
 //     return true;
 // }
 
-        assert_or_throw(!(aa === bb), `Expected !(aa === bb).`);
+        jslint_assert(!(aa === bb), `Expected !(aa === bb).`);
         if (Array.isArray(aa)) {
             return (
                 Array.isArray(bb)
@@ -287,7 +358,7 @@ function jslint(
 //     return false;
 // }
 
-        assert_or_throw(!Array.isArray(bb), `Expected !Array.isArray(bb).`);
+        jslint_assert(!Array.isArray(bb), `Expected !Array.isArray(bb).`);
         if (aa.id === "(number)" && bb.id === "(number)") {
             return aa.value === bb.value;
         }
@@ -362,7 +433,7 @@ function jslint(
 //     return false;
 // }
 
-            assert_or_throw(
+            jslint_assert(
                 !(aa.arity === "function" || aa.arity === "regexp"),
                 `Expected !(aa.arity === "function" || aa.arity === "regexp").`
             );
@@ -787,7 +858,7 @@ function jslint(
 
 // Validate mm.
 
-        assert_or_throw(mm, code);
+        jslint_assert(mm, code);
         warning.message = mm;
 
 // PR-242 - Include stack_trace for jslint to debug itself for errors.
@@ -855,8 +926,8 @@ function jslint(
 // PHASE 1. Split <source> by newlines into <line_list>.
 
         jslint_phase1_split(state);
-        assert_or_throw(catch_stack.length === 1, `catch_stack.length === 1.`);
-        assert_or_throw(
+        jslint_assert(catch_stack.length === 1, `catch_stack.length === 1.`);
+        jslint_assert(
             function_stack.length === 0,
             `function_stack.length === 0.`
         );
@@ -864,8 +935,8 @@ function jslint(
 // PHASE 2. Lex <line_list> into <token_list>.
 
         jslint_phase2_lex(state);
-        assert_or_throw(catch_stack.length === 1, `catch_stack.length === 1.`);
-        assert_or_throw(
+        jslint_assert(catch_stack.length === 1, `catch_stack.length === 1.`);
+        jslint_assert(
             function_stack.length === 0,
             `function_stack.length === 0.`
         );
@@ -873,8 +944,8 @@ function jslint(
 // PHASE 3. Parse <token_list> into <token_tree> using the Pratt-parser.
 
         jslint_phase3_parse(state);
-        assert_or_throw(catch_stack.length === 1, `catch_stack.length === 1.`);
-        assert_or_throw(
+        jslint_assert(catch_stack.length === 1, `catch_stack.length === 1.`);
+        jslint_assert(
             function_stack.length === 0,
             `function_stack.length === 0.`
         );
@@ -886,8 +957,8 @@ function jslint(
         if (!state.mode_json) {
             jslint_phase4_walk(state);
         }
-        assert_or_throw(catch_stack.length === 1, `catch_stack.length === 1.`);
-        assert_or_throw(
+        jslint_assert(catch_stack.length === 1, `catch_stack.length === 1.`);
+        jslint_assert(
             function_stack.length === 0,
             `function_stack.length === 0.`
         );
@@ -897,8 +968,8 @@ function jslint(
         if (!state.mode_json && warning_list.length === 0) {
             jslint_phase5_whitage(state);
         }
-        assert_or_throw(catch_stack.length === 1, `catch_stack.length === 1.`);
-        assert_or_throw(
+        jslint_assert(catch_stack.length === 1, `catch_stack.length === 1.`);
+        jslint_assert(
             function_stack.length === 0,
             `function_stack.length === 0.`
         );
@@ -917,7 +988,7 @@ function jslint(
 //         }
 
         if (option_dict.test_internal_error) {
-            assert_or_throw(undefined, "test_internal_error");
+            jslint_assert(undefined, "test_internal_error");
         }
     } catch (err) {
         mode_stop = true;
@@ -991,25 +1062,25 @@ function jslint(
     };
 }
 
-// PR-362 - Add api-documentation.
+// PR-362 - Add API Doc.
 
 async function jslint_apidoc({
     example_list,
     github_repo,
     module_list,
     package_name,
+    pathname,
     version
 }) {
 
-// This function will create api-documentation from <module_list>.
+// This function will create API Doc from <module_list>.
+
     let elem_ii = 0;
     let html;
-    let module_fs = await import("fs");
-    let module_path = await import("path");
 
-    function elem_create(module_obj, module_name, key) {
+    function elem_create(module_obj, key, module_name) {
 
-// This function will create apidoc-elem in given <module_obj>.
+// This function will create a sub API Doc from elem <module_obj>[<key>].
 
         let example = "N/A";
         let id = encodeURIComponent("apidoc.elem." + module_name + "." + key);
@@ -1120,12 +1191,16 @@ ${name}<span class="apidocSignatureSpan">${signature}</span>
         str = str.replace(new RegExp("^" + whitespace, "gm"), "");
         return str;
     }
+    await module_fs_init();
 
-    // html-escape param
+// Html-escape params.
+
     github_repo = html_escape(github_repo);
     package_name = html_escape(package_name);
     version = html_escape(version);
-    // init example_list
+
+// Init example_list.
+
     example_list = await Promise.all(example_list.map(async function (file) {
 
 // This function will read example from given file.
@@ -1134,7 +1209,7 @@ ${name}<span class="apidocSignatureSpan">${signature}</span>
         result = (
             "\n\n\n\n\n\n\n\n"
             // bug-workaround - truncate example to manageable size
-            + result.slice(0, 262144)
+            + result.slice(0, 524288)
             + "\n\n\n\n\n\n\n\n"
         );
         result = result.replace((
@@ -1153,7 +1228,7 @@ ${name}<span class="apidocSignatureSpan">${signature}</span>
         }
         return {
             elem_list: Object.keys(module_obj).map(function (key) {
-                return elem_create(module_obj, module_name, key);
+                return elem_create(module_obj, key, module_name);
             }).sort(function (aa, bb) {
                 return (
                     aa.name < bb.name
@@ -1182,12 +1257,11 @@ ${name}<span class="apidocSignatureSpan">${signature}</span>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="${package_name} api documentation">
+<meta name="description" content="${package_name} API Doc">
 <title>${package_name} apidoc</title>
 <style>
 /*csslint*/
 body {
-    border: 1px solid #777;
     margin: 0;
     padding: 20px;
 }
@@ -1311,13 +1385,22 @@ body {
     html = html.trim().replace((
         / +?$/gm
     ), "") + "\n";
-    await module_fs.promises.mkdir(".artifact", {
-        recursive: true
-    });
-    await module_fs.promises.writeFile(".artifact/apidoc.html", html);
-    console.error(
-        "jslint - created apidoc "
-        + module_path.resolve(".artifact/apidoc.html")
+    await fs_write_file_with_parents(pathname, html);
+}
+
+function jslint_assert(condition, message) {
+
+// This function will throw <message> if <condition> is falsy.
+
+    if (condition) {
+        return condition;
+    }
+    throw new Error(
+        `This was caused by a bug in JSLint.
+Please open an issue with this stack-trace (and possible example-code) at
+https://github.com/jslint-org/jslint/issues.
+edition = "${jslint_edition}";
+${String(message).slice(0, 2000)}`
     );
 }
 
@@ -1329,8 +1412,6 @@ async function jslint_cli({
     file,
     mode_cli,
     mode_noop,
-    mode_report,
-    mode_vim_plugin,
     option,
     process_argv,
     process_exit,
@@ -1339,11 +1420,11 @@ async function jslint_cli({
 
 // This function will run jslint from nodejs-cli.
 
+    let command;
     let data;
     let exit_code = 0;
-    let module_fs;
-    let module_path;
-    let module_url;
+    let mode_report;
+    let mode_vim_plugin;
     let result;
 
     function jslint_from_file({
@@ -1475,11 +1556,9 @@ async function jslint_cli({
     }
     console_error = console_error || console.error;
     console_log = console_log || console.log;
-    module_fs = await import("fs");
-    module_path = await import("path");
-    module_url = await import("url");
     process_argv = process_argv || process.argv;
     process_exit = process_exit || process.exit;
+    await module_fs_init();
     if (!(
 
 // Feature-detect nodejs-cjs-cli.
@@ -1505,21 +1584,28 @@ async function jslint_cli({
         return exit_code;
     }
 
-    switch (process_argv[2]) {
+// init commmand
 
-// PR-362 - Add api-documentation.
+    command = String(process_argv[2]).split("=");
+    command[1] = command.slice(1).join("=");
+
+    switch (command[0]) {
+
+// PR-362 - Add API Doc.
 
     case "jslint_apidoc":
-        await jslint_apidoc(JSON.parse(process_argv[3]));
+        await jslint_apidoc(Object.assign(JSON.parse(process_argv[3]), {
+            pathname: command[1]
+        }));
         return;
+
+// PR-363 - Add command jslint_report.
+
+    case "jslint_report":
+        mode_report = command[1];
+        process_argv = process_argv.slice(1);
+        break;
     }
-
-// PR-360 - Add cli-option `--mode-report`.
-
-    mode_report = (
-        process_argv.slice(2).indexOf("--mode-report") >= 0
-        || mode_report
-    );
 
 // PR-349 - Detect cli-option --mode-vim-plugin.
 
@@ -1617,14 +1703,7 @@ async function jslint_cli({
         option
     });
     if (mode_report) {
-        await module_fs.promises.writeFile(
-            ".jslint_report.html",
-            jslint_report(result)
-        );
-        console_error(
-            "jslint - created html-report "
-            + module_path.resolve(".jslint_report.html")
-        );
+        await fs_write_file_with_parents(mode_report, jslint_report(result));
     }
     process_exit(exit_code);
     return exit_code;
@@ -4744,7 +4823,7 @@ function jslint_phase3_parse(state) {
 //  if (mode_mega) {
 //      warn("unexpected_a", the_function);
 //  }
-//  assert_or_throw(!mode_mega, `Expected !mode_mega.`);
+//  jslint_assert(!mode_mega, `Expected !mode_mega.`);
 
 // Don't create functions in loops. It is inefficient, and it can lead to
 // scoping errors.
@@ -6268,9 +6347,18 @@ function jslint_phase3_parse(state) {
 
                             return stop("expected_identifier_a");
                         }
-                        token_nxt.label = name;
-                        the_variable.names.push(token_nxt);
-                        enroll(token_nxt, "variable", mode_const);
+
+// PR-363 - Bugfix - fix false-warning
+// <uninitialized 'bb'> in code '/*jslint node*/\nlet {aa:bb} = {}; bb();'
+
+                        // token_nxt.label = name;
+                        // the_variable.names.push(token_nxt);
+                        // enroll(token_nxt, "variable", mode_const);
+                        name = token_nxt;
+                        the_variable.names.push(name);
+                        survey(name);
+                        enroll(name, "variable", mode_const);
+
                         advance();
                         the_brace.open = true;
                     } else {
@@ -6959,7 +7047,7 @@ function jslint_phase4_walk(state) {
 //     init_variable(thing.names);
 // }
 
-                assert_or_throw(
+                jslint_assert(
                     !Array.isArray(thing.names),
                     `Expected !Array.isArray(thing.names).`
                 );
@@ -7407,7 +7495,7 @@ function jslint_phase4_walk(state) {
 //     name.init = true;
 // }
 
-                assert_or_throw(
+                jslint_assert(
                     !(name.id === "{" || name.id === "["),
                     `Expected !(name.id === "{" || name.id === "[").`
                 );
@@ -8026,7 +8114,7 @@ function jslint_phase5_whitage(state) {
 //     || name.parent.arity !== "unary"
 // )
 
-                    && assert_or_throw(
+                    && jslint_assert(
                         name.role !== "function",
                         `Expected name.role !== "function".`
                     )
@@ -8056,7 +8144,7 @@ function jslint_phase5_whitage(state) {
 //     right = token_nxt;
 // }
 
-        assert_or_throw(
+        jslint_assert(
             !(right === undefined),
             `Expected !(right === undefined).`
         );
@@ -8119,8 +8207,8 @@ function jslint_phase5_whitage(state) {
 //     }
 // }
 
-            assert_or_throw(open, `Expected open.`);
-            assert_or_throw(free, `Expected free.`);
+            jslint_assert(open, `Expected open.`);
+            jslint_assert(free, `Expected free.`);
             if (right.from < margin) {
 
 // test_cause:
@@ -8241,7 +8329,7 @@ function jslint_phase5_whitage(state) {
 // Probably deadcode.
 // case "${}":
 
-                assert_or_throw(
+                jslint_assert(
                     !(left.id + right.id === "${}"),
                     "Expected !(left.id + right.id === \"${}\")."
                 );
@@ -8619,8 +8707,8 @@ function jslint_report({
     warnings
 }) {
 
-// This function will create human-readable, html-report for warnings,
-// properties, and functions from jslint's results.
+// This function will create human-readable, html-report
+// for warnings, properties, and functions from jslint's results.
 // Example usage:
 //  let result = jslint("console.log('hello world')");
 //  let html = jslint_report(result);
@@ -8644,13 +8732,6 @@ function jslint_report({
             : ""
         );
     }
-
-// Produce the HTML Error Report.
-// <cite>
-//     <address>LINE_NUMBER</address>
-//     MESSAGE
-// </cite>
-// <samp>EVIDENCE</samp>
 
     html += "<div class=\"JSLINT_\" id=\"JSLINT_REPORT_HTML\">\n";
     html += String(`
@@ -8945,6 +9026,12 @@ body {
     background: honeydew;
     height: 100px;
 }
+.JSLINT_ #JSLINT_REPORT_TITLE {
+    color: darkslategray;
+    font-size: 32px;
+    padding-top: 16px;
+    text-align: center;
+}
 .JSLINT_ #JSLINT_REPORT_WARNINGS cite {
     display: block;
     margin: 16px 0 4px 0;
@@ -8973,6 +9060,20 @@ body {
 }
 </style>
             `).trim() + "\n";
+
+// Produce the Title.
+
+    html += "<div id=\"JSLINT_REPORT_TITLE\">\n";
+    html += "JSLint Report\n";
+    html += "</div>\n";
+
+// Produce the HTML Error Report.
+// <cite>
+//     <address>LINE_NUMBER</address>
+//     MESSAGE
+// </cite>
+// <samp>EVIDENCE</samp>
+
     html += "<fieldset id=\"JSLINT_REPORT_WARNINGS\">\n";
     html += "<legend>Report: Warnings (" + warnings.length + ")</legend>\n";
     html += "<div>\n";
@@ -9156,6 +9257,44 @@ body {
     return html;
 }
 
+async function module_fs_init() {
+
+// This function will import nodejs builtin-modules if they have not yet been
+// imported.
+
+// State 3 - Modules already imported.
+
+    if (module_fs !== undefined) {
+        return;
+    }
+
+// State 2 - Wait while modules are importing.
+
+    if (module_fs_init_resolve_list !== undefined) {
+        return new Promise(function (resolve) {
+            module_fs_init_resolve_list.push(resolve);
+        });
+    }
+
+// State 1 - Start importing modules.
+
+    module_fs_init_resolve_list = [];
+    [
+        module_child_process,
+        module_fs,
+        module_path,
+        module_url
+    ] = await Promise.all([
+        import("child_process"),
+        import("fs"),
+        import("path"),
+        import("url")
+    ]);
+    while (module_fs_init_resolve_list.length > 0) {
+        module_fs_init_resolve_list.shift()();
+    }
+}
+
 function noop(val) {
 
 // This function will do nothing except return <val>.
@@ -9176,8 +9315,15 @@ function object_assign_from_list(dict, list, val) {
 // Export jslint as cjs/esm.
 
 jslint_export = Object.freeze(Object.assign(jslint, {
+    assert_or_throw,
+    debug_inline,
+    fs_rm_recursive,
+    fs_write_file_with_parents,
+    html_escape,
     jslint,
     jslint_apidoc,
+    jslint_assert,
+    jslint_charset_ascii,
     jslint_cli,
     jslint_edition,
     jslint_phase1_split,
@@ -9185,7 +9331,9 @@ jslint_export = Object.freeze(Object.assign(jslint, {
     jslint_phase3_parse,
     jslint_phase4_walk,
     jslint_phase5_whitage,
-    jslint_report
+    jslint_report,
+    module_fs_init,
+    noop
 }));
 // module.exports = jslint_export;              // Export jslint as cjs.
 export default Object.freeze(jslint_export);    // Export jslint as esm.
@@ -9211,6 +9359,3 @@ jslint_import_meta_url = import.meta.url;
         cjs_require
     });
 }());
-
-// Coverage-hack.
-noop(jslint_charset_ascii);
