@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta
+    name="description"
+    content="JSLint, The JavaScript Code Quality Tool. This file allows JSLint
+    to be run from a web browser. It can accept a source program and analyze
+    it without sending it over the network."
+/>
+<meta
+    name="author"
+    content="Douglas Crockford"
+/>
+<meta
+    name="date"
+    content="2020-10-23"
+/>
+<link
+    rel="stylesheet"
+    type="text/css"
+    href="jslint.css"
+    media="screen"
+>
+<link
+    rel="icon"
+    href="image/favicon.ico"
+/>
+<title>JSLint:&nbsp;The&nbsp;JavaScript&nbsp;Code Quality Tool</title>
+</head>
+<body><div id="JSLINT_TITLEBOX">
+    <div>JSLint</div>
+    <ul>
+        <li><a href="help.html">Read the instructions.</a></li>
+        <li><a href="https://www.amazon.com/dp/1949815005/wrrrldwideweb" target="_blank">
+<i>How JavaScript Works</i> by Douglas Crockford.
+  </a></li>
+    </ul>
+</div>
+<div id="JSLINT_">
+  <fieldset><legend>Source</legend><textarea
+      id="JSLINT_NUMBER"
+      rows="18"
+      readonly="true"
+  ></textarea><textarea
+      id="JSLINT_SOURCE"
+      rows="18"
+      autofocus
+      spellcheck="false"
+      placeholder="// Paste JavaScript source or JSON text here."
+  ></textarea></fieldset>
+  <div class="center">
+      <button name=JSLint>JSLint</button>
+      <button name=clear>clear</button>
+  </div>
+  <fieldset id="JSLINT_WARNINGS" class="none">
+    <legend>Warnings</legend>
+    <div id="JSLINT_WARNINGS_LIST"></div>
+  </fieldset>
+  <fieldset id="JSLINT_REPORT" class="none">
+    <legend>Function Report</legend>
+    <div id="JSLINT_REPORT_LIST"></div>
+  </fieldset>
+  <fieldset id="JSLINT_PROPERTYFIELDSET" class="none">
+    <legend>Property Directive</legend>
+    <textarea id="JSLINT_PROPERTY" rows="8" readonly="true"></textarea>
+  </fieldset>
+  <div id=JSLINT_AUX class="none center">
+      <button name=select id=JSLINT_SELECT>select property</button>
+      <button name=JSLint>JSLint</button>
+      <button name=clear>clear</button>
+      <button name=options id=JSLINT_CLEAR_OPTIONS>clear options</button>
+  </div>
+  <fieldset id=JSLINT_OPTIONS><legend>Options</legend>
+    <div>Assume...
+      <div><label><input title=devel type=checkbox>in development</label></div>
+      <div><label><input title=browser type=checkbox>a browser</label></div>
+      <div><label><input title=couch type=checkbox>CouchDB</label></div>
+      <div><label><input title=node type=checkbox>Node.js</label></div>
+    <br>Fudge...
+      <div><label><input id="JSLINT_FUDGE" title=fudge type=checkbox>First line number is 1</label></div>
+    </div>
+    <div>Tolerate...
+      <div><label><input title=bitwise type=checkbox>bitwise operators</label></div>
+      <div><label><input title=convert type=checkbox>conversion operators</label></div>
+      <div><label><input title=eval type=checkbox>eval</label></div>
+      <div><label><input title=for type=checkbox>for statement</label></div>
+      <div><label><input title=getset type=checkbox>get and set</label></div>
+      <div><label><input title=long type=checkbox>long lines</label></div>
+      <div><label><input title=single type=checkbox>single quote strings</label></div>
+      <div><label><input title=this type=checkbox>this</label></div>
+      <div><label><input title=white type=checkbox>whitespace mess</label></div>
+    </div>
+    <div>Global variables...
+      <textarea
+        id=JSLINT_GLOBAL
+        title=global
+        spellcheck="false"
+        placeholder="imported globals here"
+    ></textarea>
+    </div>
+  </fieldset>
+</div>
+<script
+    src="./browser.js"
+    type="module"
+></script>
+</body></html>
