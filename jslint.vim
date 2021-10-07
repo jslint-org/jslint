@@ -1,5 +1,5 @@
 "" jslint.vim
-"" jslint vim-plugin
+"" jslint plugin for vim
 ""
 "" 1. Save this file and "jslint.mjs" to directory "~/.vim/"
 "" 2. Add vim-command ":source ~/.vim/jslint.vim" to file "~/.vimrc"
