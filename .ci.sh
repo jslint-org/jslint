@@ -1,7 +1,7 @@
 shArtifactUploadCustom() {(set -e
 # this function will custom-upload build-artifacts to branch-gh-pages
     # save jslint.cjs
-    git add -f jslint.cjs jslint.js || true
+    git add -f jslint.cjs jslint.js
     # seo - inline css-assets and invalidate cached-assets
     node --input-type=module -e '
 import moduleFs from "fs";

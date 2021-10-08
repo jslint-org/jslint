@@ -182,7 +182,7 @@ function noop(val) {
         process_exit: processExit1,
         source: "["
     });
-    // test vim-plugin handling-behavior
+    // test plugin-vim handling-behavior
     jslint.jslint_cli({
         // suppress error
         console_error: noop,
@@ -190,7 +190,7 @@ function noop(val) {
         process_argv: [
             "node",
             "jslint.mjs",
-            "--mode-vim-plugin",
+            "jslint_plugin_vim",
             "syntax-error.js"
         ],
         process_exit: processExit1,

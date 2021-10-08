@@ -1423,8 +1423,8 @@ async function jslint_cli({
     let command;
     let data;
     let exit_code = 0;
+    let mode_plugin_vim;
     let mode_report;
-    let mode_vim_plugin;
     let result;
 
     function jslint_from_file({
@@ -1491,7 +1491,7 @@ async function jslint_cli({
         if (result_from_file.warnings.length > 0) {
             exit_code = 1;
             console_error(
-                mode_vim_plugin
+                mode_plugin_vim
 
 // PR-349 - Print warnings in format readable by vim.
 
@@ -1599,6 +1599,13 @@ async function jslint_cli({
         }));
         return;
 
+// CL-xxx - add command jslint_plugin_vim
+
+    case "jslint_plugin_vim":
+        mode_plugin_vim = true;
+        process_argv = process_argv.slice(1);
+        break;
+
 // PR-363 - Add command jslint_report.
 
     case "jslint_report":
@@ -1609,9 +1616,9 @@ async function jslint_cli({
 
 // PR-349 - Detect cli-option --mode-vim-plugin.
 
-    mode_vim_plugin = (
+    mode_plugin_vim = (
         process_argv.slice(2).indexOf("--mode-vim-plugin") >= 0
-        || mode_vim_plugin
+        || mode_plugin_vim
     );
 
 // Normalize file relative to process.cwd().
@@ -8708,7 +8715,7 @@ function jslint_report({
 }) {
 
 // This function will create human-readable, html-report
-// for warnings, properties, and functions from jslint's results.
+// for warnings, properties, and functions from jslint-result-object.
 // Example usage:
 //  let result = jslint("console.log('hello world')");
 //  let html = jslint_report(result);

@@ -2,7 +2,7 @@
 
 # Todo
 - cli - add cli-command `jslint_coverage_report`
-- cli - change cli-option `--mode-vim-plugin` to cli-command `jslint_plugin_vim`
+- cli - remove cli-option `--mode-vim-plugin`
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
 - jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
@@ -13,10 +13,11 @@
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 
 # v2021.10.1-beta
-- cli - change cli-option `--mode-report` to cli-command `jslint_report=<filename>`
 - bugfix - fix false warning `uninitialized 'bb'` in code `/*jslint node*/\nlet {aa:bb} = {}; bb();`
 - bugfix - fix issue #358 - switch-statement crashes jslint
 - ci - rename dir .build/ to .artifact/
+- cli - add cli-command `jslint_plugin_vim`
+- cli - change cli-option `--mode-report` to cli-command `jslint_report=<filename>`
 - deprecated - cli - add cli-option `--mode-report`
 - doc - add api-documentation
 - fs - merge file asset_codemirror_rollup.css into index.html

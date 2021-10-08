@@ -608,9 +608,9 @@ case "jslint_apidoc":
     }));
     return;
 
-// PR-363 - Add command jslint_report.
+// CL-xxx - add command jslint_plugin_vim
 
-case "jslint_report":
+case "jslint_plugin_vim":
 ...</pre></li>
 
 <li>
@@ -691,8 +691,8 @@ case "{}":
 </span>    let command;
     let data;
     let exit_code = 0;
+    let mode_plugin_vim;
     let mode_report;
-    let mode_vim_plugin;
     let result;
 
     function jslint_from_file({
@@ -752,7 +752,7 @@ case "{}":
     process_exit: processExit1,
     source: "["
 });
-// test vim-plugin handling-behavior
+// test plugin-vim handling-behavior
 jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
     // suppress error
     console_error: noop,
@@ -760,7 +760,7 @@ jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
     process_argv: [
         "node",
         "jslint.mjs",
-        "--mode-vim-plugin",
+        "jslint_plugin_vim",
 ...</pre></li>
 
 <li>
@@ -1218,7 +1218,7 @@ jslint_assert(
 }) {
 <span class="apidocCodeCommentSpan">
 // This function will create human-readable, html-report
-// for warnings, properties, and functions from jslint's results.
+// for warnings, properties, and functions from jslint-result-object.
 // Example usage:
 //  let result = jslint("console.log('hello world')");
 //  let html = jslint_report(result);
@@ -1262,7 +1262,7 @@ X7WWiwqyCE98qt0jk5JJmgR5WJJElBmzRb1F7a66MmSLTNWZ2XSHfKBSKHoVteSEJ6EOdvVw\
 fNZOtXKDe39jXdRlkmMnOWIOFBgeEK/b0mFsgffnPyyAitNyutKky7J8a8MSEkAKGLgfptnS\
 /gDRSo7vwdNUmQDB7oP6pK7QF5d9SrY8M/tkrXcurSIQAmX7tz7pd33LIB7GQkBQ/k81s/0D\
 gpt4gbw7x0Cn/PocitK5KIGPGQIzQzAMuCeC2ERAidx9TySVqX06goT0SFFOOV9Kuxdi5Rg7\
-l6n3c...
+l...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
