@@ -208,20 +208,23 @@ function noop(val) {
         ],
         async_await: [
             "async function aa() {\n    await aa();\n}",
-            "async function aa() {\n"
-            + "    try {\n"
-            + "        aa();\n"
-            + "    } catch (err) {\n"
-            + "        await err();\n"
-            + "    }\n"
-            + "}\n",
-            "async function aa() {\n"
-            + "    try {\n"
-            + "        await aa();\n"
-            + "    } catch (err) {\n"
-            + "        await err();\n"
-            + "    }\n"
-            + "}\n"
+            (
+                "async function aa() {\n"
+                + "    try {\n"
+                + "        aa();\n"
+                + "    } catch (err) {\n"
+                + "        await err();\n"
+                + "    }\n"
+                + "}\n"
+            ), (
+                "async function aa() {\n"
+                + "    try {\n"
+                + "        await aa();\n"
+                + "    } catch (err) {\n"
+                + "        await err();\n"
+                + "    }\n"
+                + "}\n"
+            )
         ],
 
 // PR-351 - Add BigInt support.
@@ -245,6 +248,16 @@ function noop(val) {
         fart: [
             "function aa() {\n    return () => 0;\n}"
         ],
+        for: [
+            (
+                "/*jslint for*/\n"
+                + "function aa(bb) {\n"
+                + "    for (bb = 0; bb < 0; bb += 1) {\n"
+                + "        bb();\n"
+                + "    }\n"
+                + "}\n"
+            )
+        ],
         jslint_disable: [
             "/*jslint-disable*/\n0\n/*jslint-enable*/"
         ],
@@ -255,14 +268,16 @@ function noop(val) {
             "{\"aa\":[[],-0,null]}"
         ],
         label: [
-            "function aa() {\n"
-            + "bb:\n"
-            + "    while (true) {\n"
-            + "        if (true) {\n"
-            + "            break bb;\n"
-            + "        }\n"
-            + "    }\n"
-            + "}\n"
+            (
+                "function aa() {\n"
+                + "bb:\n"
+                + "    while (true) {\n"
+                + "        if (true) {\n"
+                + "            break bb;\n"
+                + "        }\n"
+                + "    }\n"
+                + "}\n"
+            )
         ],
         loop: [
             "function aa() {\n    do {\n        aa();\n    } while (aa());\n}"
@@ -284,12 +299,15 @@ function noop(val) {
             "let aa = aa?.bb?.cc;"
         ],
         param: [
-            "function aa({aa, bb}) {\n"
-            + "    return {aa, bb};\n"
-            + "}\n",
-            "function aa({constructor}) {\n"
-            + "    return {constructor};\n"
-            + "}\n"
+            (
+                "function aa({aa, bb}) {\n"
+                + "    return {aa, bb};\n"
+                + "}\n"
+            ), (
+                "function aa({constructor}) {\n"
+                + "    return {constructor};\n"
+                + "}\n"
+            )
         ],
         property: [
             "let aa = aa[`!`];"
@@ -308,18 +326,20 @@ function noop(val) {
             "let aa = (\n    aa()\n    ? `${0}`\n    : `${1}`\n);"
         ],
         try_catch: [
-            "let aa = 0;\n"
-            + "try {\n"
-            + "    aa();\n"
-            + "} catch (err) {\n"
-            + "    aa = err;\n"
-            + "}\n"
-            + "try {\n"
-            + "    aa();\n"
-            + "} catch (err) {\n"
-            + "    aa = err;\n"
-            + "}\n"
-            + "aa();\n"
+            (
+                "let aa = 0;\n"
+                + "try {\n"
+                + "    aa();\n"
+                + "} catch (err) {\n"
+                + "    aa = err;\n"
+                + "}\n"
+                + "try {\n"
+                + "    aa();\n"
+                + "} catch (err) {\n"
+                + "    aa = err;\n"
+                + "}\n"
+                + "aa();\n"
+            )
         ],
         use_strict: [
             (
@@ -557,9 +577,8 @@ function noop(val) {
 /*
  * this function will test misc handling-behavior
  */
-
     // test debugInline's handling-behavior
-    debugInline();
+    noop(debugInline);
     // test assertOrThrow's handling-behavior
     try {
         assertOrThrow(undefined, "undefined");

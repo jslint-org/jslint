@@ -1027,7 +1027,7 @@ function jslint(
     }, ii, list) {
         list[ii].formatted_message = String(
             String(ii + 1).padStart(2, " ")
-            + ". \u001b[31m" + message + "\u001b[39m"
+            + ". \u001b[1;31m" + message + "\u001b[39m"
             + " \u001b[90m\/\/ line " + line + ", column " + column
             + "\u001b[39m\n"
             + ("    " + line_source.trim()).slice(0, 72) + "\n"
@@ -1526,21 +1526,21 @@ async function jslint_cli({
 
 // This function will count number of newlines in <code>.
 
-        let cnt;
+        let count;
         let ii;
 
 // https://jsperf.com/regexp-counting-2/8
 
-        cnt = 0;
+        count = 0;
         ii = 0;
         while (true) {
             ii = code.indexOf("\n", ii) + 1;
             if (ii === 0) {
                 break;
             }
-            cnt += 1;
+            count += 1;
         }
-        return cnt;
+        return count;
     }
 
 // Feature-detect nodejs.
@@ -1599,7 +1599,7 @@ async function jslint_cli({
         }));
         return;
 
-// CL-xxx - add command jslint_plugin_vim
+// COMMIT-b26d6df2 - Add command jslint_plugin_vim.
 
     case "jslint_plugin_vim":
         mode_plugin_vim = true;
@@ -2294,6 +2294,7 @@ function jslint_phase2_lex(state) {
                         warn_at("unexpected_a", line, column - 1, "-");
                     }
                     return char_after("]");
+
 // PR-362 - Relax regexp-warning against using <space>.
 //                 case " ":
 //
@@ -2302,6 +2303,7 @@ function jslint_phase2_lex(state) {
 //
 //                     warn_at("expected_a_b", line, column, "\\u0020", " ");
 //                     break;
+
                 case "-":
                 case "/":
                 case "[":
@@ -2382,6 +2384,7 @@ function jslint_phase2_lex(state) {
 //                     warn_at("expected_a_b", line, column, "\\s", " ");
 //                     char_after();
 //                     break;
+
                 case "$":
                     if (line_source[0] !== "/") {
                         mode_regexp_multiline = true;
@@ -4575,12 +4578,19 @@ function jslint_phase3_parse(state) {
                 warn("unexpected_a", the_label);
             }
             advance(":");
-            if (
-                token_nxt.id === "do"
-                || token_nxt.id === "for"
-                || token_nxt.id === "switch"
-                || token_nxt.id === "while"
-            ) {
+            switch (token_nxt.id) {
+            case "do":
+            case "for":
+            case "switch":
+            case "while":
+
+// test_cause:
+// ["aa:do{}", "parse_statement", "the_statement_label", "do", 0]
+// ["aa:for{}", "parse_statement", "the_statement_label", "for", 0]
+// ["aa:switch{}", "parse_statement", "the_statement_label", "switch", 0]
+// ["aa:while{}", "parse_statement", "the_statement_label", "while", 0]
+
+                test_cause("the_statement_label", token_nxt.id);
                 enroll(the_label, "label", true);
                 the_label.dead = false;
                 the_label.init = true;
@@ -4949,94 +4959,148 @@ function jslint_phase3_parse(state) {
         const signature = ["("];
         let optional;
         let subparam;
-        if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
-            (function parameter() {
-                let ellipsis = false;
-                let param;
-                if (token_nxt.id === "{") {
-                    if (optional !== undefined) {
+        function parameter() {
+            let ellipsis = false;
+            let param;
+            if (token_nxt.id === "{") {
+                if (optional !== undefined) {
 
 // test_cause:
 // ["function aa(aa=0,{}){}", "parameter", "required_a_optional_b", "aa", 18]
 
-                        warn(
-                            "required_a_optional_b",
-                            token_nxt,
-                            token_nxt.id,
-                            optional.id
-                        );
-                    }
-                    param = token_nxt;
-                    param.names = [];
-                    advance("{");
-                    signature.push("{");
-                    while (true) {
-                        subparam = token_nxt;
-                        if (!subparam.identifier) {
+                    warn(
+                        "required_a_optional_b",
+                        token_nxt,
+                        token_nxt.id,
+                        optional.id
+                    );
+                }
+                param = token_nxt;
+                param.names = [];
+                advance("{");
+                signature.push("{");
+                while (true) {
+                    subparam = token_nxt;
+                    if (!subparam.identifier) {
 
 // test_cause:
 // ["function aa(aa=0,{}){}", "parameter", "expected_identifier_a", "}", 19]
 // ["function aa({0}){}", "parameter", "expected_identifier_a", "0", 14]
 
-                            return stop("expected_identifier_a");
-                        }
-                        survey(subparam);
+                        return stop("expected_identifier_a");
+                    }
+                    survey(subparam);
+                    advance();
+                    signature.push(subparam.id);
+                    if (token_nxt.id === ":") {
+                        advance(":");
                         advance();
-                        signature.push(subparam.id);
-                        if (token_nxt.id === ":") {
-                            advance(":");
-                            advance();
-                            token_now.label = subparam;
-                            subparam = token_now;
-                            if (!subparam.identifier) {
+                        token_now.label = subparam;
+                        subparam = token_now;
+                        if (!subparam.identifier) {
 
 // test_cause:
 // ["function aa({aa:0}){}", "parameter", "expected_identifier_a", "}", 18]
 
-                                return stop(
-                                    "expected_identifier_a",
-                                    token_nxt
-                                );
-                            }
+                            return stop(
+                                "expected_identifier_a",
+                                token_nxt
+                            );
                         }
+                    }
 
 // test_cause:
 // ["function aa({aa=aa},aa){}", "parameter", "equal", "", 0]
 
-                        test_cause("equal");
-                        if (token_nxt.id === "=") {
-                            advance("=");
-                            subparam.expression = parse_expression();
-                            param.open = true;
-                        }
-                        param.names.push(subparam);
-                        if (token_nxt.id === ",") {
-                            advance(",");
-                            signature.push(", ");
-                        } else {
-                            break;
-                        }
+                    test_cause("equal");
+                    if (token_nxt.id === "=") {
+                        advance("=");
+                        subparam.expression = parse_expression();
+                        param.open = true;
                     }
-                    list.push(param);
+                    param.names.push(subparam);
+                    if (token_nxt.id === ",") {
+                        advance(",");
+                        signature.push(", ");
+                    } else {
+                        break;
+                    }
+                }
+                list.push(param);
 
 // test_cause:
 // ["
 // function aa({bb,aa}){}
 // ", "check_ordered", "expected_a_b_before_c_d", "aa", 17]
 
-                    check_ordered("parameter", param.names);
-                    advance("}");
-                    signature.push("}");
-                    if (token_nxt.id === ",") {
-                        advance(",");
-                        signature.push(", ");
-                        return parameter();
-                    }
-                } else if (token_nxt.id === "[") {
-                    if (optional !== undefined) {
+                check_ordered("parameter", param.names);
+                advance("}");
+                signature.push("}");
+                if (token_nxt.id === ",") {
+                    advance(",");
+                    signature.push(", ");
+                    return parameter();
+                }
+            } else if (token_nxt.id === "[") {
+                if (optional !== undefined) {
 
 // test_cause:
 // ["function aa(aa=0,[]){}", "parameter", "required_a_optional_b", "aa", 18]
+
+                    warn(
+                        "required_a_optional_b",
+                        token_nxt,
+                        token_nxt.id,
+                        optional.id
+                    );
+                }
+                param = token_nxt;
+                param.names = [];
+                advance("[");
+                signature.push("[]");
+                while (true) {
+                    subparam = token_nxt;
+                    if (!subparam.identifier) {
+
+// test_cause:
+// ["function aa(aa=0,[]){}", "parameter", "expected_identifier_a", "]", 19]
+
+                        return stop("expected_identifier_a");
+                    }
+                    advance();
+                    param.names.push(subparam);
+
+// test_cause:
+// ["function aa([aa=aa],aa){}", "parameter", "id", "", 0]
+
+                    test_cause("id");
+                    if (token_nxt.id === "=") {
+                        advance("=");
+                        subparam.expression = parse_expression();
+                        param.open = true;
+                    }
+                    if (token_nxt.id === ",") {
+                        advance(",");
+                    } else {
+                        break;
+                    }
+                }
+                list.push(param);
+                advance("]");
+                if (token_nxt.id === ",") {
+                    advance(",");
+                    signature.push(", ");
+                    return parameter();
+                }
+            } else {
+                if (token_nxt.id === "...") {
+                    ellipsis = true;
+                    signature.push("...");
+                    advance("...");
+                    if (optional !== undefined) {
+
+// test_cause:
+// ["function aa(aa=0,...){}", "parameter", "required_a_optional_b", "aa", 21]
 
                         warn(
                             "required_a_optional_b",
@@ -5045,102 +5109,49 @@ function jslint_phase3_parse(state) {
                             optional.id
                         );
                     }
-                    param = token_nxt;
-                    param.names = [];
-                    advance("[");
-                    signature.push("[]");
-                    while (true) {
-                        subparam = token_nxt;
-                        if (!subparam.identifier) {
+                }
+                if (!token_nxt.identifier) {
 
 // test_cause:
-// ["function aa(aa=0,[]){}", "parameter", "expected_identifier_a", "]", 19]
+// ["function aa(0){}", "parameter", "expected_identifier_a", "0", 13]
 
-                            return stop("expected_identifier_a");
-                        }
-                        advance();
-                        param.names.push(subparam);
+                    return stop("expected_identifier_a");
+                }
+                param = token_nxt;
+                list.push(param);
+                advance();
+                signature.push(param.id);
+                if (ellipsis) {
+                    param.ellipsis = true;
+                } else {
+                    if (token_nxt.id === "=") {
+                        optional = param;
+                        advance("=");
+                        param.expression = parse_expression(0);
+                    } else {
+                        if (optional !== undefined) {
 
 // test_cause:
-// ["function aa([aa=aa],aa){}", "parameter", "id", "", 0]
+// ["function aa(aa=0,bb){}", "parameter", "required_a_optional_b", "aa", 18]
 
-                        test_cause("id");
-                        if (token_nxt.id === "=") {
-                            advance("=");
-                            subparam.expression = parse_expression();
-                            param.open = true;
-                        }
-                        if (token_nxt.id === ",") {
-                            advance(",");
-                        } else {
-                            break;
+                            warn(
+                                "required_a_optional_b",
+                                param,
+                                param.id,
+                                optional.id
+                            );
                         }
                     }
-                    list.push(param);
-                    advance("]");
                     if (token_nxt.id === ",") {
                         advance(",");
                         signature.push(", ");
                         return parameter();
                     }
-                } else {
-                    if (token_nxt.id === "...") {
-                        ellipsis = true;
-                        signature.push("...");
-                        advance("...");
-                        if (optional !== undefined) {
-
-// test_cause:
-// ["function aa(aa=0,...){}", "parameter", "required_a_optional_b", "aa", 21]
-
-                            warn(
-                                "required_a_optional_b",
-                                token_nxt,
-                                token_nxt.id,
-                                optional.id
-                            );
-                        }
-                    }
-                    if (!token_nxt.identifier) {
-
-// test_cause:
-// ["function aa(0){}", "parameter", "expected_identifier_a", "0", 13]
-
-                        return stop("expected_identifier_a");
-                    }
-                    param = token_nxt;
-                    list.push(param);
-                    advance();
-                    signature.push(param.id);
-                    if (ellipsis) {
-                        param.ellipsis = true;
-                    } else {
-                        if (token_nxt.id === "=") {
-                            optional = param;
-                            advance("=");
-                            param.expression = parse_expression(0);
-                        } else {
-                            if (optional !== undefined) {
-
-// test_cause:
-// ["function aa(aa=0,bb){}", "parameter", "required_a_optional_b", "aa", 18]
-
-                                warn(
-                                    "required_a_optional_b",
-                                    param,
-                                    param.id,
-                                    optional.id
-                                );
-                            }
-                        }
-                        if (token_nxt.id === ",") {
-                            advance(",");
-                            signature.push(", ");
-                            return parameter();
-                        }
-                    }
                 }
-            }());
+            }
+        }
+        if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
+            parameter();
         }
         advance(")");
         signature.push(")");
@@ -5751,8 +5762,8 @@ function jslint_phase3_parse(state) {
     }
 
     function stmt_for() {
-        const the_for = token_now;
         let first;
+        let the_for = token_now;
         if (!option_dict.for) {
 
 // test_cause:
@@ -5771,11 +5782,10 @@ function jslint_phase3_parse(state) {
 
             return stop("expected_a_b", the_for, "while (", "for (;");
         }
-        if (
-            token_nxt.id === "var"
-            || token_nxt.id === "let"
-            || token_nxt.id === "const"
-        ) {
+        switch (token_nxt.id) {
+        case "const":
+        case "let":
+        case "var":
 
 // test_cause:
 // ["for(const aa in aa){}", "stmt_for", "unexpected_a", "const", 5]
@@ -7426,6 +7436,9 @@ function jslint_phase4_walk(state) {
     }
 
     function post_s_for(thing) {
+
+// Recurse walk_statement().
+
         walk_statement(thing.inc);
     }
 
@@ -7481,6 +7494,9 @@ function jslint_phase4_walk(state) {
                     init: true
                 });
             }
+
+// Recurse walk_statement().
+
             walk_statement(thing.catch.block);
 
 // Restore previous catch-scope after catch-block.
@@ -7794,18 +7810,40 @@ function jslint_phase4_walk(state) {
         });
     }
 
-    function pre_s_f(thing) {
+    function pre_s_for(thing) {
+        let the_variable;
+        if (thing.name !== undefined) {
+            thing.name.dead = false;
+            the_variable = lookup(thing.name);
+            if (the_variable !== undefined) {
+                if (the_variable.init && the_variable.readonly) {
 
 // test_cause:
-// ["()=>0", "pre_s_f", "", "", 0]
-// ["(function (){}())", "pre_s_f", "", "", 0]
-// ["function aa(){}", "pre_s_f", "", "", 0]
+// ["const aa=0;for(aa in aa){}", "pre_s_for", "bad_assignment_a", "aa", 16]
+
+                    warn("bad_assignment_a", thing.name);
+                }
+                the_variable.init = true;
+            }
+        }
+
+// Recurse walk_statement().
+
+        walk_statement(thing.initial);
+    }
+
+    function pre_s_function(thing) {
+
+// test_cause:
+// ["()=>0", "pre_s_function", "", "", 0]
+// ["(function (){}())", "pre_s_function", "", "", 0]
+// ["function aa(){}", "pre_s_function", "", "", 0]
 
         test_cause("");
         if (thing.arity === "statement" && blockage.body !== true) {
 
 // test_cause:
-// ["if(0){function aa(){}\n}", "pre_s_f", "unexpected_a", "function", 7]
+// ["if(0){function aa(){}\n}", "pre_s_function", "unexpected_a", "function", 7]
 
             warn("unexpected_a", thing);
         }
@@ -7822,7 +7860,10 @@ function jslint_phase4_walk(state) {
             if (thing.parameters.length !== 0) {
 
 // test_cause:
-// ["/*jslint getset*/\naa={get aa(aa){}}", "pre_s_f", "bad_get", "function", 9]
+// ["
+// /*jslint getset*/
+// aa={get aa(aa){}}
+// ", "pre_s_function", "bad_get", "function", 9]
 
                 warn("bad_get", thing);
             }
@@ -7830,7 +7871,10 @@ function jslint_phase4_walk(state) {
             if (thing.parameters.length !== 1) {
 
 // test_cause:
-// ["/*jslint getset*/\naa={set aa(){}}", "pre_s_f", "bad_set", "function", 9]
+// ["
+// /*jslint getset*/
+// aa={set aa(){}}
+// ", "pre_s_function", "bad_set", "function", 9]
 
                 warn("bad_set", thing);
             }
@@ -7844,24 +7888,6 @@ function jslint_phase4_walk(state) {
                 name.init = true;
             }
         });
-    }
-
-    function pre_s_for(thing) {
-        let the_variable;
-        if (thing.name !== undefined) {
-            the_variable = lookup(thing.name);
-            if (the_variable !== undefined) {
-                the_variable.init = true;
-                if (the_variable.readonly) {
-
-// test_cause:
-// ["const aa=0;for(aa in aa){}", "pre_s_for", "bad_assignment_a", "aa", 16]
-
-                    warn("bad_assignment_a", thing.name);
-                }
-            }
-        }
-        walk_statement(thing.initial);
     }
 
     function pre_s_lbrace(thing) {
@@ -7913,6 +7939,9 @@ function jslint_phase4_walk(state) {
 // ["aa=function(){}", "walk_expression", "function", "", 0]
 
                     test_cause("function");
+
+// Recurse walk_statement().
+
                     walk_statement(thing.block);
                 }
                 if (
@@ -7952,6 +7981,9 @@ function jslint_phase4_walk(state) {
 // ["+[]", "walk_statement", "isArray", "", 0]
 
                 test_cause("isArray");
+
+// Recurse walk_statement().
+
                 thing.forEach(walk_statement);
             } else {
                 preamble(thing);
@@ -7982,6 +8014,9 @@ function jslint_phase4_walk(state) {
 
                     warn("unexpected_expression_a", thing);
                 }
+
+// Recurse walk_statement().
+
                 walk_statement(thing.block);
                 walk_statement(thing.else);
                 postamble(thing);
@@ -8018,17 +8053,17 @@ function jslint_phase4_walk(state) {
     preaction("binary", "!=", pre_b_noteq);
     preaction("binary", "(", pre_b_lparen);
     preaction("binary", "==", pre_b_eqeq);
-    preaction("binary", "=>", pre_s_f);
+    preaction("binary", "=>", pre_s_function);
     preaction("binary", "in", pre_b_in);
     preaction("binary", "instanceof", pre_b_instanceof);
     preaction("binary", "||", pre_b_or);
     preaction("binary", pre_b);
     preaction("binary", pre_a_bitwise);
     preaction("statement", "for", pre_s_for);
-    preaction("statement", "function", pre_s_f);
+    preaction("statement", "function", pre_s_function);
     preaction("statement", "try", pre_try);
     preaction("statement", "{", pre_s_lbrace);
-    preaction("unary", "function", pre_s_f);
+    preaction("unary", "function", pre_s_function);
     preaction("unary", "~", pre_a_bitwise);
     preaction("variable", pre_v);
 
@@ -9217,7 +9252,7 @@ body {
             case "[":
             case "{":
 
-// Recurse extract.
+// Recurse extract().
 
                 names.forEach(extract);
                 break;
@@ -9366,3 +9401,6 @@ jslint_import_meta_url = import.meta.url;
         cjs_require
     });
 }());
+
+// Coverage-hack.
+debug_inline();
