@@ -78,29 +78,29 @@ body {
             <ul>
             <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.assert_or_throw">1.
-function assert_or_throw<span class="apidocSignatureSpan">(condition, message)</span>
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.assertOrThrow">1.
+function assertOrThrow<span class="apidocSignatureSpan">(condition, message)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.debug_inline">2.
-function debug_inline<span class="apidocSignatureSpan">(...argv)</span>
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.debugInline">2.
+function debugInline<span class="apidocSignatureSpan">(...argv)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.fs_rm_recursive">3.
-function fs_rm_recursive<span class="apidocSignatureSpan">(path, option_dict)</span>
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.fsRmRecursive">3.
+function fsRmRecursive<span class="apidocSignatureSpan">(path, option_dict)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.fs_write_file_with_parents">4.
-function fs_write_file_with_parents<span class="apidocSignatureSpan">(pathname, data)</span>
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.fsWriteFileWithParents">4.
+function fsWriteFileWithParents<span class="apidocSignatureSpan">(pathname, data)</span>
 </a>
 
 </li>
@@ -216,8 +216,8 @@ function jslint_report<span class="apidocSignatureSpan">({
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.module_fs_init">16.
-function module_fs_init<span class="apidocSignatureSpan">()</span>
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.moduleFsInit">16.
+function moduleFsInit<span class="apidocSignatureSpan">()</span>
 </a>
 
 </li>
@@ -255,29 +255,43 @@ string jslint_edition
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.assert_or_throw" id="apidoc.elem.%22.%2Fjslint.mjs%22.assert_or_throw">1.
-    function assert_or_throw<span class="apidocSignatureSpan">(condition, message)</span>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.assertOrThrow" id="apidoc.elem.%22.%2Fjslint.mjs%22.assertOrThrow">1.
+    function assertOrThrow<span class="apidocSignatureSpan">(condition, message)</span>
     </a>
     </h2>
 </li>
-<li>Description and source-code:<pre class="apidocCodePre">function assert_or_throw(condition, message) {
+<li>Description and source-code:<pre class="apidocCodePre">function assertOrThrow(condition, message) {
 <span class="apidocCodeCommentSpan">
 // This function will throw &lt;message&gt; if &lt;condition&gt; is falsy.
 
 </span>    if (!condition) {
         throw (
-            typeof message === "string"
-            ? new Error(message.slice(0, 2048))
+            (!message || typeof message === "string")
+            ? new Error(String(message).slice(0, 2048))
             : message
         );
     }
 }</pre></li>
-<li>Example usage:<pre class="apidocCodePre">N/A</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+/*
+ * this function will test misc handling-behavior
+ */
+    // test debugInline's handling-behavior
+    noop(debugInline);
+    // test assertOrThrow's handling-behavior
+    try {
+        <span class="apidocCodeKeywordSpan">assertOrThrow</span>(undefined, "undefined");
+    } catch (ignore) {}
+    try {
+        assertOrThrow(undefined, new Error());
+    } catch (ignore) {}
+}());
+...</pre></li>
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.debug_inline" id="apidoc.elem.%22.%2Fjslint.mjs%22.debug_inline">2.
-    function debug_inline<span class="apidocSignatureSpan">(...argv)</span>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.debugInline" id="apidoc.elem.%22.%2Fjslint.mjs%22.debugInline">2.
+    function debugInline<span class="apidocSignatureSpan">(...argv)</span>
     </a>
     </h2>
 </li>
@@ -285,26 +299,35 @@ string jslint_edition
 <span class="apidocCodeCommentSpan">
 // This function will both print &lt;argv&gt; to stderr and return &lt;argv&gt;[0].
 
-</span>    console_error("\n\ndebug_inline");
-    console_error(...argv);
-    console_error("\n");
-    console_error = console.error;
+</span>    consoleError("\n\ndebugInline");
+    consoleError(...argv);
+    consoleError("\n");
+    consoleError = console.error;
     return argv[0];
 }</pre></li>
-<li>Example usage:<pre class="apidocCodePre">N/A</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+    jslint_cli({
+        cjs_module,
+        cjs_require
+    });
+}());
+
+// Coverage-hack.
+<span class="apidocCodeKeywordSpan">debugInline</span>();
+...</pre></li>
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.fs_rm_recursive" id="apidoc.elem.%22.%2Fjslint.mjs%22.fs_rm_recursive">3.
-    function fs_rm_recursive<span class="apidocSignatureSpan">(path, option_dict)</span>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.fsRmRecursive" id="apidoc.elem.%22.%2Fjslint.mjs%22.fsRmRecursive">3.
+    function fsRmRecursive<span class="apidocSignatureSpan">(path, option_dict)</span>
     </a>
     </h2>
 </li>
-<li>Description and source-code:<pre class="apidocCodePre">async function fs_rm_recursive(path, option_dict) {
+<li>Description and source-code:<pre class="apidocCodePre">async function fsRmRecursive(path, option_dict) {
 <span class="apidocCodeCommentSpan">
 // This function will 'rm -r' &lt;path&gt;.
 
-</span>    await module_fs_init();
+</span>    await moduleFsInit();
     console.error("rm -r path " + path);
     if (((
         option_dict &amp;&amp; option_dict.process_version
@@ -313,14 +336,14 @@ string jslint_edition
 // Legacy rmdir for nodejs v12
 
         await Promise.all([
-            module_fs.promises.unlink(path).catch(noop),
-            module_fs.promises.rmdir(path, {
+            moduleFs.promises.unlink(path).catch(noop),
+            moduleFs.promises.rmdir(path, {
                 recursive: true
             }).catch(noop)
         ]);
         return;
     }
-    await module_fs.promises.rm(path, {
+    await moduleFs.promises.rm(path, {
         recursive: true
     }).catch(noop);
 }</pre></li>
@@ -329,61 +352,61 @@ string jslint_edition
 
 (function testCaseFsXxx() {
 /*
-* this function will test fs_xxx's handling-behavior
+* this function will test fsXxx's handling-behavior
 */
-   // test fs_rm_recursive handling-behavior
-   jslint.<span class="apidocCodeKeywordSpan">fs_rm_recursive</span>(".artifact/fs_rm_recursive");
-   jslint.fs_rm_recursive(".artifact/fs_rm_recursive", {
+   // test fsRmRecursive handling-behavior
+   jslint.<span class="apidocCodeKeywordSpan">fsRmRecursive</span>(".artifact/fsRmRecursive");
+   jslint.fsRmRecursive(".artifact/fsRmRecursive", {
        process_version: "v12"
    });
-   // test fs_write_file_with_parents handling-behavior
+   // test fsWriteFileWithParents handling-behavior
    (async function () {
-       await jslint.fs_rm_recursive(".artifact/fs_write_file_with_parents");
-       await jslint.fs_write_file_with_parents(
+       await jslint.fsRmRecursive(".artifact/fsWriteFileWithParents");
+       await jslint.fsWriteFileWithParents(
 ...</pre></li>
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.fs_write_file_with_parents" id="apidoc.elem.%22.%2Fjslint.mjs%22.fs_write_file_with_parents">4.
-    function fs_write_file_with_parents<span class="apidocSignatureSpan">(pathname, data)</span>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.fsWriteFileWithParents" id="apidoc.elem.%22.%2Fjslint.mjs%22.fsWriteFileWithParents">4.
+    function fsWriteFileWithParents<span class="apidocSignatureSpan">(pathname, data)</span>
     </a>
     </h2>
 </li>
-<li>Description and source-code:<pre class="apidocCodePre">async function fs_write_file_with_parents(pathname, data) {
+<li>Description and source-code:<pre class="apidocCodePre">async function fsWriteFileWithParents(pathname, data) {
 <span class="apidocCodeCommentSpan">
 // This function will write &lt;data&gt; to &lt;pathname&gt; and lazy-mkdirp if necessary.
 
-</span>    await module_fs_init();
+</span>    await moduleFsInit();
 
 // Try writing to pathname.
 
     try {
-        await module_fs.promises.writeFile(pathname, data);
+        await moduleFs.promises.writeFile(pathname, data);
     } catch (ignore) {
 
 // Lazy mkdirp.
 
-        await module_fs.promises.mkdir(module_path.dirname(pathname), {
+        await moduleFs.promises.mkdir(modulePath.dirname(pathname), {
             recursive: true
         });
 
 // Retry writing to pathname.
 
-        await module_fs.promises.writeFile(pathname, data);
+        await moduleFs.promises.writeFile(pathname, data);
 
     }
     console.error("wrote file " + pathname);
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-    jslint.fs_rm_recursive(".artifact/fs_rm_recursive");
-    jslint.fs_rm_recursive(".artifact/fs_rm_recursive", {
+    jslint.fsRmRecursive(".artifact/fsRmRecursive");
+    jslint.fsRmRecursive(".artifact/fsRmRecursive", {
         process_version: "v12"
     });
-    // test fs_write_file_with_parents handling-behavior
+    // test fsWriteFileWithParents handling-behavior
     (async function () {
-        await jslint.fs_rm_recursive(".artifact/fs_write_file_with_parents");
-        await jslint.<span class="apidocCodeKeywordSpan">fs_write_file_with_parents</span>(
-            ".artifact/fs_write_file_with_parents/aa/bb/cc",
+        await jslint.fsRmRecursive(".artifact/fsWriteFileWithParents");
+        await jslint.<span class="apidocCodeKeywordSpan">fsWriteFileWithParents</span>(
+            ".artifact/fsWriteFileWithParents/aa/bb/cc",
             "aa"
         );
     }());
@@ -535,17 +558,17 @@ import fs from "fs";
 </span>    let elem_ii = 0;
     let html;
 
-    function elem_create(module_obj, key, module_name) {
+    function elem_create(moduleObj, key, moduleName) {
 
-// This function will create a sub API Doc from elem &lt;module_obj&gt;[&lt;key&gt;].
+// This function will create a sub API Doc from elem &lt;moduleObj&gt;[&lt;key&gt;].
 
         let example = "N/A";
-        let id = encodeURIComponent("apidoc.elem." + module_name + "." + key);
+        let id = encodeURIComponent("apidoc.elem." + moduleName + "." + key);
         let name;
         let signature;
         let source;
-        name = html_escape((typeof module_obj[key]) + " " + key);
-        if (typeof module_obj[key] !== "function") {
+        name = html_escape((typeof moduleObj[key]) + " " + key);
+        if (typeof moduleObj[key] !== "function") {
             return {
                 name,
                 signature: (`
@@ -565,7 +588,7 @@ ${name}
             };
         }
         // init source
-        source = html_escape(trim_start(module_obj[key].toString()));
+        source = html_escape(trim_start(moduleObj[key].toString()));
         // init signature
         source = source.replace((
             /(\([\S\s]*?\)) \{/
@@ -592,7 +615,7 @@ ${name}
                     "((?:\\n.*?){8}(function )?)\\b"
                     + key
                     + "(\\((?:.*?\\n){8})"
-                )...
+                ), "g"),...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -608,7 +631,7 @@ case "jslint_apidoc":
     }));
     return;
 
-// CL-xxx - add command jslint_plugin_vim
+// COMMIT-b26d6df2 - Add command jslint_plugin_vim.
 
 case "jslint_plugin_vim":
 ...</pre></li>
@@ -1285,46 +1308,46 @@ import fs from "fs";
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.module_fs_init" id="apidoc.elem.%22.%2Fjslint.mjs%22.module_fs_init">16.
-    function module_fs_init<span class="apidocSignatureSpan">()</span>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.moduleFsInit" id="apidoc.elem.%22.%2Fjslint.mjs%22.moduleFsInit">16.
+    function moduleFsInit<span class="apidocSignatureSpan">()</span>
     </a>
     </h2>
 </li>
-<li>Description and source-code:<pre class="apidocCodePre">async function module_fs_init() {
+<li>Description and source-code:<pre class="apidocCodePre">async function moduleFsInit() {
 <span class="apidocCodeCommentSpan">
 // This function will import nodejs builtin-modules if they have not yet been
 // imported.
 
 </span>// State 3 - Modules already imported.
 
-    if (module_fs !== undefined) {
+    if (moduleFs !== undefined) {
         return;
     }
 
 // State 2 - Wait while modules are importing.
 
-    if (module_fs_init_resolve_list !== undefined) {
+    if (moduleFsInitResolveList !== undefined) {
         return new Promise(function (resolve) {
-            module_fs_init_resolve_list.push(resolve);
+            moduleFsInitResolveList.push(resolve);
         });
     }
 
 // State 1 - Start importing modules.
 
-    module_fs_init_resolve_list = [];
+    moduleFsInitResolveList = [];
     [
-        module_child_process,
-        module_fs,
-        module_path,
-        module_url
+        moduleChildProcess,
+        moduleFs,
+        modulePath,
+        moduleUrl
     ] = await Promise.all([
         import("child_process"),
         import("fs"),
         import("path"),
         import("url")
     ]);
-    while (module_fs_init_resolve_list.length &gt; 0) {
-        module_fs_init_resolve_list.shift()();
+    while (moduleFsInitResolveList.length &gt; 0) {
+        moduleFsInitResolveList.shift()();
     }
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1335,7 +1358,7 @@ return exit_code;
     console_log = console_log || console.log;
     process_argv = process_argv || process.argv;
     process_exit = process_exit || process.exit;
-    await <span class="apidocCodeKeywordSpan">module_fs_init</span>();
+    await <span class="apidocCodeKeywordSpan">moduleFsInit</span>();
     if (!(
 
 // Feature-detect nodejs-cjs-cli.
@@ -1357,7 +1380,23 @@ return exit_code;
 
 </span>    return val;
 }</pre></li>
-<li>Example usage:<pre class="apidocCodePre">N/A</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+}());
+
+(function testCaseMisc() {
+/*
+* this function will test misc handling-behavior
+*/
+   // test debugInline's handling-behavior
+   <span class="apidocCodeKeywordSpan">noop</span>(debugInline);
+   // test assertOrThrow's handling-behavior
+   try {
+       assertOrThrow(undefined, "undefined");
+   } catch (ignore) {}
+   try {
+       assertOrThrow(undefined, new Error());
+   } catch (ignore) {}
+...</pre></li>
 
 <li>
     <h2>

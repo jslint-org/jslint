@@ -1,7 +1,7 @@
 # Changelog
 
 # Todo
-- cli - add cli-command `jslint_coverage_report`
+- cli - add cli-command jslint_coverage_report
 - cli - remove cli-option `--mode-vim-plugin`
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
 - jslint - add `for...of` syntax support.
@@ -11,12 +11,13 @@
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 - merge function.html and help.html into README.md
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
+- npm - add file package.json and command `npm test`
 
 # v2021.10.1-beta
 - bugfix - fix false warning `uninitialized 'bb'` in code `/*jslint node*/\nlet {aa:bb} = {}; bb();`
 - bugfix - fix issue #358 - switch-statement crashes jslint
 - ci - rename dir .build/ to .artifact/
-- cli - add cli-command `jslint_plugin_vim`
+- cli - add cli-command jslint_plugin_vim
 - cli - change cli-option `--mode-report` to cli-command `jslint_report=<filename>`
 - deprecated - cli - add cli-option `--mode-report`
 - doc - add api-documentation

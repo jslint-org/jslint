@@ -3,8 +3,8 @@ import moduleFs from "fs";
 import jslint from "./jslint.mjs";
 
 let {
-    assert_or_throw: assertOrThrow,
-    debug_inline: debugInline
+    assertOrThrow,
+    debugInline
 } = jslint;
 
 function noop(val) {
@@ -16,18 +16,18 @@ function noop(val) {
 
 (function testCaseFsXxx() {
 /*
- * this function will test fs_xxx's handling-behavior
+ * this function will test fsXxx's handling-behavior
  */
-    // test fs_rm_recursive handling-behavior
-    jslint.fs_rm_recursive(".artifact/fs_rm_recursive");
-    jslint.fs_rm_recursive(".artifact/fs_rm_recursive", {
+    // test fsRmRecursive handling-behavior
+    jslint.fsRmRecursive(".artifact/fsRmRecursive");
+    jslint.fsRmRecursive(".artifact/fsRmRecursive", {
         process_version: "v12"
     });
-    // test fs_write_file_with_parents handling-behavior
+    // test fsWriteFileWithParents handling-behavior
     (async function () {
-        await jslint.fs_rm_recursive(".artifact/fs_write_file_with_parents");
-        await jslint.fs_write_file_with_parents(
-            ".artifact/fs_write_file_with_parents/aa/bb/cc",
+        await jslint.fsRmRecursive(".artifact/fsWriteFileWithParents");
+        await jslint.fsWriteFileWithParents(
+            ".artifact/fsWriteFileWithParents/aa/bb/cc",
             "aa"
         );
     }());
@@ -208,20 +208,23 @@ function noop(val) {
         ],
         async_await: [
             "async function aa() {\n    await aa();\n}",
-            "async function aa() {\n"
-            + "    try {\n"
-            + "        aa();\n"
-            + "    } catch (err) {\n"
-            + "        await err();\n"
-            + "    }\n"
-            + "}\n",
-            "async function aa() {\n"
-            + "    try {\n"
-            + "        await aa();\n"
-            + "    } catch (err) {\n"
-            + "        await err();\n"
-            + "    }\n"
-            + "}\n"
+            (
+                "async function aa() {\n"
+                + "    try {\n"
+                + "        aa();\n"
+                + "    } catch (err) {\n"
+                + "        await err();\n"
+                + "    }\n"
+                + "}\n"
+            ), (
+                "async function aa() {\n"
+                + "    try {\n"
+                + "        await aa();\n"
+                + "    } catch (err) {\n"
+                + "        await err();\n"
+                + "    }\n"
+                + "}\n"
+            )
         ],
 
 // PR-351 - Add BigInt support.
@@ -245,6 +248,16 @@ function noop(val) {
         fart: [
             "function aa() {\n    return () => 0;\n}"
         ],
+        for: [
+            (
+                "/*jslint for*/\n"
+                + "function aa(bb) {\n"
+                + "    for (bb = 0; bb < 0; bb += 1) {\n"
+                + "        bb();\n"
+                + "    }\n"
+                + "}\n"
+            )
+        ],
         jslint_disable: [
             "/*jslint-disable*/\n0\n/*jslint-enable*/"
         ],
@@ -255,14 +268,16 @@ function noop(val) {
             "{\"aa\":[[],-0,null]}"
         ],
         label: [
-            "function aa() {\n"
-            + "bb:\n"
-            + "    while (true) {\n"
-            + "        if (true) {\n"
-            + "            break bb;\n"
-            + "        }\n"
-            + "    }\n"
-            + "}\n"
+            (
+                "function aa() {\n"
+                + "bb:\n"
+                + "    while (true) {\n"
+                + "        if (true) {\n"
+                + "            break bb;\n"
+                + "        }\n"
+                + "    }\n"
+                + "}\n"
+            )
         ],
         loop: [
             "function aa() {\n    do {\n        aa();\n    } while (aa());\n}"
@@ -284,12 +299,15 @@ function noop(val) {
             "let aa = aa?.bb?.cc;"
         ],
         param: [
-            "function aa({aa, bb}) {\n"
-            + "    return {aa, bb};\n"
-            + "}\n",
-            "function aa({constructor}) {\n"
-            + "    return {constructor};\n"
-            + "}\n"
+            (
+                "function aa({aa, bb}) {\n"
+                + "    return {aa, bb};\n"
+                + "}\n"
+            ), (
+                "function aa({constructor}) {\n"
+                + "    return {constructor};\n"
+                + "}\n"
+            )
         ],
         property: [
             "let aa = aa[`!`];"
@@ -308,18 +326,20 @@ function noop(val) {
             "let aa = (\n    aa()\n    ? `${0}`\n    : `${1}`\n);"
         ],
         try_catch: [
-            "let aa = 0;\n"
-            + "try {\n"
-            + "    aa();\n"
-            + "} catch (err) {\n"
-            + "    aa = err;\n"
-            + "}\n"
-            + "try {\n"
-            + "    aa();\n"
-            + "} catch (err) {\n"
-            + "    aa = err;\n"
-            + "}\n"
-            + "aa();\n"
+            (
+                "let aa = 0;\n"
+                + "try {\n"
+                + "    aa();\n"
+                + "} catch (err) {\n"
+                + "    aa = err;\n"
+                + "}\n"
+                + "try {\n"
+                + "    aa();\n"
+                + "} catch (err) {\n"
+                + "    aa = err;\n"
+                + "}\n"
+                + "aa();\n"
+            )
         ],
         use_strict: [
             (
@@ -557,9 +577,8 @@ function noop(val) {
 /*
  * this function will test misc handling-behavior
  */
-
     // test debugInline's handling-behavior
-    debugInline();
+    noop(debugInline);
     // test assertOrThrow's handling-behavior
     try {
         assertOrThrow(undefined, "undefined");
