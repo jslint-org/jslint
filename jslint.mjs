@@ -94,16 +94,16 @@
 /*jslint beta, node*/
 
 /*property
-    JSLINT_BETA, a, all, argv, arity, artifact, assert_or_throw, assign, async,
+    JSLINT_BETA, a, all, argv, arity, artifact, assertOrThrow, assign, async,
     b, beta, bitwise, block, body, browser, c, calls, catch, catch_list,
     catch_stack, causes, cjs_module, cjs_require, closer, closure, code, column,
     concat, console_error, console_log, constant, context, convert, create, cwd,
-    d, dead, debug_inline, default, devel, directive, directive_list,
+    d, dead, debugInline, default, devel, directive, directive_list,
     directive_quiet, directives, dirname, disrupt, dot, edition, elem_list,
     ellipsis, else, endsWith, env, error, eval, every, example_list, exec,
     execArgv, exit, export_dict, exports, expression, extra, file,
     fileURLToPath, filter, finally, flag, for, forEach, formatted_message, free,
-    freeze, from, froms, fs_rm_recursive, fs_write_file_with_parents, fud,
+    freeze, from, froms, fsRmRecursive, fsWriteFileWithParents, fud,
     function_list, function_stack, functions, getset, github_repo, global,
     global_dict, global_list, html_escape, id, identifier, import, import_list,
     inc, indent2, index, indexOf, init, initial, isArray, isNaN, is_equal,
@@ -114,7 +114,7 @@
     line_offset, line_source, lines, live, log, long, loop, m, main, map,
     margin, match, max, message, meta, min, mkdir, mode_cli, mode_json,
     mode_module, mode_noop, mode_property, mode_shebang, mode_stop, module,
-    module_fs_init, module_list, module_name, name, names, node, noop, now, nr,
+    moduleFsInit, module_list, moduleName, name, names, node, noop, now, nr,
     nud, ok, open, opening, option, option_dict, order, package_name, padStart,
     parameters, parent, parse, pathname, pop, process_argv, process_exit,
     process_version, promises, property, property_dict, push, quote, readFile,
@@ -128,19 +128,19 @@
     warn, warn_at, warning, warning_list, warnings, white, wrapped, writeFile
 */
 
-// init debug_inline
-let debug_inline = (function () {
-    let console_error = function () {
+// init debugInline
+let debugInline = (function () {
+    let consoleError = function () {
         return;
     };
     return function (...argv) {
 
 // This function will both print <argv> to stderr and return <argv>[0].
 
-        console_error("\n\ndebug_inline");
-        console_error(...argv);
-        console_error("\n");
-        console_error = console.error;
+        consoleError("\n\ndebugInline");
+        consoleError(...argv);
+        consoleError("\n");
+        consoleError = console.error;
         return argv[0];
     };
 }());
@@ -157,20 +157,20 @@ let jslint_edition = "v2021.10.1-beta";
 let jslint_export;              // The jslint object to be exported.
 let jslint_fudge = 1;           // Fudge starting line and starting column to 1.
 let jslint_import_meta_url = "";        // import.meta.url used by cli.
-let module_child_process;
-let module_fs;
-let module_fs_init_resolve_list;
-let module_path;
-let module_url;
+let moduleChildProcess;
+let moduleFs;
+let moduleFsInitResolveList;
+let modulePath;
+let moduleUrl;
 
-function assert_or_throw(condition, message) {
+function assertOrThrow(condition, message) {
 
 // This function will throw <message> if <condition> is falsy.
 
     if (!condition) {
         throw (
-            typeof message === "string"
-            ? new Error(message.slice(0, 2048))
+            (!message || typeof message === "string")
+            ? new Error(String(message).slice(0, 2048))
             : message
         );
     }
@@ -185,11 +185,11 @@ function empty() {
     return Object.create(null);
 }
 
-async function fs_rm_recursive(path, option_dict) {
+async function fsRmRecursive(path, option_dict) {
 
 // This function will 'rm -r' <path>.
 
-    await module_fs_init();
+    await moduleFsInit();
     console.error("rm -r path " + path);
     if (((
         option_dict && option_dict.process_version
@@ -198,39 +198,39 @@ async function fs_rm_recursive(path, option_dict) {
 // Legacy rmdir for nodejs v12
 
         await Promise.all([
-            module_fs.promises.unlink(path).catch(noop),
-            module_fs.promises.rmdir(path, {
+            moduleFs.promises.unlink(path).catch(noop),
+            moduleFs.promises.rmdir(path, {
                 recursive: true
             }).catch(noop)
         ]);
         return;
     }
-    await module_fs.promises.rm(path, {
+    await moduleFs.promises.rm(path, {
         recursive: true
     }).catch(noop);
 }
 
-async function fs_write_file_with_parents(pathname, data) {
+async function fsWriteFileWithParents(pathname, data) {
 
 // This function will write <data> to <pathname> and lazy-mkdirp if necessary.
 
-    await module_fs_init();
+    await moduleFsInit();
 
 // Try writing to pathname.
 
     try {
-        await module_fs.promises.writeFile(pathname, data);
+        await moduleFs.promises.writeFile(pathname, data);
     } catch (ignore) {
 
 // Lazy mkdirp.
 
-        await module_fs.promises.mkdir(module_path.dirname(pathname), {
+        await moduleFs.promises.mkdir(modulePath.dirname(pathname), {
             recursive: true
         });
 
 // Retry writing to pathname.
 
-        await module_fs.promises.writeFile(pathname, data);
+        await moduleFs.promises.writeFile(pathname, data);
 
     }
     console.error("wrote file " + pathname);
@@ -1027,7 +1027,7 @@ function jslint(
     }, ii, list) {
         list[ii].formatted_message = String(
             String(ii + 1).padStart(2, " ")
-            + ". \u001b[1;31m" + message + "\u001b[39m"
+            + ". \u001b[31m" + message + "\u001b[39m"
             + " \u001b[90m\/\/ line " + line + ", column " + column
             + "\u001b[39m\n"
             + ("    " + line_source.trim()).slice(0, 72) + "\n"
@@ -1078,17 +1078,17 @@ async function jslint_apidoc({
     let elem_ii = 0;
     let html;
 
-    function elem_create(module_obj, key, module_name) {
+    function elem_create(moduleObj, key, moduleName) {
 
-// This function will create a sub API Doc from elem <module_obj>[<key>].
+// This function will create a sub API Doc from elem <moduleObj>[<key>].
 
         let example = "N/A";
-        let id = encodeURIComponent("apidoc.elem." + module_name + "." + key);
+        let id = encodeURIComponent("apidoc.elem." + moduleName + "." + key);
         let name;
         let signature;
         let source;
-        name = html_escape((typeof module_obj[key]) + " " + key);
-        if (typeof module_obj[key] !== "function") {
+        name = html_escape((typeof moduleObj[key]) + " " + key);
+        if (typeof moduleObj[key] !== "function") {
             return {
                 name,
                 signature: (`
@@ -1108,7 +1108,7 @@ ${name}
             };
         }
         // init source
-        source = html_escape(trim_start(module_obj[key].toString()));
+        source = html_escape(trim_start(moduleObj[key].toString()));
         // init signature
         source = source.replace((
             /(\([\S\s]*?\)) \{/
@@ -1191,7 +1191,7 @@ ${name}<span class="apidocSignatureSpan">${signature}</span>
         str = str.replace(new RegExp("^" + whitespace, "gm"), "");
         return str;
     }
-    await module_fs_init();
+    await moduleFsInit();
 
 // Html-escape params.
 
@@ -1205,7 +1205,7 @@ ${name}<span class="apidocSignatureSpan">${signature}</span>
 
 // This function will read example from given file.
 
-        let result = await module_fs.promises.readFile(file, "utf8");
+        let result = await moduleFs.promises.readFile(file, "utf8");
         result = (
             "\n\n\n\n\n\n\n\n"
             // bug-workaround - truncate example to manageable size
@@ -1221,14 +1221,14 @@ ${name}<span class="apidocSignatureSpan">${signature}</span>
     module_list = await Promise.all(module_list.map(async function ({
         pathname
     }) {
-        let module_name = html_escape(JSON.stringify(pathname));
-        let module_obj = await import(pathname);
-        if (module_obj.default) {
-            module_obj = module_obj.default;
+        let moduleName = html_escape(JSON.stringify(pathname));
+        let moduleObj = await import(pathname);
+        if (moduleObj.default) {
+            moduleObj = moduleObj.default;
         }
         return {
-            elem_list: Object.keys(module_obj).map(function (key) {
-                return elem_create(module_obj, key, module_name);
+            elem_list: Object.keys(moduleObj).map(function (key) {
+                return elem_create(moduleObj, key, moduleName);
             }).sort(function (aa, bb) {
                 return (
                     aa.name < bb.name
@@ -1247,8 +1247,8 @@ ${name}<span class="apidocSignatureSpan">${signature}</span>
                 );
                 return elem;
             }),
-            id: encodeURIComponent("apidoc.module." + module_name),
-            module_name
+            id: encodeURIComponent("apidoc.module." + moduleName),
+            moduleName
         };
     }));
     html = (`
@@ -1329,12 +1329,12 @@ body {
     `) + module_list.map(function ({
         elem_list,
         id,
-        module_name
+        moduleName
     }) {
         return (
             (`
         <li>
-            <a class="apidocModuleA" href="#${id}">Module ${module_name}</a>
+            <a class="apidocModuleA" href="#${id}">Module ${moduleName}</a>
             <ul>
             `)
             + elem_list.map(function ({
@@ -1353,12 +1353,12 @@ body {
     `) + module_list.map(function ({
         elem_list,
         id,
-        module_name
+        moduleName
     }) {
         return (
             (`
 <div class="apidocSectionDiv">
-    <h1><a href="#${id}" id="${id}">Module ${module_name}</a></h1>
+    <h1><a href="#${id}" id="${id}">Module ${moduleName}</a></h1>
     <ul>
             `)
             + elem_list.map(function ({
@@ -1385,7 +1385,7 @@ body {
     html = html.trim().replace((
         / +?$/gm
     ), "") + "\n";
-    await fs_write_file_with_parents(pathname, html);
+    await fsWriteFileWithParents(pathname, html);
 }
 
 function jslint_assert(condition, message) {
@@ -1558,7 +1558,7 @@ async function jslint_cli({
     console_log = console_log || console.log;
     process_argv = process_argv || process.argv;
     process_exit = process_exit || process.exit;
-    await module_fs_init();
+    await moduleFsInit();
     if (!(
 
 // Feature-detect nodejs-cjs-cli.
@@ -1577,8 +1577,8 @@ async function jslint_cli({
                 ).test(process_argv[1])
                 || mode_cli
             )
-            && module_url.fileURLToPath(jslint_import_meta_url) ===
-            module_path.resolve(process_argv[1])
+            && moduleUrl.fileURLToPath(jslint_import_meta_url) ===
+            modulePath.resolve(process_argv[1])
         )
     ) && !mode_cli) {
         return exit_code;
@@ -1632,7 +1632,7 @@ async function jslint_cli({
     if (!file) {
         return;
     }
-    file = module_path.resolve(file) + "/";
+    file = modulePath.resolve(file) + "/";
     if (file.startsWith(process.cwd() + "/")) {
         file = file.replace(process.cwd() + "/", "").slice(0, -1) || ".";
     }
@@ -1648,7 +1648,7 @@ async function jslint_cli({
 // jslint_cli - jslint directory.
 
         try {
-            data = await module_fs.promises.readdir(file, "utf8");
+            data = await moduleFs.promises.readdir(file, "utf8");
         } catch (ignore) {}
         if (data) {
             await Promise.all(data.map(async function (file2) {
@@ -1669,7 +1669,7 @@ async function jslint_cli({
                     return;
                 }
                 try {
-                    code = await module_fs.promises.readFile(file2, "utf8");
+                    code = await moduleFs.promises.readFile(file2, "utf8");
                 } catch (ignore) {
                     return;
                 }
@@ -1696,7 +1696,7 @@ async function jslint_cli({
 // jslint_cli - jslint file.
 
         try {
-            data = await module_fs.promises.readFile(file, "utf8");
+            data = await moduleFs.promises.readFile(file, "utf8");
         } catch (err) {
             console_error(err);
             exit_code = 1;
@@ -1710,7 +1710,7 @@ async function jslint_cli({
         option
     });
     if (mode_report) {
-        await fs_write_file_with_parents(mode_report, jslint_report(result));
+        await fsWriteFileWithParents(mode_report, jslint_report(result));
     }
     process_exit(exit_code);
     return exit_code;
@@ -9299,41 +9299,41 @@ body {
     return html;
 }
 
-async function module_fs_init() {
+async function moduleFsInit() {
 
 // This function will import nodejs builtin-modules if they have not yet been
 // imported.
 
 // State 3 - Modules already imported.
 
-    if (module_fs !== undefined) {
+    if (moduleFs !== undefined) {
         return;
     }
 
 // State 2 - Wait while modules are importing.
 
-    if (module_fs_init_resolve_list !== undefined) {
+    if (moduleFsInitResolveList !== undefined) {
         return new Promise(function (resolve) {
-            module_fs_init_resolve_list.push(resolve);
+            moduleFsInitResolveList.push(resolve);
         });
     }
 
 // State 1 - Start importing modules.
 
-    module_fs_init_resolve_list = [];
+    moduleFsInitResolveList = [];
     [
-        module_child_process,
-        module_fs,
-        module_path,
-        module_url
+        moduleChildProcess,
+        moduleFs,
+        modulePath,
+        moduleUrl
     ] = await Promise.all([
         import("child_process"),
         import("fs"),
         import("path"),
         import("url")
     ]);
-    while (module_fs_init_resolve_list.length > 0) {
-        module_fs_init_resolve_list.shift()();
+    while (moduleFsInitResolveList.length > 0) {
+        moduleFsInitResolveList.shift()();
     }
 }
 
@@ -9357,10 +9357,10 @@ function object_assign_from_list(dict, list, val) {
 // Export jslint as cjs/esm.
 
 jslint_export = Object.freeze(Object.assign(jslint, {
-    assert_or_throw,
-    debug_inline,
-    fs_rm_recursive,
-    fs_write_file_with_parents,
+    assertOrThrow,
+    debugInline,
+    fsRmRecursive,
+    fsWriteFileWithParents,
     html_escape,
     jslint,
     jslint_apidoc,
@@ -9374,7 +9374,7 @@ jslint_export = Object.freeze(Object.assign(jslint, {
     jslint_phase4_walk,
     jslint_phase5_whitage,
     jslint_report,
-    module_fs_init,
+    moduleFsInit,
     noop
 }));
 // module.exports = jslint_export;              // Export jslint as cjs.
@@ -9403,4 +9403,4 @@ jslint_import_meta_url = import.meta.url;
 }());
 
 // Coverage-hack.
-debug_inline();
+debugInline();

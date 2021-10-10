@@ -3,8 +3,8 @@ import moduleFs from "fs";
 import jslint from "./jslint.mjs";
 
 let {
-    assert_or_throw: assertOrThrow,
-    debug_inline: debugInline
+    assertOrThrow,
+    debugInline
 } = jslint;
 
 function noop(val) {
@@ -16,18 +16,18 @@ function noop(val) {
 
 (function testCaseFsXxx() {
 /*
- * this function will test fs_xxx's handling-behavior
+ * this function will test fsXxx's handling-behavior
  */
-    // test fs_rm_recursive handling-behavior
-    jslint.fs_rm_recursive(".artifact/fs_rm_recursive");
-    jslint.fs_rm_recursive(".artifact/fs_rm_recursive", {
+    // test fsRmRecursive handling-behavior
+    jslint.fsRmRecursive(".artifact/fsRmRecursive");
+    jslint.fsRmRecursive(".artifact/fsRmRecursive", {
         process_version: "v12"
     });
-    // test fs_write_file_with_parents handling-behavior
+    // test fsWriteFileWithParents handling-behavior
     (async function () {
-        await jslint.fs_rm_recursive(".artifact/fs_write_file_with_parents");
-        await jslint.fs_write_file_with_parents(
-            ".artifact/fs_write_file_with_parents/aa/bb/cc",
+        await jslint.fsRmRecursive(".artifact/fsWriteFileWithParents");
+        await jslint.fsWriteFileWithParents(
+            ".artifact/fsWriteFileWithParents/aa/bb/cc",
             "aa"
         );
     }());
