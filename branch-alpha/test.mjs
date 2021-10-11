@@ -3,20 +3,25 @@ import moduleFs from "fs";
 import jslint from "./jslint.mjs";
 
 let {
+    assertErrorThrownAsync,
     assertJsonEqual,
     assertOrThrow,
     debugInline,
+    fsRmRecursive,
+    fsWriteFileWithParents,
     jstestDescribe,
     jstestIt,
     jstestOnExit,
-    v8CoverageListMerge
+    noop,
+    v8CoverageListMerge,
+    v8CoverageReportCreate
 } = jslint;
 
-function noop(val) {
-/*
- * this function will do nothing except return val
- */
-    return val;
+function processExit0(exitCode) {
+    assertOrThrow(exitCode === 0, exitCode);
+}
+function processExit1(exitCode) {
+    assertOrThrow(exitCode === 1, exitCode);
 }
 
 (function testCaseFsXxx() {
@@ -24,15 +29,15 @@ function noop(val) {
  * this function will test fsXxx's handling-behavior
  */
     // test fsRmRecursive handling-behavior
-    jslint.fsRmRecursive(".artifact/fsRmRecursive");
-    jslint.fsRmRecursive(".artifact/fsRmRecursive", {
+    fsRmRecursive(".artifact/fsRmRecursive");
+    fsRmRecursive(".artifact/fsRmRecursive", {
         process_version: "v12"
     });
     // test fsWriteFileWithParents handling-behavior
     (async function () {
-        await jslint.fsRmRecursive(".artifact/fsWriteFileWithParents");
-        await jslint.fsWriteFileWithParents(
-            ".artifact/fsWriteFileWithParents/aa/bb/cc",
+        await fsRmRecursive(".artifact/tmp/fsWriteFileWithParents");
+        await fsWriteFileWithParents(
+            ".artifact/tmp/fsWriteFileWithParents/aa/bb/cc",
             "aa"
         );
     }());
@@ -42,12 +47,6 @@ function noop(val) {
 /*
  * this function will test jslint's cli handling-behavior
  */
-    function processExit0(exitCode) {
-        assertOrThrow(exitCode === 0, exitCode);
-    }
-    function processExit1(exitCode) {
-        assertOrThrow(exitCode === 1, exitCode);
-    }
     // test null-case handling-behavior
     jslint.jslint_cli({
         mode_noop: true,
@@ -578,23 +577,27 @@ function noop(val) {
     });
 }());
 
-(function testCaseMisc() {
+(async function testCaseMisc() {
 /*
  * this function will test misc handling-behavior
  */
     // test debugInline's handling-behavior
     noop(debugInline);
-    // test assertJsonEqual's handling-behavior
-    try {
+    // test assertErrorThrownAsync's error handling-behavior
+    await assertErrorThrownAsync(function () {
+        return assertErrorThrownAsync(noop);
+    });
+    // test assertJsonEqual's error handling-behavior
+    await assertErrorThrownAsync(function () {
         assertJsonEqual(1, 2);
-    } catch (ignore) {}
-    // test assertOrThrow's handling-behavior
-    try {
+    });
+    // test assertOrThrow's error handling-behavior
+    await assertErrorThrownAsync(function () {
         assertOrThrow(undefined, "undefined");
-    } catch (ignore) {}
-    try {
+    });
+    await assertErrorThrownAsync(function () {
         assertOrThrow(undefined, new Error());
-    } catch (ignore) {}
+    });
 }());
 
 (async function () {
@@ -605,16 +608,24 @@ function noop(val) {
         )
     );
 
-    jstestDescribe("test jstestXxx's handling-behavior", function () {
-        jstestIt("test jstestDescribe's error handling-behavior", function () {
+    jstestDescribe((
+        "test jstestXxx's handling-behavior"
+    ), function () {
+        jstestIt((
+            "test jstestDescribe's error handling-behavior"
+        ), function () {
             throw new Error();
         }, "pass");
-        jstestIt("test jstestOnExit's error handling-behavior", function () {
+        jstestIt((
+            "test jstestOnExit's error handling-behavior"
+        ), function () {
             jstestOnExit(undefined, noop, 1);
         });
     });
 
-    jstestDescribe("test v8CoverageListMerge's handling-behavior", function () {
+    jstestDescribe((
+        "test v8CoverageListMerge's handling-behavior"
+    ), function () {
         let functionsExpected = JSON.stringify([
             {
                 functionName: "test",
@@ -656,12 +667,16 @@ function noop(val) {
                 ]
             }
         ]);
-        jstestIt("accepts empty arrays for `v8CoverageListMerge`", function () {
+        jstestIt((
+            "accepts empty arrays for `v8CoverageListMerge`"
+        ), function () {
             assertJsonEqual(v8CoverageListMerge([]), {
                 result: []
             });
         });
-        jstestIt("funcCovs.length === 1", function () {
+        jstestIt((
+            "funcCovs.length === 1"
+        ), function () {
             assertJsonEqual(v8CoverageListMerge([
                 {
                     result: [
@@ -788,7 +803,9 @@ function noop(val) {
                 });
             });
         });
-        jstestIt("merge multiple node-sqlite coverage files", function () {
+        jstestIt((
+            "merge multiple node-sqlite coverage files"
+        ), function () {
             let data1 = [
                 "test_v8_coverage_node_sqlite_9884_1633662346346_0.json",
                 "test_v8_coverage_node_sqlite_13216_1633662333140_0.json"
@@ -808,6 +825,107 @@ function noop(val) {
 // );
 
             assertJsonEqual(data1, data2);
+        });
+    });
+
+    jstestDescribe((
+        "test v8CoverageReportCreate's handling-behavior"
+    ), function () {
+        jstestIt((
+            "test null-case handling-behavior"
+        ), async function () {
+            await assertErrorThrownAsync(function () {
+                return v8CoverageReportCreate({});
+            }, "invalid coverageDir");
+        });
+        jstestIt((
+            "test invalid-coverageDir handling-behavior"
+        ), async function () {
+            await assertErrorThrownAsync(function () {
+                return jslint.jslint_cli({
+                    // suppress error
+                    console_error: noop,
+                    mode_cli: true,
+                    processArgv: [
+                        "node", "jslint.mjs",
+                        "v8_coverage_report=..",
+                        "node", "jslint.mjs"
+                    ]
+                });
+            }, "is not subdirectory of cwd");
+        });
+        jstestIt((
+            "test coverage-report jslint.mjs handling-behavior"
+        ), async function () {
+            await jslint.jslint_cli({
+                mode_cli: true,
+                processArgv: [
+                    "node", "jslint.mjs",
+                    "v8_coverage_report=.artifact/tmp/coverage_jslint",
+                    "node", "jslint.mjs"
+                ]
+            });
+        });
+        [
+            [
+                "v8CoverageReportCreate_high.js", (
+                    "switch(0){\n"
+                    + "case 0:break;\n"
+                    + "}\n"
+                )
+            ], [
+                "v8CoverageReportCreate_ignore.js", (
+                    "/*mode-coverage-ignore-file*/\n"
+                    + "switch(0){\n"
+                    + "case 0:break;\n"
+                    + "}\n"
+                )
+            ], [
+                "v8CoverageReportCreate_low.js", (
+                    "switch(0){\n"
+                    + "case 1:break;\n"
+                    + "case 2:break;\n"
+                    + "case 3:break;\n"
+                    + "case 4:break;\n"
+                    + "}\n"
+                )
+            ], [
+                "v8CoverageReportCreate_medium.js", (
+                    "switch(0){\n"
+                    + "case 0:break;\n"
+                    + "case 1:break;\n"
+                    + "case 2:break;\n"
+                    + "}\n"
+                )
+            ]
+        ].forEach(function ([
+            file, data
+        ], ii) {
+            jstestIt(file, async function () {
+                let dir = ".artifact/tmp/coverage" + ii + "/";
+                file = dir + file;
+                await fsWriteFileWithParents(file, data);
+                await jslint.jslint_cli({
+                    mode_cli: true,
+                    processArgv: [
+                        "node", "jslint.mjs",
+                        "v8_coverage_report=" + dir,
+                        "node",
+                        file
+                    ]
+                });
+                // test npm handling-behavior
+                if (ii === 0) {
+                    await jslint.jslint_cli({
+                        mode_cli: true,
+                        processArgv: [
+                            "node", "jslint.mjs",
+                            "v8_coverage_report=" + dir,
+                            "npm", "version"
+                        ]
+                    });
+                }
+            });
         });
     });
 }());

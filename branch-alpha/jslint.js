@@ -95,7 +95,7 @@
 
 /*property
     NODE_V8_COVERAGE,
-    char, coverageDir,
+    char, consoleError, coverageDir,
     fileList,
     holeList,
     isHole,
@@ -116,7 +116,7 @@
     unshift,
     v8CoverageListMerge,
 
-    assertJsonEqual,
+    assertErrorThrownAsync, assertJsonEqual,
     jstestDescribe, jstestIt, jstestOnExit,
 
     floor,
@@ -191,6 +191,7 @@ let jslint_fudge = 1;                   // Fudge starting line and starting
 let jslint_import_meta_url = "";        // import.meta.url used by cli.
 let jstestCountFailed = 0;
 let jstestCountTotal = 0;
+let jstestItCount = 0;
 let jstestItList = [];
 let jstestTimeStart;
 let moduleChildProcess;
@@ -199,9 +200,26 @@ let moduleFsInitResolveList;
 let modulePath;
 let moduleUrl;
 
+async function assertErrorThrownAsync(asyncFunc, regexp) {
+
+// This function will assert <asyncFunc> throws an error.
+
+    let err;
+    try {
+        await asyncFunc();
+    } catch (errCaught) {
+        err = errCaught;
+    }
+    assertOrThrow(err, "no error thrown");
+    assertOrThrow(
+        regexp === undefined || new RegExp(regexp).test(err.message),
+        err
+    );
+}
+
 function assertJsonEqual(aa, bb) {
 
-// this function will assert JSON.stringify(<aa>) === JSON.stringify(<bb>)
+// This function will assert JSON.stringify(<aa>) === JSON.stringify(<bb>).
 
     aa = JSON.stringify(objectDeepCopyWithKeysSorted(aa));
     bb = JSON.stringify(objectDeepCopyWithKeysSorted(bb));
@@ -9358,6 +9376,10 @@ body {
 }
 
 async function jstestDescribe(description, testFunction) {
+
+// This function will create-and-run test-group <testFunction>
+// with given <description>.
+
     let message;
     let result;
 
@@ -9385,11 +9407,12 @@ async function jstestDescribe(description, testFunction) {
         + result.map(function ([
             err, description, mode
         ]) {
+            jstestItCount += 1;
             if (err) {
                 jstestCountFailed += 1;
                 err = (
-                    "    \u001b[31m\u2718 it - " + description + "\n"
-                    + err.stack + "\u001b[39m"
+                    "    \u001b[31m\u2718 " + jstestItCount + ". test it - "
+                    + description + "\n" + err.stack + "\u001b[39m"
                 );
                 if (mode === "pass") {
                     jstestCountFailed -= 1;
@@ -9397,7 +9420,8 @@ async function jstestDescribe(description, testFunction) {
                 }
             }
             return err || (
-                "    \u001b[32m\u2714 it - " + description + "\u001b[39m"
+                "    \u001b[31m\u2714 " + jstestItCount + ". test it - "
+                + description + "\u001b[39m"
             );
         }).join("\n")
     );
@@ -9405,6 +9429,10 @@ async function jstestDescribe(description, testFunction) {
 }
 
 function jstestIt(description, testFunction, mode) {
+
+// This function will create-and-run test-case <testFunction>
+// inside current test-group with given <description>.
+
     jstestCountTotal += 1;
     jstestItList.push(new Promise(async function (resolve) {
         let err;
@@ -9420,6 +9448,10 @@ function jstestIt(description, testFunction, mode) {
 }
 
 function jstestOnExit(exitCode, processExit, countFailed) {
+
+// This function will on process-exit, print test-report
+// and exit with non-zero exit-code if any test failed.
+
     let message = (
         (
             (jstestCountFailed || countFailed)
@@ -9485,7 +9517,7 @@ function noop(val) {
 
 function objectDeepCopyWithKeysSorted(obj) {
 
-// this function will recursively deep-copy <obj> with keys sorted
+// This function will recursively deep-copy <obj> with keys sorted.
 
     let sorted;
     if (typeof obj !== "object" || !obj) {
@@ -9519,6 +9551,10 @@ function object_assign_from_list(dict, list, val) {
 
 function v8CoverageListMerge(processCovs) {
 
+// This function is derived from MIT Licensed v8-coverage at
+// https://github.com/demurgos/v8-coverage/tree/master/ts
+// https://github.com/demurgos/v8-coverage/blob/master/ts/LICENSE.md
+//
 // Merges a list of v8 process coverages.
 // The result is normalized.
 // The input values may be mutated, it is not safe to use them after passing
@@ -10159,6 +10195,7 @@ function v8CoverageListMerge(processCovs) {
 }
 
 async function v8CoverageReportCreate({
+    consoleError,
     coverageDir,
     processArgv = []
 }) {
@@ -10466,7 +10503,10 @@ body {
                 lineHtml = "";
                 lineId = "line_" + (ii + 1);
                 switch (count) {
-                case -1:
+
+// Probably deadcode.
+// case -1:
+
                 case 0:
                     if (holeList.length === 0) {
                         lineHtml += "</span>";
@@ -10546,7 +10586,7 @@ ${String(count).padStart(7, " ")}
             return;
         }
         // fs - write coverage.txt
-        console.error("\n" + txt);
+        consoleError("\n" + txt);
         promiseList.push(fsWriteFileWithParents((
             coverageDir + "coverage_report.txt"
         ), txt));
@@ -10568,12 +10608,11 @@ ${String(count).padStart(7, " ")}
     }
 
 /*
-function sentinel() {
-    return;
-}
+function sentinel() {}
 */
 
     await moduleFsInit();
+    consoleError = consoleError || console.error;
     cwd = process.cwd().replace((
         /\\/g
     ), "/") + "/";
@@ -10581,6 +10620,7 @@ function sentinel() {
 // Init coverageDir.
 // Assert coverageDir is subdirectory of cwd.
 
+    assertOrThrow(coverageDir, "invalid coverageDir " + coverageDir);
     assertOrThrow(
         pathnameRelativeCwd(coverageDir),
         "coverageDir " + coverageDir + " is not subdirectory of cwd " + cwd
@@ -10796,14 +10836,13 @@ function sentinel() {
 }
 
 /*
-function sentinel() {
-    return;
-}
+function sentinel() {}
 */
 
 // Export jslint as cjs/esm.
 
 jslint_export = Object.freeze(Object.assign(jslint, {
+    assertErrorThrownAsync,
     assertJsonEqual,
     assertOrThrow,
     debugInline,

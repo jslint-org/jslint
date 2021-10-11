@@ -245,37 +245,37 @@
     textLength="768"
     x="10"
     y="890"
->npm WARN deprecated mkdirp@0.5.1: Legacy versions of mkdirp are no longer supported. Please upda\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="912"
->  te to mkdirp 1.x. (Note that the API surface has changed to use Promises in 1.x.)              </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="934"
 >npm WARN deprecated request@2.88.2: request has been deprecated, see https://github.com/request/\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="956"
+    y="912"
 >  request/issues/3142                                                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="978"
+    y="934"
 >npm WARN deprecated tar@2.2.2: This version of tar is no longer supported, and will not receive \</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1000"
+    y="956"
 >  security updates. Please upgrade asap.                                                         </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="978"
+>npm WARN deprecated mkdirp@0.5.1: Legacy versions of mkdirp are no longer supported. Please upda\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1000"
+>  te to mkdirp 1.x. (Note that the API surface has changed to use Promises in 1.x.)              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -305,31 +305,31 @@
     textLength="768"
     x="10"
     y="1110"
->npm WARN deprecated uuid@3.3.2: Please upgrade  to version 7 or higher.  Older versions may use \</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1132"
->  Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1154"
->  blog/math-random for details.                                                                  </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1176"
 >npm WARN deprecated querystring@0.2.0: The querystring API is considered Legacy. new code should\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1198"
+    y="1132"
 >   use the URLSearchParams API instead.                                                          </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1154"
+>npm WARN deprecated uuid@3.3.2: Please upgrade  to version 7 or higher.  Older versions may use \</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1176"
+>  Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1198"
+>  blog/math-random for details.                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -353,7 +353,7 @@
     textLength="768"
     x="10"
     y="1286"
->&gt; aws-sdk@2.1004.0 postinstall /home/runner/work/jslint/jslint/node-sqlite3/node_modules/aws-sdk </tspan>
+>&gt; aws-sdk@2.1005.0 postinstall /home/runner/work/jslint/jslint/node-sqlite3/node_modules/aws-sdk </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -419,7 +419,7 @@
     textLength="768"
     x="10"
     y="1528"
->added 247 packages from 769 contributors and audited 248 packages in 7.93s                       </tspan>
+>added 247 packages from 769 contributors and audited 248 packages in 9.758s                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -539,7 +539,7 @@
     textLength="768"
     x="10"
     y="1968"
->    ✓ should return the correct lastID (165ms)                                                   </tspan>
+>    ✓ should return the correct lastID (250ms)                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -623,7 +623,7 @@
     textLength="768"
     x="10"
     y="2276"
->    ✓ fuss-free incremental backups work (173ms)                                                 </tspan>
+>    ✓ fuss-free incremental backups work (165ms)                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -809,7 +809,7 @@
     textLength="768"
     x="10"
     y="2958"
->    ✓ retrieve 100,000 rows with Statement#each (262ms)                                          </tspan>
+>    ✓ retrieve 100,000 rows with Statement#each (279ms)                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -911,7 +911,7 @@
     textLength="768"
     x="10"
     y="3332"
->(node:2209) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability i\</tspan>
+>(node:2280) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability i\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1091,7 +1091,7 @@
     textLength="768"
     x="10"
     y="3992"
->    ✓ should insert rows with lots of null values (95ms)                                         </tspan>
+>    ✓ should insert rows with lots of null values (179ms)                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1325,7 +1325,7 @@
     textLength="768"
     x="10"
     y="4850"
->    ✓ should serialize float 1633937690351                                                       </tspan>
+>    ✓ should serialize float 1633991491301                                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1385,7 +1385,7 @@
     textLength="768"
     x="10"
     y="5070"
->    ✓ should serialize integer 1633937690351                                                     </tspan>
+>    ✓ should serialize integer 1633991491301                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1445,7 +1445,7 @@
     textLength="768"
     x="10"
     y="5290"
->    ✓ should insert in parallel (1005ms)                                                         </tspan>
+>    ✓ should insert in parallel (1689ms)                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1517,7 +1517,7 @@
     textLength="768"
     x="10"
     y="5554"
->      ✓ should prepare a statement and run it 1005 times                                         </tspan>
+>      ✓ should prepare a statement and run it 1005 times (43ms)                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1829,7 +1829,7 @@
     textLength="768"
     x="10"
     y="6698"
->    ✓ should have inserted all the rows after synchronizing with serialize()                     </tspan>
+>    ✓ should have inserted all the rows after synchronizing with serialize() (49ms)              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1847,7 +1847,7 @@
     textLength="768"
     x="10"
     y="6764"
->    ✓ should call the callback (40ms)                                                            </tspan>
+>    ✓ should call the callback (54ms)                                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1979,7 +1979,7 @@
     textLength="768"
     x="10"
     y="7248"
->  160 passing (2s)                                                                               </tspan>
+>  160 passing (3s)                                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
