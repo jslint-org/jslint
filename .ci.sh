@@ -48,11 +48,11 @@ echo "\
         /250/g
     ), Math.floor(screenshotCurl.size / 1024));
     // parallel-task - screenshot example-shell-commands in README.md
-    Array.from(String(
+    await Promise.all(Array.from(String(
         await moduleFs.promises.readFile("README.md", "utf8")
     ).matchAll(
         /\n```shell <!-- shRunWithScreenshotTxt (.*?) -->\n([\S\s]*?\n)```\n/g
-    )).forEach(async function ([
+    )).map(async function ([
         ignore, file, script
     ]) {
         await moduleFs.promises.writeFile(file + ".sh", (
@@ -70,41 +70,68 @@ echo "\
                 screenshotCurl
             )
         ));
-        moduleChildProcess.spawn(
-            "sh",
-            [
-                "jslint_ci.sh",
-                "shRunWithScreenshotTxt",
-                file,
+        await new Promise(function (resolve) {
+            moduleChildProcess.spawn(
                 "sh",
-                file + ".sh"
-            ],
-            {
-                stdio: [
-                    "ignore", 1, 2
-                ]
-            }
-        );
-    });
+                [
+                    "jslint_ci.sh",
+                    "shRunWithScreenshotTxt",
+                    file,
+                    "sh",
+                    file + ".sh"
+                ],
+                {
+                    stdio: [
+                        "ignore", 1, 2
+                    ]
+                }
+            ).on("exit", resolve);
+        });
+    }));
 }());
 ' "$@" # '
     # screenshot asset_image_logo
     shImageLogoCreate &
-    # screenshot web-demo
-    shBrowserScreenshot "https://$UPSTREAM_OWNER.github.io/\
-$UPSTREAM_REPO/branch-beta/index.html"
-    # screenshot jslint_apidoc
-    shBrowserScreenshot .artifact/apidoc.html
-    # screenshot jslint_report
-    shBrowserScreenshot .artifact/jslint_report.html
-    # screenshot jslint_run_with_coverage
-    shBrowserScreenshot .artifact/my_coverage/my_test2.mjs.html
+    # screenshot html
+    node --input-type=module -e '
+import moduleChildProcess from "child_process";
+(async function () {
+    await Promise.all([
+        (
+            "https://"
+            + process.env.UPSTREAM_OWNER
+            + ".github.io/"
+            + process.env.UPSTREAM_REPO
+            + "/branch-beta/index.html"
+        ),
+        ".artifact/apidoc.html",
+        ".artifact/coverage_sqlite3/index.html",
+        ".artifact/coverage_sqlite3/lib/sqlite3.js.html",
+        ".artifact/jslint_report.html"
+    ].map(async function (url) {
+        await new Promise(function (resolve) {
+            moduleChildProcess.spawn(
+                "sh",
+                [
+                    "jslint_ci.sh", "shBrowserScreenshot", url
+                ],
+                {
+                    stdio: [
+                        "ignore", 1, 2
+                    ]
+                }
+            ).on("exit", resolve);
+        });
+    }));
+}());
+' "$@" # '
 )}
 
 shCiBaseCustom() {(set -e
 # this function will run base-ci
     # update edition in README.md, jslint.mjs from CHANGELOG.md
     node --input-type=module -e '
+import jslint from "./jslint.mjs";
 import moduleFs from "fs";
 (async function () {
     let fileDict;
@@ -115,7 +142,9 @@ import moduleFs from "fs";
         "CHANGELOG.md",
         "README.md",
         "index.html",
-        "jslint.mjs"
+        "jslint.mjs",
+        "jslint_ci.sh",
+        "package.json"
     ].map(async function (file) {
         fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
     }));
@@ -148,6 +177,28 @@ import moduleFs from "fs";
             src: fileDict["jslint.mjs"].replace((
                 /^let jslint_edition = ".*?";$/m
             ), `let jslint_edition = "${versionBeta}";`)
+        }, {
+            file: "jslint_ci.sh",
+            // update coverage-code
+            src: fileDict["jslint_ci.sh"].replace((
+                /(\nshRunWithCoverage[\S\s]*?\nlet moduleUrl;\n)[\S\s]*?\nv8CoverageReportCreate\(/m
+            ), function (ignore, match1) {
+                return match1 + [
+                    jslint.assertOrThrow,
+                    jslint.fsWriteFileWithParents,
+                    jslint.htmlEscape,
+                    jslint.moduleFsInit,
+                    jslint.v8CoverageListMerge,
+                    jslint.v8CoverageReportCreate
+                ].join("\n").replace((
+                    /    /g
+                ), "  ") + "\nv8CoverageReportCreate(";
+            })
+        }, {
+            file: "package.json",
+            src: fileDict["package.json"].replace((
+                /("version": )".*?"/
+            ), "$1" + JSON.stringify(versionMaster.slice(1)))
         }
     ].forEach(function ({
         file,

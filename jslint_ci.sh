@@ -360,7 +360,7 @@ import moduleChildProcess from "child_process";
     )
 )}
 
-shArtifactUploadCustom() {(set -e
+shCiArtifactUploadCustom() {(set -e
     return
 )}
 
@@ -517,6 +517,11 @@ import moduleUrl from "url";
     });
 }());
 ' "$@" # '
+)}
+
+shDuList() {(set -e
+# this function will du $1 and sort its subdir by size
+    du -md1 "$1" | sort -nr
 )}
 
 shGitCmdWithGithubToken() {(set -e
@@ -697,7 +702,6 @@ vendor)s{0,1}(\\b|_)\
 shGrepReplace() {(set -e
 # this function will inline grep-and-replace /tmp/shGrep.txt
     node --input-type=module -e '
-/*jslint bitwise, name*/
 import moduleFs from "fs";
 import moduleOs from "os";
 import modulePath from "path";
@@ -711,7 +715,7 @@ import modulePath from "path";
     data = data.replace((
         /^(.+?):(\d+?):(.*?)$/gm
     ), function (ignore, file, lineno, str) {
-        dict[file] = dict[file] || moduleFs.readFileSync(
+        dict[file] = dict[file] || moduleFs.readFileSync( //jslint-quiet
             modulePath.resolve(file),
             "utf8"
         ).split("\n");
@@ -1479,69 +1483,769 @@ shRmDsStore() {(set -e
 shRunWithCoverage() {(set -e
 # this function will run nodejs command $@ with v8-coverage
 # and create coverage-report .artifact/coverage/index.html
-    local EXIT_CODE
-    EXIT_CODE=0
-    export DIR_COVERAGE=.artifact/coverage/
-    rm -rf "$DIR_COVERAGE"
-    mkdir -p "$DIR_COVERAGE"
-    (set -e
-        export NODE_V8_COVERAGE="$DIR_COVERAGE"
-        "$@"
-    ) || EXIT_CODE="$?"
-    if [ "$EXIT_CODE" = 0 ]
-    then
-        node --input-type=module -e '
-import moduleFs from "fs";
-import modulePath from "path";
-// init debugInline
-(function () {
-    let consoleError = console.error;
-    globalThis.debugInline = globalThis.debugInline || function (...argList) {
+    node --input-type=module -e '
+/*jslint beta, indent2, node*/
+let moduleChildProcess;
+let moduleFs;
+let moduleFsInitResolveList;
+let modulePath;
+let moduleUrl;
+function assertOrThrow(condition, message) {
 
-// this function will both print <argList> to stderr and return <argList>[0]
+// This function will throw <message> if <condition> is falsy.
 
-        consoleError("\n\ndebugInline");
-        consoleError(...argList);
-        consoleError("\n");
-        return argList[0];
+  if (!condition) {
+    throw (
+      (!message || typeof message === "string")
+      ? new Error(String(message).slice(0, 2048))
+      : message
+    );
+  }
+}
+async function fsWriteFileWithParents(pathname, data) {
+
+// This function will write <data> to <pathname> and lazy-mkdirp if necessary.
+
+  await moduleFsInit();
+
+// Try writing to pathname.
+
+  try {
+    await moduleFs.promises.writeFile(pathname, data);
+  } catch (ignore) {
+
+// Lazy mkdirp.
+
+    await moduleFs.promises.mkdir(modulePath.dirname(pathname), {
+      recursive: true
+    });
+
+// Retry writing to pathname.
+
+    await moduleFs.promises.writeFile(pathname, data);
+
+  }
+  console.error("wrote file " + pathname);
+}
+function htmlEscape(str) {
+
+// This function will make <str> html-safe by escaping & < >.
+
+  return String(str).replace((
+    /&/g
+  ), "&amp;").replace((
+    /</g
+  ), "&lt;").replace((
+    />/g
+  ), "&gt;");
+}
+async function moduleFsInit() {
+
+// This function will import nodejs builtin-modules if they have not yet been
+// imported.
+
+// State 3 - Modules already imported.
+
+  if (moduleFs !== undefined) {
+    return;
+  }
+
+// State 2 - Wait while modules are importing.
+
+  if (moduleFsInitResolveList !== undefined) {
+    return new Promise(function (resolve) {
+      moduleFsInitResolveList.push(resolve);
+    });
+  }
+
+// State 1 - Start importing modules.
+
+  moduleFsInitResolveList = [];
+  [
+    moduleChildProcess,
+    moduleFs,
+    modulePath,
+    moduleUrl
+  ] = await Promise.all([
+    import("child_process"),
+    import("fs"),
+    import("path"),
+    import("url")
+  ]);
+  while (moduleFsInitResolveList.length > 0) {
+    moduleFsInitResolveList.shift()();
+  }
+}
+function v8CoverageListMerge(processCovs) {
+
+// Merges a list of v8 process coverages.
+// The result is normalized.
+// The input values may be mutated, it is not safe to use them after passing
+// them to this function.
+// The computation is synchronous.
+// @param processCovs Process coverages to merge.
+// @return Merged process coverage.
+
+  let resultMerged = [];    // List of merged scripts from processCovs.
+  let urlToScriptDict = new Map();  // Map scriptCov.url to scriptCovs.
+
+  function compareRangeList(aa, bb) {
+
+// Compares two range coverages.
+// The ranges are first ordered by ascending `startOffset` and then by
+// descending `endOffset`.
+// This corresponds to a pre-order tree traversal.
+
+    if (aa.startOffset !== bb.startOffset) {
+      return aa.startOffset - bb.startOffset;
+    }
+    return bb.endOffset - aa.endOffset;
+  }
+
+  function dictKeyValueAppend(dict, key, val) {
+
+// This function will append <val> to list <dict>[<key>].
+
+    let list = dict.get(key);
+    if (list === undefined) {
+      list = [];
+      dict.set(key, list);
+    }
+    list.push(val);
+  }
+
+  function mergeTreeList(parentTrees) {
+
+// This function will return RangeTree object with <parentTrees> merged into
+// property-children.
+// @precondition Same `start` and `end` for all the parentTrees
+
+    if (parentTrees.length <= 1) {
+      return parentTrees[0];
+    }
+
+// new RangeTree().
+
+    return {
+
+// Merge parentTrees into property-children.
+
+      children: mergeTreeListToChildren(parentTrees),
+      delta: parentTrees.reduce(function (aa, bb) {
+        return aa + bb.delta;
+      }, 0),
+      end: parentTrees[0].end,
+      start: parentTrees[0].start
     };
-}());
-(async function () {
-    let DIR_COVERAGE = process.env.DIR_COVERAGE;
-    let cwd;
-    let data;
-    let fileDict;
-    async function htmlRender({
-        fileList,
-        lineList,
-        pathname
-    }) {
-        let html;
-        let padLines;
-        let padPathname;
-        let txt;
-        let txtBorder;
-        function stringHtmlSafe(str) {
-        /*
-         * this function will make <str> html-safe
-         * https://stackoverflow.com/questions/7381974/which-characters-need-to-be-escaped-on-html //jslint-quiet
-         */
-            return str.replace((
-                /&/gu
-            ), "&amp;").replace((
-                /"/gu
-            ), "&quot;").replace((
-                /\u0027/gu
-            ), "&apos;").replace((
-                /</gu
-            ), "&lt;").replace((
-                />/gu
-            ), "&gt;").replace((
-                /&amp;(amp;|apos;|gt;|lt;|quot;)/igu
-            ), "&$1");
+  }
+
+  function mergeTreeListToChildren(parentTrees) {
+
+// This function will return <resultChildren> with <parentTrees> merged.
+
+    let openRange;
+    let parentToChildDict = new Map();    // Map parent to child.
+    let queueList;
+    let queueListIi = 0;
+    let queueOffset;
+    let queueTrees;
+    let resultChildren = [];
+    let startToTreeDict = new Map();    // Map tree.start to tree.
+    function nextXxx() {
+
+// Increment nextOffset, nextTrees.
+
+      let [
+        nextOffset, nextTrees
+      ] = queueList[queueListIi] || [];
+      let openRangeEnd;
+      if (queueTrees === undefined) {
+        queueListIi += 1;
+
+// Increment nextOffset, nextTrees.
+
+      } else if (nextOffset === undefined || nextOffset > queueOffset) {
+        nextOffset = queueOffset;
+        nextTrees = queueTrees;
+        queueTrees = undefined;
+
+// Concat queueTrees to nextTrees.
+
+      } else {
+        if (nextOffset === queueOffset) {
+          queueTrees.forEach(function (tree) {
+            nextTrees.push(tree);
+          });
+          queueTrees = undefined;
         }
-        html = "";
-        html += `<!DOCTYPE html>
+        queueListIi += 1;
+      }
+
+// Reached end of queueList.
+
+      if (nextOffset === undefined) {
+        if (openRange !== undefined) {
+
+// Append nested-children from parentToChildDict (within openRange) to
+// resultChildren.
+
+          resultAppendNextChild();
+        }
+        return true;
+      }
+      if (openRange !== undefined && openRange.end <= nextOffset) {
+
+// Append nested-children from parentToChildDict (within openRange) to
+// resultChildren.
+
+        resultAppendNextChild();
+        openRange = undefined;
+      }
+      if (openRange === undefined) {
+        openRangeEnd = nextOffset + 1;
+        nextTrees.forEach(function ({
+          parentIi,
+          tree
+        }) {
+          openRangeEnd = Math.max(openRangeEnd, tree.end);
+
+// Append children from nextTrees to parentToChildDict.
+
+          dictKeyValueAppend(parentToChildDict, parentIi, tree);
+        });
+        queueOffset = openRangeEnd;
+        openRange = {
+          end: openRangeEnd,
+          start: nextOffset
+        };
+      } else {
+        nextTrees.forEach(function ({
+          parentIi,
+          tree
+        }) {
+          let right;
+          if (tree.end > openRange.end) {
+            right = treeSplit(tree, openRange.end);
+            if (queueTrees === undefined) {
+              queueTrees = [];
+            }
+
+// new RangeTreeWithParent().
+
+            queueTrees.push({
+              parentIi,
+              tree: right
+            });
+          }
+
+// Append children from nextTrees to parentToChildDict.
+
+          dictKeyValueAppend(parentToChildDict, parentIi, tree);
+        });
+      }
+    }
+    function resultAppendNextChild() {
+
+// This function will append next child to <resultChildren>.
+
+      let treesMatching = [];
+      parentToChildDict.forEach(function (nested) {
+        if (
+          nested.length === 1
+          && nested[0].start === openRange.start
+          && nested[0].end === openRange.end
+        ) {
+          treesMatching.push(nested[0]);
+        } else {
+
+// new rangeTreeCreate().
+
+          treesMatching.push({
+            children: nested,
+            delta: 0,
+            end: openRange.end,
+            start: openRange.start
+          });
+        }
+      });
+      parentToChildDict.clear();
+
+// Recurse mergeTreeList().
+
+      resultChildren.push(mergeTreeList(treesMatching));
+    }
+    function treeSplit(tree, offset) {
+
+// This function will split <tree> along <offset> and return the right-side.
+// @precondition `tree.start < offset && offset < tree.end`
+// @return RangeTree Right part
+
+      let child;
+      let ii = 0;
+      let leftChildLen = tree.children.length;
+      let mid;
+      let resultTree;
+      let rightChildren;
+
+// TODO(perf): Binary search (check overhead) //jslint-quiet
+
+      while (ii < tree.children.length) {
+        child = tree.children[ii];
+        if (child.start < offset && offset < child.end) {
+
+// Recurse treeSplit().
+
+          mid = treeSplit(child, offset);
+          leftChildLen = ii + 1;
+          break;
+        }
+        if (child.start >= offset) {
+          leftChildLen = ii;
+          break;
+        }
+        ii += 1;
+      }
+      rightChildren = tree.children.splice(
+        leftChildLen,
+        tree.children.length - leftChildLen
+      );
+      if (mid !== undefined) {
+        rightChildren.unshift(mid);
+      }
+
+// new rangeTreeCreate().
+
+      resultTree = {
+        children: rightChildren,
+        delta: tree.delta,
+        end: tree.end,
+        start: offset
+      };
+      tree.end = offset;
+      return resultTree;
+    }
+
+// Init startToTreeDict.
+
+    parentTrees.forEach(function (parentTree, parentIi) {
+      parentTree.children.forEach(function (child) {
+
+// Append child with child.start to startToTreeDict.
+
+        dictKeyValueAppend(startToTreeDict, child.start, {
+          parentIi,
+          tree: child
+        });
+      });
+    });
+
+// init queueList.
+
+    queueList = Array.from(startToTreeDict).map(function ([
+      startOffset, trees
+    ]) {
+
+// new StartEvent().
+
+      return [
+        startOffset, trees
+      ];
+    }).sort(function (aa, bb) {
+      return aa[0] - bb[0];
+    });
+    while (true) {
+      if (nextXxx()) {
+        break;
+      }
+    }
+    return resultChildren;
+  }
+
+  function sortFunc(funcCov) {
+
+// This function will normalize-and-sort <funcCov>.ranges.
+// Sorts the ranges (pre-order sort).
+// TODO: Tree-based normalization of the ranges. //jslint-quiet
+// @param funcCov Function coverage to normalize.
+
+    funcCov.ranges = treeToRanges(treeFromSortedRanges(
+      funcCov.ranges.sort(compareRangeList)
+    ));
+    return funcCov;
+  }
+
+  function sortProcess(processCov) {
+
+// This function will sort <processCov>.result.
+// Sorts the scripts alphabetically by `url`.
+// Reassigns script ids: the script at index `0` receives `"0"`, the script at
+// index `1` receives `"1"` etc.
+
+    Object.entries(processCov.result.sort(function (aa, bb) {
+      return (
+        aa.url < bb.url
+        ? -1
+        : aa.url > bb.url
+        ? 1
+        : 0
+      );
+    })).forEach(function ([
+      scriptId, scriptCov
+    ]) {
+      scriptCov.scriptId = scriptId.toString(10);
+    });
+    return processCov;
+  }
+
+  function sortScript(scriptCov) {
+
+// This function will normalize-and-sort <scriptCov>.functions.
+
+// Normalize-and-sort functions[xxx].ranges.
+
+    scriptCov.functions.forEach(function (funcCov) {
+      sortFunc(funcCov);
+    });
+
+// Sort functions by root range (pre-order sort).
+
+    scriptCov.functions.sort(function (aa, bb) {
+      return compareRangeList(aa.ranges[0], bb.ranges[0]);
+    });
+    return scriptCov;
+  }
+
+  function treeFromSortedRanges(ranges) {
+
+// @precondition `ranges` are well-formed and pre-order sorted
+
+    let root;
+    let stack = [];   // Stack of parent trees and parent counts.
+    ranges.forEach(function (range) {
+
+// new rangeTreeCreate().
+
+      let node = {
+        children: [],
+        delta: range.count,
+        end: range.endOffset,
+        start: range.startOffset
+      };
+      let parent;
+      let parentCount;
+      if (root === undefined) {
+        root = node;
+        stack.push([
+          node, range.count
+        ]);
+        return;
+      }
+      while (true) {
+        [
+          parent, parentCount
+        ] = stack[stack.length - 1];
+
+// assert: `top !== undefined` (the ranges are sorted)
+
+        if (range.startOffset < parent.end) {
+          break;
+        }
+        stack.pop();
+      }
+      node.delta -= parentCount;
+      parent.children.push(node);
+      stack.push([
+        node, range.count
+      ]);
+    });
+    return root;
+  }
+
+  function treeToRanges(tree) {
+
+// Get the range coverages corresponding to the tree.
+// The ranges are pre-order sorted.
+
+    let count;
+    let cur;
+    let ii;
+    let parentCount;
+    let ranges = [];
+    let stack = [       // Stack of parent trees and counts.
+      [
+        tree, 0
+      ]
+    ];
+    function normalizeRange(tree) {
+
+// @internal
+
+      let children = [];
+      let curEnd;
+      let head;
+      let tail = [];
+      function endChain() {
+        if (tail.length !== 0) {
+          head.end = tail[tail.length - 1].end;
+          tail.forEach(function (tailTree) {
+            tailTree.children.forEach(function (subChild) {
+              subChild.delta += tailTree.delta - head.delta;
+              head.children.push(subChild);
+            });
+          });
+          tail.length = 0;
+        }
+
+// Recurse normalizeRange().
+
+        normalizeRange(head);
+        children.push(head);
+      }
+      tree.children.forEach(function (child) {
+        if (head === undefined) {
+          head = child;
+        } else if (
+          child.delta === head.delta && child.start === curEnd
+        ) {
+          tail.push(child);
+        } else {
+          endChain();
+          head = child;
+        }
+        curEnd = child.end;
+      });
+      if (head !== undefined) {
+        endChain();
+      }
+      if (children.length === 1) {
+        if (
+          children[0].start === tree.start
+          && children[0].end === tree.end
+        ) {
+          tree.delta += children[0].delta;
+          tree.children = children[0].children;
+
+// `.lazyCount` is zero for both (both are after normalization)
+
+          return;
+        }
+      }
+      tree.children = children;
+    }
+    normalizeRange(tree);
+    while (stack.length > 0) {
+      [
+        cur, parentCount
+      ] = stack.pop();
+      count = parentCount + cur.delta;
+      ranges.push({
+        count,
+        endOffset: cur.end,
+        startOffset: cur.start
+      });
+      ii = cur.children.length - 1;
+      while (ii >= 0) {
+        stack.push([
+          cur.children[ii], count
+        ]);
+        ii -= 1;
+      }
+    }
+    return ranges;
+  }
+
+  if (processCovs.length === 0) {
+    return {
+      result: []
+    };
+  }
+  if (processCovs.length === 1) {
+
+// Normalize-and-sort scriptCov.
+
+    processCovs[0].result.forEach(function (scriptCov) {
+      sortScript(scriptCov);
+    });
+
+// Sort processCovs[0].result.
+
+    return sortProcess(processCovs[0]);
+  }
+
+// Init urlToScriptDict.
+
+  processCovs.forEach(function ({
+    result
+  }) {
+    result.forEach(function (scriptCov) {
+      dictKeyValueAppend(urlToScriptDict, scriptCov.url, scriptCov);
+    });
+  });
+  urlToScriptDict.forEach(function (scriptCovs) {
+
+// assert: `scriptCovs.length > 0`
+
+// function mergeScriptList(scriptCovs) {
+// Merges a list of matching script coverages.
+// Scripts are matching if they have the same `url`.
+// The result is normalized.
+// The input values may be mutated, it is not safe to use them after passing
+// them to this function.
+// The computation is synchronous.
+// @param scriptCovs Process coverages to merge.
+// @return Merged script coverage, or `undefined` if the input list was empty.
+
+    let functions = [];
+
+// Map funcCovRoot.startOffset:funcCovRoot.endOffset to funcCov.
+
+    let rangeToFuncDict = new Map();
+
+// Probably deadcode.
+// if (scriptCovs.length === 0) {
+//   return undefined;
+// }
+
+    if (scriptCovs.length === 1) {
+      resultMerged.push(sortScript(scriptCovs[0]));
+      return;
+    }
+
+// Init rangeToFuncDict.
+// Map funcCovRoot.startOffset:funcCovRoot.endOffset to funcCov.
+
+    scriptCovs.forEach(function ({
+      functions
+    }) {
+      functions.forEach(function (funcCov) {
+        dictKeyValueAppend(
+          rangeToFuncDict,
+
+// This string can be used to match function with same root range.
+// The string is derived from the start and end offsets of the root range of
+// the function.
+// This assumes that `ranges` is non-empty (true for valid function coverages).
+
+          (
+            funcCov.ranges[0].startOffset
+            + ";" + funcCov.ranges[0].endOffset
+          ),
+          funcCov
+        );
+      });
+    });
+    rangeToFuncDict.forEach(function (funcCovs) {
+
+// assert: `funcCovs.length > 0`
+
+// function mergeFuncList(funcCovs) {
+// Merges a list of matching function coverages.
+// Functions are matching if their root ranges have the same span.
+// The result is normalized.
+// The input values may be mutated, it is not safe to use them after passing
+// them to this function.
+// The computation is synchronous.
+// @param funcCovs Function coverages to merge.
+// @return Merged function coverage, or `undefined` if the input list was empty.
+
+      let count = 0;
+      let isBlockCoverage;
+      let merged;
+      let ranges;
+      let trees = [];
+
+// Probably deadcode.
+// if (funcCovs.length === 0) {
+//   return undefined;
+// }
+
+      if (funcCovs.length === 1) {
+        functions.push(sortFunc(funcCovs[0]));
+        return;
+      }
+
+// assert: `funcCovs[0].ranges.length > 0`
+
+      funcCovs.forEach(function (funcCov) {
+
+// assert: `funcCov.ranges.length > 0`
+// assert: `funcCov.ranges` is sorted
+
+        count += (
+          funcCov.count !== undefined
+          ? funcCov.count
+          : funcCov.ranges[0].count
+        );
+        if (funcCov.isBlockCoverage) {
+          trees.push(treeFromSortedRanges(funcCov.ranges));
+        }
+      });
+      if (trees.length > 0) {
+        isBlockCoverage = true;
+        ranges = treeToRanges(mergeTreeList(trees));
+      } else {
+        isBlockCoverage = false;
+        ranges = [
+          {
+            count,
+            endOffset: funcCovs[0].ranges[0].endOffset,
+            startOffset: funcCovs[0].ranges[0].startOffset
+          }
+        ];
+      }
+      merged = {
+        functionName: funcCovs[0].functionName,
+        isBlockCoverage,
+        ranges
+      };
+      if (count !== ranges[0].count) {
+        merged.count = count;
+      }
+
+// assert: `merged` is normalized
+
+      functions.push(merged);
+    });
+    resultMerged.push(sortScript({
+      functions,
+      scriptId: scriptCovs[0].scriptId,
+      url: scriptCovs[0].url
+    }));
+  });
+  return sortProcess({
+    result: resultMerged
+  });
+}
+async function v8CoverageReportCreate({
+  coverageDir,
+  processArgv = []
+}) {
+
+// This function will create html-coverage-reports directly from
+// v8-coverage-files in <coverageDir>.
+// 1. Spawn node.js program <processArgv> with NODE_V8_COVERAGE.
+// 2. Merge JSON v8-coverage-files in <coverageDir>.
+// 3. Create html-coverage-reports in <coverageDir>.
+
+  let cwd;
+  let exitCode = 0;
+  let fileDict;
+  let promiseList = [];
+  let v8CoverageObj;
+
+  function htmlRender({
+    fileList,
+    lineList,
+    modeIndex,
+    pathname
+  }) {
+    let html;
+    let padLines;
+    let padPathname;
+    let txt;
+    let txtBorder;
+    html = "";
+    html += `<!DOCTYPE html>
 <html lang="en">
 <head>
 <title>coverage-report</title>
@@ -1549,102 +2253,102 @@ import modulePath from "path";
 /* csslint ignore:start */
 * {
 box-sizing: border-box;
-    font-family: consolas, menlo, monospace;
+  font-family: consolas, menlo, monospace;
 }
 /* csslint ignore:end */
 body {
-    margin: 0;
+  margin: 0;
 }
 .coverage pre {
-    margin: 5px 0;
+  margin: 5px 0;
 }
 .coverage table {
-    border-collapse: collapse;
+  border-collapse: collapse;
 }
 .coverage td,
 .coverage th {
-    border: 1px solid #777;
-    margin: 0;
-    padding: 5px;
+  border: 1px solid #777;
+  margin: 0;
+  padding: 5px;
 }
 .coverage td span {
-    display: inline-block;
-    width: 100%;
+  display: inline-block;
+  width: 100%;
 }
 .coverage .content {
-    padding: 0 5px;
+  padding: 0 5px;
 }
 .coverage .content a {
-    text-decoration: none;
+  text-decoration: none;
 }
 .coverage .count {
-    margin: 0 5px;
-    padding: 0 5px;
+  margin: 0 5px;
+  padding: 0 5px;
 }
 .coverage .footer,
 .coverage .header {
-    padding: 20px;
+  padding: 20px;
 }
 .coverage .percentbar {
-    height: 12px;
-    margin: 2px 0;
-    min-width: 200px;
-    position: relative;
-    width: 100%;
+  height: 12px;
+  margin: 2px 0;
+  min-width: 200px;
+  position: relative;
+  width: 100%;
 }
 .coverage .percentbar div {
-    height: 100%;
-    position: absolute;
+  height: 100%;
+  position: absolute;
 }
 .coverage .title {
-    font-size: large;
-    font-weight: bold;
-    margin-bottom: 10px;
+  font-size: large;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
 .coverage td,
 .coverage th {
-    background: #fff;
+  background: #fff;
 }
 .coverage .count {
-    background: #9d9;
-    color: #777;
+  background: #9d9;
+  color: #777;
 }
 .coverage .coverageHigh{
-    background: #9d9;
+  background: #9d9;
 }
 .coverage .coverageIgnore{
-    background: #ccc;
+  background: #ccc;
 }
 .coverage .coverageLow{
-    background: #ebb;
+  background: #ebb;
 }
 .coverage .coverageMedium{
-    background: #fd7;
+  background: #fd7;
 }
 .coverage .header {
-    background: #ddd;
+  background: #ddd;
 }
 .coverage .lineno {
-    background: #ddd;
+  background: #ddd;
 }
 .coverage .percentbar {
-    background: #999;
+  background: #999;
 }
 .coverage .percentbar div {
-    background: #666;
+  background: #666;
 }
 .coverage .uncovered {
-    background: #dbb;
+  background: #dbb;
 }
 
 .coverage pre:hover span,
 .coverage tr:hover td {
-    background: #7d7;
+  background: #7d7;
 }
 .coverage pre:hover span.uncovered,
 .coverage tr:hover td.coverageLow {
-    background: #d99;
+  background: #d99;
 }
 </style>
 </head>
@@ -1659,409 +2363,500 @@ body {
 </tr>
 </thead>
 <tbody>`;
-        if (!lineList) {
-            padLines = String("(ignore) 100.00 %").length;
-            padPathname = 32;
-            fileList.unshift({
-                linesCovered: 0,
-                linesTotal: 0,
-                modeCoverageIgnoreFile: "",
-                pathname: "./"
-            });
-            fileList.slice(1).forEach(function ({
-                linesCovered,
-                linesTotal,
-                modeCoverageIgnoreFile,
-                pathname
-            }) {
-                if (!modeCoverageIgnoreFile) {
-                    fileList[0].linesCovered += linesCovered;
-                    fileList[0].linesTotal += linesTotal;
-                }
-                padPathname = Math.max(padPathname, pathname.length + 2);
-                padLines = Math.max(
-                    padLines,
-                    String(linesCovered + " / " + linesTotal).length
-                );
-            });
+    if (modeIndex) {
+      padLines = String("(ignore) 100.00 %").length;
+      padPathname = 32;
+      fileList.unshift({
+        linesCovered: 0,
+        linesTotal: 0,
+        modeCoverageIgnoreFile: "",
+        pathname: "./"
+      });
+      fileList.slice(1).forEach(function ({
+        linesCovered,
+        linesTotal,
+        modeCoverageIgnoreFile,
+        pathname
+      }) {
+        if (!modeCoverageIgnoreFile) {
+          fileList[0].linesCovered += linesCovered;
+          fileList[0].linesTotal += linesTotal;
         }
-        txtBorder = (
-            "+" + "-".repeat(padPathname + 2) + "+"
-            + "-".repeat(padLines + 2) + "+\n"
+        padPathname = Math.max(padPathname, pathname.length + 2);
+        padLines = Math.max(
+          padLines,
+          String(linesCovered + " / " + linesTotal).length
         );
-        txt = "";
-        txt += "coverage-report\n";
-        txt += txtBorder;
-        txt += (
-            "| " + String("files covered").padEnd(padPathname, " ") + " | "
-            + String("lines").padStart(padLines, " ") + " |\n"
+      });
+    }
+    txtBorder = (
+      "+" + "-".repeat(padPathname + 2) + "+"
+      + "-".repeat(padLines + 2) + "+\n"
+    );
+    txt = "";
+    txt += "coverage-report\n";
+    txt += txtBorder;
+    txt += (
+      "| " + String("files covered").padEnd(padPathname, " ") + " | "
+      + String("lines").padStart(padLines, " ") + " |\n"
+    );
+    txt += txtBorder;
+    fileList.forEach(function ({
+      linesCovered,
+      linesTotal,
+      modeCoverageIgnoreFile,
+      pathname
+    }, ii) {
+      let coverageLevel;
+      let coveragePct;
+      let fill;
+      let str1;
+      let str2;
+      let xx1;
+      let xx2;
+      coveragePct = Math.floor(10000 * linesCovered / linesTotal || 0);
+      coverageLevel = (
+        modeCoverageIgnoreFile
+        ? "coverageIgnore"
+        : coveragePct >= 8000
+        ? "coverageHigh"
+        : coveragePct >= 5000
+        ? "coverageMedium"
+        : "coverageLow"
+      );
+      coveragePct = String(coveragePct).replace((
+        /..$/m
+      ), ".$&");
+      if (modeIndex && ii === 0) {
+        fill = (
+          // red
+          "#" + Math.round(
+            (100 - Number(coveragePct)) * 2.21
+          ).toString(16).padStart(2, "0")
+          // green
+          + Math.round(
+            Number(coveragePct) * 2.21
+          ).toString(16).padStart(2, "0")
+          + // blue
+          "00"
         );
-        txt += txtBorder;
-        fileList.forEach(function ({
-            linesCovered,
-            linesTotal,
-            modeCoverageIgnoreFile,
-            pathname
-        }, ii) {
-            let coverageLevel;
-            let coveragePct;
-            let fill;
-            let str1;
-            let str2;
-            let xx1;
-            let xx2;
-            coveragePct = Math.floor(10000 * linesCovered / linesTotal || 0);
-            coverageLevel = (
-                modeCoverageIgnoreFile
-                ? "coverageIgnore"
-                : coveragePct >= 8000
-                ? "coverageHigh"
-                : coveragePct >= 5000
-                ? "coverageMedium"
-                : "coverageLow"
-            );
-            coveragePct = String(coveragePct).replace((
-                /..$/m
-            ), ".$&");
-            if (!lineList && ii === 0) {
-                fill = (
-                    // red
-                    "#" + Math.round(
-                        (100 - Number(coveragePct)) * 2.21
-                    ).toString(16).padStart(2, "0")
-                    // green
-                    + Math.round(
-                        Number(coveragePct) * 2.21
-                    ).toString(16).padStart(2, "0")
-                    + // blue
-                    "00"
-                );
-                str1 = "coverage";
-                str2 = coveragePct + " %";
-                xx1 = 6 * str1.length + 20;
-                xx2 = 6 * str2.length + 20;
-                // fs - write coverage_badge.svg
-                moduleFs.promises.writeFile((
-                    DIR_COVERAGE + "/coverage_badge.svg"
-                ), String(`
+        str1 = "coverage";
+        str2 = coveragePct + " %";
+        xx1 = 6 * str1.length + 20;
+        xx2 = 6 * str2.length + 20;
+        // fs - write coverage_badge.svg
+        promiseList.push(fsWriteFileWithParents((
+          coverageDir + "coverage_badge.svg"
+        ), String(`
 <svg height="20" width="${xx1 + xx2}" xmlns="http://www.w3.org/2000/svg">
 <rect fill="#555" height="20" width="${xx1 + xx2}"/>
 <rect fill="${fill}" height="20" width="${xx2}" x="${xx1}"/>
 <g
-    fill="#fff"
-    font-family="dejavu sans, verdana, geneva, sans-serif"
-    font-size="11"
-    font-weight="bold"
-    text-anchor="middle"
+  fill="#fff"
+  font-family="dejavu sans, verdana, geneva, sans-serif"
+  font-size="11"
+  font-weight="bold"
+  text-anchor="middle"
 >
 <text x="${0.5 * xx1}" y="14">${str1}</text>
 <text x="${xx1 + 0.5 * xx2}" y="14">${str2}</text>
 </g>
 </svg>
-                `).trim() + "\n");
-                pathname = "";
-            }
-            txt += (
-                "| "
-                + String("./" + pathname).padEnd(padPathname, " ") + " | "
-                + String(
-                    modeCoverageIgnoreFile + " " + coveragePct + " %"
-                ).padStart(padLines, " ") + " |\n"
-            );
-            txt += (
-                "| " + "*".repeat(
-                    Math.round(0.01 * coveragePct * padPathname)
-                ).padEnd(padPathname, "_") + " | "
-                + String(
-                    linesCovered + " / " + linesTotal
-                ).padStart(padLines, " ") + " |\n"
-            );
-            txt += txtBorder;
-            pathname = stringHtmlSafe(pathname);
-            html += `<tr>
+        `).trim() + "\n"));
+        pathname = "";
+      }
+      txt += (
+        "| "
+        + String("./" + pathname).padEnd(padPathname, " ") + " | "
+        + String(
+          modeCoverageIgnoreFile + " " + coveragePct + " %"
+        ).padStart(padLines, " ") + " |\n"
+      );
+      txt += (
+        "| " + "*".repeat(
+          Math.round(0.01 * coveragePct * padPathname)
+        ).padEnd(padPathname, "_") + " | "
+        + String(
+          linesCovered + " / " + linesTotal
+        ).padStart(padLines, " ") + " |\n"
+      );
+      txt += txtBorder;
+      pathname = htmlEscape(pathname);
+      html += `<tr>
 <td class="${coverageLevel}">
-            ${(
-                lineList
-                ? (
-                    "<a href=\"index.html\">./ </a>"
-                    + pathname + "<br>"
-                )
-                : (
-                    "<a href=\"" + (pathname || "index") + ".html\">./ "
-                    + pathname + "</a><br>"
-                )
-            )}
+      ${(
+        modeIndex
+        ? (
+          "<a href=\"" + (pathname || "index") + ".html\">./ "
+          + pathname + "</a><br>"
+        )
+        : (
+          "<a href=\"index.html\">./ </a>"
+          + pathname + "<br>"
+        )
+      )}
 <div class="percentbar">
-    <div style="width: ${coveragePct}%;"></div>
+  <div style="width: ${coveragePct}%;"></div>
 </div>
 </td>
 <td style="text-align: right;">
-    ${modeCoverageIgnoreFile} ${coveragePct} %<br>
-    ${linesCovered} / ${linesTotal}
+  ${modeCoverageIgnoreFile} ${coveragePct} %<br>
+  ${linesCovered} / ${linesTotal}
 </td>
 </tr>`;
-        });
-        if (lineList) {
-            html += `</tbody>
+    });
+    if (!modeIndex) {
+      html += `</tbody>
 </table>
 </div>
 <div class="content">
 `;
-            lineList.forEach(function ({
-                count,
-                holeList,
-                line,
-                startOffset
-            }, ii) {
-                let chunk;
-                let inHole;
-                let lineHtml;
-                let lineId;
-                lineHtml = "";
-                lineId = "line_" + (ii + 1);
-                switch (count) {
-                case -1:
-                case 0:
-                    if (holeList.length === 0) {
-                        lineHtml += "</span>";
-                        lineHtml += "<span class=\"uncovered\">";
-                        lineHtml += stringHtmlSafe(line);
-                        break;
-                    }
-                    line = line.split("").map(function (chr) {
-                        return {
-                            chr,
-                            isHole: undefined
-                        };
-                    });
-                    holeList.forEach(function ([
-                        aa, bb
-                    ]) {
-                        aa = Math.max(aa - startOffset, 0);
-                        bb = Math.min(bb - startOffset, line.length);
-                        while (aa < bb) {
-                            line[aa].isHole = true;
-                            aa += 1;
-                        }
-                    });
-                    chunk = "";
-                    line.forEach(function ({
-                        chr,
-                        isHole
-                    }) {
-                        if (inHole !== isHole) {
-                            lineHtml += stringHtmlSafe(chunk);
-                            lineHtml += (
-                                isHole
-                                ? "</span><span class=\"uncovered\">"
-                                : "</span><span>"
-                            );
-                            chunk = "";
-                            inHole = isHole;
-                        }
-                        chunk += chr;
-                    });
-                    lineHtml += stringHtmlSafe(chunk);
-                    break;
-                default:
-                    lineHtml += stringHtmlSafe(line);
-                }
-                html += String(`
+      lineList.forEach(function ({
+        count,
+        holeList,
+        line,
+        startOffset
+      }, ii) {
+        let chunk;
+        let inHole;
+        let lineHtml;
+        let lineId;
+        lineHtml = "";
+        lineId = "line_" + (ii + 1);
+        switch (count) {
+        case -1:
+        case 0:
+          if (holeList.length === 0) {
+            lineHtml += "</span>";
+            lineHtml += "<span class=\"uncovered\">";
+            lineHtml += htmlEscape(line);
+            break;
+          }
+          line = line.split("").map(function (char) {
+            return {
+              char,
+              isHole: undefined
+            };
+          });
+          holeList.forEach(function ([
+            aa, bb
+          ]) {
+            aa = Math.max(aa - startOffset, 0);
+            bb = Math.min(bb - startOffset, line.length);
+            while (aa < bb) {
+              line[aa].isHole = true;
+              aa += 1;
+            }
+          });
+          chunk = "";
+          line.forEach(function ({
+            char,
+            isHole
+          }) {
+            if (inHole !== isHole) {
+              lineHtml += htmlEscape(chunk);
+              lineHtml += (
+                isHole
+                ? "</span><span class=\"uncovered\">"
+                : "</span><span>"
+              );
+              chunk = "";
+              inHole = isHole;
+            }
+            chunk += char;
+          });
+          lineHtml += htmlEscape(chunk);
+          break;
+        default:
+          lineHtml += htmlEscape(line);
+        }
+        html += String(`
 <pre>
 <span class="lineno">
 <a href="#${lineId}" id="${lineId}">${String(ii + 1).padStart(5, " ")}.</a>
 </span>
 <span class="count
-                ${(
-                    count <= 0
-                    ? "uncovered"
-                    : ""
-                )}"
+        ${(
+          count <= 0
+          ? "uncovered"
+          : ""
+        )}"
 >
 ${String(count).padStart(7, " ")}
 </span>
 <span>${lineHtml}</span>
 </pre>
-                `).replace((
-                    /\n/g
-                ), "").trim() + "\n";
-            });
-        }
-        html += `
+        `).replace((
+          /\n/g
+        ), "").trim() + "\n";
+      });
+    }
+    html += `
 </div>
 <div class="coverageFooter">
 </div>
 </body>
 </html>`;
-        html += "\n";
-        await moduleFs.promises.mkdir(modulePath.dirname(pathname), {
-            recursive: true
-        });
-        // fs - write *.html
-        moduleFs.promises.writeFile(pathname + ".html", html);
-        if (lineList) {
-            return;
-        }
-        // fs - write coverage.txt
-        console.error("\n" + txt);
-        moduleFs.promises.writeFile((
-            DIR_COVERAGE + "/coverage_report.txt"
-        ), txt);
+    html += "\n";
+    // fs - write *.html
+    promiseList.push(fsWriteFileWithParents(pathname + ".html", html));
+    if (!modeIndex) {
+      return;
     }
-    data = await moduleFs.promises.readdir(DIR_COVERAGE);
-    await Promise.all(data.map(async function (file) {
-        if ((
-            /^coverage-.*?\.json$/
-        ).test(file)) {
-            data = await moduleFs.promises.readFile((
-                DIR_COVERAGE + file
-            ), "utf8");
-            // fs - rename to coverage_v8.json
-            moduleFs.promises.rename(
-                DIR_COVERAGE + file,
-                DIR_COVERAGE + "coverage_v8.json"
-            );
-        }
+    // fs - write coverage.txt
+    console.error("\n" + txt);
+    promiseList.push(fsWriteFileWithParents((
+      coverageDir + "coverage_report.txt"
+    ), txt));
+  }
+
+  function pathnameRelativeCwd(pathname) {
+
+// This function will if <pathname> is inside <cwd>,
+// return it relative to <cwd>, else empty-string.
+
+    pathname = modulePath.resolve(pathname).replace((
+      /\\/g
+    ), "/");
+    if (!pathname.startsWith(cwd)) {
+      return;
+    }
+    pathname = pathname.slice(cwd.length);
+    return pathname;
+  }
+
+/*
+function sentinel() {
+  return;
+}
+*/
+
+  await moduleFsInit();
+  cwd = process.cwd().replace((
+    /\\/g
+  ), "/") + "/";
+
+// Init coverageDir.
+// Assert coverageDir is subdirectory of cwd.
+
+  assertOrThrow(
+    pathnameRelativeCwd(coverageDir),
+    "coverageDir " + coverageDir + " is not subdirectory of cwd " + cwd
+  );
+  coverageDir = cwd + pathnameRelativeCwd(coverageDir) + "/";
+
+// 1. Spawn node.js program <processArgv> with coverage
+
+  if (processArgv.length > 0) {
+
+// Remove old coverage-files.
+
+    await fsWriteFileWithParents(coverageDir + "/touch.txt", "");
+    await Promise.all(Array.from(
+      await moduleFs.promises.readdir(coverageDir)
+    ).map(async function (file) {
+      if ((
+        /^coverage-\d+?-\d+?-\d+?\.json$/
+      ).test(file)) {
+        console.error("rm file " + coverageDir + file);
+        await moduleFs.promises.unlink(coverageDir + file);
+      }
     }));
-    fileDict = {};
-    cwd = process.cwd().replace((
-        /\\/g
-    ), "/") + "/";
-    await Promise.all(JSON.parse(data).result.map(async function ({
-        functions,
-        url
-    }) {
-        let lineList;
-        let linesCovered;
-        let linesTotal;
-        let pathname;
-        let src;
-        if (!url.startsWith("file:///")) {
-            return;
-        }
-        pathname = url.replace((
-            process.platform === "win32"
-            ? "file:///"
-            : "file://"
-        ), "").replace((
-            /\\\\/g
-        ), "/");
-        if (
-            !pathname.startsWith(cwd)
-            || pathname.startsWith(cwd + "[")
-            || (
-                process.env.npm_config_mode_coverage !== "all"
-                && pathname.indexOf("/node_modules/") >= 0
-            )
-        ) {
-            return;
-        }
-        pathname = pathname.replace(cwd, "");
-        src = await moduleFs.promises.readFile(pathname, "utf8");
-        lineList = [{}];
-        src.replace((
-            /^.*$/gm
-        ), function (line, startOffset) {
-            lineList[lineList.length - 1].endOffset = startOffset - 1;
-            lineList.push({
-                count: -1,
-                endOffset: 0,
-                holeList: [],
-                line,
-                startOffset
-            });
-            return "";
-        });
-        lineList.shift();
-        lineList[lineList.length - 1].endOffset = src.length;
-        functions.reverse().forEach(function ({
-            ranges
-        }) {
-            ranges.reverse().forEach(function ({
-                count,
-                endOffset,
-                startOffset
-            }, ii, list) {
-                lineList.forEach(function (elem) {
-                    if (!(
-                        (
-                            elem.startOffset <= startOffset
-                            && startOffset <= elem.endOffset
-                        ) || (
-                            elem.startOffset <= endOffset
-                            && endOffset <= elem.endOffset
-                        ) || (
-                            startOffset <= elem.startOffset
-                            && elem.endOffset <= endOffset
-                        )
-                    )) {
-                        return;
-                    }
-                    // handle root-range
-                    if (ii + 1 === list.length) {
-                        if (elem.count === -1) {
-                            elem.count = count;
-                        }
-                        return;
-                    }
-                    // handle non-root-range
-                    if (elem.count !== 0) {
-                        elem.count = Math.max(count, elem.count);
-                    }
-                    if (count === 0) {
-                        elem.count = 0;
-                        elem.holeList.push([
-                            startOffset, endOffset
-                        ]);
-                    }
-                });
-            });
-        });
-        linesTotal = lineList.length;
-        linesCovered = lineList.filter(function ({
-            count
-        }) {
-            return count > 0;
-        }).length;
-        await moduleFs.promises.mkdir((
-            modulePath.dirname(DIR_COVERAGE + pathname)
-        ), {
-            recursive: true
-        });
-        fileDict[pathname] = {
-            lineList,
-            linesCovered,
-            linesTotal,
-            modeCoverageIgnoreFile: (
-                (
-                    /^\/\*mode-coverage-ignore-file\*\/$/m
-                ).test(src.slice(0, 65536))
-                ? "(ignore)"
-                : ""
-            ),
-            pathname,
-            src
-        };
-        await htmlRender({
-            fileList: [
-                fileDict[pathname]
-            ],
-            lineList,
-            pathname: DIR_COVERAGE + pathname
-        });
-    }));
-    await htmlRender({
-        fileList: Object.keys(fileDict).sort().map(function (pathname) {
-            return fileDict[pathname];
+    exitCode = await new Promise(function (resolve) {
+      moduleChildProcess.spawn((
+        (process.platform === "win32" && processArgv[0] === "npm")
+        ? "npm.cmd"
+        : processArgv[0]
+      ), processArgv.slice(1), {
+        env: Object.assign({}, process.env, {
+          NODE_V8_COVERAGE: coverageDir
         }),
-        pathname: DIR_COVERAGE + "index"
+        stdio: [
+          "ignore", 1, 2
+        ]
+      }).on("exit", resolve);
     });
-}());
+  }
+
+// 2. Merge JSON v8-coverage-files in <coverageDir>.
+
+  v8CoverageObj = await moduleFs.promises.readdir(coverageDir);
+  v8CoverageObj = v8CoverageObj.filter(function (file) {
+    return (
+      /^coverage-\d+?-\d+?-\d+?\.json$/
+    ).test(file);
+  });
+  v8CoverageObj = await Promise.all(v8CoverageObj.map(async function (file) {
+    let data = await moduleFs.promises.readFile(coverageDir + file, "utf8");
+    data = JSON.parse(data);
+    data.result = data.result.filter(function (scriptCov) {
+      let pathname = scriptCov.url;
+
+// Filter out internal coverages.
+
+      if (!pathname.startsWith("file:///")) {
+        return;
+      }
+
+// Normalize pathname.
+
+      pathname = pathnameRelativeCwd(moduleUrl.fileURLToPath(pathname));
+      if (
+
+// Filter files outside of cwd.
+
+        !pathname
+        || pathname.startsWith("[")
+
+// Filter directory node_modules.
+
+        || (
+          process.env.npm_config_mode_coverage !== "all"
+          && (
+            /(?:^|\/)node_modules\//m
+          ).test(pathname)
+        )
+      ) {
+        return;
+      }
+      scriptCov.url = pathname;
+      return true;
+    });
+    return data;
+  }));
+
+// Merge v8CoverageObj.
+
+  v8CoverageObj = v8CoverageListMerge(v8CoverageObj);
+
+// debug v8CoverageObj.
+
+  await fsWriteFileWithParents(
+    coverageDir + "v8_coverage_merged.json",
+    JSON.stringify(v8CoverageObj)
+  );
+
+// 3. Create html-coverage-reports in <coverageDir>.
+
+  fileDict = {};
+  await Promise.all(v8CoverageObj.result.map(async function ({
+    functions,
+    url: pathname
+  }) {
+    let lineList;
+    let linesCovered;
+    let linesTotal;
+    let source;
+    source = await moduleFs.promises.readFile(pathname, "utf8");
+    lineList = [{}];
+    source.replace((
+      /^.*$/gm
+    ), function (line, startOffset) {
+      lineList[lineList.length - 1].endOffset = startOffset - 1;
+      lineList.push({
+        count: -1,
+        endOffset: 0,
+        holeList: [],
+        line,
+        startOffset
+      });
+      return "";
+    });
+    lineList.shift();
+    lineList[lineList.length - 1].endOffset = source.length;
+    functions.reverse().forEach(function ({
+      ranges
+    }) {
+      ranges.reverse().forEach(function ({
+        count,
+        endOffset,
+        startOffset
+      }, ii, list) {
+        lineList.forEach(function (elem) {
+          if (!(
+            (
+              elem.startOffset <= startOffset
+              && startOffset <= elem.endOffset
+            ) || (
+              elem.startOffset <= endOffset
+              && endOffset <= elem.endOffset
+            ) || (
+              startOffset <= elem.startOffset
+              && elem.endOffset <= endOffset
+            )
+          )) {
+            return;
+          }
+          // handle root-range
+          if (ii + 1 === list.length) {
+            if (elem.count === -1) {
+              elem.count = count;
+            }
+            return;
+          }
+          // handle non-root-range
+          if (elem.count !== 0) {
+            elem.count = Math.max(count, elem.count);
+          }
+          if (count === 0) {
+            elem.count = 0;
+            elem.holeList.push([
+              startOffset, endOffset
+            ]);
+          }
+        });
+      });
+    });
+    linesTotal = lineList.length;
+    linesCovered = lineList.filter(function ({
+      count
+    }) {
+      return count > 0;
+    }).length;
+    await moduleFs.promises.mkdir((
+      modulePath.dirname(coverageDir + pathname)
+    ), {
+      recursive: true
+    });
+    fileDict[pathname] = {
+      lineList,
+      linesCovered,
+      linesTotal,
+      modeCoverageIgnoreFile: (
+        (
+          /^\/\*mode-coverage-ignore-file\*\/$/m
+        ).test(source.slice(0, 65536))
+        ? "(ignore)"
+        : ""
+      ),
+      pathname
+    };
+    htmlRender({
+      fileList: [
+        fileDict[pathname]
+      ],
+      lineList,
+      pathname: coverageDir + pathname
+    });
+  }));
+  htmlRender({
+    fileList: Object.keys(fileDict).sort().map(function (pathname) {
+      return fileDict[pathname];
+    }),
+    modeIndex: true,
+    pathname: coverageDir + "index"
+  });
+  assertOrThrow(
+    exitCode === 0,
+    "v8CoverageReportCreate - nonzero exitCode " + exitCode
+  );
+  await Promise.all(promiseList);
+}
+v8CoverageReportCreate({
+  coverageDir: ".artifact/coverage",
+  processArgv: process.argv.slice(1)
+});
 ' "$@" # '
-        find "$DIR_COVERAGE"
-    fi
-    printf "shRunWithCoverage - EXIT_CODE=$EXIT_CODE\n" 1>&2
-    return "$EXIT_CODE"
 )}
 
 shRunWithScreenshotTxt() {(set -e
@@ -2156,6 +2951,10 @@ ${result}
 
 shCiMain() {(set -e
 # this function will run $@
+    if [ "$1" = "" ]
+    then
+        return
+    fi
     # run "$@" with winpty
     export CI_UNAME="${CI_UNAME:-$(uname)}"
     case "$CI_UNAME" in
@@ -2163,7 +2962,7 @@ shCiMain() {(set -e
         if [ ! "$CI_WINPTY" ] && [ "$1" != shHttpFileServer ]
         then
             export CI_WINPTY=1
-            winpty -Xallow-non-tty -Xplain sh jslint_ci.sh "$@"
+            winpty -Xallow-non-tty -Xplain sh "$0" "$@"
             return
         fi
         ;;

@@ -23,11 +23,12 @@ Douglas Crockford <douglas@crockford.com>
 3. [API Doc](#api-doc)
 4. [Quickstart Install](#quickstart-install)
 5. [Quickstart JSLint Report](#quickstart-jslint-report)
-6. [Plugin Vim](#plugin-vim)
-7. [Description](#description)
-8. [Package Listing](#package-listing)
-9. [Changelog](#changelog)
-10. [License](#license)
+6. [Quickstart V8 Coverage Report](#quickstart-v8-coverage-report)
+7. [Plugin Vim](#plugin-vim)
+8. [Description](#description)
+9. [Package Listing](#package-listing)
+10. [Changelog](#changelog)
+11. [License](#license)
 
 
 # Web Demo
@@ -151,6 +152,39 @@ import fs from "fs";
 - shell output
 
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_install_import_report.svg)
+
+
+# Quickstart V8 Coverage Report
+### To create v8-coverage-report from node.js or npm program:
+```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_install_cli_coverage.svg -->
+#!/bin/sh
+
+git clone https://github.com/mapbox/node-sqlite3 \
+    --branch=v5.0.2 \
+    --depth=1 \
+    --single-branch
+
+(set -e
+    cd node-sqlite3
+    npm install
+    node ../jslint.mjs \
+        v8_coverage_report=.artifact/coverage_sqlite3 \
+        npm run test
+)
+
+cp -a node-sqlite3/.artifact .
+```
+- screenshot file `.artifact/coverage_sqlite3/index.html`
+
+![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fcoverage_sqlite3_2findex.html.png)
+
+- screenshot file `.artifact/coverage_sqlite3/lib/sqlite3.js.html`
+
+![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fcoverage_sqlite3_2flib_2fsqlite3.js.html.png)
+
+- shell output
+
+![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_install_cli_coverage.svg)
 
 
 # Plugin Vim

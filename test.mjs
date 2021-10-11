@@ -3,8 +3,13 @@ import moduleFs from "fs";
 import jslint from "./jslint.mjs";
 
 let {
+    assertJsonEqual,
     assertOrThrow,
-    debugInline
+    debugInline,
+    jstestDescribe,
+    jstestIt,
+    jstestOnExit,
+    v8CoverageListMerge
 } = jslint;
 
 function noop(val) {
@@ -63,7 +68,7 @@ function noop(val) {
     // test apidoc handling-behavior
     jslint.jslint_cli({
         mode_cli: true,
-        process_argv: [
+        processArgv: [
             "node",
             "jslint.mjs",
             "jslint_apidoc=.artifact/apidoc.html",
@@ -118,7 +123,7 @@ function noop(val) {
         // suppress error
         console_error: noop,
         mode_cli: true,
-        process_argv: [
+        processArgv: [
             "node",
             "jslint.mjs",
             "jslint_report=.artifact/jslint_report.html",
@@ -131,7 +136,7 @@ function noop(val) {
         // suppress error
         console_error: noop,
         mode_cli: true,
-        process_argv: [
+        processArgv: [
             "node",
             "jslint.mjs",
             "jslint_report=.artifact/jslint_report.html",
@@ -145,7 +150,7 @@ function noop(val) {
         // suppress error
         console_error: noop,
         mode_cli: true,
-        process_argv: [
+        processArgv: [
             "node",
             "jslint.mjs",
             "jslint_report=.artifact/jslint_report.html",
@@ -159,7 +164,7 @@ function noop(val) {
         // suppress error
         console_error: noop,
         mode_cli: true,
-        process_argv: [
+        processArgv: [
             "node",
             "jslint.mjs",
             "jslint_report=.artifact/jslint_report.html",
@@ -173,7 +178,7 @@ function noop(val) {
         // suppress error
         console_error: noop,
         mode_cli: true,
-        process_argv: [
+        processArgv: [
             "node",
             "jslint.mjs",
             "jslint_report=.artifact/jslint_report.html",
@@ -187,7 +192,7 @@ function noop(val) {
         // suppress error
         console_error: noop,
         mode_cli: true,
-        process_argv: [
+        processArgv: [
             "node",
             "jslint.mjs",
             "jslint_plugin_vim",
@@ -579,6 +584,10 @@ function noop(val) {
  */
     // test debugInline's handling-behavior
     noop(debugInline);
+    // test assertJsonEqual's handling-behavior
+    try {
+        assertJsonEqual(1, 2);
+    } catch (ignore) {}
     // test assertOrThrow's handling-behavior
     try {
         assertOrThrow(undefined, "undefined");
@@ -586,4 +595,219 @@ function noop(val) {
     try {
         assertOrThrow(undefined, new Error());
     } catch (ignore) {}
+}());
+
+(async function () {
+    let testCoverageMergeData = JSON.parse(
+        await moduleFs.promises.readFile(
+            "test_coverage_merge_data.json",
+            "utf8"
+        )
+    );
+
+    jstestDescribe("test jstestXxx's handling-behavior", function () {
+        jstestIt("test jstestDescribe's error handling-behavior", function () {
+            throw new Error();
+        }, "pass");
+        jstestIt("test jstestOnExit's error handling-behavior", function () {
+            jstestOnExit(undefined, noop, 1);
+        });
+    });
+
+    jstestDescribe("test v8CoverageListMerge's handling-behavior", function () {
+        let functionsExpected = JSON.stringify([
+            {
+                functionName: "test",
+                isBlockCoverage: true,
+                ranges: [
+                    {
+                        count: 2,
+                        endOffset: 4,
+                        startOffset: 0
+                    },
+                    {
+                        count: 1,
+                        endOffset: 3,
+                        startOffset: 1
+                    }
+                ]
+            }
+        ]);
+        let functionsInput = JSON.stringify([
+            {
+                functionName: "test",
+                isBlockCoverage: true,
+                ranges: [
+                    {
+                        count: 2,
+                        endOffset: 4,
+                        startOffset: 0
+                    },
+                    {
+                        count: 1,
+                        endOffset: 2,
+                        startOffset: 1
+                    },
+                    {
+                        count: 1,
+                        endOffset: 3,
+                        startOffset: 2
+                    }
+                ]
+            }
+        ]);
+        jstestIt("accepts empty arrays for `v8CoverageListMerge`", function () {
+            assertJsonEqual(v8CoverageListMerge([]), {
+                result: []
+            });
+        });
+        jstestIt("funcCovs.length === 1", function () {
+            assertJsonEqual(v8CoverageListMerge([
+                {
+                    result: [
+                        {
+                            functions: [
+                                {
+                                    functionName: "test",
+                                    isBlockCoverage: true,
+                                    ranges: [
+                                        {
+                                            count: 2,
+                                            endOffset: 4,
+                                            startOffset: 0
+                                        }
+                                    ]
+                                }
+                            ],
+                            moduleUrl: "/lib.js",
+                            scriptId: "1"
+                        }
+                    ]
+                },
+                {
+                    result: [
+                        {
+                            functions: [],
+                            moduleUrl: "/lib.js",
+                            scriptId: "2"
+                        }
+                    ]
+                }
+            ]), {
+                result: [
+                    {
+                        functions: [
+                            {
+                                functionName: "test",
+                                isBlockCoverage: true,
+                                ranges: [
+                                    {
+                                        count: 2,
+                                        endOffset: 4,
+                                        startOffset: 0
+                                    }
+                                ]
+                            }
+                        ],
+                        scriptId: "0"
+                    }
+                ]
+            });
+        });
+        jstestIt((
+            "accepts arrays with a single item for `v8CoverageListMerge`"
+        ), function () {
+            assertJsonEqual(v8CoverageListMerge([
+                {
+                    result: [
+                        {
+                            functions: JSON.parse(functionsInput),
+                            moduleUrl: "/lib.js",
+                            scriptId: "123"
+                        }
+                    ]
+                }
+            ]), {
+                result: [
+                    {
+                        functions: JSON.parse(functionsExpected),
+                        moduleUrl: "/lib.js",
+                        scriptId: "0"
+                    }
+                ]
+            });
+        });
+        jstestIt((
+            "accepts arrays with two identical items for"
+            + " `v8CoverageListMerge`"
+        ), function () {
+            assertJsonEqual(v8CoverageListMerge([
+                {
+                    result: [
+                        {
+                            functions: JSON.parse(functionsInput),
+                            scriptId: "123",
+                            url: "/lib.js"
+                        }, {
+                            functions: JSON.parse(functionsInput),
+                            scriptId: "123",
+                            url: "/lib.js"
+                        }
+                    ]
+                }
+            ]), {
+                result: [
+                    {
+                        functions: JSON.parse(functionsExpected),
+                        scriptId: "0",
+                        url: "/lib.js"
+                    },
+                    {
+                        functions: JSON.parse(functionsExpected),
+                        scriptId: "1",
+                        url: "/lib.js"
+                    }
+                ]
+            });
+        });
+        [
+            "test_coverage_merge_is_block_coverage_test.json",
+            "test_coverage_merge_issue_2_mixed_is_block_coverage_test.json",
+            "test_coverage_merge_node_10_internal_errors_one_of_test.json",
+            "test_coverage_merge_reduced_test.json",
+            "test_coverage_merge_simple_test.json",
+            "test_coverage_merge_various_test.json"
+        ].forEach(function (file) {
+            jstestIt(file, function () {
+                file = testCoverageMergeData[file];
+                file.forEach(function ({
+                    expected,
+                    inputs
+                }) {
+                    assertJsonEqual(v8CoverageListMerge(inputs), expected);
+                });
+            });
+        });
+        jstestIt("merge multiple node-sqlite coverage files", function () {
+            let data1 = [
+                "test_v8_coverage_node_sqlite_9884_1633662346346_0.json",
+                "test_v8_coverage_node_sqlite_13216_1633662333140_0.json"
+            ].map(function (file) {
+                return testCoverageMergeData[file];
+            });
+            let data2 = testCoverageMergeData[
+                "test_v8_coverage_node_sqlite_merged.json"
+            ];
+            data1 = v8CoverageListMerge(data1);
+            data1 = v8CoverageListMerge([data1]);
+
+// Debug data1.
+// await moduleFs.promises.writeFile(
+//     ".test_v8_coverage_node_sqlite_merged.json",
+//     JSON.stringify(objectDeepCopyWithKeysSorted(data1), undefined, 4) + "\n"
+// );
+
+            assertJsonEqual(data1, data2);
+        });
+    });
 }());
