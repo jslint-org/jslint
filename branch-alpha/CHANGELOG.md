@@ -1,19 +1,20 @@
 # Changelog
 
 # Todo
-- cli - add cli-command jslint_coverage_report
 - cli - remove cli-option `--mode-vim-plugin`
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
-- jslint - add `for...of` syntax support.
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning requiring paren around comma-separated concatenations.
+- jslint - add top-level-await support
 - jslint - require regexp to use open-form.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 - merge function.html and help.html into README.md
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
-- npm - add file package.json and command `npm test`
 
 # v2021.10.1-beta
+- cli - add cli-command v8_coverage_report
+- npm - add file package.json and command `npm test`
+- test - add mocha-like test-functions jstestDescribe, jstestIt
 - bugfix - fix false warning `uninitialized 'bb'` in code `/*jslint node*/\nlet {aa:bb} = {}; bb();`
 - bugfix - fix issue #358 - switch-statement crashes jslint
 - ci - rename dir .build/ to .artifact/
@@ -28,6 +29,7 @@
 - fs - rename files with dashes to files with underscore
 - jslint - disable linting of embedded javascript in markdown-files
 - jslint - relax regexp-warning against using 'space'
+- style - change naming-convention for non-jslint-core code from underscore to camelCase
 
 # v2021.9.20
 - jslint - add bigint support.

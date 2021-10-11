@@ -1,0 +1,9 @@
+{
+    "fileCount": 26,
+    "name": "@jslint/jslint",
+    "scripts": {
+        "ci": "sh jslint_ci.sh shCiBase",
+        "test": "node jslint.mjs v8_coverage_report=.artifact/coverage node test.mjs"
+    },
+    "version": "2021.9.20"
+}
