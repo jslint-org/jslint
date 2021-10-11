@@ -236,3 +236,4 @@ right so that you can focus your creative energy where it is most needed.
 # License
 - JSLint is under [Unlicense License](LICENSE).
 - CodeMirror code-editor is under [MIT License](https://github.com/codemirror/CodeMirror/blob/master/LICENSE).
+- Function `v8CoverageListMerge` is derived from [MIT Licensed v8-coverage](https://github.com/demurgos/v8-coverage/blob/73446087dc38f61b09832c9867122a23f8577099/ts/LICENSE.md).

@@ -129,12 +129,13 @@ import moduleChildProcess from "child_process";
 
 shCiBaseCustom() {(set -e
 # this function will run base-ci
-    # update edition in README.md, jslint.mjs from CHANGELOG.md
+    # update version in README.md, jslint.mjs, package.json from CHANGELOG.md
     node --input-type=module -e '
 import jslint from "./jslint.mjs";
 import moduleFs from "fs";
 (async function () {
     let fileDict;
+    let fileModified;
     let versionBeta;
     let versionMaster;
     fileDict = {};
@@ -156,7 +157,7 @@ import moduleFs from "fs";
         versionBeta = versionBeta || version;
         versionMaster = versionMaster || (!isBeta && version);
     });
-    [
+    await Promise.all([
         {
             file: "README.md",
             src: fileDict["README.md"].replace((
@@ -190,9 +191,13 @@ import moduleFs from "fs";
                     jslint.moduleFsInit,
                     jslint.v8CoverageListMerge,
                     jslint.v8CoverageReportCreate
+                // remove comments to reduce size of string/argument
+                // passed to nodejs
                 ].join("\n").replace((
-                    /    /g
-                ), "  ") + "\nv8CoverageReportCreate(";
+                    /\n\/\/.*/g
+                ), "").replace((
+                    /\n\n\n/g
+                ), "\n") + "\nv8CoverageReportCreate(";
             })
         }, {
             file: "package.json",
@@ -200,16 +205,20 @@ import moduleFs from "fs";
                 /("version": )".*?"/
             ), "$1" + JSON.stringify(versionMaster.slice(1)))
         }
-    ].forEach(function ({
+    ].map(async function ({
         file,
         src
     }) {
         let src0 = fileDict[file];
         if (src !== src0) {
             console.error(`update file ${file}`);
-            moduleFs.promises.writeFile(file, src);
+            fileModified = file;
+            await moduleFs.promises.writeFile(file, src);
         }
-    });
+    }));
+    if (fileModified) {
+        throw new Error("modified file " + fileModified);
+    }
 }());
 ' "$@" # '
     # create jslint.cjs
@@ -231,6 +240,6 @@ import moduleFs from "fs";
     (set -e
         # coverage-hack - test jslint's cli handling-behavior
         export JSLINT_BETA=1
-        shRunWithCoverage node test.mjs
+        npm run test
     )
 )}
