@@ -257,13 +257,13 @@
     textLength="768"
     x="10"
     y="934"
->npm WARN deprecated request@2.88.2: request has been deprecated, see https://github.com/request/\</tspan>
+>npm WARN deprecated mkdirp@0.5.1: Legacy versions of mkdirp are no longer supported. Please upda\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="956"
->  request/issues/3142                                                                            </tspan>
+>  te to mkdirp 1.x. (Note that the API surface has changed to use Promises in 1.x.)              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -281,13 +281,13 @@
     textLength="768"
     x="10"
     y="1022"
->npm WARN deprecated mkdirp@0.5.1: Legacy versions of mkdirp are no longer supported. Please upda\</tspan>
+>npm WARN deprecated request@2.88.2: request has been deprecated, see https://github.com/request/\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1044"
->  te to mkdirp 1.x. (Note that the API surface has changed to use Promises in 1.x.)              </tspan>
+>  request/issues/3142                                                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -317,31 +317,31 @@
     textLength="768"
     x="10"
     y="1154"
->npm WARN deprecated uuid@3.3.2: Please upgrade  to version 7 or higher.  Older versions may use \</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1176"
->  Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1198"
->  blog/math-random for details.                                                                  </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1220"
 >npm WARN deprecated querystring@0.2.0: The querystring API is considered Legacy. new code should\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1242"
+    y="1176"
 >   use the URLSearchParams API instead.                                                          </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1198"
+>npm WARN deprecated uuid@3.3.2: Please upgrade  to version 7 or higher.  Older versions may use \</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1220"
+>  Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1242"
+>  blog/math-random for details.                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -431,7 +431,7 @@
     textLength="768"
     x="10"
     y="1572"
->added 247 packages from 769 contributors and audited 248 packages in 8.238s                      </tspan>
+>added 247 packages from 769 contributors and audited 248 packages in 10.571s                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -551,7 +551,7 @@
     textLength="768"
     x="10"
     y="2012"
->    ✓ should return the correct lastID (170ms)                                                   </tspan>
+>    ✓ should return the correct lastID (258ms)                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -635,7 +635,7 @@
     textLength="768"
     x="10"
     y="2320"
->    ✓ fuss-free incremental backups work (176ms)                                                 </tspan>
+>    ✓ fuss-free incremental backups work (172ms)                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -821,7 +821,7 @@
     textLength="768"
     x="10"
     y="3002"
->    ✓ retrieve 100,000 rows with Statement#each (249ms)                                          </tspan>
+>    ✓ retrieve 100,000 rows with Statement#each (310ms)                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -923,7 +923,7 @@
     textLength="768"
     x="10"
     y="3376"
->(node:2250) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability i\</tspan>
+>(node:2272) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability i\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1103,7 +1103,7 @@
     textLength="768"
     x="10"
     y="4036"
->    ✓ should insert rows with lots of null values (110ms)                                        </tspan>
+>    ✓ should insert rows with lots of null values (211ms)                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1337,7 +1337,7 @@
     textLength="768"
     x="10"
     y="4894"
->    ✓ should serialize float 1633997537400                                                       </tspan>
+>    ✓ should serialize float 1634005223566                                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1397,7 +1397,7 @@
     textLength="768"
     x="10"
     y="5114"
->    ✓ should serialize integer 1633997537400                                                     </tspan>
+>    ✓ should serialize integer 1634005223566                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1457,7 +1457,7 @@
     textLength="768"
     x="10"
     y="5334"
->    ✓ should insert in parallel (1061ms)                                                         </tspan>
+>    ✓ should insert in parallel (1995ms)                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1529,7 +1529,7 @@
     textLength="768"
     x="10"
     y="5598"
->      ✓ should prepare a statement and run it 1005 times                                         </tspan>
+>      ✓ should prepare a statement and run it 1005 times (50ms)                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1667,7 +1667,7 @@
     textLength="768"
     x="10"
     y="6104"
->      ✓ should insert all values                                                                 </tspan>
+>      ✓ should insert all values (44ms)                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1709,7 +1709,7 @@
     textLength="768"
     x="10"
     y="6258"
->      ✓ should insert 1000 rows                                                                  </tspan>
+>      ✓ should insert 1000 rows (47ms)                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1841,7 +1841,7 @@
     textLength="768"
     x="10"
     y="6742"
->    ✓ should have inserted all the rows after synchronizing with serialize()                     </tspan>
+>    ✓ should have inserted all the rows after synchronizing with serialize() (48ms)              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1859,7 +1859,7 @@
     textLength="768"
     x="10"
     y="6808"
->    ✓ should call the callback (38ms)                                                            </tspan>
+>    ✓ should call the callback (48ms)                                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1919,7 +1919,7 @@
     textLength="768"
     x="10"
     y="7028"
->    ✓ should insert all values (49ms)                                                            </tspan>
+>    ✓ should insert all values (44ms)                                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1991,7 +1991,7 @@
     textLength="768"
     x="10"
     y="7292"
->  160 passing (2s)                                                                               </tspan>
+>  160 passing (4s)                                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -2909,67 +2909,67 @@
     textLength="768"
     x="10"
     y="10658"
->wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/named_pa\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="10680"
->  rams.test.js.html                                                                              </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="10702"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/null_err\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10724"
+    y="10680"
 >  or.test.js.html                                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10746"
+    y="10702"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/open_clo\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10768"
+    y="10724"
 >  se.test.js.html                                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10790"
+    y="10746"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/other_ob\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10812"
+    y="10768"
 >  jects.test.js.html                                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10834"
+    y="10790"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/parallel\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10856"
+    y="10812"
 >  _insert.test.js.html                                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10878"
+    y="10834"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/prepare.\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="10856"
+>  test.js.html                                                                                   </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="10878"
+>wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/profile.\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -2981,139 +2981,139 @@
     textLength="768"
     x="10"
     y="10922"
->wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/profile.\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="10944"
->  test.js.html                                                                                   </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="10966"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/rerun.te\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10988"
+    y="10944"
 >  st.js.html                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11010"
+    y="10966"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/scheduli\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11032"
+    y="10988"
 >  ng.test.js.html                                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11054"
+    y="11010"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/serializ\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11076"
+    y="11032"
 >  ation.test.js.html                                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11098"
+    y="11054"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/support/\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11120"
+    y="11076"
 >  helper.js.html                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11142"
+    y="11098"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/trace.te\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11164"
+    y="11120"
 >  st.js.html                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11186"
+    y="11142"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/unicode.\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11208"
+    y="11164"
 >  test.js.html                                                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11230"
+    y="11186"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/upsert.t\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11252"
+    y="11208"
 >  est.js.html                                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11274"
+    y="11230"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/verbose.\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11296"
+    y="11252"
 >  test.js.html                                                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11318"
+    y="11274"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/coverage_badg\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11340"
+    y="11296"
 >  e.svg                                                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11362"
+    y="11318"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/index.html    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11384"
+    y="11340"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/coverage_repo\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11406"
+    y="11362"
 >  rt.txt                                                                                         </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="11384"
+>wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/named_pa\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="11406"
+>  rams.test.js.html                                                                              </tspan>
 
 </text>
 </svg>
