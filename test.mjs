@@ -3,15 +3,25 @@ import moduleFs from "fs";
 import jslint from "./jslint.mjs";
 
 let {
+    assertErrorThrownAsync,
+    assertJsonEqual,
     assertOrThrow,
-    debugInline
+    debugInline,
+    fsRmRecursive,
+    fsWriteFileWithParents,
+    jstestDescribe,
+    jstestIt,
+    jstestOnExit,
+    noop,
+    v8CoverageListMerge,
+    v8CoverageReportCreate
 } = jslint;
 
-function noop(val) {
-/*
- * this function will do nothing except return val
- */
-    return val;
+function processExit0(exitCode) {
+    assertOrThrow(exitCode === 0, exitCode);
+}
+function processExit1(exitCode) {
+    assertOrThrow(exitCode === 1, exitCode);
 }
 
 (function testCaseFsXxx() {
@@ -19,15 +29,15 @@ function noop(val) {
  * this function will test fsXxx's handling-behavior
  */
     // test fsRmRecursive handling-behavior
-    jslint.fsRmRecursive(".artifact/fsRmRecursive");
-    jslint.fsRmRecursive(".artifact/fsRmRecursive", {
+    fsRmRecursive(".artifact/fsRmRecursive");
+    fsRmRecursive(".artifact/fsRmRecursive", {
         process_version: "v12"
     });
     // test fsWriteFileWithParents handling-behavior
     (async function () {
-        await jslint.fsRmRecursive(".artifact/fsWriteFileWithParents");
-        await jslint.fsWriteFileWithParents(
-            ".artifact/fsWriteFileWithParents/aa/bb/cc",
+        await fsRmRecursive(".tmp/fsWriteFileWithParents");
+        await fsWriteFileWithParents(
+            ".tmp/fsWriteFileWithParents/aa/bb/cc",
             "aa"
         );
     }());
@@ -37,12 +47,6 @@ function noop(val) {
 /*
  * this function will test jslint's cli handling-behavior
  */
-    function processExit0(exitCode) {
-        assertOrThrow(exitCode === 0, exitCode);
-    }
-    function processExit1(exitCode) {
-        assertOrThrow(exitCode === 1, exitCode);
-    }
     // test null-case handling-behavior
     jslint.jslint_cli({
         mode_noop: true,
@@ -63,7 +67,7 @@ function noop(val) {
     // test apidoc handling-behavior
     jslint.jslint_cli({
         mode_cli: true,
-        process_argv: [
+        processArgv: [
             "node",
             "jslint.mjs",
             "jslint_apidoc=.artifact/apidoc.html",
@@ -118,10 +122,10 @@ function noop(val) {
         // suppress error
         console_error: noop,
         mode_cli: true,
-        process_argv: [
+        processArgv: [
             "node",
             "jslint.mjs",
-            "jslint_report=.artifact/jslint_report.html",
+            "jslint_report=.tmp/jslint_report.html",
             "jslint.mjs"
         ],
         process_exit: processExit0
@@ -131,10 +135,10 @@ function noop(val) {
         // suppress error
         console_error: noop,
         mode_cli: true,
-        process_argv: [
+        processArgv: [
             "node",
             "jslint.mjs",
-            "jslint_report=.artifact/jslint_report.html",
+            "jslint_report=.tmp/jslint_report.html",
             "syntax-error.js"
         ],
         process_exit: processExit1,
@@ -145,10 +149,10 @@ function noop(val) {
         // suppress error
         console_error: noop,
         mode_cli: true,
-        process_argv: [
+        processArgv: [
             "node",
             "jslint.mjs",
-            "jslint_report=.artifact/jslint_report.html",
+            "jslint_report=.tmp/jslint_report.html",
             "aa.json"
         ],
         process_exit: processExit0,
@@ -159,10 +163,10 @@ function noop(val) {
         // suppress error
         console_error: noop,
         mode_cli: true,
-        process_argv: [
+        processArgv: [
             "node",
             "jslint.mjs",
-            "jslint_report=.artifact/jslint_report.html",
+            "jslint_report=.tmp/jslint_report.html",
             "aa.js"
         ],
         process_exit: processExit1,
@@ -173,10 +177,10 @@ function noop(val) {
         // suppress error
         console_error: noop,
         mode_cli: true,
-        process_argv: [
+        processArgv: [
             "node",
             "jslint.mjs",
-            "jslint_report=.artifact/jslint_report.html",
+            "jslint_report=.tmp/jslint_report.html",
             "aa.json"
         ],
         process_exit: processExit1,
@@ -187,7 +191,7 @@ function noop(val) {
         // suppress error
         console_error: noop,
         mode_cli: true,
-        process_argv: [
+        processArgv: [
             "node",
             "jslint.mjs",
             "jslint_plugin_vim",
@@ -573,17 +577,355 @@ function noop(val) {
     });
 }());
 
-(function testCaseMisc() {
+(async function testCaseMisc() {
 /*
  * this function will test misc handling-behavior
  */
     // test debugInline's handling-behavior
     noop(debugInline);
-    // test assertOrThrow's handling-behavior
-    try {
+    // test assertErrorThrownAsync's error handling-behavior
+    await assertErrorThrownAsync(function () {
+        return assertErrorThrownAsync(noop);
+    });
+    // test assertJsonEqual's error handling-behavior
+    await assertErrorThrownAsync(function () {
+        assertJsonEqual(1, 2);
+    });
+    // test assertOrThrow's error handling-behavior
+    await assertErrorThrownAsync(function () {
         assertOrThrow(undefined, "undefined");
-    } catch (ignore) {}
-    try {
+    });
+    await assertErrorThrownAsync(function () {
         assertOrThrow(undefined, new Error());
-    } catch (ignore) {}
+    });
+}());
+
+(async function () {
+    let testCoverageMergeData = JSON.parse(
+        await moduleFs.promises.readFile(
+            "test_coverage_merge_data.json",
+            "utf8"
+        )
+    );
+
+    jstestDescribe((
+        "test jstestXxx's handling-behavior"
+    ), function () {
+        jstestIt((
+            "test jstestDescribe's error handling-behavior"
+        ), function () {
+            throw new Error();
+        }, "pass");
+        jstestIt((
+            "test jstestOnExit's error handling-behavior"
+        ), function () {
+            jstestOnExit(undefined, noop, 1);
+        });
+    });
+
+    jstestDescribe((
+        "test v8CoverageListMerge's handling-behavior"
+    ), function () {
+        let functionsExpected = JSON.stringify([
+            {
+                functionName: "test",
+                isBlockCoverage: true,
+                ranges: [
+                    {
+                        count: 2,
+                        endOffset: 4,
+                        startOffset: 0
+                    },
+                    {
+                        count: 1,
+                        endOffset: 3,
+                        startOffset: 1
+                    }
+                ]
+            }
+        ]);
+        let functionsInput = JSON.stringify([
+            {
+                functionName: "test",
+                isBlockCoverage: true,
+                ranges: [
+                    {
+                        count: 2,
+                        endOffset: 4,
+                        startOffset: 0
+                    },
+                    {
+                        count: 1,
+                        endOffset: 2,
+                        startOffset: 1
+                    },
+                    {
+                        count: 1,
+                        endOffset: 3,
+                        startOffset: 2
+                    }
+                ]
+            }
+        ]);
+        jstestIt((
+            "accepts empty arrays for `v8CoverageListMerge`"
+        ), function () {
+            assertJsonEqual(v8CoverageListMerge([]), {
+                result: []
+            });
+        });
+        jstestIt((
+            "funcCovs.length === 1"
+        ), function () {
+            assertJsonEqual(v8CoverageListMerge([
+                {
+                    result: [
+                        {
+                            functions: [
+                                {
+                                    functionName: "test",
+                                    isBlockCoverage: true,
+                                    ranges: [
+                                        {
+                                            count: 2,
+                                            endOffset: 4,
+                                            startOffset: 0
+                                        }
+                                    ]
+                                }
+                            ],
+                            moduleUrl: "/lib.js",
+                            scriptId: "1"
+                        }
+                    ]
+                },
+                {
+                    result: [
+                        {
+                            functions: [],
+                            moduleUrl: "/lib.js",
+                            scriptId: "2"
+                        }
+                    ]
+                }
+            ]), {
+                result: [
+                    {
+                        functions: [
+                            {
+                                functionName: "test",
+                                isBlockCoverage: true,
+                                ranges: [
+                                    {
+                                        count: 2,
+                                        endOffset: 4,
+                                        startOffset: 0
+                                    }
+                                ]
+                            }
+                        ],
+                        scriptId: "0"
+                    }
+                ]
+            });
+        });
+        jstestIt((
+            "accepts arrays with a single item for `v8CoverageListMerge`"
+        ), function () {
+            assertJsonEqual(v8CoverageListMerge([
+                {
+                    result: [
+                        {
+                            functions: JSON.parse(functionsInput),
+                            moduleUrl: "/lib.js",
+                            scriptId: "123"
+                        }
+                    ]
+                }
+            ]), {
+                result: [
+                    {
+                        functions: JSON.parse(functionsExpected),
+                        moduleUrl: "/lib.js",
+                        scriptId: "0"
+                    }
+                ]
+            });
+        });
+        jstestIt((
+            "accepts arrays with two identical items for"
+            + " `v8CoverageListMerge`"
+        ), function () {
+            assertJsonEqual(v8CoverageListMerge([
+                {
+                    result: [
+                        {
+                            functions: JSON.parse(functionsInput),
+                            scriptId: "123",
+                            url: "/lib.js"
+                        }, {
+                            functions: JSON.parse(functionsInput),
+                            scriptId: "123",
+                            url: "/lib.js"
+                        }
+                    ]
+                }
+            ]), {
+                result: [
+                    {
+                        functions: JSON.parse(functionsExpected),
+                        scriptId: "0",
+                        url: "/lib.js"
+                    },
+                    {
+                        functions: JSON.parse(functionsExpected),
+                        scriptId: "1",
+                        url: "/lib.js"
+                    }
+                ]
+            });
+        });
+        [
+            "test_coverage_merge_is_block_coverage_test.json",
+            "test_coverage_merge_issue_2_mixed_is_block_coverage_test.json",
+            "test_coverage_merge_node_10_internal_errors_one_of_test.json",
+            "test_coverage_merge_reduced_test.json",
+            "test_coverage_merge_simple_test.json",
+            "test_coverage_merge_various_test.json"
+        ].forEach(function (file) {
+            jstestIt(file, function () {
+                file = testCoverageMergeData[file];
+                file.forEach(function ({
+                    expected,
+                    inputs
+                }) {
+                    assertJsonEqual(v8CoverageListMerge(inputs), expected);
+                });
+            });
+        });
+        jstestIt((
+            "merge multiple node-sqlite coverage files"
+        ), function () {
+            let data1 = [
+                "test_v8_coverage_node_sqlite_9884_1633662346346_0.json",
+                "test_v8_coverage_node_sqlite_13216_1633662333140_0.json"
+            ].map(function (file) {
+                return testCoverageMergeData[file];
+            });
+            let data2 = testCoverageMergeData[
+                "test_v8_coverage_node_sqlite_merged.json"
+            ];
+            data1 = v8CoverageListMerge(data1);
+            data1 = v8CoverageListMerge([data1]);
+
+// Debug data1.
+// await moduleFs.promises.writeFile(
+//     ".test_v8_coverage_node_sqlite_merged.json",
+//     JSON.stringify(objectDeepCopyWithKeysSorted(data1), undefined, 4) + "\n"
+// );
+
+            assertJsonEqual(data1, data2);
+        });
+    });
+
+    jstestDescribe((
+        "test v8CoverageReportCreate's handling-behavior"
+    ), function () {
+        jstestIt((
+            "test null-case handling-behavior"
+        ), async function () {
+            await assertErrorThrownAsync(function () {
+                return v8CoverageReportCreate({});
+            }, "invalid coverageDir");
+        });
+        jstestIt((
+            "test invalid-coverageDir handling-behavior"
+        ), async function () {
+            await assertErrorThrownAsync(function () {
+                return jslint.jslint_cli({
+                    // suppress error
+                    console_error: noop,
+                    mode_cli: true,
+                    processArgv: [
+                        "node", "jslint.mjs",
+                        "v8_coverage_report=..",
+                        "node", "jslint.mjs"
+                    ]
+                });
+            }, "is not subdirectory of cwd");
+        });
+        jstestIt((
+            "test coverage-report jslint.mjs handling-behavior"
+        ), async function () {
+            await jslint.jslint_cli({
+                mode_cli: true,
+                processArgv: [
+                    "node", "jslint.mjs",
+                    "v8_coverage_report=.tmp/coverage_jslint",
+                    "node", "jslint.mjs"
+                ]
+            });
+        });
+        [
+            [
+                "v8CoverageReportCreate_high.js", (
+                    "switch(0){\n"
+                    + "case 0:break;\n"
+                    + "}\n"
+                )
+            ], [
+                "v8CoverageReportCreate_ignore.js", (
+                    "/*mode-coverage-ignore-file*/\n"
+                    + "switch(0){\n"
+                    + "case 0:break;\n"
+                    + "}\n"
+                )
+            ], [
+                "v8CoverageReportCreate_low.js", (
+                    "switch(0){\n"
+                    + "case 1:break;\n"
+                    + "case 2:break;\n"
+                    + "case 3:break;\n"
+                    + "case 4:break;\n"
+                    + "}\n"
+                )
+            ], [
+                "v8CoverageReportCreate_medium.js", (
+                    "switch(0){\n"
+                    + "case 0:break;\n"
+                    + "case 1:break;\n"
+                    + "case 2:break;\n"
+                    + "}\n"
+                )
+            ]
+        ].forEach(function ([
+            file, data
+        ], ii) {
+            jstestIt(file, async function () {
+                let dir = ".tmp/coverage" + ii + "/";
+                file = dir + file;
+                await fsWriteFileWithParents(file, data);
+                await jslint.jslint_cli({
+                    mode_cli: true,
+                    processArgv: [
+                        "node", "jslint.mjs",
+                        "v8_coverage_report=" + dir,
+                        "node",
+                        file
+                    ]
+                });
+                // test npm handling-behavior
+                if (ii === 0) {
+                    await jslint.jslint_cli({
+                        mode_cli: true,
+                        processArgv: [
+                            "node", "jslint.mjs",
+                            "v8_coverage_report=" + dir,
+                            "npm", "--version"
+                        ]
+                    });
+                }
+            });
+        });
+    });
 }());

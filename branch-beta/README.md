@@ -23,11 +23,12 @@ Douglas Crockford <douglas@crockford.com>
 3. [API Doc](#api-doc)
 4. [Quickstart Install](#quickstart-install)
 5. [Quickstart JSLint Report](#quickstart-jslint-report)
-6. [Plugin Vim](#plugin-vim)
-7. [Description](#description)
-8. [Package Listing](#package-listing)
-9. [Changelog](#changelog)
-10. [License](#license)
+6. [Quickstart V8 Coverage Report](#quickstart-v8-coverage-report)
+7. [Plugin Vim](#plugin-vim)
+8. [Description](#description)
+9. [Package Listing](#package-listing)
+10. [Changelog](#changelog)
+11. [License](#license)
 
 
 # Web Demo
@@ -115,16 +116,16 @@ node jslint.mjs .
 printf "function foo() {console.log('hello world');}\n" > hello.js
 
 node jslint.mjs \
-    jslint_report=.artifact/jslint_report.html \
+    jslint_report=.artifact/jslint_report_hello.html \
     hello.js
 ```
 - shell output
 
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_install_cli_report.svg)
 
-- screenshot file `.artifact/jslint_report.html`
+- screenshot file [.artifact/jslint_report_hello.html](https://jslint-org.github.io/jslint/branch-beta/.artifact/jslint_report_hello.html)
 
-![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fjslint_report.html.png)
+[![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fjslint_report_hello.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/jslint_report_hello.html)
 
 
 ### To create a jslint-report programmatically:
@@ -142,8 +143,9 @@ import fs from "fs";
     let source = "function foo() {console.log(\u0027hello world\u0027);}\n";
     result = jslint.jslint(source);
     report = jslint.jslint_report(result);
-    await fs.promises.writeFile(".artifact/jslint_report.html", report);
-    console.error("wrote file .artifact/jslint_report.html");
+    await fs.promises.mkdir(".artifact/", {recursive: true});
+    await fs.promises.writeFile(".artifact/jslint_report_hello.html", report);
+    console.error("wrote file .artifact/jslint_report_hello.html");
 }());
 
 '
@@ -151,6 +153,40 @@ import fs from "fs";
 - shell output
 
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_install_import_report.svg)
+
+
+# Quickstart V8 Coverage Report
+### To create v8-coverage-report from node.js or npm program:
+```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_install_cli_coverage.svg -->
+#!/bin/sh
+
+git clone https://github.com/mapbox/node-sqlite3 \
+    --branch=v5.0.2 \
+    --depth=1 \
+    --single-branch
+
+(set -e
+    cd node-sqlite3
+    git checkout 60a022c511a37788e652c271af23174566a80c30
+    npm install
+    node ../jslint.mjs \
+        v8_coverage_report=.artifact/coverage_sqlite3 \
+        npm run test
+)
+
+cp -a node-sqlite3/.artifact .
+```
+- screenshot file [.artifact/coverage_sqlite3/index.html](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3/index.html)
+
+[![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fcoverage_sqlite3_2findex.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3/index.html)
+
+- screenshot file [.artifact/coverage_sqlite3/lib/sqlite3.js.html](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3/lib/sqlite3.js.html)
+
+[![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fcoverage_sqlite3_2flib_2fsqlite3.js.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3/lib/sqlite3.js.html)
+
+- shell output
+
+![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_install_cli_coverage.svg)
 
 
 # Plugin Vim
@@ -202,3 +238,4 @@ right so that you can focus your creative energy where it is most needed.
 # License
 - JSLint is under [Unlicense License](LICENSE).
 - CodeMirror code-editor is under [MIT License](https://github.com/codemirror/CodeMirror/blob/master/LICENSE).
+- Function `v8CoverageListMerge` is derived from [MIT Licensed v8-coverage](https://github.com/demurgos/v8-coverage/blob/73446087dc38f61b09832c9867122a23f8577099/ts/LICENSE.md).

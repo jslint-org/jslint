@@ -294,6 +294,7 @@ import moduleChildProcess from "child_process";
     fi
     # add dir .artifact
     git add -f .artifact
+    git rm --cached -r .artifact/tmp 2>/dev/null || true
     git commit -am "add dir .artifact"
     # checkout branch-gh-pages
     git fetch origin gh-pages
@@ -360,7 +361,7 @@ import moduleChildProcess from "child_process";
     )
 )}
 
-shArtifactUploadCustom() {(set -e
+shCiArtifactUploadCustom() {(set -e
     return
 )}
 
@@ -517,6 +518,11 @@ import moduleUrl from "url";
     });
 }());
 ' "$@" # '
+)}
+
+shDuList() {(set -e
+# this function will du $1 and sort its subdir by size
+    du -md1 "$1" | sort -nr
 )}
 
 shGitCmdWithGithubToken() {(set -e
@@ -697,7 +703,6 @@ vendor)s{0,1}(\\b|_)\
 shGrepReplace() {(set -e
 # this function will inline grep-and-replace /tmp/shGrep.txt
     node --input-type=module -e '
-/*jslint bitwise, name*/
 import moduleFs from "fs";
 import moduleOs from "os";
 import modulePath from "path";
@@ -711,7 +716,7 @@ import modulePath from "path";
     data = data.replace((
         /^(.+?):(\d+?):(.*?)$/gm
     ), function (ignore, file, lineno, str) {
-        dict[file] = dict[file] || moduleFs.readFileSync(
+        dict[file] = dict[file] || moduleFs.readFileSync( //jslint-quiet
             modulePath.resolve(file),
             "utf8"
         ).split("\n");
@@ -1479,41 +1484,519 @@ shRmDsStore() {(set -e
 shRunWithCoverage() {(set -e
 # this function will run nodejs command $@ with v8-coverage
 # and create coverage-report .artifact/coverage/index.html
-    local EXIT_CODE
-    EXIT_CODE=0
-    export DIR_COVERAGE=.artifact/coverage/
-    rm -rf "$DIR_COVERAGE"
-    mkdir -p "$DIR_COVERAGE"
-    (set -e
-        export NODE_V8_COVERAGE="$DIR_COVERAGE"
-        "$@"
-    ) || EXIT_CODE="$?"
-    if [ "$EXIT_CODE" = 0 ]
-    then
-        node --input-type=module -e '
-import moduleFs from "fs";
-import modulePath from "path";
-// init debugInline
-(function () {
-    let consoleError = console.error;
-    globalThis.debugInline = globalThis.debugInline || function (...argList) {
+    node --input-type=module -e '
+let moduleChildProcess;
+let moduleFs;
+let moduleFsInitResolveList;
+let modulePath;
+let moduleUrl;
+function assertOrThrow(condition, message) {
+    if (!condition) {
+        throw (
+            (!message || typeof message === "string")
+            ? new Error(String(message).slice(0, 2048))
+            : message
+        );
+    }
+}
+async function fsWriteFileWithParents(pathname, data) {
+    await moduleFsInit();
+    try {
+        await moduleFs.promises.writeFile(pathname, data);
+    } catch (ignore) {
+        await moduleFs.promises.mkdir(modulePath.dirname(pathname), {
+            recursive: true
+        });
+        await moduleFs.promises.writeFile(pathname, data);
 
-// this function will both print <argList> to stderr and return <argList>[0]
+    }
+    console.error("wrote file " + pathname);
+}
+function htmlEscape(str) {
+    return String(str).replace((
+        /&/g
+    ), "&amp;").replace((
+        /</g
+    ), "&lt;").replace((
+        />/g
+    ), "&gt;");
+}
+async function moduleFsInit() {
 
-        consoleError("\n\ndebugInline");
-        consoleError(...argList);
-        consoleError("\n");
-        return argList[0];
-    };
-}());
-(async function () {
-    let DIR_COVERAGE = process.env.DIR_COVERAGE;
+    if (moduleFs !== undefined) {
+        return;
+    }
+    if (moduleFsInitResolveList !== undefined) {
+        return new Promise(function (resolve) {
+            moduleFsInitResolveList.push(resolve);
+        });
+    }
+    moduleFsInitResolveList = [];
+    [
+        moduleChildProcess,
+        moduleFs,
+        modulePath,
+        moduleUrl
+    ] = await Promise.all([
+        import("child_process"),
+        import("fs"),
+        import("path"),
+        import("url")
+    ]);
+    while (moduleFsInitResolveList.length > 0) {
+        moduleFsInitResolveList.shift()();
+    }
+}
+function v8CoverageListMerge(processCovs) {
+    let resultMerged = [];      // List of merged scripts from processCovs.
+    let urlToScriptDict = new Map();    // Map scriptCov.url to scriptCovs.
+
+    function compareRangeList(aa, bb) {
+        if (aa.startOffset !== bb.startOffset) {
+            return aa.startOffset - bb.startOffset;
+        }
+        return bb.endOffset - aa.endOffset;
+    }
+
+    function dictKeyValueAppend(dict, key, val) {
+        let list = dict.get(key);
+        if (list === undefined) {
+            list = [];
+            dict.set(key, list);
+        }
+        list.push(val);
+    }
+
+    function mergeTreeList(parentTrees) {
+        if (parentTrees.length <= 1) {
+            return parentTrees[0];
+        }
+        return {
+            children: mergeTreeListToChildren(parentTrees),
+            delta: parentTrees.reduce(function (aa, bb) {
+                return aa + bb.delta;
+            }, 0),
+            end: parentTrees[0].end,
+            start: parentTrees[0].start
+        };
+    }
+
+    function mergeTreeListToChildren(parentTrees) {
+        let openRange;
+        let parentToChildDict = new Map();      // Map parent to child.
+        let queueList;
+        let queueListIi = 0;
+        let queueOffset;
+        let queueTrees;
+        let resultChildren = [];
+        let startToTreeDict = new Map();        // Map tree.start to tree.
+        function nextXxx() {
+            let [
+                nextOffset, nextTrees
+            ] = queueList[queueListIi] || [];
+            let openRangeEnd;
+            if (queueTrees === undefined) {
+                queueListIi += 1;
+            } else if (nextOffset === undefined || nextOffset > queueOffset) {
+                nextOffset = queueOffset;
+                nextTrees = queueTrees;
+                queueTrees = undefined;
+            } else {
+                if (nextOffset === queueOffset) {
+                    queueTrees.forEach(function (tree) {
+                        nextTrees.push(tree);
+                    });
+                    queueTrees = undefined;
+                }
+                queueListIi += 1;
+            }
+            if (nextOffset === undefined) {
+                if (openRange !== undefined) {
+                    resultAppendNextChild();
+                }
+                return true;
+            }
+            if (openRange !== undefined && openRange.end <= nextOffset) {
+                resultAppendNextChild();
+                openRange = undefined;
+            }
+            if (openRange === undefined) {
+                openRangeEnd = nextOffset + 1;
+                nextTrees.forEach(function ({
+                    parentIi,
+                    tree
+                }) {
+                    openRangeEnd = Math.max(openRangeEnd, tree.end);
+                    dictKeyValueAppend(parentToChildDict, parentIi, tree);
+                });
+                queueOffset = openRangeEnd;
+                openRange = {
+                    end: openRangeEnd,
+                    start: nextOffset
+                };
+            } else {
+                nextTrees.forEach(function ({
+                    parentIi,
+                    tree
+                }) {
+                    let right;
+                    if (tree.end > openRange.end) {
+                        right = treeSplit(tree, openRange.end);
+                        if (queueTrees === undefined) {
+                            queueTrees = [];
+                        }
+                        queueTrees.push({
+                            parentIi,
+                            tree: right
+                        });
+                    }
+                    dictKeyValueAppend(parentToChildDict, parentIi, tree);
+                });
+            }
+        }
+        function resultAppendNextChild() {
+            let treesMatching = [];
+            parentToChildDict.forEach(function (nested) {
+                if (
+                    nested.length === 1
+                    && nested[0].start === openRange.start
+                    && nested[0].end === openRange.end
+                ) {
+                    treesMatching.push(nested[0]);
+                } else {
+                    treesMatching.push({
+                        children: nested,
+                        delta: 0,
+                        end: openRange.end,
+                        start: openRange.start
+                    });
+                }
+            });
+            parentToChildDict.clear();
+            resultChildren.push(mergeTreeList(treesMatching));
+        }
+        function treeSplit(tree, offset) {
+            let child;
+            let ii = 0;
+            let leftChildLen = tree.children.length;
+            let mid;
+            let resultTree;
+            let rightChildren;
+            while (ii < tree.children.length) {
+                child = tree.children[ii];
+                if (child.start < offset && offset < child.end) {
+                    mid = treeSplit(child, offset);
+                    leftChildLen = ii + 1;
+                    break;
+                }
+                if (child.start >= offset) {
+                    leftChildLen = ii;
+                    break;
+                }
+                ii += 1;
+            }
+            rightChildren = tree.children.splice(
+                leftChildLen,
+                tree.children.length - leftChildLen
+            );
+            if (mid !== undefined) {
+                rightChildren.unshift(mid);
+            }
+            resultTree = {
+                children: rightChildren,
+                delta: tree.delta,
+                end: tree.end,
+                start: offset
+            };
+            tree.end = offset;
+            return resultTree;
+        }
+        parentTrees.forEach(function (parentTree, parentIi) {
+            parentTree.children.forEach(function (child) {
+                dictKeyValueAppend(startToTreeDict, child.start, {
+                    parentIi,
+                    tree: child
+                });
+            });
+        });
+        queueList = Array.from(startToTreeDict).map(function ([
+            startOffset, trees
+        ]) {
+            return [
+                startOffset, trees
+            ];
+        }).sort(function (aa, bb) {
+            return aa[0] - bb[0];
+        });
+        while (true) {
+            if (nextXxx()) {
+                break;
+            }
+        }
+        return resultChildren;
+    }
+
+    function sortFunc(funcCov) {
+        funcCov.ranges = treeToRanges(treeFromSortedRanges(
+            funcCov.ranges.sort(compareRangeList)
+        ));
+        return funcCov;
+    }
+
+    function sortProcess(processCov) {
+        Object.entries(processCov.result.sort(function (aa, bb) {
+            return (
+                aa.url < bb.url
+                ? -1
+                : aa.url > bb.url
+                ? 1
+                : 0
+            );
+        })).forEach(function ([
+            scriptId, scriptCov
+        ]) {
+            scriptCov.scriptId = scriptId.toString(10);
+        });
+        return processCov;
+    }
+
+    function sortScript(scriptCov) {
+
+        scriptCov.functions.forEach(function (funcCov) {
+            sortFunc(funcCov);
+        });
+        scriptCov.functions.sort(function (aa, bb) {
+            return compareRangeList(aa.ranges[0], bb.ranges[0]);
+        });
+        return scriptCov;
+    }
+
+    function treeFromSortedRanges(ranges) {
+        let root;
+        let stack = [];   // Stack of parent trees and parent counts.
+        ranges.forEach(function (range) {
+            let node = {
+                children: [],
+                delta: range.count,
+                end: range.endOffset,
+                start: range.startOffset
+            };
+            let parent;
+            let parentCount;
+            if (root === undefined) {
+                root = node;
+                stack.push([
+                    node, range.count
+                ]);
+                return;
+            }
+            while (true) {
+                [
+                    parent, parentCount
+                ] = stack[stack.length - 1];
+                if (range.startOffset < parent.end) {
+                    break;
+                }
+                stack.pop();
+            }
+            node.delta -= parentCount;
+            parent.children.push(node);
+            stack.push([
+                node, range.count
+            ]);
+        });
+        return root;
+    }
+
+    function treeToRanges(tree) {
+        let count;
+        let cur;
+        let ii;
+        let parentCount;
+        let ranges = [];
+        let stack = [           // Stack of parent trees and counts.
+            [
+                tree, 0
+            ]
+        ];
+        function normalizeRange(tree) {
+            let children = [];
+            let curEnd;
+            let head;
+            let tail = [];
+            function endChain() {
+                if (tail.length !== 0) {
+                    head.end = tail[tail.length - 1].end;
+                    tail.forEach(function (tailTree) {
+                        tailTree.children.forEach(function (subChild) {
+                            subChild.delta += tailTree.delta - head.delta;
+                            head.children.push(subChild);
+                        });
+                    });
+                    tail.length = 0;
+                }
+                normalizeRange(head);
+                children.push(head);
+            }
+            tree.children.forEach(function (child) {
+                if (head === undefined) {
+                    head = child;
+                } else if (
+                    child.delta === head.delta && child.start === curEnd
+                ) {
+                    tail.push(child);
+                } else {
+                    endChain();
+                    head = child;
+                }
+                curEnd = child.end;
+            });
+            if (head !== undefined) {
+                endChain();
+            }
+            if (children.length === 1) {
+                if (
+                    children[0].start === tree.start
+                    && children[0].end === tree.end
+                ) {
+                    tree.delta += children[0].delta;
+                    tree.children = children[0].children;
+                    return;
+                }
+            }
+            tree.children = children;
+        }
+        normalizeRange(tree);
+        while (stack.length > 0) {
+            [
+                cur, parentCount
+            ] = stack.pop();
+            count = parentCount + cur.delta;
+            ranges.push({
+                count,
+                endOffset: cur.end,
+                startOffset: cur.start
+            });
+            ii = cur.children.length - 1;
+            while (ii >= 0) {
+                stack.push([
+                    cur.children[ii], count
+                ]);
+                ii -= 1;
+            }
+        }
+        return ranges;
+    }
+
+    if (processCovs.length === 0) {
+        return {
+            result: []
+        };
+    }
+    if (processCovs.length === 1) {
+        processCovs[0].result.forEach(function (scriptCov) {
+            sortScript(scriptCov);
+        });
+        return sortProcess(processCovs[0]);
+    }
+    processCovs.forEach(function ({
+        result
+    }) {
+        result.forEach(function (scriptCov) {
+            dictKeyValueAppend(urlToScriptDict, scriptCov.url, scriptCov);
+        });
+    });
+    urlToScriptDict.forEach(function (scriptCovs) {
+
+        let functions = [];
+        let rangeToFuncDict = new Map();
+        if (scriptCovs.length === 1) {
+            resultMerged.push(sortScript(scriptCovs[0]));
+            return;
+        }
+        scriptCovs.forEach(function ({
+            functions
+        }) {
+            functions.forEach(function (funcCov) {
+                dictKeyValueAppend(
+                    rangeToFuncDict,
+                    (
+                        funcCov.ranges[0].startOffset
+                        + ";" + funcCov.ranges[0].endOffset
+                    ),
+                    funcCov
+                );
+            });
+        });
+        rangeToFuncDict.forEach(function (funcCovs) {
+
+            let count = 0;
+            let isBlockCoverage;
+            let merged;
+            let ranges;
+            let trees = [];
+            if (funcCovs.length === 1) {
+                functions.push(sortFunc(funcCovs[0]));
+                return;
+            }
+            funcCovs.forEach(function (funcCov) {
+                count += (
+                    funcCov.count !== undefined
+                    ? funcCov.count
+                    : funcCov.ranges[0].count
+                );
+                if (funcCov.isBlockCoverage) {
+                    trees.push(treeFromSortedRanges(funcCov.ranges));
+                }
+            });
+            if (trees.length > 0) {
+                isBlockCoverage = true;
+                ranges = treeToRanges(mergeTreeList(trees));
+            } else {
+                isBlockCoverage = false;
+                ranges = [
+                    {
+                        count,
+                        endOffset: funcCovs[0].ranges[0].endOffset,
+                        startOffset: funcCovs[0].ranges[0].startOffset
+                    }
+                ];
+            }
+            merged = {
+                functionName: funcCovs[0].functionName,
+                isBlockCoverage,
+                ranges
+            };
+            if (count !== ranges[0].count) {
+                merged.count = count;
+            }
+            functions.push(merged);
+        });
+        resultMerged.push(sortScript({
+            functions,
+            scriptId: scriptCovs[0].scriptId,
+            url: scriptCovs[0].url
+        }));
+    });
+    return sortProcess({
+        result: resultMerged
+    });
+}
+async function v8CoverageReportCreate({
+    consoleError,
+    coverageDir,
+    processArgv = []
+}) {
     let cwd;
-    let data;
+    let exitCode = 0;
     let fileDict;
-    async function htmlRender({
+    let promiseList = [];
+    let v8CoverageObj;
+
+    function htmlRender({
         fileList,
         lineList,
+        modeIndex,
         pathname
     }) {
         let html;
@@ -1521,25 +2004,6 @@ import modulePath from "path";
         let padPathname;
         let txt;
         let txtBorder;
-        function stringHtmlSafe(str) {
-        /*
-         * this function will make <str> html-safe
-         * https://stackoverflow.com/questions/7381974/which-characters-need-to-be-escaped-on-html //jslint-quiet
-         */
-            return str.replace((
-                /&/gu
-            ), "&amp;").replace((
-                /"/gu
-            ), "&quot;").replace((
-                /\u0027/gu
-            ), "&apos;").replace((
-                /</gu
-            ), "&lt;").replace((
-                />/gu
-            ), "&gt;").replace((
-                /&amp;(amp;|apos;|gt;|lt;|quot;)/igu
-            ), "&$1");
-        }
         html = "";
         html += `<!DOCTYPE html>
 <html lang="en">
@@ -1659,7 +2123,7 @@ body {
 </tr>
 </thead>
 <tbody>`;
-        if (!lineList) {
+        if (modeIndex) {
             padLines = String("(ignore) 100.00 %").length;
             padPathname = 32;
             fileList.unshift({
@@ -1723,7 +2187,7 @@ body {
             coveragePct = String(coveragePct).replace((
                 /..$/m
             ), ".$&");
-            if (!lineList && ii === 0) {
+            if (modeIndex && ii === 0) {
                 fill = (
                     // red
                     "#" + Math.round(
@@ -1741,8 +2205,8 @@ body {
                 xx1 = 6 * str1.length + 20;
                 xx2 = 6 * str2.length + 20;
                 // fs - write coverage_badge.svg
-                moduleFs.promises.writeFile((
-                    DIR_COVERAGE + "/coverage_badge.svg"
+                promiseList.push(fsWriteFileWithParents((
+                    coverageDir + "coverage_badge.svg"
                 ), String(`
 <svg height="20" width="${xx1 + xx2}" xmlns="http://www.w3.org/2000/svg">
 <rect fill="#555" height="20" width="${xx1 + xx2}"/>
@@ -1758,7 +2222,7 @@ body {
 <text x="${xx1 + 0.5 * xx2}" y="14">${str2}</text>
 </g>
 </svg>
-                `).trim() + "\n");
+                `).trim() + "\n"));
                 pathname = "";
             }
             txt += (
@@ -1777,18 +2241,18 @@ body {
                 ).padStart(padLines, " ") + " |\n"
             );
             txt += txtBorder;
-            pathname = stringHtmlSafe(pathname);
+            pathname = htmlEscape(pathname);
             html += `<tr>
 <td class="${coverageLevel}">
             ${(
-                lineList
+                modeIndex
                 ? (
-                    "<a href=\"index.html\">./ </a>"
-                    + pathname + "<br>"
-                )
-                : (
                     "<a href=\"" + (pathname || "index") + ".html\">./ "
                     + pathname + "</a><br>"
+                )
+                : (
+                    "<a href=\"index.html\">./ </a>"
+                    + pathname + "<br>"
                 )
             )}
 <div class="percentbar">
@@ -1801,7 +2265,7 @@ body {
 </td>
 </tr>`;
         });
-        if (lineList) {
+        if (!modeIndex) {
             html += `</tbody>
 </table>
 </div>
@@ -1820,17 +2284,16 @@ body {
                 lineHtml = "";
                 lineId = "line_" + (ii + 1);
                 switch (count) {
-                case -1:
                 case 0:
                     if (holeList.length === 0) {
                         lineHtml += "</span>";
                         lineHtml += "<span class=\"uncovered\">";
-                        lineHtml += stringHtmlSafe(line);
+                        lineHtml += htmlEscape(line);
                         break;
                     }
-                    line = line.split("").map(function (chr) {
+                    line = line.split("").map(function (char) {
                         return {
-                            chr,
+                            char,
                             isHole: undefined
                         };
                     });
@@ -1846,11 +2309,11 @@ body {
                     });
                     chunk = "";
                     line.forEach(function ({
-                        chr,
+                        char,
                         isHole
                     }) {
                         if (inHole !== isHole) {
-                            lineHtml += stringHtmlSafe(chunk);
+                            lineHtml += htmlEscape(chunk);
                             lineHtml += (
                                 isHole
                                 ? "</span><span class=\"uncovered\">"
@@ -1859,12 +2322,12 @@ body {
                             chunk = "";
                             inHole = isHole;
                         }
-                        chunk += chr;
+                        chunk += char;
                     });
-                    lineHtml += stringHtmlSafe(chunk);
+                    lineHtml += htmlEscape(chunk);
                     break;
                 default:
-                    lineHtml += stringHtmlSafe(line);
+                    lineHtml += htmlEscape(line);
                 }
                 html += String(`
 <pre>
@@ -1894,72 +2357,123 @@ ${String(count).padStart(7, " ")}
 </body>
 </html>`;
         html += "\n";
-        await moduleFs.promises.mkdir(modulePath.dirname(pathname), {
-            recursive: true
-        });
         // fs - write *.html
-        moduleFs.promises.writeFile(pathname + ".html", html);
-        if (lineList) {
+        promiseList.push(fsWriteFileWithParents(pathname + ".html", html));
+        if (!modeIndex) {
             return;
         }
         // fs - write coverage.txt
-        console.error("\n" + txt);
-        moduleFs.promises.writeFile((
-            DIR_COVERAGE + "/coverage_report.txt"
-        ), txt);
+        consoleError("\n" + txt);
+        promiseList.push(fsWriteFileWithParents((
+            coverageDir + "coverage_report.txt"
+        ), txt));
     }
-    data = await moduleFs.promises.readdir(DIR_COVERAGE);
-    await Promise.all(data.map(async function (file) {
-        if ((
-            /^coverage-.*?\.json$/
-        ).test(file)) {
-            data = await moduleFs.promises.readFile((
-                DIR_COVERAGE + file
-            ), "utf8");
-            // fs - rename to coverage_v8.json
-            moduleFs.promises.rename(
-                DIR_COVERAGE + file,
-                DIR_COVERAGE + "coverage_v8.json"
-            );
+
+    function pathnameRelativeCwd(pathname) {
+        pathname = modulePath.resolve(pathname).replace((
+            /\\/g
+        ), "/");
+        if (!pathname.startsWith(cwd)) {
+            return;
         }
-    }));
-    fileDict = {};
+        pathname = pathname.slice(cwd.length);
+        return pathname;
+    }
+
+/*
+function sentinel() {}
+*/
+
+    await moduleFsInit();
+    consoleError = consoleError || console.error;
     cwd = process.cwd().replace((
         /\\/g
     ), "/") + "/";
-    await Promise.all(JSON.parse(data).result.map(async function ({
+    assertOrThrow(coverageDir, "invalid coverageDir " + coverageDir);
+    assertOrThrow(
+        pathnameRelativeCwd(coverageDir),
+        "coverageDir " + coverageDir + " is not subdirectory of cwd " + cwd
+    );
+    coverageDir = cwd + pathnameRelativeCwd(coverageDir) + "/";
+    if (processArgv.length > 0) {
+        await fsWriteFileWithParents(coverageDir + "/touch.txt", "");
+        await Promise.all(Array.from(
+            await moduleFs.promises.readdir(coverageDir)
+        ).map(async function (file) {
+            if ((
+                /^coverage-\d+?-\d+?-\d+?\.json$/
+            ).test(file)) {
+                console.error("rm file " + coverageDir + file);
+                await moduleFs.promises.unlink(coverageDir + file);
+            }
+        }));
+        exitCode = await new Promise(function (resolve) {
+            moduleChildProcess.spawn((
+                processArgv[0] === "npm"
+                ? process.platform.replace("win32", "npm.cmd").replace(
+                    process.platform,
+                    "npm"
+                )
+                : processArgv[0]
+            ), processArgv.slice(1), {
+                env: Object.assign({}, process.env, {
+                    NODE_V8_COVERAGE: coverageDir
+                }),
+                stdio: [
+                    "ignore", 1, 2
+                ]
+            }).on("exit", resolve);
+        });
+    }
+    v8CoverageObj = await moduleFs.promises.readdir(coverageDir);
+    v8CoverageObj = v8CoverageObj.filter(function (file) {
+        return (
+            /^coverage-\d+?-\d+?-\d+?\.json$/
+        ).test(file);
+    });
+    v8CoverageObj = await Promise.all(v8CoverageObj.map(async function (file) {
+        let data = await moduleFs.promises.readFile(coverageDir + file, "utf8");
+        data = JSON.parse(data);
+        data.result = data.result.filter(function (scriptCov) {
+            let pathname = scriptCov.url;
+            if (!pathname.startsWith("file:///")) {
+                return;
+            }
+            pathname = pathnameRelativeCwd(moduleUrl.fileURLToPath(pathname));
+            if (
+                !pathname
+                || pathname.startsWith("[")
+                || (
+                    process.env.npm_config_mode_coverage !== "all"
+                    && (
+                        /(?:^|\/)node_modules\//m
+                    ).test(pathname)
+                )
+            ) {
+                return;
+            }
+            scriptCov.url = pathname;
+            return true;
+        });
+        return data;
+    }));
+    v8CoverageObj = v8CoverageListMerge(v8CoverageObj);
+    await fsWriteFileWithParents(
+        coverageDir + "v8_coverage_merged.json",
+        JSON.stringify(v8CoverageObj)
+    );
+    fileDict = {};
+    await Promise.all(v8CoverageObj.result.map(async function ({
         functions,
-        url
+        url: pathname
     }) {
         let lineList;
         let linesCovered;
         let linesTotal;
-        let pathname;
-        let src;
-        if (!url.startsWith("file:///")) {
-            return;
-        }
-        pathname = url.replace((
-            process.platform === "win32"
-            ? "file:///"
-            : "file://"
-        ), "").replace((
-            /\\\\/g
-        ), "/");
-        if (
-            !pathname.startsWith(cwd)
-            || pathname.startsWith(cwd + "[")
-            || (
-                process.env.npm_config_mode_coverage !== "all"
-                && pathname.indexOf("/node_modules/") >= 0
-            )
-        ) {
-            return;
-        }
-        pathname = pathname.replace(cwd, "");
-        src = await moduleFs.promises.readFile(pathname, "utf8");
+        let source;
+        source = await moduleFs.promises.readFile(pathname, "utf8");
         lineList = [{}];
-        src.replace((
+        source.replace((
             /^.*$/gm
         ), function (line, startOffset) {
             lineList[lineList.length - 1].endOffset = startOffset - 1;
@@ -1973,7 +2487,7 @@ ${String(count).padStart(7, " ")}
             return "";
         });
         lineList.shift();
-        lineList[lineList.length - 1].endOffset = src.length;
+        lineList[lineList.length - 1].endOffset = source.length;
         functions.reverse().forEach(function ({
             ranges
         }) {
@@ -2024,7 +2538,7 @@ ${String(count).padStart(7, " ")}
             return count > 0;
         }).length;
         await moduleFs.promises.mkdir((
-            modulePath.dirname(DIR_COVERAGE + pathname)
+            modulePath.dirname(coverageDir + pathname)
         ), {
             recursive: true
         });
@@ -2035,33 +2549,38 @@ ${String(count).padStart(7, " ")}
             modeCoverageIgnoreFile: (
                 (
                     /^\/\*mode-coverage-ignore-file\*\/$/m
-                ).test(src.slice(0, 65536))
+                ).test(source.slice(0, 65536))
                 ? "(ignore)"
                 : ""
             ),
-            pathname,
-            src
+            pathname
         };
-        await htmlRender({
+        htmlRender({
             fileList: [
                 fileDict[pathname]
             ],
             lineList,
-            pathname: DIR_COVERAGE + pathname
+            pathname: coverageDir + pathname
         });
     }));
-    await htmlRender({
+    htmlRender({
         fileList: Object.keys(fileDict).sort().map(function (pathname) {
             return fileDict[pathname];
         }),
-        pathname: DIR_COVERAGE + "index"
+        modeIndex: true,
+        pathname: coverageDir + "index"
     });
-}());
+    assertOrThrow(
+        exitCode === 0,
+        "v8CoverageReportCreate - nonzero exitCode " + exitCode
+    );
+    await Promise.all(promiseList);
+}
+v8CoverageReportCreate({
+    coverageDir: ".artifact/coverage",
+    processArgv: process.argv.slice(1)
+});
 ' "$@" # '
-        find "$DIR_COVERAGE"
-    fi
-    printf "shRunWithCoverage - EXIT_CODE=$EXIT_CODE\n" 1>&2
-    return "$EXIT_CODE"
 )}
 
 shRunWithScreenshotTxt() {(set -e
@@ -2156,6 +2675,10 @@ ${result}
 
 shCiMain() {(set -e
 # this function will run $@
+    if [ "$1" = "" ]
+    then
+        return
+    fi
     # run "$@" with winpty
     export CI_UNAME="${CI_UNAME:-$(uname)}"
     case "$CI_UNAME" in
@@ -2163,7 +2686,7 @@ shCiMain() {(set -e
         if [ ! "$CI_WINPTY" ] && [ "$1" != shHttpFileServer ]
         then
             export CI_WINPTY=1
-            winpty -Xallow-non-tty -Xplain sh jslint_ci.sh "$@"
+            winpty -Xallow-non-tty -Xplain sh "$0" "$@"
             return
         fi
         ;;

@@ -1,5 +1,5 @@
-<svg height="492" width="800" xmlns="http://www.w3.org/2000/svg">
-<rect height="492" fill="#222" width="800"></rect>
+<svg height="514" width="800" xmlns="http://www.w3.org/2000/svg">
+<rect height="514" fill="#222" width="800"></rect>
 <text
     fill="#7f7"
     font-family="consolas, menlo, monospace"
@@ -89,37 +89,37 @@
     textLength="768"
     x="10"
     y="318"
->&gt;     await fs.promises.writeFile(".artifact/jslint_report.html", report);                       </tspan>
+>&gt;     await fs.promises.mkdir(".artifact/", {recursive: true});                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="340"
->&gt;     console.error("wrote file .artifact/jslint_report.html");                                  </tspan>
+>&gt;     await fs.promises.writeFile(".artifact/jslint_report_hello.html", report);                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="362"
->&gt; }());                                                                                          </tspan>
+>&gt;     console.error("wrote file .artifact/jslint_report_hello.html");                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="384"
->&gt;                                                                                                </tspan>
+>&gt; }());                                                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="406"
->&gt; '                                                                                              </tspan>
+>&gt;                                                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="428"
->                                                                                                 </tspan>
+>&gt; '                                                                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -131,7 +131,13 @@
     textLength="768"
     x="10"
     y="472"
->wrote file .artifact/jslint_report.html                                                          </tspan>
+>                                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="494"
+>wrote file .artifact/jslint_report_hello.html                                                    </tspan>
 
 </text>
 </svg>

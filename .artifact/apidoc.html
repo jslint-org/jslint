@@ -78,42 +78,56 @@ body {
             <ul>
             <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.assertOrThrow">1.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.assertErrorThrownAsync">1.
+function assertErrorThrownAsync<span class="apidocSignatureSpan">(asyncFunc, regexp)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.assertJsonEqual">2.
+function assertJsonEqual<span class="apidocSignatureSpan">(aa, bb)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.assertOrThrow">3.
 function assertOrThrow<span class="apidocSignatureSpan">(condition, message)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.debugInline">2.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.debugInline">4.
 function debugInline<span class="apidocSignatureSpan">(...argv)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.fsRmRecursive">3.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.fsRmRecursive">5.
 function fsRmRecursive<span class="apidocSignatureSpan">(path, option_dict)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.fsWriteFileWithParents">4.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.fsWriteFileWithParents">6.
 function fsWriteFileWithParents<span class="apidocSignatureSpan">(pathname, data)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.html_escape">5.
-function html_escape<span class="apidocSignatureSpan">(str)</span>
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.htmlEscape">7.
+function htmlEscape<span class="apidocSignatureSpan">(str)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint">6.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint">8.
 function jslint<span class="apidocSignatureSpan">(
     source = "",
     option_dict = empty(),
@@ -124,7 +138,7 @@ function jslint<span class="apidocSignatureSpan">(
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_apidoc">7.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_apidoc">9.
 function jslint_apidoc<span class="apidocSignatureSpan">({
     example_list,
     github_repo,
@@ -138,14 +152,14 @@ function jslint_apidoc<span class="apidocSignatureSpan">({
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_assert">8.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_assert">10.
 function jslint_assert<span class="apidocSignatureSpan">(condition, message)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_cli">9.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_cli">11.
 function jslint_cli<span class="apidocSignatureSpan">({
     cjs_module,
     cjs_require,
@@ -155,7 +169,7 @@ function jslint_cli<span class="apidocSignatureSpan">({
     mode_cli,
     mode_noop,
     option,
-    process_argv,
+    processArgv,
     process_exit,
     source
 })</span>
@@ -164,42 +178,42 @@ function jslint_cli<span class="apidocSignatureSpan">({
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase1_split">10.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase1_split">12.
 function jslint_phase1_split<span class="apidocSignatureSpan">()</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase2_lex">11.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase2_lex">13.
 function jslint_phase2_lex<span class="apidocSignatureSpan">(state)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase3_parse">12.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase3_parse">14.
 function jslint_phase3_parse<span class="apidocSignatureSpan">(state)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase4_walk">13.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase4_walk">15.
 function jslint_phase4_walk<span class="apidocSignatureSpan">(state)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase5_whitage">14.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase5_whitage">16.
 function jslint_phase5_whitage<span class="apidocSignatureSpan">(state)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_report">15.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_report">17.
 function jslint_report<span class="apidocSignatureSpan">({
     exports,
     froms,
@@ -216,28 +230,67 @@ function jslint_report<span class="apidocSignatureSpan">({
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.moduleFsInit">16.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestDescribe">18.
+function jstestDescribe<span class="apidocSignatureSpan">(description, testFunction)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestIt">19.
+function jstestIt<span class="apidocSignatureSpan">(description, testFunction, mode)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestOnExit">20.
+function jstestOnExit<span class="apidocSignatureSpan">(exitCode, processExit, countFailed)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.moduleFsInit">21.
 function moduleFsInit<span class="apidocSignatureSpan">()</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.noop">17.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.noop">22.
 function noop<span class="apidocSignatureSpan">(val)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_charset_ascii">18.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.v8CoverageListMerge">23.
+function v8CoverageListMerge<span class="apidocSignatureSpan">(processCovs)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.v8CoverageReportCreate">24.
+function v8CoverageReportCreate<span class="apidocSignatureSpan">({
+    consoleError,
+    coverageDir,
+    processArgv = []
+})</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_charset_ascii">25.
 string jslint_charset_ascii
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_edition">19.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_edition">26.
 string jslint_edition
 </a>
 
@@ -255,7 +308,85 @@ string jslint_edition
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.assertOrThrow" id="apidoc.elem.%22.%2Fjslint.mjs%22.assertOrThrow">1.
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.assertErrorThrownAsync" id="apidoc.elem.%22.%2Fjslint.mjs%22.assertErrorThrownAsync">1.
+    function assertErrorThrownAsync<span class="apidocSignatureSpan">(asyncFunc, regexp)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">async function assertErrorThrownAsync(asyncFunc, regexp) {
+<span class="apidocCodeCommentSpan">
+// This function will assert &lt;asyncFunc&gt; throws an error.
+
+</span>    let err;
+    try {
+        await asyncFunc();
+    } catch (errCaught) {
+        err = errCaught;
+    }
+    assertOrThrow(err, "no error thrown");
+    assertOrThrow(
+        regexp === undefined || new RegExp(regexp).test(err.message),
+        err
+    );
+}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+
+jstestDescribe((
+    "test v8CoverageReportCreate's handling-behavior"
+), function () {
+    jstestIt((
+        "test null-case handling-behavior"
+    ), async function () {
+        await <span class="apidocCodeKeywordSpan">assertErrorThrownAsync</span>(function () {
+            return v8CoverageReportCreate({});
+        }, "invalid coverageDir");
+    });
+    jstestIt((
+        "test invalid-coverageDir handling-behavior"
+    ), async function () {
+        await assertErrorThrownAsync(function () {
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.assertJsonEqual" id="apidoc.elem.%22.%2Fjslint.mjs%22.assertJsonEqual">2.
+    function assertJsonEqual<span class="apidocSignatureSpan">(aa, bb)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function assertJsonEqual(aa, bb) {
+<span class="apidocCodeCommentSpan">
+// This function will assert JSON.stringify(&lt;aa&gt;) === JSON.stringify(&lt;bb&gt;).
+
+</span>    aa = JSON.stringify(objectDeepCopyWithKeysSorted(aa));
+    bb = JSON.stringify(objectDeepCopyWithKeysSorted(bb));
+    if (aa !== bb) {
+        throw new Error(
+            JSON.stringify(aa) + " !== " + JSON.stringify(bb)
+        );
+    }
+}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+
+// Debug data1.
+// await moduleFs.promises.writeFile(
+//     ".test_v8_coverage_node_sqlite_merged.json",
+//     JSON.stringify(objectDeepCopyWithKeysSorted(data1), undefined, 4) + "\n"
+// );
+
+        <span class="apidocCodeKeywordSpan">assertJsonEqual</span>(data1, data2);
+    });
+});
+
+jstestDescribe((
+    "test v8CoverageReportCreate's handling-behavior"
+), function () {
+    jstestIt((
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.assertOrThrow" id="apidoc.elem.%22.%2Fjslint.mjs%22.assertOrThrow">3.
     function assertOrThrow<span class="apidocSignatureSpan">(condition, message)</span>
     </a>
     </h2>
@@ -273,24 +404,26 @@ string jslint_edition
     }
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-/*
- * this function will test misc handling-behavior
- */
-    // test debugInline's handling-behavior
-    noop(debugInline);
-    // test assertOrThrow's handling-behavior
-    try {
+    });
+    // test assertJsonEqual's error handling-behavior
+    await assertErrorThrownAsync(function () {
+        assertJsonEqual(1, 2);
+    });
+    // test assertOrThrow's error handling-behavior
+    await assertErrorThrownAsync(function () {
         <span class="apidocCodeKeywordSpan">assertOrThrow</span>(undefined, "undefined");
-    } catch (ignore) {}
-    try {
+    });
+    await assertErrorThrownAsync(function () {
         assertOrThrow(undefined, new Error());
-    } catch (ignore) {}
+    });
 }());
+
+(async function () {
 ...</pre></li>
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.debugInline" id="apidoc.elem.%22.%2Fjslint.mjs%22.debugInline">2.
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.debugInline" id="apidoc.elem.%22.%2Fjslint.mjs%22.debugInline">4.
     function debugInline<span class="apidocSignatureSpan">(...argv)</span>
     </a>
     </h2>
@@ -318,7 +451,7 @@ string jslint_edition
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.fsRmRecursive" id="apidoc.elem.%22.%2Fjslint.mjs%22.fsRmRecursive">3.
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.fsRmRecursive" id="apidoc.elem.%22.%2Fjslint.mjs%22.fsRmRecursive">5.
     function fsRmRecursive<span class="apidocSignatureSpan">(path, option_dict)</span>
     </a>
     </h2>
@@ -355,19 +488,19 @@ string jslint_edition
 * this function will test fsXxx's handling-behavior
 */
    // test fsRmRecursive handling-behavior
-   jslint.<span class="apidocCodeKeywordSpan">fsRmRecursive</span>(".artifact/fsRmRecursive");
-   jslint.fsRmRecursive(".artifact/fsRmRecursive", {
+   <span class="apidocCodeKeywordSpan">fsRmRecursive</span>(".artifact/fsRmRecursive");
+   fsRmRecursive(".artifact/fsRmRecursive", {
        process_version: "v12"
    });
    // test fsWriteFileWithParents handling-behavior
    (async function () {
-       await jslint.fsRmRecursive(".artifact/fsWriteFileWithParents");
-       await jslint.fsWriteFileWithParents(
+       await fsRmRecursive(".tmp/fsWriteFileWithParents");
+       await fsWriteFileWithParents(
 ...</pre></li>
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.fsWriteFileWithParents" id="apidoc.elem.%22.%2Fjslint.mjs%22.fsWriteFileWithParents">4.
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.fsWriteFileWithParents" id="apidoc.elem.%22.%2Fjslint.mjs%22.fsWriteFileWithParents">6.
     function fsWriteFileWithParents<span class="apidocSignatureSpan">(pathname, data)</span>
     </a>
     </h2>
@@ -398,31 +531,31 @@ string jslint_edition
     console.error("wrote file " + pathname);
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-    jslint.fsRmRecursive(".artifact/fsRmRecursive");
-    jslint.fsRmRecursive(".artifact/fsRmRecursive", {
-        process_version: "v12"
-    });
-    // test fsWriteFileWithParents handling-behavior
-    (async function () {
-        await jslint.fsRmRecursive(".artifact/fsWriteFileWithParents");
-        await jslint.<span class="apidocCodeKeywordSpan">fsWriteFileWithParents</span>(
-            ".artifact/fsWriteFileWithParents/aa/bb/cc",
-            "aa"
-        );
-    }());
-}());
-
-(function testCaseJslintCli() {
+    ]
+].forEach(function ([
+    file, data
+], ii) {
+    jstestIt(file, async function () {
+        let dir = ".tmp/coverage" + ii + "/";
+        file = dir + file;
+        await <span class="apidocCodeKeywordSpan">fsWriteFileWithParents</span>(file, data);
+        await jslint.jslint_cli({
+            mode_cli: true,
+            processArgv: [
+                "node", "jslint.mjs",
+                "v8_coverage_report=" + dir,
+                "node",
+                file
 ...</pre></li>
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.html_escape" id="apidoc.elem.%22.%2Fjslint.mjs%22.html_escape">5.
-    function html_escape<span class="apidocSignatureSpan">(str)</span>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.htmlEscape" id="apidoc.elem.%22.%2Fjslint.mjs%22.htmlEscape">7.
+    function htmlEscape<span class="apidocSignatureSpan">(str)</span>
     </a>
     </h2>
 </li>
-<li>Description and source-code:<pre class="apidocCodePre">function html_escape(str) {
+<li>Description and source-code:<pre class="apidocCodePre">function htmlEscape(str) {
 <span class="apidocCodeCommentSpan">
 // This function will make &lt;str&gt; html-safe by escaping &amp; &lt; &gt;.
 
@@ -435,26 +568,26 @@ string jslint_edition
     ), "&amp;gt;");
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-
-    parameters = [],
-    signature
-} = the_function;
-let list = Object.keys(context);
-let params;
-html += (
-    "&lt;div class=\"level level" + <span class="apidocCodeKeywordSpan">html_escape</span>(level) + "\"&gt;"
-    + "&lt;address&gt;" + html_escape(line) + "&lt;/address&gt;"
-    + "&lt;dfn&gt;"
-    + (
-        name === "=&gt;"
-        ? html_escape(signature) + " =&gt;"
-        : (
-            typeof name === "string"
+});
+chunk = "";
+line.forEach(function ({
+    char,
+    isHole
+}) {
+    if (inHole !== isHole) {
+        lineHtml += <span class="apidocCodeKeywordSpan">htmlEscape</span>(chunk);
+        lineHtml += (
+            isHole
+            ? "&lt;/span&gt;&lt;span class=\"uncovered\"&gt;"
+            : "&lt;/span&gt;&lt;span&gt;"
+        );
+        chunk = "";
+        inHole = isHole;
 ...</pre></li>
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint">6.
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint">8.
     function jslint<span class="apidocSignatureSpan">(
     source = "",
     option_dict = empty(),
@@ -522,17 +655,17 @@ import fs from "fs";
     let source = "function foo() {console.log(\u0027hello world\u0027);}\n";
     result = jslint.<span class="apidocCodeKeywordSpan">jslint</span>(source);
     report = jslint.jslint_report(result);
-    await fs.promises.writeFile(".artifact/jslint_report.html", report);
-    console.error("wrote file .artifact/jslint_report.html");
+    await fs.promises.mkdir(".artifact/", {recursive: true});
+    await fs.promises.writeFile(".artifact/jslint_report_hello.html", report);
+    console.error("wrote file .artifact/jslint_report_hello.html");
 }());
 
 '
-```
 ...</pre></li>
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_apidoc" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_apidoc">7.
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_apidoc" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_apidoc">9.
     function jslint_apidoc<span class="apidocSignatureSpan">({
     example_list,
     github_repo,
@@ -567,7 +700,7 @@ import fs from "fs";
         let name;
         let signature;
         let source;
-        name = html_escape((typeof moduleObj[key]) + " " + key);
+        name = htmlEscape((typeof moduleObj[key]) + " " + key);
         if (typeof moduleObj[key] !== "function") {
             return {
                 name,
@@ -588,12 +721,12 @@ ${name}
             };
         }
         // init source
-        source = html_escape(trim_start(moduleObj[key].toString()));
+        source = htmlEscape(trim_start(moduleObj[key].toString()));
         // init signature
         source = source.replace((
             /(\([\S\s]*?\)) \{/
         ), function (match0, match1) {
-            signature = html_escape(
+            signature = htmlEscape(
                 match1.replace((
                     / *?\/\*[\S\s]*?\*\/ */g
                 ), "").replace((
@@ -615,7 +748,8 @@ ${name}
                     "((?:\\n.*?){8}(function )?)\\b"
                     + key
                     + "(\\((?:.*?\\n){8})"
-                ), "g"),...
+                ), "g"),
+  ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -626,7 +760,7 @@ switch (command[0]) {
 // PR-362 - Add API Doc.
 
 case "jslint_apidoc":
-    await <span class="apidocCodeKeywordSpan">jslint_apidoc</span>(Object.assign(JSON.parse(process_argv[3]), {
+    await <span class="apidocCodeKeywordSpan">jslint_apidoc</span>(Object.assign(JSON.parse(processArgv[3]), {
         pathname: command[1]
     }));
     return;
@@ -638,7 +772,7 @@ case "jslint_plugin_vim":
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_assert" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_assert">8.
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_assert" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_assert">10.
     function jslint_assert<span class="apidocSignatureSpan">(condition, message)</span>
     </a>
     </h2>
@@ -678,7 +812,7 @@ case "{}":
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_cli" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_cli">9.
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_cli" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_cli">11.
     function jslint_cli<span class="apidocSignatureSpan">({
     cjs_module,
     cjs_require,
@@ -688,7 +822,7 @@ case "{}":
     mode_cli,
     mode_noop,
     option,
-    process_argv,
+    processArgv,
     process_exit,
     source
 })</span>
@@ -704,7 +838,7 @@ case "{}":
     mode_cli,
     mode_noop,
     option,
-    process_argv,
+    processArgv,
     process_exit,
     source
 }) {
@@ -765,30 +899,30 @@ case "{}":
                             process.env.JSLINT_BETA
                             &amp;&amp; !(
                                 /0|false|null|undefined/
-                            ).test(process.en...
+                            ).test(process.env...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-        "jslint_report=.artifact/jslint_report.html",
-        "aa.json"
-    ],
-    process_exit: processExit1,
-    source: "["
-});
-// test plugin-vim handling-behavior
-jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
-    // suppress error
-    console_error: noop,
-    mode_cli: true,
-    process_argv: [
-        "node",
-        "jslint.mjs",
-        "jslint_plugin_vim",
+].forEach(function ([
+    file, data
+], ii) {
+    jstestIt(file, async function () {
+        let dir = ".tmp/coverage" + ii + "/";
+        file = dir + file;
+        await fsWriteFileWithParents(file, data);
+        await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
+            mode_cli: true,
+            processArgv: [
+                "node", "jslint.mjs",
+                "v8_coverage_report=" + dir,
+                "node",
+                file
+            ]
 ...</pre></li>
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase1_split" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase1_split">10.
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase1_split" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase1_split">12.
     function jslint_phase1_split<span class="apidocSignatureSpan">()</span>
     </a>
     </h2>
@@ -819,7 +953,7 @@ jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase2_lex" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase2_lex">11.
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase2_lex" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase2_lex">13.
     function jslint_phase2_lex<span class="apidocSignatureSpan">(state)</span>
     </a>
     </h2>
@@ -908,7 +1042,7 @@ jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase3_parse" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase3_parse">12.
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase3_parse" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase3_parse">14.
     function jslint_phase3_parse<span class="apidocSignatureSpan">(state)</span>
     </a>
     </h2>
@@ -1000,7 +1134,7 @@ jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase4_walk" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase4_walk">13.
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase4_walk" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase4_walk">15.
     function jslint_phase4_walk<span class="apidocSignatureSpan">(state)</span>
     </a>
     </h2>
@@ -1099,7 +1233,7 @@ jslint_assert(
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase5_whitage" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase5_whitage">14.
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase5_whitage" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase5_whitage">16.
     function jslint_phase5_whitage<span class="apidocSignatureSpan">(state)</span>
     </a>
     </h2>
@@ -1213,7 +1347,7 @@ jslint_assert(
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_report" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_report">15.
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_report" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_report">17.
     function jslint_report<span class="apidocSignatureSpan">({
     exports,
     froms,
@@ -1258,7 +1392,7 @@ jslint_assert(
 // &lt;dt&gt; and &lt;dd&gt; groups, &lt;script&gt;, &lt;template&gt; or &lt;div&gt; elements.
 
                 "&lt;dl&gt;"
-                + "&lt;dt&gt;" + html_escape(title) + "&lt;/dt&gt;"
+                + "&lt;dt&gt;" + htmlEscape(title) + "&lt;/dt&gt;"
                 + "&lt;dd&gt;" + list.join(", ") + "&lt;/dd&gt;"
                 + "&lt;/dl&gt;"
             )
@@ -1285,7 +1419,7 @@ X7WWiwqyCE98qt0jk5JJmgR5WJJElBmzRb1F7a66MmSLTNWZ2XSHfKBSKHoVteSEJ6EOdvVw\
 fNZOtXKDe39jXdRlkmMnOWIOFBgeEK/b0mFsgffnPyyAitNyutKky7J8a8MSEkAKGLgfptnS\
 /gDRSo7vwdNUmQDB7oP6pK7QF5d9SrY8M/tkrXcurSIQAmX7tz7pd33LIB7GQkBQ/k81s/0D\
 gpt4gbw7x0Cn/PocitK5KIGPGQIzQzAMuCeC2ERAidx9TySVqX06goT0SFFOOV9Kuxdi5Rg7\
-l...
+l6...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1297,18 +1431,185 @@ import fs from "fs";
     let source = "function foo() {console.log(\u0027hello world\u0027);}\n";
     result = jslint.jslint(source);
     report = jslint.<span class="apidocCodeKeywordSpan">jslint_report</span>(result);
-    await fs.promises.writeFile(".artifact/jslint_report.html", report);
-    console.error("wrote file .artifact/jslint_report.html");
+    await fs.promises.mkdir(".artifact/", {recursive: true});
+    await fs.promises.writeFile(".artifact/jslint_report_hello.html", report);
+    console.error("wrote file .artifact/jslint_report_hello.html");
 }());
 
 '
 ```
-- shell output
 ...</pre></li>
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.moduleFsInit" id="apidoc.elem.%22.%2Fjslint.mjs%22.moduleFsInit">16.
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestDescribe" id="apidoc.elem.%22.%2Fjslint.mjs%22.jstestDescribe">18.
+    function jstestDescribe<span class="apidocSignatureSpan">(description, testFunction)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">async function jstestDescribe(description, testFunction) {
+<span class="apidocCodeCommentSpan">
+// This function will create-and-run test-group &lt;testFunction&gt;
+// with given &lt;description&gt;.
+
+</span>    let message;
+    let result;
+
+// Init jstestTimeStart.
+
+    if (jstestTimeStart === undefined) {
+        jstestTimeStart = jstestTimeStart || Date.now();
+        process.on("exit", jstestOnExit);
+    }
+
+// Init jstestItList.
+
+    jstestItList = [];
+    testFunction();
+
+// Wait for jstestItList to resolve.
+
+    result = await Promise.all(jstestItList);
+
+// Print test results.
+
+    message = (
+        "\n  " + (Date.now() - jstestTimeStart) + "ms"
+        + " - test describe - " + description + "\n"
+        + result.map(function ([
+            err, description, mode
+        ]) {
+            jstestItCount += 1;
+            if (err) {
+                jstestCountFailed += 1;
+                err = (
+                    "    \u001b[31m\u2718 " + jstestItCount + ". test it - "
+                    + description + "\n" + err.stack + "\u001b[39m"
+                );
+                if (mode === "pass") {
+                    jstestCountFailed -= 1;
+                    err = "";
+                }
+            }
+            return err || (
+                "    \u001b[31m\u2714 " + jstestItCount + ". test it - "
+                + description + "\u001b[39m"
+            );
+        }).join("\n")
+    );
+    console.error(message);
+}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+//     JSON.stringify(objectDeepCopyWithKeysSorted(data1), undefined, 4) + "\n"
+// );
+
+        assertJsonEqual(data1, data2);
+    });
+});
+
+<span class="apidocCodeKeywordSpan">jstestDescribe</span>((
+    "test v8CoverageReportCreate's handling-behavior"
+), function () {
+    jstestIt((
+        "test null-case handling-behavior"
+    ), async function () {
+        await assertErrorThrownAsync(function () {
+            return v8CoverageReportCreate({});
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestIt" id="apidoc.elem.%22.%2Fjslint.mjs%22.jstestIt">19.
+    function jstestIt<span class="apidocSignatureSpan">(description, testFunction, mode)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function jstestIt(description, testFunction, mode) {
+<span class="apidocCodeCommentSpan">
+// This function will create-and-run test-case &lt;testFunction&gt;
+// inside current test-group with given &lt;description&gt;.
+
+</span>    jstestCountTotal += 1;
+    jstestItList.push(new Promise(async function (resolve) {
+        let err;
+        try {
+            await testFunction();
+        } catch (errCaught) {
+            err = errCaught;
+        }
+        resolve([
+            err, description, mode
+        ]);
+    }));
+}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+            + "case 2:break;\n"
+            + "}\n"
+        )
+    ]
+].forEach(function ([
+    file, data
+], ii) {
+    <span class="apidocCodeKeywordSpan">jstestIt</span>(file, async function () {
+        let dir = ".tmp/coverage" + ii + "/";
+        file = dir + file;
+        await fsWriteFileWithParents(file, data);
+        await jslint.jslint_cli({
+            mode_cli: true,
+            processArgv: [
+                "node", "jslint.mjs",
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestOnExit" id="apidoc.elem.%22.%2Fjslint.mjs%22.jstestOnExit">20.
+    function jstestOnExit<span class="apidocSignatureSpan">(exitCode, processExit, countFailed)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function jstestOnExit(exitCode, processExit, countFailed) {
+<span class="apidocCodeCommentSpan">
+// This function will on process-exit, print test-report
+// and exit with non-zero exit-code if any test failed.
+
+</span>    let message = (
+        (
+            (jstestCountFailed || countFailed)
+            ? "\n\u001b[31m"
+            : "\n\u001b[32m"
+        )
+        + "  tests total  - " + jstestCountTotal + "\n"
+        + "  tests failed - " + jstestCountFailed + "\n"
+        + "\u001b[39m"
+    );
+    if (!processExit) {
+        console.error(message);
+        processExit = process.exit;
+    }
+    processExit(exitCode || jstestCountFailed);
+    return message;
+}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+        "test jstestDescribe's error handling-behavior"
+    ), function () {
+        throw new Error();
+    }, "pass");
+    jstestIt((
+        "test jstestOnExit's error handling-behavior"
+    ), function () {
+        <span class="apidocCodeKeywordSpan">jstestOnExit</span>(undefined, noop, 1);
+    });
+});
+
+jstestDescribe((
+    "test v8CoverageListMerge's handling-behavior"
+), function () {
+    let functionsExpected = JSON.stringify([
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.moduleFsInit" id="apidoc.elem.%22.%2Fjslint.mjs%22.moduleFsInit">21.
     function moduleFsInit<span class="apidocSignatureSpan">()</span>
     </a>
     </h2>
@@ -1351,25 +1652,26 @@ import fs from "fs";
     }
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-    )) {
-return exit_code;
+        return pathname;
     }
-    console_error = console_error || console.error;
-    console_log = console_log || console.log;
-    process_argv = process_argv || process.argv;
-    process_exit = process_exit || process.exit;
+
+/*
+function sentinel() {}
+*/
+
     await <span class="apidocCodeKeywordSpan">moduleFsInit</span>();
-    if (!(
+    consoleError = consoleError || console.error;
+    cwd = process.cwd().replace((
+        /\\/g
+    ), "/") + "/";
 
-// Feature-detect nodejs-cjs-cli.
-
-(cjs_module &amp;&amp; cjs_require)
-? cjs_module === cjs_require.main
+// Init coverageDir.
+// Assert coverageDir is subdirectory of cwd.
 ...</pre></li>
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.noop" id="apidoc.elem.%22.%2Fjslint.mjs%22.noop">17.
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.noop" id="apidoc.elem.%22.%2Fjslint.mjs%22.noop">22.
     function noop<span class="apidocSignatureSpan">(val)</span>
     </a>
     </h2>
@@ -1383,24 +1685,253 @@ return exit_code;
 <li>Example usage:<pre class="apidocCodePre">...
 }());
 
-(function testCaseMisc() {
+(async function testCaseMisc() {
 /*
 * this function will test misc handling-behavior
 */
    // test debugInline's handling-behavior
    <span class="apidocCodeKeywordSpan">noop</span>(debugInline);
-   // test assertOrThrow's handling-behavior
-   try {
-       assertOrThrow(undefined, "undefined");
-   } catch (ignore) {}
-   try {
-       assertOrThrow(undefined, new Error());
-   } catch (ignore) {}
+   // test assertErrorThrownAsync's error handling-behavior
+   await assertErrorThrownAsync(function () {
+       return assertErrorThrownAsync(noop);
+   });
+   // test assertJsonEqual's error handling-behavior
+   await assertErrorThrownAsync(function () {
+       assertJsonEqual(1, 2);
 ...</pre></li>
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_charset_ascii" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_charset_ascii">18.
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.v8CoverageListMerge" id="apidoc.elem.%22.%2Fjslint.mjs%22.v8CoverageListMerge">23.
+    function v8CoverageListMerge<span class="apidocSignatureSpan">(processCovs)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function v8CoverageListMerge(processCovs) {
+<span class="apidocCodeCommentSpan">
+// This function is derived from MIT Licensed v8-coverage at
+// https://github.com/demurgos/v8-coverage/tree/master/ts
+// https://github.com/demurgos/v8-coverage/blob/master/ts/LICENSE.md
+//
+// Merges a list of v8 process coverages.
+// The result is normalized.
+// The input values may be mutated, it is not safe to use them after passing
+// them to this function.
+// The computation is synchronous.
+// @param processCovs Process coverages to merge.
+// @return Merged process coverage.
+
+</span>    let resultMerged = [];      // List of merged scripts from processCovs.
+    let urlToScriptDict = new Map();    // Map scriptCov.url to scriptCovs.
+
+    function compareRangeList(aa, bb) {
+
+// Compares two range coverages.
+// The ranges are first ordered by ascending `startOffset` and then by
+// descending `endOffset`.
+// This corresponds to a pre-order tree traversal.
+
+        if (aa.startOffset !== bb.startOffset) {
+            return aa.startOffset - bb.startOffset;
+        }
+        return bb.endOffset - aa.endOffset;
+    }
+
+    function dictKeyValueAppend(dict, key, val) {
+
+// This function will append &lt;val&gt; to list &lt;dict&gt;[&lt;key&gt;].
+
+        let list = dict.get(key);
+        if (list === undefined) {
+            list = [];
+            dict.set(key, list);
+        }
+        list.push(val);
+    }
+
+    function mergeTreeList(parentTrees) {
+
+// This function will return RangeTree object with &lt;parentTrees&gt; merged into
+// property-children.
+// @precondition Same `start` and `end` for all the parentTrees
+
+        if (parentTrees.length &lt;= 1) {
+            return parentTrees[0];
+        }
+
+// new RangeTree().
+
+        return {
+
+// Merge parentTrees into property-children.
+
+            children: mergeTreeListToChildren(parentTrees),
+            delta: parentTrees.reduce(function (aa, bb) {
+                return aa + bb.delta;
+            }, 0),
+            end: parentTrees[0].end,
+            start: parentTrees[0].start
+   ...
+}
+</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+                "test_v8_coverage_node_sqlite_13216_1633662333140_0.json"
+            ].map(function (file) {
+                return testCoverageMergeData[file];
+            });
+            let data2 = testCoverageMergeData[
+                "test_v8_coverage_node_sqlite_merged.json"
+            ];
+            data1 = <span class="apidocCodeKeywordSpan">v8CoverageListMerge</span>(data1);
+            data1 = v8CoverageListMerge([data1]);
+
+// Debug data1.
+// await moduleFs.promises.writeFile(
+//     ".test_v8_coverage_node_sqlite_merged.json",
+//     JSON.stringify(objectDeepCopyWithKeysSorted(data1), undefined, 4) + "\n"
+// );
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.v8CoverageReportCreate" id="apidoc.elem.%22.%2Fjslint.mjs%22.v8CoverageReportCreate">24.
+    function v8CoverageReportCreate<span class="apidocSignatureSpan">({
+    consoleError,
+    coverageDir,
+    processArgv = []
+})</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">async function v8CoverageReportCreate({
+    consoleError,
+    coverageDir,
+    processArgv = []
+}) {
+<span class="apidocCodeCommentSpan">
+// This function will create html-coverage-reports directly from
+// v8-coverage-files in &lt;coverageDir&gt;.
+// 1. Spawn node.js program &lt;processArgv&gt; with NODE_V8_COVERAGE.
+// 2. Merge JSON v8-coverage-files in &lt;coverageDir&gt;.
+// 3. Create html-coverage-reports in &lt;coverageDir&gt;.
+
+</span>    let cwd;
+    let exitCode = 0;
+    let fileDict;
+    let promiseList = [];
+    let v8CoverageObj;
+
+    function htmlRender({
+        fileList,
+        lineList,
+        modeIndex,
+        pathname
+    }) {
+        let html;
+        let padLines;
+        let padPathname;
+        let txt;
+        let txtBorder;
+        html = "";
+        html += `&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+&lt;title&gt;coverage-report&lt;/title&gt;
+&lt;style&gt;
+/* csslint ignore:start */
+* {
+box-sizing: border-box;
+    font-family: consolas, menlo, monospace;
+}
+/* csslint ignore:end */
+body {
+    margin: 0;
+}
+.coverage pre {
+    margin: 5px 0;
+}
+.coverage table {
+    border-collapse: collapse;
+}
+.coverage td,
+.coverage th {
+    border: 1px solid #777;
+    margin: 0;
+    padding: 5px;
+}
+.coverage td span {
+    display: inline-block;
+    width: 100%;
+}
+.coverage .content {
+    padding: 0 5px;
+}
+.coverage .content a {
+    text-decoration: none;
+}
+.coverage .count {
+    margin: 0 5px;
+    padding: 0 5px;
+}
+.coverage .footer,
+.coverage .header {
+    padding: 20px;
+}
+.coverage .percentbar {
+    height: 12px;
+    margin: 2px 0;
+    min-width: 200px;
+    position: relative;
+    width: 100%;
+}
+.coverage .percentbar div {
+    height: 100%;
+    position: absolute;
+}
+.coverage .title {
+    font-size: large;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.coverage td,
+.coverage th {
+    background: #fff;
+}
+.coverage .count {
+    background: #9d9;
+    color: #777;
+}
+.coverage .coverageHigh{
+    background: #9d9;
+}
+.coverage .coverageIgnore{
+    background: #ccc;
+}
+.coverage .coverageLow...
+}
+</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+jstestDescribe((
+    "test v8CoverageReportCreate's handling-behavior"
+), function () {
+    jstestIt((
+        "test null-case handling-behavior"
+    ), async function () {
+        await assertErrorThrownAsync(function () {
+            return <span class="apidocCodeKeywordSpan">v8CoverageReportCreate</span>({});
+        }, "invalid coverageDir");
+    });
+    jstestIt((
+        "test invalid-coverageDir handling-behavior"
+    ), async function () {
+        await assertErrorThrownAsync(function () {
+            return jslint.jslint_cli({
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_charset_ascii" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_charset_ascii">25.
     string jslint_charset_ascii
     </a>
     </h2>
@@ -1408,7 +1939,7 @@ return exit_code;
 
 <li>
     <h2>
-    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_edition" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_edition">19.
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_edition" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_edition">26.
     string jslint_edition
     </a>
     </h2>

@@ -11,8 +11,9 @@ printf '> #!/bin/sh
 >     let source = "function foo() {console.log(\\u0027hello world\\u0027);}\\n";
 >     result = jslint.jslint(source);
 >     report = jslint.jslint_report(result);
->     await fs.promises.writeFile(".artifact/jslint_report.html", report);
->     console.error("wrote file .artifact/jslint_report.html");
+>     await fs.promises.mkdir(".artifact/", {recursive: true});
+>     await fs.promises.writeFile(".artifact/jslint_report_hello.html", report);
+>     console.error("wrote file .artifact/jslint_report_hello.html");
 > }());
 > 
 > '"'"'
@@ -32,8 +33,9 @@ import fs from "fs";
     let source = "function foo() {console.log(\u0027hello world\u0027);}\n";
     result = jslint.jslint(source);
     report = jslint.jslint_report(result);
-    await fs.promises.writeFile(".artifact/jslint_report.html", report);
-    console.error("wrote file .artifact/jslint_report.html");
+    await fs.promises.mkdir(".artifact/", {recursive: true});
+    await fs.promises.writeFile(".artifact/jslint_report_hello.html", report);
+    console.error("wrote file .artifact/jslint_report_hello.html");
 }());
 
 '
