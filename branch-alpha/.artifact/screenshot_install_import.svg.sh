@@ -1,3 +1,4 @@
+(set -e
 printf '> #!/bin/sh
 > 
 > node --input-type=module -e '"'"'
@@ -37,3 +38,4 @@ result.warnings.forEach(function ({
 });
 
 '
+)

@@ -117,7 +117,7 @@ body {
 </thead>
 <tbody><tr>
 <td class="coverageHigh">
-            <a href="index.html">./ </a>test/unicode.test.js<br>
+            <a href="../index.html">. / </a>test/unicode.test.js<br>
 <div class="percentbar">
     <div style="width: 98.26%;"></div>
 </div>
@@ -168,44 +168,44 @@ body {
 <pre><span class="lineno"><a href="#line_36" id="line_36">   36.</a></span><span class="count                ">     32</span><span>        subranges[1].push(i);</span></pre>
 <pre><span class="lineno"><a href="#line_37" id="line_37">   37.</a></span><span class="count                ">     32</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_38" id="line_38">   38.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_39" id="line_39">   39.</a></span><span class="count                "> 182103</span><span>    function random_choice(arr) {</span></pre>
-<pre><span class="lineno"><a href="#line_40" id="line_40">   40.</a></span><span class="count                "> 182103</span><span>        return arr[Math.random() * arr.length | 0];</span></pre>
-<pre><span class="lineno"><a href="#line_41" id="line_41">   41.</a></span><span class="count                "> 182103</span><span>    }</span></pre>
+<pre><span class="lineno"><a href="#line_39" id="line_39">   39.</a></span><span class="count                ">  98241</span><span>    function random_choice(arr) {</span></pre>
+<pre><span class="lineno"><a href="#line_40" id="line_40">   40.</a></span><span class="count                ">  98241</span><span>        return arr[Math.random() * arr.length | 0];</span></pre>
+<pre><span class="lineno"><a href="#line_41" id="line_41">   41.</a></span><span class="count                ">  98241</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_42" id="line_42">   42.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_43" id="line_43">   43.</a></span><span class="count                "> 126753</span><span>    function random_utf8() {</span></pre>
-<pre><span class="lineno"><a href="#line_44" id="line_44">   44.</a></span><span class="count                "> 126753</span><span>        var first = random_choice(first_values);</span></pre>
-<pre><span class="lineno"><a href="#line_45" id="line_45">   45.</a></span><span class="count                "> 126753</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_46" id="line_46">   46.</a></span><span class="count                ">  85783</span><span>        if (first &lt; 0x80) {</span></pre>
-<pre><span class="lineno"><a href="#line_47" id="line_47">   47.</a></span><span class="count                ">  85783</span><span>            return String.fromCharCode(first);</span></pre>
-<pre><span class="lineno"><a href="#line_48" id="line_48">   48.</a></span><span class="count                ">  85783</span><span>        } else if (first &lt; 0xe0) {</span></pre>
-<pre><span class="lineno"><a href="#line_49" id="line_49">   49.</a></span><span class="count                ">  40970</span><span>            return String.fromCharCode((first &amp; 0x1f) &lt;&lt; 0x6 | random_choice(trailing_values) &amp; 0x3f);</span></pre>
-<pre><span class="lineno"><a href="#line_50" id="line_50">   50.</a></span><span class="count                ">  40970</span><span>        } else if (first == 0xe0) {</span></pre>
-<pre><span class="lineno"><a href="#line_51" id="line_51">   51.</a></span><span class="count                ">  40970</span><span>             return String.fromCharCode(((first &amp; 0xf) &lt;&lt; 0xc) | ((random_choice(subranges[0]) &amp; 0x3f) &lt;&lt; 6) | random_choice(trailing_values) &amp; 0x3f);</span></pre>
-<pre><span class="lineno"><a href="#line_52" id="line_52">   52.</a></span><span class="count                ">  40970</span><span>        } else if (first == 0xed) {</span></pre>
-<pre><span class="lineno"><a href="#line_53" id="line_53">   53.</a></span><span class="count                ">  40970</span><span>            return String.fromCharCode(((first &amp; 0xf) &lt;&lt; 0xc) | ((random_choice(subranges[1]) &amp; 0x3f) &lt;&lt; 6) | random_choice(trailing_values) &amp; 0x3f);</span></pre>
-<pre><span class="lineno"><a href="#line_54" id="line_54">   54.</a></span><span class="count                ">  40970</span><span>        } else if (first &lt; 0xf0) {</span></pre>
-<pre><span class="lineno"><a href="#line_55" id="line_55">   55.</a></span><span class="count                ">  40970</span><span>            return String.fromCharCode(((first &amp; 0xf) &lt;&lt; 0xc) | ((random_choice(trailing_values) &amp; 0x3f) &lt;&lt; 6) | random_choice(trailing_values) &amp; 0x3f);</span></pre>
-<pre><span class="lineno"><a href="#line_56" id="line_56">   56.</a></span><span class="count                ">  40970</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_57" id="line_57">   57.</a></span><span class="count                "> 126753</span><span>    }</span></pre>
+<pre><span class="lineno"><a href="#line_43" id="line_43">   43.</a></span><span class="count                ">  68228</span><span>    function random_utf8() {</span></pre>
+<pre><span class="lineno"><a href="#line_44" id="line_44">   44.</a></span><span class="count                ">  68228</span><span>        var first = random_choice(first_values);</span></pre>
+<pre><span class="lineno"><a href="#line_45" id="line_45">   45.</a></span><span class="count                ">  68228</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_46" id="line_46">   46.</a></span><span class="count                ">  46004</span><span>        if (first &lt; 0x80) {</span></pre>
+<pre><span class="lineno"><a href="#line_47" id="line_47">   47.</a></span><span class="count                ">  46004</span><span>            return String.fromCharCode(first);</span></pre>
+<pre><span class="lineno"><a href="#line_48" id="line_48">   48.</a></span><span class="count                ">  46004</span><span>        } else if (first &lt; 0xe0) {</span></pre>
+<pre><span class="lineno"><a href="#line_49" id="line_49">   49.</a></span><span class="count                ">  22224</span><span>            return String.fromCharCode((first &amp; 0x1f) &lt;&lt; 0x6 | random_choice(trailing_values) &amp; 0x3f);</span></pre>
+<pre><span class="lineno"><a href="#line_50" id="line_50">   50.</a></span><span class="count                ">  22224</span><span>        } else if (first == 0xe0) {</span></pre>
+<pre><span class="lineno"><a href="#line_51" id="line_51">   51.</a></span><span class="count                ">  22224</span><span>             return String.fromCharCode(((first &amp; 0xf) &lt;&lt; 0xc) | ((random_choice(subranges[0]) &amp; 0x3f) &lt;&lt; 6) | random_choice(trailing_values) &amp; 0x3f);</span></pre>
+<pre><span class="lineno"><a href="#line_52" id="line_52">   52.</a></span><span class="count                ">  22224</span><span>        } else if (first == 0xed) {</span></pre>
+<pre><span class="lineno"><a href="#line_53" id="line_53">   53.</a></span><span class="count                ">  22224</span><span>            return String.fromCharCode(((first &amp; 0xf) &lt;&lt; 0xc) | ((random_choice(subranges[1]) &amp; 0x3f) &lt;&lt; 6) | random_choice(trailing_values) &amp; 0x3f);</span></pre>
+<pre><span class="lineno"><a href="#line_54" id="line_54">   54.</a></span><span class="count                ">  22224</span><span>        } else if (first &lt; 0xf0) {</span></pre>
+<pre><span class="lineno"><a href="#line_55" id="line_55">   55.</a></span><span class="count                ">  22224</span><span>            return String.fromCharCode(((first &amp; 0xf) &lt;&lt; 0xc) | ((random_choice(trailing_values) &amp; 0x3f) &lt;&lt; 6) | random_choice(trailing_values) &amp; 0x3f);</span></pre>
+<pre><span class="lineno"><a href="#line_56" id="line_56">   56.</a></span><span class="count                ">  22224</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_57" id="line_57">   57.</a></span><span class="count                ">  68228</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_58" id="line_58">   58.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_59" id="line_59">   59.</a></span><span class="count                ">    877</span><span>    function randomString() {</span></pre>
-<pre><span class="lineno"><a href="#line_60" id="line_60">   60.</a></span><span class="count                ">    877</span><span>        var str = '',</span></pre>
-<pre><span class="lineno"><a href="#line_61" id="line_61">   61.</a></span><span class="count                ">    877</span><span>        i;</span></pre>
-<pre><span class="lineno"><a href="#line_62" id="line_62">   62.</a></span><span class="count                ">    877</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_63" id="line_63">   63.</a></span><span class="count                "> 126753</span><span>        for (i = Math.random() * 300; i &gt; 0; i--) {</span></pre>
-<pre><span class="lineno"><a href="#line_64" id="line_64">   64.</a></span><span class="count                "> 126753</span><span>            str += random_utf8();</span></pre>
-<pre><span class="lineno"><a href="#line_65" id="line_65">   65.</a></span><span class="count                "> 126753</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_66" id="line_66">   66.</a></span><span class="count                ">    877</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_67" id="line_67">   67.</a></span><span class="count                ">    877</span><span>        return str;</span></pre>
-<pre><span class="lineno"><a href="#line_68" id="line_68">   68.</a></span><span class="count                ">    877</span><span>    }</span></pre>
+<pre><span class="lineno"><a href="#line_59" id="line_59">   59.</a></span><span class="count                ">    441</span><span>    function randomString() {</span></pre>
+<pre><span class="lineno"><a href="#line_60" id="line_60">   60.</a></span><span class="count                ">    441</span><span>        var str = '',</span></pre>
+<pre><span class="lineno"><a href="#line_61" id="line_61">   61.</a></span><span class="count                ">    441</span><span>        i;</span></pre>
+<pre><span class="lineno"><a href="#line_62" id="line_62">   62.</a></span><span class="count                ">    441</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_63" id="line_63">   63.</a></span><span class="count                ">  68228</span><span>        for (i = Math.random() * 300; i &gt; 0; i--) {</span></pre>
+<pre><span class="lineno"><a href="#line_64" id="line_64">   64.</a></span><span class="count                ">  68228</span><span>            str += random_utf8();</span></pre>
+<pre><span class="lineno"><a href="#line_65" id="line_65">   65.</a></span><span class="count                ">  68228</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_66" id="line_66">   66.</a></span><span class="count                ">    441</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_67" id="line_67">   67.</a></span><span class="count                ">    441</span><span>        return str;</span></pre>
+<pre><span class="lineno"><a href="#line_68" id="line_68">   68.</a></span><span class="count                ">    441</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_69" id="line_69">   69.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_70" id="line_70">   70.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_71" id="line_71">   71.</a></span><span class="count                ">      1</span><span>        // Generate random data.</span></pre>
 <pre><span class="lineno"><a href="#line_72" id="line_72">   72.</a></span><span class="count                ">      1</span><span>    var data = [];</span></pre>
 <pre><span class="lineno"><a href="#line_73" id="line_73">   73.</a></span><span class="count                ">      1</span><span>    var length = Math.floor(Math.random() * 1000) + 200;</span></pre>
-<pre><span class="lineno"><a href="#line_74" id="line_74">   74.</a></span><span class="count                ">    877</span><span>    for (var i = 0; i &lt; length; i++) {</span></pre>
-<pre><span class="lineno"><a href="#line_75" id="line_75">   75.</a></span><span class="count                ">    877</span><span>        data.push(randomString());</span></pre>
-<pre><span class="lineno"><a href="#line_76" id="line_76">   76.</a></span><span class="count                ">    877</span><span>    }</span></pre>
+<pre><span class="lineno"><a href="#line_74" id="line_74">   74.</a></span><span class="count                ">    441</span><span>    for (var i = 0; i &lt; length; i++) {</span></pre>
+<pre><span class="lineno"><a href="#line_75" id="line_75">   75.</a></span><span class="count                ">    441</span><span>        data.push(randomString());</span></pre>
+<pre><span class="lineno"><a href="#line_76" id="line_76">   76.</a></span><span class="count                ">    441</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_77" id="line_77">   77.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_78" id="line_78">   78.</a></span><span class="count                ">      1</span><span>    var inserted = 0;</span></pre>
 <pre><span class="lineno"><a href="#line_79" id="line_79">   79.</a></span><span class="count                ">      1</span><span>    var retrieved = 0;</span></pre>
@@ -216,12 +216,12 @@ body {
 <pre><span class="lineno"><a href="#line_84" id="line_84">   84.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_85" id="line_85">   85.</a></span><span class="count                ">      1</span><span>    it('should insert all values', function(done) {</span></pre>
 <pre><span class="lineno"><a href="#line_86" id="line_86">   86.</a></span><span class="count                ">      1</span><span>        var stmt = db.prepare("INSERT INTO foo VALUES(?, ?)");</span></pre>
-<pre><span class="lineno"><a href="#line_87" id="line_87">   87.</a></span><span class="count                ">    877</span><span>        for (var i = 0; i &lt; data.length; i++) {</span></pre>
-<pre><span class="lineno"><a href="#line_88" id="line_88">   88.</a></span><span class="count                ">    877</span><span>            stmt.run(i, data[i], function(err) {</span></pre>
+<pre><span class="lineno"><a href="#line_87" id="line_87">   87.</a></span><span class="count                ">    441</span><span>        for (var i = 0; i &lt; data.length; i++) {</span></pre>
+<pre><span class="lineno"><a href="#line_88" id="line_88">   88.</a></span><span class="count                ">    441</span><span>            stmt.run(i, data[i], function(err) {</span></pre>
 <pre><span class="lineno"><a href="#line_89" id="line_89">   89.</a></span><span class="count                uncovered">      0</span><span>                if (err) </span><span class="uncovered">throw err;</span></pre>
-<pre><span class="lineno"><a href="#line_90" id="line_90">   90.</a></span><span class="count                ">    877</span><span>                inserted++;</span></pre>
-<pre><span class="lineno"><a href="#line_91" id="line_91">   91.</a></span><span class="count                ">    877</span><span>            });</span></pre>
-<pre><span class="lineno"><a href="#line_92" id="line_92">   92.</a></span><span class="count                ">    877</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_90" id="line_90">   90.</a></span><span class="count                ">    441</span><span>                inserted++;</span></pre>
+<pre><span class="lineno"><a href="#line_91" id="line_91">   91.</a></span><span class="count                ">    441</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_92" id="line_92">   92.</a></span><span class="count                ">    441</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_93" id="line_93">   93.</a></span><span class="count                ">      1</span><span>        stmt.finalize(done);</span></pre>
 <pre><span class="lineno"><a href="#line_94" id="line_94">   94.</a></span><span class="count                ">      1</span><span>    });</span></pre>
 <pre><span class="lineno"><a href="#line_95" id="line_95">   95.</a></span><span class="count                ">      1</span><span></span></pre>
@@ -229,10 +229,10 @@ body {
 <pre><span class="lineno"><a href="#line_97" id="line_97">   97.</a></span><span class="count                ">      1</span><span>        db.all("SELECT txt FROM foo ORDER BY id", function(err, rows) {</span></pre>
 <pre><span class="lineno"><a href="#line_98" id="line_98">   98.</a></span><span class="count                uncovered">      0</span><span>            if (err) </span><span class="uncovered">throw err;</span></pre>
 <pre><span class="lineno"><a href="#line_99" id="line_99">   99.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_100" id="line_100">  100.</a></span><span class="count                ">    877</span><span>            for (var i = 0; i &lt; rows.length; i++) {</span></pre>
-<pre><span class="lineno"><a href="#line_101" id="line_101">  101.</a></span><span class="count                ">    877</span><span>                assert.equal(rows[i].txt, data[i]);</span></pre>
-<pre><span class="lineno"><a href="#line_102" id="line_102">  102.</a></span><span class="count                ">    877</span><span>                retrieved++;</span></pre>
-<pre><span class="lineno"><a href="#line_103" id="line_103">  103.</a></span><span class="count                ">    877</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_100" id="line_100">  100.</a></span><span class="count                ">    441</span><span>            for (var i = 0; i &lt; rows.length; i++) {</span></pre>
+<pre><span class="lineno"><a href="#line_101" id="line_101">  101.</a></span><span class="count                ">    441</span><span>                assert.equal(rows[i].txt, data[i]);</span></pre>
+<pre><span class="lineno"><a href="#line_102" id="line_102">  102.</a></span><span class="count                ">    441</span><span>                retrieved++;</span></pre>
+<pre><span class="lineno"><a href="#line_103" id="line_103">  103.</a></span><span class="count                ">    441</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_104" id="line_104">  104.</a></span><span class="count                ">      1</span><span>            done();</span></pre>
 <pre><span class="lineno"><a href="#line_105" id="line_105">  105.</a></span><span class="count                ">      1</span><span>        });</span></pre>
 <pre><span class="lineno"><a href="#line_106" id="line_106">  106.</a></span><span class="count                ">      1</span><span>    });</span></pre>

@@ -38,6 +38,11 @@ jobs:
       - run: git config --global core.autocrlf false
       # https://github.com/actions/checkout
       - uses: actions/checkout@v2
+      # https://github.com/actions/cache
+      - uses: actions/cache@v2
+        with:
+          key: ${{ matrix.architecture }}-${{ matrix.node_version }}-${{ matrix.os }}-${{ hashFiles('./package.json') }}
+          path: .cache
       # https://github.com/actions/setup-node
       - uses: actions/setup-node@v2
         with:

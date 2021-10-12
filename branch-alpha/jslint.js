@@ -9420,7 +9420,7 @@ async function jstestDescribe(description, testFunction) {
                 }
             }
             return err || (
-                "    \u001b[31m\u2714 " + jstestItCount + ". test it - "
+                "    \u001b[32m\u2714 " + jstestItCount + ". test it - "
                 + description + "\u001b[39m"
             );
         }).join("\n")
@@ -10461,16 +10461,21 @@ body {
             );
             txt += txtBorder;
             pathname = htmlEscape(pathname);
+
+// CL-xxx - Bugfix - Fix incorrect http-link to index.html.
+
             html += `<tr>
 <td class="${coverageLevel}">
             ${(
                 modeIndex
                 ? (
-                    "<a href=\"" + (pathname || "index") + ".html\">./ "
+                    "<a href=\"" + (pathname || "index") + ".html\">. / "
                     + pathname + "</a><br>"
                 )
                 : (
-                    "<a href=\"index.html\">./ </a>"
+                    "<a href=\""
+                    + "../".repeat(pathname.split("/").length - 1)
+                    + "index.html\">. / </a>"
                     + pathname + "<br>"
                 )
             )}
@@ -10504,7 +10509,7 @@ body {
                 lineId = "line_" + (ii + 1);
                 switch (count) {
 
-// Probably deadcode.
+// PR-364 - Probably deadcode.
 // case -1:
 
                 case 0:

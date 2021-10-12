@@ -1,3 +1,4 @@
+(set -e
 printf '> #!/bin/sh
 > 
 > node --input-type=module -e '"'"'
@@ -39,3 +40,4 @@ import fs from "fs";
 }());
 
 '
+)
