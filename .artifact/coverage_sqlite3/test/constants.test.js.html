@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>coverage-report</title>
+<title>V8 Coverage Report</title>
 <style>
-/* csslint ignore:start */
+/* jslint utility2:true */
+/*csslint ignore:start*/
 * {
 box-sizing: border-box;
     font-family: consolas, menlo, monospace;
 }
-/* csslint ignore:end */
+/*csslint ignore:end*/
 body {
     margin: 0;
 }
@@ -41,6 +42,9 @@ body {
 .coverage .footer,
 .coverage .header {
     padding: 20px;
+}
+.coverage .footer {
+    text-align: center;
 }
 .coverage .percentbar {
     height: 12px;
@@ -79,6 +83,7 @@ body {
 .coverage .coverageMedium{
     background: #fd7;
 }
+.coverage .footer,
 .coverage .header {
     background: #ddd;
 }
@@ -106,29 +111,34 @@ body {
 </style>
 </head>
 <body class="coverage">
+<!-- header start -->
 <div class="header">
-<div class="title">coverage-report</div>
+<div class="title">V8 Coverage Report</div>
 <table>
 <thead>
-<tr>
-<th>files covered</th>
-<th>lines</th>
-</tr>
+    <tr>
+    <th>Files covered</th>
+    <th>Lines</th>
+    </tr>
 </thead>
-<tbody><tr>
-<td class="coverageHigh">
+<tbody>
+<tr>
+    <td class="coverageHigh">
             <a href="../index.html">. / </a>test/constants.test.js<br>
-<div class="percentbar">
-    <div style="width: 100.00%;"></div>
-</div>
-</td>
-<td style="text-align: right;">
-     100.00 %<br>
-    45 / 45
-</td>
-</tr></tbody>
+        <div class="percentbar">
+            <div style="width: 100.00%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         100.00 %<br>
+        45 / 45
+    </td>
+    </tr>
+</tbody>
 </table>
 </div>
+<!-- header end -->
+<!-- content start -->
 <div class="content">
 <pre><span class="lineno"><a href="#line_1" id="line_1">    1.</a></span><span class="count                ">      1</span><span>var sqlite3 = require('..');</span></pre>
 <pre><span class="lineno"><a href="#line_2" id="line_2">    2.</a></span><span class="count                ">      1</span><span>var assert = require('assert');</span></pre>
@@ -175,9 +185,13 @@ body {
 <pre><span class="lineno"><a href="#line_43" id="line_43">   43.</a></span><span class="count                ">      1</span><span>    });</span></pre>
 <pre><span class="lineno"><a href="#line_44" id="line_44">   44.</a></span><span class="count                ">      1</span><span>});</span></pre>
 <pre><span class="lineno"><a href="#line_45" id="line_45">   45.</a></span><span class="count                ">      1</span><span></span></pre>
-
 </div>
-<div class="coverageFooter">
+<!-- content end -->
+<div class="footer">
+    [
+    This document was created with
+    <a href="https://github.com/jslint-org/jslint">JSLint</a>
+    ]
 </div>
 </body>
 </html>

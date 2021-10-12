@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>coverage-report</title>
+<title>V8 Coverage Report</title>
 <style>
-/* csslint ignore:start */
+/* jslint utility2:true */
+/*csslint ignore:start*/
 * {
 box-sizing: border-box;
     font-family: consolas, menlo, monospace;
 }
-/* csslint ignore:end */
+/*csslint ignore:end*/
 body {
     margin: 0;
 }
@@ -41,6 +42,9 @@ body {
 .coverage .footer,
 .coverage .header {
     padding: 20px;
+}
+.coverage .footer {
+    text-align: center;
 }
 .coverage .percentbar {
     height: 12px;
@@ -79,6 +83,7 @@ body {
 .coverage .coverageMedium{
     background: #fd7;
 }
+.coverage .footer,
 .coverage .header {
     background: #ddd;
 }
@@ -106,29 +111,34 @@ body {
 </style>
 </head>
 <body class="coverage">
+<!-- header start -->
 <div class="header">
-<div class="title">coverage-report</div>
+<div class="title">V8 Coverage Report</div>
 <table>
 <thead>
-<tr>
-<th>files covered</th>
-<th>lines</th>
-</tr>
+    <tr>
+    <th>Files covered</th>
+    <th>Lines</th>
+    </tr>
 </thead>
-<tbody><tr>
-<td class="coverageMedium">
+<tbody>
+<tr>
+    <td class="coverageMedium">
             <a href="../../index.html">. / </a>test/support/helper.js<br>
-<div class="percentbar">
-    <div style="width: 72.97%;"></div>
-</div>
-</td>
-<td style="text-align: right;">
-     72.97 %<br>
-    27 / 37
-</td>
-</tr></tbody>
+        <div class="percentbar">
+            <div style="width: 64.86%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         64.86 %<br>
+        24 / 37
+    </td>
+    </tr>
+</tbody>
 </table>
 </div>
+<!-- header end -->
+<!-- content start -->
 <div class="content">
 <pre><span class="lineno"><a href="#line_1" id="line_1">    1.</a></span><span class="count                ">      1</span><span>var assert = require('assert');</span></pre>
 <pre><span class="lineno"><a href="#line_2" id="line_2">    2.</a></span><span class="count                ">      1</span><span>var fs = require('fs');</span></pre>
@@ -137,17 +147,17 @@ body {
 <pre><span class="lineno"><a href="#line_5" id="line_5">    5.</a></span><span class="count                ">     40</span><span>exports.deleteFile = function(name) {</span></pre>
 <pre><span class="lineno"><a href="#line_6" id="line_6">    6.</a></span><span class="count                ">     40</span><span>    try {</span></pre>
 <pre><span class="lineno"><a href="#line_7" id="line_7">    7.</a></span><span class="count                ">     40</span><span>        fs.unlinkSync(name);</span></pre>
-<pre><span class="lineno"><a href="#line_8" id="line_8">    8.</a></span><span class="count                ">     23</span><span>    } catch(err) {</span></pre>
+<pre><span class="lineno"><a href="#line_8" id="line_8">    8.</a></span><span class="count                ">     20</span><span>    } catch(err) {</span></pre>
 <pre><span class="lineno"><a href="#line_9" id="line_9">    9.</a></span><span class="count                uncovered">      0</span><span>        if (err.errno !== process.ENOENT &amp;&amp; err.code !== 'ENOENT' </span><span class="uncovered">&amp;&amp; err.syscall !== 'unlink'</span><span>) </span><span class="uncovered">{</span></pre>
 <pre><span class="lineno"><a href="#line_10" id="line_10">   10.</a></span><span class="count                uncovered">      0</span><span></span><span class="uncovered">            throw err;</span></pre>
 <pre><span class="lineno"><a href="#line_11" id="line_11">   11.</a></span><span class="count                uncovered">      0</span><span></span><span class="uncovered">        }</span></pre>
-<pre><span class="lineno"><a href="#line_12" id="line_12">   12.</a></span><span class="count                ">     23</span><span>    }</span></pre>
+<pre><span class="lineno"><a href="#line_12" id="line_12">   12.</a></span><span class="count                ">     20</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_13" id="line_13">   13.</a></span><span class="count                ">     40</span><span>};</span></pre>
 <pre><span class="lineno"><a href="#line_14" id="line_14">   14.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_15" id="line_15">   15.</a></span><span class="count                ">      5</span><span>exports.ensureExists = function(name,cb) {</span></pre>
-<pre><span class="lineno"><a href="#line_16" id="line_16">   16.</a></span><span class="count                ">      1</span><span>    if (!pathExists(name)) {</span></pre>
-<pre><span class="lineno"><a href="#line_17" id="line_17">   17.</a></span><span class="count                ">      1</span><span>        fs.mkdirSync(name);</span></pre>
-<pre><span class="lineno"><a href="#line_18" id="line_18">   18.</a></span><span class="count                ">      1</span><span>    };</span></pre>
+<pre><span class="lineno"><a href="#line_16" id="line_16">   16.</a></span><span class="count                uncovered">      0</span><span>    if (!pathExists(name)) </span><span class="uncovered">{</span></pre>
+<pre><span class="lineno"><a href="#line_17" id="line_17">   17.</a></span><span class="count                uncovered">      0</span><span></span><span class="uncovered">        fs.mkdirSync(name);</span></pre>
+<pre><span class="lineno"><a href="#line_18" id="line_18">   18.</a></span><span class="count                uncovered">      0</span><span></span><span class="uncovered">    }</span><span>;</span></pre>
 <pre><span class="lineno"><a href="#line_19" id="line_19">   19.</a></span><span class="count                ">      5</span><span>}</span></pre>
 <pre><span class="lineno"><a href="#line_20" id="line_20">   20.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_21" id="line_21">   21.</a></span><span class="count                ">      2</span><span>assert.fileDoesNotExist = function(name) {</span></pre>
@@ -167,9 +177,13 @@ body {
 <pre><span class="lineno"><a href="#line_35" id="line_35">   35.</a></span><span class="count                uncovered">      0</span><span></span><span class="uncovered">        throw err;</span></pre>
 <pre><span class="lineno"><a href="#line_36" id="line_36">   36.</a></span><span class="count                uncovered">      0</span><span></span><span class="uncovered">    }</span></pre>
 <pre><span class="lineno"><a href="#line_37" id="line_37">   37.</a></span><span class="count                ">      6</span><span>};</span></pre>
-
 </div>
-<div class="coverageFooter">
+<!-- content end -->
+<div class="footer">
+    [
+    This document was created with
+    <a href="https://github.com/jslint-org/jslint">JSLint</a>
+    ]
 </div>
 </body>
 </html>

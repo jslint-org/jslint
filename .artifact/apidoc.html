@@ -6,6 +6,7 @@
 <meta name="description" content="JSLint API Doc">
 <title>JSLint apidoc</title>
 <style>
+/* jslint utility2:true */
 /*csslint*/
 body {
     margin: 0;
@@ -170,6 +171,7 @@ function jslint_cli<span class="apidocSignatureSpan">({
     mode_noop,
     option,
     processArgv,
+    processEnv,
     process_exit,
     source
 })</span>
@@ -823,6 +825,7 @@ case "{}":
     mode_noop,
     option,
     processArgv,
+    processEnv,
     process_exit,
     source
 })</span>
@@ -839,6 +842,7 @@ case "{}":
     mode_noop,
     option,
     processArgv,
+    processEnv,
     process_exit,
     source
 }) {
@@ -896,10 +900,10 @@ case "{}":
                     line_offset: string_line_count(code.slice(0, ii)) + 1,
                     option: Object.assign(empty(), {
                         beta: Boolean(
-                            process.env.JSLINT_BETA
+                            processEnv.JSLINT_BETA
                             &amp;&amp; !(
                                 /0|false|null|undefined/
-                            ).test(process.env...
+                            ).t...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1403,6 +1407,7 @@ jslint_assert(
     html += "&lt;div class=\"JSLINT_\" id=\"JSLINT_REPORT_HTML\"&gt;\n";
     html += String(`
 &lt;style class="JSLINT_REPORT_STYLE"&gt;
+/* jslint utility2:true */
 /*csslint box-model: false, ids:false */
 /*csslint ignore:start*/
 @font-face {
@@ -1418,8 +1423,7 @@ llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOtz\
 X7WWiwqyCE98qt0jk5JJmgR5WJJElBmzRb1F7a66MmSLTNWZ2XSHfKBSKHoVteSEJ6EOdvVw\
 fNZOtXKDe39jXdRlkmMnOWIOFBgeEK/b0mFsgffnPyyAitNyutKky7J8a8MSEkAKGLgfptnS\
 /gDRSo7vwdNUmQDB7oP6pK7QF5d9SrY8M/tkrXcurSIQAmX7tz7pd33LIB7GQkBQ/k81s/0D\
-gpt4gbw7x0Cn/PocitK5KIGPGQIzQzAMuCeC2ERAidx9TySVqX06goT0SFFOOV9Kuxdi5Rg7\
-l6...
+gpt4gbw7x0Cn/PocitK5KIGPGQIzQzAMuCeC2ERAidx9TySVq...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1833,17 +1837,19 @@ function sentinel() {}
         let txt;
         let txtBorder;
         html = "";
-        html += `&lt;!DOCTYPE html&gt;
+        html += String(`
+&lt;!DOCTYPE html&gt;
 &lt;html lang="en"&gt;
 &lt;head&gt;
-&lt;title&gt;coverage-report&lt;/title&gt;
+&lt;title&gt;V8 Coverage Report&lt;/title&gt;
 &lt;style&gt;
-/* csslint ignore:start */
+/* jslint utility2:true */
+/*csslint ignore:start*/
 * {
 box-sizing: border-box;
     font-family: consolas, menlo, monospace;
 }
-/* csslint ignore:end */
+/*csslint ignore:end*/
 body {
     margin: 0;
 }
@@ -1877,6 +1883,9 @@ body {
 .coverage .header {
     padding: 20px;
 }
+.coverage .footer {
+    text-align: center;
+}
 .coverage .percentbar {
     height: 12px;
     margin: 2px 0;
@@ -1903,12 +1912,7 @@ body {
     color: #777;
 }
 .coverage .coverageHigh{
-    background: #9d9;
-}
-.coverage .coverageIgnore{
-    background: #ccc;
-}
-.coverage .coverageLow...
+    background: #...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

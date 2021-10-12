@@ -118,6 +118,7 @@
 
     assertErrorThrownAsync, assertJsonEqual,
     jstestDescribe, jstestIt, jstestOnExit,
+    processEnv,
 
     floor,
     on,
@@ -1327,6 +1328,7 @@ ${name}<span class="apidocSignatureSpan">${signature}</span>
 <meta name="description" content="${package_name} API Doc">
 <title>${package_name} apidoc</title>
 <style>
+/* jslint utility2:true */
 /*csslint*/
 body {
     margin: 0;
@@ -1481,6 +1483,7 @@ async function jslint_cli({
     mode_noop,
     option,
     processArgv,
+    processEnv,
     process_exit,
     source
 }) {
@@ -1538,10 +1541,10 @@ async function jslint_cli({
                     line_offset: string_line_count(code.slice(0, ii)) + 1,
                     option: Object.assign(empty(), {
                         beta: Boolean(
-                            process.env.JSLINT_BETA
+                            processEnv.JSLINT_BETA
                             && !(
                                 /0|false|null|undefined/
-                            ).test(process.env.JSLINT_BETA)
+                            ).test(processEnv.JSLINT_BETA)
                         ),
                         node: true
                     }, option)
@@ -1624,6 +1627,7 @@ async function jslint_cli({
     console_error = console_error || console.error;
     console_log = console_log || console.log;
     processArgv = processArgv || process.argv;
+    processEnv = processEnv || process.env;
     process_exit = process_exit || process.exit;
     await moduleFsInit();
     if (!(
@@ -1680,7 +1684,7 @@ async function jslint_cli({
         processArgv = processArgv.slice(1);
         break;
 
-// PR-xxx - Add command v8_coverage_report.
+// PR-364 - Add command v8_coverage_report.
 
     case "v8_coverage_report":
         await v8CoverageReportCreate({
@@ -8854,6 +8858,7 @@ function jslint_report({
     html += "<div class=\"JSLINT_\" id=\"JSLINT_REPORT_HTML\">\n";
     html += String(`
 <style class="JSLINT_REPORT_STYLE">
+/* jslint utility2:true */
 /*csslint box-model: false, ids:false */
 /*csslint ignore:start*/
 @font-face {
@@ -10224,17 +10229,19 @@ async function v8CoverageReportCreate({
         let txt;
         let txtBorder;
         html = "";
-        html += `<!DOCTYPE html>
+        html += String(`
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<title>coverage-report</title>
+<title>V8 Coverage Report</title>
 <style>
-/* csslint ignore:start */
+/* jslint utility2:true */
+/*csslint ignore:start*/
 * {
 box-sizing: border-box;
     font-family: consolas, menlo, monospace;
 }
-/* csslint ignore:end */
+/*csslint ignore:end*/
 body {
     margin: 0;
 }
@@ -10267,6 +10274,9 @@ body {
 .coverage .footer,
 .coverage .header {
     padding: 20px;
+}
+.coverage .footer {
+    text-align: center;
 }
 .coverage .percentbar {
     height: 12px;
@@ -10305,6 +10315,7 @@ body {
 .coverage .coverageMedium{
     background: #fd7;
 }
+.coverage .footer,
 .coverage .header {
     background: #ddd;
 }
@@ -10332,16 +10343,18 @@ body {
 </style>
 </head>
 <body class="coverage">
+<!-- header start -->
 <div class="header">
-<div class="title">coverage-report</div>
+<div class="title">V8 Coverage Report</div>
 <table>
 <thead>
-<tr>
-<th>files covered</th>
-<th>lines</th>
-</tr>
+    <tr>
+    <th>Files covered</th>
+    <th>Lines</th>
+    </tr>
 </thead>
-<tbody>`;
+<tbody>
+        `).trim() + "\n";
         if (modeIndex) {
             padLines = String("(ignore) 100.00 %").length;
             padPathname = 32;
@@ -10373,11 +10386,11 @@ body {
             + "-".repeat(padLines + 2) + "+\n"
         );
         txt = "";
-        txt += "coverage-report\n";
+        txt += "V8 Coverage Report\n";
         txt += txtBorder;
         txt += (
-            "| " + String("files covered").padEnd(padPathname, " ") + " | "
-            + String("lines").padStart(padLines, " ") + " |\n"
+            "| " + String("Files covered").padEnd(padPathname, " ") + " | "
+            + String("Lines").padStart(padLines, " ") + " |\n"
         );
         txt += txtBorder;
         fileList.forEach(function ({
@@ -10462,10 +10475,11 @@ body {
             txt += txtBorder;
             pathname = htmlEscape(pathname);
 
-// CL-xxx - Bugfix - Fix incorrect http-link to index.html.
+// CL-37251d17 - Bugfix - Fix incorrect http-link to index.html.
 
-            html += `<tr>
-<td class="${coverageLevel}">
+            html += String(`
+    <tr>
+    <td class="${coverageLevel}">
             ${(
                 modeIndex
                 ? (
@@ -10479,22 +10493,28 @@ body {
                     + pathname + "<br>"
                 )
             )}
-<div class="percentbar">
-    <div style="width: ${coveragePct}%;"></div>
-</div>
-</td>
-<td style="text-align: right;">
-    ${modeCoverageIgnoreFile} ${coveragePct} %<br>
-    ${linesCovered} / ${linesTotal}
-</td>
-</tr>`;
+        <div class="percentbar">
+            <div style="width: ${coveragePct}%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+        ${modeCoverageIgnoreFile} ${coveragePct} %<br>
+        ${linesCovered} / ${linesTotal}
+    </td>
+    </tr>
+        `).trim() + "\n";
         });
-        if (!modeIndex) {
-            html += `</tbody>
+        html += String(`
+</tbody>
 </table>
 </div>
+<!-- header end -->
+        `).trim() + "\n";
+        if (!modeIndex) {
+            html += String(`
+<!-- content start -->
 <div class="content">
-`;
+            `).trim() + "\n";
             lineList.forEach(function ({
                 count,
                 holeList,
@@ -10577,14 +10597,21 @@ ${String(count).padStart(7, " ")}
                     /\n/g
                 ), "").trim() + "\n";
             });
-        }
-        html += `
+            html += String(`
 </div>
-<div class="coverageFooter">
+<!-- content end -->
+            `).trim() + "\n";
+        }
+        html += String(`
+<div class="footer">
+    [
+    This document was created with
+    <a href="https://github.com/jslint-org/jslint">JSLint</a>
+    ]
 </div>
 </body>
-</html>`;
-        html += "\n";
+</html>
+        `).trim() + "\n";
         // fs - write *.html
         promiseList.push(fsWriteFileWithParents(pathname + ".html", html));
         if (!modeIndex) {
