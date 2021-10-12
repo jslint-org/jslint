@@ -2247,11 +2247,13 @@ body {
             ${(
                 modeIndex
                 ? (
-                    "<a href=\"" + (pathname || "index") + ".html\">./ "
+                    "<a href=\"" + (pathname || "index") + ".html\">. / "
                     + pathname + "</a><br>"
                 )
                 : (
-                    "<a href=\"index.html\">./ </a>"
+                    "<a href=\""
+                    + "../".repeat(pathname.split("/").length - 1)
+                    + "index.html\">. / </a>"
                     + pathname + "<br>"
                 )
             )}
@@ -2597,7 +2599,8 @@ shRunWithScreenshotTxt() {(set -e
         "$@" 2>&1 || printf "$?\n" > "$SCREENSHOT_SVG.exit_code"
     ) | tee "$SCREENSHOT_SVG.txt"
     EXIT_CODE="$(cat "$SCREENSHOT_SVG.exit_code")"
-    printf "shRunWithScreenshotTxt - EXIT_CODE=$EXIT_CODE\n" 1>&2
+    printf "shRunWithScreenshotTxt - EXIT_CODE=$EXIT_CODE - $SCREENSHOT_SVG\n" \
+        1>&2
     # format text-output
     node --input-type=module -e '
 import moduleFs from "fs";
