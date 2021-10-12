@@ -116,16 +116,16 @@ node jslint.mjs .
 printf "function foo() {console.log('hello world');}\n" > hello.js
 
 node jslint.mjs \
-    jslint_report=.artifact/jslint_report.html \
+    jslint_report=.artifact/jslint_report_hello.html \
     hello.js
 ```
 - shell output
 
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_install_cli_report.svg)
 
-- screenshot file `.artifact/jslint_report.html`
+- screenshot file [.artifact/jslint_report_hello.html](https://jslint-org.github.io/jslint/branch-beta/.artifact/jslint_report_hello.html)
 
-![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fjslint_report.html.png)
+[![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fjslint_report_hello.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/jslint_report_hello.html)
 
 
 ### To create a jslint-report programmatically:
@@ -143,8 +143,9 @@ import fs from "fs";
     let source = "function foo() {console.log(\u0027hello world\u0027);}\n";
     result = jslint.jslint(source);
     report = jslint.jslint_report(result);
-    await fs.promises.writeFile(".artifact/jslint_report.html", report);
-    console.error("wrote file .artifact/jslint_report.html");
+    await fs.promises.mkdir(".artifact/", {recursive: true});
+    await fs.promises.writeFile(".artifact/jslint_report_hello.html", report);
+    console.error("wrote file .artifact/jslint_report_hello.html");
 }());
 
 '
@@ -166,6 +167,7 @@ git clone https://github.com/mapbox/node-sqlite3 \
 
 (set -e
     cd node-sqlite3
+    git checkout 60a022c511a37788e652c271af23174566a80c30
     npm install
     node ../jslint.mjs \
         v8_coverage_report=.artifact/coverage_sqlite3 \
@@ -174,13 +176,13 @@ git clone https://github.com/mapbox/node-sqlite3 \
 
 cp -a node-sqlite3/.artifact .
 ```
-- screenshot file `.artifact/coverage_sqlite3/index.html`
+- screenshot file [.artifact/coverage_sqlite3/index.html](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3/index.html)
 
-![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fcoverage_sqlite3_2findex.html.png)
+[![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fcoverage_sqlite3_2findex.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3/index.html)
 
-- screenshot file `.artifact/coverage_sqlite3/lib/sqlite3.js.html`
+- screenshot file [.artifact/coverage_sqlite3/lib/sqlite3.js.html](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3/lib/sqlite3.js.html)
 
-![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fcoverage_sqlite3_2flib_2fsqlite3.js.html.png)
+[![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fcoverage_sqlite3_2flib_2fsqlite3.js.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3/lib/sqlite3.js.html)
 
 - shell output
 

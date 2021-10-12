@@ -35,9 +35,9 @@ function processExit1(exitCode) {
     });
     // test fsWriteFileWithParents handling-behavior
     (async function () {
-        await fsRmRecursive(".artifact/tmp/fsWriteFileWithParents");
+        await fsRmRecursive(".tmp/fsWriteFileWithParents");
         await fsWriteFileWithParents(
-            ".artifact/tmp/fsWriteFileWithParents/aa/bb/cc",
+            ".tmp/fsWriteFileWithParents/aa/bb/cc",
             "aa"
         );
     }());
@@ -125,7 +125,7 @@ function processExit1(exitCode) {
         processArgv: [
             "node",
             "jslint.mjs",
-            "jslint_report=.artifact/jslint_report.html",
+            "jslint_report=.tmp/jslint_report.html",
             "jslint.mjs"
         ],
         process_exit: processExit0
@@ -138,7 +138,7 @@ function processExit1(exitCode) {
         processArgv: [
             "node",
             "jslint.mjs",
-            "jslint_report=.artifact/jslint_report.html",
+            "jslint_report=.tmp/jslint_report.html",
             "syntax-error.js"
         ],
         process_exit: processExit1,
@@ -152,7 +152,7 @@ function processExit1(exitCode) {
         processArgv: [
             "node",
             "jslint.mjs",
-            "jslint_report=.artifact/jslint_report.html",
+            "jslint_report=.tmp/jslint_report.html",
             "aa.json"
         ],
         process_exit: processExit0,
@@ -166,7 +166,7 @@ function processExit1(exitCode) {
         processArgv: [
             "node",
             "jslint.mjs",
-            "jslint_report=.artifact/jslint_report.html",
+            "jslint_report=.tmp/jslint_report.html",
             "aa.js"
         ],
         process_exit: processExit1,
@@ -180,7 +180,7 @@ function processExit1(exitCode) {
         processArgv: [
             "node",
             "jslint.mjs",
-            "jslint_report=.artifact/jslint_report.html",
+            "jslint_report=.tmp/jslint_report.html",
             "aa.json"
         ],
         process_exit: processExit1,
@@ -861,7 +861,7 @@ function processExit1(exitCode) {
                 mode_cli: true,
                 processArgv: [
                     "node", "jslint.mjs",
-                    "v8_coverage_report=.artifact/tmp/coverage_jslint",
+                    "v8_coverage_report=.tmp/coverage_jslint",
                     "node", "jslint.mjs"
                 ]
             });
@@ -902,7 +902,7 @@ function processExit1(exitCode) {
             file, data
         ], ii) {
             jstestIt(file, async function () {
-                let dir = ".artifact/tmp/coverage" + ii + "/";
+                let dir = ".tmp/coverage" + ii + "/";
                 file = dir + file;
                 await fsWriteFileWithParents(file, data);
                 await jslint.jslint_cli({
@@ -921,7 +921,7 @@ function processExit1(exitCode) {
                         processArgv: [
                             "node", "jslint.mjs",
                             "v8_coverage_report=" + dir,
-                            "npm", "version"
+                            "npm", "--version"
                         ]
                     });
                 }
