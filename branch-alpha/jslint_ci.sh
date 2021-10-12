@@ -2005,17 +2005,19 @@ async function v8CoverageReportCreate({
         let txt;
         let txtBorder;
         html = "";
-        html += `<!DOCTYPE html>
+        html += String(`
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<title>coverage-report</title>
+<title>V8 Coverage Report</title>
 <style>
-/* csslint ignore:start */
+/* jslint utility2:true */
+/*csslint ignore:start*/
 * {
 box-sizing: border-box;
     font-family: consolas, menlo, monospace;
 }
-/* csslint ignore:end */
+/*csslint ignore:end*/
 body {
     margin: 0;
 }
@@ -2048,6 +2050,9 @@ body {
 .coverage .footer,
 .coverage .header {
     padding: 20px;
+}
+.coverage .footer {
+    text-align: center;
 }
 .coverage .percentbar {
     height: 12px;
@@ -2086,6 +2091,7 @@ body {
 .coverage .coverageMedium{
     background: #fd7;
 }
+.coverage .footer,
 .coverage .header {
     background: #ddd;
 }
@@ -2113,16 +2119,18 @@ body {
 </style>
 </head>
 <body class="coverage">
+<!-- header start -->
 <div class="header">
-<div class="title">coverage-report</div>
+<div class="title">V8 Coverage Report</div>
 <table>
 <thead>
-<tr>
-<th>files covered</th>
-<th>lines</th>
-</tr>
+    <tr>
+    <th>Files covered</th>
+    <th>Lines</th>
+    </tr>
 </thead>
-<tbody>`;
+<tbody>
+        `).trim() + "\n";
         if (modeIndex) {
             padLines = String("(ignore) 100.00 %").length;
             padPathname = 32;
@@ -2154,11 +2162,11 @@ body {
             + "-".repeat(padLines + 2) + "+\n"
         );
         txt = "";
-        txt += "coverage-report\n";
+        txt += "V8 Coverage Report\n";
         txt += txtBorder;
         txt += (
-            "| " + String("files covered").padEnd(padPathname, " ") + " | "
-            + String("lines").padStart(padLines, " ") + " |\n"
+            "| " + String("Files covered").padEnd(padPathname, " ") + " | "
+            + String("Lines").padStart(padLines, " ") + " |\n"
         );
         txt += txtBorder;
         fileList.forEach(function ({
@@ -2242,8 +2250,9 @@ body {
             );
             txt += txtBorder;
             pathname = htmlEscape(pathname);
-            html += `<tr>
-<td class="${coverageLevel}">
+            html += String(`
+    <tr>
+    <td class="${coverageLevel}">
             ${(
                 modeIndex
                 ? (
@@ -2257,22 +2266,28 @@ body {
                     + pathname + "<br>"
                 )
             )}
-<div class="percentbar">
-    <div style="width: ${coveragePct}%;"></div>
-</div>
-</td>
-<td style="text-align: right;">
-    ${modeCoverageIgnoreFile} ${coveragePct} %<br>
-    ${linesCovered} / ${linesTotal}
-</td>
-</tr>`;
+        <div class="percentbar">
+            <div style="width: ${coveragePct}%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+        ${modeCoverageIgnoreFile} ${coveragePct} %<br>
+        ${linesCovered} / ${linesTotal}
+    </td>
+    </tr>
+        `).trim() + "\n";
         });
-        if (!modeIndex) {
-            html += `</tbody>
+        html += String(`
+</tbody>
 </table>
 </div>
+<!-- header end -->
+        `).trim() + "\n";
+        if (!modeIndex) {
+            html += String(`
+<!-- content start -->
 <div class="content">
-`;
+            `).trim() + "\n";
             lineList.forEach(function ({
                 count,
                 holeList,
@@ -2351,14 +2366,21 @@ ${String(count).padStart(7, " ")}
                     /\n/g
                 ), "").trim() + "\n";
             });
-        }
-        html += `
+            html += String(`
 </div>
-<div class="coverageFooter">
+<!-- content end -->
+            `).trim() + "\n";
+        }
+        html += String(`
+<div class="footer">
+    [
+    This document was created with
+    <a href="https://github.com/jslint-org/jslint">JSLint</a>
+    ]
 </div>
 </body>
-</html>`;
-        html += "\n";
+</html>
+        `).trim() + "\n";
         // fs - write *.html
         promiseList.push(fsWriteFileWithParents(pathname + ".html", html));
         if (!modeIndex) {

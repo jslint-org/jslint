@@ -159,7 +159,9 @@ import moduleChildProcess from "child_process";
 shCiBaseCustom() {(set -e
 # this function will run base-ci
     # update version in README.md, jslint.mjs, package.json from CHANGELOG.md
-    node --input-type=module -e '
+    if [ "$(git branch --show-current)" = alpha ]
+    then
+        node --input-type=module -e '
 import jslint from "./jslint.mjs";
 import moduleFs from "fs";
 (async function () {
@@ -252,10 +254,12 @@ import moduleFs from "fs";
         }
     }));
     if (fileModified) {
-        throw new Error("modified file " + fileModified);
+        // throw new Error("modified file " + fileModified);
+        return;
     }
 }());
-' || [ "$(git branch --show-current)" != alpha ] # limit fail to branch-alpha
+' "$@" # '
+    fi
     # create jslint.cjs
     cp jslint.mjs jslint.js
     cat jslint.mjs | sed \
@@ -272,9 +276,5 @@ import moduleFs from "fs";
     printf "node jslint.mjs .\n"
     node jslint.mjs .
     printf "node test.mjs\n"
-    (set -e
-        # coverage-hack - test jslint's cli handling-behavior
-        export JSLINT_BETA=1
-        npm run test
-    )
+    npm run test
 )}
