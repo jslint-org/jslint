@@ -107,7 +107,7 @@ import moduleChildProcess from "child_process";
         ".artifact/apidoc.html",
         ".artifact/coverage_sqlite3/index.html",
         ".artifact/coverage_sqlite3/lib/sqlite3.js.html",
-        ".artifact/jslint_report.html"
+        ".artifact/jslint_report_hello.html"
     ].map(async function (url) {
         await new Promise(function (resolve) {
             moduleChildProcess.spawn(
@@ -125,6 +125,9 @@ import moduleChildProcess from "child_process";
     }));
 }());
 ' "$@" # '
+    # remove bloated json-coverage-files
+    rm .artifact/coverage/*.json
+    rm .artifact/coverage_sqlite3/*.json
 )}
 
 shCiBaseCustom() {(set -e

@@ -494,7 +494,7 @@ jstestDescribe((
    });
    // test fsWriteFileWithParents handling-behavior
    (async function () {
-       await fsRmRecursive(".artifact/tmp/fsWriteFileWithParents");
+       await fsRmRecursive(".tmp/fsWriteFileWithParents");
        await fsWriteFileWithParents(
 ...</pre></li>
 
@@ -536,7 +536,7 @@ jstestDescribe((
     file, data
 ], ii) {
     jstestIt(file, async function () {
-        let dir = ".artifact/tmp/coverage" + ii + "/";
+        let dir = ".tmp/coverage" + ii + "/";
         file = dir + file;
         await <span class="apidocCodeKeywordSpan">fsWriteFileWithParents</span>(file, data);
         await jslint.jslint_cli({
@@ -655,12 +655,12 @@ import fs from "fs";
     let source = "function foo() {console.log(\u0027hello world\u0027);}\n";
     result = jslint.<span class="apidocCodeKeywordSpan">jslint</span>(source);
     report = jslint.jslint_report(result);
-    await fs.promises.writeFile(".artifact/jslint_report.html", report);
-    console.error("wrote file .artifact/jslint_report.html");
+    await fs.promises.mkdir(".artifact/", {recursive: true});
+    await fs.promises.writeFile(".artifact/jslint_report_hello.html", report);
+    console.error("wrote file .artifact/jslint_report_hello.html");
 }());
 
 '
-```
 ...</pre></li>
 
 <li>
@@ -907,7 +907,7 @@ case "{}":
     file, data
 ], ii) {
     jstestIt(file, async function () {
-        let dir = ".artifact/tmp/coverage" + ii + "/";
+        let dir = ".tmp/coverage" + ii + "/";
         file = dir + file;
         await fsWriteFileWithParents(file, data);
         await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
@@ -1431,13 +1431,13 @@ import fs from "fs";
     let source = "function foo() {console.log(\u0027hello world\u0027);}\n";
     result = jslint.jslint(source);
     report = jslint.<span class="apidocCodeKeywordSpan">jslint_report</span>(result);
-    await fs.promises.writeFile(".artifact/jslint_report.html", report);
-    console.error("wrote file .artifact/jslint_report.html");
+    await fs.promises.mkdir(".artifact/", {recursive: true});
+    await fs.promises.writeFile(".artifact/jslint_report_hello.html", report);
+    console.error("wrote file .artifact/jslint_report_hello.html");
 }());
 
 '
 ```
-- shell output
 ...</pre></li>
 
 <li>
@@ -1551,7 +1551,7 @@ import fs from "fs";
     file, data
 ], ii) {
     <span class="apidocCodeKeywordSpan">jstestIt</span>(file, async function () {
-        let dir = ".artifact/tmp/coverage" + ii + "/";
+        let dir = ".tmp/coverage" + ii + "/";
         file = dir + file;
         await fsWriteFileWithParents(file, data);
         await jslint.jslint_cli({

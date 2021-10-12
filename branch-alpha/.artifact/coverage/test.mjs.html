@@ -167,9 +167,9 @@ body {
 <pre><span class="lineno"><a href="#line_35" id="line_35">   35.</a></span><span class="count                ">      1</span><span>    });</span></pre>
 <pre><span class="lineno"><a href="#line_36" id="line_36">   36.</a></span><span class="count                ">      1</span><span>    // test fsWriteFileWithParents handling-behavior</span></pre>
 <pre><span class="lineno"><a href="#line_37" id="line_37">   37.</a></span><span class="count                ">      1</span><span>    (async function () {</span></pre>
-<pre><span class="lineno"><a href="#line_38" id="line_38">   38.</a></span><span class="count                ">      1</span><span>        await fsRmRecursive(".artifact/tmp/fsWriteFileWithParents");</span></pre>
+<pre><span class="lineno"><a href="#line_38" id="line_38">   38.</a></span><span class="count                ">      1</span><span>        await fsRmRecursive(".tmp/fsWriteFileWithParents");</span></pre>
 <pre><span class="lineno"><a href="#line_39" id="line_39">   39.</a></span><span class="count                ">      1</span><span>        await fsWriteFileWithParents(</span></pre>
-<pre><span class="lineno"><a href="#line_40" id="line_40">   40.</a></span><span class="count                ">      1</span><span>            ".artifact/tmp/fsWriteFileWithParents/aa/bb/cc",</span></pre>
+<pre><span class="lineno"><a href="#line_40" id="line_40">   40.</a></span><span class="count                ">      1</span><span>            ".tmp/fsWriteFileWithParents/aa/bb/cc",</span></pre>
 <pre><span class="lineno"><a href="#line_41" id="line_41">   41.</a></span><span class="count                ">      1</span><span>            "aa"</span></pre>
 <pre><span class="lineno"><a href="#line_42" id="line_42">   42.</a></span><span class="count                ">      1</span><span>        );</span></pre>
 <pre><span class="lineno"><a href="#line_43" id="line_43">   43.</a></span><span class="count                ">      1</span><span>    }());</span></pre>
@@ -257,7 +257,7 @@ body {
 <pre><span class="lineno"><a href="#line_125" id="line_125">  125.</a></span><span class="count                ">      1</span><span>        processArgv: [</span></pre>
 <pre><span class="lineno"><a href="#line_126" id="line_126">  126.</a></span><span class="count                ">      1</span><span>            "node",</span></pre>
 <pre><span class="lineno"><a href="#line_127" id="line_127">  127.</a></span><span class="count                ">      1</span><span>            "jslint.mjs",</span></pre>
-<pre><span class="lineno"><a href="#line_128" id="line_128">  128.</a></span><span class="count                ">      1</span><span>            "jslint_report=.artifact/jslint_report.html",</span></pre>
+<pre><span class="lineno"><a href="#line_128" id="line_128">  128.</a></span><span class="count                ">      1</span><span>            "jslint_report=.tmp/jslint_report.html",</span></pre>
 <pre><span class="lineno"><a href="#line_129" id="line_129">  129.</a></span><span class="count                ">      1</span><span>            "jslint.mjs"</span></pre>
 <pre><span class="lineno"><a href="#line_130" id="line_130">  130.</a></span><span class="count                ">      1</span><span>        ],</span></pre>
 <pre><span class="lineno"><a href="#line_131" id="line_131">  131.</a></span><span class="count                ">      1</span><span>        process_exit: processExit0</span></pre>
@@ -270,7 +270,7 @@ body {
 <pre><span class="lineno"><a href="#line_138" id="line_138">  138.</a></span><span class="count                ">      1</span><span>        processArgv: [</span></pre>
 <pre><span class="lineno"><a href="#line_139" id="line_139">  139.</a></span><span class="count                ">      1</span><span>            "node",</span></pre>
 <pre><span class="lineno"><a href="#line_140" id="line_140">  140.</a></span><span class="count                ">      1</span><span>            "jslint.mjs",</span></pre>
-<pre><span class="lineno"><a href="#line_141" id="line_141">  141.</a></span><span class="count                ">      1</span><span>            "jslint_report=.artifact/jslint_report.html",</span></pre>
+<pre><span class="lineno"><a href="#line_141" id="line_141">  141.</a></span><span class="count                ">      1</span><span>            "jslint_report=.tmp/jslint_report.html",</span></pre>
 <pre><span class="lineno"><a href="#line_142" id="line_142">  142.</a></span><span class="count                ">      1</span><span>            "syntax-error.js"</span></pre>
 <pre><span class="lineno"><a href="#line_143" id="line_143">  143.</a></span><span class="count                ">      1</span><span>        ],</span></pre>
 <pre><span class="lineno"><a href="#line_144" id="line_144">  144.</a></span><span class="count                ">      1</span><span>        process_exit: processExit1,</span></pre>
@@ -284,7 +284,7 @@ body {
 <pre><span class="lineno"><a href="#line_152" id="line_152">  152.</a></span><span class="count                ">      1</span><span>        processArgv: [</span></pre>
 <pre><span class="lineno"><a href="#line_153" id="line_153">  153.</a></span><span class="count                ">      1</span><span>            "node",</span></pre>
 <pre><span class="lineno"><a href="#line_154" id="line_154">  154.</a></span><span class="count                ">      1</span><span>            "jslint.mjs",</span></pre>
-<pre><span class="lineno"><a href="#line_155" id="line_155">  155.</a></span><span class="count                ">      1</span><span>            "jslint_report=.artifact/jslint_report.html",</span></pre>
+<pre><span class="lineno"><a href="#line_155" id="line_155">  155.</a></span><span class="count                ">      1</span><span>            "jslint_report=.tmp/jslint_report.html",</span></pre>
 <pre><span class="lineno"><a href="#line_156" id="line_156">  156.</a></span><span class="count                ">      1</span><span>            "aa.json"</span></pre>
 <pre><span class="lineno"><a href="#line_157" id="line_157">  157.</a></span><span class="count                ">      1</span><span>        ],</span></pre>
 <pre><span class="lineno"><a href="#line_158" id="line_158">  158.</a></span><span class="count                ">      1</span><span>        process_exit: processExit0,</span></pre>
@@ -298,7 +298,7 @@ body {
 <pre><span class="lineno"><a href="#line_166" id="line_166">  166.</a></span><span class="count                ">      1</span><span>        processArgv: [</span></pre>
 <pre><span class="lineno"><a href="#line_167" id="line_167">  167.</a></span><span class="count                ">      1</span><span>            "node",</span></pre>
 <pre><span class="lineno"><a href="#line_168" id="line_168">  168.</a></span><span class="count                ">      1</span><span>            "jslint.mjs",</span></pre>
-<pre><span class="lineno"><a href="#line_169" id="line_169">  169.</a></span><span class="count                ">      1</span><span>            "jslint_report=.artifact/jslint_report.html",</span></pre>
+<pre><span class="lineno"><a href="#line_169" id="line_169">  169.</a></span><span class="count                ">      1</span><span>            "jslint_report=.tmp/jslint_report.html",</span></pre>
 <pre><span class="lineno"><a href="#line_170" id="line_170">  170.</a></span><span class="count                ">      1</span><span>            "aa.js"</span></pre>
 <pre><span class="lineno"><a href="#line_171" id="line_171">  171.</a></span><span class="count                ">      1</span><span>        ],</span></pre>
 <pre><span class="lineno"><a href="#line_172" id="line_172">  172.</a></span><span class="count                ">      1</span><span>        process_exit: processExit1,</span></pre>
@@ -312,7 +312,7 @@ body {
 <pre><span class="lineno"><a href="#line_180" id="line_180">  180.</a></span><span class="count                ">      1</span><span>        processArgv: [</span></pre>
 <pre><span class="lineno"><a href="#line_181" id="line_181">  181.</a></span><span class="count                ">      1</span><span>            "node",</span></pre>
 <pre><span class="lineno"><a href="#line_182" id="line_182">  182.</a></span><span class="count                ">      1</span><span>            "jslint.mjs",</span></pre>
-<pre><span class="lineno"><a href="#line_183" id="line_183">  183.</a></span><span class="count                ">      1</span><span>            "jslint_report=.artifact/jslint_report.html",</span></pre>
+<pre><span class="lineno"><a href="#line_183" id="line_183">  183.</a></span><span class="count                ">      1</span><span>            "jslint_report=.tmp/jslint_report.html",</span></pre>
 <pre><span class="lineno"><a href="#line_184" id="line_184">  184.</a></span><span class="count                ">      1</span><span>            "aa.json"</span></pre>
 <pre><span class="lineno"><a href="#line_185" id="line_185">  185.</a></span><span class="count                ">      1</span><span>        ],</span></pre>
 <pre><span class="lineno"><a href="#line_186" id="line_186">  186.</a></span><span class="count                ">      1</span><span>        process_exit: processExit1,</span></pre>
@@ -993,7 +993,7 @@ body {
 <pre><span class="lineno"><a href="#line_861" id="line_861">  861.</a></span><span class="count                ">      1</span><span>                mode_cli: true,</span></pre>
 <pre><span class="lineno"><a href="#line_862" id="line_862">  862.</a></span><span class="count                ">      1</span><span>                processArgv: [</span></pre>
 <pre><span class="lineno"><a href="#line_863" id="line_863">  863.</a></span><span class="count                ">      1</span><span>                    "node", "jslint.mjs",</span></pre>
-<pre><span class="lineno"><a href="#line_864" id="line_864">  864.</a></span><span class="count                ">      1</span><span>                    "v8_coverage_report=.artifact/tmp/coverage_jslint",</span></pre>
+<pre><span class="lineno"><a href="#line_864" id="line_864">  864.</a></span><span class="count                ">      1</span><span>                    "v8_coverage_report=.tmp/coverage_jslint",</span></pre>
 <pre><span class="lineno"><a href="#line_865" id="line_865">  865.</a></span><span class="count                ">      1</span><span>                    "node", "jslint.mjs"</span></pre>
 <pre><span class="lineno"><a href="#line_866" id="line_866">  866.</a></span><span class="count                ">      1</span><span>                ]</span></pre>
 <pre><span class="lineno"><a href="#line_867" id="line_867">  867.</a></span><span class="count                ">      1</span><span>            });</span></pre>
@@ -1034,7 +1034,7 @@ body {
 <pre><span class="lineno"><a href="#line_902" id="line_902">  902.</a></span><span class="count                ">      4</span><span>            file, data</span></pre>
 <pre><span class="lineno"><a href="#line_903" id="line_903">  903.</a></span><span class="count                ">      4</span><span>        ], ii) {</span></pre>
 <pre><span class="lineno"><a href="#line_904" id="line_904">  904.</a></span><span class="count                ">      4</span><span>            jstestIt(file, async function () {</span></pre>
-<pre><span class="lineno"><a href="#line_905" id="line_905">  905.</a></span><span class="count                ">      4</span><span>                let dir = ".artifact/tmp/coverage" + ii + "/";</span></pre>
+<pre><span class="lineno"><a href="#line_905" id="line_905">  905.</a></span><span class="count                ">      4</span><span>                let dir = ".tmp/coverage" + ii + "/";</span></pre>
 <pre><span class="lineno"><a href="#line_906" id="line_906">  906.</a></span><span class="count                ">      4</span><span>                file = dir + file;</span></pre>
 <pre><span class="lineno"><a href="#line_907" id="line_907">  907.</a></span><span class="count                ">      4</span><span>                await fsWriteFileWithParents(file, data);</span></pre>
 <pre><span class="lineno"><a href="#line_908" id="line_908">  908.</a></span><span class="count                ">      4</span><span>                await jslint.jslint_cli({</span></pre>
@@ -1053,7 +1053,7 @@ body {
 <pre><span class="lineno"><a href="#line_921" id="line_921">  921.</a></span><span class="count                ">      1</span><span>                        processArgv: [</span></pre>
 <pre><span class="lineno"><a href="#line_922" id="line_922">  922.</a></span><span class="count                ">      1</span><span>                            "node", "jslint.mjs",</span></pre>
 <pre><span class="lineno"><a href="#line_923" id="line_923">  923.</a></span><span class="count                ">      1</span><span>                            "v8_coverage_report=" + dir,</span></pre>
-<pre><span class="lineno"><a href="#line_924" id="line_924">  924.</a></span><span class="count                ">      1</span><span>                            "npm", "version"</span></pre>
+<pre><span class="lineno"><a href="#line_924" id="line_924">  924.</a></span><span class="count                ">      1</span><span>                            "npm", "--version"</span></pre>
 <pre><span class="lineno"><a href="#line_925" id="line_925">  925.</a></span><span class="count                ">      1</span><span>                        ]</span></pre>
 <pre><span class="lineno"><a href="#line_926" id="line_926">  926.</a></span><span class="count                ">      1</span><span>                    });</span></pre>
 <pre><span class="lineno"><a href="#line_927" id="line_927">  927.</a></span><span class="count                ">      1</span><span>                }</span></pre>

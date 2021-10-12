@@ -10646,8 +10646,15 @@ function sentinel() {}
         }));
         exitCode = await new Promise(function (resolve) {
             moduleChildProcess.spawn((
-                (process.platform === "win32" && processArgv[0] === "npm")
-                ? "npm.cmd"
+                processArgv[0] === "npm"
+
+// If win32 environment, then replace program npm with npm.cmd.
+// Coverage-hack - Ugly hack to get test-coverage under both win32 and linux.
+
+                ? process.platform.replace("win32", "npm.cmd").replace(
+                    process.platform,
+                    "npm"
+                )
                 : processArgv[0]
             ), processArgv.slice(1), {
                 env: Object.assign({}, process.env, {
