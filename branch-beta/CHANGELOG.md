@@ -12,13 +12,13 @@
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 
 # v2021.10.1-beta
-- cli - add cli-command v8_coverage_report
-- npm - add file package.json and command `npm test`
-- test - add mocha-like test-functions jstestDescribe, jstestIt
+- bugfix - fix coverage-report having incorrect http-link to index.html
 - bugfix - fix false warning `uninitialized 'bb'` in code `/*jslint node*/\nlet {aa:bb} = {}; bb();`
 - bugfix - fix issue #358 - switch-statement crashes jslint
+- ci - cache coverage-example node-sqlite3 to speed up ci
 - ci - rename dir .build/ to .artifact/
 - cli - add cli-command jslint_plugin_vim
+- cli - add cli-command v8_coverage_report
 - cli - change cli-option `--mode-report` to cli-command `jslint_report=<filename>`
 - deprecated - cli - add cli-option `--mode-report`
 - doc - add api-documentation
@@ -29,7 +29,9 @@
 - fs - rename files with dashes to files with underscore
 - jslint - disable linting of embedded javascript in markdown-files
 - jslint - relax regexp-warning against using 'space'
+- npm - add file package.json and command `npm test`
 - style - change naming-convention for non-jslint-core code from underscore to camelCase
+- test - add mocha-like test-functions jstestDescribe, jstestIt
 
 # v2021.9.20
 - jslint - add bigint support.

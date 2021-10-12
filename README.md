@@ -1,7 +1,7 @@
 [<img align="left" height="100" src="asset_image_logo_512.svg"/>](https://github.com/jslint-org/jslint)
 
 
-# JSLint, The JavaScript Code Quality Tool
+# JSLint, The JavaScript Code Quality and Coverage Tool
 
 &nbsp;
 
@@ -165,16 +165,15 @@ git clone https://github.com/mapbox/node-sqlite3 \
     --depth=1 \
     --single-branch
 
-(set -e
-    cd node-sqlite3
-    git checkout 60a022c511a37788e652c271af23174566a80c30
-    npm install
-    node ../jslint.mjs \
-        v8_coverage_report=.artifact/coverage_sqlite3 \
-        npm run test
-)
+cd node-sqlite3
+npm install
 
-cp -a node-sqlite3/.artifact .
+# v8_coverage_report
+node ../jslint.mjs \
+    v8_coverage_report=.artifact/coverage_sqlite3 \
+    npm run test
+
+cp -a .artifact ..
 ```
 - screenshot file [.artifact/coverage_sqlite3/index.html](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3/index.html)
 

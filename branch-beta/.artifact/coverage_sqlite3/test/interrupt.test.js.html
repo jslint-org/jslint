@@ -117,7 +117,7 @@ body {
 </thead>
 <tbody><tr>
 <td class="coverageHigh">
-            <a href="index.html">./ </a>test/interrupt.test.js<br>
+            <a href="../index.html">. / </a>test/interrupt.test.js<br>
 <div class="percentbar">
     <div style="width: 92.59%;"></div>
 </div>
@@ -154,14 +154,14 @@ body {
 <pre><span class="lineno"><a href="#line_22" id="line_22">   22.</a></span><span class="count                ">      1</span><span>                var query = 'select last.n ' +</span></pre>
 <pre><span class="lineno"><a href="#line_23" id="line_23">   23.</a></span><span class="count                ">      1</span><span>                    'from t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t as last';</span></pre>
 <pre><span class="lineno"><a href="#line_24" id="line_24">   24.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_25" id="line_25">   25.</a></span><span class="count                ">    143</span><span>                db.each(query, function(err) {</span></pre>
+<pre><span class="lineno"><a href="#line_25" id="line_25">   25.</a></span><span class="count                ">    114</span><span>                db.each(query, function(err) {</span></pre>
 <pre><span class="lineno"><a href="#line_26" id="line_26">   26.</a></span><span class="count                ">      1</span><span>                    if (err) {</span></pre>
 <pre><span class="lineno"><a href="#line_27" id="line_27">   27.</a></span><span class="count                ">      1</span><span>                        saved = err;</span></pre>
-<pre><span class="lineno"><a href="#line_28" id="line_28">   28.</a></span><span class="count                ">    142</span><span>                    } else if (!interrupted) {</span></pre>
-<pre><span class="lineno"><a href="#line_29" id="line_29">   29.</a></span><span class="count                ">    142</span><span>                        interrupted = true;</span></pre>
-<pre><span class="lineno"><a href="#line_30" id="line_30">   30.</a></span><span class="count                ">    142</span><span>                        db.interrupt();</span></pre>
-<pre><span class="lineno"><a href="#line_31" id="line_31">   31.</a></span><span class="count                ">    142</span><span>                    }</span></pre>
-<pre><span class="lineno"><a href="#line_32" id="line_32">   32.</a></span><span class="count                ">    143</span><span>                });</span></pre>
+<pre><span class="lineno"><a href="#line_28" id="line_28">   28.</a></span><span class="count                ">    113</span><span>                    } else if (!interrupted) {</span></pre>
+<pre><span class="lineno"><a href="#line_29" id="line_29">   29.</a></span><span class="count                ">    113</span><span>                        interrupted = true;</span></pre>
+<pre><span class="lineno"><a href="#line_30" id="line_30">   30.</a></span><span class="count                ">    113</span><span>                        db.interrupt();</span></pre>
+<pre><span class="lineno"><a href="#line_31" id="line_31">   31.</a></span><span class="count                ">    113</span><span>                    }</span></pre>
+<pre><span class="lineno"><a href="#line_32" id="line_32">   32.</a></span><span class="count                ">    114</span><span>                });</span></pre>
 <pre><span class="lineno"><a href="#line_33" id="line_33">   33.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_34" id="line_34">   34.</a></span><span class="count                ">      1</span><span>                db.close(function() {</span></pre>
 <pre><span class="lineno"><a href="#line_35" id="line_35">   35.</a></span><span class="count                ">      1</span><span>                    if (saved) {</span></pre>

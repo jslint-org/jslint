@@ -1,5 +1,11 @@
 shArtifactUploadCustom() {(set -e
 # this function will custom-upload build-artifacts to branch-gh-pages
+    # .cache - restore
+    if [ -d .cache ]
+    then
+        cp -a .cache/* .
+        # js-hack - */
+    fi
     # save jslint.cjs
     git add -f jslint.cjs jslint.js
     # seo - inline css-assets and invalidate cached-assets
@@ -53,11 +59,28 @@ echo "\
     ).matchAll(
         /\n```shell <!-- shRunWithScreenshotTxt (.*?) -->\n([\S\s]*?\n)```\n/g
     )).map(async function ([
-        ignore, file, script
+        ignore, file, script0
     ]) {
-        await moduleFs.promises.writeFile(file + ".sh", (
-            "printf \u0027"
-            + script.trim().replace((
+        let script = script0;
+        // modify script - jslint install
+        script = script.replace(
+            "curl -L https://www.jslint.com/jslint.mjs > jslint.mjs",
+            screenshotCurl
+        );
+        // modify script - v8 coverage report
+        script = script.replace(
+            "\n\ncd node-sqlite3\n",
+            (
+                " 2>/dev/null || true\n"
+                + "$&\n"
+                + "git checkout 60a022c511a37788e652c271af23174566a80c30\n"
+            )
+        );
+        // printf script
+        script = (
+            "(set -e\n"
+            + "printf \u0027"
+            + script0.trim().replace((
                 /[%\\]/gm
             ), "$&$&").replace((
                 /\u0027/g
@@ -65,20 +88,16 @@ echo "\
                 /^/gm
             ), "> ")
             + "\n\n\n\u0027\n"
-            + script.replace(
-                "curl -L https://www.jslint.com/jslint.mjs > jslint.mjs",
-                screenshotCurl
-            )
-        ));
+            + script
+            + ")\n"
+        );
+        await moduleFs.promises.writeFile(file + ".sh", script);
         await new Promise(function (resolve) {
             moduleChildProcess.spawn(
                 "sh",
                 [
-                    "jslint_ci.sh",
-                    "shRunWithScreenshotTxt",
-                    file,
-                    "sh",
-                    file + ".sh"
+                    "jslint_ci.sh", "shRunWithScreenshotTxt", file,
+                    "sh", file + ".sh"
                 ],
                 {
                     stdio: [
@@ -128,6 +147,13 @@ import moduleChildProcess from "child_process";
     # remove bloated json-coverage-files
     rm .artifact/coverage/*.json
     rm .artifact/coverage_sqlite3/*.json
+    # js-hack - */
+    # .cache - save
+    if [ ! -d .cache ]
+    then
+        mkdir .cache
+        cp -a node-sqlite3 .cache
+    fi
 )}
 
 shCiBaseCustom() {(set -e
@@ -139,6 +165,7 @@ import moduleFs from "fs";
 (async function () {
     let fileDict;
     let fileModified;
+    let packageDescription;
     let versionBeta;
     let versionMaster;
     fileDict = {};
@@ -152,6 +179,9 @@ import moduleFs from "fs";
     ].map(async function (file) {
         fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
     }));
+    packageDescription = fileDict["package.json"].match(
+        /"description": "(.*?)"/
+    )[1];
     Array.from(fileDict["CHANGELOG.md"].matchAll(
         /\n\n# (v\d\d\d\d\.\d\d?\.\d\d?(.*?)?)\n/g
     )).slice(0, 2).forEach(function ([
@@ -165,7 +195,9 @@ import moduleFs from "fs";
             file: "README.md",
             src: fileDict["README.md"].replace((
                 /\bv\d\d\d\d\.\d\d?\.\d\d?\b/m
-            ), versionMaster)
+            ), versionMaster).replace((
+                /\n# .*/
+            ), "\n# " + packageDescription)
         }, {
             file: "index.html",
             src: fileDict["index.html"].replace((
@@ -206,7 +238,7 @@ import moduleFs from "fs";
             file: "package.json",
             src: fileDict["package.json"].replace((
                 /("version": )".*?"/
-            ), "$1" + JSON.stringify(versionMaster.slice(1)))
+            ), "$1" + JSON.stringify(versionBeta.slice(1)))
         }
     ].map(async function ({
         file,
@@ -223,7 +255,7 @@ import moduleFs from "fs";
         throw new Error("modified file " + fileModified);
     }
 }());
-' "$@" # '
+' || [ "$(git branch --show-current)" != alpha ] # limit fail to branch-alpha
     # create jslint.cjs
     cp jslint.mjs jslint.js
     cat jslint.mjs | sed \

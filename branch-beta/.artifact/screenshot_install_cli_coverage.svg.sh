@@ -1,3 +1,4 @@
+(set -e
 printf '> #!/bin/sh
 > 
 > git clone https://github.com/mapbox/node-sqlite3 \\
@@ -5,16 +6,15 @@ printf '> #!/bin/sh
 >     --depth=1 \\
 >     --single-branch
 > 
-> (set -e
->     cd node-sqlite3
->     git checkout 60a022c511a37788e652c271af23174566a80c30
->     npm install
->     node ../jslint.mjs \\
->         v8_coverage_report=.artifact/coverage_sqlite3 \\
->         npm run test
-> )
+> cd node-sqlite3
+> npm install
 > 
-> cp -a node-sqlite3/.artifact .
+> # v8_coverage_report
+> node ../jslint.mjs \\
+>     v8_coverage_report=.artifact/coverage_sqlite3 \\
+>     npm run test
+> 
+> cp -a .artifact ..
 
 
 '
@@ -23,15 +23,18 @@ printf '> #!/bin/sh
 git clone https://github.com/mapbox/node-sqlite3 \
     --branch=v5.0.2 \
     --depth=1 \
-    --single-branch
+    --single-branch 2>/dev/null || true
 
-(set -e
-    cd node-sqlite3
-    git checkout 60a022c511a37788e652c271af23174566a80c30
-    npm install
-    node ../jslint.mjs \
-        v8_coverage_report=.artifact/coverage_sqlite3 \
-        npm run test
+
+cd node-sqlite3
+
+git checkout 60a022c511a37788e652c271af23174566a80c30
+npm install
+
+# v8_coverage_report
+node ../jslint.mjs \
+    v8_coverage_report=.artifact/coverage_sqlite3 \
+    npm run test
+
+cp -a .artifact ..
 )
-
-cp -a node-sqlite3/.artifact .

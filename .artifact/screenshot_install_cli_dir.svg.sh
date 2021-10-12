@@ -1,3 +1,4 @@
+(set -e
 printf '> #!/bin/sh
 > 
 > node jslint.mjs .
@@ -7,3 +8,4 @@ printf '> #!/bin/sh
 #!/bin/sh
 
 node jslint.mjs .
+)

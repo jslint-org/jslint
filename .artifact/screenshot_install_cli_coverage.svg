@@ -1,5 +1,5 @@
-<svg height="11426" width="800" xmlns="http://www.w3.org/2000/svg">
-<rect height="11426" fill="#222" width="800"></rect>
+<svg height="11008" width="800" xmlns="http://www.w3.org/2000/svg">
+<rect height="11008" fill="#222" width="800"></rect>
 <text
     fill="#7f7"
     font-family="consolas, menlo, monospace"
@@ -53,61 +53,61 @@
     textLength="768"
     x="10"
     y="186"
->&gt; (set -e                                                                                        </tspan>
+>&gt; cd node-sqlite3                                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="208"
->&gt;     cd node-sqlite3                                                                            </tspan>
+>&gt; npm install                                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="230"
->&gt;     git checkout 60a022c511a37788e652c271af23174566a80c30                                      </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="252"
->&gt;     npm install                                                                                </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="274"
->&gt;     node ../jslint.mjs \                                                                       </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="296"
->&gt;         v8_coverage_report=.artifact/coverage_sqlite3 \                                        </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="318"
->&gt;         npm run test                                                                           </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="340"
->&gt; )                                                                                              </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="362"
 >&gt;                                                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
+    y="252"
+>&gt; # v8_coverage_report                                                                           </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="274"
+>&gt; node ../jslint.mjs \                                                                           </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="296"
+>&gt;     v8_coverage_report=.artifact/coverage_sqlite3 \                                            </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="318"
+>&gt;     npm run test                                                                               </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="340"
+>&gt;                                                                                                </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="362"
+>&gt; cp -a .artifact ..                                                                             </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
     y="384"
->&gt; cp -a node-sqlite3/.artifact .                                                                 </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -119,265 +119,265 @@
     textLength="768"
     x="10"
     y="428"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="450"
->Cloning into 'node-sqlite3'...                                                                   </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="472"
->Note: switching to '60a022c511a37788e652c271af23174566a80c30'.                                   </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="494"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="516"
->You are in 'detached HEAD' state. You can look around, make experimental                         </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="538"
->changes and commit them, and you can discard any commits you make in this                        </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="560"
->state without impacting any branches by switching back to a branch.                              </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="582"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="604"
->If you want to create a new branch to retain commits you create, you may                         </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="626"
->do so (now or later) by using -c with the switch command. Example:                               </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="648"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="670"
->  git switch -c &lt;new-branch-name&gt;                                                                </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="692"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="714"
->Or undo this operation with:                                                                     </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="736"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="758"
->  git switch -                                                                                   </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="780"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="802"
->Turn off this advice by setting config variable advice.detachedHead to false                     </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="824"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="846"
 >HEAD is now at 60a022c napi: temporarily disable v6 (see issue #1444)                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="868"
+    y="450"
 >npm WARN deprecated node-pre-gyp@0.11.0: Please upgrade to @mapbox/node-pre-gyp: the non-scoped \</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="890"
+    y="472"
 >  node-pre-gyp package is deprecated and only the @mapbox scoped package will recieve updates in\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="912"
+    y="494"
 >   the future                                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="934"
->npm WARN deprecated mkdirp@0.5.1: Legacy versions of mkdirp are no longer supported. Please upda\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="956"
->  te to mkdirp 1.x. (Note that the API surface has changed to use Promises in 1.x.)              </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="978"
+    y="516"
 >npm WARN deprecated request@2.88.2: request has been deprecated, see https://github.com/request/\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1000"
+    y="538"
 >  request/issues/3142                                                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1022"
+    y="560"
 >npm WARN deprecated tar@2.2.2: This version of tar is no longer supported, and will not receive \</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1044"
+    y="582"
 >  security updates. Please upgrade asap.                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1066"
->npm WARN deprecated querystring@0.2.0: The querystring API is considered Legacy. new code should\</tspan>
+    y="604"
+>npm WARN deprecated mkdirp@0.5.1: Legacy versions of mkdirp are no longer supported. Please upda\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1088"
->   use the URLSearchParams API instead.                                                          </tspan>
+    y="626"
+>  te to mkdirp 1.x. (Note that the API surface has changed to use Promises in 1.x.)              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1110"
->npm WARN deprecated uuid@3.3.2: Please upgrade  to version 7 or higher.  Older versions may use \</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1132"
->  Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1154"
->  blog/math-random for details.                                                                  </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1176"
+    y="648"
 >npm WARN deprecated har-validator@5.1.5: this library is no longer supported                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1198"
+    y="670"
 >npm WARN deprecated uuid@3.4.0: Please upgrade  to version 7 or higher.  Older versions may use \</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1220"
+    y="692"
 >  Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1242"
+    y="714"
 >  blog/math-random for details.                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1264"
+    y="736"
+>npm WARN deprecated uuid@3.3.2: Please upgrade  to version 7 or higher.  Older versions may use \</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="758"
+>  Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="780"
+>  blog/math-random for details.                                                                  </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="802"
+>npm WARN deprecated querystring@0.2.0: The querystring API is considered Legacy. new code should\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="824"
+>   use the URLSearchParams API instead.                                                          </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="846"
 >npm WARN deprecated circular-json@0.3.3: CircularJSON is in maintenance only, flatted is its suc\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1286"
+    y="868"
 >  cessor.                                                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1308"
+    y="890"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1330"
+    y="912"
 >&gt; aws-sdk@2.1005.0 postinstall /home/runner/work/jslint/jslint/node-sqlite3/node_modules/aws-sdk </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1352"
+    y="934"
 >&gt; node scripts/check-node-version.js                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1374"
+    y="956"
 >                                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="978"
+>                                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1000"
+>&gt; sqlite3@5.0.2 install /home/runner/work/jslint/jslint/node-sqlite3                             </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1022"
+>&gt; node-pre-gyp install --fallback-to-build                                                       </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1044"
+>                                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1066"
+>node-pre-gyp WARN Using request for node-pre-gyp https download                                  </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1088"
+>[sqlite3] Success: "/home/runner/work/jslint/jslint/node-sqlite3/lib/binding/napi-v3-linux-x64/n\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1110"
+>  ode_sqlite3.node" is installed via remote                                                      </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1132"
+>npm notice created a lockfile as package-lock.json. You should commit this file.                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1154"
+>added 247 packages from 769 contributors and audited 248 packages in 8.765s                      </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1176"
+>                                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1198"
+>4 packages are looking for funding                                                               </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1220"
+>  run `npm fund` for details                                                                     </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1242"
+>                                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1264"
+>found 7 vulnerabilities (2 moderate, 5 high)                                                     </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1286"
+>  run `npm audit fix` to fix them, or `npm audit` for details                                    </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1308"
+>wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3//touch.txt    </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1330"
+>                                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1352"
+>&gt; sqlite3@5.0.2 pretest /home/runner/work/jslint/jslint/node-sqlite3                             </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1374"
+>&gt; node test/support/createdb.js                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -389,445 +389,445 @@
     textLength="768"
     x="10"
     y="1418"
->&gt; sqlite3@5.0.2 install /home/runner/work/jslint/jslint/node-sqlite3                             </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1440"
->&gt; node-pre-gyp install --fallback-to-build                                                       </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1462"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1484"
->node-pre-gyp WARN Using request for node-pre-gyp https download                                  </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1506"
->[sqlite3] Success: "/home/runner/work/jslint/jslint/node-sqlite3/lib/binding/napi-v3-linux-x64/n\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1528"
->  ode_sqlite3.node" is installed via remote                                                      </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1550"
->npm notice created a lockfile as package-lock.json. You should commit this file.                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1572"
->added 247 packages from 769 contributors and audited 248 packages in 10.837s                     </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1594"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1616"
->4 packages are looking for funding                                                               </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1638"
->  run `npm fund` for details                                                                     </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1660"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1682"
->found 7 vulnerabilities (2 moderate, 5 high)                                                     </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1704"
->  run `npm audit fix` to fix them, or `npm audit` for details                                    </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1726"
->wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3//touch.txt    </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1748"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1770"
->&gt; sqlite3@5.0.2 pretest /home/runner/work/jslint/jslint/node-sqlite3                             </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1792"
->&gt; node test/support/createdb.js                                                                  </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1814"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1836"
 >Creating test database... This may take several minutes.                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1858"
+    y="1440"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1880"
+    y="1462"
 >&gt; sqlite3@5.0.2 test /home/runner/work/jslint/jslint/node-sqlite3                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1902"
+    y="1484"
 >&gt; mocha -R spec --timeout 480000                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1924"
+    y="1506"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1946"
+    y="1528"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1968"
+    y="1550"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1990"
+    y="1572"
 >  query properties                                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2012"
->    ✓ should return the correct lastID (251ms)                                                   </tspan>
+    y="1594"
+>    ✓ should return the correct lastID (194ms)                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2034"
+    y="1616"
 >    ✓ should return the correct changes count                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2056"
+    y="1638"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2078"
+    y="1660"
 >  backup                                                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2100"
+    y="1682"
 >    ✓ output db created once step is called                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2122"
+    y="1704"
 >    ✓ copies source fully with step(-1)                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2144"
+    y="1726"
 >    ✓ backup db not created if finished immediately                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2166"
+    y="1748"
 >    ✓ error closing db if backup not finished                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2188"
+    y="1770"
 >    ✓ using the backup after finished is an error                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2210"
+    y="1792"
 >    ✓ remaining/pageCount are available after call to step                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2232"
+    y="1814"
 >    ✓ backup works if database is modified half-way through                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2254"
+    y="1836"
 >    ✓ can backup from temp to main                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2276"
+    y="1858"
 >    ✓ can backup from main to temp                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2298"
+    y="1880"
 >    ✓ cannot backup to a locked db                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2320"
->    ✓ fuss-free incremental backups work (170ms)                                                 </tspan>
+    y="1902"
+>    ✓ fuss-free incremental backups work (175ms)                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2342"
+    y="1924"
 >    ✓ setting retryErrors to empty disables automatic finishing                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2364"
+    y="1946"
 >    ✓ setting retryErrors enables automatic finishing                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2386"
+    y="1968"
 >    ✓ default retryErrors will retry on a locked/busy db                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2408"
+    y="1990"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2430"
+    y="2012"
 >  blob                                                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2452"
+    y="2034"
 >    ✓ should insert blobs                                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2474"
+    y="2056"
 >    ✓ should retrieve the blobs                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2496"
+    y="2078"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2518"
+    y="2100"
 >  cache                                                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2540"
+    y="2122"
 >    ✓ should cache Database objects while opening                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2562"
+    y="2144"
 >    ✓ should cache Database objects after they are open                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2584"
+    y="2166"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2606"
+    y="2188"
 >  constants                                                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2628"
+    y="2210"
 >    ✓ should have the right OPEN_* flags                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2650"
+    y="2232"
 >    ✓ should have the right error flags                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2672"
+    y="2254"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2694"
+    y="2276"
 >  error handling                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2716"
+    y="2298"
 >    ✓ throw when calling Database() without new                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2738"
+    y="2320"
 >    ✓ should error when calling Database#get on a missing table                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2760"
+    y="2342"
 >    ✓ Database#all prepare fail                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2782"
+    y="2364"
 >    ✓ Database#run prepare fail                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2804"
+    y="2386"
 >    ✓ Database#each prepare fail                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2826"
+    y="2408"
 >    ✓ Database#each prepare fail without completion handler                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2848"
+    y="2430"
 >    ✓ Database#get prepare fail with param binding                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2870"
+    y="2452"
 >    ✓ Database#all prepare fail with param binding                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2892"
+    y="2474"
 >    ✓ Database#run prepare fail with param binding                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2914"
+    y="2496"
 >    ✓ Database#each prepare fail with param binding                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2936"
+    y="2518"
 >    ✓ Database#each prepare fail with param binding without completion handler                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2958"
+    y="2540"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="2980"
+    y="2562"
 >  each                                                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
+    y="2584"
+>    ✓ retrieve 100,000 rows with Statement#each (287ms)                                          </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="2606"
+>    ✓ Statement#each with complete callback                                                      </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="2628"
+>                                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="2650"
+>  exec                                                                                           </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="2672"
+>    ✓ Database#exec                                                                              </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="2694"
+>    ✓ retrieve database structure                                                                </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="2716"
+>                                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="2738"
+>  fts                                                                                            </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="2760"
+>    ✓ should create a new fts4 table                                                             </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="2782"
+>                                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="2804"
+>  interrupt                                                                                      </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="2826"
+>    ✓ should interrupt queries                                                                   </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="2848"
+>    ✓ should throw if interrupt is called before open                                            </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="2870"
+>    ✓ should throw if interrupt is called after close                                            </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="2892"
+>    ✓ should throw if interrupt is called during close                                           </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="2914"
+>                                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="2936"
+>  buffer                                                                                         </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="2958"
+>(node:2297) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability i\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="2980"
+>  ssues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.  </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
     y="3002"
->    ✓ retrieve 100,000 rows with Statement#each (308ms)                                          </tspan>
+>(Use `node --trace-deprecation ...` to show where the warning was created)                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="3024"
->    ✓ Statement#each with complete callback                                                      </tspan>
+>    ✓ should insert blobs                                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -839,37 +839,37 @@
     textLength="768"
     x="10"
     y="3068"
->  exec                                                                                           </tspan>
+>  json                                                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="3090"
->    ✓ Database#exec                                                                              </tspan>
+>    ✓ should select JSON                                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="3112"
->    ✓ retrieve database structure                                                                </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="3134"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
+    y="3134"
+>  map                                                                                            </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
     y="3156"
->  fts                                                                                            </tspan>
+>    ✓ test Database#map() with two columns                                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="3178"
->    ✓ should create a new fts4 table                                                             </tspan>
+>    ✓ test Database#map() with three columns                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -881,31 +881,31 @@
     textLength="768"
     x="10"
     y="3222"
->  interrupt                                                                                      </tspan>
+>  named columns                                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="3244"
->    ✓ should interrupt queries                                                                   </tspan>
+>    ✓ should create the table                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="3266"
->    ✓ should throw if interrupt is called before open                                            </tspan>
+>    ✓ should insert a value                                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="3288"
->    ✓ should throw if interrupt is called after close                                            </tspan>
+>    ✓ should retrieve the values                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="3310"
->    ✓ should throw if interrupt is called during close                                           </tspan>
+>    ✓ should be able to retrieve rowid of last inserted value                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -917,631 +917,631 @@
     textLength="768"
     x="10"
     y="3354"
->  buffer                                                                                         </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="3376"
->(node:2280) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability i\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="3398"
->  ssues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.  </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="3420"
->(Use `node --trace-deprecation ...` to show where the warning was created)                       </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="3442"
->    ✓ should insert blobs                                                                        </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="3464"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="3486"
->  json                                                                                           </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="3508"
->    ✓ should select JSON                                                                         </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="3530"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="3552"
->  map                                                                                            </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="3574"
->    ✓ test Database#map() with two columns                                                       </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="3596"
->    ✓ test Database#map() with three columns                                                     </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="3618"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="3640"
->  named columns                                                                                  </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="3662"
->    ✓ should create the table                                                                    </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="3684"
->    ✓ should insert a value                                                                      </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="3706"
->    ✓ should retrieve the values                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="3728"
->    ✓ should be able to retrieve rowid of last inserted value                                    </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="3750"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="3772"
 >  named parameters                                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="3794"
+    y="3376"
 >    ✓ should create the table                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="3816"
+    y="3398"
 >    ✓ should insert a value with $ placeholders                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="3838"
+    y="3420"
 >    ✓ should insert a value with : placeholders                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="3860"
+    y="3442"
 >    ✓ should insert a value with @ placeholders                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="3882"
+    y="3464"
 >    ✓ should insert a value with @ placeholders using an array                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="3904"
+    y="3486"
 >    ✓ should insert a value with indexed placeholders                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="3926"
+    y="3508"
 >    ✓ should insert a value with autoindexed placeholders                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="3948"
+    y="3530"
 >    ✓ should retrieve all inserted values                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="3970"
+    y="3552"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="3992"
+    y="3574"
 >  null error                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4014"
+    y="3596"
 >    ✓ should create a table                                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4036"
->    ✓ should insert rows with lots of null values (212ms)                                        </tspan>
+    y="3618"
+>    ✓ should insert rows with lots of null values (129ms)                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4058"
+    y="3640"
 >    ✓ should have created the database                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4080"
+    y="3662"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4102"
+    y="3684"
 >  open/close                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4124"
+    y="3706"
 >    ✓ should not be unable to open an inaccessible database                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4146"
+    y="3728"
 >    open and close non-existant database                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4168"
+    y="3750"
 >      ✓ should open the database                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4190"
+    y="3772"
 >      ✓ should close the database                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4212"
+    y="3794"
 >      ✓ should have created the file                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4234"
+    y="3816"
 >    open and close non-existant shared database                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4256"
+    y="3838"
 >      ✓ should open the database                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4278"
+    y="3860"
 >      ✓ should close the database                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4300"
+    y="3882"
 >      ✓ should have created the file                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4322"
+    y="3904"
 >    open and close shared memory database                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4344"
+    y="3926"
 >      ✓ should open the first database                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4366"
+    y="3948"
 >      ✓ should open the second database                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4388"
+    y="3970"
 >      ✓ first database should set the user_version                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4410"
+    y="3992"
 >      ✓ second database should get the user_version                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4432"
+    y="4014"
 >      ✓ should close the first database                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4454"
+    y="4036"
 >      ✓ should close the second database                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4476"
+    y="4058"
 >    creating database without create flag                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4498"
+    y="4080"
 >      ✓ should fail to open the database                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4520"
+    y="4102"
 >      ✓ should not have created the file                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4542"
+    y="4124"
 >    open and close memory database queuing                                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4564"
+    y="4146"
 >      ✓ should open the database                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4586"
+    y="4168"
 >      ✓ should close the database                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4608"
+    y="4190"
 >      ✓ shouldn't close the database again                                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4630"
+    y="4212"
 >    closing with unfinalized statements                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4652"
+    y="4234"
 >      ✓ should create a table                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4674"
+    y="4256"
 >      ✓ should prepare/run a statement                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4696"
+    y="4278"
 >      ✓ should fail to close the database                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4718"
+    y="4300"
 >      ✓ should succeed to close the database after finalizing                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4740"
+    y="4322"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4762"
+    y="4344"
 >  data types                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4784"
+    y="4366"
 >    ✓ should serialize Date()                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4806"
+    y="4388"
 >    ✓ should serialize RegExp()                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4828"
+    y="4410"
 >    ✓ should serialize float 4294967296.249                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4850"
+    y="4432"
 >    ✓ should serialize float 3.141592653589793                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4872"
+    y="4454"
 >    ✓ should serialize float 3924729304762836.5                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4894"
->    ✓ should serialize float 1633998155407                                                       </tspan>
+    y="4476"
+>    ✓ should serialize float 1634053747447                                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4916"
+    y="4498"
 >    ✓ should serialize float 912667.394828365                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4938"
+    y="4520"
 >    ✓ should serialize float 2.3948728634826374e+83                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4960"
+    y="4542"
 >    ✓ should serialize float 9.293476892934982e+300                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="4982"
+    y="4564"
 >    ✓ should serialize float Infinity                                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5004"
+    y="4586"
 >    ✓ should serialize float -9.293476892934982e+300                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5026"
+    y="4608"
 >    ✓ should serialize float -2.3948728634826374e+83                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5048"
+    y="4630"
 >    ✓ should serialize float -Infinity                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5070"
+    y="4652"
 >    ✓ should serialize integer 4294967299                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5092"
+    y="4674"
 >    ✓ should serialize integer 3924729304762836                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5114"
->    ✓ should serialize integer 1633998155408                                                     </tspan>
+    y="4696"
+>    ✓ should serialize integer 1634053747447                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5136"
+    y="4718"
 >    ✓ should serialize integer 2.3948728634826374e+83                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5158"
+    y="4740"
 >    ✓ should serialize integer 9.293476892934982e+300                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5180"
+    y="4762"
 >    ✓ should serialize integer Infinity                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5202"
+    y="4784"
 >    ✓ should serialize integer -9.293476892934982e+300                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5224"
+    y="4806"
 >    ✓ should serialize integer -2.3948728634826374e+83                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5246"
+    y="4828"
 >    ✓ should serialize integer -Infinity                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5268"
+    y="4850"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5290"
+    y="4872"
 >  parallel                                                                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5312"
+    y="4894"
 >    ✓ should create the table                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5334"
->    ✓ should insert in parallel (1929ms)                                                         </tspan>
+    y="4916"
+>    ✓ should insert in parallel (1292ms)                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5356"
+    y="4938"
 >    ✓ should close the database                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5378"
+    y="4960"
 >    ✓ should verify that the database exists                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5400"
+    y="4982"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5422"
+    y="5004"
 >  prepare                                                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5444"
+    y="5026"
 >    invalid SQL                                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5466"
+    y="5048"
 >      ✓ should fail preparing a statement with invalid SQL                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5488"
+    y="5070"
 >    simple prepared statement                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5510"
+    y="5092"
 >      ✓ should prepare, run and finalize the statement                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5532"
+    y="5114"
 >    inserting and retrieving rows                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5554"
+    y="5136"
 >      ✓ should create the table                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5576"
+    y="5158"
 >      ✓ should insert 1000 rows                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5598"
->      ✓ should prepare a statement and run it 1005 times (59ms)                                  </tspan>
+    y="5180"
+>      ✓ should prepare a statement and run it 1005 times (43ms)                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5620"
+    y="5202"
 >      ✓ should have retrieved 1005 rows                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="5642"
+    y="5224"
 >    inserting with accidental undefined                                                          </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="5246"
+>      ✓ should create the table                                                                  </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="5268"
+>      ✓ should insert two rows                                                                   </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="5290"
+>      ✓ should retrieve the data                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="5312"
+>      ✓ should have retrieved two rows                                                           </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="5334"
+>    retrieving reset() function                                                                  </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="5356"
+>      ✓ should retrieve the same row over and over again                                         </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="5378"
+>      ✓ should have retrieved 10 rows                                                            </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="5400"
+>    multiple get() parameter binding                                                             </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="5422"
+>      ✓ should retrieve particular rows                                                          </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="5444"
+>      ✓ should have retrieved 10 rows                                                            </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="5466"
+>    prepare() parameter binding                                                                  </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="5488"
+>      ✓ should retrieve particular rows                                                          </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="5510"
+>      ✓ should have retrieved 1 row                                                              </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="5532"
+>    all()                                                                                        </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="5554"
+>      ✓ should retrieve particular rows                                                          </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="5576"
+>      ✓ should have retrieved all rows                                                           </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="5598"
+>    all()                                                                                        </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="5620"
+>      ✓ should retrieve particular rows                                                          </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="5642"
+>    high concurrency                                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1553,235 +1553,235 @@
     textLength="768"
     x="10"
     y="5686"
->      ✓ should insert two rows                                                                   </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="5708"
->      ✓ should retrieve the data                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="5730"
->      ✓ should have retrieved two rows                                                           </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="5752"
->    retrieving reset() function                                                                  </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="5774"
->      ✓ should retrieve the same row over and over again                                         </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="5796"
->      ✓ should have retrieved 10 rows                                                            </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="5818"
->    multiple get() parameter binding                                                             </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="5840"
->      ✓ should retrieve particular rows                                                          </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="5862"
->      ✓ should have retrieved 10 rows                                                            </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="5884"
->    prepare() parameter binding                                                                  </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="5906"
->      ✓ should retrieve particular rows                                                          </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="5928"
->      ✓ should have retrieved 1 row                                                              </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="5950"
->    all()                                                                                        </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="5972"
->      ✓ should retrieve particular rows                                                          </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="5994"
->      ✓ should have retrieved all rows                                                           </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="6016"
->    all()                                                                                        </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="6038"
->      ✓ should retrieve particular rows                                                          </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="6060"
->    high concurrency                                                                             </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="6082"
->      ✓ should create the table                                                                  </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="6104"
 >      ✓ should insert all values                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="6126"
+    y="5708"
 >      ✓ should retrieve all values                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="6148"
+    y="5730"
 >    test Database#get()                                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="6170"
+    y="5752"
 >      ✓ should get a row                                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="6192"
+    y="5774"
 >      ✓ should have retrieved all rows                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="6214"
+    y="5796"
 >    Database#run() and Database#all()                                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="6236"
+    y="5818"
 >      ✓ should create the table                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="6258"
+    y="5840"
 >      ✓ should insert 1000 rows                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="6280"
+    y="5862"
 >      ✓ should retrieve all rows                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="6302"
+    y="5884"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="6324"
+    y="5906"
 >  profiling                                                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="6346"
+    y="5928"
 >    ✓ should profile a create table                                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="6368"
+    y="5950"
 >profile select                                                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="6390"
+    y="5972"
 >    ✓ should profile a select                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="6412"
+    y="5994"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="6434"
+    y="6016"
 >  rerunning statements                                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="6456"
+    y="6038"
 >    ✓ should create the table                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="6478"
+    y="6060"
 >    ✓ should insert repeatedly, reusing the same statement                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="6500"
+    y="6082"
 >    ✓ should retrieve repeatedly, resuing the same statement                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="6522"
+    y="6104"
 >    ✓ should have inserted and retrieved the right amount                                        </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6126"
+>                                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6148"
+>  scheduling                                                                                     </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6170"
+>    ✓ scheduling after the database was closed                                                   </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6192"
+>    ✓ scheduling a query with callback after the database was closed                             </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6214"
+>    ✓ running a query after the database was closed                                              </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6236"
+>                                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6258"
+>  serialize() and parallelize()                                                                  </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6280"
+>    ✓ should toggle                                                                              </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6302"
+>    ✓ should insert rows                                                                         </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6324"
+>    ✓ should have inserted all the rows after synchronizing with serialize() (47ms)              </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6346"
+>                                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6368"
+>  serialize(fn)                                                                                  </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6390"
+>    ✓ should call the callback (47ms)                                                            </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6412"
+>    ✓ should have inserted and retrieved all rows                                                </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6434"
+>                                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6456"
+>  tracing                                                                                        </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6478"
+>    ✓ Database tracing                                                                           </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6500"
+>    ✓ test disabling tracing #1                                                                  </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6522"
+>    ✓ test disabling tracing #2                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1793,79 +1793,79 @@
     textLength="768"
     x="10"
     y="6566"
->  scheduling                                                                                     </tspan>
+>  unicode                                                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="6588"
->    ✓ scheduling after the database was closed                                                   </tspan>
+>    ✓ should create the table                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="6610"
->    ✓ scheduling a query with callback after the database was closed                             </tspan>
+>    ✓ should insert all values                                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="6632"
->    ✓ running a query after the database was closed                                              </tspan>
+>    ✓ should retrieve all values                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="6654"
->                                                                                                 </tspan>
+>    ✓ should have inserted and retrieved the correct amount                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="6676"
->  serialize() and parallelize()                                                                  </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="6698"
->    ✓ should toggle                                                                              </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="6720"
->    ✓ should insert rows                                                                         </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="6742"
->    ✓ should have inserted all the rows after synchronizing with serialize() (49ms)              </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="6764"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
+    y="6698"
+>  query properties                                                                               </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6720"
+>    ✓ should upsert                                                                              </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6742"
+>                                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="6764"
+>  verbose                                                                                        </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
     y="6786"
->  serialize(fn)                                                                                  </tspan>
+>    ✓ Shoud add trace info to error when verbose is called                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="6808"
->    ✓ should call the callback (55ms)                                                            </tspan>
+>    ✓ Shoud not add trace info to error when verbose is not called                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="6830"
->    ✓ should have inserted and retrieved all rows                                                </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1877,25 +1877,25 @@
     textLength="768"
     x="10"
     y="6874"
->  tracing                                                                                        </tspan>
+>  160 passing (3s)                                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="6896"
->    ✓ Database tracing                                                                           </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="6918"
->    ✓ test disabling tracing #1                                                                  </tspan>
+>wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/v8_coverage_m\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="6940"
->    ✓ test disabling tracing #2                                                                  </tspan>
+>  erged.json                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -1907,1212 +1907,1098 @@
     textLength="768"
     x="10"
     y="6984"
->  unicode                                                                                        </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="7006"
->    ✓ should create the table                                                                    </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="7028"
->    ✓ should insert all values (46ms)                                                            </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="7050"
->    ✓ should retrieve all values                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="7072"
->    ✓ should have inserted and retrieved the correct amount                                      </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="7094"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="7116"
->  query properties                                                                               </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="7138"
->    ✓ should upsert                                                                              </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="7160"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="7182"
->  verbose                                                                                        </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="7204"
->    ✓ Shoud add trace info to error when verbose is called                                       </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="7226"
->    ✓ Shoud not add trace info to error when verbose is not called                               </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="7248"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="7270"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="7292"
->  160 passing (4s)                                                                               </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="7314"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="7336"
->wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/v8_coverage_m\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="7358"
->  erged.json                                                                                     </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="7380"
->                                                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="7402"
 >coverage-report                                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7424"
+    y="7006"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7446"
+    y="7028"
 >| files covered                    |             lines |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7468"
+    y="7050"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7490"
+    y="7072"
 >| ./                               |           91.76 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7512"
+    y="7094"
 >| *****************************___ |       2474 / 2696 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7534"
+    y="7116"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7556"
+    y="7138"
 >| ./lib/sqlite3-binding.js         |          100.00 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7578"
+    y="7160"
 >| ******************************** |             6 / 6 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7600"
+    y="7182"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7622"
+    y="7204"
 >| ./lib/sqlite3.js                 |           97.08 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7644"
+    y="7226"
 >| *******************************_ |         200 / 206 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7666"
+    y="7248"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7688"
+    y="7270"
 >| ./lib/trace.js                   |          100.00 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7710"
+    y="7292"
 >| ******************************** |           39 / 39 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7732"
+    y="7314"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7754"
+    y="7336"
 >| ./test/affected.test.js          |           93.93 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7776"
+    y="7358"
 >| ******************************__ |           31 / 33 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7798"
+    y="7380"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7820"
+    y="7402"
 >| ./test/backup.test.js            |           83.21 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7842"
+    y="7424"
 >| ***************************_____ |         233 / 280 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7864"
+    y="7446"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7886"
+    y="7468"
 >| ./test/blob.test.js              |           90.90 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7908"
+    y="7490"
 >| *****************************___ |           50 / 55 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7930"
+    y="7512"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7952"
+    y="7534"
 >| ./test/cache.test.js             |           90.69 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7974"
+    y="7556"
 >| *****************************___ |           39 / 43 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="7996"
+    y="7578"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8018"
+    y="7600"
 >| ./test/constants.test.js         |          100.00 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8040"
+    y="7622"
 >| ******************************** |           45 / 45 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8062"
+    y="7644"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8084"
+    y="7666"
 >| ./test/database_fail.test.js     |           77.92 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8106"
+    y="7688"
 >| *************************_______ |         120 / 154 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8128"
+    y="7710"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8150"
+    y="7732"
 >| ./test/each.test.js              |           95.00 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8172"
+    y="7754"
 >| ******************************__ |           38 / 40 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8194"
+    y="7776"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8216"
+    y="7798"
 >| ./test/exec.test.js              |           97.50 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8238"
+    y="7820"
 >| *******************************_ |           39 / 40 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8260"
+    y="7842"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8282"
+    y="7864"
 >| ./test/extension.test.js         |           96.15 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8304"
+    y="7886"
 >| *******************************_ |           25 / 26 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8326"
+    y="7908"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8348"
+    y="7930"
 >| ./test/fts-content.test.js       |          100.00 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8370"
+    y="7952"
 >| ******************************** |           14 / 14 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8392"
+    y="7974"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8414"
+    y="7996"
 >| ./test/interrupt.test.js         |           92.59 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8436"
+    y="8018"
 >| ******************************__ |           75 / 81 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8458"
+    y="8040"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8480"
+    y="8062"
 >| ./test/issue-108.test.js         |           89.65 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8502"
+    y="8084"
 >| *****************************___ |           26 / 29 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8524"
+    y="8106"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8546"
+    y="8128"
 >| ./test/json.test.js              |           65.21 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8568"
+    y="8150"
 >| *********************___________ |           15 / 23 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8590"
+    y="8172"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8612"
+    y="8194"
 >| ./test/map.test.js               |           93.75 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8634"
+    y="8216"
 >| ******************************__ |           60 / 64 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8656"
+    y="8238"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8678"
+    y="8260"
 >| ./test/named_columns.test.js     |           94.87 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8700"
+    y="8282"
 >| ******************************__ |           37 / 39 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8722"
+    y="8304"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8744"
+    y="8326"
 >| ./test/named_params.test.js      |           98.57 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8766"
+    y="8348"
 >| ******************************** |           69 / 70 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8788"
+    y="8370"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8810"
+    y="8392"
 >| ./test/null_error.test.js        |           95.23 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8832"
+    y="8414"
 >| ******************************__ |           40 / 42 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8854"
+    y="8436"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8876"
+    y="8458"
 >| ./test/open_close.test.js        |           93.61 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8898"
+    y="8480"
 >| ******************************__ |         176 / 188 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8920"
+    y="8502"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8942"
+    y="8524"
 >| ./test/other_objects.test.js     |           91.11 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8964"
+    y="8546"
 >| *****************************___ |           82 / 90 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="8986"
+    y="8568"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9008"
+    y="8590"
 >| ./test/parallel_insert.test.js   |          100.00 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9030"
+    y="8612"
 >| ******************************** |           45 / 45 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9052"
+    y="8634"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9074"
+    y="8656"
 >| ./test/prepare.test.js           |           94.85 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9096"
+    y="8678"
 >| ******************************__ |         406 / 428 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9118"
+    y="8700"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9140"
+    y="8722"
 >| ./test/profile.test.js           |           89.65 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9162"
+    y="8744"
 >| *****************************___ |           52 / 58 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9184"
+    y="8766"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9206"
+    y="8788"
 >| ./test/rerun.test.js             |           94.11 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9228"
+    y="8810"
 >| ******************************__ |           48 / 51 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9250"
+    y="8832"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9272"
+    y="8854"
 >| ./test/scheduling.test.js        |           91.11 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9294"
+    y="8876"
 >| *****************************___ |           41 / 45 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9316"
+    y="8898"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9338"
+    y="8920"
 >| ./test/serialization.test.js     |           95.23 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9360"
+    y="8942"
 >| ******************************__ |         100 / 105 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9382"
+    y="8964"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9404"
+    y="8986"
 >| ./test/support/createdb.js       |           89.58 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9426"
+    y="9008"
 >| *****************************___ |           43 / 48 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9448"
+    y="9030"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9470"
+    y="9052"
 >| ./test/support/helper.js         |           72.97 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9492"
+    y="9074"
 >| ***********************_________ |           27 / 37 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9514"
+    y="9096"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9536"
+    y="9118"
 >| ./test/trace.test.js             |           80.88 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9558"
+    y="9140"
 >| **************************______ |           55 / 68 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9580"
+    y="9162"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9602"
+    y="9184"
 >| ./test/unicode.test.js           |           98.26 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9624"
+    y="9206"
 >| *******************************_ |         113 / 115 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9646"
+    y="9228"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9668"
+    y="9250"
 >| ./test/upsert.test.js            |           85.71 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9690"
+    y="9272"
 >| ***************************_____ |           24 / 28 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9712"
+    y="9294"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9734"
+    y="9316"
 >| ./test/verbose.test.js           |          100.00 % |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9756"
+    y="9338"
 >| ******************************** |           61 / 61 |                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9778"
+    y="9360"
 >+----------------------------------+-------------------+                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9800"
+    y="9382"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9822"
+    y="9404"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/lib/sqlite3-b\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9844"
+    y="9426"
 >  inding.js.html                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9866"
+    y="9448"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/affected\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9888"
+    y="9470"
 >  .test.js.html                                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9910"
+    y="9492"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/support/\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9932"
+    y="9514"
 >  createdb.js.html                                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9954"
+    y="9536"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/lib/sqlite3.j\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9976"
+    y="9558"
 >  s.html                                                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="9998"
+    y="9580"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/lib/trace.js.\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10020"
+    y="9602"
 >  html                                                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10042"
+    y="9624"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/backup.t\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10064"
+    y="9646"
 >  est.js.html                                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10086"
+    y="9668"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/blob.tes\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10108"
+    y="9690"
 >  t.js.html                                                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10130"
+    y="9712"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/cache.te\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10152"
+    y="9734"
 >  st.js.html                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10174"
+    y="9756"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/constant\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10196"
+    y="9778"
 >  s.test.js.html                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10218"
+    y="9800"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/database\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10240"
+    y="9822"
 >  _fail.test.js.html                                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10262"
+    y="9844"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/each.tes\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10284"
+    y="9866"
 >  t.js.html                                                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10306"
+    y="9888"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/exec.tes\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10328"
+    y="9910"
 >  t.js.html                                                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10350"
+    y="9932"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/extensio\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10372"
+    y="9954"
 >  n.test.js.html                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10394"
+    y="9976"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/fts-cont\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10416"
+    y="9998"
 >  ent.test.js.html                                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10438"
+    y="10020"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/interrup\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10460"
+    y="10042"
 >  t.test.js.html                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10482"
+    y="10064"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/issue-10\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10504"
+    y="10086"
 >  8.test.js.html                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10526"
+    y="10108"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/json.tes\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10548"
+    y="10130"
 >  t.js.html                                                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10570"
+    y="10152"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/map.test\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10592"
+    y="10174"
 >  .js.html                                                                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10614"
+    y="10196"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/named_co\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10636"
+    y="10218"
 >  lumns.test.js.html                                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10658"
+    y="10240"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/named_pa\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10680"
+    y="10262"
 >  rams.test.js.html                                                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10702"
+    y="10284"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/null_err\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10724"
+    y="10306"
 >  or.test.js.html                                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10746"
+    y="10328"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/open_clo\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10768"
+    y="10350"
 >  se.test.js.html                                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10790"
+    y="10372"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/other_ob\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10812"
+    y="10394"
 >  jects.test.js.html                                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10834"
+    y="10416"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/parallel\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10856"
+    y="10438"
 >  _insert.test.js.html                                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10878"
+    y="10460"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/prepare.\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10900"
+    y="10482"
 >  test.js.html                                                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10922"
+    y="10504"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/profile.\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10944"
+    y="10526"
 >  test.js.html                                                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10966"
+    y="10548"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/rerun.te\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="10988"
+    y="10570"
 >  st.js.html                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11010"
+    y="10592"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/scheduli\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11032"
+    y="10614"
 >  ng.test.js.html                                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11054"
+    y="10636"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/serializ\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11076"
+    y="10658"
 >  ation.test.js.html                                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11098"
+    y="10680"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/support/\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11120"
+    y="10702"
 >  helper.js.html                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11142"
+    y="10724"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/trace.te\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11164"
+    y="10746"
 >  st.js.html                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11186"
+    y="10768"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/unicode.\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11208"
+    y="10790"
 >  test.js.html                                                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11230"
+    y="10812"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/upsert.t\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11252"
+    y="10834"
 >  est.js.html                                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11274"
+    y="10856"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/test/verbose.\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11296"
+    y="10878"
 >  test.js.html                                                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11318"
+    y="10900"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/coverage_badg\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11340"
+    y="10922"
 >  e.svg                                                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11362"
+    y="10944"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/index.html    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11384"
+    y="10966"
 >wrote file /home/runner/work/jslint/jslint/node-sqlite3/.artifact/coverage_sqlite3/coverage_repo\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="11406"
+    y="10988"
 >  rt.txt                                                                                         </tspan>
 
 </text>
