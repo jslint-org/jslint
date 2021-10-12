@@ -61,6 +61,9 @@ function processExit1(exitCode) {
             console_error: noop,        // suppress error
             file,
             mode_cli: true,
+            processEnv: {
+                JSLINT_BETA: "1"
+            },
             process_exit: processExit0
         });
     });
