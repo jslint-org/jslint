@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>V8 Coverage Report</title>
+<style>
+/* jslint utility2:true */
+/*csslint ignore:start*/
+* {
+box-sizing: border-box;
+    font-family: consolas, menlo, monospace;
+}
+/*csslint ignore:end*/
+body {
+    margin: 0;
+}
+.coverage pre {
+    margin: 5px 0;
+}
+.coverage table {
+    border-collapse: collapse;
+}
+.coverage td,
+.coverage th {
+    border: 1px solid #777;
+    margin: 0;
+    padding: 5px;
+}
+.coverage td span {
+    display: inline-block;
+    width: 100%;
+}
+.coverage .content {
+    padding: 0 5px;
+}
+.coverage .content a {
+    text-decoration: none;
+}
+.coverage .count {
+    margin: 0 5px;
+    padding: 0 5px;
+}
+.coverage .footer,
+.coverage .header {
+    padding: 20px;
+}
+.coverage .footer {
+    text-align: center;
+}
+.coverage .percentbar {
+    height: 12px;
+    margin: 2px 0;
+    min-width: 200px;
+    position: relative;
+    width: 100%;
+}
+.coverage .percentbar div {
+    height: 100%;
+    position: absolute;
+}
+.coverage .title {
+    font-size: large;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.coverage td,
+.coverage th {
+    background: #fff;
+}
+.coverage .count {
+    background: #9d9;
+    color: #777;
+}
+.coverage .coverageHigh{
+    background: #9d9;
+}
+.coverage .coverageIgnore{
+    background: #ccc;
+}
+.coverage .coverageLow{
+    background: #ebb;
+}
+.coverage .coverageMedium{
+    background: #fd7;
+}
+.coverage .footer,
+.coverage .header {
+    background: #ddd;
+}
+.coverage .lineno {
+    background: #ddd;
+}
+.coverage .percentbar {
+    background: #999;
+}
+.coverage .percentbar div {
+    background: #666;
+}
+.coverage .uncovered {
+    background: #dbb;
+}
+
+.coverage pre:hover span,
+.coverage tr:hover td {
+    background: #7d7;
+}
+.coverage pre:hover span.uncovered,
+.coverage tr:hover td.coverageLow {
+    background: #d99;
+}
+</style>
+</head>
+<body class="coverage">
+<!-- header start -->
+<div class="header">
+<div class="title">V8 Coverage Report</div>
+<table>
+<thead>
+    <tr>
+    <th>Files covered</th>
+    <th>Lines</th>
+    </tr>
+</thead>
+<tbody>
+<tr>
+    <td class="coverageHigh">
+            <a href="../index.html">. / </a>test/prepare.test.js<br>
+        <div class="percentbar">
+            <div style="width: 94.85%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         94.85 %<br>
+        406 / 428
+    </td>
+    </tr>
+</tbody>
+</table>
+</div>
+<!-- header end -->
+<!-- content start -->
+<div class="content">
+<pre><span class="lineno"><a href="#line_1" id="line_1">    1.</a></span><span class="count                ">      1</span><span>var sqlite3 = require('..');</span></pre>
+<pre><span class="lineno"><a href="#line_2" id="line_2">    2.</a></span><span class="count                ">      1</span><span>var assert = require('assert');</span></pre>
+<pre><span class="lineno"><a href="#line_3" id="line_3">    3.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_4" id="line_4">    4.</a></span><span class="count                ">      1</span><span>describe('prepare', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_5" id="line_5">    5.</a></span><span class="count                ">      1</span><span>    describe('invalid SQL', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_6" id="line_6">    6.</a></span><span class="count                ">      1</span><span>        var db;</span></pre>
+<pre><span class="lineno"><a href="#line_7" id="line_7">    7.</a></span><span class="count                ">      1</span><span>        before(function(done) { db = new sqlite3.Database(':memory:', done); });</span></pre>
+<pre><span class="lineno"><a href="#line_8" id="line_8">    8.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_9" id="line_9">    9.</a></span><span class="count                ">      1</span><span>        var stmt;</span></pre>
+<pre><span class="lineno"><a href="#line_10" id="line_10">   10.</a></span><span class="count                ">      1</span><span>        it('should fail preparing a statement with invalid SQL', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_11" id="line_11">   11.</a></span><span class="count                ">      1</span><span>            stmt = db.prepare('CRATE TALE foo text bar)', function(err, statement) {</span></pre>
+<pre><span class="lineno"><a href="#line_12" id="line_12">   12.</a></span><span class="count                ">      1</span><span>                if (err &amp;&amp; err.errno == sqlite3.ERROR &amp;&amp;</span></pre>
+<pre><span class="lineno"><a href="#line_13" id="line_13">   13.</a></span><span class="count                ">      1</span><span>                    err.message === 'SQLITE_ERROR: near "CRATE": syntax error') {</span></pre>
+<pre><span class="lineno"><a href="#line_14" id="line_14">   14.</a></span><span class="count                ">      1</span><span>                    done();</span></pre>
+<pre><span class="lineno"><a href="#line_15" id="line_15">   15.</a></span><span class="count                uncovered">      0</span><span>                }</span></pre>
+<pre><span class="lineno"><a href="#line_16" id="line_16">   16.</a></span><span class="count                uncovered">      0</span><span></span><span class="uncovered">                else throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_17" id="line_17">   17.</a></span><span class="count                ">      1</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_18" id="line_18">   18.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_19" id="line_19">   19.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_20" id="line_20">   20.</a></span><span class="count                ">      1</span><span>        after(function(done) { db.close(done); });</span></pre>
+<pre><span class="lineno"><a href="#line_21" id="line_21">   21.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_22" id="line_22">   22.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_23" id="line_23">   23.</a></span><span class="count                ">      1</span><span>    describe('simple prepared statement', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_24" id="line_24">   24.</a></span><span class="count                ">      1</span><span>        var db;</span></pre>
+<pre><span class="lineno"><a href="#line_25" id="line_25">   25.</a></span><span class="count                ">      1</span><span>        before(function(done) { db = new sqlite3.Database(':memory:', done); });</span></pre>
+<pre><span class="lineno"><a href="#line_26" id="line_26">   26.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_27" id="line_27">   27.</a></span><span class="count                ">      1</span><span>        it('should prepare, run and finalize the statement', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_28" id="line_28">   28.</a></span><span class="count                ">      1</span><span>            db.prepare("CREATE TABLE foo (text bar)")</span></pre>
+<pre><span class="lineno"><a href="#line_29" id="line_29">   29.</a></span><span class="count                ">      1</span><span>                .run()</span></pre>
+<pre><span class="lineno"><a href="#line_30" id="line_30">   30.</a></span><span class="count                ">      1</span><span>                .finalize(done);</span></pre>
+<pre><span class="lineno"><a href="#line_31" id="line_31">   31.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_32" id="line_32">   32.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_33" id="line_33">   33.</a></span><span class="count                ">      1</span><span>        after(function(done) { db.close(done); });</span></pre>
+<pre><span class="lineno"><a href="#line_34" id="line_34">   34.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_35" id="line_35">   35.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_36" id="line_36">   36.</a></span><span class="count                ">      1</span><span>    describe('inserting and retrieving rows', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_37" id="line_37">   37.</a></span><span class="count                ">      1</span><span>        var db;</span></pre>
+<pre><span class="lineno"><a href="#line_38" id="line_38">   38.</a></span><span class="count                ">      1</span><span>        before(function(done) { db = new sqlite3.Database(':memory:', done); });</span></pre>
+<pre><span class="lineno"><a href="#line_39" id="line_39">   39.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_40" id="line_40">   40.</a></span><span class="count                ">      1</span><span>        var inserted = 0;</span></pre>
+<pre><span class="lineno"><a href="#line_41" id="line_41">   41.</a></span><span class="count                ">      1</span><span>        var retrieved = 0;</span></pre>
+<pre><span class="lineno"><a href="#line_42" id="line_42">   42.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_43" id="line_43">   43.</a></span><span class="count                ">      1</span><span>        // We insert and retrieve that many rows.</span></pre>
+<pre><span class="lineno"><a href="#line_44" id="line_44">   44.</a></span><span class="count                ">      1</span><span>        var count = 1000;</span></pre>
+<pre><span class="lineno"><a href="#line_45" id="line_45">   45.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_46" id="line_46">   46.</a></span><span class="count                ">      1</span><span>        it('should create the table', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_47" id="line_47">   47.</a></span><span class="count                ">      1</span><span>            db.prepare("CREATE TABLE foo (txt text, num int, flt float, blb blob)").run().finalize(done);</span></pre>
+<pre><span class="lineno"><a href="#line_48" id="line_48">   48.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_49" id="line_49">   49.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_50" id="line_50">   50.</a></span><span class="count                ">      1</span><span>        it('should insert ' + count + ' rows', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_51" id="line_51">   51.</a></span><span class="count                ">   1000</span><span>            for (var i = 0; i &lt; count; i++) {</span></pre>
+<pre><span class="lineno"><a href="#line_52" id="line_52">   52.</a></span><span class="count                ">   1000</span><span>                db.prepare("INSERT INTO foo VALUES(?, ?, ?, ?)").run(</span></pre>
+<pre><span class="lineno"><a href="#line_53" id="line_53">   53.</a></span><span class="count                ">   1000</span><span>                    'String ' + i,</span></pre>
+<pre><span class="lineno"><a href="#line_54" id="line_54">   54.</a></span><span class="count                ">   1000</span><span>                    i,</span></pre>
+<pre><span class="lineno"><a href="#line_55" id="line_55">   55.</a></span><span class="count                ">   1000</span><span>                    i * Math.PI,</span></pre>
+<pre><span class="lineno"><a href="#line_56" id="line_56">   56.</a></span><span class="count                ">   1000</span><span>                    // null (SQLite sets this implicitly)</span></pre>
+<pre><span class="lineno"><a href="#line_57" id="line_57">   57.</a></span><span class="count                ">   1000</span><span>                    function(err) {</span></pre>
+<pre><span class="lineno"><a href="#line_58" id="line_58">   58.</a></span><span class="count                uncovered">      0</span><span>                        if (err) </span><span class="uncovered">throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_59" id="line_59">   59.</a></span><span class="count                ">   1000</span><span>                        inserted++;</span></pre>
+<pre><span class="lineno"><a href="#line_60" id="line_60">   60.</a></span><span class="count                ">   1000</span><span>                    }</span></pre>
+<pre><span class="lineno"><a href="#line_61" id="line_61">   61.</a></span><span class="count                ">   1000</span><span>                ).finalize(function(err) {</span></pre>
+<pre><span class="lineno"><a href="#line_62" id="line_62">   62.</a></span><span class="count                uncovered">      0</span><span>                    if (err) </span><span class="uncovered">throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_63" id="line_63">   63.</a></span><span class="count                ">   1000</span><span>                    if (inserted == count) done();</span></pre>
+<pre><span class="lineno"><a href="#line_64" id="line_64">   64.</a></span><span class="count                ">   1000</span><span>                });</span></pre>
+<pre><span class="lineno"><a href="#line_65" id="line_65">   65.</a></span><span class="count                ">   1000</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_66" id="line_66">   66.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_67" id="line_67">   67.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_68" id="line_68">   68.</a></span><span class="count                ">      1</span><span>        it('should prepare a statement and run it ' + (count + 5) + ' times', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_69" id="line_69">   69.</a></span><span class="count                ">      1</span><span>            var stmt = db.prepare("SELECT txt, num, flt, blb FROM foo ORDER BY num", function(err) {</span></pre>
+<pre><span class="lineno"><a href="#line_70" id="line_70">   70.</a></span><span class="count                uncovered">      0</span><span>                if (err) </span><span class="uncovered">throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_71" id="line_71">   71.</a></span><span class="count                ">      1</span><span>                assert.equal(stmt.sql, 'SELECT txt, num, flt, blb FROM foo ORDER BY num');</span></pre>
+<pre><span class="lineno"><a href="#line_72" id="line_72">   72.</a></span><span class="count                ">      1</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_73" id="line_73">   73.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_74" id="line_74">   74.</a></span><span class="count                ">   1005</span><span>            for (var i = 0; i &lt; count + 5; i++) (function(i) {</span></pre>
+<pre><span class="lineno"><a href="#line_75" id="line_75">   75.</a></span><span class="count                ">   1005</span><span>                stmt.get(function(err, row) {</span></pre>
+<pre><span class="lineno"><a href="#line_76" id="line_76">   76.</a></span><span class="count                uncovered">      0</span><span>                    if (err) </span><span class="uncovered">throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_77" id="line_77">   77.</a></span><span class="count                ">   1005</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_78" id="line_78">   78.</a></span><span class="count                ">   1005</span><span>                    if (retrieved &gt;= 1000) {</span></pre>
+<pre><span class="lineno"><a href="#line_79" id="line_79">   79.</a></span><span class="count                ">   1005</span><span>                        assert.equal(row, undefined);</span></pre>
+<pre><span class="lineno"><a href="#line_80" id="line_80">   80.</a></span><span class="count                ">   1005</span><span>                    } else {</span></pre>
+<pre><span class="lineno"><a href="#line_81" id="line_81">   81.</a></span><span class="count                ">   1005</span><span>                        assert.equal(row.txt, 'String ' + i);</span></pre>
+<pre><span class="lineno"><a href="#line_82" id="line_82">   82.</a></span><span class="count                ">   1005</span><span>                        assert.equal(row.num, i);</span></pre>
+<pre><span class="lineno"><a href="#line_83" id="line_83">   83.</a></span><span class="count                ">   1005</span><span>                        assert.equal(row.flt, i * Math.PI);</span></pre>
+<pre><span class="lineno"><a href="#line_84" id="line_84">   84.</a></span><span class="count                ">   1005</span><span>                        assert.equal(row.blb, null);</span></pre>
+<pre><span class="lineno"><a href="#line_85" id="line_85">   85.</a></span><span class="count                ">   1005</span><span>                    }</span></pre>
+<pre><span class="lineno"><a href="#line_86" id="line_86">   86.</a></span><span class="count                ">   1005</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_87" id="line_87">   87.</a></span><span class="count                ">   1005</span><span>                    retrieved++;</span></pre>
+<pre><span class="lineno"><a href="#line_88" id="line_88">   88.</a></span><span class="count                ">   1005</span><span>                });</span></pre>
+<pre><span class="lineno"><a href="#line_89" id="line_89">   89.</a></span><span class="count                ">   1005</span><span>            })(i);</span></pre>
+<pre><span class="lineno"><a href="#line_90" id="line_90">   90.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_91" id="line_91">   91.</a></span><span class="count                ">      1</span><span>            stmt.finalize(done);</span></pre>
+<pre><span class="lineno"><a href="#line_92" id="line_92">   92.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_93" id="line_93">   93.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_94" id="line_94">   94.</a></span><span class="count                ">      1</span><span>        it('should have retrieved ' + (count + 5) + ' rows', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_95" id="line_95">   95.</a></span><span class="count                ">      1</span><span>            assert.equal(count + 5, retrieved, "Didn't retrieve all rows");</span></pre>
+<pre><span class="lineno"><a href="#line_96" id="line_96">   96.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_97" id="line_97">   97.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_98" id="line_98">   98.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_99" id="line_99">   99.</a></span><span class="count                ">      1</span><span>        after(function(done) { db.close(done); });</span></pre>
+<pre><span class="lineno"><a href="#line_100" id="line_100">  100.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_101" id="line_101">  101.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_102" id="line_102">  102.</a></span><span class="count                ">      1</span><span>    describe('inserting with accidental undefined', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_103" id="line_103">  103.</a></span><span class="count                ">      1</span><span>        var db;</span></pre>
+<pre><span class="lineno"><a href="#line_104" id="line_104">  104.</a></span><span class="count                ">      1</span><span>        before(function(done) { db = new sqlite3.Database(':memory:', done); });</span></pre>
+<pre><span class="lineno"><a href="#line_105" id="line_105">  105.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_106" id="line_106">  106.</a></span><span class="count                ">      1</span><span>        var inserted = 0;</span></pre>
+<pre><span class="lineno"><a href="#line_107" id="line_107">  107.</a></span><span class="count                ">      1</span><span>        var retrieved = 0;</span></pre>
+<pre><span class="lineno"><a href="#line_108" id="line_108">  108.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_109" id="line_109">  109.</a></span><span class="count                ">      1</span><span>        it('should create the table', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_110" id="line_110">  110.</a></span><span class="count                ">      1</span><span>            db.prepare("CREATE TABLE foo (num int)").run().finalize(done);</span></pre>
+<pre><span class="lineno"><a href="#line_111" id="line_111">  111.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_112" id="line_112">  112.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_113" id="line_113">  113.</a></span><span class="count                ">      1</span><span>        it('should insert two rows', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_114" id="line_114">  114.</a></span><span class="count                ">      1</span><span>            db.prepare('INSERT INTO foo VALUES(4)').run(function(err) {</span></pre>
+<pre><span class="lineno"><a href="#line_115" id="line_115">  115.</a></span><span class="count                uncovered">      0</span><span>                if (err) </span><span class="uncovered">throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_116" id="line_116">  116.</a></span><span class="count                ">      1</span><span>                inserted++;</span></pre>
+<pre><span class="lineno"><a href="#line_117" id="line_117">  117.</a></span><span class="count                ">      1</span><span>            }).run(undefined, function (err) {</span></pre>
+<pre><span class="lineno"><a href="#line_118" id="line_118">  118.</a></span><span class="count                ">      1</span><span>                // The second time we pass undefined as a parameter. This is</span></pre>
+<pre><span class="lineno"><a href="#line_119" id="line_119">  119.</a></span><span class="count                ">      1</span><span>                // a mistake, but it should either throw an error or be ignored,</span></pre>
+<pre><span class="lineno"><a href="#line_120" id="line_120">  120.</a></span><span class="count                ">      1</span><span>                // not silently fail to run the statement.</span></pre>
+<pre><span class="lineno"><a href="#line_121" id="line_121">  121.</a></span><span class="count                uncovered">      0</span><span>                if (err) </span><span class="uncovered">throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_122" id="line_122">  122.</a></span><span class="count                ">      1</span><span>                inserted++;</span></pre>
+<pre><span class="lineno"><a href="#line_123" id="line_123">  123.</a></span><span class="count                ">      1</span><span>            }).finalize(function(err) {</span></pre>
+<pre><span class="lineno"><a href="#line_124" id="line_124">  124.</a></span><span class="count                uncovered">      0</span><span>                if (err) </span><span class="uncovered">throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_125" id="line_125">  125.</a></span><span class="count                ">      1</span><span>                if (inserted == 2) done();</span></pre>
+<pre><span class="lineno"><a href="#line_126" id="line_126">  126.</a></span><span class="count                ">      1</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_127" id="line_127">  127.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_128" id="line_128">  128.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_129" id="line_129">  129.</a></span><span class="count                ">      1</span><span>        it('should retrieve the data', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_130" id="line_130">  130.</a></span><span class="count                ">      1</span><span>            var stmt = db.prepare("SELECT num FROM foo", function(err) {</span></pre>
+<pre><span class="lineno"><a href="#line_131" id="line_131">  131.</a></span><span class="count                uncovered">      0</span><span>                if (err) </span><span class="uncovered">throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_132" id="line_132">  132.</a></span><span class="count                ">      1</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_133" id="line_133">  133.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_134" id="line_134">  134.</a></span><span class="count                ">      2</span><span>            for (var i = 0; i &lt; 2; i++) (function(i) {</span></pre>
+<pre><span class="lineno"><a href="#line_135" id="line_135">  135.</a></span><span class="count                ">      2</span><span>                stmt.get(function(err, row) {</span></pre>
+<pre><span class="lineno"><a href="#line_136" id="line_136">  136.</a></span><span class="count                uncovered">      0</span><span>                    if (err) </span><span class="uncovered">throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_137" id="line_137">  137.</a></span><span class="count                ">      2</span><span>                    assert(row);</span></pre>
+<pre><span class="lineno"><a href="#line_138" id="line_138">  138.</a></span><span class="count                ">      2</span><span>                    assert.equal(row.num, 4);</span></pre>
+<pre><span class="lineno"><a href="#line_139" id="line_139">  139.</a></span><span class="count                ">      2</span><span>                    retrieved++;</span></pre>
+<pre><span class="lineno"><a href="#line_140" id="line_140">  140.</a></span><span class="count                ">      2</span><span>                });</span></pre>
+<pre><span class="lineno"><a href="#line_141" id="line_141">  141.</a></span><span class="count                ">      2</span><span>            })(i);</span></pre>
+<pre><span class="lineno"><a href="#line_142" id="line_142">  142.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_143" id="line_143">  143.</a></span><span class="count                ">      1</span><span>            stmt.finalize(done);</span></pre>
+<pre><span class="lineno"><a href="#line_144" id="line_144">  144.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_145" id="line_145">  145.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_146" id="line_146">  146.</a></span><span class="count                ">      1</span><span>        it('should have retrieved two rows', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_147" id="line_147">  147.</a></span><span class="count                ">      1</span><span>            assert.equal(2, retrieved, "Didn't retrieve all rows");</span></pre>
+<pre><span class="lineno"><a href="#line_148" id="line_148">  148.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_149" id="line_149">  149.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_150" id="line_150">  150.</a></span><span class="count                ">      1</span><span>        after(function(done) { db.close(done); });</span></pre>
+<pre><span class="lineno"><a href="#line_151" id="line_151">  151.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_152" id="line_152">  152.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_153" id="line_153">  153.</a></span><span class="count                ">      1</span><span>    describe('retrieving reset() function', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_154" id="line_154">  154.</a></span><span class="count                ">      1</span><span>        var db;</span></pre>
+<pre><span class="lineno"><a href="#line_155" id="line_155">  155.</a></span><span class="count                ">      1</span><span>        before(function(done) { db = new sqlite3.Database('test/support/prepare.db', sqlite3.OPEN_READONLY, done); });</span></pre>
+<pre><span class="lineno"><a href="#line_156" id="line_156">  156.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_157" id="line_157">  157.</a></span><span class="count                ">      1</span><span>        var retrieved = 0;</span></pre>
+<pre><span class="lineno"><a href="#line_158" id="line_158">  158.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_159" id="line_159">  159.</a></span><span class="count                ">      1</span><span>        it('should retrieve the same row over and over again', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_160" id="line_160">  160.</a></span><span class="count                ">      1</span><span>            var stmt = db.prepare("SELECT txt, num, flt, blb FROM foo ORDER BY num");</span></pre>
+<pre><span class="lineno"><a href="#line_161" id="line_161">  161.</a></span><span class="count                ">     10</span><span>            for (var i = 0; i &lt; 10; i++) {</span></pre>
+<pre><span class="lineno"><a href="#line_162" id="line_162">  162.</a></span><span class="count                ">     10</span><span>                stmt.reset();</span></pre>
+<pre><span class="lineno"><a href="#line_163" id="line_163">  163.</a></span><span class="count                ">     10</span><span>                stmt.get(function(err, row) {</span></pre>
+<pre><span class="lineno"><a href="#line_164" id="line_164">  164.</a></span><span class="count                uncovered">      0</span><span>                    if (err) </span><span class="uncovered">throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_165" id="line_165">  165.</a></span><span class="count                ">     10</span><span>                    assert.equal(row.txt, 'String 0');</span></pre>
+<pre><span class="lineno"><a href="#line_166" id="line_166">  166.</a></span><span class="count                ">     10</span><span>                    assert.equal(row.num, 0);</span></pre>
+<pre><span class="lineno"><a href="#line_167" id="line_167">  167.</a></span><span class="count                ">     10</span><span>                    assert.equal(row.flt, 0.0);</span></pre>
+<pre><span class="lineno"><a href="#line_168" id="line_168">  168.</a></span><span class="count                ">     10</span><span>                    assert.equal(row.blb, null);</span></pre>
+<pre><span class="lineno"><a href="#line_169" id="line_169">  169.</a></span><span class="count                ">     10</span><span>                    retrieved++;</span></pre>
+<pre><span class="lineno"><a href="#line_170" id="line_170">  170.</a></span><span class="count                ">     10</span><span>                });</span></pre>
+<pre><span class="lineno"><a href="#line_171" id="line_171">  171.</a></span><span class="count                ">     10</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_172" id="line_172">  172.</a></span><span class="count                ">      1</span><span>            stmt.finalize(done);</span></pre>
+<pre><span class="lineno"><a href="#line_173" id="line_173">  173.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_174" id="line_174">  174.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_175" id="line_175">  175.</a></span><span class="count                ">      1</span><span>        it('should have retrieved 10 rows', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_176" id="line_176">  176.</a></span><span class="count                ">      1</span><span>            assert.equal(10, retrieved, "Didn't retrieve all rows");</span></pre>
+<pre><span class="lineno"><a href="#line_177" id="line_177">  177.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_178" id="line_178">  178.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_179" id="line_179">  179.</a></span><span class="count                ">      1</span><span>        after(function(done) { db.close(done); });</span></pre>
+<pre><span class="lineno"><a href="#line_180" id="line_180">  180.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_181" id="line_181">  181.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_182" id="line_182">  182.</a></span><span class="count                ">      1</span><span>    describe('multiple get() parameter binding', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_183" id="line_183">  183.</a></span><span class="count                ">      1</span><span>        var db;</span></pre>
+<pre><span class="lineno"><a href="#line_184" id="line_184">  184.</a></span><span class="count                ">      1</span><span>        before(function(done) { db = new sqlite3.Database('test/support/prepare.db', sqlite3.OPEN_READONLY, done); });</span></pre>
+<pre><span class="lineno"><a href="#line_185" id="line_185">  185.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_186" id="line_186">  186.</a></span><span class="count                ">      1</span><span>        var retrieved = 0;</span></pre>
+<pre><span class="lineno"><a href="#line_187" id="line_187">  187.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_188" id="line_188">  188.</a></span><span class="count                ">      1</span><span>        it('should retrieve particular rows', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_189" id="line_189">  189.</a></span><span class="count                ">      1</span><span>            var stmt = db.prepare("SELECT txt, num, flt, blb FROM foo WHERE num = ?");</span></pre>
+<pre><span class="lineno"><a href="#line_190" id="line_190">  190.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_191" id="line_191">  191.</a></span><span class="count                ">     10</span><span>            for (var i = 0; i &lt; 10; i++) (function(i) {</span></pre>
+<pre><span class="lineno"><a href="#line_192" id="line_192">  192.</a></span><span class="count                ">     10</span><span>                stmt.get(i * 10 + 1, function(err, row) {</span></pre>
+<pre><span class="lineno"><a href="#line_193" id="line_193">  193.</a></span><span class="count                uncovered">      0</span><span>                    if (err) </span><span class="uncovered">throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_194" id="line_194">  194.</a></span><span class="count                ">     10</span><span>                    var val = i * 10 + 1;</span></pre>
+<pre><span class="lineno"><a href="#line_195" id="line_195">  195.</a></span><span class="count                ">     10</span><span>                    assert.equal(row.txt, 'String ' + val);</span></pre>
+<pre><span class="lineno"><a href="#line_196" id="line_196">  196.</a></span><span class="count                ">     10</span><span>                    assert.equal(row.num, val);</span></pre>
+<pre><span class="lineno"><a href="#line_197" id="line_197">  197.</a></span><span class="count                ">     10</span><span>                    assert.equal(row.flt, val * Math.PI);</span></pre>
+<pre><span class="lineno"><a href="#line_198" id="line_198">  198.</a></span><span class="count                ">     10</span><span>                    assert.equal(row.blb, null);</span></pre>
+<pre><span class="lineno"><a href="#line_199" id="line_199">  199.</a></span><span class="count                ">     10</span><span>                    retrieved++;</span></pre>
+<pre><span class="lineno"><a href="#line_200" id="line_200">  200.</a></span><span class="count                ">     10</span><span>                });</span></pre>
+<pre><span class="lineno"><a href="#line_201" id="line_201">  201.</a></span><span class="count                ">     10</span><span>            })(i);</span></pre>
+<pre><span class="lineno"><a href="#line_202" id="line_202">  202.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_203" id="line_203">  203.</a></span><span class="count                ">      1</span><span>            stmt.finalize(done);</span></pre>
+<pre><span class="lineno"><a href="#line_204" id="line_204">  204.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_205" id="line_205">  205.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_206" id="line_206">  206.</a></span><span class="count                ">      1</span><span>        it('should have retrieved 10 rows', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_207" id="line_207">  207.</a></span><span class="count                ">      1</span><span>            assert.equal(10, retrieved, "Didn't retrieve all rows");</span></pre>
+<pre><span class="lineno"><a href="#line_208" id="line_208">  208.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_209" id="line_209">  209.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_210" id="line_210">  210.</a></span><span class="count                ">      1</span><span>        after(function(done) { db.close(done); });</span></pre>
+<pre><span class="lineno"><a href="#line_211" id="line_211">  211.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_212" id="line_212">  212.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_213" id="line_213">  213.</a></span><span class="count                ">      1</span><span>    describe('prepare() parameter binding', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_214" id="line_214">  214.</a></span><span class="count                ">      1</span><span>        var db;</span></pre>
+<pre><span class="lineno"><a href="#line_215" id="line_215">  215.</a></span><span class="count                ">      1</span><span>        before(function(done) { db = new sqlite3.Database('test/support/prepare.db', sqlite3.OPEN_READONLY, done); });</span></pre>
+<pre><span class="lineno"><a href="#line_216" id="line_216">  216.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_217" id="line_217">  217.</a></span><span class="count                ">      1</span><span>        var retrieved = 0;</span></pre>
+<pre><span class="lineno"><a href="#line_218" id="line_218">  218.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_219" id="line_219">  219.</a></span><span class="count                ">      1</span><span>        it('should retrieve particular rows', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_220" id="line_220">  220.</a></span><span class="count                ">      1</span><span>            db.prepare("SELECT txt, num, flt, blb FROM foo WHERE num = ? AND txt = ?", 10, 'String 10')</span></pre>
+<pre><span class="lineno"><a href="#line_221" id="line_221">  221.</a></span><span class="count                ">      1</span><span>                .get(function(err, row) {</span></pre>
+<pre><span class="lineno"><a href="#line_222" id="line_222">  222.</a></span><span class="count                uncovered">      0</span><span>                    if (err) </span><span class="uncovered">throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_223" id="line_223">  223.</a></span><span class="count                ">      1</span><span>                    assert.equal(row.txt, 'String 10');</span></pre>
+<pre><span class="lineno"><a href="#line_224" id="line_224">  224.</a></span><span class="count                ">      1</span><span>                    assert.equal(row.num, 10);</span></pre>
+<pre><span class="lineno"><a href="#line_225" id="line_225">  225.</a></span><span class="count                ">      1</span><span>                    assert.equal(row.flt, 10 * Math.PI);</span></pre>
+<pre><span class="lineno"><a href="#line_226" id="line_226">  226.</a></span><span class="count                ">      1</span><span>                    assert.equal(row.blb, null);</span></pre>
+<pre><span class="lineno"><a href="#line_227" id="line_227">  227.</a></span><span class="count                ">      1</span><span>                    retrieved++;</span></pre>
+<pre><span class="lineno"><a href="#line_228" id="line_228">  228.</a></span><span class="count                ">      1</span><span>                })</span></pre>
+<pre><span class="lineno"><a href="#line_229" id="line_229">  229.</a></span><span class="count                ">      1</span><span>                .finalize(done);</span></pre>
+<pre><span class="lineno"><a href="#line_230" id="line_230">  230.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_231" id="line_231">  231.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_232" id="line_232">  232.</a></span><span class="count                ">      1</span><span>        it('should have retrieved 1 row', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_233" id="line_233">  233.</a></span><span class="count                ">      1</span><span>            assert.equal(1, retrieved, "Didn't retrieve all rows");</span></pre>
+<pre><span class="lineno"><a href="#line_234" id="line_234">  234.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_235" id="line_235">  235.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_236" id="line_236">  236.</a></span><span class="count                ">      1</span><span>        after(function(done) { db.close(done); });</span></pre>
+<pre><span class="lineno"><a href="#line_237" id="line_237">  237.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_238" id="line_238">  238.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_239" id="line_239">  239.</a></span><span class="count                ">      1</span><span>    describe('all()', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_240" id="line_240">  240.</a></span><span class="count                ">      1</span><span>        var db;</span></pre>
+<pre><span class="lineno"><a href="#line_241" id="line_241">  241.</a></span><span class="count                ">      1</span><span>        before(function(done) { db = new sqlite3.Database('test/support/prepare.db', sqlite3.OPEN_READONLY, done); });</span></pre>
+<pre><span class="lineno"><a href="#line_242" id="line_242">  242.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_243" id="line_243">  243.</a></span><span class="count                ">      1</span><span>        var retrieved = 0;</span></pre>
+<pre><span class="lineno"><a href="#line_244" id="line_244">  244.</a></span><span class="count                ">      1</span><span>        var count = 1000;</span></pre>
+<pre><span class="lineno"><a href="#line_245" id="line_245">  245.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_246" id="line_246">  246.</a></span><span class="count                ">      1</span><span>        it('should retrieve particular rows', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_247" id="line_247">  247.</a></span><span class="count                ">      1</span><span>            db.prepare("SELECT txt, num, flt, blb FROM foo WHERE num &lt; ? ORDER BY num", count)</span></pre>
+<pre><span class="lineno"><a href="#line_248" id="line_248">  248.</a></span><span class="count                ">      1</span><span>                .all(function(err, rows) {</span></pre>
+<pre><span class="lineno"><a href="#line_249" id="line_249">  249.</a></span><span class="count                uncovered">      0</span><span>                    if (err) </span><span class="uncovered">throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_250" id="line_250">  250.</a></span><span class="count                ">   1000</span><span>                    for (var i = 0; i &lt; rows.length; i++) {</span></pre>
+<pre><span class="lineno"><a href="#line_251" id="line_251">  251.</a></span><span class="count                ">   1000</span><span>                        assert.equal(rows[i].txt, 'String ' + i);</span></pre>
+<pre><span class="lineno"><a href="#line_252" id="line_252">  252.</a></span><span class="count                ">   1000</span><span>                        assert.equal(rows[i].num, i);</span></pre>
+<pre><span class="lineno"><a href="#line_253" id="line_253">  253.</a></span><span class="count                ">   1000</span><span>                        assert.equal(rows[i].flt, i * Math.PI);</span></pre>
+<pre><span class="lineno"><a href="#line_254" id="line_254">  254.</a></span><span class="count                ">   1000</span><span>                        assert.equal(rows[i].blb, null);</span></pre>
+<pre><span class="lineno"><a href="#line_255" id="line_255">  255.</a></span><span class="count                ">   1000</span><span>                        retrieved++;</span></pre>
+<pre><span class="lineno"><a href="#line_256" id="line_256">  256.</a></span><span class="count                ">   1000</span><span>                    }</span></pre>
+<pre><span class="lineno"><a href="#line_257" id="line_257">  257.</a></span><span class="count                ">      1</span><span>                })</span></pre>
+<pre><span class="lineno"><a href="#line_258" id="line_258">  258.</a></span><span class="count                ">      1</span><span>                .finalize(done);</span></pre>
+<pre><span class="lineno"><a href="#line_259" id="line_259">  259.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_260" id="line_260">  260.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_261" id="line_261">  261.</a></span><span class="count                ">      1</span><span>        it('should have retrieved all rows', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_262" id="line_262">  262.</a></span><span class="count                ">      1</span><span>            assert.equal(count, retrieved, "Didn't retrieve all rows");</span></pre>
+<pre><span class="lineno"><a href="#line_263" id="line_263">  263.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_264" id="line_264">  264.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_265" id="line_265">  265.</a></span><span class="count                ">      1</span><span>        after(function(done) { db.close(done); });</span></pre>
+<pre><span class="lineno"><a href="#line_266" id="line_266">  266.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_267" id="line_267">  267.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_268" id="line_268">  268.</a></span><span class="count                ">      1</span><span>    describe('all()', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_269" id="line_269">  269.</a></span><span class="count                ">      1</span><span>        var db;</span></pre>
+<pre><span class="lineno"><a href="#line_270" id="line_270">  270.</a></span><span class="count                ">      1</span><span>        before(function(done) { db = new sqlite3.Database('test/support/prepare.db', sqlite3.OPEN_READONLY, done); });</span></pre>
+<pre><span class="lineno"><a href="#line_271" id="line_271">  271.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_272" id="line_272">  272.</a></span><span class="count                ">      1</span><span>        it('should retrieve particular rows', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_273" id="line_273">  273.</a></span><span class="count                ">      1</span><span>           db.prepare("SELECT txt, num, flt, blb FROM foo WHERE num &gt; 5000")</span></pre>
+<pre><span class="lineno"><a href="#line_274" id="line_274">  274.</a></span><span class="count                ">      1</span><span>                .all(function(err, rows) {</span></pre>
+<pre><span class="lineno"><a href="#line_275" id="line_275">  275.</a></span><span class="count                uncovered">      0</span><span>                    if (err) </span><span class="uncovered">throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_276" id="line_276">  276.</a></span><span class="count                ">      1</span><span>                    assert.ok(rows.length === 0);</span></pre>
+<pre><span class="lineno"><a href="#line_277" id="line_277">  277.</a></span><span class="count                ">      1</span><span>                })</span></pre>
+<pre><span class="lineno"><a href="#line_278" id="line_278">  278.</a></span><span class="count                ">      1</span><span>                .finalize(done);</span></pre>
+<pre><span class="lineno"><a href="#line_279" id="line_279">  279.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_280" id="line_280">  280.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_281" id="line_281">  281.</a></span><span class="count                ">      1</span><span>        after(function(done) { db.close(done); });</span></pre>
+<pre><span class="lineno"><a href="#line_282" id="line_282">  282.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_283" id="line_283">  283.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_284" id="line_284">  284.</a></span><span class="count                ">      1</span><span>    describe('high concurrency', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_285" id="line_285">  285.</a></span><span class="count                ">      1</span><span>        var db;</span></pre>
+<pre><span class="lineno"><a href="#line_286" id="line_286">  286.</a></span><span class="count                ">      1</span><span>        before(function(done) { db = new sqlite3.Database(':memory:', done); });</span></pre>
+<pre><span class="lineno"><a href="#line_287" id="line_287">  287.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_288" id="line_288">  288.</a></span><span class="count                ">   1014</span><span>        function randomString() {</span></pre>
+<pre><span class="lineno"><a href="#line_289" id="line_289">  289.</a></span><span class="count                ">   1014</span><span>            var str = '';</span></pre>
+<pre><span class="lineno"><a href="#line_290" id="line_290">  290.</a></span><span class="count                "> 152568</span><span>            for (var i = Math.random() * 300; i &gt; 0; i--) {</span></pre>
+<pre><span class="lineno"><a href="#line_291" id="line_291">  291.</a></span><span class="count                "> 152568</span><span>                str += String.fromCharCode(Math.floor(Math.random() * 256));</span></pre>
+<pre><span class="lineno"><a href="#line_292" id="line_292">  292.</a></span><span class="count                "> 152568</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_293" id="line_293">  293.</a></span><span class="count                ">   1014</span><span>            return str;</span></pre>
+<pre><span class="lineno"><a href="#line_294" id="line_294">  294.</a></span><span class="count                ">   1014</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_295" id="line_295">  295.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_296" id="line_296">  296.</a></span><span class="count                ">      1</span><span>        // Generate random data.</span></pre>
+<pre><span class="lineno"><a href="#line_297" id="line_297">  297.</a></span><span class="count                ">      1</span><span>        var data = [];</span></pre>
+<pre><span class="lineno"><a href="#line_298" id="line_298">  298.</a></span><span class="count                ">      1</span><span>        var length = Math.floor(Math.random() * 1000) + 200;</span></pre>
+<pre><span class="lineno"><a href="#line_299" id="line_299">  299.</a></span><span class="count                ">   1014</span><span>        for (var i = 0; i &lt; length; i++) {</span></pre>
+<pre><span class="lineno"><a href="#line_300" id="line_300">  300.</a></span><span class="count                ">   1014</span><span>            data.push([ randomString(), i, i * Math.random(), null ]);</span></pre>
+<pre><span class="lineno"><a href="#line_301" id="line_301">  301.</a></span><span class="count                ">   1014</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_302" id="line_302">  302.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_303" id="line_303">  303.</a></span><span class="count                ">      1</span><span>        var inserted = 0;</span></pre>
+<pre><span class="lineno"><a href="#line_304" id="line_304">  304.</a></span><span class="count                ">      1</span><span>        var retrieved = 0;</span></pre>
+<pre><span class="lineno"><a href="#line_305" id="line_305">  305.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_306" id="line_306">  306.</a></span><span class="count                ">      1</span><span>        it('should create the table', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_307" id="line_307">  307.</a></span><span class="count                ">      1</span><span>            db.prepare("CREATE TABLE foo (txt text, num int, flt float, blb blob)").run().finalize(done);</span></pre>
+<pre><span class="lineno"><a href="#line_308" id="line_308">  308.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_309" id="line_309">  309.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_310" id="line_310">  310.</a></span><span class="count                ">      1</span><span>        it('should insert all values', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_311" id="line_311">  311.</a></span><span class="count                ">   1014</span><span>            for (var i = 0; i &lt; data.length; i++) {</span></pre>
+<pre><span class="lineno"><a href="#line_312" id="line_312">  312.</a></span><span class="count                ">   1014</span><span>                var stmt = db.prepare("INSERT INTO foo VALUES(?, ?, ?, ?)");</span></pre>
+<pre><span class="lineno"><a href="#line_313" id="line_313">  313.</a></span><span class="count                ">   1014</span><span>                stmt.run(data[i][0], data[i][1], data[i][2], data[i][3], function(err) {</span></pre>
+<pre><span class="lineno"><a href="#line_314" id="line_314">  314.</a></span><span class="count                uncovered">      0</span><span>                    if (err) </span><span class="uncovered">throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_315" id="line_315">  315.</a></span><span class="count                ">   1014</span><span>                    inserted++;</span></pre>
+<pre><span class="lineno"><a href="#line_316" id="line_316">  316.</a></span><span class="count                ">   1014</span><span>                }).finalize(function(err) {</span></pre>
+<pre><span class="lineno"><a href="#line_317" id="line_317">  317.</a></span><span class="count                uncovered">      0</span><span>                    if (err) </span><span class="uncovered">throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_318" id="line_318">  318.</a></span><span class="count                ">   1014</span><span>                    if (inserted == data.length) done();</span></pre>
+<pre><span class="lineno"><a href="#line_319" id="line_319">  319.</a></span><span class="count                ">   1014</span><span>                });</span></pre>
+<pre><span class="lineno"><a href="#line_320" id="line_320">  320.</a></span><span class="count                ">   1014</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_321" id="line_321">  321.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_322" id="line_322">  322.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_323" id="line_323">  323.</a></span><span class="count                ">      1</span><span>        it('should retrieve all values', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_324" id="line_324">  324.</a></span><span class="count                ">      1</span><span>            db.prepare("SELECT txt, num, flt, blb FROM foo")</span></pre>
+<pre><span class="lineno"><a href="#line_325" id="line_325">  325.</a></span><span class="count                ">      1</span><span>                .all(function(err, rows) {</span></pre>
+<pre><span class="lineno"><a href="#line_326" id="line_326">  326.</a></span><span class="count                uncovered">      0</span><span>                    if (err) </span><span class="uncovered">throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_327" id="line_327">  327.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_328" id="line_328">  328.</a></span><span class="count                ">   1014</span><span>                    for (var i = 0; i &lt; rows.length; i++) {</span></pre>
+<pre><span class="lineno"><a href="#line_329" id="line_329">  329.</a></span><span class="count                ">   1014</span><span>                        assert.ok(data[rows[i].num] !== true);</span></pre>
+<pre><span class="lineno"><a href="#line_330" id="line_330">  330.</a></span><span class="count                ">   1014</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_331" id="line_331">  331.</a></span><span class="count                ">   1014</span><span>                        assert.equal(rows[i].txt, data[rows[i].num][0]);</span></pre>
+<pre><span class="lineno"><a href="#line_332" id="line_332">  332.</a></span><span class="count                ">   1014</span><span>                        assert.equal(rows[i].num, data[rows[i].num][1]);</span></pre>
+<pre><span class="lineno"><a href="#line_333" id="line_333">  333.</a></span><span class="count                ">   1014</span><span>                        assert.equal(rows[i].flt, data[rows[i].num][2]);</span></pre>
+<pre><span class="lineno"><a href="#line_334" id="line_334">  334.</a></span><span class="count                ">   1014</span><span>                        assert.equal(rows[i].blb, data[rows[i].num][3]);</span></pre>
+<pre><span class="lineno"><a href="#line_335" id="line_335">  335.</a></span><span class="count                ">   1014</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_336" id="line_336">  336.</a></span><span class="count                ">   1014</span><span>                        // Mark the data row as already retrieved.</span></pre>
+<pre><span class="lineno"><a href="#line_337" id="line_337">  337.</a></span><span class="count                ">   1014</span><span>                        data[rows[i].num] = true;</span></pre>
+<pre><span class="lineno"><a href="#line_338" id="line_338">  338.</a></span><span class="count                ">   1014</span><span>                        retrieved++;</span></pre>
+<pre><span class="lineno"><a href="#line_339" id="line_339">  339.</a></span><span class="count                ">   1014</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_340" id="line_340">  340.</a></span><span class="count                ">   1014</span><span>                    }</span></pre>
+<pre><span class="lineno"><a href="#line_341" id="line_341">  341.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_342" id="line_342">  342.</a></span><span class="count                ">      1</span><span>                    assert.equal(retrieved, data.length);</span></pre>
+<pre><span class="lineno"><a href="#line_343" id="line_343">  343.</a></span><span class="count                ">      1</span><span>                    assert.equal(retrieved, inserted);</span></pre>
+<pre><span class="lineno"><a href="#line_344" id="line_344">  344.</a></span><span class="count                ">      1</span><span>                })</span></pre>
+<pre><span class="lineno"><a href="#line_345" id="line_345">  345.</a></span><span class="count                ">      1</span><span>                .finalize(done);</span></pre>
+<pre><span class="lineno"><a href="#line_346" id="line_346">  346.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_347" id="line_347">  347.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_348" id="line_348">  348.</a></span><span class="count                ">      1</span><span>        after(function(done) { db.close(done); });</span></pre>
+<pre><span class="lineno"><a href="#line_349" id="line_349">  349.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_350" id="line_350">  350.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_351" id="line_351">  351.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_352" id="line_352">  352.</a></span><span class="count                ">      1</span><span>    describe('test Database#get()', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_353" id="line_353">  353.</a></span><span class="count                ">      1</span><span>        var db;</span></pre>
+<pre><span class="lineno"><a href="#line_354" id="line_354">  354.</a></span><span class="count                ">      1</span><span>        before(function(done) { db = new sqlite3.Database('test/support/prepare.db', sqlite3.OPEN_READONLY, done); });</span></pre>
+<pre><span class="lineno"><a href="#line_355" id="line_355">  355.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_356" id="line_356">  356.</a></span><span class="count                ">      1</span><span>        var retrieved = 0;</span></pre>
+<pre><span class="lineno"><a href="#line_357" id="line_357">  357.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_358" id="line_358">  358.</a></span><span class="count                ">      1</span><span>        it('should get a row', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_359" id="line_359">  359.</a></span><span class="count                ">      1</span><span>            db.get("SELECT txt, num, flt, blb FROM foo WHERE num = ? AND txt = ?", 10, 'String 10', function(err, row) {</span></pre>
+<pre><span class="lineno"><a href="#line_360" id="line_360">  360.</a></span><span class="count                uncovered">      0</span><span>                if (err) </span><span class="uncovered">throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_361" id="line_361">  361.</a></span><span class="count                ">      1</span><span>                assert.equal(row.txt, 'String 10');</span></pre>
+<pre><span class="lineno"><a href="#line_362" id="line_362">  362.</a></span><span class="count                ">      1</span><span>                assert.equal(row.num, 10);</span></pre>
+<pre><span class="lineno"><a href="#line_363" id="line_363">  363.</a></span><span class="count                ">      1</span><span>                assert.equal(row.flt, 10 * Math.PI);</span></pre>
+<pre><span class="lineno"><a href="#line_364" id="line_364">  364.</a></span><span class="count                ">      1</span><span>                assert.equal(row.blb, null);</span></pre>
+<pre><span class="lineno"><a href="#line_365" id="line_365">  365.</a></span><span class="count                ">      1</span><span>                retrieved++;</span></pre>
+<pre><span class="lineno"><a href="#line_366" id="line_366">  366.</a></span><span class="count                ">      1</span><span>                done();</span></pre>
+<pre><span class="lineno"><a href="#line_367" id="line_367">  367.</a></span><span class="count                ">      1</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_368" id="line_368">  368.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_369" id="line_369">  369.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_370" id="line_370">  370.</a></span><span class="count                ">      1</span><span>        it('should have retrieved all rows', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_371" id="line_371">  371.</a></span><span class="count                ">      1</span><span>            assert.equal(1, retrieved, "Didn't retrieve all rows");</span></pre>
+<pre><span class="lineno"><a href="#line_372" id="line_372">  372.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_373" id="line_373">  373.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_374" id="line_374">  374.</a></span><span class="count                ">      1</span><span>        after(function(done) { db.close(done); });</span></pre>
+<pre><span class="lineno"><a href="#line_375" id="line_375">  375.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_376" id="line_376">  376.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_377" id="line_377">  377.</a></span><span class="count                ">      1</span><span>    describe('Database#run() and Database#all()', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_378" id="line_378">  378.</a></span><span class="count                ">      1</span><span>        var db;</span></pre>
+<pre><span class="lineno"><a href="#line_379" id="line_379">  379.</a></span><span class="count                ">      1</span><span>        before(function(done) { db = new sqlite3.Database(':memory:', done); });</span></pre>
+<pre><span class="lineno"><a href="#line_380" id="line_380">  380.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_381" id="line_381">  381.</a></span><span class="count                ">      1</span><span>        var inserted = 0;</span></pre>
+<pre><span class="lineno"><a href="#line_382" id="line_382">  382.</a></span><span class="count                ">      1</span><span>        var retrieved = 0;</span></pre>
+<pre><span class="lineno"><a href="#line_383" id="line_383">  383.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_384" id="line_384">  384.</a></span><span class="count                ">      1</span><span>        // We insert and retrieve that many rows.</span></pre>
+<pre><span class="lineno"><a href="#line_385" id="line_385">  385.</a></span><span class="count                ">      1</span><span>        var count = 1000;</span></pre>
+<pre><span class="lineno"><a href="#line_386" id="line_386">  386.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_387" id="line_387">  387.</a></span><span class="count                ">      1</span><span>        it('should create the table', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_388" id="line_388">  388.</a></span><span class="count                ">      1</span><span>            db.run("CREATE TABLE foo (txt text, num int, flt float, blb blob)", done);</span></pre>
+<pre><span class="lineno"><a href="#line_389" id="line_389">  389.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_390" id="line_390">  390.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_391" id="line_391">  391.</a></span><span class="count                ">      1</span><span>        it('should insert ' + count + ' rows', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_392" id="line_392">  392.</a></span><span class="count                ">   1000</span><span>            for (var i = 0; i &lt; count; i++) {</span></pre>
+<pre><span class="lineno"><a href="#line_393" id="line_393">  393.</a></span><span class="count                ">   1000</span><span>                db.run("INSERT INTO foo VALUES(?, ?, ?, ?)",</span></pre>
+<pre><span class="lineno"><a href="#line_394" id="line_394">  394.</a></span><span class="count                ">   1000</span><span>                    'String ' + i,</span></pre>
+<pre><span class="lineno"><a href="#line_395" id="line_395">  395.</a></span><span class="count                ">   1000</span><span>                    i,</span></pre>
+<pre><span class="lineno"><a href="#line_396" id="line_396">  396.</a></span><span class="count                ">   1000</span><span>                    i * Math.PI,</span></pre>
+<pre><span class="lineno"><a href="#line_397" id="line_397">  397.</a></span><span class="count                ">   1000</span><span>                    // null (SQLite sets this implicitly)</span></pre>
+<pre><span class="lineno"><a href="#line_398" id="line_398">  398.</a></span><span class="count                ">   1000</span><span>                    function(err) {</span></pre>
+<pre><span class="lineno"><a href="#line_399" id="line_399">  399.</a></span><span class="count                uncovered">      0</span><span>                        if (err) </span><span class="uncovered">throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_400" id="line_400">  400.</a></span><span class="count                ">   1000</span><span>                        inserted++;</span></pre>
+<pre><span class="lineno"><a href="#line_401" id="line_401">  401.</a></span><span class="count                ">   1000</span><span>                        if (inserted == count) done();</span></pre>
+<pre><span class="lineno"><a href="#line_402" id="line_402">  402.</a></span><span class="count                ">   1000</span><span>                    }</span></pre>
+<pre><span class="lineno"><a href="#line_403" id="line_403">  403.</a></span><span class="count                ">   1000</span><span>                );</span></pre>
+<pre><span class="lineno"><a href="#line_404" id="line_404">  404.</a></span><span class="count                ">   1000</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_405" id="line_405">  405.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_406" id="line_406">  406.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_407" id="line_407">  407.</a></span><span class="count                ">      1</span><span>        it('should retrieve all rows', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_408" id="line_408">  408.</a></span><span class="count                ">      1</span><span>            db.all("SELECT txt, num, flt, blb FROM foo ORDER BY num", function(err, rows) {</span></pre>
+<pre><span class="lineno"><a href="#line_409" id="line_409">  409.</a></span><span class="count                uncovered">      0</span><span>                if (err) </span><span class="uncovered">throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_410" id="line_410">  410.</a></span><span class="count                ">   1000</span><span>                for (var i = 0; i &lt; rows.length; i++) {</span></pre>
+<pre><span class="lineno"><a href="#line_411" id="line_411">  411.</a></span><span class="count                ">   1000</span><span>                    assert.equal(rows[i].txt, 'String ' + i);</span></pre>
+<pre><span class="lineno"><a href="#line_412" id="line_412">  412.</a></span><span class="count                ">   1000</span><span>                    assert.equal(rows[i].num, i);</span></pre>
+<pre><span class="lineno"><a href="#line_413" id="line_413">  413.</a></span><span class="count                ">   1000</span><span>                    assert.equal(rows[i].flt, i * Math.PI);</span></pre>
+<pre><span class="lineno"><a href="#line_414" id="line_414">  414.</a></span><span class="count                ">   1000</span><span>                    assert.equal(rows[i].blb, null);</span></pre>
+<pre><span class="lineno"><a href="#line_415" id="line_415">  415.</a></span><span class="count                ">   1000</span><span>                    retrieved++;</span></pre>
+<pre><span class="lineno"><a href="#line_416" id="line_416">  416.</a></span><span class="count                ">   1000</span><span>                }</span></pre>
+<pre><span class="lineno"><a href="#line_417" id="line_417">  417.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_418" id="line_418">  418.</a></span><span class="count                ">      1</span><span>                assert.equal(retrieved, count);</span></pre>
+<pre><span class="lineno"><a href="#line_419" id="line_419">  419.</a></span><span class="count                ">      1</span><span>                assert.equal(retrieved, inserted);</span></pre>
+<pre><span class="lineno"><a href="#line_420" id="line_420">  420.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_421" id="line_421">  421.</a></span><span class="count                ">      1</span><span>                done();</span></pre>
+<pre><span class="lineno"><a href="#line_422" id="line_422">  422.</a></span><span class="count                ">      1</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_423" id="line_423">  423.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_424" id="line_424">  424.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_425" id="line_425">  425.</a></span><span class="count                ">      1</span><span>        after(function(done) { db.close(done); });</span></pre>
+<pre><span class="lineno"><a href="#line_426" id="line_426">  426.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_427" id="line_427">  427.</a></span><span class="count                ">      1</span><span>});</span></pre>
+<pre><span class="lineno"><a href="#line_428" id="line_428">  428.</a></span><span class="count                ">      1</span><span></span></pre>
+</div>
+<!-- content end -->
+<div class="footer">
+    [
+    This document was created with
+    <a href="https://github.com/jslint-org/jslint">JSLint</a>
+    ]
+</div>
+</body>
+</html>
