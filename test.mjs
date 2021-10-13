@@ -841,22 +841,25 @@ function processExit1(exitCode) {
                 return v8CoverageReportCreate({});
             }, "invalid coverageDir");
         });
-        jstestIt((
-            "test invalid-coverageDir handling-behavior"
-        ), async function () {
-            await assertErrorThrownAsync(function () {
-                return jslint.jslint_cli({
-                    // suppress error
-                    console_error: noop,
-                    mode_cli: true,
-                    processArgv: [
-                        "node", "jslint.mjs",
-                        "v8_coverage_report=..",
-                        "node", "jslint.mjs"
-                    ]
-                });
-            }, "is not subdirectory of cwd");
-        });
+
+// CL-xxx - coverage - Relax requirement for coverageDir to be in cwd.
+//         jstestIt((
+//             "test invalid-coverageDir handling-behavior"
+//         ), async function () {
+//             await assertErrorThrownAsync(function () {
+//                 return jslint.jslint_cli({
+//                     // suppress error
+//                     console_error: noop,
+//                     mode_cli: true,
+//                     processArgv: [
+//                         "node", "jslint.mjs",
+//                         "v8_coverage_report=..",
+//                         "node", "jslint.mjs"
+//                     ]
+//                 });
+//             }, "is not subdirectory of cwd");
+//         });
+
         jstestIt((
             "test coverage-report jslint.mjs handling-behavior"
         ), async function () {
