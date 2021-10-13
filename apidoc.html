@@ -333,20 +333,20 @@ string jslint_edition
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
 
-jstestDescribe((
-    "test v8CoverageReportCreate's handling-behavior"
-), function () {
-    jstestIt((
-        "test null-case handling-behavior"
-    ), async function () {
-        await <span class="apidocCodeKeywordSpan">assertErrorThrownAsync</span>(function () {
-            return v8CoverageReportCreate({});
-        }, "invalid coverageDir");
-    });
-    jstestIt((
-        "test invalid-coverageDir handling-behavior"
-    ), async function () {
-        await assertErrorThrownAsync(function () {
+    jstestDescribe((
+        "test v8CoverageReportCreate's handling-behavior"
+    ), function () {
+        jstestIt((
+            "test null-case handling-behavior"
+        ), async function () {
+            await <span class="apidocCodeKeywordSpan">assertErrorThrownAsync</span>(function () {
+                return v8CoverageReportCreate({});
+            }, "invalid coverageDir");
+        });
+
+// CL-xxx - coverage - Relax requirement for coverageDir to be in cwd.
+//         jstestIt((
+//             "test invalid-coverageDir handling-behavior"
 ...</pre></li>
 
 <li>
@@ -528,7 +528,6 @@ jstestDescribe((
 // Retry writing to pathname.
 
         await moduleFs.promises.writeFile(pathname, data);
-
     }
     console.error("wrote file " + pathname);
 }</pre></li>
@@ -648,21 +647,20 @@ line.forEach(function ({
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-/*jslint devel*/
-import jslint from "./jslint.mjs";
-import fs from "fs";
 (async function () {
     let report;
     let result;
     let source = "function foo() {console.log(\u0027hello world\u0027);}\n";
+
+// Create JSLint report from &lt;source&gt; in javascript.
+
     result = jslint.<span class="apidocCodeKeywordSpan">jslint</span>(source);
     report = jslint.jslint_report(result);
+
     await fs.promises.mkdir(".artifact/", {recursive: true});
     await fs.promises.writeFile(".artifact/jslint_report_hello.html", report);
     console.error("wrote file .artifact/jslint_report_hello.html");
 }());
-
-'
 ...</pre></li>
 
 <li>
@@ -892,7 +890,7 @@ case "{}":
 // Recursively jslint embedded "node -e '\n...\n'".
 
             code.replace((
-                /\bnode .*? -e '\n([\S\s]*?\n)'/gm
+                /\bnode\b.*? -e '\n([\S\s]*?\n)'/gm
             ), function (ignore, match1, ii) {
                 jslint_from_file({
                     code: match1,
@@ -903,7 +901,7 @@ case "{}":
                             processEnv.JSLINT_BETA
                             &amp;&amp; !(
                                 /0|false|null|undefined/
-                            ).t...
+                            )....
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1427,21 +1425,21 @@ gpt4gbw7x0Cn/PocitK5KIGPGQIzQzAMuCeC2ERAidx9TySVq...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-import jslint from "./jslint.mjs";
-import fs from "fs";
-(async function () {
     let report;
     let result;
     let source = "function foo() {console.log(\u0027hello world\u0027);}\n";
+
+// Create JSLint report from &lt;source&gt; in javascript.
+
     result = jslint.jslint(source);
     report = jslint.<span class="apidocCodeKeywordSpan">jslint_report</span>(result);
+
     await fs.promises.mkdir(".artifact/", {recursive: true});
     await fs.promises.writeFile(".artifact/jslint_report_hello.html", report);
     console.error("wrote file .artifact/jslint_report_hello.html");
 }());
 
 '
-```
 ...</pre></li>
 
 <li>
@@ -1916,21 +1914,21 @@ body {
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-jstestDescribe((
-    "test v8CoverageReportCreate's handling-behavior"
-), function () {
-    jstestIt((
-        "test null-case handling-behavior"
-    ), async function () {
-        await assertErrorThrownAsync(function () {
-            return <span class="apidocCodeKeywordSpan">v8CoverageReportCreate</span>({});
-        }, "invalid coverageDir");
+
+/*jslint node*/
+import jslint from "../jslint.mjs";
+(async function () {
+
+// Create V8 coverage report from program `npm run test` in javascript.
+
+    await jslint.<span class="apidocCodeKeywordSpan">v8CoverageReportCreate</span>({
+        coverageDir: "../.artifact/coverage_sqlite3_js/",
+        processArgv: ["npm", "run", "test"]
     });
-    jstestIt((
-        "test invalid-coverageDir handling-behavior"
-    ), async function () {
-        await assertErrorThrownAsync(function () {
-            return jslint.jslint_cli({
+}());
+
+'
+```
 ...</pre></li>
 
 <li>

@@ -299,7 +299,6 @@ async function fsWriteFileWithParents(pathname, data) {
 // Retry writing to pathname.
 
         await moduleFs.promises.writeFile(pathname, data);
-
     }
     console.error("wrote file " + pathname);
 }
@@ -1533,7 +1532,7 @@ async function jslint_cli({
 // Recursively jslint embedded "node -e '\n...\n'".
 
             code.replace((
-                /\bnode .*? -e '\n([\S\s]*?\n)'/gm
+                /\bnode\b.*? -e '\n([\S\s]*?\n)'/gm
             ), function (ignore, match1, ii) {
                 jslint_from_file({
                     code: match1,
@@ -10421,22 +10420,30 @@ body {
             ), ".$&");
             if (modeIndex && ii === 0) {
                 fill = (
-                    // red
+
+// Badge-color rgb-red.
+
                     "#" + Math.round(
                         (100 - Number(coveragePct)) * 2.21
                     ).toString(16).padStart(2, "0")
-                    // green
+
+// Badge-color rgb-green.
+
                     + Math.round(
                         Number(coveragePct) * 2.21
                     ).toString(16).padStart(2, "0")
-                    + // blue
-                    "00"
+
+// Badge-color rgb-blue.
+
+                    + "00"
                 );
                 str1 = "coverage";
                 str2 = coveragePct + " %";
                 xx1 = 6 * str1.length + 20;
                 xx2 = 6 * str2.length + 20;
-                // fs - write coverage_badge.svg
+
+// Fs - write coverage_badge.svg
+
                 promiseList.push(fsWriteFileWithParents((
                     coverageDir + "coverage_badge.svg"
                 ), String(`
@@ -10612,12 +10619,16 @@ ${String(count).padStart(7, " ")}
 </body>
 </html>
         `).trim() + "\n";
-        // fs - write *.html
+
+// Fs - write <file>.html
+
         promiseList.push(fsWriteFileWithParents(pathname + ".html", html));
         if (!modeIndex) {
             return;
         }
-        // fs - write coverage.txt
+
+// Fs - write coverage_report.txt
+
         consoleError("\n" + txt);
         promiseList.push(fsWriteFileWithParents((
             coverageDir + "coverage_report.txt"
@@ -10653,11 +10664,16 @@ function sentinel() {}
 // Assert coverageDir is subdirectory of cwd.
 
     assertOrThrow(coverageDir, "invalid coverageDir " + coverageDir);
-    assertOrThrow(
-        pathnameRelativeCwd(coverageDir),
-        "coverageDir " + coverageDir + " is not subdirectory of cwd " + cwd
-    );
-    coverageDir = cwd + pathnameRelativeCwd(coverageDir) + "/";
+
+// CL-xxx - coverage - Relax requirement for coverageDir to be in cwd.
+//     assertOrThrow(
+//         pathnameRelativeCwd(coverageDir),
+//         "coverageDir " + coverageDir + " is not subdirectory of cwd " + cwd
+//     );
+
+    coverageDir = modulePath.resolve(coverageDir).replace((
+        /\\/g
+    ), "/") + "/";
 
 // 1. Spawn node.js program <processArgv> with coverage
 
@@ -10808,14 +10824,18 @@ function sentinel() {}
                     )) {
                         return;
                     }
-                    // handle root-range
+
+// Handle tree-root.
+
                     if (ii + 1 === list.length) {
                         if (elem.count === -1) {
                             elem.count = count;
                         }
                         return;
                     }
-                    // handle non-root-range
+
+// Handle tree-children.
+
                     if (elem.count !== 0) {
                         elem.count = Math.max(count, elem.count);
                     }

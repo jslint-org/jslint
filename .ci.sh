@@ -1,4 +1,4 @@
-shArtifactUploadCustom() {(set -e
+shCiArtifactUploadCustom() {(set -e
 # this function will custom-upload build-artifacts to branch-gh-pages
     # .cache - restore
     if [ -d .cache ]
@@ -68,14 +68,15 @@ echo "\
             screenshotCurl
         );
         // modify script - v8 coverage report
-        script = script.replace(
-            "\n\ncd node-sqlite3\n",
-            (
-                " 2>/dev/null || true\n"
-                + "$&\n"
-                + "git checkout 60a022c511a37788e652c271af23174566a80c30\n"
-            )
-        );
+        script = script.replace((
+            /\n\ncd node-sqlite3-\w*?\n/g
+        ), (
+            " 2>/dev/null || true\n"
+            + "$&\n"
+            + "git checkout 60a022c511a37788e652c271af23174566a80c30\n"
+        ));
+        // limit stdout to 100 lines
+        script = script.trimRight() + " 2>&1 | head -n 100\n";
         // printf script
         script = (
             "(set -e\n"
@@ -124,8 +125,10 @@ import moduleChildProcess from "child_process";
             + "/branch-beta/index.html"
         ),
         ".artifact/apidoc.html",
-        ".artifact/coverage_sqlite3/index.html",
-        ".artifact/coverage_sqlite3/lib/sqlite3.js.html",
+        ".artifact/coverage_sqlite3_js/index.html",
+        ".artifact/coverage_sqlite3_js/lib/sqlite3.js.html",
+        ".artifact/coverage_sqlite3_sh/index.html",
+        ".artifact/coverage_sqlite3_sh/lib/sqlite3.js.html",
         ".artifact/jslint_report_hello.html"
     ].map(async function (url) {
         await new Promise(function (resolve) {
@@ -146,13 +149,13 @@ import moduleChildProcess from "child_process";
 ' "$@" # '
     # remove bloated json-coverage-files
     rm .artifact/coverage/*.json
-    rm .artifact/coverage_sqlite3/*.json
+    rm .artifact/coverage_sqlite3_*/*.json
     # js-hack - */
     # .cache - save
     if [ ! -d .cache ]
     then
         mkdir .cache
-        cp -a node-sqlite3 .cache
+        cp -a node-sqlite3-* .cache
     fi
 )}
 
@@ -221,20 +224,28 @@ import moduleFs from "fs";
             src: fileDict["jslint_ci.sh"].replace((
                 /(\nshRunWithCoverage[\S\s]*?\nlet moduleUrl;\n)[\S\s]*?\nv8CoverageReportCreate\(/m
             ), function (ignore, match1) {
-                return match1 + [
-                    jslint.assertOrThrow,
-                    jslint.fsWriteFileWithParents,
-                    jslint.htmlEscape,
-                    jslint.moduleFsInit,
-                    jslint.v8CoverageListMerge,
-                    jslint.v8CoverageReportCreate
-                // remove comments to reduce size of string/argument
-                // passed to nodejs
-                ].join("\n").replace((
-                    /\n\/\/.*/g
-                ), "").replace((
-                    /\n\n\n/g
-                ), "\n") + "\nv8CoverageReportCreate(";
+                return (
+                    match1
+                    + [
+                        jslint.assertOrThrow,
+                        jslint.fsWriteFileWithParents,
+                        jslint.htmlEscape,
+                        jslint.moduleFsInit,
+                        jslint.v8CoverageListMerge,
+                        jslint.v8CoverageReportCreate
+                    // reduce size of string/argument passed to nodejs
+                    // by removing comments
+                    ].join("\n").replace((
+                        /\n\/\/.*/g
+                    ), "").replace((
+                        /\n\n\n/g
+                    // CL-xxx reduce size of string/argument passed to nodejs
+                    // by using 2-space-indent
+                    ), "\n").replace((
+                        /    /g
+                    ), "  ")
+                    + "\nv8CoverageReportCreate("
+                );
             })
         }, {
             file: "package.json",
