@@ -1,27 +1,29 @@
 # Changelog
 
 # Todo
+- ci - deprecate/remove jslint.cjs from ci
 - cli - remove cli-option `--mode-vim-plugin`
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning requiring paren around comma-separated concatenations.
 - jslint - add top-level-await support
+- jslint - unify analysis of variable-assignment/function-parameters into one function
 - jslint - require regexp to use open-form.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
-- merge function.html and help.html into README.md
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 
 # v2021.10.1-beta
-- ci - update shell-function shRunWithCoverage() to reduce size of string/argument passed to nodejs by using 2-space-indent
-- coverage - relax requirement for coverageDir to be in cwd
+- ci - add release-trigger to publish to `@jslint-org/jslint`
 - bugfix - fix coverage-report having incorrect http-link to index.html
 - bugfix - fix false warning `uninitialized 'bb'` in code `/*jslint node*/\nlet {aa:bb} = {}; bb();`
 - bugfix - fix issue #358 - switch-statement crashes jslint
 - ci - cache coverage-example node-sqlite3 to speed up ci
 - ci - rename dir .build/ to .artifact/
+- ci - update shell-function shRunWithCoverage() to reduce size of string/argument passed to nodejs by using 2-space-indent
 - cli - add cli-command jslint_plugin_vim
 - cli - add cli-command v8_coverage_report
 - cli - change cli-option `--mode-report` to cli-command `jslint_report=<filename>`
+- coverage - relax requirement for coverageDir to be in cwd
 - deprecated - cli - add cli-option `--mode-report`
 - doc - add api-documentation
 - fs - merge file asset_codemirror_rollup.css into index.html

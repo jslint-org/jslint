@@ -7,6 +7,8 @@ shCiArtifactUploadCustom() {(set -e
         # js-hack - */
     fi
     # save jslint.cjs
+    mv .jslint.cjs jslint.cjs
+    cp jslint.mjs jslint.js
     git add -f jslint.cjs jslint.js
     # seo - inline css-assets and invalidate cached-assets
     node --input-type=module -e '
@@ -53,7 +55,7 @@ echo "\
     `).trim().replace((
         /250/g
     ), Math.floor(screenshotCurl.size / 1024));
-    // parallel-task - screenshot example-shell-commands in README.md
+    // parallel-task - run-and-screenshot example-shell-commands in README.md
     await Promise.all(Array.from(String(
         await moduleFs.promises.readFile("README.md", "utf8")
     ).matchAll(
@@ -67,7 +69,7 @@ echo "\
             "curl -L https://www.jslint.com/jslint.mjs > jslint.mjs",
             screenshotCurl
         );
-        // modify script - v8 coverage report
+        // modify script - cd node-sqlite3
         script = script.replace((
             /\n\ncd node-sqlite3-\w*?\n/g
         ), (
@@ -168,12 +170,11 @@ shCiBaseCustom() {(set -e
 import jslint from "./jslint.mjs";
 import moduleFs from "fs";
 (async function () {
-    let fileDict;
+    let fileDict = {};
     let fileModified;
     let packageDescription;
     let versionBeta;
     let versionMaster;
-    fileDict = {};
     await Promise.all([
         "CHANGELOG.md",
         "README.md",
@@ -271,19 +272,18 @@ import moduleFs from "fs";
 }());
 ' "$@" # '
     fi
-    # create jslint.cjs
-    cp jslint.mjs jslint.js
+    # create .jslint.cjs
     cat jslint.mjs | sed \
         -e "s|^// module.exports = |module.exports = |" \
         -e "s|^export default Object.freeze(|// &|" \
         -e "s|^jslint_import_meta_url = |// &|" \
-        > jslint.cjs
+        > .jslint.cjs
     # run test with coverage-report
     # coverage-hack - test jslint's invalid-file handling-behavior
     mkdir -p .test-dir.js
     # test jslint's cli handling-behavior
-    printf "node jslint.cjs .\n"
-    node jslint.cjs .
+    printf "node .jslint.cjs .\n"
+    node .jslint.cjs .
     printf "node jslint.mjs .\n"
     node jslint.mjs .
     printf "node test.mjs\n"

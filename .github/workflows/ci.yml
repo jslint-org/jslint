@@ -15,9 +15,10 @@ on:
       - master
       - sandbox
 jobs:
+
+
 # shCiBase - start
   job1:
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         architecture:
@@ -33,6 +34,7 @@ jobs:
           - ubuntu-latest
           - windows-latest
     name: job1 . node . v${{ matrix.node_version }} . ${{ matrix.architecture }} . ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     steps:
       # disable autocrlf in windows
       - run: git config --global core.autocrlf false
@@ -53,6 +55,8 @@ jobs:
       # run nodejs coverages and tests
       - run: sh jslint_ci.sh shCiBase
 # shCiBase - end
+
+
 # shCiArtifactUpload - start
       # fetch jslint_ci.sh from trusted source
       - run: git fetch origin alpha && git checkout origin/alpha .ci.sh jslint_ci.sh

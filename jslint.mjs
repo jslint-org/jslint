@@ -94,70 +94,47 @@
 /*jslint beta, node*/
 
 /*property
-    NODE_V8_COVERAGE,
-    char, consoleError, coverageDir,
-    fileList,
-    holeList,
-    isHole,
-    lineList, linesCovered, linesTotal,
-    modeCoverageIgnoreFile, modeIndex,
-    npm_config_mode_coverage,
-    v8CoverageReportCreate
-
-    children, clear, count,
-    delta,
-    end, endOffset, entries,
-    functionName,
-    get,
-    isBlockCoverage,
-    parentIi,
-    ranges, result,
-    scriptId, set, splice, start, startOffset,
-    unshift,
-    v8CoverageListMerge,
-
-    assertErrorThrownAsync, assertJsonEqual,
-    jstestDescribe, jstestIt, jstestOnExit,
-    processEnv,
-
-    floor,
-    on,
-    padEnd, platform,
-    rename, reverse, round,
-    sep, spawn, stdio,
-
-    JSLINT_BETA, a, all, argv, arity, artifact, assertOrThrow, assign, async,
-    b, beta, bitwise, block, body, browser, c, calls, catch, catch_list,
-    catch_stack, causes, cjs_module, cjs_require, closer, closure, code, column,
-    concat, console_error, console_log, constant, context, convert, create, cwd,
-    d, dead, debugInline, default, devel, directive, directive_list,
+    JSLINT_BETA, NODE_V8_COVERAGE, a, all, argv, arity, artifact,
+    assertErrorThrownAsync, assertJsonEqual, assertOrThrow, assign, async, b,
+    beta, bitwise, block, body, browser, c, calls, catch, catch_list,
+    catch_stack, causes, char, children, cjs_module, cjs_require, clear, closer,
+    closure, code, column, concat, consoleError, console_error, console_log,
+    constant, context, convert, count, coverageDir, create, cwd, d, dead,
+    debugInline, default, delta, devel, directive, directive_list,
     directive_quiet, directives, dirname, disrupt, dot, edition, elem_list,
-    ellipsis, else, endsWith, env, error, eval, every, example_list, exec,
-    execArgv, exit, export_dict, exports, expression, extra, file,
-    fileURLToPath, filter, finally, flag, for, forEach, formatted_message, free,
-    freeze, from, froms, fsRmRecursive, fsWriteFileWithParents, fud,
-    function_list, function_stack, functions, getset, github_repo, global,
-    global_dict, global_list, htmlEscape, id, identifier, import, import_list,
-    inc, indent2, index, indexOf, init, initial, isArray, isNaN, is_equal,
-    is_weird, join, jslint, jslint_apidoc, jslint_assert, jslint_charset_ascii,
-    jslint_cli, jslint_edition, jslint_phase1_split, jslint_phase2_lex,
-    jslint_phase3_parse, jslint_phase4_walk, jslint_phase5_whitage,
-    jslint_report, json, keys, label, lbp, led, length, level, line, line_list,
-    line_offset, line_source, lines, live, log, long, loop, m, main, map,
-    margin, match, max, message, meta, min, mkdir, mode_cli, mode_json,
-    mode_module, mode_noop, mode_property, mode_shebang, mode_stop, module,
-    moduleFsInit, module_list, moduleName, name, names, node, noop, now, nr,
-    nud, ok, open, opening, option, option_dict, order, package_name, padStart,
-    parameters, parent, parse, pathname, pop, processArgv, process_exit,
-    process_version, promises, property, property_dict, push, quote, readFile,
-    readdir, readonly, recursive, reduce, repeat, replace, resolve, rm, rmdir,
-    role, search, shebang, shift, signature, single, slice, some, sort, source,
-    split, stack, stack_trace, startsWith, statement, statement_prv, stop,
-    stop_at, stringify, switch, syntax_dict, tenure, test, test_cause,
-    test_internal_error, this, thru, toString, token, token_global, token_list,
-    token_nxt, token_tree, tokens, trace, tree, trim, trimEnd, trimRight, try,
-    type, unlink, unordered, url, used, value, variable, version, versions,
-    warn, warn_at, warning, warning_list, warnings, white, wrapped, writeFile
+    ellipsis, else, end, endOffset, endsWith, entries, env, error, eval, every,
+    example_list, exec, execArgv, exit, export_dict, exports, expression, extra,
+    file, fileList, fileURLToPath, filter, finally, flag, floor, for, forEach,
+    formatted_message, free, freeze, from, froms, fsRmRecursive,
+    fsWriteFileWithParents, fud, functionName, function_list, function_stack,
+    functions, get, getset, github_repo, global, global_dict, global_list,
+    holeList, htmlEscape, id, identifier, import, import_list, inc, indent2,
+    index, indexOf, init, initial, isArray, isBlockCoverage, isHole, isNaN,
+    is_equal, is_weird, join, jslint, jslint_apidoc, jslint_assert,
+    jslint_charset_ascii, jslint_cli, jslint_edition, jslint_phase1_split,
+    jslint_phase2_lex, jslint_phase3_parse, jslint_phase4_walk,
+    jslint_phase5_whitage, jslint_report, json, jstestDescribe, jstestIt,
+    jstestOnExit, keys, label, lbp, led, length, level, line, lineList,
+    line_list, line_offset, line_source, lines, linesCovered, linesTotal, live,
+    log, long, loop, m, main, map, margin, match, max, message, meta, min,
+    mkdir, modeCoverageIgnoreFile, modeIndex, mode_cli, mode_json, mode_module,
+    mode_noop, mode_property, mode_shebang, mode_stop, module, moduleFsInit,
+    moduleName, module_list, name, names, node, noop, now,
+    npm_config_mode_coverage, nr, nud, ok, on, open, opening, option,
+    option_dict, order, package_name, padEnd, padStart, parameters, parent,
+    parentIi, parse, pathname, platform, pop, processArgv, process_argv,
+    process_env, process_exit, process_version, promises, property,
+    property_dict, push, quote, ranges, readFile, readdir, readonly, recursive,
+    reduce, repeat, replace, resolve, result, reverse, rm, rmdir, role, round,
+    scriptId, search, set, shebang, shift, signature, single, slice, some, sort,
+    source, spawn, splice, split, stack, stack_trace, start, startOffset,
+    startsWith, statement, statement_prv, stdio, stop, stop_at, stringify,
+    switch, syntax_dict, tenure, test, test_cause, test_internal_error, this,
+    thru, toString, token, token_global, token_list, token_nxt, token_tree,
+    tokens, trace, tree, trim, trimEnd, trimRight, try, type, unlink, unordered,
+    unshift, url, used, v8CoverageListMerge, v8CoverageReportCreate, value,
+    variable, version, versions, warn, warn_at, warning, warning_list, warnings,
+    white, wrapped, writeFile
 */
 
 // init debugInline
@@ -1481,8 +1458,8 @@ async function jslint_cli({
     mode_cli,
     mode_noop,
     option,
-    processArgv,
-    processEnv,
+    process_argv,
+    process_env,
     process_exit,
     source
 }) {
@@ -1540,10 +1517,10 @@ async function jslint_cli({
                     line_offset: string_line_count(code.slice(0, ii)) + 1,
                     option: Object.assign(empty(), {
                         beta: Boolean(
-                            processEnv.JSLINT_BETA
+                            process_env.JSLINT_BETA
                             && !(
                                 /0|false|null|undefined/
-                            ).test(processEnv.JSLINT_BETA)
+                            ).test(process_env.JSLINT_BETA)
                         ),
                         node: true
                     }, option)
@@ -1625,8 +1602,8 @@ async function jslint_cli({
     }
     console_error = console_error || console.error;
     console_log = console_log || console.log;
-    processArgv = processArgv || process.argv;
-    processEnv = processEnv || process.env;
+    process_argv = process_argv || process.argv;
+    process_env = process_env || process.env;
     process_exit = process_exit || process.exit;
     await moduleFsInit();
     if (!(
@@ -1644,11 +1621,11 @@ async function jslint_cli({
             && (
                 (
                     /[\/|\\]jslint(?:\.[cm]?js)?$/m
-                ).test(processArgv[1])
+                ).test(process_argv[1])
                 || mode_cli
             )
             && moduleUrl.fileURLToPath(jslint_import_meta_url) ===
-            modulePath.resolve(processArgv[1])
+            modulePath.resolve(process_argv[1])
         )
     ) && !mode_cli) {
         return exit_code;
@@ -1656,7 +1633,7 @@ async function jslint_cli({
 
 // init commmand
 
-    command = String(processArgv[2]).split("=");
+    command = String(process_argv[2]).split("=");
     command[1] = command.slice(1).join("=");
 
     switch (command[0]) {
@@ -1664,7 +1641,7 @@ async function jslint_cli({
 // PR-362 - Add API Doc.
 
     case "jslint_apidoc":
-        await jslint_apidoc(Object.assign(JSON.parse(processArgv[3]), {
+        await jslint_apidoc(Object.assign(JSON.parse(process_argv[3]), {
             pathname: command[1]
         }));
         return;
@@ -1673,14 +1650,14 @@ async function jslint_cli({
 
     case "jslint_plugin_vim":
         mode_plugin_vim = true;
-        processArgv = processArgv.slice(1);
+        process_argv = process_argv.slice(1);
         break;
 
 // PR-363 - Add command jslint_report.
 
     case "jslint_report":
         mode_report = command[1];
-        processArgv = processArgv.slice(1);
+        process_argv = process_argv.slice(1);
         break;
 
 // PR-364 - Add command v8_coverage_report.
@@ -1688,7 +1665,7 @@ async function jslint_cli({
     case "v8_coverage_report":
         await v8CoverageReportCreate({
             coverageDir: command[1],
-            processArgv: processArgv.slice(3)
+            processArgv: process_argv.slice(3)
         });
         return;
     }
@@ -1696,13 +1673,13 @@ async function jslint_cli({
 // PR-349 - Detect cli-option --mode-vim-plugin.
 
     mode_plugin_vim = (
-        processArgv.slice(2).indexOf("--mode-vim-plugin") >= 0
+        process_argv.slice(2).indexOf("--mode-vim-plugin") >= 0
         || mode_plugin_vim
     );
 
 // Normalize file relative to process.cwd().
 
-    processArgv.slice(2).some(function (arg) {
+    process_argv.slice(2).some(function (arg) {
         if (!arg.startsWith("-")) {
             file = file || arg;
             return true;
@@ -7046,9 +7023,7 @@ function jslint_phase4_walk(state) {
 
 // Look up the variable in the current context.
 
-        the_variable = (
-            functionage.context[id] || catchage.context[id]
-        );
+        the_variable = functionage.context[id] || catchage.context[id];
 
 // If it isn't local, search all the other contexts. If there are name
 // collisions, take the most recent.
@@ -10887,11 +10862,11 @@ function sentinel() {}
         modeIndex: true,
         pathname: coverageDir + "index"
     });
+    await Promise.all(promiseList);
     assertOrThrow(
         exitCode === 0,
         "v8CoverageReportCreate - nonzero exitCode " + exitCode
     );
-    await Promise.all(promiseList);
 }
 
 /*

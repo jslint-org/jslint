@@ -569,18 +569,22 @@ shGitGc() {(set -e
 )}
 
 shGitInitBase() {(set -e
-# this function will git init && git fetch utility2 base
+# this function will git init && create basic git-template from jslint-org/base
+    local BRANCH
     git init
     git config core.autocrlf input
-    git remote add devenv \
-        https://github.com/kaizhu256/devenv
-    git fetch devenv base
-    git reset devenv/base
-    git checkout -b alpha
-    git add .
-    git commit -am "initial commit"
-    curl -Lf -o .git/config \
-https://raw.githubusercontent.com/kaizhu256/devenv/alpha/.gitconfig
+    git remote remove base 2>/dev/null || true
+    git remote add base https://github.com/jslint-org/base
+    git fetch base base
+    for BRANCH in base alpha
+    do
+        git branch -D "$BRANCH" 2>/dev/null || true
+        git checkout -b "$BRANCH" base/base
+    done
+    sed -i.bak "s|owner/repo|${1:-owner/repo}|" .gitconfig
+    rm .gitconfig.bak
+    cp .gitconfig .git/config
+    git commit -am "update owner/repo to $1" || true
 )}
 
 
@@ -2593,15 +2597,15 @@ function sentinel() {}
     modeIndex: true,
     pathname: coverageDir + "index"
   });
+  await Promise.all(promiseList);
   assertOrThrow(
     exitCode === 0,
     "v8CoverageReportCreate - nonzero exitCode " + exitCode
   );
-  await Promise.all(promiseList);
 }
 v8CoverageReportCreate({
   coverageDir: ".artifact/coverage",
-  processArgv: process.argv.slice(1)
+  process_argv: process.argv.slice(1)
 });
 ' "$@" # '
 )}

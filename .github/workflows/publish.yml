@@ -1,0 +1,61 @@
+# Publishing packages to npm and GitHub Packages
+# https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages#publishing-packages-to-npm-and-github-packages
+name: publish
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+    branches:
+      - alpha
+      - beta
+      - master
+      - sandbox
+jobs:
+  build:
+    strategy:
+      matrix:
+        architecture:
+          # - arm64
+          - x64
+          # - x86
+        node_version:
+          # - 12
+          - 14
+          # - 16
+        os:
+          # - macos-latest
+          - ubuntu-latest
+          # - windows-latest
+    name: job1 . node . v${{ matrix.node_version }} . ${{ matrix.architecture }} . ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v2
+
+      # Setup .npmrc file to publish to GitHub Packages
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node_version }}
+          architecture: ${{ matrix.architecture }}
+          registry-url: 'https://npm.pkg.github.com'
+          # Defaults to the user or organization that owns the workflow file
+          # scope: '@octocat'
+      - run: npm install
+      # Publish to GitHub Packages
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Setup .npmrc file to publish to npm
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node_version }}
+          architecture: ${{ matrix.architecture }}
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm install
+      # Publish to npm
+      - run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

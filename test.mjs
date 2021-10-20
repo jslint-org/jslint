@@ -61,7 +61,7 @@ function processExit1(exitCode) {
             console_error: noop,        // suppress error
             file,
             mode_cli: true,
-            processEnv: {
+            process_env: {
                 JSLINT_BETA: "1"
             },
             process_exit: processExit0
@@ -70,7 +70,7 @@ function processExit1(exitCode) {
     // test apidoc handling-behavior
     jslint.jslint_cli({
         mode_cli: true,
-        processArgv: [
+        process_argv: [
             "node",
             "jslint.mjs",
             "jslint_apidoc=.artifact/apidoc.html",
@@ -125,7 +125,7 @@ function processExit1(exitCode) {
         // suppress error
         console_error: noop,
         mode_cli: true,
-        processArgv: [
+        process_argv: [
             "node",
             "jslint.mjs",
             "jslint_report=.tmp/jslint_report.html",
@@ -138,7 +138,7 @@ function processExit1(exitCode) {
         // suppress error
         console_error: noop,
         mode_cli: true,
-        processArgv: [
+        process_argv: [
             "node",
             "jslint.mjs",
             "jslint_report=.tmp/jslint_report.html",
@@ -152,7 +152,7 @@ function processExit1(exitCode) {
         // suppress error
         console_error: noop,
         mode_cli: true,
-        processArgv: [
+        process_argv: [
             "node",
             "jslint.mjs",
             "jslint_report=.tmp/jslint_report.html",
@@ -166,7 +166,7 @@ function processExit1(exitCode) {
         // suppress error
         console_error: noop,
         mode_cli: true,
-        processArgv: [
+        process_argv: [
             "node",
             "jslint.mjs",
             "jslint_report=.tmp/jslint_report.html",
@@ -180,7 +180,7 @@ function processExit1(exitCode) {
         // suppress error
         console_error: noop,
         mode_cli: true,
-        processArgv: [
+        process_argv: [
             "node",
             "jslint.mjs",
             "jslint_report=.tmp/jslint_report.html",
@@ -194,7 +194,7 @@ function processExit1(exitCode) {
         // suppress error
         console_error: noop,
         mode_cli: true,
-        processArgv: [
+        process_argv: [
             "node",
             "jslint.mjs",
             "jslint_plugin_vim",
@@ -851,7 +851,7 @@ function processExit1(exitCode) {
 //                     // suppress error
 //                     console_error: noop,
 //                     mode_cli: true,
-//                     processArgv: [
+//                     process_argv: [
 //                         "node", "jslint.mjs",
 //                         "v8_coverage_report=..",
 //                         "node", "jslint.mjs"
@@ -865,7 +865,7 @@ function processExit1(exitCode) {
         ), async function () {
             await jslint.jslint_cli({
                 mode_cli: true,
-                processArgv: [
+                process_argv: [
                     "node", "jslint.mjs",
                     "v8_coverage_report=.tmp/coverage_jslint",
                     "node", "jslint.mjs"
@@ -913,7 +913,7 @@ function processExit1(exitCode) {
                 await fsWriteFileWithParents(file, data);
                 await jslint.jslint_cli({
                     mode_cli: true,
-                    processArgv: [
+                    process_argv: [
                         "node", "jslint.mjs",
                         "v8_coverage_report=" + dir,
                         "node",
@@ -924,7 +924,7 @@ function processExit1(exitCode) {
                 if (ii === 0) {
                     await jslint.jslint_cli({
                         mode_cli: true,
-                        processArgv: [
+                        process_argv: [
                             "node", "jslint.mjs",
                             "v8_coverage_report=" + dir,
                             "npm", "--version"
