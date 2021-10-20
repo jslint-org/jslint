@@ -1202,6 +1202,16 @@ import moduleFs from "fs";
 ' "$@" # '
 )}
 
+shNpmPublishV0() {(set -e
+# this function will npm-publish name $1 with bare package.json
+    local DIR
+    DIR=/tmp/shNpmPublishV0
+    rm -rf "$DIR" && mkdir -p "$DIR" && cd "$DIR"
+    printf "{\"name\":\"$1\",\"version\":\"0.0.1\"}\n" > package.json
+    shift
+    npm publish "$@"
+)}
+
 shRawLibFetch() {(set -e
 # this function will fetch raw-lib from $1
     node --input-type=module -e '
