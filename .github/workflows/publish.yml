@@ -11,6 +11,9 @@ on:
       - master
       - sandbox
 jobs:
+
+
+# npm publish - start
   build:
     strategy:
       matrix:
@@ -32,9 +35,10 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v2
 
       # Setup .npmrc file to publish to GitHub Packages
+      - run: rm -f /home/runner/work/_temp/.npmrc
+      - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node_version }}
@@ -42,20 +46,23 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
           # Defaults to the user or organization that owns the workflow file
           # scope: '@octocat'
-      - run: npm install
       # Publish to GitHub Packages
-      - run: npm publish
+      - run: npm install
+      - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Setup .npmrc file to publish to npm
+      - run: rm -f /home/runner/work/_temp/.npmrc
+      - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node_version }}
           architecture: ${{ matrix.architecture }}
           registry-url: 'https://registry.npmjs.org'
-      - run: npm install
       # Publish to npm
+      - run: npm install
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+# npm publish - end

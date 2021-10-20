@@ -1,7 +1,7 @@
 {
     "counter": 7,
     "description": "JSLint, The JavaScript Code Quality and Coverage Tool",
-    "fileCount": 26,
+    "fileCount": 27,
     "license": "UNLICENSE",
     "name": "@jslint-org/jslint",
     "repository": {
@@ -12,5 +12,5 @@
         "test": "node jslint.mjs v8_coverage_report=.artifact/coverage node test.mjs",
         "test2": "sh jslint_ci.sh shCiBase"
     },
-    "version": "2021.10.1-beta"
+    "version": "2021.10.20"
 }
