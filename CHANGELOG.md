@@ -1,16 +1,19 @@
 # Changelog
 
 # Todo
-- ci - deprecate/remove jslint.cjs from ci
 - cli - remove cli-option `--mode-vim-plugin`
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning requiring paren around comma-separated concatenations.
+- jslint - add numeric-separators support.
 - jslint - add top-level-await support
-- jslint - unify analysis of variable-assignment/function-parameters into one function
 - jslint - require regexp to use open-form.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
+- jslint - unify analysis of variable-assignment/function-parameters into one function
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
+
+# v2021.11.1-beta
+- ci - deprecate/remove jslint.cjs from ci
 
 # v2021.10.20
 - ci - add release-trigger to publish to `@jslint-org/jslint`

@@ -1,5 +1,6 @@
 /*jslint beta, node*/
 import moduleFs from "fs";
+import modulePath from "path";
 import jslint from "./jslint.mjs";
 
 let {
@@ -43,7 +44,7 @@ function processExit1(exitCode) {
     }());
 }());
 
-(function testCaseJslintCli() {
+(async function testCaseJslintCli() {
 /*
  * this function will test jslint's cli handling-behavior
  */
@@ -52,6 +53,8 @@ function processExit1(exitCode) {
         mode_noop: true,
         process_exit: processExit0
     });
+    // test cjs-and-invalid-file handling-behavior
+    await fsWriteFileWithParents(".test_dir.cjs/touch.txt", "");
     [
         ".",            // test dir handling-behavior
         "jslint.mjs",   // test file handling-behavior
@@ -90,14 +93,6 @@ function processExit1(exitCode) {
                 version: jslint.jslint_edition
             })
         ],
-        process_exit: processExit0
-    });
-    // test cjs handling-behavior
-    jslint.jslint_cli({
-        cjs_module: {
-            exports: {}
-        },
-        cjs_require: {},
         process_exit: processExit0
     });
     // test file-error handling-behavior
@@ -908,7 +903,7 @@ function processExit1(exitCode) {
             file, data
         ], ii) {
             jstestIt(file, async function () {
-                let dir = ".tmp/coverage" + ii + "/";
+                let dir = ".tmp/coverage_" + ii + "/";
                 file = dir + file;
                 await fsWriteFileWithParents(file, data);
                 await jslint.jslint_cli({
@@ -920,17 +915,83 @@ function processExit1(exitCode) {
                         file
                     ]
                 });
-                // test npm handling-behavior
-                if (ii === 0) {
-                    await jslint.jslint_cli({
-                        mode_cli: true,
-                        process_argv: [
-                            "node", "jslint.mjs",
-                            "v8_coverage_report=" + dir,
-                            "npm", "--version"
+            });
+        });
+        jstestIt((
+            "test npm handling-behavior"
+        ), async function () {
+            await jslint.jslint_cli({
+                mode_cli: true,
+                process_argv: [
+                    "node", "jslint.mjs",
+                    "v8_coverage_report=.tmp/coverage_npm",
+                    "npm", "--version"
+                ]
+            });
+        });
+        jstestIt((
+            "test misc handling-behavior"
+        ), async function () {
+            await Promise.all([
+                [
+                    ".tmp/coverage_misc/aa.js", "\n".repeat(0x100)
+                ], [
+                    ".tmp/coverage_misc/coverage-0-0-0.json", JSON.stringify({
+                        "result": [
+                            {
+                                "functions": [
+                                    {
+                                        "functionName": "",
+                                        "isBlockCoverage": true,
+                                        "ranges": [
+                                            {
+                                                "count": 1,
+                                                "endOffset": 0xf0,
+                                                "startOffset": 0x10
+                                            },
+                                            {
+                                                "count": 1,
+                                                "endOffset": 0x40,
+                                                "startOffset": 0x20
+                                            },
+                                            {
+                                                "count": 1,
+                                                "endOffset": 0x80,
+                                                "startOffset": 0x60
+                                            },
+                                            {
+                                                "count": 0,
+                                                "endOffset": 0x45,
+                                                "startOffset": 0x25
+                                            },
+                                            {
+                                                "count": 0,
+                                                "endOffset": 0x85,
+                                                "startOffset": 0x65
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "scriptId": "0",
+                                "url": "file:///" + modulePath.resolve(
+                                    ".tmp/coverage_misc/aa.js"
+                                )
+                            }
                         ]
-                    });
-                }
+                    }, undefined, 4)
+                ]
+            ].map(async function ([
+                file, data
+            ]) {
+                await fsWriteFileWithParents(file, data);
+            }));
+            await jslint.jslint_cli({
+                mode_cli: true,
+                process_argv: [
+                    "node", "jslint.mjs",
+                    "v8_coverage_report=.tmp/coverage_misc"
+                    // "node", ".tmp/coverage_misc/aa.js"
+                ]
             });
         });
     });

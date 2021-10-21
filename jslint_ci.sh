@@ -2240,7 +2240,7 @@ body {
 <rect fill="${fill}" height="20" width="${xx2}" x="${xx1}"/>
 <g
   fill="#fff"
-  font-family="dejavu sans, verdana, geneva, sans-serif"
+  font-family="verdana, geneva, dejavu sans, sans-serif"
   font-size="11"
   font-weight="bold"
   text-anchor="middle"
@@ -2320,6 +2320,7 @@ body {
         lineHtml = "";
         lineId = "line_" + (ii + 1);
         switch (count) {
+        case -1:
         case 0:
           if (holeList.length === 0) {
             lineHtml += "</span>";
@@ -2350,11 +2351,11 @@ body {
           }) {
             if (inHole !== isHole) {
               lineHtml += htmlEscape(chunk);
-              lineHtml += (
-                isHole
-                ? "</span><span class=\"uncovered\">"
-                : "</span><span>"
-              );
+              lineHtml += "</span><span";
+              if (isHole) {
+                lineHtml += " class=\"uncovered\"";
+              }
+              lineHtml += ">";
               chunk = "";
               inHole = isHole;
             }
@@ -2499,7 +2500,7 @@ function sentinel() {}
   v8CoverageObj = v8CoverageListMerge(v8CoverageObj);
   await fsWriteFileWithParents(
     coverageDir + "v8_coverage_merged.json",
-    JSON.stringify(v8CoverageObj)
+    JSON.stringify(v8CoverageObj, undefined, 1)
   );
   fileDict = {};
   await Promise.all(v8CoverageObj.result.map(async function ({

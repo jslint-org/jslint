@@ -97,7 +97,7 @@
     JSLINT_BETA, NODE_V8_COVERAGE, a, all, argv, arity, artifact,
     assertErrorThrownAsync, assertJsonEqual, assertOrThrow, assign, async, b,
     beta, bitwise, block, body, browser, c, calls, catch, catch_list,
-    catch_stack, causes, char, children, cjs_module, cjs_require, clear, closer,
+    catch_stack, causes, char, children, clear, closer,
     closure, code, column, concat, consoleError, console_error, console_log,
     constant, context, convert, count, coverageDir, create, cwd, d, dead,
     debugInline, default, delta, devel, directive, directive_list,
@@ -162,7 +162,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2021.10.20";
+let jslint_edition = "v2021.11.1-beta";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -1450,8 +1450,6 @@ ${String(message).slice(0, 2000)}`
 }
 
 async function jslint_cli({
-    cjs_module,
-    cjs_require,
     console_error,
     console_log,
     file,
@@ -1606,16 +1604,11 @@ async function jslint_cli({
     process_env = process_env || process.env;
     process_exit = process_exit || process.exit;
     await moduleFsInit();
-    if (!(
+    if (
+        !(
 
-// Feature-detect nodejs-cjs-cli.
+// Feature-detect nodejs-cli.
 
-        (cjs_module && cjs_require)
-        ? cjs_module === cjs_require.main
-
-// Feature-detect nodejs-esm-cli.
-
-        : (
             process.execArgv.indexOf("--eval") === -1
             && process.execArgv.indexOf("-e") === -1
             && (
@@ -1624,10 +1617,11 @@ async function jslint_cli({
                 ).test(process_argv[1])
                 || mode_cli
             )
-            && moduleUrl.fileURLToPath(jslint_import_meta_url) ===
-            modulePath.resolve(process_argv[1])
+            && moduleUrl.fileURLToPath(jslint_import_meta_url)
+            === modulePath.resolve(process_argv[1])
         )
-    ) && !mode_cli) {
+        && !mode_cli
+    ) {
         return exit_code;
     }
 
@@ -1729,11 +1723,12 @@ async function jslint_cli({
                 } catch (ignore) {
                     return;
                 }
-                if (!(
-                    !(
+                if (
+                    (
                         /(?:\b|_)(?:lock|min|raw|rollup)(?:\b|_)/
-                    ).test(file2) && code && code.length < 1048576
-                )) {
+                    ).test(file2)
+                    || !(code && code.length < 1048576)
+                ) {
                     return;
                 }
                 jslint_from_file({
@@ -10417,7 +10412,7 @@ body {
                 xx1 = 6 * str1.length + 20;
                 xx2 = 6 * str2.length + 20;
 
-// Fs - write coverage_badge.svg
+// Fs - write coverage_badge.svg.
 
                 promiseList.push(fsWriteFileWithParents((
                     coverageDir + "coverage_badge.svg"
@@ -10427,7 +10422,7 @@ body {
 <rect fill="${fill}" height="20" width="${xx2}" x="${xx1}"/>
 <g
     fill="#fff"
-    font-family="dejavu sans, verdana, geneva, sans-serif"
+    font-family="verdana, geneva, dejavu sans, sans-serif"
     font-size="11"
     font-weight="bold"
     text-anchor="middle"
@@ -10510,10 +10505,7 @@ body {
                 lineHtml = "";
                 lineId = "line_" + (ii + 1);
                 switch (count) {
-
-// PR-364 - Probably deadcode.
-// case -1:
-
+                case -1:
                 case 0:
                     if (holeList.length === 0) {
                         lineHtml += "</span>";
@@ -10544,11 +10536,15 @@ body {
                     }) {
                         if (inHole !== isHole) {
                             lineHtml += htmlEscape(chunk);
-                            lineHtml += (
-                                isHole
-                                ? "</span><span class=\"uncovered\">"
-                                : "</span><span>"
-                            );
+                            lineHtml += "</span><span";
+
+// Coverage-hack - Ugly hack around possible deadcode
+// where isHole is always true.
+
+                            if (isHole) {
+                                lineHtml += " class=\"uncovered\"";
+                            }
+                            lineHtml += ">";
                             chunk = "";
                             inHole = isHole;
                         }
@@ -10595,14 +10591,14 @@ ${String(count).padStart(7, " ")}
 </html>
         `).trim() + "\n";
 
-// Fs - write <file>.html
+// Fs - write <file>.html.
 
         promiseList.push(fsWriteFileWithParents(pathname + ".html", html));
         if (!modeIndex) {
             return;
         }
 
-// Fs - write coverage_report.txt
+// Fs - write coverage_report.txt.
 
         consoleError("\n" + txt);
         promiseList.push(fsWriteFileWithParents((
@@ -10745,7 +10741,7 @@ function sentinel() {}
 
     await fsWriteFileWithParents(
         coverageDir + "v8_coverage_merged.json",
-        JSON.stringify(v8CoverageObj)
+        JSON.stringify(v8CoverageObj, undefined, 1)
     );
 
 // 3. Create html-coverage-reports in <coverageDir>.
@@ -10908,25 +10904,7 @@ export default Object.freeze(jslint_export);    // Export jslint as esm.
 jslint_import_meta_url = import.meta.url;
 
 // Run jslint_cli.
-
-(function () {
-    let cjs_module;
-    let cjs_require;
-
-// Coverage-hack.
-// Init commonjs builtins in try-catch-block in case we're in es-module-mode.
-
-    try {
-        cjs_module = module;
-    } catch (ignore) {}
-    try {
-        cjs_require = require;
-    } catch (ignore) {}
-    jslint_cli({
-        cjs_module,
-        cjs_require
-    });
-}());
+jslint_cli({});
 
 // Coverage-hack.
 debugInline();

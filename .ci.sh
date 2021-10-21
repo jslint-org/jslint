@@ -6,10 +6,9 @@ shCiArtifactUploadCustom() {(set -e
         cp -a .cache/* .
         # js-hack - */
     fi
-    # save jslint.cjs
-    mv .jslint.cjs jslint.cjs
+    # add jslint.js
     cp jslint.mjs jslint.js
-    git add -f jslint.cjs jslint.js
+    git add -f jslint.js
     # seo - inline css-assets and invalidate cached-assets
     node --input-type=module -e '
 import moduleFs from "fs";
@@ -272,20 +271,10 @@ import moduleFs from "fs";
 }());
 ' "$@" # '
     fi
-    # create .jslint.cjs
-    cat jslint.mjs | sed \
-        -e "s|^// module.exports = |module.exports = |" \
-        -e "s|^export default Object.freeze(|// &|" \
-        -e "s|^jslint_import_meta_url = |// &|" \
-        > .jslint.cjs
-    # run test with coverage-report
-    # coverage-hack - test jslint's invalid-file handling-behavior
-    mkdir -p .test-dir.js
     # test jslint's cli handling-behavior
-    printf "node .jslint.cjs .\n"
-    node .jslint.cjs .
     printf "node jslint.mjs .\n"
     node jslint.mjs .
+    # run test with coverage-report
     printf "node test.mjs\n"
     npm run test
 )}

@@ -1,4 +1,7 @@
 {
+    "bin": {
+        "jslint": "./jslint.mjs"
+    },
     "counter": 7,
     "description": "JSLint, The JavaScript Code Quality and Coverage Tool",
     "fileCount": 27,
@@ -12,5 +15,5 @@
         "test": "node jslint.mjs v8_coverage_report=.artifact/coverage node test.mjs",
         "test2": "sh jslint_ci.sh shCiBase"
     },
-    "version": "2021.10.20"
+    "version": "2021.11.1-beta"
 }
