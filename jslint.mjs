@@ -9182,7 +9182,6 @@ body {
         html += (
             `<div onclick='editor.focus(); editor.setCursor({line: ${line - 1}, ch: ${column}})'`
             + "<cite>"
-            // + `<div onclick = '${editor.setCursor(line, column)}'>`
             +"<address>" + htmlEscape(line + ": " + column) + "</address>"
             + htmlEscape((ii + 1) + ". " + message)
             + "</cite>"
