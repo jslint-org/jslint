@@ -9283,7 +9283,7 @@ body {
         let params;
         html += (
             "<div class=\"level level" + htmlEscape(level) + "\">"
-            + "<address>" + htmlEscape(line) + "</address>"
+            + `<address onclick='editor.focus(); editor.setCursor({line: ${line - 1}})'>` + htmlEscape(line) + "</address>"
             + "<dfn>"
             + (
                 name === "=>"
