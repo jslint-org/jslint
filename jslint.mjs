@@ -9180,10 +9180,13 @@ body {
         stack_trace = ""
     }, ii) {
         html += (
-            "<cite>"
-            + "<address>" + htmlEscape(line + ": " + column) + "</address>"
+            `<div onclick='editor.focus(); editor.setCursor({line: ${line - 1}, ch: ${column}})'`
+            + "<cite>"
+            // + `<div onclick = '${editor.setCursor(line, column)}'>`
+            +"<address>" + htmlEscape(line + ": " + column) + "</address>"
             + htmlEscape((ii + 1) + ". " + message)
             + "</cite>"
+            + "</div>"
             + "<samp>"
             + htmlEscape(line_source.slice(0, 400) + "\n" + stack_trace)
             + "</samp>\n"
