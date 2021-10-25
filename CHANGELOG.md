@@ -11,9 +11,11 @@
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 - jslint - unify analysis of variable-assignment/function-parameters into one function
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
+- perf - improve performance by hoisting inlined regexps out of loops and subfunctions
 
 # v2021.11.1-beta
 - ci - deprecate/remove jslint.cjs from ci
+- website - add clickable-links to editor-code in report-warnings and report-functions
 
 # v2021.10.20
 - ci - add release-trigger to publish to `@jslint-org/jslint`

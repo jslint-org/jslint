@@ -206,10 +206,10 @@ import moduleFs from "fs";
         }, {
             file: "index.html",
             src: fileDict["index.html"].replace((
-                /\n<style\sclass="JSLINT_REPORT_STYLE">\n[\S\s]*?\n<\/style>\n/
+                /\n<style class="JSLINT_REPORT_STYLE">\n[\S\s]*?\n<\/style>\n/
             ), function () {
                 return fileDict["jslint.mjs"].match(
-                    /\n<style\sclass="JSLINT_REPORT_STYLE">\n[\S\s]*?\n<\/style>\n/
+                    /\n<style class="JSLINT_REPORT_STYLE">\n[\S\s]*?\n<\/style>\n/
                 )[0];
             })
         }, {
