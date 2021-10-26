@@ -15,6 +15,7 @@
 
 # v2021.11.1-beta
 - ci - deprecate/remove jslint.cjs from ci
+- coverage - dedupe coverage-logic now applied when only one script passed
 - website - add clickable-links to editor-code in report-warnings and report-functions
 
 # v2021.10.20

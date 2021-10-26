@@ -1,7 +1,4 @@
-[<img align="left" height="100" src="asset_image_logo_512.svg"/>](https://github.com/jslint-org/jslint)
-
-
-# JSLint, The JavaScript Code Quality and Coverage Tool
+# [<img align="left" height="80" src="asset_image_logo_512.svg"/>](https://github.com/jslint-org/jslint) JSLint, The JavaScript Code Quality and Coverage Tool
 
 &nbsp;
 
@@ -41,7 +38,7 @@ Douglas Crockford <douglas@crockford.com>
     - [To create V8 coverage report from Node.js / Npm program in javascript:](#to-create-v8-coverage-report-from-nodejs--npm-program-in-javascript)
 
 7. [Plugin Vim](#plugin-vim)
-    - [To run JSLint inside vim:](#to-run-jslint-inside-vim)
+    - [To run JSLint in Vim:](#to-run-jslint-in-vim)
 
 8. [Description](#description)
 
@@ -299,7 +296,7 @@ import jslint from "../jslint.mjs";
 
 
 # Plugin Vim
-### To run JSLint inside vim:
+### To run JSLint in Vim:
 1. Download and save [`jslint.mjs`](https://www.jslint.com/jslint.mjs), [`jslint.vim`](https://www.jslint.com/jslint.vim) to directory `~/.vim/`
 2. Add vim-command `:source ~/.vim/jslint.vim` to file `~/.vimrc`
 3. Vim can now jslint files (via nodejs):

@@ -142,16 +142,19 @@ let debugInline = (function () {
     let consoleError = function () {
         return;
     };
-    return function (...argv) {
+    function debug(...argv) {
 
-// This function will both print <argv> to stderr and return <argv>[0].
+// This function will print <argv> to stderr and then return <argv>[0].
 
         consoleError("\n\ndebugInline");
         consoleError(...argv);
         consoleError("\n");
-        consoleError = console.error;
         return argv[0];
-    };
+    }
+    // Coverage-hack.
+    debug();
+    consoleError = console.error;
+    return debug;
 }());
 let jslint_charset_ascii = (
     "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007"
@@ -9840,29 +9843,6 @@ function v8CoverageListMerge(processCovs) {
         return funcCov;
     }
 
-    function sortProcess(processCov) {
-
-// This function will sort <processCov>.result.
-// Sorts the scripts alphabetically by `url`.
-// Reassigns script ids: the script at index `0` receives `"0"`, the script at
-// index `1` receives `"1"` etc.
-
-        Object.entries(processCov.result.sort(function (aa, bb) {
-            return (
-                aa.url < bb.url
-                ? -1
-                : aa.url > bb.url
-                ? 1
-                : 0
-            );
-        })).forEach(function ([
-            scriptId, scriptCov
-        ]) {
-            scriptCov.scriptId = scriptId.toString(10);
-        });
-        return processCov;
-    }
-
     function sortScript(scriptCov) {
 
 // This function will normalize-and-sort <scriptCov>.functions.
@@ -10025,18 +10005,6 @@ function v8CoverageListMerge(processCovs) {
             result: []
         };
     }
-    if (processCovs.length === 1) {
-
-// Normalize-and-sort scriptCov.
-
-        processCovs[0].result.forEach(function (scriptCov) {
-            sortScript(scriptCov);
-        });
-
-// Sort processCovs[0].result.
-
-        return sortProcess(processCovs[0]);
-    }
 
 // Init urlToScriptDict.
 
@@ -10178,9 +10146,25 @@ function v8CoverageListMerge(processCovs) {
             url: scriptCovs[0].url
         }));
     });
-    return sortProcess({
-        result: resultMerged
+
+// Sorts the scripts alphabetically by `url`.
+// Reassigns script ids: the script at index `0` receives `"0"`, the script at
+// index `1` receives `"1"` etc.
+
+    Object.entries(resultMerged.sort(function (aa, bb) {
+        return (
+            aa.url > bb.url
+            ? 1
+            : -1
+        );
+    })).forEach(function ([
+        scriptId, scriptCov
+    ]) {
+        scriptCov.scriptId = scriptId.toString(10);
     });
+    return {
+        result: resultMerged
+    };
 }
 
 async function v8CoverageReportCreate({
@@ -10920,6 +10904,3 @@ jslint_import_meta_url = import.meta.url;
 
 // Run jslint_cli.
 jslint_cli({});
-
-// Coverage-hack.
-debugInline();

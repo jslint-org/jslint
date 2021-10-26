@@ -1766,23 +1766,6 @@ function v8CoverageListMerge(processCovs) {
     return funcCov;
   }
 
-  function sortProcess(processCov) {
-    Object.entries(processCov.result.sort(function (aa, bb) {
-      return (
-        aa.url < bb.url
-        ? -1
-        : aa.url > bb.url
-        ? 1
-        : 0
-      );
-    })).forEach(function ([
-      scriptId, scriptCov
-    ]) {
-      scriptCov.scriptId = scriptId.toString(10);
-    });
-    return processCov;
-  }
-
   function sortScript(scriptCov) {
 
     scriptCov.functions.forEach(function (funcCov) {
@@ -1916,12 +1899,6 @@ function v8CoverageListMerge(processCovs) {
       result: []
     };
   }
-  if (processCovs.length === 1) {
-    processCovs[0].result.forEach(function (scriptCov) {
-      sortScript(scriptCov);
-    });
-    return sortProcess(processCovs[0]);
-  }
   processCovs.forEach(function ({
     result
   }) {
@@ -2001,9 +1978,20 @@ function v8CoverageListMerge(processCovs) {
       url: scriptCovs[0].url
     }));
   });
-  return sortProcess({
-    result: resultMerged
+  Object.entries(resultMerged.sort(function (aa, bb) {
+    return (
+      aa.url > bb.url
+      ? 1
+      : -1
+    );
+  })).forEach(function ([
+    scriptId, scriptCov
+  ]) {
+    scriptCov.scriptId = scriptId.toString(10);
   });
+  return {
+    result: resultMerged
+  };
 }
 async function v8CoverageReportCreate({
   consoleError,

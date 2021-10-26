@@ -624,24 +624,6 @@ function processExit1(exitCode) {
     jstestDescribe((
         "test v8CoverageListMerge's handling-behavior"
     ), function () {
-        let functionsExpected = JSON.stringify([
-            {
-                functionName: "test",
-                isBlockCoverage: true,
-                ranges: [
-                    {
-                        count: 2,
-                        endOffset: 4,
-                        startOffset: 0
-                    },
-                    {
-                        count: 1,
-                        endOffset: 3,
-                        startOffset: 1
-                    }
-                ]
-            }
-        ]);
         let functionsInput = JSON.stringify([
             {
                 functionName: "test",
@@ -743,7 +725,24 @@ function processExit1(exitCode) {
             ]), {
                 result: [
                     {
-                        functions: JSON.parse(functionsExpected),
+                        functions: [
+                            {
+                                functionName: "test",
+                                isBlockCoverage: true,
+                                ranges: [
+                                    {
+                                        count: 2,
+                                        endOffset: 4,
+                                        startOffset: 0
+                                    },
+                                    {
+                                        count: 1,
+                                        endOffset: 3,
+                                        startOffset: 1
+                                    }
+                                ]
+                            }
+                        ],
                         moduleUrl: "/lib.js",
                         scriptId: "0"
                     }
@@ -771,13 +770,25 @@ function processExit1(exitCode) {
             ]), {
                 result: [
                     {
-                        functions: JSON.parse(functionsExpected),
+                        functions: [
+                            {
+                                functionName: "test",
+                                isBlockCoverage: true,
+                                ranges: [
+                                    {
+                                        count: 4,
+                                        endOffset: 4,
+                                        startOffset: 0
+                                    },
+                                    {
+                                        count: 2,
+                                        endOffset: 3,
+                                        startOffset: 1
+                                    }
+                                ]
+                            }
+                        ],
                         scriptId: "0",
-                        url: "/lib.js"
-                    },
-                    {
-                        functions: JSON.parse(functionsExpected),
-                        scriptId: "1",
                         url: "/lib.js"
                     }
                 ]
