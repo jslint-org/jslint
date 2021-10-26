@@ -8807,6 +8807,14 @@ function jslint_report({
     let html = "";
     let length_80 = 1111;
 
+    function address(line = 1, column = 1) {
+
+// This function will create HTML address element from <line> and <column>
+
+        return `<address>${Number(line)}: ${Number(column)}</address>`;
+
+    }
+
     function detail(title, list) {
         return (
             (Array.isArray(list) && list.length > 0)
@@ -8988,15 +8996,11 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 }
 /*csslint ignore:end*/
 
-.JSLINT_ {
+/* css - jslint_report - font */
+.JSLINT_,
+.JSLINT_ fieldset legend {
     font-family: daley, sans-serif;
     font-size: 14px;
-}
-.JSLINT_ fieldset legend,
-.JSLINT_ .center {
-    font-family: daley, sans-serif;
-    font-size: 14px;
-    text-align: center;
 }
 .JSLINT_ fieldset textarea,
 .JSLINT_ #JSLINT_REPORT_FUNCTIONS dt,
@@ -9010,7 +9014,18 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 .JSLINT_ fieldset > div {
     font-family: sans-serif;
 }
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS .level dfn {
+    font-style: normal;
+    font-weight: bold;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS .level dt {
+    font-style: italic;
+}
+.JSLINT_ #JSLINT_REPORT_TITLE {
+    font-size: 32px;
+}
 
+/* css - jslint_report - general */
 body {
     background: antiquewhite;
 }
@@ -9022,6 +9037,10 @@ body {
 }
 .JSLINT_ fieldset address {
     float: right;
+}
+.JSLINT_ fieldset legend,
+.JSLINT_ #JSLINT_REPORT_TITLE {
+    text-align: center;
 }
 .JSLINT_ fieldset legend {
     background: darkslategray;
@@ -9053,15 +9072,12 @@ body {
 }
 .JSLINT_ #JSLINT_REPORT_FUNCTIONS .level dfn {
     display: block;
-    font-style: normal;
-    font-weight: bold;
     line-height: 20px;
 }
 .JSLINT_ #JSLINT_REPORT_FUNCTIONS .level dl {
     position: relative
 }
 .JSLINT_ #JSLINT_REPORT_FUNCTIONS .level dt {
-    font-style: italic;
     line-height: 20px;
     position: absolute;
     text-align: right;
@@ -9120,9 +9136,7 @@ body {
 }
 .JSLINT_ #JSLINT_REPORT_TITLE {
     color: darkslategray;
-    font-size: 32px;
     padding-top: 16px;
-    text-align: center;
 }
 .JSLINT_ #JSLINT_REPORT_WARNINGS cite {
     display: block;
@@ -9181,7 +9195,7 @@ body {
     }, ii) {
         html += (
             "<cite>"
-            + "<address>" + htmlEscape(line + ": " + column) + "</address>"
+            + address(line, column)
             + htmlEscape((ii + 1) + ". " + message)
             + "</cite>"
             + "<samp>"
@@ -9267,6 +9281,7 @@ body {
     functions.forEach(function (the_function) {
         let {
             context,
+            from,
             level,
             line,
             name,
@@ -9280,7 +9295,7 @@ body {
         let params;
         html += (
             "<div class=\"level level" + htmlEscape(level) + "\">"
-            + "<address>" + htmlEscape(line) + "</address>"
+            + address(line, from + 1)
             + "<dfn>"
             + (
                 name === "=>"

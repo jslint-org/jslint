@@ -678,15 +678,11 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 }
 /*csslint ignore:end*/
 
-.JSLINT_ {
+/* css - jslint_report - font */
+.JSLINT_,
+.JSLINT_ fieldset legend {
     font-family: daley, sans-serif;
     font-size: 14px;
-}
-.JSLINT_ fieldset legend,
-.JSLINT_ .center {
-    font-family: daley, sans-serif;
-    font-size: 14px;
-    text-align: center;
 }
 .JSLINT_ fieldset textarea,
 .JSLINT_ #JSLINT_REPORT_FUNCTIONS dt,
@@ -700,7 +696,18 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 .JSLINT_ fieldset > div {
     font-family: sans-serif;
 }
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS .level dfn {
+    font-style: normal;
+    font-weight: bold;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS .level dt {
+    font-style: italic;
+}
+.JSLINT_ #JSLINT_REPORT_TITLE {
+    font-size: 32px;
+}
 
+/* css - jslint_report - general */
 body {
     background: antiquewhite;
 }
@@ -712,6 +719,10 @@ body {
 }
 .JSLINT_ fieldset address {
     float: right;
+}
+.JSLINT_ fieldset legend,
+.JSLINT_ #JSLINT_REPORT_TITLE {
+    text-align: center;
 }
 .JSLINT_ fieldset legend {
     background: darkslategray;
@@ -743,15 +754,12 @@ body {
 }
 .JSLINT_ #JSLINT_REPORT_FUNCTIONS .level dfn {
     display: block;
-    font-style: normal;
-    font-weight: bold;
     line-height: 20px;
 }
 .JSLINT_ #JSLINT_REPORT_FUNCTIONS .level dl {
     position: relative
 }
 .JSLINT_ #JSLINT_REPORT_FUNCTIONS .level dt {
-    font-style: italic;
     line-height: 20px;
     position: absolute;
     text-align: right;
@@ -810,9 +818,7 @@ body {
 }
 .JSLINT_ #JSLINT_REPORT_TITLE {
     color: darkslategray;
-    font-size: 32px;
     padding-top: 16px;
-    text-align: center;
 }
 .JSLINT_ #JSLINT_REPORT_WARNINGS cite {
     display: block;
@@ -842,6 +848,7 @@ body {
 }
 </style>
 <style>
+/* jslint utility2:true */
 /*csslint
     box-model: false,
     ids:false,
@@ -880,6 +887,7 @@ body {
 }
 /*csslint ignore:end*/
 
+/* css - website - font */
 .JSLINT_ #JSLINT_BUTTONS button,
 .JSLINT_ #JSLINT_OPTIONS > div,
 .JSLINT_ #JSLINT_TITLEBOX {
@@ -889,71 +897,25 @@ body {
 .JSLINT_ #JSLINT_OPTIONS label {
     font-family: sans-serif;
 }
-.JSLINT_ #JSLINT_REPORT_TITLE {
-    display: none;
-}
 .JSLINT_ #JSLINT_SOURCE .CodeMirror,
 .JSLINT_ #JSLINT_SOURCE .CodeMirror pre {
     font-family: monospace;
     font-size: 12px;
 }
-.skip-link {
-    background: darkslategray;
-    color: white;
-    left: 0;
-    opacity: 0.75;
-    padding: 4px;
-    position: absolute;
-    top: -40px;
-}
-.skip-link:focus {
-    top: 0;
-}
-#bannerFork1 {
-    height: 100px;
-    left: 0;
-    opacity: 0.75;
-    overflow: hidden;
-    position: absolute;
-    top: 0;
-    width: 200px;
-    z-index: 1;
-}
-#bannerFork1 a {
-    color: white;
-}
-#bannerFork1 div {
-    background: darkslategray;
+.JSLINT_ #bannerFork1 div {
     font-size: 12px;
-    height: 20px;
-    line-height: 20px;
-    opacity: 0.75;
-    overflow: visible;
-    position: absolute;
-    right: 65px;
-    text-align: center;
-    top: 25px;
-    transform: rotate(-45deg);
-    width: 100%;
-}
-#uiLoader1 {
-    align-items: center;
-    background: lightslategray;
-    color: white;
-    display: flex;
-    height: 50px;
-    justify-content: center;
-    left: 50%;
-    margin: -50px 0 0 -100px;
-    opacity: 0.85;
-    position: fixed;
-    top: 40%;
-    width: 200px;
-    z-index: 10;
 }
 
+/* css - website - general */
+.JSLINT_ fieldset address {
+    cursor: pointer;
+    text-decoration: underline;
+}
 .JSLINT_ .CodeMirror {
     padding: 0;
+}
+.JSLINT_ .CodeMirror-activeline-background {
+    background: #ddd;
 }
 .JSLINT_ .CodeMirror-linenumber {
 /* Google Lighthouse Accessibility - Background and foreground colors do not */
@@ -966,6 +928,18 @@ body {
 .JSLINT_ .CodeMirror-selected {
     background: wheat;
 }
+.JSLINT_ .skip-link {
+    background: darkslategray;
+    color: white;
+    left: 0;
+    opacity: 0.75;
+    padding: 4px;
+    position: absolute;
+    top: -40px;
+}
+.JSLINT_ .skip-link:focus {
+    top: 0;
+}
 .JSLINT_ .uiLoaderEllipsis span {
     animation: uiLoaderEllipsis1 1s infinite steps(1);
 }
@@ -974,6 +948,10 @@ body {
 }
 .JSLINT_ .uiLoaderEllipsis span:first-child + span + span {
     animation-name: uiLoaderEllipsis3;
+}
+.JSLINT_ #JSLINT_BUTTONS,
+.JSLINT_ #JSLINT_BUTTONS button {
+    text-align: center;
 }
 .JSLINT_ #JSLINT_BUTTONS button {
     background: darkslategray;
@@ -1012,6 +990,9 @@ body {
     line-height: 20px;
     padding: 0 16px 16px 0;
 }
+.JSLINT_ #JSLINT_REPORT_TITLE {
+    display: none;
+}
 .JSLINT_ #JSLINT_SOURCE textarea {
 /* Google Lighthouse Performance - Reduce Cumulative Layout Shift. */
     height: 298px;
@@ -1028,13 +1009,56 @@ body {
 .JSLINT_ #JSLINT_TITLEBOX ul li a:visited {
     color: #69565c;
 }
+.JSLINT_ #bannerFork1 {
+    height: 100px;
+    left: 0;
+    opacity: 0.75;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    width: 200px;
+    z-index: 1;
+}
+.JSLINT_ #bannerFork1 a {
+    color: white;
+}
+.JSLINT_ #bannerFork1 div {
+    background: darkslategray;
+    height: 20px;
+    line-height: 20px;
+    opacity: 0.75;
+    overflow: visible;
+    position: absolute;
+    right: 65px;
+    text-align: center;
+    top: 25px;
+    transform: rotate(-45deg);
+    width: 100%;
+}
+.JSLINT_ #uiLoader1 {
+    align-items: center;
+    background: lightslategray;
+    color: white;
+    display: flex;
+    height: 50px;
+    justify-content: center;
+    left: 50%;
+    margin: -50px 0 0 -100px;
+    opacity: 0.85;
+    position: fixed;
+    top: 40%;
+    width: 200px;
+    z-index: 10;
+}
 
+/* css - website - important */
 .JSLINT_ #JSLINT_BUTTONS button:hover,
 .JSLINT_ #JSLINT_OPTIONS div[title]:hover {
     background: slategray;
     color: white;
 }
 
+/* css - website - important */
 .JSLINT_ #JSLINT_BUTTONS button:active {
     color: black;
 }
@@ -1072,10 +1096,10 @@ body {
     <legend>Source</legend>
     <textarea></textarea>
 </fieldset>
-<div class="center" id="JSLINT_BUTTONS">
-    <button class="center" name="JSLint" title="Ctrl + Enter">JSLint</button>
-    <button class="center" name="clear_source">Clear Source</button>
-    <button class="center" name="clear_options">Clear Options</button>
+<div id="JSLINT_BUTTONS">
+    <button name="JSLint" title="Ctrl + Enter">JSLint</button>
+    <button name="clear_source">Clear Source</button>
+    <button name="clear_options">Clear Options</button>
 </div>
 <fieldset id="JSLINT_OPTIONS">
     <legend>Options</legend>
@@ -1185,7 +1209,10 @@ body {
 /*jslint beta, browser*/
 
 /*property
+    ch,
     jslint_edition, jslint_report,
+    setCursor, styleActiveLine,
+    tagName,
     CodeMirror, Pos, Tab, addEventListener, checked, click, closest, column,
     ctrlKey, currentTarget, dispatchEvent, display, dom_style_report_unmatched,
     editor, error, extraKeys, focus, forEach, from, fromTextArea,
@@ -1368,7 +1395,8 @@ function jslint_ui_onresize() {
         lint: jslint_option_dict,
         matchBrackets: true,
         mode: "text/javascript",
-        showTrailingSpace: true
+        showTrailingSpace: true,
+        styleActiveLine: true
     });
     window.editor = editor;
 
@@ -1388,6 +1416,25 @@ function jslint_ui_onresize() {
             break;
         }
     });
+    document.querySelector(
+        ".JSLINT_"
+    ).onclick = function ({
+        target
+    }) {
+        switch (target.tagName) {
+
+// PR-368 - website
+// Add clickable-links to editor-code in report-warnings and report-functions.
+
+        case "ADDRESS":
+            editor.focus();
+            editor.setCursor({
+                ch: Number(target.textContent.split(":")[1] - 1),
+                line: Number(target.textContent.split(":")[0] - 1)
+            });
+            break;
+        }
+    };
     document.querySelector(
         "#JSLINT_BUTTONS"
     ).onclick = function ({
