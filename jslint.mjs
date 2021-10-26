@@ -230,12 +230,12 @@ function empty() {
     return Object.create(null);
 }
 
-async function fsRmRecursive(path, option_dict) {
+async function fsRmRecursive(pathname, option_dict) {
 
-// This function will 'rm -r' <path>.
+// This function will 'rm -r' <pathname>.
 
     await moduleFsInit();
-    console.error("rm -r path " + path);
+    console.error("rm -r pathname " + pathname);
     if (((
         option_dict && option_dict.process_version
     ) || process.version) < "v14") {
@@ -243,14 +243,14 @@ async function fsRmRecursive(path, option_dict) {
 // Legacy rmdir for nodejs v12
 
         await Promise.all([
-            moduleFs.promises.unlink(path).catch(noop),
-            moduleFs.promises.rmdir(path, {
+            moduleFs.promises.unlink(pathname).catch(noop),
+            moduleFs.promises.rmdir(pathname, {
                 recursive: true
             }).catch(noop)
         ]);
         return;
     }
-    await moduleFs.promises.rm(path, {
+    await moduleFs.promises.rm(pathname, {
         recursive: true
     }).catch(noop);
 }
@@ -10651,7 +10651,7 @@ function sentinel() {}
 
     assertOrThrow(coverageDir, "invalid coverageDir " + coverageDir);
 
-// CL-xxx - coverage - Relax requirement for coverageDir to be in cwd.
+// CL-61b11012 - coverage - Relax requirement for coverageDir to be in cwd.
 //     assertOrThrow(
 //         pathnameRelativeCwd(coverageDir),
 //         "coverageDir " + coverageDir + " is not subdirectory of cwd " + cwd

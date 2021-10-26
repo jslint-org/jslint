@@ -837,7 +837,7 @@ function processExit1(exitCode) {
             }, "invalid coverageDir");
         });
 
-// CL-xxx - coverage - Relax requirement for coverageDir to be in cwd.
+// CL-61b11012 - coverage - Relax requirement for coverageDir to be in cwd.
 //         jstestIt((
 //             "test invalid-coverageDir handling-behavior"
 //         ), async function () {
@@ -858,6 +858,11 @@ function processExit1(exitCode) {
         jstestIt((
             "test coverage-report jslint.mjs handling-behavior"
         ), async function () {
+            // test remove-old-coverage handling-behavior
+            await fsWriteFileWithParents(
+                ".tmp/coverage_jslint/coverage-0-0-0.json",
+                ""
+            );
             await jslint.jslint_cli({
                 mode_cli: true,
                 process_argv: [

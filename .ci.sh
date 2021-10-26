@@ -239,8 +239,8 @@ import moduleFs from "fs";
                         /\n\/\/.*/g
                     ), "").replace((
                         /\n\n\n/g
-                    // CL-xxx reduce size of string/argument passed to nodejs
-                    // by using 2-space-indent
+                    // CL-61b11012 reduce size of string/argument passed
+                    // to nodejs by using 2-space-indent
                     ), "\n").replace((
                         /    /g
                     ), "  ")
