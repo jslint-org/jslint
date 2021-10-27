@@ -4858,7 +4858,7 @@ function jslint_phase3_parse(state) {
     function prefix_await() {
         const the_await = token_now;
 
-// PR-xxx - Add top-level-await support.
+// PR-370 - Add top-level-await support.
 
         if (functionage.async === 0 && functionage !== token_global) {
 
