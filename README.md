@@ -94,7 +94,7 @@ node jslint.mjs hello.js
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_js_import_esm.svg -->
 #!/bin/sh
 
-node --input-type=module -e '
+node --input-type=module --eval '
 
 /*jslint devel*/
 
@@ -126,7 +126,7 @@ result.warnings.forEach(function ({
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_js_import_cjs.svg -->
 #!/bin/sh
 
-node -e '
+node --eval '
 
 /*jslint devel*/
 (async function () {
@@ -196,7 +196,7 @@ node jslint.mjs \
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_js_jslint_report_file.svg -->
 #!/bin/sh
 
-node --input-type=module -e '
+node --input-type=module --eval '
 
 /*jslint devel*/
 import jslint from "./jslint.mjs";
@@ -266,7 +266,7 @@ git clone https://github.com/mapbox/node-sqlite3 node-sqlite3-js \
 cd node-sqlite3-js
 npm install
 
-node --input-type=module -e '
+node --input-type=module --eval '
 
 /*jslint node*/
 import jslint from "../jslint.mjs";
@@ -345,3 +345,10 @@ right so that you can focus your creative energy where it is most needed.
 - JSLint is under [Unlicense License](LICENSE).
 - CodeMirror code-editor is under [MIT License](https://github.com/codemirror/CodeMirror/blob/master/LICENSE).
 - Function `v8CoverageListMerge` is derived from [MIT Licensed v8-coverage](https://github.com/demurgos/v8-coverage/blob/73446087dc38f61b09832c9867122a23f8577099/ts/LICENSE.md).
+
+<!--
+Coverage-hack
+node --eval '
+0
+'
+-->

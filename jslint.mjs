@@ -94,6 +94,7 @@
 /*jslint beta, node*/
 
 /*property
+    mode_conditional,
     JSLINT_BETA, NODE_V8_COVERAGE, a, all, argv, arity, artifact,
     assertErrorThrownAsync, assertJsonEqual, assertOrThrow, assign, async, b,
     beta, bitwise, block, body, browser, c, calls, catch, catch_list,
@@ -1478,9 +1479,18 @@ async function jslint_cli({
         code,
         file,
         line_offset = 0,
+        mode_conditional,
         option = empty()
     }) {
         let result_from_file;
+        if (
+            mode_conditional
+            && !(
+                /^\/\*jslint\b/m
+            ).test(code.slice(0, 65536))
+        ) {
+            return;
+        }
         option = Object.assign(empty(), option, {
             file
         });
@@ -1505,28 +1515,25 @@ async function jslint_cli({
                 return "";
             });
             return;
+        case ".md":
+
+// Recursively jslint embedded "node --eval '\n...\n'".
+
+            jslint_node_eval({
+                code,
+                file,
+                mode_conditional: true,
+                option
+            });
+            return;
         case ".sh":
 
-// Recursively jslint embedded "node -e '\n...\n'".
+// Recursively jslint embedded "node --eval '\n...\n'".
 
-            code.replace((
-                /\bnode\b.*? -e '\n([\S\s]*?\n)'/gm
-            ), function (ignore, match1, ii) {
-                jslint_from_file({
-                    code: match1,
-                    file: file + ".<node -e>.js",
-                    line_offset: string_line_count(code.slice(0, ii)) + 1,
-                    option: Object.assign(empty(), {
-                        beta: Boolean(
-                            process_env.JSLINT_BETA
-                            && !(
-                                /0|false|null|undefined/
-                            ).test(process_env.JSLINT_BETA)
-                        ),
-                        node: true
-                    }, option)
-                });
-                return "";
+            jslint_node_eval({
+                code,
+                file,
+                option
             });
             return;
         default:
@@ -1567,6 +1574,34 @@ async function jslint_cli({
             );
         }
         return result_from_file;
+    }
+
+    function jslint_node_eval({
+        code,
+        file,
+        mode_conditional,
+        option = empty()
+    }) {
+        code.replace((
+            /\bnode\b.*? (?:--eval|-e) '\n([\S\s]*?\n)'/gm
+        ), function (ignore, match1, ii) {
+            jslint_from_file({
+                code: match1,
+                file: file + ".<node -e>.js",
+                line_offset: string_line_count(code.slice(0, ii)) + 1,
+                mode_conditional,
+                option: Object.assign(empty(), {
+                    beta: Boolean(
+                        process_env.JSLINT_BETA
+                        && !(
+                            /0|false|null|undefined/
+                        ).test(process_env.JSLINT_BETA)
+                    ),
+                    node: true
+                }, option)
+            });
+            return "";
+        });
     }
 
     function string_line_count(code) {
@@ -1715,6 +1750,7 @@ async function jslint_cli({
                 case ".html":
                 case ".js":
                 case ".json":
+                case ".md":
                 case ".mjs":
                 case ".sh":
                     break;
@@ -3059,7 +3095,7 @@ function jslint_phase2_lex(state) {
 // These are the globals that are provided by the language standard.
 // Assign global ECMAScript variables to global_dict.
 /*
-node --input-type=module -e '
+node --input-type=module --eval '
 // /\*jslint beta, node*\/
 import https from "https";
 (async function () {
@@ -3152,7 +3188,7 @@ import https from "https";
 
 // Assign global Node.js variables to global_dict.
 /*
-node --input-type=module -e '
+node --input-type=module --eval '
 // /\*jslint beta, node*\/
 import moduleHttps from "https";
 (async function () {
@@ -4821,10 +4857,12 @@ function jslint_phase3_parse(state) {
 
     function prefix_await() {
         const the_await = token_now;
-        if (functionage.async === 0) {
+
+// PR-370 - Add top-level-await support.
+
+        if (functionage.async === 0 && functionage !== token_global) {
 
 // test_cause:
-// ["await", "prefix_await", "unexpected_a", "await", 1]
 // ["function aa(){aa=await 0;}", "prefix_await", "unexpected_a", "await", 18]
 // ["function aa(){await 0;}", "prefix_await", "unexpected_a", "await", 15]
 
@@ -9001,7 +9039,8 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 
 /* css - jslint_report - font */
 .JSLINT_,
-.JSLINT_ fieldset legend {
+.JSLINT_ fieldset legend,
+.JSLINT_ .center {
     font-family: daley, sans-serif;
     font-size: 14px;
 }
@@ -9042,7 +9081,7 @@ body {
     float: right;
 }
 .JSLINT_ fieldset legend,
-.JSLINT_ #JSLINT_REPORT_TITLE {
+.JSLINT_ .center {
     text-align: center;
 }
 .JSLINT_ fieldset legend {
@@ -9172,7 +9211,7 @@ body {
 
 // Produce the Title.
 
-    html += "<div id=\"JSLINT_REPORT_TITLE\">\n";
+    html += "<div class=\"center\" id=\"JSLINT_REPORT_TITLE\">\n";
     html += "JSLint Report\n";
     html += "</div>\n";
 
