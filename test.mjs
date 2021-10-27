@@ -61,7 +61,8 @@ function processExit1(exitCode) {
         undefined       // test file-undefined handling-behavior
     ].forEach(function (file) {
         jslint.jslint_cli({
-            console_error: noop,        // suppress error
+            // suppress error
+            console_error: noop,
             file,
             mode_cli: true,
             process_env: {
@@ -226,7 +227,11 @@ function processExit1(exitCode) {
                 + "        await err();\n"
                 + "    }\n"
                 + "}\n"
-            )
+            ),
+
+// PR-xxx - Add top-level-await support.
+
+            "await String();\n"
         ],
 
 // PR-351 - Add BigInt support.

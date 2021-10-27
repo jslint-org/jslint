@@ -142,7 +142,7 @@ shBashrcDebianInit() {
 shBrowserScreenshot() {(set -e
 # this function will run headless-chrome to screenshot url $1 with
 # window-size $2
-    node --input-type=module -e '
+    node --input-type=module --eval '
 import moduleChildProcess from "child_process";
 import modulePath from "path";
 import moduleUrl from "url";
@@ -235,7 +235,7 @@ shCiArtifactUpload() {(set -e
 # this function will upload build-artifacts to branch-gh-pages
     local BRANCH
     local FILE
-    node --input-type=module -e '
+    node --input-type=module --eval '
 process.exit(Number(
     `${process.version.split(".")[0]}.${process.arch}.${process.platform}`
     !== process.env.CI_NODE_VERSION_ARCH_PLATFORM
@@ -252,7 +252,7 @@ process.exit(Number(
     # init $UPSTREAM_REPO
     export UPSTREAM_REPO="${UPSTREAM_REPO:-jslint}"
     # screenshot changelog and files
-    node --input-type=module -e '
+    node --input-type=module --eval '
 import moduleChildProcess from "child_process";
 (function () {
     [
@@ -369,7 +369,7 @@ shCiArtifactUploadCustom() {(set -e
 shCiBase() {(set -e
 # this function will run base-ci
     # update table-of-contents in README.md
-    node --input-type=module -e '
+    node --input-type=module --eval '
 import moduleFs from "fs";
 (async function () {
     let data = await moduleFs.promises.readFile("README.md", "utf8");
@@ -435,7 +435,7 @@ shCiBranchPromote() {(set -e
 
 shDirHttplinkValidate() {(set -e
 # this function will validate http-links embedded in .html and .md files
-    node --input-type=module -e '
+    node --input-type=module --eval '
 import moduleFs from "fs";
 import moduleHttps from "https";
 import moduleUrl from "url";
@@ -593,7 +593,7 @@ shGitLsTree() {(set -e
 # example use:
 # shGitLsTree | sort -rk3 # sort by date
 # shGitLsTree | sort -rk4 # sort by size
-    node --input-type=module -e '
+    node --input-type=module --eval '
 import moduleChildProcess from "child_process";
 (async function () {
     let result;
@@ -715,7 +715,7 @@ vendor)s{0,1}(\\b|_)\
 
 shGrepReplace() {(set -e
 # this function will inline grep-and-replace /tmp/shGrep.txt
-    node --input-type=module -e '
+    node --input-type=module --eval '
 import moduleFs from "fs";
 import moduleOs from "os";
 import modulePath from "path";
@@ -770,7 +770,7 @@ shHttpFileServer() {(set -e
         done
         return
     fi
-    node --input-type=module -e '
+    node --input-type=module --eval '
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
 import moduleHttp from "http";
@@ -1105,7 +1105,7 @@ div {
 
 shImageToDataUri() {(set -e
 # this function will convert image $1 to data-uri string
-    node --input-type=module -e '
+    node --input-type=module --eval '
 import moduleFs from "fs";
 import moduleHttps from "https";
 (async function () {
@@ -1146,7 +1146,7 @@ shJsonNormalize() {(set -e
 # 1. read json-data from file $1
 # 2. normalize json-data
 # 3. write normalized json-data back to file $1
-    node --input-type=module -e '
+    node --input-type=module --eval '
 import moduleFs from "fs";
 (async function () {
     function noop(val) {
@@ -1214,7 +1214,7 @@ shNpmPublishV0() {(set -e
 
 shRawLibFetch() {(set -e
 # this function will fetch raw-lib from $1
-    node --input-type=module -e '
+    node --input-type=module --eval '
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
 import moduleHttps from "https";
@@ -1507,7 +1507,7 @@ shRmDsStore() {(set -e
 shRunWithCoverage() {(set -e
 # this function will run nodejs command $@ with v8-coverage
 # and create coverage-report .artifact/coverage/index.html
-    node --input-type=module -e '
+    node --input-type=module --eval '
 /*jslint indent2*/
 let moduleChildProcess;
 let moduleFs;
@@ -2626,7 +2626,7 @@ shRunWithScreenshotTxt() {(set -e
     printf "shRunWithScreenshotTxt - EXIT_CODE=$EXIT_CODE - $SCREENSHOT_SVG\n" \
         1>&2
     # format text-output
-    node --input-type=module -e '
+    node --input-type=module --eval '
 import moduleFs from "fs";
 (async function () {
     let result = await moduleFs.promises.readFile(

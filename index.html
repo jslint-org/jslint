@@ -680,7 +680,8 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 
 /* css - jslint_report - font */
 .JSLINT_,
-.JSLINT_ fieldset legend {
+.JSLINT_ fieldset legend,
+.JSLINT_ .center {
     font-family: daley, sans-serif;
     font-size: 14px;
 }
@@ -721,7 +722,7 @@ body {
     float: right;
 }
 .JSLINT_ fieldset legend,
-.JSLINT_ #JSLINT_REPORT_TITLE {
+.JSLINT_ .center {
     text-align: center;
 }
 .JSLINT_ fieldset legend {
@@ -889,13 +890,8 @@ body {
 
 /* css - website - font */
 .JSLINT_ #JSLINT_BUTTONS button,
-.JSLINT_ #JSLINT_OPTIONS > div,
-.JSLINT_ #JSLINT_TITLEBOX {
+.JSLINT_ #JSLINT_OPTIONS .legend {
     font-family: daley, sans-serif;
-    font-size: 14px;
-}
-.JSLINT_ #JSLINT_OPTIONS label {
-    font-family: sans-serif;
 }
 .JSLINT_ #JSLINT_SOURCE .CodeMirror,
 .JSLINT_ #JSLINT_SOURCE .CodeMirror pre {
@@ -924,6 +920,12 @@ body {
 }
 .JSLINT_ .CodeMirror-lint-marker {
     background-position: 1px -1px;
+}
+.JSLINT_ .CodeMirror-overwrite .CodeMirror-cursor {
+    background: #333;
+    border-left: #777;
+    opacity: 0.5;
+    width: auto;
 }
 .JSLINT_ .CodeMirror-selected {
     background: wheat;
@@ -1104,7 +1106,8 @@ body {
 <fieldset id="JSLINT_OPTIONS">
     <legend>Options</legend>
     <div>
-    <div>Env...
+    <div>
+        <span class="legend">Env...</span>
         <div title="Assume browser environment.">
         <label><input type="checkbox" value="browser">browser</label>
         </div>
@@ -1118,7 +1121,8 @@ body {
         <label><input type="checkbox" value="trace">trace</label>
         </div>
     </div>
-    <div>Allow...
+    <div>
+        <span class="legend">Allow...</span>
         <div title="Enable experimental warnings.">
         <label><input type="checkbox" value="beta">beta</label>
         </div>
