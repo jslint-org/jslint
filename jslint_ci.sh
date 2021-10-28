@@ -2604,7 +2604,7 @@ function sentinel() {}
 }
 v8CoverageReportCreate({
   coverageDir: ".artifact/coverage",
-  process_argv: process.argv.slice(1)
+  processArgv: process.argv.slice(1)
 });
 ' "$@" # '
 )}
