@@ -1,7 +1,4 @@
 # [<img align="left" height="80" src="asset_image_logo_512.svg"/>](https://github.com/jslint-org/jslint) JSLint, The JavaScript Code Quality and Coverage Tool
-
-&nbsp;
-
 Douglas Crockford <douglas@crockford.com>
 
 
@@ -14,6 +11,7 @@ Douglas Crockford <douglas@crockford.com>
 | Artifacts | [<img src="asset_image_folder_open_solid.svg" height="30">](https://github.com/jslint-org/jslint/tree/gh-pages/branch-master/.artifact) | [<img src="asset_image_folder_open_solid.svg" height="30">](https://github.com/jslint-org/jslint/tree/gh-pages/branch-beta/.artifact) | [<img src="asset_image_folder_open_solid.svg" height="30">](https://github.com/jslint-org/jslint/tree/gh-pages/branch-alpha/.artifact) |
 
 
+<br><br>
 # Table of Contents
 
 1. [Web Demo](#web-demo)
@@ -49,25 +47,32 @@ Douglas Crockford <douglas@crockford.com>
 11. [License](#license)
 
 
+<br><br>
 # Web Demo
 - https://www.jslint.com
 
 [![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2fjslint_2fbranch-beta_2findex.html.png)](https://jslint-org.github.io/jslint/index.html)
 
 
+<br><br>
 # Web Demo Archived
 - [Web Demo 2020](https://www.jslint.com/branch-v2020.11.6/index.html)
 - [Web Demo 2014 (ES5 only)](https://www.jslint.com/branch-v2014.7.8/jslint.html)
 - [Web Demo 2013 (ES5, CSS, HTML)](https://www.jslint.com/branch-v2013.3.13/jslint.html)
 
 
+<br><br>
 # API Doc
 - https://www.jslint.com/apidoc.html
 
 [![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fapidoc.html.png)](https://www.jslint.com/apidoc.html)
 
 
+<br><br>
 # Quickstart Install
+
+
+<br><br>
 ### To install, just download https://www.jslint.com/jslint.mjs and save to file:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_install_download.svg -->
 #!/bin/sh
@@ -78,6 +83,8 @@ curl -L https://www.jslint.com/jslint.mjs > jslint.mjs
 
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_sh_install_download.svg)
 
+
+<br><br>
 ### To run `jslint.mjs` in shell:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_jslint_file.svg -->
 #!/bin/sh
@@ -90,6 +97,8 @@ node jslint.mjs hello.js
 
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_sh_jslint_file.svg)
 
+
+<br><br>
 ### To import `jslint.mjs` in ES Module environment:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_js_import_esm.svg -->
 #!/bin/sh
@@ -122,6 +131,8 @@ result.warnings.forEach(function ({
 
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_js_import_esm.svg)
 
+
+<br><br>
 ### To import `jslint.mjs` in CommonJS environment:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_js_import_cjs.svg -->
 #!/bin/sh
@@ -157,6 +168,8 @@ node --eval '
 
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_js_import_cjs.svg)
 
+
+<br><br>
 ### To JSLint entire directory in shell:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_jslint_dir.svg -->
 #!/bin/sh
@@ -170,7 +183,11 @@ node jslint.mjs .
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_sh_jslint_dir.svg)
 
 
+<br><br>
 # Quickstart JSLint Report
+
+
+<br><br>
 ### To create a JSLint report in shell:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_jslint_report_file.svg -->
 #!/bin/sh
@@ -192,6 +209,7 @@ node jslint.mjs \
 [![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fjslint_report_hello.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/jslint_report_hello.html)
 
 
+<br><br>
 ### To create a JSLint report in javascript:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_js_jslint_report_file.svg -->
 #!/bin/sh
@@ -222,8 +240,16 @@ import fs from "fs";
 
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_js_jslint_report_file.svg)
 
+- screenshot file [.artifact/jslint_report_hello.html](https://jslint-org.github.io/jslint/branch-beta/.artifact/jslint_report_hello.html)
 
+[![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fjslint_report_hello.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/jslint_report_hello.html)
+
+
+<br><br>
 # Quickstart V8 Coverage Report
+
+
+<br><br>
 ### To create V8 coverage report from Node.js / Npm program in shell:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_coverage_report_spawn.svg -->
 #!/bin/sh
@@ -254,6 +280,8 @@ node ../jslint.mjs \
 
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_sh_coverage_report_spawn.svg)
 
+
+<br><br>
 ### To create V8 coverage report from Node.js / Npm program in javascript:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_js_coverage_report_spawn.svg -->
 #!/bin/sh
@@ -295,7 +323,11 @@ import jslint from "../jslint.mjs";
 ![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_js_coverage_report_spawn.svg)
 
 
+<br><br>
 # Plugin Vim
+
+
+<br><br>
 ### To run JSLint in Vim:
 1. Download and save [`jslint.mjs`](https://www.jslint.com/jslint.mjs), [`jslint.vim`](https://www.jslint.com/jslint.vim) to directory `~/.vim/`
 2. Add vim-command `:source ~/.vim/jslint.vim` to file `~/.vimrc`
@@ -307,6 +339,7 @@ import jslint from "../jslint.mjs";
 ![screenshot.png](asset_image_jslint_vim_plugin.png)
 
 
+<br><br>
 # Description
 - [jslint.mjs](jslint.mjs) contains the jslint function. It parses and analyzes a source file, returning an object with information about the file. It can also take an object that sets options.
 
@@ -331,16 +364,19 @@ plays the part of a stern but benevolent editor, helping you to get the style
 right so that you can focus your creative energy where it is most needed.
 
 
+<br><br>
 # Package Listing
 ![screenshot_package_listing.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_package_listing.svg)
 
 
+<br><br>
 # Changelog
 - [Full CHANGELOG.md](CHANGELOG.md)
 
 ![screenshot_changelog.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_changelog.svg)
 
 
+<br><br>
 # License
 - JSLint is under [Unlicense License](LICENSE).
 - CodeMirror code-editor is under [MIT License](https://github.com/codemirror/CodeMirror/blob/master/LICENSE).

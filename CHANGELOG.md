@@ -16,6 +16,7 @@
 - ci - deprecate/remove jslint.cjs from ci
 - coverage - dedupe coverage-logic now applied when only one script passed
 - jslint - add top-level-await support
+- npm - add file .npmignore
 - website - add clickable-links to editor-code in report-warnings and report-functions
 
 # v2021.10.20

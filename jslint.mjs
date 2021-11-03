@@ -106,7 +106,7 @@
     ellipsis, else, end, endOffset, endsWith, entries, env, error, eval, every,
     example_list, exec, execArgv, exit, export_dict, exports, expression, extra,
     file, fileList, fileURLToPath, filter, finally, flag, floor, for, forEach,
-    formatted_message, free, freeze, from, froms, fsRmRecursive,
+    formatted_message, free, freeze, from, froms,
     fsWriteFileWithParents, fud, functionName, function_list, function_stack,
     functions, get, getset, github_repo, global, global_dict, global_list,
     holeList, htmlEscape, id, identifier, import, import_list, inc, indent2,
@@ -152,8 +152,7 @@ let debugInline = (function () {
         consoleError("\n");
         return argv[0];
     }
-    // Coverage-hack.
-    debug();
+    debug(); // Coverage-hack.
     consoleError = console.error;
     return debug;
 }());
@@ -199,7 +198,7 @@ async function assertErrorThrownAsync(asyncFunc, regexp) {
     );
 }
 
-function assertJsonEqual(aa, bb) {
+function assertJsonEqual(aa, bb, message) {
 
 // This function will assert JSON.stringify(<aa>) === JSON.stringify(<bb>).
 
@@ -207,7 +206,7 @@ function assertJsonEqual(aa, bb) {
     bb = JSON.stringify(objectDeepCopyWithKeysSorted(bb));
     if (aa !== bb) {
         throw new Error(
-            JSON.stringify(aa) + " !== " + JSON.stringify(bb)
+            message || JSON.stringify(aa) + " !== " + JSON.stringify(bb)
         );
     }
 }
@@ -232,31 +231,6 @@ function empty() {
 // 'constructor' are completely avoided.
 
     return Object.create(null);
-}
-
-async function fsRmRecursive(pathname, option_dict) {
-
-// This function will 'rm -r' <pathname>.
-
-    await moduleFsInit();
-    console.error("rm -r pathname " + pathname);
-    if (((
-        option_dict && option_dict.process_version
-    ) || process.version) < "v14") {
-
-// Legacy rmdir for nodejs v12
-
-        await Promise.all([
-            moduleFs.promises.unlink(pathname).catch(noop),
-            moduleFs.promises.rmdir(pathname, {
-                recursive: true
-            }).catch(noop)
-        ]);
-        return;
-    }
-    await moduleFs.promises.rm(pathname, {
-        recursive: true
-    }).catch(noop);
 }
 
 async function fsWriteFileWithParents(pathname, data) {
@@ -7868,8 +7842,10 @@ function jslint_phase4_walk(state) {
                 left_variable = parent.context[left.id];
                 if (
                     left_variable !== undefined
-                    // Coverage-hack.
-                    // && left_variable.dead
+
+// Probably deadcode.
+// && left_variable.dead
+
                     && left_variable.parent === parent
                     && left_variable.calls !== undefined
                     && left_variable.calls[functionage.name.id] !== undefined
@@ -10576,8 +10552,8 @@ body {
                             lineHtml += htmlEscape(chunk);
                             lineHtml += "</span><span";
 
-// Coverage-hack - Ugly hack around possible deadcode
-// where isHole is always true.
+// Coverage-hack - Ugly-hack around possible deadcode where isHole is always
+// true.
 
                             if (isHole) {
                                 lineHtml += " class=\"uncovered\"";
@@ -10706,7 +10682,7 @@ function sentinel() {}
                 processArgv[0] === "npm"
 
 // If win32 environment, then replace program npm with npm.cmd.
-// Coverage-hack - Ugly hack to get test-coverage under both win32 and linux.
+// Coverage-hack - Ugly-hack to get test-coverage under both win32 and linux.
 
                 ? process.platform.replace("win32", "npm.cmd").replace(
                     process.platform,
@@ -10914,7 +10890,6 @@ jslint_export = Object.freeze(Object.assign(jslint, {
     assertJsonEqual,
     assertOrThrow,
     debugInline,
-    fsRmRecursive,
     fsWriteFileWithParents,
     htmlEscape,
     jslint,

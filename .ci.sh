@@ -267,7 +267,6 @@ import moduleFs from "fs";
     fi
     # test jslint's cli handling-behavior
     printf "node jslint.mjs .\n"
-    JSLINT_BETA=1 node jslint.mjs .
     # run test with coverage-report
     printf "node test.mjs\n"
     npm run test

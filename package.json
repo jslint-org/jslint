@@ -4,7 +4,14 @@
     },
     "counter": 7,
     "description": "JSLint, The JavaScript Code Quality and Coverage Tool",
-    "fileCount": 27,
+    "fileCount": 28,
+    "keywords": [
+        "coverage-report",
+        "javascript",
+        "jslint",
+        "zero-config",
+        "zero-dependency"
+    ],
     "license": "UNLICENSE",
     "name": "@jslint-org/jslint",
     "repository": {

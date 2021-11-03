@@ -8,11 +8,11 @@ let {
     assertJsonEqual,
     assertOrThrow,
     debugInline,
-    fsRmRecursive,
     fsWriteFileWithParents,
     jstestDescribe,
     jstestIt,
     jstestOnExit,
+    moduleFsInit,
     noop,
     v8CoverageListMerge,
     v8CoverageReportCreate
@@ -25,29 +25,58 @@ function processExit1(exitCode) {
     assertOrThrow(exitCode === 1, exitCode);
 }
 
-(function testCaseFsXxx() {
-/*
- * this function will test fsXxx's handling-behavior
- */
-    // test fsRmRecursive handling-behavior
-    fsRmRecursive(".artifact/fsRmRecursive");
-    fsRmRecursive(".artifact/fsRmRecursive", {
-        process_version: "v12"
+// Coverage-hack - Ugly-hack to get test-coverage for all initialization-states.
+
+moduleFsInit();
+moduleFsInit();
+
+// Cleanup directory .tmp
+// await moduleFs.promises.rm(".tmp", {
+//     recursive: true
+// }).catch(noop);
+//
+// TODO //jslint-quiet
+// Replace code below with code above, after nodejs-v12 is deprecated
+
+try {
+    moduleFs.rmSync(".tmp", { //jslint-quiet
+        recursive: true
     });
-    // test fsWriteFileWithParents handling-behavior
-    (async function () {
-        await fsRmRecursive(".tmp/fsWriteFileWithParents");
-        await fsWriteFileWithParents(
-            ".tmp/fsWriteFileWithParents/aa/bb/cc",
-            "aa"
-        );
-    }());
+} catch (ignore) {}
+
+(function testcaseFsXxx() {
+
+// This function will test fsXxx's handling-behavior.
+
+    jstestDescribe((
+        "test fsXxx's handling-behavior"
+    ), function () {
+        jstestIt((
+            "test fsWriteFileWithParents's handling-behavior"
+        ), async function () {
+            await Promise.all([
+                1, 2, 3, 4
+            ].map(async function () {
+                await fsWriteFileWithParents(
+                    ".tmp/fsWriteFileWithParents/aa/bb/cc",
+                    "aa"
+                );
+            }));
+            assertJsonEqual(
+                await moduleFs.promises.readFile(
+                    ".tmp/fsWriteFileWithParents/aa/bb/cc",
+                    "utf8"
+                ),
+                "aa"
+            );
+        });
+    });
 }());
 
-(async function testCaseJslintCli() {
-/*
- * this function will test jslint's cli handling-behavior
- */
+(async function testcaseJslintCli() {
+
+// This function will test jslint's cli handling-behavior.
+
     // test null-case handling-behavior
     jslint.jslint_cli({
         mode_noop: true,
@@ -61,8 +90,6 @@ function processExit1(exitCode) {
         undefined       // test file-undefined handling-behavior
     ].forEach(function (file) {
         jslint.jslint_cli({
-            // suppress error
-            console_error: noop,
             file,
             mode_cli: true,
             process_env: {
@@ -201,10 +228,10 @@ function processExit1(exitCode) {
     });
 }());
 
-(function testCaseJslintCodeValidate() {
-/*
- * this function will validate each code is valid in jslint
- */
+(function testcaseJslintCodeValidate() {
+
+// This function will validate each code is valid in jslint.
+
     Object.values({
         array: [
             "new Array(0);"
@@ -229,7 +256,7 @@ function processExit1(exitCode) {
                 + "}\n"
             ),
 
-// PR-xxx - Add top-level-await support.
+// PR-370 - Add top-level-await support.
 
             "await String();\n"
         ],
@@ -398,10 +425,10 @@ function processExit1(exitCode) {
     });
 }());
 
-(async function testCaseJslintOption() {
-/*
- * this function will test jslint's option handling-behavior
- */
+(async function testcaseJslintOption() {
+
+// This function will test jslint's option handling-behavior.
+
     let elemPrv = "";
     [
         [
@@ -523,7 +550,7 @@ function processExit1(exitCode) {
     }).warnings.length === 1);
 }());
 
-(async function testCaseJslintWarningsValidate() {
+(async function testcaseJslintWarningsValidate() {
 /*
  * this function will validate each jslint <warning> is raised with given
  * malformed <code>
@@ -580,10 +607,10 @@ function processExit1(exitCode) {
     });
 }());
 
-(async function testCaseMisc() {
-/*
- * this function will test misc handling-behavior
- */
+(async function testcaseMisc() {
+
+// This function will test misc handling-behavior.
+
     // test debugInline's handling-behavior
     noop(debugInline);
     // test assertErrorThrownAsync's error handling-behavior
@@ -603,7 +630,10 @@ function processExit1(exitCode) {
     });
 }());
 
-(async function () {
+(async function testcaseV8CoverageXxx() {
+
+// This function will test V8CoverageXxx's handling-behavior
+
     let testCoverageMergeData = JSON.parse(
         await moduleFs.promises.readFile(
             "test_coverage_merge_data.json",
@@ -852,25 +882,6 @@ function processExit1(exitCode) {
                 return v8CoverageReportCreate({});
             }, "invalid coverageDir");
         });
-
-// CL-61b11012 - coverage - Relax requirement for coverageDir to be in cwd.
-//         jstestIt((
-//             "test invalid-coverageDir handling-behavior"
-//         ), async function () {
-//             await assertErrorThrownAsync(function () {
-//                 return jslint.jslint_cli({
-//                     // suppress error
-//                     console_error: noop,
-//                     mode_cli: true,
-//                     process_argv: [
-//                         "node", "jslint.mjs",
-//                         "v8_coverage_report=..",
-//                         "node", "jslint.mjs"
-//                     ]
-//                 });
-//             }, "is not subdirectory of cwd");
-//         });
-
         jstestIt((
             "test coverage-report jslint.mjs handling-behavior"
         ), async function () {
