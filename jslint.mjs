@@ -10676,7 +10676,7 @@ function sentinel() {}
         processArgElem[1] = processArgElem.slice(1).join("=");
         switch (processArgElem[0]) {
 
-// PR-xxx - add cli-option `--exclude=aa,bb`
+// PR-371 - add cli-option `--exclude=aa,bb`
 
         case "--exclude":
             fileExcludeList = fileExcludeList.concat(
@@ -10684,7 +10684,7 @@ function sentinel() {}
             );
             break;
 
-// PR-xxx - add cli-option `--exclude-node-modules=false`
+// PR-371 - add cli-option `--exclude-node-modules=false`
 
         case "--exclude-node-modules":
             fileIncludeNodeModules = (
@@ -10692,7 +10692,7 @@ function sentinel() {}
             ).test(processArgElem[1]);
             break;
 
-// PR-xxx - add cli-option `--include=aa,bb`
+// PR-371 - add cli-option `--include=aa,bb`
 
         case "--include":
             fileIncludeList = fileIncludeList.concat(
@@ -10772,7 +10772,7 @@ function sentinel() {}
                 !pathname
                 || pathname.startsWith("[")
 
-// PR-xxx - Filter directory node_modules.
+// PR-371 - Filter directory node_modules.
 
                 || (
                     !fileIncludeNodeModules
@@ -10781,11 +10781,11 @@ function sentinel() {}
                     ).test(pathname)
                 )
 
-// PR-xxx - Filter fileExcludeList.
+// PR-371 - Filter fileExcludeList.
 
                 || fileExcludeList.indexOf(pathname) >= 0
 
-// PR-xxx - Filter fileIncludeList.
+// PR-371 - Filter fileIncludeList.
 
                 || (
                     fileIncludeList.length > 0
