@@ -266,8 +266,15 @@ npm install
 
 node ../jslint.mjs \
     v8_coverage_report=../.artifact/coverage_sqlite3_sh/ \
+    --exclude-node-modules=true \
+    --exclude=test/foo.js,test/bar.js \
+    --exclude=test/baz.js \
     npm run test
 ```
+- shell output
+
+![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_sh_coverage_report_spawn.svg)
+
 - screenshot file [.artifact/coverage_sqlite3_sh/index.html](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3_sh/index.html)
 
 [![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fcoverage_sqlite3_sh_2findex.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3_sh/index.html)
@@ -275,10 +282,6 @@ node ../jslint.mjs \
 - screenshot file [.artifact/coverage_sqlite3_sh/lib/sqlite3.js.html](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3_sh/lib/sqlite3.js.html)
 
 [![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fcoverage_sqlite3_sh_2flib_2fsqlite3.js.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3_sh/lib/sqlite3.js.html)
-
-- shell output
-
-![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_sh_coverage_report_spawn.svg)
 
 
 <br><br>
@@ -304,12 +307,20 @@ import jslint from "../jslint.mjs";
 
     await jslint.v8CoverageReportCreate({
         coverageDir: "../.artifact/coverage_sqlite3_js/",
-        processArgv: ["npm", "run", "test"]
+        processArgv: [
+            "--include=lib/sqlite3-binding.js,lib/sqlite3.js",
+            "--include=lib/trace.js",
+            "npm", "run", "test"
+        ]
     });
 }());
 
 '
 ```
+- shell output
+
+![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_js_coverage_report_spawn.svg)
+
 - screenshot file [.artifact/coverage_sqlite3_js/index.html](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3_js/index.html)
 
 [![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fcoverage_sqlite3_js_2findex.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3_js/index.html)
@@ -317,10 +328,6 @@ import jslint from "../jslint.mjs";
 - screenshot file [.artifact/coverage_sqlite3_js/lib/sqlite3.js.html](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3_js/lib/sqlite3.js.html)
 
 [![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fcoverage_sqlite3_js_2flib_2fsqlite3.js.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3_js/lib/sqlite3.js.html)
-
-- shell output
-
-![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_js_coverage_report_spawn.svg)
 
 
 <br><br>
@@ -379,7 +386,7 @@ right so that you can focus your creative energy where it is most needed.
 <br><br>
 # License
 - JSLint is under [Unlicense License](LICENSE).
-- CodeMirror code-editor is under [MIT License](https://github.com/codemirror/CodeMirror/blob/master/LICENSE).
+- CodeMirror editor is under [MIT License](https://github.com/codemirror/CodeMirror/blob/master/LICENSE).
 - Function `v8CoverageListMerge` is derived from [MIT Licensed v8-coverage](https://github.com/demurgos/v8-coverage/blob/73446087dc38f61b09832c9867122a23f8577099/ts/LICENSE.md).
 
 <!--

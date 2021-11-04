@@ -76,8 +76,8 @@ echo "\
             + "$&\n"
             + "git checkout 60a022c511a37788e652c271af23174566a80c30\n"
         ));
-        // limit stdout to 100 lines
-        script = script.trimRight() + " 2>&1 | head -n 100\n";
+        // limit stdout to 32 lines
+        script = script.trimRight() + " 2>&1 | head -n 32\n";
         // printf script
         script = (
             "(set -e\n"

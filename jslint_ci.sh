@@ -2004,6 +2004,10 @@ async function v8CoverageReportCreate({
   let cwd;
   let exitCode = 0;
   let fileDict;
+  let fileExcludeList = [];
+  let fileIncludeList = [];
+  let fileIncludeNodeModules;
+  let processArgElem;
   let promiseList = [];
   let v8CoverageObj;
 
@@ -2032,6 +2036,8 @@ box-sizing: border-box;
   font-family: consolas, menlo, monospace;
 }
 /*csslint ignore:end*/
+
+/* css - coverage_report - general */
 body {
   margin: 0;
 }
@@ -2044,8 +2050,9 @@ body {
 .coverage td,
 .coverage th {
   border: 1px solid #777;
+  line-height: 20px;
   margin: 0;
-  padding: 5px;
+  padding: 5px 10px;
 }
 .coverage td span {
   display: inline-block;
@@ -2085,30 +2092,30 @@ body {
   margin-bottom: 10px;
 }
 
+/* css - coverage_report - color */
 .coverage td,
 .coverage th {
   background: #fff;
 }
+.coverage .count,
+.coverage .coverageHigh {
+  background: #9d9;
+}
 .coverage .count {
-  background: #9d9;
-  color: #777;
+  color: #666;
 }
-.coverage .coverageHigh{
-  background: #9d9;
-}
-.coverage .coverageIgnore{
+.coverage .coverageIgnore {
   background: #ccc;
 }
-.coverage .coverageLow{
+.coverage .coverageLow,
+.coverage .uncovered {
   background: #ebb;
 }
-.coverage .coverageMedium{
+.coverage .coverageMedium {
   background: #fd7;
 }
 .coverage .footer,
-.coverage .header {
-  background: #ddd;
-}
+.coverage .header,
 .coverage .lineno {
   background: #ddd;
 }
@@ -2118,17 +2125,15 @@ body {
 .coverage .percentbar div {
   background: #666;
 }
-.coverage .uncovered {
-  background: #dbb;
-}
 
+/* css - coverage_report - important */
 .coverage pre:hover span,
 .coverage tr:hover td {
   background: #7d7;
 }
 .coverage pre:hover span.uncovered,
 .coverage tr:hover td.coverageLow {
-  background: #d99;
+  background: #f99;
 }
 </style>
 </head>
@@ -2141,6 +2146,7 @@ body {
   <tr>
   <th>Files covered</th>
   <th>Lines</th>
+  <th>Remaining</th>
   </tr>
 </thead>
 <tbody>
@@ -2284,6 +2290,10 @@ body {
     ${modeCoverageIgnoreFile} ${coveragePct} %<br>
     ${linesCovered} / ${linesTotal}
   </td>
+  <td style="text-align: right;">
+    <br>
+    ${linesTotal - linesCovered} / ${linesTotal}
+  </td>
   </tr>
     `).trim() + "\n";
     });
@@ -2369,7 +2379,7 @@ body {
           : ""
         )}"
 >
-${String(count).padStart(7, " ")}
+${String(count || "-0").padStart(7, " ")}
 </span>
 <span>${lineHtml}</span>
 </pre>
@@ -2426,6 +2436,29 @@ function sentinel() {}
   coverageDir = modulePath.resolve(coverageDir).replace((
     /\\/g
   ), "/") + "/";
+
+  processArgv = processArgv.slice();
+  while (processArgv[0] && processArgv[0][0] === "-") {
+    processArgElem = processArgv.shift().split("=");
+    processArgElem[1] = processArgElem.slice(1).join("=");
+    switch (processArgElem[0]) {
+    case "--exclude":
+      fileExcludeList = fileExcludeList.concat(
+        processArgElem[1].split(",")
+      );
+      break;
+    case "--exclude-node-modules":
+      fileIncludeNodeModules = (
+        /0|false|null|undefined/
+      ).test(processArgElem[1]);
+      break;
+    case "--include":
+      fileIncludeList = fileIncludeList.concat(
+        processArgElem[1].split(",")
+      );
+      break;
+    }
+  }
   if (processArgv.length > 0) {
     await fsWriteFileWithParents(coverageDir + "/touch.txt", "");
     await Promise.all(Array.from(
@@ -2475,10 +2508,15 @@ function sentinel() {}
         !pathname
         || pathname.startsWith("[")
         || (
-          process.env.npm_config_mode_coverage !== "all"
+          !fileIncludeNodeModules
           && (
             /(?:^|\/)node_modules\//m
           ).test(pathname)
+        )
+        || fileExcludeList.indexOf(pathname) >= 0
+        || (
+          fileIncludeList.length > 0
+          && fileIncludeList.indexOf(pathname) === -1
         )
       ) {
         return;
@@ -2577,7 +2615,7 @@ function sentinel() {}
       linesTotal,
       modeCoverageIgnoreFile: (
         (
-          /^\/\*mode-coverage-ignore-file\*\/$/m
+          /^\/\*coverage-ignore-file\*\/$/m
         ).test(source.slice(0, 65536))
         ? "(ignore)"
         : ""
@@ -2607,9 +2645,9 @@ function sentinel() {}
 }
 v8CoverageReportCreate({
   coverageDir: ".artifact/coverage",
-  processArgv: process.argv.slice(1)
+  processArgv: process.argv.slice(2)
 });
-' "$@" # '
+' 0 "$@" # '
 )}
 
 shRunWithScreenshotTxt() {(set -e
@@ -2726,11 +2764,6 @@ shCiMain() {(set -e
     if [ -f ./.ci.sh ]
     then
         . ./.ci.sh "$@"
-    fi
-    if [ "$npm_config_mode_coverage" ] && [ "$1" = "node" ]
-    then
-        shRunWithCoverage "$@"
-        return
     fi
     "$@"
 )}

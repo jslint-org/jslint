@@ -121,7 +121,7 @@
     mkdir, modeCoverageIgnoreFile, modeIndex, mode_cli, mode_json, mode_module,
     mode_noop, mode_property, mode_shebang, mode_stop, module, moduleFsInit,
     moduleName, module_list, name, names, node, noop, now,
-    npm_config_mode_coverage, nr, nud, ok, on, open, opening, option,
+    nr, nud, ok, on, open, opening, option,
     option_dict, order, package_name, padEnd, padStart, parameters, parent,
     parentIi, parse, pathname, platform, pop, processArgv, process_argv,
     process_env, process_exit, process_version, promises, property,
@@ -10197,6 +10197,10 @@ async function v8CoverageReportCreate({
     let cwd;
     let exitCode = 0;
     let fileDict;
+    let fileExcludeList = [];
+    let fileIncludeList = [];
+    let fileIncludeNodeModules;
+    let processArgElem;
     let promiseList = [];
     let v8CoverageObj;
 
@@ -10225,6 +10229,8 @@ box-sizing: border-box;
     font-family: consolas, menlo, monospace;
 }
 /*csslint ignore:end*/
+
+/* css - coverage_report - general */
 body {
     margin: 0;
 }
@@ -10237,8 +10243,9 @@ body {
 .coverage td,
 .coverage th {
     border: 1px solid #777;
+    line-height: 20px;
     margin: 0;
-    padding: 5px;
+    padding: 5px 10px;
 }
 .coverage td span {
     display: inline-block;
@@ -10278,30 +10285,30 @@ body {
     margin-bottom: 10px;
 }
 
+/* css - coverage_report - color */
 .coverage td,
 .coverage th {
     background: #fff;
 }
+.coverage .count,
+.coverage .coverageHigh {
+    background: #9d9;
+}
 .coverage .count {
-    background: #9d9;
-    color: #777;
+    color: #666;
 }
-.coverage .coverageHigh{
-    background: #9d9;
-}
-.coverage .coverageIgnore{
+.coverage .coverageIgnore {
     background: #ccc;
 }
-.coverage .coverageLow{
+.coverage .coverageLow,
+.coverage .uncovered {
     background: #ebb;
 }
-.coverage .coverageMedium{
+.coverage .coverageMedium {
     background: #fd7;
 }
 .coverage .footer,
-.coverage .header {
-    background: #ddd;
-}
+.coverage .header,
 .coverage .lineno {
     background: #ddd;
 }
@@ -10311,17 +10318,15 @@ body {
 .coverage .percentbar div {
     background: #666;
 }
-.coverage .uncovered {
-    background: #dbb;
-}
 
+/* css - coverage_report - important */
 .coverage pre:hover span,
 .coverage tr:hover td {
     background: #7d7;
 }
 .coverage pre:hover span.uncovered,
 .coverage tr:hover td.coverageLow {
-    background: #d99;
+    background: #f99;
 }
 </style>
 </head>
@@ -10334,6 +10339,7 @@ body {
     <tr>
     <th>Files covered</th>
     <th>Lines</th>
+    <th>Remaining</th>
     </tr>
 </thead>
 <tbody>
@@ -10492,6 +10498,10 @@ body {
         ${modeCoverageIgnoreFile} ${coveragePct} %<br>
         ${linesCovered} / ${linesTotal}
     </td>
+    <td style="text-align: right;">
+        <br>
+        ${linesTotal - linesCovered} / ${linesTotal}
+    </td>
     </tr>
         `).trim() + "\n";
         });
@@ -10581,7 +10591,7 @@ body {
                     : ""
                 )}"
 >
-${String(count).padStart(7, " ")}
+${String(count || "-0").padStart(7, " ")}
 </span>
 <span>${lineHtml}</span>
 </pre>
@@ -10660,6 +10670,38 @@ function sentinel() {}
         /\\/g
     ), "/") + "/";
 
+    processArgv = processArgv.slice();
+    while (processArgv[0] && processArgv[0][0] === "-") {
+        processArgElem = processArgv.shift().split("=");
+        processArgElem[1] = processArgElem.slice(1).join("=");
+        switch (processArgElem[0]) {
+
+// PR-xxx - add cli-option `--exclude=aa,bb`
+
+        case "--exclude":
+            fileExcludeList = fileExcludeList.concat(
+                processArgElem[1].split(",")
+            );
+            break;
+
+// PR-xxx - add cli-option `--exclude-node-modules=false`
+
+        case "--exclude-node-modules":
+            fileIncludeNodeModules = (
+                /0|false|null|undefined/
+            ).test(processArgElem[1]);
+            break;
+
+// PR-xxx - add cli-option `--include=aa,bb`
+
+        case "--include":
+            fileIncludeList = fileIncludeList.concat(
+                processArgElem[1].split(",")
+            );
+            break;
+        }
+    }
+
 // 1. Spawn node.js program <processArgv> with coverage
 
     if (processArgv.length > 0) {
@@ -10730,13 +10772,24 @@ function sentinel() {}
                 !pathname
                 || pathname.startsWith("[")
 
-// Filter directory node_modules.
+// PR-xxx - Filter directory node_modules.
 
                 || (
-                    process.env.npm_config_mode_coverage !== "all"
+                    !fileIncludeNodeModules
                     && (
                         /(?:^|\/)node_modules\//m
                     ).test(pathname)
+                )
+
+// PR-xxx - Filter fileExcludeList.
+
+                || fileExcludeList.indexOf(pathname) >= 0
+
+// PR-xxx - Filter fileIncludeList.
+
+                || (
+                    fileIncludeList.length > 0
+                    && fileIncludeList.indexOf(pathname) === -1
                 )
             ) {
                 return;
@@ -10850,7 +10903,7 @@ function sentinel() {}
             linesTotal,
             modeCoverageIgnoreFile: (
                 (
-                    /^\/\*mode-coverage-ignore-file\*\/$/m
+                    /^\/\*coverage-ignore-file\*\/$/m
                 ).test(source.slice(0, 65536))
                 ? "(ignore)"
                 : ""

@@ -3,6 +3,7 @@
 # Todo
 - cli - remove cli-option `--mode-vim-plugin`
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
+- coverage - support globbing `*` in cli-options `--exclude` and `--include`
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - add numeric-separators support.
@@ -14,6 +15,7 @@
 
 # v2021.11.1-beta
 - ci - deprecate/remove jslint.cjs from ci
+- coverage - add cli-options `--exclude=aa,bb`, `--exclude-node-modules=false`, `--include=aa,bb`
 - coverage - dedupe coverage-logic now applied when only one script passed
 - jslint - add top-level-await support
 - npm - add file .npmignore

@@ -42,6 +42,7 @@ try {
     moduleFs.rmSync(".tmp", { //jslint-quiet
         recursive: true
     });
+    assertOrThrow(undefined);
 } catch (ignore) {}
 
 (function testcaseFsXxx() {
@@ -895,6 +896,9 @@ try {
                 process_argv: [
                     "node", "jslint.mjs",
                     "v8_coverage_report=.tmp/coverage_jslint",
+                    "--exclude-node-modules=0",
+                    "--exclude=aa.js",
+                    "--include=jslint.mjs",
                     "node", "jslint.mjs"
                 ]
             });
@@ -908,7 +912,7 @@ try {
                 )
             ], [
                 "v8CoverageReportCreate_ignore.js", (
-                    "/*mode-coverage-ignore-file*/\n"
+                    "/*coverage-ignore-file*/\n"
                     + "switch(0){\n"
                     + "case 0:break;\n"
                     + "}\n"
