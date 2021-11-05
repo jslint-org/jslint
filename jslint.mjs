@@ -2973,12 +2973,10 @@ function jslint_phase2_lex(state) {
         switch (val && key) {
 
 // Assign global browser variables to global_dict.
-// /*jslint beta, browser, devel*/
-// console.log(JSON.stringify(Array.from([
-//     ...
-// ]).filter(function (key) {
-//     return window.hasOwnProperty(key);
-// }), undefined, 4));
+/*
+// /\*jslint beta, browser, devel*\/
+console.log(JSON.stringify(Object.keys(window).sort(), undefined, 4));
+*/
 
         case "browser":
             object_assign_from_list(global_dict, [
@@ -2986,6 +2984,7 @@ function jslint_phase2_lex(state) {
 // Shared with Node.js.
 
                 "AbortController",
+                // "Buffer",
                 "DOMException",
                 "Event",
                 "EventTarget",
@@ -2997,17 +2996,33 @@ function jslint_phase2_lex(state) {
                 "URL",
                 "URLSearchParams",
                 "WebAssembly",
+                // "__dirname",
+                // "__filename",
                 // "atob",
                 // "btoa",
+                // "clearImmediate",
                 "clearInterval",
                 "clearTimeout",
                 // "console",
+                // "exports",
+                // "global",
+                // "module",
                 "performance",
+                // "process",
                 "queueMicrotask",
+                // "require",
+                // "setImmediate",
                 "setInterval",
                 "setTimeout",
+                "structuredClone",
 
-// Browser only.
+// Web worker only.
+// https://github.com/mdn/content/blob/main/files/en-us/web/api
+// /workerglobalscope/index.md
+
+                "importScripts",
+
+// Window.
 
                 // "CharacterData",
                 // "DocumentType",
@@ -3031,6 +3046,7 @@ function jslint_phase2_lex(state) {
                 // "event",
                 "fetch",
                 // "history",
+                "indexedDb",
                 "localStorage",
                 "location",
                 // "name",
@@ -3077,8 +3093,8 @@ import https from "https";
     let result = "";
     await new Promise(function (resolve) {
         https.get((
-            "https://raw.githubusercontent.com/mdn/content/main/files/"
-            + "en-us/web/javascript/reference/global_objects/index.md"
+            "https://raw.githubusercontent.com/mdn/content/main/files"
+            + "/en-us/web/javascript/reference/global_objects/index.md"
         ), function (res) {
             res.on("data", function (chunk) {
                 result += chunk;
@@ -3170,8 +3186,8 @@ import moduleHttps from "https";
     let result = "";
     await new Promise(function (resolve) {
         moduleHttps.get((
-            "https://raw.githubusercontent.com/nodejs/node/master/doc/api/"
-            + "globals.md"
+            "https://raw.githubusercontent.com/nodejs/node/master/doc/api"
+            + "/globals.md"
         ), function (res) {
             res.on("data", function (chunk) {
                 result += chunk;
@@ -3221,7 +3237,8 @@ import moduleHttps from "https";
                 "require",
                 "setImmediate",
                 "setInterval",
-                "setTimeout"
+                "setTimeout",
+                "structuredClone"
             ], "Node.js");
             break;
         }

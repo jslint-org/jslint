@@ -7,6 +7,7 @@
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - add numeric-separators support.
+- jslint - relax warning against console.log and friends and deprecate directive `devel`
 - jslint - require regexp to use open-form.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 - jslint - unify analysis of variable-assignment/function-parameters into one function
