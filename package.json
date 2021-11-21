@@ -13,6 +13,7 @@
         "zero-dependency"
     ],
     "license": "UNLICENSE",
+    "main": "jslint.mjs",
     "name": "@jslint-org/jslint",
     "repository": {
         "type": "git",
