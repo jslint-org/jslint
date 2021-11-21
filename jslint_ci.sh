@@ -1151,38 +1151,38 @@ shJsonNormalize() {(set -e
 # 3. write normalized json-data back to file $1
     node --input-type=module --eval '
 import moduleFs from "fs";
+function noop(val) {
+
+// This function will do nothing except return <val>.
+
+    return val;
+}
+function objectDeepCopyWithKeysSorted(obj) {
+
+// This function will recursively deep-copy <obj> with keys sorted.
+
+    let sorted;
+    if (typeof obj !== "object" || !obj) {
+        return obj;
+    }
+
+// Recursively deep-copy list with child-keys sorted.
+
+    if (Array.isArray(obj)) {
+        return obj.map(objectDeepCopyWithKeysSorted);
+    }
+
+// Recursively deep-copy obj with keys sorted.
+
+    sorted = {};
+    Object.keys(obj).sort().forEach(function (key) {
+        sorted[key] = objectDeepCopyWithKeysSorted(obj[key]);
+    });
+    return sorted;
+}
 (async function () {
-    function noop(val) {
-
-// this function will do nothing except return <val>
-
-        return val;
-    }
-    function objectDeepCopyWithKeysSorted(obj) {
-
-// this function will recursively deep-copy <obj> with keys sorted
-
-        let sorted;
-        if (typeof obj !== "object" || !obj) {
-            return obj;
-        }
-
-// recursively deep-copy list with child-keys sorted
-
-        if (Array.isArray(obj)) {
-            return obj.map(objectDeepCopyWithKeysSorted);
-        }
-
-// recursively deep-copy obj with keys sorted
-
-        sorted = {};
-        Object.keys(obj).sort().forEach(function (key) {
-            sorted[key] = objectDeepCopyWithKeysSorted(obj[key]);
-        });
-        return sorted;
-    }
     console.error("shJsonNormalize - " + process.argv[1]);
-    moduleFs.promises.writeFile(
+    await moduleFs.promises.writeFile(
         process.argv[1],
         JSON.stringify(
             objectDeepCopyWithKeysSorted(
@@ -1198,7 +1198,7 @@ import moduleFs from "fs";
                 )
             ),
             undefined,
-            4
+            Number(process.argv[2]) || 4
         ) + "\n"
     );
 }());
