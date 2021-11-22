@@ -121,7 +121,7 @@
     mkdir, modeCoverageIgnoreFile, modeIndex, mode_cli, mode_json, mode_module,
     mode_noop, mode_property, mode_shebang, mode_stop, module, moduleFsInit,
     moduleName, module_list, name, names, node, noop, now,
-    nr, nud, ok, on, open, opening, option,
+    nr, nud, objectDeepCopyWithKeysSorted, ok, on, open, opening, option,
     option_dict, order, package_name, padEnd, padStart, parameters, parent,
     parentIi, parse, pathname, platform, pop, processArgv, process_argv,
     process_env, process_exit, process_version, promises, property,
@@ -165,7 +165,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2021.11.1-beta";
+let jslint_edition = "v2021.11.20";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -183,7 +183,7 @@ let moduleUrl;
 
 async function assertErrorThrownAsync(asyncFunc, regexp) {
 
-// This function will assert <asyncFunc> throws an error.
+// This function will assert calling <asyncFunc> throws an error.
 
     let err;
     try {
@@ -191,7 +191,7 @@ async function assertErrorThrownAsync(asyncFunc, regexp) {
     } catch (errCaught) {
         err = errCaught;
     }
-    assertOrThrow(err, "no error thrown");
+    assertOrThrow(err, "No error thrown.");
     assertOrThrow(
         regexp === undefined || new RegExp(regexp).test(err.message),
         err
@@ -206,7 +206,11 @@ function assertJsonEqual(aa, bb, message) {
     bb = JSON.stringify(objectDeepCopyWithKeysSorted(bb));
     if (aa !== bb) {
         throw new Error(
-            message || JSON.stringify(aa) + " !== " + JSON.stringify(bb)
+            JSON.stringify(aa) + " !== " + JSON.stringify(bb) + (
+                message
+                ? " - " + message
+                : ""
+            )
         );
     }
 }
@@ -9548,13 +9552,13 @@ function objectDeepCopyWithKeysSorted(obj) {
         return obj;
     }
 
-// recursively deep-copy list with child-keys sorted
+// Recursively deep-copy list with child-keys sorted.
 
     if (Array.isArray(obj)) {
         return obj.map(objectDeepCopyWithKeysSorted);
     }
 
-// recursively deep-copy obj with keys sorted
+// Recursively deep-copy obj with keys sorted.
 
     sorted = {};
     Object.keys(obj).sort().forEach(function (key) {
@@ -10979,6 +10983,7 @@ jslint_export = Object.freeze(Object.assign(jslint, {
     jstestOnExit,
     moduleFsInit,
     noop,
+    objectDeepCopyWithKeysSorted,
     v8CoverageListMerge,
     v8CoverageReportCreate
 }));

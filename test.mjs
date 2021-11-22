@@ -622,6 +622,9 @@ try {
     await assertErrorThrownAsync(function () {
         assertJsonEqual(1, 2);
     });
+    await assertErrorThrownAsync(function () {
+        assertJsonEqual(1, 2, "undefined");
+    });
     // test assertOrThrow's error handling-behavior
     await assertErrorThrownAsync(function () {
         assertOrThrow(undefined, "undefined");

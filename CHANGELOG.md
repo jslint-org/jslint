@@ -14,11 +14,11 @@
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 - perf - improve performance by hoisting inlined regexps out of loops and subfunctions
 
-# v2021.11.1-beta
+# v2021.11.20
+- jslint - add top-level-await support
 - ci - deprecate/remove jslint.cjs from ci
 - coverage - add cli-options `--exclude=aa,bb`, `--exclude-node-modules=false`, `--include=aa,bb`
 - coverage - dedupe coverage-logic now applied when only one script passed
-- jslint - add top-level-await support
 - npm - add file .npmignore
 - website - add clickable-links to editor-code in report-warnings and report-functions
 
