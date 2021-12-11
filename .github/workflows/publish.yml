@@ -23,8 +23,8 @@ jobs:
           # - x86
         node_version:
           # - 12
-          - 14
-          # - 16
+          # - 14
+          - 16
         os:
           # - macos-latest
           - ubuntu-latest
@@ -47,10 +47,10 @@ jobs:
           # Defaults to the user or organization that owns the workflow file
           # scope: '@octocat'
       # Publish to GitHub Packages
-      - run: npm install
-      - run: npm publish --access public
+      - run: sh jslint_ci.sh shCiNpmPublish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_REGISTRY: github
 
       # Setup .npmrc file to publish to npm
       - run: rm -f /home/runner/work/_temp/.npmrc
@@ -61,8 +61,8 @@ jobs:
           architecture: ${{ matrix.architecture }}
           registry-url: 'https://registry.npmjs.org'
       # Publish to npm
-      - run: npm install
-      - run: npm publish --access public
+      - run: sh jslint_ci.sh shCiNpmPublish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_REGISTRY: npm
 # npm publish - end

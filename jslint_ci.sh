@@ -363,11 +363,66 @@ import moduleChildProcess from "child_process";
 )}
 
 shCiArtifactUploadCustom() {(set -e
+# this function will run custom-code to upload build-artifacts
     return
 )}
 
 shCiBase() {(set -e
 # this function will run base-ci
+    # update version in README.md, jslint.mjs, package.json from CHANGELOG.md
+    if [ "$(git branch --show-current)" = alpha ]
+    then
+        node --input-type=module --eval '
+import moduleFs from "fs";
+(async function () {
+    let fileDict = {};
+    let fileModified;
+    let versionBeta;
+    let versionMaster;
+    await Promise.all([
+        "CHANGELOG.md",
+        "README.md",
+        "package.json"
+    ].map(async function (file) {
+        fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
+    }));
+    Array.from(fileDict["CHANGELOG.md"].matchAll(
+        /\n\n# (v\d\d\d\d\.\d\d?\.\d\d?(.*?)?)\n/g
+    )).slice(0, 2).forEach(function ([
+        ignore, version, isBeta
+    ]) {
+        versionBeta = versionBeta || version;
+        versionMaster = versionMaster || (!isBeta && version);
+    });
+    await Promise.all([
+        {
+            file: "README.md",
+            src: fileDict["README.md"].replace((
+                /\bv\d\d\d\d\.\d\d?\.\d\d?\b/m
+            ), versionMaster)
+        }, {
+            file: "package.json",
+            src: fileDict["package.json"].replace((
+                /("version": )".*?"/
+            ), "$1" + JSON.stringify(versionBeta.slice(1)))
+        }
+    ].map(async function ({
+        file,
+        src
+    }) {
+        let src0 = fileDict[file];
+        if (src !== src0) {
+            console.error(`update file ${file}`);
+            fileModified = file;
+            await moduleFs.promises.writeFile(file, src);
+        }
+    }));
+    if (fileModified) {
+        throw new Error("modified file " + fileModified);
+    }
+}());
+' "$@" # '
+    fi
     # update table-of-contents in README.md
     node --input-type=module --eval '
 import moduleFs from "fs";
@@ -418,6 +473,7 @@ import moduleFs from "fs";
 )}
 
 shCiBaseCustom() {(set -e
+# this function will run custom-ci
     return
 )}
 
@@ -434,6 +490,25 @@ shCiBranchPromote() {(set -e
     shift
     git fetch "$REMOTE" "$BRANCH1"
     git push "$REMOTE" "$REMOTE/$BRANCH1:$BRANCH2" "$@"
+)}
+
+shCiNpmPublish() {(set -e
+# this function will npm-publish package
+    # init package.json for npm-publish
+    npm install
+    # update package-name
+    if [ "$NPM_REGISTRY" = github ]
+    then
+        sed -i \
+            "s|^    \"name\":.*|    \"name\": \"@$GITHUB_REPOSITORY\",|" \
+            package.json
+    fi
+    shCiNpmPublishCustom
+)}
+
+shCiNpmPublishCustom() {(set -e
+# this function will run custom-code to npm-publish package
+    # npm publish --access public
 )}
 
 shDirHttplinkValidate() {(set -e

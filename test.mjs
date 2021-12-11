@@ -315,7 +315,25 @@ try {
             )
         ],
         loop: [
-            "function aa() {\n    do {\n        aa();\n    } while (aa());\n}"
+            (
+                "function aa() {\n"
+                + "    do {\n"
+                + "        aa();\n"
+                + "    } while (aa());\n"
+                + "}\n"
+            ),
+
+// PR-xxx - Relax warning "function_in_loop".
+
+            (
+                "function aa() {\n"
+                + "    while (true) {\n"
+                + "        (function () {\n"
+                + "            return;\n"
+                + "        }());\n"
+                + "    }\n"
+                + "}\n"
+            )
         ],
         module: [
             "export default Object.freeze();",
@@ -624,6 +642,9 @@ try {
     });
     await assertErrorThrownAsync(function () {
         assertJsonEqual(1, 2, "undefined");
+    });
+    await assertErrorThrownAsync(function () {
+        assertJsonEqual(1, 2, {});
     });
     // test assertOrThrow's error handling-behavior
     await assertErrorThrownAsync(function () {

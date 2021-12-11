@@ -14,6 +14,10 @@
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 - perf - improve performance by hoisting inlined regexps out of loops and subfunctions
 
+# v2021.12.1-beta
+- jslint - relax warning "function_in_loop"
+- update function assertJsonEqual to JSON.stringify 3rd param if its an object
+
 # v2021.11.20
 - jslint - add top-level-await support
 - ci - deprecate/remove jslint.cjs from ci
