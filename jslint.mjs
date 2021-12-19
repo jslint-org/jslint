@@ -165,7 +165,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2021.11.20";
+let jslint_edition = "v2021.12.1-beta";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -202,13 +202,16 @@ function assertJsonEqual(aa, bb, message) {
 
 // This function will assert JSON.stringify(<aa>) === JSON.stringify(<bb>).
 
-    aa = JSON.stringify(objectDeepCopyWithKeysSorted(aa));
-    bb = JSON.stringify(objectDeepCopyWithKeysSorted(bb));
+    aa = JSON.stringify(objectDeepCopyWithKeysSorted(aa), undefined, 1);
+    bb = JSON.stringify(objectDeepCopyWithKeysSorted(bb), undefined, 1);
     if (aa !== bb) {
         throw new Error(
-            JSON.stringify(aa) + " !== " + JSON.stringify(bb) + (
-                message
+            "\n" + aa + "\n!==\n" + bb
+            + (
+                typeof message === "string"
                 ? " - " + message
+                : message
+                ? " - " + JSON.stringify(message)
                 : ""
             )
         );
@@ -676,9 +679,12 @@ function jslint(
                 `Expected 'Object.freeze('. All export values should be frozen.`
             );
             break;
-        case "function_in_loop":
-            mm = `Don't create functions within a loop.`;
-            break;
+
+// PR-378 - Relax warning "function_in_loop".
+//
+//         case "function_in_loop":
+//             mm = `Don't create functions within a loop.`;
+//             break;
         case "infix_in":
             mm = (
                 `Unexpected 'in'. Compare with undefined,`
@@ -3028,6 +3034,7 @@ console.log(JSON.stringify(Object.keys(window).sort(), undefined, 4));
 
 // Window.
 
+                "Blob",
                 // "CharacterData",
                 // "DocumentType",
                 // "Element",
@@ -4929,18 +4936,20 @@ function jslint_phase3_parse(state) {
 //  }
 //  jslint_assert(!mode_mega, `Expected !mode_mega.`);
 
-// Don't create functions in loops. It is inefficient, and it can lead to
-// scoping errors.
-
-        if (functionage.loop > 0) {
-
-// test_cause:
-// ["
-// while(0){aa.map(function(){});}
-// ", "prefix_function", "function_in_loop", "function", 17]
-
-            warn("function_in_loop", the_function);
-        }
+// PR-378 - Relax warning "function_in_loop".
+//
+// // Don't create functions in loops. It is inefficient, and it can lead to
+// // scoping errors.
+//
+//         if (functionage.loop > 0) {
+//
+// // test_cause:
+// // ["
+// // while(0){aa.map(function(){});}
+// // ", "prefix_function", "function_in_loop", "function", 17]
+//
+//             warn("function_in_loop", the_function);
+//         }
 
 // Give the function properties for storing its names and for observing the
 // depth of loops and switches.

@@ -3,8 +3,7 @@ shCiArtifactUploadCustom() {(set -e
     # .cache - restore
     if [ -d .cache ]
     then
-        cp -a .cache/* .
-        # js-hack - */
+        cp -a .cache/* . # js-hack - */
     fi
     # add jslint.js
     cp jslint.mjs jslint.js
@@ -76,8 +75,6 @@ echo "\
             + "$&\n"
             + "git checkout 60a022c511a37788e652c271af23174566a80c30\n"
         ));
-        // limit stdout to 32 lines
-        script = script.trimRight() + " 2>&1 | head -n 32\n";
         // printf script
         script = (
             "(set -e\n"
@@ -102,6 +99,10 @@ echo "\
                     "sh", file + ".sh"
                 ],
                 {
+                    env: Object.assign({
+                        // limit stdout to xxx lines
+                        SH_RUN_WITH_SCREENSHOT_TXT_MAX_LINES: 64
+                    }, process.env),
                     stdio: [
                         "ignore", 1, 2
                     ]
@@ -149,9 +150,8 @@ import moduleChildProcess from "child_process";
 }());
 ' "$@" # '
     # remove bloated json-coverage-files
-    rm .artifact/coverage/*.json
-    rm .artifact/coverage_sqlite3_*/*.json
-    # js-hack - */
+    rm .artifact/coverage/*.json # js-hack - */
+    rm .artifact/coverage_sqlite3_*/*.json # js-hack - */
     # .cache - save
     if [ ! -d .cache ]
     then
@@ -162,7 +162,7 @@ import moduleChildProcess from "child_process";
 
 shCiBaseCustom() {(set -e
 # this function will run base-ci
-    # update version in README.md, jslint.mjs, package.json from CHANGELOG.md
+    # update files
     if [ "$(git branch --show-current)" = alpha ]
     then
         node --input-type=module --eval '
@@ -175,11 +175,9 @@ import moduleFs from "fs";
     let versionMaster;
     await Promise.all([
         "CHANGELOG.md",
-        "README.md",
         "index.html",
         "jslint.mjs",
-        "jslint_ci.sh",
-        "package.json"
+        "jslint_ci.sh"
     ].map(async function (file) {
         fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
     }));
@@ -193,11 +191,6 @@ import moduleFs from "fs";
     });
     await Promise.all([
         {
-            file: "README.md",
-            src: fileDict["README.md"].replace((
-                /\bv\d\d\d\d\.\d\d?\.\d\d?\b/m
-            ), versionMaster)
-        }, {
             file: "index.html",
             src: fileDict["index.html"].replace((
                 /\n<style class="JSLINT_REPORT_STYLE">\n[\S\s]*?\n<\/style>\n/
@@ -241,11 +234,6 @@ import moduleFs from "fs";
                     + "\nv8CoverageReportCreate("
                 );
             })
-        }, {
-            file: "package.json",
-            src: fileDict["package.json"].replace((
-                /("version": )".*?"/
-            ), "$1" + JSON.stringify(versionBeta.slice(1)))
         }
     ].map(async function ({
         file,
@@ -259,15 +247,16 @@ import moduleFs from "fs";
         }
     }));
     if (fileModified) {
-        // throw new Error("modified file " + fileModified);
-        return;
+        throw new Error("modified file " + fileModified);
     }
 }());
 ' "$@" # '
     fi
-    # test jslint's cli handling-behavior
-    printf "node jslint.mjs .\n"
     # run test with coverage-report
-    printf "node test.mjs\n"
     npm run test
+)}
+
+shCiNpmPublishCustom() {(set -e
+# this function will run custom-code to npm-publish package
+    npm publish --access public
 )}
