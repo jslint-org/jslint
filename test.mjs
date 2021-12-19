@@ -323,7 +323,7 @@ try {
                 + "}\n"
             ),
 
-// PR-xxx - Relax warning "function_in_loop".
+// PR-378 - Relax warning "function_in_loop".
 
             (
                 "function aa() {\n"

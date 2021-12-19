@@ -680,7 +680,7 @@ function jslint(
             );
             break;
 
-// PR-xxx - Relax warning "function_in_loop".
+// PR-378 - Relax warning "function_in_loop".
 //
 //         case "function_in_loop":
 //             mm = `Don't create functions within a loop.`;
@@ -4936,7 +4936,7 @@ function jslint_phase3_parse(state) {
 //  }
 //  jslint_assert(!mode_mega, `Expected !mode_mega.`);
 
-// PR-xxx - Relax warning "function_in_loop".
+// PR-378 - Relax warning "function_in_loop".
 //
 // // Don't create functions in loops. It is inefficient, and it can lead to
 // // scoping errors.
