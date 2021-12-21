@@ -4,6 +4,10 @@
     },
     "counter": 7,
     "description": "JSLint, The JavaScript Code Quality and Coverage Tool",
+    "exports": {
+        "default": "./jslint.cjs",
+        "import": "./jslint.mjs"
+    },
     "fileCount": 28,
     "keywords": [
         "coverage-report",
@@ -13,7 +17,8 @@
         "zero-dependency"
     ],
     "license": "UNLICENSE",
-    "main": "jslint.mjs",
+    "main": "./jslint.cjs",
+    "module": "./jslint.mjs",
     "name": "@jslint-org/jslint",
     "repository": {
         "type": "git",
@@ -23,5 +28,6 @@
         "test": "node jslint.mjs v8_coverage_report=.artifact/coverage node test.mjs",
         "test2": "sh jslint_ci.sh shCiBase"
     },
-    "version": "2021.12.1-beta"
+    "type": "module",
+    "version": "2021.12.20"
 }
