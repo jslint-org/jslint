@@ -1,7 +1,8 @@
 /*jslint beta, node*/
+import jslint from "./jslint.mjs";
+import jslintCjs from "./jslint.cjs";
 import moduleFs from "fs";
 import modulePath from "path";
-import jslint from "./jslint.mjs";
 
 let {
     assertErrorThrownAsync,
@@ -433,13 +434,18 @@ try {
                 elemPrv, code
             ], undefined, 4));
             elemPrv = code;
-            warnings = jslint.jslint(code, {
-                beta: true
-            }).warnings;
-            assertOrThrow(
-                warnings.length === 0,
-                JSON.stringify([code, warnings])
-            );
+            [
+                jslint.jslint,
+                jslintCjs.jslint
+            ].forEach(function (jslint) {
+                warnings = jslint.jslint(code, {
+                    beta: true
+                }).warnings;
+                assertOrThrow(
+                    warnings.length === 0,
+                    JSON.stringify([code, warnings])
+                );
+            });
         });
     });
 }());
@@ -565,6 +571,9 @@ try {
         assertOrThrow(jslint.jslint(source).warnings.length === 0, source);
     });
     assertOrThrow(jslint.jslint("", {
+        test_internal_error: true
+    }).warnings.length === 1);
+    assertOrThrow(jslintCjs.jslint("", {
         test_internal_error: true
     }).warnings.length === 1);
 }());

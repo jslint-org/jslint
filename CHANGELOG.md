@@ -15,6 +15,7 @@
 - perf - improve performance by hoisting inlined regexps out of loops and subfunctions
 
 # v2021.12.20
+- npm - add file jslint.cjs so package @jslint-org/jslint can be published as dual-module
 - jslint - relax warning "function_in_loop"
 - update function assertJsonEqual to JSON.stringify 3rd param if its an object
 

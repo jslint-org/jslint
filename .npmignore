@@ -1,8 +1,6 @@
 *
 .*
 !.npmignore
-!CHANGELOG.md
-!LICENSE
-!README.md
 
+!jslint.cjs
 !jslint.mjs
