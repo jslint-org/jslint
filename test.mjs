@@ -578,60 +578,71 @@ try {
     }).warnings.length === 1);
 }());
 
-(async function testcaseJslintWarningsValidate() {
-/*
- * this function will validate each jslint <warning> is raised with given
- * malformed <code>
- */
-    String(
-        await moduleFs.promises.readFile("jslint.mjs", "utf8")
-    ).replace((
-        /(\n\s*?\/\/\s*?test_cause:\s*?)(\S[\S\s]*?\S)(\n\n\s*?) *?\S/g
-    ), function (match0, header, causeList, footer) {
-        let tmp;
-        // console.error(match0);
-        // Validate header.
-        assertOrThrow(header === "\n\n// test_cause:\n", match0);
-        // Validate footer.
-        assertOrThrow(footer === "\n\n", match0);
-        // Validate causeList.
-        causeList = causeList.replace((
-            /^\/\/ /gm
-        ), "").replace((
-            /^\["\n([\S\s]*?)\n"(,.*?)$/gm
-        ), function (ignore, source, param) {
-            source = "[" + JSON.stringify(source) + param;
-            assertOrThrow(source.length > (80 - 3), source);
-            return source;
-        }).replace((
-            / \/\/jslint-quiet$/gm
-        ), "");
-        tmp = causeList.split("\n").map(function (cause) {
-            return (
-                "["
-                + JSON.parse(cause).map(function (elem) {
-                    return JSON.stringify(elem);
-                }).join(", ")
-                + "]"
-            );
-        }).sort().join("\n");
-        assertOrThrow(causeList === tmp, "\n" + causeList + "\n\n" + tmp);
-        causeList.split("\n").forEach(function (cause) {
-            cause = JSON.parse(cause);
-            tmp = jslint.jslint(cause[0], {
-                beta: true,
-                test_cause: true
-            }).causes;
-            // Validate cause.
-            assertOrThrow(
-                tmp[JSON.stringify(cause.slice(1))],
-                (
-                    "\n" + JSON.stringify(cause) + "\n\n"
-                    + Object.keys(tmp).sort().join("\n")
-                )
-            );
+(function testcaseJslintWarningsValidate() {
+
+// this function will validate each jslint <warning> is raised with given
+// malformed <code>
+
+    jstestDescribe((
+        "test jslint's handling-behavior"
+    ), function () {
+        jstestIt((
+            "test jslint's warning handling-behavior"
+        ), async function () {
+            String(
+                await moduleFs.promises.readFile("jslint.mjs", "utf8")
+            ).replace((
+                /(\n\s*?\/\/\s*?test_cause:\s*?)(\S[\S\s]*?\S)(\n\n\s*?) *?\S/g
+            ), function (match0, header, causeList, footer) {
+                let tmp;
+                // console.error(match0);
+                // Validate header.
+                assertOrThrow(header === "\n\n// test_cause:\n", match0);
+                // Validate footer.
+                assertOrThrow(footer === "\n\n", match0);
+                // Validate causeList.
+                causeList = causeList.replace((
+                    /^\/\/ /gm
+                ), "").replace((
+                    /^\["\n([\S\s]*?)\n"(,.*?)$/gm
+                ), function (ignore, source, param) {
+                    source = "[" + JSON.stringify(source) + param;
+                    assertOrThrow(source.length > (80 - 3), source);
+                    return source;
+                }).replace((
+                    / \/\/jslint-quiet$/gm
+                ), "");
+                tmp = causeList.split("\n").map(function (cause) {
+                    return (
+                        "["
+                        + JSON.parse(cause).map(function (elem) {
+                            return JSON.stringify(elem);
+                        }).join(", ")
+                        + "]"
+                    );
+                }).sort().join("\n");
+                assertOrThrow(
+                    causeList === tmp,
+                    "\n" + causeList + "\n\n" + tmp
+                );
+                causeList.split("\n").forEach(function (cause) {
+                    cause = JSON.parse(cause);
+                    tmp = jslint.jslint(cause[0], {
+                        beta: true,
+                        test_cause: true
+                    }).causes;
+                    // Validate cause.
+                    assertOrThrow(
+                        tmp[JSON.stringify(cause.slice(1))],
+                        (
+                            "\n" + JSON.stringify(cause) + "\n\n"
+                            + Object.keys(tmp).sort().join("\n")
+                        )
+                    );
+                });
+                return "";
+            });
         });
-        return "";
     });
 }());
 

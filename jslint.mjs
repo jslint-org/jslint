@@ -165,7 +165,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2021.12.20";
+let jslint_edition = "v2022.2.1-beta";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -3193,7 +3193,7 @@ node --input-type=module --eval '
 // /\*jslint beta, node*\/
 import moduleHttps from "https";
 (async function () {
-    let dict = {};
+    let dict = Object.create(null);
     let result = "";
     await new Promise(function (resolve) {
         moduleHttps.get((
@@ -4447,22 +4447,26 @@ function jslint_phase3_parse(state) {
         the_fart.name = "=>";
         the_fart.level = functionage.level + 1;
         function_list.push(the_fart);
-        if (functionage.loop > 0) {
+// PR-xxx - Relax warning "function_in_loop".
+//
+//         if (functionage.loop > 0) {
 
-// test_cause:
-// ["while(0){aa.map(()=>0);}", "parse_fart", "function_in_loop", "=>", 19]
-
-            warn("function_in_loop", the_fart);
-        }
+// // test_cause:
+// // ["while(0){aa.map(()=>0);}", "parse_fart", "function_in_loop", "=>", 19]
+//
+//             warn("function_in_loop", the_fart);
+//         }
 
 // Give the function properties storing its names and for observing the depth
 // of loops and switches.
 
-        the_fart.context = empty();
-        the_fart.finally = 0;
-        the_fart.loop = 0;
-        the_fart.switch = 0;
-        the_fart.try = 0;
+        Object.assign(the_fart, {
+            context: empty(),
+            finally: 0,
+            loop: 0,
+            switch: 0,
+            try: 0
+        });
 
 // Push the current function context and establish a new one.
 
@@ -4478,14 +4482,25 @@ function jslint_phase3_parse(state) {
             test_cause("parameter");
             enroll(name, "parameter", true);
         });
-        if (token_nxt.id === "{") {
+        switch (token_nxt.id) {
+
+// PR-xxx - Bugfix - Fixes issue #379 - fart-warning against "delete" keyword.
+
+// test_cause:
+// ["()=>delete aa", "parse_fart", "unexpected_a", "delete", 5]
+
+        case "delete":
+            stop("unexpected_a");
+            break;
+        case "{":
 
 // test_cause:
 // ["()=>{}", "parse_fart", "expected_a_b", "=>", 3]
 
             warn("expected_a_b", the_fart, "function", "=>");
             the_fart.block = block("body");
-        } else {
+            break;
+        default:
             the_fart.expression = parse_expression(0);
         }
         functionage = function_stack.pop();
@@ -9569,7 +9584,7 @@ function objectDeepCopyWithKeysSorted(obj) {
 
 // Recursively deep-copy obj with keys sorted.
 
-    sorted = {};
+    sorted = Object.create(null);
     Object.keys(obj).sort().forEach(function (key) {
         sorted[key] = objectDeepCopyWithKeysSorted(obj[key]);
     });
@@ -10843,7 +10858,7 @@ function sentinel() {}
 
 // 3. Create html-coverage-reports in <coverageDir>.
 
-    fileDict = {};
+    fileDict = Object.create(null);
     await Promise.all(v8CoverageObj.result.map(async function ({
         functions,
         url: pathname
