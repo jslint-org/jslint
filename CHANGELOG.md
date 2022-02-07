@@ -11,8 +11,13 @@
 - jslint - require regexp to use open-form.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 - jslint - unify analysis of variable-assignment/function-parameters into one function
+- jslint - add new warning "Expected Object.create(null) instead of {}"
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 - perf - improve performance by hoisting inlined regexps out of loops and subfunctions
+
+# v2022.2.1-beta
+- bugfix - fix issue #379 - warn against naked-statement in fart.
+- update commonjs-wrapper jslint.cjs to load jslint in strict-mode.
 
 # v2021.12.20
 - npm - add file jslint.cjs so package @jslint-org/jslint can be published as dual-module

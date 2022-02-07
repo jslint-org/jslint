@@ -2606,7 +2606,7 @@ function sentinel() {}
     coverageDir + "v8_coverage_merged.json",
     JSON.stringify(v8CoverageObj, undefined, 1)
   );
-  fileDict = {};
+  fileDict = Object.create(null);
   await Promise.all(v8CoverageObj.result.map(async function ({
     functions,
     url: pathname
