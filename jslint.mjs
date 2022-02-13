@@ -3444,7 +3444,7 @@ import moduleHttps from "https";
             the_token.dot = true;
         }
 
-// PR-xxx - Bugfix - Fixes issue #382 - failure to detect destructured fart.
+// PR-385 - Bugfix - Fixes issue #382 - failure to detect destructured fart.
 // Farts are now detected by keeping a list of most recent "(" tokens at any
 // given depth. When a "=>" token is encountered, the most recent "(" token at
 // current depth is marked as a fart.
@@ -4537,7 +4537,7 @@ function jslint_phase3_parse(state) {
                 enroll(name, "parameter", true);
             } else {
 
-// PR-xxx - Bugfix - Fixes issue #382 - fix warnings against destructured fart.
+// PR-385 - Bugfix - Fixes issue #382 - fix warnings against destructured fart.
 
 // test_cause:
 // ["([aa])=>0", "enroll_parameter", "expected_a_before_b", "(", 1]
@@ -5552,7 +5552,7 @@ function jslint_phase3_parse(state) {
         let the_paren = token_now;
         let the_value;
 
-// PR-xxx - Bugfix - Fixes issue #382 - failure to detect destructured fart.
+// PR-385 - Bugfix - Fixes issue #382 - failure to detect destructured fart.
 
         if (token_now.is_fart) {
             the_paren.free = false;
