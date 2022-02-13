@@ -16,6 +16,7 @@
 - perf - improve performance by hoisting inlined regexps out of loops and subfunctions
 
 # v2022.2.1-beta
+- bugfix - fix issue #382 - fix warnings against destructured fart
 - bugfix - fix issue #379 - warn against naked-statement in fart.
 - update commonjs-wrapper jslint.cjs to load jslint in strict-mode.
 

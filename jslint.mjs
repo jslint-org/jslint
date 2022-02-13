@@ -95,6 +95,7 @@
 
 /*property
     fud_stmt,
+    is_fart,
     mode_conditional,
     JSLINT_BETA, NODE_V8_COVERAGE, a, all, argv, arity, artifact,
     assertErrorThrownAsync, assertJsonEqual, assertOrThrow, assign, async, b,
@@ -1832,6 +1833,9 @@ function jslint_phase2_lex(state) {
                                 // ... literal.
     let mode_regexp;            // true if regular expression literal seen on
                                 // ... this line.
+    let paren_backtrack_list = [];      // List of most recent "(" tokens at any
+                                        // ... paren-depth.
+    let paren_depth = 0;                // Keeps track of current paren-depth.
     let rx_token = new RegExp(
         "^("
         + "(\\s+)"
@@ -3393,9 +3397,11 @@ import moduleHttps from "https";
             from,
             id,
             identifier: Boolean(identifier),
+            is_fart: false,
             line,
             nr: token_list.length,
-            thru: column
+            thru: column,
+            value
         };
         token_list.push(the_token);
 
@@ -3403,12 +3409,6 @@ import moduleHttps from "https";
 
         if (id !== "(comment)" && id !== ";") {
             mode_directive = false;
-        }
-
-// If the token is to have a value, give it one.
-
-        if (value !== undefined) {
-            the_token.value = value;
         }
 
 // If this token is an identifier that touches a preceding number, or
@@ -3442,6 +3442,29 @@ import moduleHttps from "https";
         }
         if (token_prv_expr.id === "." && the_token.identifier) {
             the_token.dot = true;
+        }
+
+// PR-385 - Bugfix - Fixes issue #382 - failure to detect destructured fart.
+// Farts are now detected by keeping a list of most recent "(" tokens at any
+// given depth. When a "=>" token is encountered, the most recent "(" token at
+// current depth is marked as a fart.
+
+        switch (id) {
+        case "(":
+            paren_backtrack_list[paren_depth] = the_token;
+            paren_depth += 1;
+            break;
+        case ")":
+            paren_depth -= 1;
+            break;
+        case "=>":
+            if (
+                token_prv_expr.id === ")"
+                && paren_backtrack_list[paren_depth]
+            ) {
+                paren_backtrack_list[paren_depth].is_fart = true;
+            }
+            break;
         }
 
 // The previous token is used to detect adjacency problems.
@@ -3559,7 +3582,7 @@ function jslint_phase3_parse(state) {
                 match === undefined
 
 // test_cause:
-// ["()", "advance", "expected_a_b", "(end)", 1]
+// ["{0:0}", "advance", "expected_a_b", "0", 2]
 
                 ? stop("expected_a_b", token_nxt, id, artifact())
 
@@ -4354,21 +4377,6 @@ function jslint_phase3_parse(state) {
         return the_symbol;
     }
 
-    function lookahead() {
-
-// Look ahead one token without advancing, skipping comments.
-
-        let cadet;
-        let ii = token_ii;
-        while (true) {
-            cadet = token_list[ii];
-            if (cadet.id !== "(comment)") {
-                return cadet;
-            }
-            ii += 1;
-        }
-    }
-
     function parse_expression(rbp, initial) {
 
 // This is the heart of JSLINT, the Pratt parser. In addition to parsing, it
@@ -4486,8 +4494,12 @@ function jslint_phase3_parse(state) {
         return left;
     }
 
-    function parse_fart(pl) {
+    function parse_fart() {
+        let parameters;
+        let signature;
         let the_fart;
+        let the_paren = token_now;
+        [parameters, signature] = prefix_function_arg();
         advance("=>");
         the_fart = token_now;
         the_fart.arity = "binary";
@@ -4511,6 +4523,8 @@ function jslint_phase3_parse(state) {
         the_fart.context = empty();
         the_fart.finally = 0;
         the_fart.loop = 0;
+        the_fart.parameters = parameters;
+        the_fart.signature = signature;
         the_fart.switch = 0;
         the_fart.try = 0;
 
@@ -4518,15 +4532,29 @@ function jslint_phase3_parse(state) {
 
         function_stack.push(functionage);
         functionage = the_fart;
-        the_fart.parameters = pl[0];
-        the_fart.signature = pl[1];
-        the_fart.parameters.forEach(function (name) {
+        the_fart.parameters.forEach(function enroll_parameter(name) {
+            if (name.identifier) {
+                enroll(name, "parameter", true);
+            } else {
+
+// PR-385 - Bugfix - Fixes issue #382 - fix warnings against destructured fart.
 
 // test_cause:
-// ["(aa)=>{}", "parse_fart", "parameter", "", 0]
+// ["([aa])=>0", "enroll_parameter", "expected_a_before_b", "(", 1]
+// ["({aa})=>0", "enroll_parameter", "expected_a_before_b", "(", 1]
 
-            test_cause("parameter");
-            enroll(name, "parameter", true);
+                warn("expected_a_before_b", the_paren, "function", "(");
+
+// test_cause:
+// ["([aa])=>0", "enroll_parameter", "expected_a_b", "=>", 7]
+// ["({aa})=>0", "enroll_parameter", "expected_a_b", "=>", 7]
+
+                warn("expected_a_b", the_fart, "{", "=>");
+
+// Recurse enroll_parameter().
+
+                name.names.forEach(enroll_parameter);
+            }
         });
         if (token_nxt.id === "{") {
 
@@ -5058,6 +5086,9 @@ function jslint_phase3_parse(state) {
             if (name.identifier) {
                 enroll(name, "parameter", false);
             } else {
+
+// Recurse enroll_parameter().
+
                 name.names.forEach(enroll_parameter);
             }
         });
@@ -5518,25 +5549,14 @@ function jslint_phase3_parse(state) {
     }
 
     function prefix_lparen() {
-        const cadet = lookahead().id;
-        const the_paren = token_now;
+        let the_paren = token_now;
         let the_value;
 
-// We can distinguish between a parameter list for => and a wrapped expression
-// with one token of lookahead.
+// PR-385 - Bugfix - Fixes issue #382 - failure to detect destructured fart.
 
-        if (
-            token_nxt.id === ")"
-            || token_nxt.id === "..."
-            || (token_nxt.identifier && (cadet === "," || cadet === "="))
-        ) {
-
-// test_cause:
-// ["()=>0", "prefix_lparen", "fart", "", 0]
-
-            test_cause("fart");
+        if (token_now.is_fart) {
             the_paren.free = false;
-            return parse_fart(prefix_function_arg());
+            return parse_fart();
         }
 
 // test_cause:
@@ -5554,31 +5574,6 @@ function jslint_phase3_parse(state) {
         }
         the_value.wrapped = true;
         advance(")", the_paren);
-        if (token_nxt.id === "=>") {
-            if (the_value.arity !== "variable") {
-                if (the_value.id === "{" || the_value.id === "[") {
-
-// test_cause:
-// ["([])=>0", "prefix_lparen", "expected_a_before_b", "(", 1]
-// ["({})=>0", "prefix_lparen", "expected_a_before_b", "(", 1]
-
-                    warn("expected_a_before_b", the_paren, "function", "(");
-
-// test_cause:
-// ["([])=>0", "prefix_lparen", "expected_a_b", "=>", 5]
-// ["({})=>0", "prefix_lparen", "expected_a_b", "=>", 5]
-
-                    return stop("expected_a_b", token_nxt, "{", "=>");
-                }
-
-// test_cause:
-// ["(0)=>0", "prefix_lparen", "expected_identifier_a", "0", 2]
-
-                return stop("expected_identifier_a", the_value);
-            }
-            the_paren.expression = [the_value];
-            return parse_fart([the_paren.expression, "(" + the_value.id + ")"]);
-        }
         return the_value;
     }
 
