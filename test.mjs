@@ -234,217 +234,231 @@ try {
 
 // This function will validate each code is valid in jslint.
 
-    Object.values({
-        array: [
-            "new Array(0);"
-        ],
-        async_await: [
-            "async function aa() {\n    await aa();\n}",
-            (
-                "async function aa() {\n"
-                + "    try {\n"
-                + "        aa();\n"
-                + "    } catch (err) {\n"
-                + "        await err();\n"
-                + "    }\n"
-                + "}\n"
-            ), (
-                "async function aa() {\n"
-                + "    try {\n"
-                + "        await aa();\n"
-                + "    } catch (err) {\n"
-                + "        await err();\n"
-                + "    }\n"
-                + "}\n"
-            ),
+    jstestDescribe((
+        "test jslint's handling-behavior"
+    ), function () {
+        jstestIt((
+            "test jslint's code-validate handling-behavior"
+        ), function () {
+            Object.values({
+                array: [
+                    "new Array(0);"
+                ],
+                async_await: [
+                    "async function aa() {\n    await aa();\n}",
+                    (
+                        "async function aa() {\n"
+                        + "    try {\n"
+                        + "        aa();\n"
+                        + "    } catch (err) {\n"
+                        + "        await err();\n"
+                        + "    }\n"
+                        + "}\n"
+                    ),
+                    (
+                        "async function aa() {\n"
+                        + "    try {\n"
+                        + "        await aa();\n"
+                        + "    } catch (err) {\n"
+                        + "        await err();\n"
+                        + "    }\n"
+                        + "}\n"
+                    ),
 
 // PR-370 - Add top-level-await support.
 
-            "await String();\n"
-        ],
+                    "await String();\n"
+                ],
 
 // PR-351 - Add BigInt support.
 
-        bigint: [
-            "let aa = 0b0n;\n",
-            "let aa = 0o0n;\n",
-            "let aa = 0x0n;\n",
-            "let aa = BigInt(0n);\n",
-            "let aa = typeof aa === \"bigint\";\n"
-        ],
-        date: [
-            "Date.getTime();",
-            "let aa = aa().getTime();",
-            "let aa = aa.aa().getTime();"
-        ],
-        directive: [
-            "#!\n/*jslint browser:false, node*/\n\"use strict\";",
-            "/*property aa bb*/"
-        ],
-        fart: [
-            "function aa() {\n    return () => 0;\n}"
-        ],
-        for: [
-            (
-                "/*jslint for*/\n"
-                + "function aa(bb) {\n"
-                + "    for (bb = 0; bb < 0; bb += 1) {\n"
-                + "        bb();\n"
-                + "    }\n"
-                + "}\n"
-            )
-        ],
-        jslint_disable: [
-            "/*jslint-disable*/\n0\n/*jslint-enable*/"
-        ],
-        jslint_quiet: [
-            "0 //jslint-quiet"
-        ],
-        json: [
-            "{\"aa\":[[],-0,null]}"
-        ],
-        label: [
-            (
-                "function aa() {\n"
-                + "bb:\n"
-                + "    while (true) {\n"
-                + "        if (true) {\n"
-                + "            break bb;\n"
-                + "        }\n"
-                + "    }\n"
-                + "}\n"
-            )
-        ],
-        loop: [
-            (
-                "function aa() {\n"
-                + "    do {\n"
-                + "        aa();\n"
-                + "    } while (aa());\n"
-                + "}\n"
-            ),
+                bigint: [
+                    "let aa = 0b0n;\n",
+                    "let aa = 0o0n;\n",
+                    "let aa = 0x0n;\n",
+                    "let aa = BigInt(0n);\n",
+                    "let aa = typeof aa === \"bigint\";\n"
+                ],
+                date: [
+                    "Date.getTime();",
+                    "let aa = aa().getTime();",
+                    "let aa = aa.aa().getTime();"
+                ],
+                directive: [
+                    "#!\n/*jslint browser:false, node*/\n\"use strict\";",
+                    "/*property aa bb*/"
+                ],
+                fart: [
+                    "function aa() {\n    return () => 0;\n}"
+                ],
+                for: [
+                    (
+                        "/*jslint for*/\n"
+                        + "function aa(bb) {\n"
+                        + "    for (bb = 0; bb < 0; bb += 1) {\n"
+                        + "        bb();\n"
+                        + "    }\n"
+                        + "}\n"
+                    )
+                ],
+                jslint_disable: [
+                    "/*jslint-disable*/\n0\n/*jslint-enable*/"
+                ],
+                jslint_quiet: [
+                    "0 //jslint-quiet"
+                ],
+                json: [
+                    "{\"aa\":[[],-0,null]}"
+                ],
+                label: [
+                    (
+                        "function aa() {\n"
+                        + "bb:\n"
+                        + "    while (true) {\n"
+                        + "        if (true) {\n"
+                        + "            break bb;\n"
+                        + "        }\n"
+                        + "    }\n"
+                        + "}\n"
+                    )
+                ],
+                loop: [
+                    (
+                        "function aa() {\n"
+                        + "    do {\n"
+                        + "        aa();\n"
+                        + "    } while (aa());\n"
+                        + "}\n"
+                    ),
 
 // PR-378 - Relax warning "function_in_loop".
 
-            (
-                "function aa() {\n"
-                + "    while (true) {\n"
-                + "        (function () {\n"
-                + "            return;\n"
-                + "        }());\n"
-                + "    }\n"
-                + "}\n"
-            )
-        ],
-        module: [
-            "export default Object.freeze();",
-            "import {aa, bb} from \"aa\";\naa(bb);",
-            "import {} from \"aa\";",
-            "import(\"aa\").then(function () {\n    return;\n});",
-            "let aa = 0;\nimport(aa).then(aa).then(aa).catch(aa).finally(aa);"
-        ],
-        number: [
-            "let aa = 0.0e0;",
-            "let aa = 0b0;",
-            "let aa = 0o0;",
-            "let aa = 0x0;"
-        ],
-        optional_chaining: [
-            "let aa = aa?.bb?.cc;"
-        ],
-        param: [
-            (
-                "function aa({aa, bb}) {\n"
-                + "    return {aa, bb};\n"
-                + "}\n"
-            ), (
-                "function aa({constructor}) {\n"
-                + "    return {constructor};\n"
-                + "}\n"
-            )
-        ],
-        property: [
-            "let aa = aa[`!`];"
-        ],
-        regexp: [
-            "function aa() {\n    return /./;\n}",
-            "let aa = /(?!.)(?:.)(?=.)/;",
-            "let aa = /./gimuy;",
-            "let aa = /[\\--\\-]/;"
-        ],
-        ternary: [
-            (
-                "let aa = (\n    aa()\n    ? 0\n    : 1\n) "
-                + "&& (\n    aa()\n    ? 0\n    : 1\n);"
-            ),
-            "let aa = (\n    aa()\n    ? `${0}`\n    : `${1}`\n);"
-        ],
-        try_catch: [
-            (
-                "let aa = 0;\n"
-                + "try {\n"
-                + "    aa();\n"
-                + "} catch (err) {\n"
-                + "    aa = err;\n"
-                + "}\n"
-                + "try {\n"
-                + "    aa();\n"
-                + "} catch (err) {\n"
-                + "    aa = err;\n"
-                + "}\n"
-                + "aa();\n"
-            )
-        ],
-        use_strict: [
-            (
-                "\"use strict\";\n"
-                + "let aa = 0;\n"
-                + "function bb() {\n"
-                + "    \"use strict\";\n"
-                + "    return aa;\n"
-                + "}\n"
-            )
-        ],
-        var: [
+                    (
+                        "function aa() {\n"
+                        + "    while (true) {\n"
+                        + "        (function () {\n"
+                        + "            return;\n"
+                        + "        }());\n"
+                        + "    }\n"
+                        + "}\n"
+                    )
+                ],
+                module: [
+                    "export default Object.freeze();",
+                    "import {aa, bb} from \"aa\";\naa(bb);",
+                    "import {} from \"aa\";",
+                    "import(\"aa\").then(function () {\n    return;\n});",
+                    (
+                        "let aa = 0;\n"
+                        + "import(aa).then(aa).then(aa)"
+                        + ".catch(aa).finally(aa);\n"
+                    )
+                ],
+                number: [
+                    "let aa = 0.0e0;",
+                    "let aa = 0b0;",
+                    "let aa = 0o0;",
+                    "let aa = 0x0;"
+                ],
+                optional_chaining: [
+                    "let aa = aa?.bb?.cc;"
+                ],
+                param: [
+                    (
+                        "function aa({aa, bb}) {\n"
+                        + "    return {aa, bb};\n"
+                        + "}\n"
+                    ),
+                    (
+                        "function aa({constructor}) {\n"
+                        + "    return {constructor};\n"
+                        + "}\n"
+                    )
+                ],
+                property: [
+                    "let aa = aa[`!`];"
+                ],
+                regexp: [
+                    "function aa() {\n    return /./;\n}",
+                    "let aa = /(?!.)(?:.)(?=.)/;",
+                    "let aa = /./gimuy;",
+                    "let aa = /[\\--\\-]/;"
+                ],
+                ternary: [
+                    (
+                        "let aa = (\n    aa()\n    ? 0\n    : 1\n) "
+                        + "&& (\n    aa()\n    ? 0\n    : 1\n);"
+                    ),
+                    "let aa = (\n    aa()\n    ? `${0}`\n    : `${1}`\n);"
+                ],
+                try_catch: [
+                    (
+                        "let aa = 0;\n"
+                        + "try {\n"
+                        + "    aa();\n"
+                        + "} catch (err) {\n"
+                        + "    aa = err;\n"
+                        + "}\n"
+                        + "try {\n"
+                        + "    aa();\n"
+                        + "} catch (err) {\n"
+                        + "    aa = err;\n"
+                        + "}\n"
+                        + "aa();\n"
+                    )
+                ],
+                use_strict: [
+                    (
+                        "\"use strict\";\n"
+                        + "let aa = 0;\n"
+                        + "function bb() {\n"
+                        + "    \"use strict\";\n"
+                        + "    return aa;\n"
+                        + "}\n"
+                    )
+                ],
+                var: [
 
 // PR-363 - Bugfix - add test against false-warning
 // <uninitialized 'bb'> in code '/*jslint node*/\nlet {aa:bb} = {}; bb();'
 
-            "/*jslint node*/\n",
-            ""
-        ].map(function (directive) {
-            return [
-                "let [\n    aa, bb = 0\n] = 0;\naa();\nbb();",
-                "let [...aa] = [...aa];\naa();",
-                "let constructor = 0;\nconstructor();",
-                "let {\n    aa: bb\n} = 0;\nbb();",
-                "let {\n    aa: bb,\n    bb: cc\n} = 0;\nbb();\ncc();",
-                "let {aa, bb} = 0;\naa();\nbb();",
-                "let {constructor} = 0;\nconstructor();"
-            ].map(function (code) {
-                return directive + code;
-            });
-        }).flat()
-    }).forEach(function (codeList) {
-        let elemPrv = "";
-        codeList.forEach(function (code) {
-            let warnings;
-            // Assert codeList is sorted.
-            assertOrThrow(elemPrv < code, JSON.stringify([
-                elemPrv, code
-            ], undefined, 4));
-            elemPrv = code;
-            [
-                jslint.jslint,
-                jslintCjs.jslint
-            ].forEach(function (jslint) {
-                warnings = jslint.jslint(code, {
-                    beta: true
-                }).warnings;
-                assertOrThrow(
-                    warnings.length === 0,
-                    JSON.stringify([code, warnings])
-                );
+                    "/*jslint node*/\n",
+                    ""
+                ].map(function (directive) {
+                    return [
+                        "let [\n    aa, bb = 0\n] = 0;\naa();\nbb();",
+                        "let [...aa] = [...aa];\naa();",
+                        "let constructor = 0;\nconstructor();",
+                        "let {\n    aa: bb\n} = 0;\nbb();",
+                        "let {\n    aa: bb,\n    bb: cc\n} = 0;\nbb();\ncc();",
+                        "let {aa, bb} = 0;\naa();\nbb();",
+                        "let {constructor} = 0;\nconstructor();"
+                    ].map(function (code) {
+                        return directive + code;
+                    });
+                }).flat()
+            }).forEach(function (codeList) {
+                let elemPrv = "";
+                codeList.forEach(function (code) {
+                    let warnings;
+                    // Assert codeList is sorted.
+                    assertOrThrow(elemPrv < code, JSON.stringify([
+                        elemPrv, code
+                    ], undefined, 4));
+                    elemPrv = code;
+                    [
+                        jslint.jslint,
+                        jslintCjs.jslint
+                    ].forEach(function (jslint) {
+                        warnings = jslint.jslint(code, {
+                            beta: true
+                        }).warnings;
+                        assertOrThrow(
+                            warnings.length === 0,
+                            JSON.stringify([code, warnings])
+                        );
+                    });
+                });
             });
         });
     });
