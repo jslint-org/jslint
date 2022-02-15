@@ -844,8 +844,8 @@ function jslint(
 
         case "use_function_not_fart":
             mm = (
-                `Use 'function (...)', not '(...) =>' when arrow function`
-                + ` becomes too complicated.`
+                `Use 'function (...)', not '(...) =>' when arrow functions`
+                + ` become too complex.`
             );
             break;
         case "use_open":
