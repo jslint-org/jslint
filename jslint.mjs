@@ -839,6 +839,15 @@ function jslint(
         case "use_double":
             mm = `Use double quotes, not single quotes.`;
             break;
+
+// PR-386 - Fix issue #382 - Make fart-related warnings more readable.
+
+        case "use_function_not_fart":
+            mm = (
+                `Use 'function (...)', not '(...) =>' when arrow functions`
+                + ` become too complex.`
+            );
+            break;
         case "use_open":
             mm = (
                 `Wrap a ternary expression in parens,`
@@ -872,15 +881,18 @@ function jslint(
         case "wrap_condition":
             mm = `Wrap the condition in parens.`;
             break;
+
+// PR-386 - Fix issue #382 - Make fart-related warnings more readable.
+
+        case "wrap_fart_parameter":
+            mm = `Wrap the parameter before '=>' in parens.`;
+            break;
         case "wrap_immediate":
             mm = (
                 `Wrap an immediate function invocation in parentheses to assist`
                 + ` the reader in understanding that the expression is the`
                 + ` result of a function, and not the function itself.`
             );
-            break;
-        case "wrap_parameter":
-            mm = `Wrap the parameter in parens.`;
             break;
         case "wrap_regexp":
             mm = `Wrap this regexp in parens to avoid confusion.`;
@@ -4195,12 +4207,12 @@ function jslint_phase3_parse(state) {
         return the_token;
     }
 
-    function infix_fart_unwrapped(left) {
+    function infix_fart_unwrapped() {
 
 // test_cause:
-// ["aa=>0", "infix_fart_unwrapped", "wrap_parameter", "aa", 1]
+// ["aa=>0", "infix_fart_unwrapped", "wrap_fart_parameter", "=>", 3]
 
-        return stop("wrap_parameter", left);
+        return stop("wrap_fart_parameter", token_now);
     }
 
     function infix_grave(left) {
@@ -4498,7 +4510,6 @@ function jslint_phase3_parse(state) {
         let parameters;
         let signature;
         let the_fart;
-        let the_paren = token_now;
         [parameters, signature] = prefix_function_arg();
         advance("=>");
         the_fart = token_now;
@@ -4540,16 +4551,10 @@ function jslint_phase3_parse(state) {
 // PR-385 - Bugfix - Fixes issue #382 - fix warnings against destructured fart.
 
 // test_cause:
-// ["([aa])=>0", "enroll_parameter", "expected_a_before_b", "(", 1]
-// ["({aa})=>0", "enroll_parameter", "expected_a_before_b", "(", 1]
+// ["([aa])=>0", "enroll_parameter", "use_function_not_fart", "=>", 7]
+// ["({aa})=>0", "enroll_parameter", "use_function_not_fart", "=>", 7]
 
-                warn("expected_a_before_b", the_paren, "function", "(");
-
-// test_cause:
-// ["([aa])=>0", "enroll_parameter", "expected_a_b", "=>", 7]
-// ["({aa})=>0", "enroll_parameter", "expected_a_b", "=>", 7]
-
-                warn("expected_a_b", the_fart, "{", "=>");
+                warn("use_function_not_fart", the_fart);
 
 // Recurse enroll_parameter().
 
@@ -4559,9 +4564,9 @@ function jslint_phase3_parse(state) {
         if (token_nxt.id === "{") {
 
 // test_cause:
-// ["()=>{}", "parse_fart", "expected_a_b", "=>", 3]
+// ["()=>{}", "parse_fart", "use_function_not_fart", "=>", 3]
 
-            warn("expected_a_b", the_fart, "function", "=>");
+            warn("use_function_not_fart", the_fart);
             the_fart.block = block("body");
         } else if (
             syntax_dict[token_nxt.id] !== undefined
