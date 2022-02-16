@@ -1469,8 +1469,8 @@ async function jslint_cli({
     let command;
     let data;
     let exit_code = 0;
-    let mode_plugin_vim;
     let mode_report;
+    let mode_wrapper_vim;
     let result;
 
     function jslint_from_file({
@@ -1543,7 +1543,7 @@ async function jslint_cli({
         if (result_from_file.warnings.length > 0) {
             exit_code = 1;
             console_error(
-                mode_plugin_vim
+                mode_wrapper_vim
 
 // PR-349 - Print warnings in format readable by vim.
 
@@ -1676,17 +1676,17 @@ async function jslint_cli({
         }));
         return;
 
-// COMMIT-b26d6df2 - Add command jslint_plugin_vim.
-
-    case "jslint_plugin_vim":
-        mode_plugin_vim = true;
-        process_argv = process_argv.slice(1);
-        break;
-
 // PR-363 - Add command jslint_report.
 
     case "jslint_report":
         mode_report = command[1];
+        process_argv = process_argv.slice(1);
+        break;
+
+// COMMIT-b26d6df2 - Add command jslint_wrapper_vim.
+
+    case "jslint_wrapper_vim":
+        mode_wrapper_vim = true;
         process_argv = process_argv.slice(1);
         break;
 
@@ -1702,9 +1702,9 @@ async function jslint_cli({
 
 // PR-349 - Detect cli-option --mode-vim-plugin.
 
-    mode_plugin_vim = (
+    mode_wrapper_vim = (
         process_argv.slice(2).indexOf("--mode-vim-plugin") >= 0
-        || mode_plugin_vim
+        || mode_wrapper_vim
     );
 
 // Normalize file relative to process.cwd().

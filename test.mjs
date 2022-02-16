@@ -1,6 +1,6 @@
 /*jslint beta, node*/
 import jslint from "./jslint.mjs";
-import jslintCjs from "./jslint.cjs";
+import jslintCjs from "./jslint_wrapper_cjs.cjs";
 import moduleFs from "fs";
 import modulePath from "path";
 
@@ -214,7 +214,7 @@ try {
         process_exit: processExit1,
         source: "["
     });
-    // test plugin-vim handling-behavior
+    // test jslint_wrapper_vim handling-behavior
     jslint.jslint_cli({
         // suppress error
         console_error: noop,
@@ -222,7 +222,7 @@ try {
         process_argv: [
             "node",
             "jslint.mjs",
-            "jslint_plugin_vim",
+            "jslint_wrapper_vim",
             "syntax-error.js"
         ],
         process_exit: processExit1,
