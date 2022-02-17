@@ -1694,6 +1694,7 @@ async function jslint_cli({
 
     case "v8_coverage_report":
         await v8CoverageReportCreate({
+            consoleError: console_error,
             coverageDir: command[1],
             processArgv: process_argv.slice(3)
         });
