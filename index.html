@@ -1273,33 +1273,6 @@ function dom_style_report_unmatched() {
     });
 }
 
-function jslint_plugin_codemirror(CodeMirror) {
-
-// This function will integrate jslint with CodeMirror's lint addon.
-// Requires CodeMirror and jslint.
-
-    CodeMirror.registerHelper("lint", "javascript", function (text, options) {
-        options.result = jslint.jslint(text, options, options.globals);
-        return options.result.warnings.map(function ({
-            column,
-            line,
-            message,
-            mode_stop
-        }) {
-            return {
-                from: CodeMirror.Pos(line - 1, column - 1), //jslint-quiet
-                message,
-                severity: (
-                    mode_stop
-                    ? "error"
-                    : "warning"
-                ),
-                to: CodeMirror.Pos(line - 1, column) //jslint-quiet
-            };
-        });
-    });
-}
-
 async function jslint_ui_call() {
 // This function will run jslint in browser and create html-reports.
 
@@ -1362,6 +1335,33 @@ function jslint_ui_onresize() {
     editor.setSize(content_width);
 }
 
+function jslint_wrapper_codemirror(CodeMirror) {
+
+// This function will integrate jslint with CodeMirror's lint addon.
+// Requires CodeMirror and jslint.
+
+    CodeMirror.registerHelper("lint", "javascript", function (text, options) {
+        options.result = jslint.jslint(text, options, options.globals);
+        return options.result.warnings.map(function ({
+            column,
+            line,
+            message,
+            mode_stop
+        }) {
+            return {
+                from: CodeMirror.Pos(line - 1, column - 1), //jslint-quiet
+                message,
+                severity: (
+                    mode_stop
+                    ? "error"
+                    : "warning"
+                ),
+                to: CodeMirror.Pos(line - 1, column) //jslint-quiet
+            };
+        });
+    });
+}
+
 (function () {
     let CodeMirror = window.CodeMirror;
 
@@ -1406,7 +1406,7 @@ function jslint_ui_onresize() {
 
 // Init CodeMirror linter.
 
-    jslint_plugin_codemirror(CodeMirror);
+    jslint_wrapper_codemirror(CodeMirror);
 
 // Init event-handling.
 

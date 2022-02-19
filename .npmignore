@@ -2,5 +2,5 @@
 .*
 !.npmignore
 
-!jslint.cjs
 !jslint.mjs
+!jslint_wrapper_cjs.cjs
