@@ -15,7 +15,7 @@
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 - perf - improve performance by hoisting inlined regexps out of loops and subfunctions
 
-# v2022.2.1-beta
+# v2022.2.20
 - test - migrate all tests to use jstestDescribe(), jstestIt()
 - fs - rename jslint-wrapper-files to jslint_wrapper_xxx.xxx
 - bugfix - fix issue #382 - make fart-related warnings more readable
