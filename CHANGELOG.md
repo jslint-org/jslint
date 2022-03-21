@@ -1,8 +1,6 @@
 # Changelog
 
 # Todo
-- jslint - add numeric-separators support
-- jslint - move regexp-literals to module-level so they are explicitly cached, to improve performance
 - cli - remove cli-option `--mode-vim-plugin`
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
 - coverage - support globbing `*` in cli-options `--exclude` and `--include`
@@ -17,6 +15,8 @@
 - perf - improve performance by hoisting inlined regexps out of loops and subfunctions
 
 # v2022.3.1-beta
+- jslint - add numeric-separator support
+- jslint - move regexp-literals to module-level so they are explicitly cached, to improve performance
 - ci - add check for package.json.fileCount
 
 # v2022.2.20
