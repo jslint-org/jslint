@@ -1,9 +1,9 @@
 shCiArtifactUploadCustom() {(set -e
 # this function will custom-upload build-artifacts to branch-gh-pages
-    # .cache - restore
-    if [ -d .cache ]
+    # .github_cache - restore
+    if [ "$GITHUB_ACTION" ] && [ -d .github_cache ]
     then
-        cp -a .cache/* . # js-hack - */
+        cp -a .github_cache/* . || true # js-hack - */
     fi
     # add jslint.js
     cp jslint.mjs jslint.js
@@ -152,11 +152,11 @@ import moduleChildProcess from "child_process";
     # remove bloated json-coverage-files
     rm .artifact/coverage/*.json # js-hack - */
     rm .artifact/coverage_sqlite3_*/*.json # js-hack - */
-    # .cache - save
-    if [ ! -d .cache ]
+    # .github_cache - save
+    if [ "$GITHUB_ACTION" ] && [ ! -d .github_cache ]
     then
-        mkdir .cache
-        cp -a node-sqlite3-* .cache
+        mkdir -p .github_cache
+        cp -a node-sqlite3-* .github_cache
     fi
 )}
 

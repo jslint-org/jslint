@@ -5,7 +5,10 @@
 require("vm").runInNewContext(
     (
         "\"use strict\";"
-        + require("fs").readFileSync(__dirname + "/jslint.mjs", "utf8").replace(
+        + require("fs").readFileSync(
+            __dirname + "/jslint.mjs",
+            "utf8"
+        ).replace(
             "\nexport default Object.freeze(jslint_export);",
             "\nmodule.exports = jslint_export;"
         ).replace(

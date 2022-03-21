@@ -1,12 +1,13 @@
 # Changelog
 
 # Todo
+- jslint - add numeric-separators support
+- jslint - move regexp-literals to module-level so they are explicitly cached, to improve performance
 - cli - remove cli-option `--mode-vim-plugin`
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
 - coverage - support globbing `*` in cli-options `--exclude` and `--include`
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning requiring paren around plus-separated concatenations.
-- jslint - add numeric-separators support.
 - jslint - relax warning against console.log and friends and deprecate directive `devel`
 - jslint - require regexp to use open-form.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
@@ -14,6 +15,9 @@
 - jslint - add new warning "Expected Object.create(null) instead of {}"
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 - perf - improve performance by hoisting inlined regexps out of loops and subfunctions
+
+# v2022.3.1-beta
+- ci - add check for package.json.fileCount
 
 # v2022.2.20
 - test - migrate all tests to use jstestDescribe(), jstestIt()

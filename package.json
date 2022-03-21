@@ -8,7 +8,7 @@
         "default": "./jslint_wrapper_cjs.cjs",
         "import": "./jslint.mjs"
     },
-    "fileCount": 28,
+    "fileCount": 29,
     "keywords": [
         "coverage-report",
         "javascript",
@@ -29,5 +29,5 @@
         "test2": "sh jslint_ci.sh shCiBase"
     },
     "type": "module",
-    "version": "2022.2.20"
+    "version": "2022.3.1-beta"
 }

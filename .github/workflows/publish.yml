@@ -22,9 +22,9 @@ jobs:
           - x64
           # - x86
         node_version:
-          # - 12
           # - 14
           - 16
+          # - 18
         os:
           # - macos-latest
           - ubuntu-latest
