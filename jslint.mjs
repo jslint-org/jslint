@@ -215,6 +215,9 @@ let jslint_rgx_mega = (
 let jslint_rgx_module = (
     /^[a-zA-Z0-9_$:.@\-\/]+$/
 );
+let jslint_rgx_numeric_separator_illegal = (
+    /__|_$|_n$/m
+);
 let jslint_rgx_slash_star_or_slash = (
     /\/\*|\/$/
 );
@@ -245,7 +248,7 @@ let jslint_rgx_token = new RegExp(
     + "|!(?:!|==?)?"
 
 // PR-351 - Add BigInt support.
-// PR-xxx - Add numeric-separator support.
+// PR-390 - Add numeric-separator support.
 
     + "|((?:0_?|[1-9][0-9_]*)n?)"
     + ")"
@@ -760,6 +763,9 @@ function jslint(
                 `Expected 'Object.freeze('. All export values should be frozen.`
             );
             break;
+        case "illegal_num_separator":
+            mm = `Illegal numeric separator '_'.`;
+            break;
 
 // PR-378 - Relax warning "function_in_loop".
 //
@@ -879,9 +885,6 @@ function jslint(
             break;
         case "unexpected_label_a":
             mm = `Unexpected label '${a}'.`;
-            break;
-        case "unexpected_numeric_separator":
-            mm = `Unexpected numeric separator '_'.`;
             break;
         case "unexpected_parens":
             mm = `Don't wrap function literals in parens.`;
@@ -2064,6 +2067,26 @@ function jslint_phase2_lex(state) {
         return char;
     }
 
+    function check_numeric_separator(digits, column) {
+
+// This function will check for illegal numeric-separator in <digits>.
+
+        digits.replace((
+            jslint_rgx_numeric_separator_illegal
+        ), function (ignore, ii) {
+
+// test_cause:
+// ["0x0_0_;", "check_numeric_separator", "illegal_num_separator", "", 6]
+// ["0x0_0__0;", "check_numeric_separator", "illegal_num_separator", "", 6]
+// ["aa=1_2_;", "check_numeric_separator", "illegal_num_separator", "", 7]
+// ["aa=1_2__3;", "check_numeric_separator", "illegal_num_separator", "", 7]
+// ["aa=1_2_n;", "check_numeric_separator", "illegal_num_separator", "", 7]
+
+            warn_at("illegal_num_separator", line, column + ii + 1);
+            return "";
+        });
+    }
+
     function lex_comment() {
         let body;
         let ii = 0;
@@ -2336,29 +2359,9 @@ function jslint_phase2_lex(state) {
     function lex_number() {
         let prefix = snippet;
 
-// PR-xxx - Add numeric-separator support.
+// PR-390 - Add numeric-separator support.
 
-// test_cause:
-// ["let aa=0_n", "lex_number", "unexpected_numeric_separator", "", 9]
-
-        if (prefix.slice(-2) === "_n") {
-            warn_at(
-                "unexpected_numeric_separator",
-                line,
-                column - 1
-            );
-        }
-
-// test_cause:
-// ["let aa=0_", "lex_number", "unexpected_numeric_separator", "", 9]
-
-        if (prefix.slice(-1) === "_") {
-            warn_at(
-                "unexpected_numeric_separator",
-                line,
-                column
-            );
-        }
+        check_numeric_separator(prefix, column - prefix.length);
         char_after();
         switch (prefix === "0" && char) {
         case "b":
@@ -3350,9 +3353,8 @@ import moduleHttps from "https";
             ? jslint_rgx_digits_hexs
             : jslint_rgx_digits_decimals
         )[0];
-        let length = digits.length;
         if (
-            (mode !== "or_blank" && length === 0)
+            (mode !== "or_blank" && digits.length === 0)
             || digits[0] === "_"
         ) {
 
@@ -3363,30 +3365,26 @@ import moduleHttps from "https";
             warn_at("expected_digits_after_a", line, column, snippet);
         }
 
-// PR-xxx - Add numeric-separator support.
+// PR-390 - Add numeric-separator support.
+
+        if (mode === "with_numeric_separator") {
+            check_numeric_separator(digits, column);
+        } else if (digits.indexOf("_") >= 0) {
 
 // test_cause:
-// ["0x0_", "read_digits", "unexpected_numeric_separator", "", 4]
+// ["\"\\u{1_2}\"", "read_digits", "illegal_num_separator", "", 6]
 
-        if (digits.slice(-1) === "_") {
-            warn_at("unexpected_numeric_separator", line, column + length);
-        }
-
-// test_cause:
-// ["\"\\u{1_2}\"", "read_digits", "unexpected_numeric_separator", "", 6]
-
-        if (mode !== "with_numeric_separator" && digits.indexOf("_") >= 0) {
             warn_at(
-                "unexpected_numeric_separator",
+                "illegal_num_separator",
                 line,
                 column + digits.indexOf("_") + 1
             );
         }
-        column += length;
-        line_source = line_source.slice(length);
+        column += digits.length;
+        line_source = line_source.slice(digits.length);
         snippet += digits;
         char_after();
-        return length;
+        return digits.length;
     }
 
     function read_line() {
