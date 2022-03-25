@@ -391,6 +391,16 @@ jstestDescribe((
                 "let aa = 0o0;",
                 "let aa = 0x0;"
             ],
+
+// PR-390 - Add numeric-separator support.
+
+            numeric_separator: [
+                "let aa = 0.0_0_0;",
+                "let aa = 0b0_1111_1111n;\n",
+                "let aa = 0o0_1234_1234n;\n",
+                "let aa = 0x0_1234_1234n;\n",
+                "let aa = 1_234_234.1_234_234E1_234_234;"
+            ],
             optional_chaining: [
                 "let aa = aa?.bb?.cc;"
             ],
