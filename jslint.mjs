@@ -763,15 +763,18 @@ function jslint(
                 `Expected 'Object.freeze('. All export values should be frozen.`
             );
             break;
-        case "illegal_num_separator":
-            mm = `Illegal numeric separator '_'.`;
-            break;
 
 // PR-378 - Relax warning "function_in_loop".
 //
 //         case "function_in_loop":
 //             mm = `Don't create functions within a loop.`;
 //             break;
+
+// PR-390 - Add numeric-separator check.
+
+        case "illegal_num_separator":
+            mm = `Illegal numeric separator '_' at column ${column}.`;
+            break;
         case "infix_in":
             mm = (
                 `Unexpected 'in'. Compare with undefined,`
@@ -1926,6 +1929,8 @@ function jslint_phase2_lex(state) {
     let line_mega;              // The starting line of megastring.
     let line_source = "";       // The remaining line source string.
     let line_whole = "";        // The whole line source string.
+    let mode_digits_empty_string = 1;
+    let mode_digits_numeric_separator = 2;
     let mode_directive = true;  // true if directives are still allowed.
     let mode_mega = false;      // true if currently parsing a megastring
                                 // ... literal.
@@ -1933,7 +1938,7 @@ function jslint_phase2_lex(state) {
                                 // ... this line.
     let paren_backtrack_list = [];      // List of most recent "(" tokens at any
                                         // ... paren-depth.
-    let paren_depth = 0;                // Keeps track of current paren-depth.
+    let paren_depth = 0;        // Keeps track of current paren-depth.
     let snippet = "";           // A piece of string.
     let token_1;                // The first token.
     let token_prv = token_global;       // The previous token including
@@ -2015,7 +2020,7 @@ function jslint_phase2_lex(state) {
 
                     warn_at("unexpected_a", line, column, char);
                 }
-                if (read_digits("x", "normal") > 5) {
+                if (read_digits("x", undefined) > 5) {
 
 // test_cause:
 // ["\"\\u{123456}\"", "char_after_escape", "too_many_digits", "", 11]
@@ -2032,7 +2037,7 @@ function jslint_phase2_lex(state) {
                 return char_after();
             }
             char_before();
-            if (read_digits("x", "or_blank") < 4) {
+            if (read_digits("x", mode_digits_empty_string) < 4) {
 
 // test_cause:
 // ["\"\\u0\"", "char_after_escape", "expected_four_digits", "", 5]
@@ -2359,7 +2364,7 @@ function jslint_phase2_lex(state) {
     function lex_number() {
         let prefix = snippet;
 
-// PR-390 - Add numeric-separator support.
+// PR-390 - Add numeric-separator check.
 
         check_numeric_separator(prefix, column - prefix.length);
         char_after();
@@ -2367,7 +2372,7 @@ function jslint_phase2_lex(state) {
         case "b":
         case "o":
         case "x":
-            read_digits(char, "with_numeric_separator");
+            read_digits(char, mode_digits_numeric_separator);
 
 // PR-351 - Ignore BigInt suffix 'n'.
 
@@ -2377,14 +2382,14 @@ function jslint_phase2_lex(state) {
             break;
         default:
             if (char === ".") {
-                read_digits("d", "with_numeric_separator");
+                read_digits("d", mode_digits_numeric_separator);
             }
             if (char === "E" || char === "e") {
                 char_after(char);
                 if (char !== "+" && char !== "-") {
                     char_before();
                 }
-                read_digits("d", "with_numeric_separator");
+                read_digits("d", mode_digits_numeric_separator);
             }
         }
 
@@ -2654,7 +2659,7 @@ function jslint_phase2_lex(state) {
                     }
                     break;
                 case "{":
-                    if (read_digits("d", "or_blank") === 0) {
+                    if (read_digits("d", mode_digits_empty_string) === 0) {
 
 // test_cause:
 // ["aa=/aa{/", "lex_regexp_group", "expected_a_before_b", ",", 8]
@@ -2667,7 +2672,7 @@ function jslint_phase2_lex(state) {
 // ["aa=/.{,/", "lex_regexp_group", "comma", "", 0]
 
                         test_cause("comma");
-                        read_digits("d", "or_blank");
+                        read_digits("d", mode_digits_empty_string);
                     }
                     if (char_after("}") === "?") {
 
@@ -3354,7 +3359,7 @@ import moduleHttps from "https";
             : jslint_rgx_digits_decimals
         )[0];
         if (
-            (mode !== "or_blank" && digits.length === 0)
+            (mode !== mode_digits_empty_string && digits.length === 0)
             || digits[0] === "_"
         ) {
 
@@ -3365,9 +3370,9 @@ import moduleHttps from "https";
             warn_at("expected_digits_after_a", line, column, snippet);
         }
 
-// PR-390 - Add numeric-separator support.
+// PR-390 - Add numeric-separator check.
 
-        if (mode === "with_numeric_separator") {
+        if (mode === mode_digits_numeric_separator) {
             check_numeric_separator(digits, column);
         } else if (digits.indexOf("_") >= 0) {
 
