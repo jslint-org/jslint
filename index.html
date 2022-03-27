@@ -1212,22 +1212,22 @@ body {
 
 /*jslint beta, browser*/
 
+/*global CodeMirror*/
+
 /*property
-    ch,
-    jslint_edition, jslint_report,
-    setCursor, styleActiveLine,
-    tagName,
-    CodeMirror, Pos, Tab, addEventListener, checked, click, closest, column,
-    ctrlKey, currentTarget, dispatchEvent, display, dom_style_report_unmatched,
-    editor, error, extraKeys, focus, forEach, from, fromTextArea,
-    globals, gutters, indentSelection, indentUnit, indentWithTabs, innerHTML,
-    jslint, key, length, line, lineNumbers, lineWrapping, lint, lintOnChange,
-    map, matchBrackets, message, metaKey, mode, mode_stop, name, offsetWidth,
-    onclick, onkeyup, outerHTML, performLint, preventDefault, push,
-    querySelector, querySelectorAll, registerHelper, replace, replaceSelection,
-    result, reverse, search, setSize, setValue, severity,
-    showTrailingSpace, somethingSelected, sort, split, stopPropagation, style,
-    target, test, textContent, to, trim, value, warnings, width
+    Pos, Tab, addEventListener, ch, checked, clear, click, closest, column,
+    ctrlKey, display, dom_style_report_unmatched, editor, error, extraKeys,
+    focus, forEach, from, fromTextArea, getItem, getValue, globals, gutters,
+    indentSelection, indentUnit, indentWithTabs, innerHTML, jslint,
+    jslint_edition, jslint_report, jslint_result, key, length, line,
+    lineNumbers, lineWrapping, lint, lintOnChange, map, matchBrackets, message,
+    metaKey, mode, mode_stop, name, offsetWidth, on, outerHTML, parse,
+    performLint, preventDefault, push, querySelector, querySelectorAll,
+    registerHelper, replace, replaceSelection, result, reverse, search,
+    setCursor, setItem, setSize, setValue, severity, showTrailingSpace,
+    somethingSelected, sort, split, stopPropagation, stringify, style,
+    styleActiveLine, tagName, target, test, textContent, to, trim, value,
+    warnings, width
 */
 
 import jslint from "./jslint.mjs";
@@ -1240,6 +1240,7 @@ let jslint_option_dict = {
     lintOnChange: false
 };
 let mode_debug;
+let mode_persist_state_debouncing;
 
 function dom_style_report_unmatched() {
 
@@ -1273,7 +1274,8 @@ function dom_style_report_unmatched() {
     });
 }
 
-async function jslint_ui_call() {
+async function jslint_run() {
+
 // This function will run jslint in browser and create html-reports.
 
 // Show ui-loader-animation.
@@ -1295,6 +1297,11 @@ async function jslint_ui_call() {
         ).forEach(function (elem) {
             jslint_option_dict[elem.value] = elem.checked;
         });
+        jslint_option_dict.globals = document.querySelector(
+            "#JSLINT_GLOBALS"
+        ).value.trim().split(
+            /[\s,;'"]+/
+        );
 
 // Execute linter.
 
@@ -1306,7 +1313,7 @@ async function jslint_ui_call() {
         document.querySelector(
             "#JSLINT_REPORT_HTML"
         ).outerHTML = jslint.jslint_report(jslint_option_dict.result);
-        jslint_ui_onresize();
+        listener_window_onresize();
     } catch (err) {
         console.error(err); //jslint-quiet
     }
@@ -1318,23 +1325,6 @@ async function jslint_ui_call() {
     }, 500);
 }
 
-function jslint_ui_onresize() {
-    let content_width = document.querySelector(
-        "#JSLINT_OPTIONS"
-    ).offsetWidth;
-
-// Set explicit content-width for overflow to work properly.
-
-    document.querySelectorAll(
-        ".JSLINT_ fieldset > div"
-    ).forEach(function (elem) {
-        if (!elem.closest("#JSLINT_OPTIONS")) {
-            elem.style.width = content_width + "px";
-        }
-    });
-    editor.setSize(content_width);
-}
-
 function jslint_wrapper_codemirror(CodeMirror) {
 
 // This function will integrate jslint with CodeMirror's lint addon.
@@ -1342,6 +1332,10 @@ function jslint_wrapper_codemirror(CodeMirror) {
 
     CodeMirror.registerHelper("lint", "javascript", function (text, options) {
         options.result = jslint.jslint(text, options, options.globals);
+
+// Debug jslint result.
+
+        window.jslint_result = options.result;
         return options.result.warnings.map(function ({
             column,
             line,
@@ -1362,137 +1356,282 @@ function jslint_wrapper_codemirror(CodeMirror) {
     });
 }
 
-(function () {
-    let CodeMirror = window.CodeMirror;
+function listener_window_onresize() {
 
-// Init edition.
+// This function will properly size ui-elements given current browser
+// dimensions.
 
-    document.querySelector("#JSLINT_EDITION").textContent = (
-        "Edition: " + jslint.jslint_edition
-    );
+    let content_width = document.querySelector(
+        "#JSLINT_OPTIONS"
+    ).offsetWidth;
 
-// Init mode_debug.
-    mode_debug = (
-        /\bdebug=1\b/
-    ).test(location.search);
+// Set explicit content-width for overflow to work properly.
 
-// Init CodeMirror editor.
-
-    editor = CodeMirror.fromTextArea(document.querySelector(
-        "#JSLINT_SOURCE textarea"
-    ), {
-        extraKeys: {
-            "Shift-Tab": "indentLess",
-            Tab: function (cm) {
-                if (cm.somethingSelected()) {
-                    cm.indentSelection("add");
-                    return;
-                }
-                cm.replaceSelection("    ");
-            }
-        },
-        gutters: ["CodeMirror-lint-markers"],
-        indentUnit: 4,
-        indentWithTabs: false,
-        lineNumbers: true,
-        lineWrapping: true,
-        lint: jslint_option_dict,
-        matchBrackets: true,
-        mode: "text/javascript",
-        showTrailingSpace: true,
-        styleActiveLine: true
-    });
-    window.editor = editor;
-
-// Init CodeMirror linter.
-
-    jslint_wrapper_codemirror(CodeMirror);
-
-// Init event-handling.
-
-    document.addEventListener("keydown", function (evt) {
-        switch ((evt.ctrlKey || evt.metaKey) && evt.key) {
-        case "Enter":
-        case "e":
-            evt.preventDefault();
-            evt.stopPropagation();
-            jslint_ui_call();
-            break;
+    document.querySelectorAll(
+        ".JSLINT_ fieldset > div"
+    ).forEach(function (elem) {
+        if (!elem.closest("#JSLINT_OPTIONS")) {
+            elem.style.width = content_width + "px";
         }
     });
-    document.querySelector(
-        ".JSLINT_"
-    ).onclick = function ({
-        target
-    }) {
-        switch (target.tagName) {
+    editor.setSize(content_width);
+}
+
+function persist_state(mode) {
+
+// PR-391 - Persist ui-state to localStorage and sessionStorage.
+
+    let state;
+
+// Debounce this function.
+
+    if (mode !== "mode_debounced") {
+        if (!mode_persist_state_debouncing) {
+            mode_persist_state_debouncing = true;
+            setTimeout(persist_state, 100, "mode_debounced");
+        }
+        return;
+    }
+    mode_persist_state_debouncing = undefined;
+
+// Persist jslint-options to localStorage.
+
+    state = {};
+    document.querySelectorAll(
+        "#JSLINT_OPTIONS input[type=checkbox]"
+    ).forEach(function (elem) {
+        state[elem.value] = elem.checked;
+    });
+    try {
+        localStorage.setItem("jslint_persist_options", JSON.stringify(state));
+    } catch (ignore) {
+        localStorage.clear();
+        localStorage.setItem("jslint_persist_options", JSON.stringify(state));
+    }
+
+// Persist jslint-globals to sessionStorage.
+
+    if (mode_debug) {
+        state = document.querySelector("#JSLINT_GLOBALS").value;
+        if (state.length <= 0x10000) {
+            try {
+                sessionStorage.setItem("jslint_persist_globals", state);
+            } catch (ignore) {
+                sessionStorage.clear();
+                sessionStorage.setItem("jslint_persist_globals", state);
+            }
+        }
+    }
+
+// Persist jslint-source to sessionStorage.
+
+    if (mode_debug) {
+        state = editor.getValue();
+        if (state.length <= 0x10000) {
+            try {
+                sessionStorage.setItem("jslint_persist_source", state);
+            } catch (ignore) {
+                sessionStorage.clear();
+                sessionStorage.setItem("jslint_persist_source", state);
+            }
+        }
+    }
+}
+
+// Init event-handling for hotkeys.
+
+document.addEventListener("keydown", function (evt) {
+    switch ((evt.ctrlKey || evt.metaKey) && evt.key) {
+    case "Enter":
+    case "e":
+        evt.preventDefault();
+        evt.stopPropagation();
+        jslint_run();
+        break;
+    }
+});
+
+// Init event-handling for #JSLINT_.
+
+document.querySelector(
+    ".JSLINT_"
+).addEventListener("click", function ({
+    target
+}) {
+    switch (target.tagName) {
 
 // PR-368 - website
 // Add clickable-links to editor-code in report-warnings and report-functions.
 
-        case "ADDRESS":
-            editor.focus();
-            editor.setCursor({
-                ch: Number(target.textContent.split(":")[1] - 1),
-                line: Number(target.textContent.split(":")[0] - 1)
-            });
-            break;
-        }
-    };
-    document.querySelector(
-        "#JSLINT_BUTTONS"
-    ).onclick = function ({
-        target
-    }) {
-        switch (target.name) {
-        case "JSLint":
-            jslint_ui_call();
-            break;
-        case "clear_options":
-            document.querySelectorAll(
-                "#JSLINT_OPTIONS input[type=checkbox]"
-            ).forEach(function (elem) {
-                elem.checked = false;
-            });
-            document.querySelector("#JSLINT_GLOBALS").value = "";
-            document.querySelector("#JSLINT_OPTIONS").click();
-            document.querySelector("#JSLINT_GLOBALS").dispatchEvent(
-                new Event("keyup")
-            );
-            break;
-        case "clear_source":
-            editor.setValue("");
-            editor.focus();
-            break;
-        }
-    };
-    document.querySelector(
-        "#JSLINT_GLOBALS"
-    ).onkeyup = function ({
-        currentTarget
-    }) {
-        jslint_option_dict.globals = currentTarget.value.trim().split(
-            /[\s,;'"]+/
-        );
-    };
-    document.querySelector(
-        "#JSLINT_OPTIONS"
-    ).onclick = function (evt) {
-        let elem;
-        elem = evt.target.closest(
-            "#JSLINT_OPTIONS div[title]"
-        );
-        elem = elem && elem.querySelector("input[type=checkbox]");
-        if (elem && elem !== evt.target) {
+    case "ADDRESS":
+        editor.focus();
+        editor.setCursor({
+            ch: Number(target.textContent.split(":")[1] - 1),
+            line: Number(target.textContent.split(":")[0] - 1)
+        });
+        break;
+    }
+});
+
+// Init event-handling for #JSLINT_BUTTONS.
+
+document.querySelector(
+    "#JSLINT_BUTTONS"
+).addEventListener("click", function ({
+    target
+}) {
+    switch (target.name) {
+    case "JSLint":
+        jslint_run();
+        break;
+    case "clear_options":
+        document.querySelectorAll(
+            "#JSLINT_OPTIONS input[type=checkbox]"
+        ).forEach(function (elem) {
+            elem.checked = false;
+        });
+        document.querySelector("#JSLINT_OPTIONS").click();
+        document.querySelector("#JSLINT_GLOBALS").value = "";
+        persist_state();
+        break;
+    case "clear_source":
+        editor.setValue("");
+        editor.focus();
+        break;
+    }
+});
+
+// Init event-handling for #JSLINT_GLOBALS.
+
+document.querySelector(
+    "#JSLINT_GLOBALS"
+).addEventListener("keyup", persist_state);
+
+// Init event-handling for #JSLINT_OPTIONS.
+
+document.querySelector(
+    "#JSLINT_OPTIONS"
+).addEventListener("click", function (evt) {
+    let elem = evt.target.closest(
+        "#JSLINT_OPTIONS div[title]"
+    );
+    elem = elem && elem.querySelector("input[type=checkbox]");
+    if (elem) {
+        if (elem !== evt.target) {
             evt.preventDefault();
             evt.stopPropagation();
             elem.checked = !elem.checked;
         }
-    };
-    window.addEventListener("load", jslint_ui_onresize);
-    window.addEventListener("resize", jslint_ui_onresize);
-    if (!mode_debug) {
-        editor.setValue(String(`
+        persist_state();
+    }
+});
+
+// Init event-handling for window.onload.
+
+window.addEventListener("load", function () {
+    let state;
+
+// PR-391 - Initialize jslint-options from localStorage.
+
+    try {
+        state = JSON.parse(localStorage.getItem("jslint_persist_options"));
+    } catch (ignore) {}
+    state = state || {};
+    document.querySelectorAll(
+        "#JSLINT_OPTIONS input[type=checkbox]"
+    ).forEach(function (elem) {
+        if (state[elem.value] === true) {
+            elem.checked = true;
+        }
+    });
+
+// PR-391 - Initialize jslint-globals from sessionStorage.
+
+    if (mode_debug) {
+        try {
+            document.querySelector(
+                "#JSLINT_GLOBALS"
+            ).value = sessionStorage.getItem("jslint_persist_globals");
+        } catch (ignore) {}
+    }
+
+// PR-391 - Initialize jslint-source from sessionStorage.
+
+    if (mode_debug) {
+        try {
+            editor.setValue(sessionStorage.getItem("jslint_persist_source"));
+        } catch (ignore) {}
+    }
+
+// JSLint current source code.
+
+    document.querySelector("button[name='JSLint']").click();
+
+// Resize ui-elements.
+
+    listener_window_onresize();
+});
+
+// Init event-handling for window.onresize.
+
+window.addEventListener("resize", listener_window_onresize);
+
+// Init edition.
+
+document.querySelector("#JSLINT_EDITION").textContent = (
+    "Edition: " + jslint.jslint_edition
+);
+
+// Init mode_debug.
+
+mode_debug = (
+    /\bdebug=1\b/
+).test(location.search);
+if (mode_debug) {
+    document.querySelector(
+        "#JSLINT_OPTIONS input[value=trace]"
+    ).click();
+}
+
+// Init CodeMirror editor.
+
+editor = CodeMirror.fromTextArea(document.querySelector(
+    "#JSLINT_SOURCE textarea"
+), {
+    extraKeys: {
+        "Shift-Tab": "indentLess",
+        Tab: function (cm) {
+            if (cm.somethingSelected()) {
+                cm.indentSelection("add");
+                return;
+            }
+            cm.replaceSelection("    ");
+        }
+    },
+    gutters: ["CodeMirror-lint-markers"],
+    indentUnit: 4,
+    indentWithTabs: false,
+    lineNumbers: true,
+    lineWrapping: true,
+    lint: jslint_option_dict,
+    matchBrackets: true,
+    mode: "text/javascript",
+    showTrailingSpace: true,
+    styleActiveLine: true
+});
+
+// Init CodeMirror linter.
+
+jslint_wrapper_codemirror(CodeMirror);
+
+// Init event-handling for CodeMirror editor.
+
+editor.on("change", persist_state);
+
+// Init default source code to lint.
+
+if (!mode_debug) {
+    editor.setValue(String(`
 #!/usr/bin/env node
 /*jslint browser, node*/
 /*global caches, indexedDb*/
@@ -1546,18 +1685,11 @@ eval("console.log(\\"hello world\\");");
         console.error(formatted_message);
     });
 }());
-        `).trim() + "\n");
-    }
-    if (mode_debug) {
-        document.querySelector(
-            "#JSLINT_OPTIONS input[value=trace]"
-        ).click();
-    }
-    document.querySelector("button[name='JSLint']").click();
+    `).trim() + "\n");
+}
 
-// Debug css-style.
-
-    window.dom_style_report_unmatched = dom_style_report_unmatched;
-}());
+// Init exports.
+window.dom_style_report_unmatched = dom_style_report_unmatched;
+window.editor = editor;
 </script>
 </body></html>

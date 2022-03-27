@@ -9443,6 +9443,9 @@ body {
         : "global"
     );
     if (global.length + froms.length + exports.length > 0) {
+        if (functions.length === 0) {
+            html += "<br>\n";
+        }
         html += "<div class=\"level level0\">\n";
         html += detail(module, global);
         html += detail("import from", froms);
