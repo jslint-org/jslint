@@ -8,6 +8,7 @@
 # git add .; npm run test2; git checkout .
 # git branch -d -r origin/aa
 # git config --global diff.algorithm histogram
+# git fetch --prune
 # git fetch origin alpha beta master && git fetch upstream alpha beta master
 # git fetch origin alpha beta master --tags
 # git fetch upstream "refs/tags/*:refs/tags/*"
@@ -242,12 +243,12 @@ import moduleUrl from "url";
 
 shCiArtifactUpload() {(set -e
 # this function will upload build-artifacts to branch-gh-pages
-    export GITHUB_BRANCH0="$(git rev-parse --abbrev-ref HEAD)"
-    local FILE
     if (! shCiIsMainJob)
     then
         return
     fi
+    export GITHUB_BRANCH0="$(git rev-parse --abbrev-ref HEAD)"
+    local FILE
     # init .git/config
     git config --local user.email "github-actions@users.noreply.github.com"
     git config --local user.name "github-actions"
@@ -308,14 +309,10 @@ import moduleChildProcess from "child_process";
     git checkout -b gh-pages origin/gh-pages
     # update dir branch-$GITHUB_BRANCH0
     rm -rf "branch-$GITHUB_BRANCH0"
-    mkdir -p "branch-$GITHUB_BRANCH0"
-    (set -e
-        cd "branch-$GITHUB_BRANCH0"
-        git init -b branch1
-        git pull --depth=1 .. "$GITHUB_BRANCH0"
-        rm -rf .git
-        git add -f .
-    )
+    git clone . "branch-$GITHUB_BRANCH0" --branch="$GITHUB_BRANCH0"
+    rm -rf "branch-$GITHUB_BRANCH0/.git"
+    # add dir branch-$GITHUB_BRANCH0
+    git add -f "branch-$GITHUB_BRANCH0"
     # update root-dir with branch-beta
     if [ "$GITHUB_BRANCH0" = beta ]
     then
@@ -346,7 +343,7 @@ import moduleChildProcess from "child_process";
     if [ "$(git rev-list --count gh-pages)" -gt 50 ]
     then
         # backup
-        shGitCmdWithGithubToken push origin -f gh-pages:gh-pages-backup
+        git push origin -f gh-pages:gh-pages-backup
         # squash commits
         git checkout --orphan squash1
         git commit --quiet -am squash || true
@@ -354,12 +351,12 @@ import moduleChildProcess from "child_process";
         git push . -f squash1:gh-pages
         git checkout gh-pages
         # force-push squashed-commit
-        shGitCmdWithGithubToken push origin -f gh-pages
+        git push origin -f gh-pages
     fi
     # list files
     shGitLsTree
     # push branch-gh-pages
-    shGitCmdWithGithubToken push origin gh-pages
+    git push origin gh-pages
     # validate http-links
     (set -e
         cd "branch-$GITHUB_BRANCH0"
@@ -513,7 +510,7 @@ shCiIsMainJob() {(set -e
 # this function will return 0 if current ci-job is main job
     node --input-type=module --eval '
 process.exit(Number(
-    `${process.version.split(".")[0]}.${process.arch}.${process.platform}`
+    `node.${process.version.split(".")[0]}.${process.arch}.${process.platform}`
     !== process.env.CI_MAIN_JOB
 ));
 ' "$@" # '
@@ -536,6 +533,11 @@ shCiNpmPublish() {(set -e
 shCiNpmPublishCustom() {(set -e
 # this function will run custom-code to npm-publish package
     # npm publish --access public
+)}
+
+shCiPre() {(set -e
+# this function will run pre-ci
+    return
 )}
 
 shDiffFileFromDir() {(set -e
@@ -647,22 +649,28 @@ shDuList() {(set -e
 )}
 
 shGitCmdWithGithubToken() {(set -e
-# this function will run git $CMD with $GITHUB_TOKEN
+# this function will run git $CMD with $MY_GITHUB_TOKEN
     local CMD
     local EXIT_CODE
-    local REMOTE
     local URL
     printf "shGitCmdWithGithubToken $*\n"
     CMD="$1"
     shift
-    REMOTE="$1"
+    URL="$1"
     shift
-    URL="$(
-        git config "remote.$REMOTE.url" \
-        | sed -e "s|https://|https://x-access-token:$GITHUB_TOKEN@|"
-    )"
+    if (printf "$URL" | grep -qv "^https://")
+    then
+        URL="$(git config "remote.$URL.url")"
+    fi
+    if [ "$MY_GITHUB_TOKEN" ]
+    then
+        URL="$(
+            printf "$URL" \
+            | sed -e "s|https://|https://x-access-token:$MY_GITHUB_TOKEN@|"
+        )"
+    fi
     EXIT_CODE=0
-    # hide $GITHUB_TOKEN in case of err
+    # hide $MY_GITHUB_TOKEN in case of err
     git "$CMD" "$URL" "$@" 2>/dev/null || EXIT_CODE="$?"
     printf "shGitCmdWithGithubToken - EXIT_CODE=$EXIT_CODE\n" 1>&2
     return "$EXIT_CODE"
@@ -826,7 +834,7 @@ function assertOrThrow(condition, message) {
             moduleHttps.request(`${url}?ref=${branch}`, {
                 headers: {
                     accept: "application/vnd.github.v3+json",
-                    authorization: `token ${process.env.GITHUB_TOKEN}`,
+                    authorization: `token ${process.env.MY_GITHUB_TOKEN}`,
                     "user-agent": "undefined"
                 },
                 method

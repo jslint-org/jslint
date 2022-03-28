@@ -15,6 +15,8 @@
 - perf - improve performance by hoisting inlined regexps out of loops and subfunctions
 
 # v2022.3.1-beta
+- website - use localStorage to persist jslint-options selected in ui
+- website - add optional debug-mode to use sessionStorage to persist jslint-globals and jslint-source from ui
 - jslint - add numeric-separator support
 - jslint - move regexp-literals to module-level so they are explicitly cached, to improve performance
 - ci - add check for package.json.fileCount
