@@ -1531,6 +1531,10 @@ document.querySelector(
 window.addEventListener("load", function () {
     let state;
 
+// Resize ui-elements.
+
+    listener_window_onresize();
+
 // PR-391 - Initialize jslint-options from localStorage.
 
     try {
@@ -1566,10 +1570,6 @@ window.addEventListener("load", function () {
 // JSLint current source code.
 
     document.querySelector("button[name='JSLint']").click();
-
-// Resize ui-elements.
-
-    listener_window_onresize();
 });
 
 // Init event-handling for window.onresize.
