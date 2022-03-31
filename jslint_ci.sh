@@ -802,6 +802,14 @@ shGitSquashPop() {(set -e
     git commit -am "$MESSAGE" || true
 )}
 
+shGithubFileDownload() {(set -e
+# this function will download file $1 from github repo/branch
+# https://docs.github.com/en/rest/reference/repos#create-or-update-file-contents
+# example use:
+# shGithubFileDownload octocat/hello-worId/master/hello.txt
+    shGithubFileUpload $1
+)}
+
 shGithubFileUpload() {(set -e
 # this function will upload file $2 to github repo/branch $1
 # https://docs.github.com/en/rest/reference/repos#create-or-update-file-contents
@@ -810,6 +818,7 @@ shGithubFileUpload() {(set -e
     node --input-type=module --eval '
 import moduleFs from "fs";
 import moduleHttps from "https";
+import modulePath from "path";
 function assertOrThrow(condition, message) {
     if (!condition) {
         throw (
@@ -821,7 +830,7 @@ function assertOrThrow(condition, message) {
 }
 (async function () {
     let branch;
-    let content = await moduleFs.promises.readFile(process.argv[2]);
+    let content = process.argv[2];
     let path = process.argv[1];
     let repo;
     let responseText;
@@ -845,11 +854,11 @@ function assertOrThrow(condition, message) {
                     responseText += chunk;
                 });
                 res.on("end", function () {
-                    assertOrThrow(
-                        res.statusCode === 200,
-                        `shGithubFileUpload - failed to upload file ${url} - `
+                    assertOrThrow(res.statusCode === 200, (
+                        "shGithubFileUpload"
+                        + `- failed to download/upload file ${url} - `
                         + responseText
-                    );
+                    ));
                     resolve();
                 });
             }).end(payload);
@@ -861,6 +870,14 @@ function assertOrThrow(condition, message) {
     path = path.slice(3).join("/");
     url = `https://api.github.com/repos/${repo}/contents/${path}`;
     await httpRequest({});
+    if (!content) {
+        await moduleFs.promises.writeFile(
+            modulePath.basename(url),
+            Buffer.from(JSON.parse(responseText).content, "base64")
+        );
+        return;
+    }
+    content = await moduleFs.promises.readFile(content);
     await httpRequest({
         method: "PUT",
         payload: JSON.stringify({
@@ -872,6 +889,19 @@ function assertOrThrow(condition, message) {
     });
 }());
 ' "$@" # '
+)}
+
+shGithubWorkflowDispatch() {(set -e
+# this function will trigger-workflow to ci-repo $1 for owner.repo.branch $2
+# example use:
+# shGithubWorkflowDispatch octocat/my_ci octocat/my_project/master
+    curl "https://api.github.com/repos/$1"\
+"/actions/workflows/ci.yml/dispatches" \
+        -H "accept: application/vnd.github.v3+json" \
+        -H "authorization: token $MY_GITHUB_TOKEN" \
+        -X POST \
+        -d '{"ref":"'"$2"'"}' \
+        -s
 )}
 
 shGrep() {(set -e

@@ -39,7 +39,7 @@ jobs:
           - macos-latest
           - ubuntu-latest
           - windows-latest
-    name: |
+    name: >
       job1
       node
       v${{ matrix.node_version }}
@@ -60,11 +60,11 @@ jobs:
       # https://github.com/actions/cache
       - uses: actions/cache@v2
         with:
-          key: |
+          key: >
+            ${{ hashFiles('./package.json') }}
             ${{ matrix.architecture }}
             ${{ matrix.node_version }}
             ${{ matrix.os }}
-            ${{ hashFiles('./package.json') }}
           path: .github_cache
       # https://github.com/actions/setup-node
       - uses: actions/setup-node@v2
