@@ -213,23 +213,6 @@ jstestDescribe((
         });
     });
     jstestIt((
-        "test cli-report-misc handling-behavior"
-    ), function () {
-        jslint.jslint_cli({
-            // suppress error
-            console_error: noop,
-            mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                "jslint_report=.tmp/jslint_report.html",
-                "aa.js"
-            ],
-            process_exit: processExit1,
-            source: "(aa)=>aa; function aa([aa]){}"
-        });
-    });
-    jstestIt((
         "test cli-report-json-error handling-behavior"
     ), function () {
         jslint.jslint_cli({
@@ -244,6 +227,36 @@ jstestDescribe((
             ],
             process_exit: processExit1,
             source: "["
+        });
+    });
+    jstestIt((
+        "test cli-report-misc handling-behavior"
+    ), function () {
+        jslint.jslint_cli({
+            // suppress error
+            console_error: noop,
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                "jslint_report=.tmp/jslint_report.html",
+                "aa.js"
+            ],
+            process_exit: processExit0,
+            source: "let aa = 0;"
+        });
+        jslint.jslint_cli({
+            // suppress error
+            console_error: noop,
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                "jslint_report=.tmp/jslint_report.html",
+                "aa.js"
+            ],
+            process_exit: processExit1,
+            source: "(aa)=>aa; function aa([aa]){}"
         });
     });
     jstestIt((
