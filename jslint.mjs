@@ -473,7 +473,7 @@ function jslint(
         case "(string)":
             return aa.value === bb.value;
 
-// PR-xxx - Bugfix
+// PR-394 - Bugfix
 // Fix jslint falsely believing megastring literals `0` and `1` are similar.
 
         case "`":
