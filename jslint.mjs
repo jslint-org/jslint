@@ -434,8 +434,6 @@ function jslint(
     }
 
     function is_equal(aa, bb) {
-        let aa_value;
-        let bb_value;
 
 // test_cause:
 // ["0&&0", "is_equal", "", "", 0]
@@ -456,6 +454,7 @@ function jslint(
 
 // test_cause:
 // ["`${0}`&&`${0}`", "is_equal", "recurse_isArray", "", 0]
+// ["`${0}`&&`${1}`", "is_equal", "recurse_isArray", "", 0]
 
                     test_cause("recurse_isArray");
                     return is_equal(value, bb[index]);
@@ -469,21 +468,19 @@ function jslint(
 // }
 
         jslint_assert(!Array.isArray(bb), `Expected !Array.isArray(bb).`);
-        if (aa.id === "(number)" && bb.id === "(number)") {
+        switch (aa.id === bb.id && aa.id) {
+        case "(number)":
+        case "(string)":
             return aa.value === bb.value;
-        }
-        if (aa.id === "(string)") {
-            aa_value = aa.value;
-        } else if (aa.id === "`" && aa.constant) {
-            aa_value = aa.value[0];
-        }
-        if (bb.id === "(string)") {
-            bb_value = bb.value;
-        } else if (bb.id === "`" && bb.constant) {
-            bb_value = bb.value[0];
-        }
-        if (typeof aa_value === "string") {
-            return aa_value === bb_value;
+
+// PR-xxx - Bugfix
+// Fix jslint falsely believing megastring literals `0` and `1` are similar.
+
+        case "`":
+            if (!is_equal(aa.value, bb.value)) {
+                return false;
+            }
+            break;
         }
         if (is_weird(aa) || is_weird(bb)) {
 
@@ -7748,6 +7745,11 @@ function jslint_phase4_walk(state) {
             || thing.expression[0].constant === true
             || is_equal(thing.expression[1], thing.expression[2])
         ) {
+
+// test_cause:
+// ["let aa=(aa?`${0}`:`${0}`);", "post_t", "unexpected_a", "?", 11]
+// ["let aa=(aa?`0`:`0`);", "post_t", "unexpected_a", "?", 11]
+
             warn("unexpected_a", thing);
         } else if (is_equal(thing.expression[0], thing.expression[1])) {
 
