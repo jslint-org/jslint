@@ -738,9 +738,9 @@ jstestDescribe((
         throw new Error();
     }, "pass");
     jstestIt((
-        "test jstestOnExit error handling-behavior"
+        "test jstestOnExit tests-failed handling-behavior"
     ), function () {
-        jstestOnExit(undefined, noop, 1);
+        jstestOnExit(undefined, "testsFailed");
     });
 });
 
