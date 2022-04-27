@@ -14,6 +14,10 @@
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 - perf - improve performance by hoisting inlined regexps out of loops and subfunctions
 
+# v2022.5.1-beta
+- bugfix - fix jslint falsely believing megastring literals `0` and `1` are similar
+- bugfix - fix function jstestOnExit() from exiting prematurely and suppressing additional error-messages
+
 # v2022.3.30
 - website - use localStorage to persist jslint-options selected in ui
 - website - add optional debug-mode to use sessionStorage to persist jslint-globals and jslint-source from ui

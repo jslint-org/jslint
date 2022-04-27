@@ -453,6 +453,17 @@ jstestDescribe((
                     + "    ? `${0}`\n"
                     + "    : `${1}`\n"
                     + ");"
+                ),
+
+// PR-394 - Bugfix
+// Fix jslint falsely believing megastring literals `0` and `1` are similar.
+
+                (
+                    "let aa = (\n"
+                    + "    aa()\n"
+                    + "    ? `0`\n"
+                    + "    : `1`\n"
+                    + ");"
                 )
             ],
             try_catch: [
@@ -738,9 +749,9 @@ jstestDescribe((
         throw new Error();
     }, "pass");
     jstestIt((
-        "test jstestOnExit error handling-behavior"
+        "test jstestOnExit tests-failed handling-behavior"
     ), function () {
-        jstestOnExit(undefined, noop, 1);
+        jstestOnExit(undefined, "testsFailed");
     });
 });
 

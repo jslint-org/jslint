@@ -94,50 +94,47 @@
 /*jslint beta, node*/
 
 /*property
-    fud_stmt,
-    is_fart,
-    mode_conditional,
     JSLINT_BETA, NODE_V8_COVERAGE, a, all, argv, arity, artifact,
     assertErrorThrownAsync, assertJsonEqual, assertOrThrow, assign, async, b,
     beta, bitwise, block, body, browser, c, calls, catch, catch_list,
-    catch_stack, causes, char, children, clear, closer,
-    closure, code, column, concat, consoleError, console_error, console_log,
-    constant, context, convert, count, coverageDir, create, cwd, d, dead,
-    debugInline, default, delta, devel, directive, directive_list,
-    directive_quiet, directives, dirname, disrupt, dot, edition, elem_list,
-    ellipsis, else, end, endOffset, endsWith, entries, env, error, eval, every,
-    example_list, exec, execArgv, exit, export_dict, exports, expression, extra,
-    file, fileList, fileURLToPath, filter, finally, flag, floor, for, forEach,
-    formatted_message, free, freeze, from, froms,
-    fsWriteFileWithParents, functionName, function_list, function_stack,
-    functions, get, getset, github_repo, global, global_dict, global_list,
-    holeList, htmlEscape, id, identifier, import, import_list, inc, indent2,
-    index, indexOf, init, initial, isArray, isBlockCoverage, isHole, isNaN,
-    is_equal, is_weird, join, jslint, jslint_apidoc, jslint_assert,
-    jslint_charset_ascii, jslint_cli, jslint_edition, jslint_phase1_split,
-    jslint_phase2_lex, jslint_phase3_parse, jslint_phase4_walk,
-    jslint_phase5_whitage, jslint_report, json, jstestDescribe, jstestIt,
-    jstestOnExit, keys, label, lbp, led_infix, length, level, line, lineList,
-    line_list, line_offset, line_source, lines, linesCovered, linesTotal, live,
-    log, long, loop, m, main, map, margin, match, max, message, meta, min,
-    mkdir, modeCoverageIgnoreFile, modeIndex, mode_cli, mode_json, mode_module,
-    mode_noop, mode_property, mode_shebang, mode_stop, module, moduleFsInit,
-    moduleName, module_list, name, names, node, noop, now,
-    nr, nud_prefix, objectDeepCopyWithKeysSorted, ok, on, open, opening, option,
-    option_dict, order, package_name, padEnd, padStart, parameters, parent,
-    parentIi, parse, pathname, platform, pop, processArgv, process_argv,
-    process_env, process_exit, process_version, promises, property,
-    property_dict, push, quote, ranges, readFile, readdir, readonly, recursive,
-    reduce, repeat, replace, resolve, result, reverse, rm, rmdir, role, round,
-    scriptId, search, set, shebang, shift, signature, single, slice, some, sort,
-    source, spawn, splice, split, stack, stack_trace, start, startOffset,
-    startsWith, statement, statement_prv, stdio, stop, stop_at, stringify,
-    switch, syntax_dict, tenure, test, test_cause, test_internal_error, this,
-    thru, toString, token, token_global, token_list, token_nxt, token_tree,
-    tokens, trace, tree, trim, trimEnd, trimRight, try, type, unlink, unordered,
-    unshift, url, used, v8CoverageListMerge, v8CoverageReportCreate, value,
-    variable, version, versions, warn, warn_at, warning, warning_list, warnings,
-    white, wrapped, writeFile
+    catch_stack, causes, char, children, clear, closer, closure, code, column,
+    concat, consoleError, console_error, console_log, constant, context,
+    convert, count, coverageDir, create, cwd, d, dead, debugInline, default,
+    delta, devel, directive, directive_list, directive_quiet, directives,
+    dirname, disrupt, dot, edition, elem_list, ellipsis, else, end, endOffset,
+    endsWith, entries, env, error, eval, every, example_list, exec, execArgv,
+    exit, exitCode, export_dict, exports, expression, extra, file, fileList,
+    fileURLToPath, filter, finally, flag, floor, for, forEach,
+    formatted_message, free, freeze, from, froms, fsWriteFileWithParents,
+    fud_stmt, functionName, function_list, function_stack, functions, get,
+    getset, github_repo, global, global_dict, global_list, holeList, htmlEscape,
+    id, identifier, import, import_list, inc, indent2, index, indexOf, init,
+    initial, isArray, isBlockCoverage, isHole, isNaN, is_equal, is_fart,
+    is_weird, join, jslint, jslint_apidoc, jslint_assert, jslint_charset_ascii,
+    jslint_cli, jslint_edition, jslint_phase1_split, jslint_phase2_lex,
+    jslint_phase3_parse, jslint_phase4_walk, jslint_phase5_whitage,
+    jslint_report, json, jstestDescribe, jstestIt, jstestOnExit, keys, label,
+    lbp, led_infix, length, level, line, lineList, line_list, line_offset,
+    line_source, lines, linesCovered, linesTotal, live, log, long, loop, m, map,
+    margin, match, max, message, meta, min, mkdir, modeCoverageIgnoreFile,
+    modeIndex, mode_cli, mode_conditional, mode_json, mode_module, mode_noop,
+    mode_property, mode_shebang, mode_stop, module, moduleFsInit, moduleName,
+    module_list, name, names, node, noop, now, nr, nud_prefix,
+    objectDeepCopyWithKeysSorted, ok, on, open, opening, option, option_dict,
+    order, package_name, padEnd, padStart, parameters, parent, parentIi, parse,
+    pathname, platform, pop, processArgv, process_argv, process_env,
+    process_exit, promises, property, property_dict, push, quote, ranges,
+    readFile, readdir, readonly, recursive, reduce, repeat, replace, resolve,
+    result, reverse, role, round, scriptId, search, set, shebang, shift,
+    signature, single, slice, some, sort, source, spawn, splice, split, stack,
+    stack_trace, start, startOffset, startsWith, statement, statement_prv,
+    stdio, stop, stop_at, stringify, switch, syntax_dict, tenure, test,
+    test_cause, test_internal_error, this, thru, toString, token, token_global,
+    token_list, token_nxt, token_tree, tokens, trace, tree, trim, trimEnd,
+    trimRight, try, type, unlink, unordered, unshift, url, used,
+    v8CoverageListMerge, v8CoverageReportCreate, value, variable, version,
+    versions, warn, warn_at, warning, warning_list, warnings, white, wrapped,
+    writeFile
 */
 
 // init debugInline
@@ -167,7 +164,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2022.3.30";
+let jslint_edition = "v2022.5.1-beta";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -437,8 +434,6 @@ function jslint(
     }
 
     function is_equal(aa, bb) {
-        let aa_value;
-        let bb_value;
 
 // test_cause:
 // ["0&&0", "is_equal", "", "", 0]
@@ -459,6 +454,7 @@ function jslint(
 
 // test_cause:
 // ["`${0}`&&`${0}`", "is_equal", "recurse_isArray", "", 0]
+// ["`${0}`&&`${1}`", "is_equal", "recurse_isArray", "", 0]
 
                     test_cause("recurse_isArray");
                     return is_equal(value, bb[index]);
@@ -472,21 +468,19 @@ function jslint(
 // }
 
         jslint_assert(!Array.isArray(bb), `Expected !Array.isArray(bb).`);
-        if (aa.id === "(number)" && bb.id === "(number)") {
+        switch (aa.id === bb.id && aa.id) {
+        case "(number)":
+        case "(string)":
             return aa.value === bb.value;
-        }
-        if (aa.id === "(string)") {
-            aa_value = aa.value;
-        } else if (aa.id === "`" && aa.constant) {
-            aa_value = aa.value[0];
-        }
-        if (bb.id === "(string)") {
-            bb_value = bb.value;
-        } else if (bb.id === "`" && bb.constant) {
-            bb_value = bb.value[0];
-        }
-        if (typeof aa_value === "string") {
-            return aa_value === bb_value;
+
+// PR-394 - Bugfix
+// Fix jslint falsely believing megastring literals `0` and `1` are similar.
+
+        case "`":
+            if (!is_equal(aa.value, bb.value)) {
+                return false;
+            }
+            break;
         }
         if (is_weird(aa) || is_weird(bb)) {
 
@@ -7751,6 +7745,11 @@ function jslint_phase4_walk(state) {
             || thing.expression[0].constant === true
             || is_equal(thing.expression[1], thing.expression[2])
         ) {
+
+// test_cause:
+// ["let aa=(aa?`${0}`:`${0}`);", "post_t", "unexpected_a", "?", 11]
+// ["let aa=(aa?`0`:`0`);", "post_t", "unexpected_a", "?", 11]
+
             warn("unexpected_a", thing);
         } else if (is_equal(thing.expression[0], thing.expression[1])) {
 
@@ -9610,14 +9609,14 @@ function jstestIt(description, testFunction, mode) {
     }));
 }
 
-function jstestOnExit(exitCode, processExit, countFailed) {
+function jstestOnExit(exitCode, mode) {
 
 // This function will on process-exit, print test-report
 // and exit with non-zero exit-code if any test failed.
 
     let message = (
         (
-            (jstestCountFailed || countFailed)
+            (jstestCountFailed || mode === "testsFailed")
             ? "\n\u001b[31m"
             : "\n\u001b[32m"
         )
@@ -9625,11 +9624,10 @@ function jstestOnExit(exitCode, processExit, countFailed) {
         + "  tests failed - " + jstestCountFailed + "\n"
         + "\u001b[39m"
     );
-    if (!processExit) {
+    if (mode !== "testsFailed") {
         console.error(message);
-        processExit = process.exit;
     }
-    processExit(exitCode || jstestCountFailed);
+    process.exitCode = exitCode || jstestCountFailed;
     return message;
 }
 
