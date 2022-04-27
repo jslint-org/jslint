@@ -454,6 +454,10 @@ jstestDescribe((
                     + "    : `${1}`\n"
                     + ");"
                 ),
+
+// PR-394 - Bugfix
+// Fix jslint falsely believing megastring literals `0` and `1` are similar.
+
                 (
                     "let aa = (\n"
                     + "    aa()\n"
