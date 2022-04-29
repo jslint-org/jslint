@@ -2,17 +2,21 @@
     "bin": {
         "jslint": "./jslint.mjs"
     },
+    "bugs": {
+        "url": "https://github.com/jslint-org/jslint/issues"
+    },
     "counter": 7,
     "description": "JSLint, The JavaScript Code Quality and Coverage Tool",
     "exports": {
         "default": "./jslint_wrapper_cjs.cjs",
         "import": "./jslint.mjs"
     },
-    "fileCount": 29,
+    "fileCount": 37,
     "keywords": [
         "coverage-report",
         "javascript",
         "jslint",
+        "linter",
         "zero-config",
         "zero-dependency"
     ],

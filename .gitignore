@@ -4,6 +4,7 @@
 *.lock
 *.log
 *.pyc
+*.vsix
 *~
 .*
 _*

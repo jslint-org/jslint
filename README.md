@@ -38,13 +38,16 @@ Douglas Crockford <douglas@crockford.com>
 7. [Quickstart JSLint in Vim](#quickstart-jslint-in-vim)
     - [To run JSLint in Vim:](#to-run-jslint-in-vim)
 
-8. [Description](#description)
+8. [Quickstart JSLint in VS Code](#quickstart-jslint-in-vs-code)
+    - [To run JSLint in VS Code:](#to-run-jslint-in-vs-code)
 
-9. [Package Listing](#package-listing)
+9. [Description](#description)
 
-10. [Changelog](#changelog)
+10. [Package Listing](#package-listing)
 
-11. [License](#license)
+11. [Changelog](#changelog)
+
+12. [License](#license)
 
 
 <br><br>
@@ -344,6 +347,22 @@ import jslint from "../jslint.mjs";
 - screenshot
 
 ![screenshot.png](asset_image_jslint_wrapper_vim.png)
+
+
+<br><br>
+# Quickstart JSLint in VS Code
+
+
+<br><br>
+### To run JSLint in VS Code:
+1. In VS Code, search-and-install extension [`vscode-jslint`](https://marketplace.visualstudio.com/items?itemName=jslint.vscode-jslint)
+2. In VS Code, while editing a javascript file:
+    - right-click context-menu and select `JSLint - Lint File`
+    - or use key-binding `Ctrl + Shift + J, L`
+    - or use key-binding `Cmd + Shift + J, L` (Mac)
+- screenshot
+
+![screenshot.png](asset_image_jslint_wrapper_vscode.png)
 
 
 <br><br>

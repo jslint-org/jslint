@@ -10,12 +10,6 @@ on:
       - master
       - sandbox
   workflow_dispatch:
-    branches:
-      # - '*/*/*'
-      - alpha
-      - beta
-      - master
-      - sandbox
 env:
   CI_MAIN_JOB: node.v16.x64.linux
   GITHUB_ARTIFACT_UPLOAD_NODE_VERSION: v16

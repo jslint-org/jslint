@@ -162,6 +162,11 @@ import moduleChildProcess from "child_process";
 
 shCiBaseCustom() {(set -e
 # this function will run base-ci
+    # jslint_wrapper_vscode - ln
+    ln -f jslint.mjs jslint_wrapper_vscode/
+    ln -f asset_image_logo_512.png jslint_wrapper_vscode/
+    # jslint_wrapper_vscode - json-normalize
+    shJsonNormalize jslint_wrapper_vscode/package.json
     # update files
     if [ "$(git branch --show-current)" = alpha ]
     then
@@ -177,7 +182,8 @@ import moduleFs from "fs";
         "CHANGELOG.md",
         "index.html",
         "jslint.mjs",
-        "jslint_ci.sh"
+        "jslint_ci.sh",
+        "jslint_wrapper_vscode/jslint_wrapper_vscode.js"
     ].map(async function (file) {
         fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
     }));
