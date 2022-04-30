@@ -84,7 +84,7 @@ curl -L https://www.jslint.com/jslint.mjs > jslint.mjs
 ```
 - shell output
 
-![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_sh_install_download.svg)
+![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_sh_install_download.svg)
 
 
 <br><br>
@@ -98,7 +98,7 @@ node jslint.mjs hello.js
 ```
 - shell output
 
-![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_sh_jslint_file.svg)
+![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_sh_jslint_file.svg)
 
 
 <br><br>
@@ -132,7 +132,7 @@ result.warnings.forEach(function ({
 ```
 - shell output
 
-![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_js_import_esm.svg)
+![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_js_import_esm.svg)
 
 
 <br><br>
@@ -169,7 +169,7 @@ node --eval '
 ```
 - shell output
 
-![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_js_import_cjs.svg)
+![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_js_import_cjs.svg)
 
 
 <br><br>
@@ -183,7 +183,7 @@ node jslint.mjs .
 ```
 - shell output
 
-![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_sh_jslint_dir.svg)
+![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_sh_jslint_dir.svg)
 
 
 <br><br>
@@ -205,11 +205,11 @@ node jslint.mjs \
 ```
 - shell output
 
-![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_sh_jslint_report_file.svg)
+![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_sh_jslint_report_file.svg)
 
 - screenshot file [.artifact/jslint_report_hello.html](https://jslint-org.github.io/jslint/branch-beta/.artifact/jslint_report_hello.html)
 
-[![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fjslint_report_hello.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/jslint_report_hello.html)
+[![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fjslint_report_hello.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/jslint_report_hello.html)
 
 
 <br><br>
@@ -241,11 +241,11 @@ import fs from "fs";
 ```
 - shell output
 
-![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_js_jslint_report_file.svg)
+![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_js_jslint_report_file.svg)
 
 - screenshot file [.artifact/jslint_report_hello.html](https://jslint-org.github.io/jslint/branch-beta/.artifact/jslint_report_hello.html)
 
-[![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fjslint_report_hello.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/jslint_report_hello.html)
+[![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fjslint_report_hello.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/jslint_report_hello.html)
 
 
 <br><br>
@@ -276,15 +276,15 @@ node ../jslint.mjs \
 ```
 - shell output
 
-![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_sh_coverage_report_spawn.svg)
+![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_sh_coverage_report_spawn.svg)
 
 - screenshot file [.artifact/coverage_sqlite3_sh/index.html](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3_sh/index.html)
 
-[![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fcoverage_sqlite3_sh_2findex.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3_sh/index.html)
+[![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fcoverage_sqlite3_sh_2findex.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3_sh/index.html)
 
 - screenshot file [.artifact/coverage_sqlite3_sh/lib/sqlite3.js.html](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3_sh/lib/sqlite3.js.html)
 
-[![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fcoverage_sqlite3_sh_2flib_2fsqlite3.js.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3_sh/lib/sqlite3.js.html)
+[![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fcoverage_sqlite3_sh_2flib_2fsqlite3.js.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3_sh/lib/sqlite3.js.html)
 
 
 <br><br>
@@ -322,15 +322,15 @@ import jslint from "../jslint.mjs";
 ```
 - shell output
 
-![screenshot.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_js_coverage_report_spawn.svg)
+![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_js_coverage_report_spawn.svg)
 
 - screenshot file [.artifact/coverage_sqlite3_js/index.html](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3_js/index.html)
 
-[![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fcoverage_sqlite3_js_2findex.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3_js/index.html)
+[![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fcoverage_sqlite3_js_2findex.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3_js/index.html)
 
 - screenshot file [.artifact/coverage_sqlite3_js/lib/sqlite3.js.html](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3_js/lib/sqlite3.js.html)
 
-[![screenshot.png](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fcoverage_sqlite3_js_2flib_2fsqlite3.js.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3_js/lib/sqlite3.js.html)
+[![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fcoverage_sqlite3_js_2flib_2fsqlite3.js.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage_sqlite3_js/lib/sqlite3.js.html)
 
 
 <br><br>
@@ -346,7 +346,7 @@ import jslint from "../jslint.mjs";
     - with vim-key-combo `<Ctrl-S> <Ctrl-J>`
 - screenshot
 
-![screenshot.png](asset_image_jslint_wrapper_vim.png)
+[![screenshot](asset_image_jslint_wrapper_vim.png)](https://www.jslint.com/jslint_wrapper_vim.vim)
 
 
 <br><br>
@@ -355,14 +355,14 @@ import jslint from "../jslint.mjs";
 
 <br><br>
 ### To run JSLint in VS Code:
-1. In VS Code, search-and-install extension [`vscode-jslint`](https://marketplace.visualstudio.com/items?itemName=jslint.vscode-jslint)
+1. In VS Code, search and install extension [`vscode-jslint`](https://marketplace.visualstudio.com/items?itemName=jslint.vscode-jslint)
 2. In VS Code, while editing a javascript file:
-    - right-click context-menu and select `JSLint - Lint File`
-    - or use key-binding `Ctrl + Shift + J, L`
-    - or use key-binding `Cmd + Shift + J, L` (Mac)
+    - right-click context-menu and select `[JSLint - Lint File]`
+    - or use key-binding `[Ctrl + Shift + J], [L]`
+    - or use key-binding `[ Cmd + Shift + J], [L]` (Mac)
 - screenshot
 
-![screenshot.png](asset_image_jslint_wrapper_vscode.png)
+[![screenshot](https://jslint-org.github.io/jslint/asset_image_jslint_wrapper_vscode.png)](https://marketplace.visualstudio.com/items?itemName=jslint.vscode-jslint)
 
 
 <br><br>
