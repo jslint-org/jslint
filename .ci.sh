@@ -152,6 +152,8 @@ import moduleChildProcess from "child_process";
     # remove bloated json-coverage-files
     rm .artifact/coverage/*.json # js-hack - */
     rm .artifact/coverage_sqlite3_*/*.json # js-hack - */
+    # jslint_wrapper_vscode - build
+    shCiVscePackageJslintWrapperVscode
     # .github_cache - save
     if [ "$GITHUB_ACTION" ] && [ ! -d .github_cache ]
     then
@@ -259,4 +261,137 @@ import moduleFs from "fs";
 shCiNpmPublishCustom() {(set -e
 # this function will run custom-code to npm-publish package
     npm publish --access public
+)}
+
+shCiVscePackageJslintWrapperVscode() {(set -e
+# this function will vsce-package jslint_wrapper_vscode
+    mkdir -p .artifact/jslint_wrapper_vscode/.vscode
+    (set -e
+    cd .artifact/jslint_wrapper_vscode
+    ln -f ../../.npmignore .vscodeignore
+    ln -f ../../LICENSE
+    ln -f ../../asset_image_logo_512.png
+    ln -f ../../jslint.mjs
+    ln -f ../../jslint_wrapper_vscode.js
+    node --input-type=module --eval '
+import moduleFs from "fs";
+(async function () {
+    let fileDict = {};
+    await Promise.all([
+        "README.md"
+    ].map(async function (file) {
+        fileDict[file] = await moduleFs.promises.readFile(
+            `../../${file}`,
+            "utf8"
+        );
+    }));
+    await Promise.all([
+        {
+            file: ".vscode/launch.json",
+            src: JSON.stringify({
+                "configurations": [
+                    {
+                        "args": [
+                            "--extensionDevelopmentPath=${workspaceFolder}"
+                        ],
+                        "name": "Run Extension",
+                        "request": "launch",
+                        "type": "extensionHost"
+                    }
+                ],
+                "version": "0.2.0"
+            }, undefined, 4)
+        }, {
+            file: "README.md",
+            src: (
+                /\n### to run jslint in vs code:\n[\S\s]*?\n\n\n/i
+            ).exec(fileDict["README.md"])[0]
+        }, {
+            file: "package.json",
+            src: JSON.stringify({
+                "activationEvents": [
+                    "onCommand:jslint.clear",
+                    "onCommand:jslint.lint"
+                ],
+                "bugs": {
+                    "url": "https://github.com/jslint-org/jslint/issues"
+                },
+                "categories": [
+                    "Linters"
+                ],
+                "contributes": {
+                    "commands": [
+                        {
+                            "category": "jslint",
+                            "command": "jslint.clear",
+                            "title": "JSLint - Clear Warnings"
+                        },
+                        {
+                            "category": "jslint",
+                            "command": "jslint.lint",
+                            "title": "JSLint - Lint File"
+                        }
+                    ],
+                    "keybindings": [
+                        {
+                            "command": "jslint.clear",
+                            "key": "ctrl+shift+j c",
+                            "mac": "cmd+shift+j c",
+                            "when": "editorTextFocus"
+                        },
+                        {
+                            "command": "jslint.lint",
+                            "key": "ctrl+shift+j l",
+                            "mac": "cmd+shift+j l",
+                            "when": "editorTextFocus"
+                        }
+                    ],
+                    "menus": {
+                        "editor/context": [
+                            {
+                                "command": "jslint.clear",
+                                "group": "7_modification",
+                                "when": "resourceLangId == javascript"
+                            },
+                            {
+                                "command": "jslint.lint",
+                                "group": "7_modification",
+                                "when": "resourceLangId == javascript"
+                            }
+                        ]
+                    }
+                },
+                "description": "Integrates JSLint into VS Code.",
+                "displayName": "vscode-jslint",
+                "engines": {
+                    "vscode": "^1.66.0"
+                },
+                "icon": "asset_image_logo_512.png",
+                "keywords": [
+                    "javascript",
+                    "jslint",
+                    "linter"
+                ],
+                "license": "UNLICENSE",
+                "main": "./jslint_wrapper_vscode.js",
+                "name": "vscode-jslint",
+                "publisher": "jslint",
+                "repository": {
+                    "type": "git",
+                    "url": "https://github.com/jslint-org/jslint.git"
+                },
+                "version": "0.0.4"
+            }, undefined, 4)
+        }
+    ].map(async function ({
+        file,
+        src
+    }) {
+        await moduleFs.promises.writeFile(file, src.trim() + "\n");
+    }));
+}());
+' "$@" # '
+    npx vsce package
+    rm -rf node_modules
+    )
 )}
