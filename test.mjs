@@ -90,21 +90,21 @@ jstestDescribe((
         });
     });
     jstestIt((
-        "test cli-export-global handling-behavior"
+        "test cli-window-jslint handling-behavior"
     ), function () {
         [
-            "&jslint_export_global=",
-            "&jslint_export_global=12",
-            "&jslint_export_global=1?",
-            "&jslint_export_global=?",
-            "?jslint_export_global=",
-            "?jslint_export_global=12",
-            "?jslint_export_global=1?",
-            "?jslint_export_global=?",
-            "jslint_export_global=1",
-            "jslint_export_global=1&",
-            "jslint_export_global=12",
-            "jslint_export_global=1?"
+            "&window_jslint=",
+            "&window_jslint=12",
+            "&window_jslint=1?",
+            "&window_jslint=?",
+            "?window_jslint=",
+            "?window_jslint=12",
+            "?window_jslint=1?",
+            "?window_jslint=?",
+            "window_jslint=1",
+            "window_jslint=1&",
+            "window_jslint=12",
+            "window_jslint=1?"
         ].forEach(function (import_meta_url) {
             jslint.jslint_cli({
                 import_meta_url
@@ -112,10 +112,10 @@ jstestDescribe((
             assertOrThrow(globalThis.jslint === undefined);
         });
         [
-            "&jslint_export_global=1",
-            "&jslint_export_global=1&",
-            "?jslint_export_global=1",
-            "?jslint_export_global=1&"
+            "&window_jslint=1",
+            "&window_jslint=1&",
+            "?window_jslint=1",
+            "?window_jslint=1&"
         ].forEach(function (import_meta_url) {
             jslint.jslint_cli({
                 import_meta_url

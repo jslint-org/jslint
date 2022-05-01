@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta
-    name="description"
-    content="JSLint, The JavaScript Code Quality and Coverage Tool. This file allows JSLint
-    to be run from a web browser. It can accept a source program and analyze
-    it without sending it over the network."
->
-<meta name="author" content="Douglas Crockford">
-<link rel="icon" type="image/png" href="asset_image_logo_512.svg">
-<title>JSLint: The JavaScript Code Quality and Coverage Tool</title>
-<!-- Google Lighthouse Performance - Reduce Largest Contentful Paint. -->
-<link as="script" rel="preload" href="asset_codemirror_rollup.js">
-<link rel="modulepreload" href="jslint.mjs">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+        name="description"
+        content="JSLint, The JavaScript Code Quality and Coverage Tool.
+        This file allows JSLint to be run from a web browser.
+        It can accept a source program and analyze it
+        without sending it over the network."
+    >
+    <meta name="author" content="Douglas Crockford">
+    <link rel="icon" type="image/png" href="asset_image_logo_512.svg">
+    <title>JSLint: The JavaScript Code Quality and Coverage Tool</title>
+    <script defer src="./asset_codemirror_rollup.js"></script>
+    <script type="module" src="./jslint.mjs?window_jslint=1"></script>
+    <script defer src="./jslint_wrapper_codemirror.js"></script>
 <style>
 /*jslint-disable*/
 /*
@@ -23,27 +24,28 @@ shRawLibFetch
     "fetchList": [
         {
             "comment": true,
-            "url": "https://github.com/codemirror/CodeMirror/blob/5.62.0/LICENSE"
+            "url": "https://github.com/codemirror/CodeMirror/blob/5.65.3/LICENSE"
         },
         {
-            "url": "https://github.com/codemirror/CodeMirror/blob/5.62.0/lib/codemirror.css"
+            "url": "https://github.com/codemirror/CodeMirror/blob/5.65.3/lib/codemirror.css"
         },
         {
-            "url": "https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/lint/lint.css"
+            "url": "https://github.com/codemirror/CodeMirror/blob/5.65.3/addon/lint/lint.css"
         }
-    ]
+    ],
+    "replaceList": []
 }
 */
 
 
 /*
-repo https://github.com/codemirror/CodeMirror/tree/5.62.0
-committed 2021-06-21T07:13:20Z
+repo https://github.com/codemirror/CodeMirror/tree/5.65.3
+committed 2022-04-20T09:49:25Z
 */
 
 
 /*
-file https://github.com/codemirror/CodeMirror/blob/5.62.0/LICENSE
+file https://github.com/codemirror/CodeMirror/blob/5.65.3/LICENSE
 */
 /*
 MIT License
@@ -71,7 +73,7 @@ THE SOFTWARE.
 
 
 /*
-file https://github.com/codemirror/CodeMirror/blob/5.62.0/lib/codemirror.css
+file https://github.com/codemirror/CodeMirror/blob/5.65.3/lib/codemirror.css
 */
 /* BASICS */
 
@@ -135,20 +137,13 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/lib/codemirror.css
 .cm-fat-cursor div.CodeMirror-cursors {
   z-index: 1;
 }
-.cm-fat-cursor-mark {
-  background-color: rgba(20, 255, 20, 0.5);
-  -webkit-animation: blink 1.06s steps(1) infinite;
-  -moz-animation: blink 1.06s steps(1) infinite;
-  animation: blink 1.06s steps(1) infinite;
-}
-.cm-animate-fat-cursor {
-  width: auto;
-  border: 0;
-  -webkit-animation: blink 1.06s steps(1) infinite;
-  -moz-animation: blink 1.06s steps(1) infinite;
-  animation: blink 1.06s steps(1) infinite;
-  background-color: #7e7;
-}
+.cm-fat-cursor .CodeMirror-line::selection,
+.cm-fat-cursor .CodeMirror-line > span::selection,
+.cm-fat-cursor .CodeMirror-line > span > span::selection { background: transparent; }
+.cm-fat-cursor .CodeMirror-line::-moz-selection,
+.cm-fat-cursor .CodeMirror-line > span::-moz-selection,
+.cm-fat-cursor .CodeMirror-line > span > span::-moz-selection { background: transparent; }
+.cm-fat-cursor { caret-color: transparent; }
 @-moz-keyframes blink {
   0% {}
   50% { background-color: transparent; }
@@ -246,6 +241,7 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #a22;}
   height: 100%;
   outline: none; /* Prevent dragging from highlighting the element */
   position: relative;
+  z-index: 0;
 }
 .CodeMirror-sizer {
   position: relative;
@@ -426,7 +422,7 @@ span.CodeMirror-selectedtext { background: none; }
 
 
 /*
-file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/lint/lint.css
+file https://github.com/codemirror/CodeMirror/blob/5.65.3/addon/lint/lint.css
 */
 /* The lint marker gutter */
 .CodeMirror-lint-markers {
@@ -664,20 +660,36 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     ) format("woff2");
 }
 .JSLINT_,
-.JSLINT_ *,
-.JSLINT_ *:after,
-.JSLINT_ *:before,
-.JSLINT_:after,
-.JSLINT_:before {
+.JSLINT_ address,
+.JSLINT_ button,
+.JSLINT_ cite,
+.JSLINT_ dd,
+.JSLINT_ dfn,
+.JSLINT_ dl,
+.JSLINT_ dt,
+.JSLINT_ fieldset,
+.JSLINT_ fieldset > div,
+.JSLINT_ input,
+.JSLINT_ label,
+.JSLINT_ legend,
+.JSLINT_ ol,
+.JSLINT_ samp,
+.JSLINT_ style,
+.JSLINT_ textarea,
+.JSLINT_ ul {
     border: 0;
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
+/* disable text inflation algorithm used on some smartphones and tablets */
 .JSLINT_ {
     -ms-text-size-adjust: none;
     -webkit-text-size-adjust: none;
     text-size-adjust: none;
+}
+#JSLINT_REPORT_HTML div {
+    box-sizing: border-box;
 }
 /*csslint ignore:end*/
 
@@ -1181,10 +1193,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     </div>
 </fieldset>
 </main>
-<div id="JSLINT_REPORT_HTML"></div>
-<script defer src="./asset_codemirror_rollup.js"></script>
-<script defer type="module" src="./jslint.mjs?jslint_export_global=1"></script>
-<script defer src="./jslint_wrapper_codemirror.js"></script>
+<div class="JSLINT_" id="JSLINT_REPORT_HTML"></div>
 <script type="module">
 // browser.mjs
 // Original Author: Douglas Crockford (https://www.jslint.com).
@@ -1420,7 +1429,7 @@ document.addEventListener("keydown", function (evt) {
     }
 });
 
-// Init event-handling for #JSLINT_.
+// Init event-handling for .JSLINT_.
 
 document.querySelector(
     ".JSLINT_"
@@ -1579,7 +1588,6 @@ editor = CodeMirror.fromTextArea(document.querySelector(
     },
     gutters: ["CodeMirror-lint-markers"],
     indentUnit: 4,
-    indentWithTabs: false,
     lineNumbers: true,
     lineWrapping: true,
     lint: jslint_option_dict,
@@ -1654,6 +1662,7 @@ eval("console.log(\\"hello world\\");");
 }
 
 // Init exports.
+
 window.dom_style_report_unmatched = dom_style_report_unmatched;
 window.editor = editor;
 </script>

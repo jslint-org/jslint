@@ -30,29 +30,24 @@
 // Example usage:
 /*
 <!DOCTYPE html>
-<link rel="stylesheet" href="https://codemirror.net/lib/codemirror.css">
-<link rel="stylesheet" href="https://codemirror.net/addon/lint/lint.css">
+    <link rel="stylesheet" href="https://codemirror.net/lib/codemirror.css">
+    <link rel="stylesheet" href="https://codemirror.net/addon/lint/lint.css">
+    <script defer src="https://codemirror.net/lib/codemirror.js"></script>
+    <script defer
+        src="https://codemirror.net/mode/javascript/javascript.js"></script>
+    <script defer src="https://codemirror.net/addon/lint/lint.js"></script>
+    <script type="module" src="./jslint.mjs?window_jslint=1"></script>
+    <script defer src="./jslint_wrapper_codemirror.js"></script>
 <textarea id="editor1">console.log('hello world');</textarea>
-<script defer
-    src="https://codemirror.net/lib/codemirror.js"></script>
-<script defer
-    src="https://codemirror.net/mode/javascript/javascript.js"></script>
-<script defer
-    src="https://codemirror.net/addon/lint/lint.js"></script>
-<script type="module"
-    src="./jslint.mjs?jslint_export_global=1"></script>
-<script defer
-    src="./jslint_wrapper_codemirror.js"></script>
-<script>
+<script type=module>
 window.addEventListener("load", function () {
     window.CodeMirror.fromTextArea(document.getElementById(
         "editor1"
     ), {
         gutters: ["CodeMirror-lint-markers"],
+        indentUnit: 4,
         lineNumbers: true,
-        lint: {
-            lintOnChange: true
-        },
+        lint: {lintOnChange: true},
         mode: "javascript"
     });
 });
@@ -95,6 +90,7 @@ window.addEventListener("load", function () {
         return [];
     }
     CodeMirror.registerHelper("lint", "javascript", function (text, options) {
+        let result = jslint.jslint(text, options, options.globals);
 
 // Save JSLint result to global-object, in case its needed again
 // to generate reports.
@@ -103,12 +99,8 @@ window.addEventListener("load", function () {
 //  cm.performLint();
 //  divReport.outerHTML = jslint.jslint_report(window.jslint_result);
 
-        window.jslint_result = jslint.jslint(
-            text,
-            options,
-            options.globals
-        );
-        return window.jslint_result.warnings.map(function ({
+        window.jslint_result = result;
+        return result.warnings.map(function ({
             column,
             line,
             message,

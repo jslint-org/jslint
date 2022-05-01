@@ -21,7 +21,7 @@ Douglas Crockford <douglas@crockford.com>
 3. [API Doc](#api-doc)
 
 4. [Quickstart Install](#quickstart-install)
-    - [To install, just download https://www.jslint.com/jslint.mjs and save to file:](#to-install-just-download-httpswwwjslintcomjslintmjs-and-save-to-file)
+    - [To install, just download and save https://www.jslint.com/jslint.mjs to file:](#to-install-just-download-and-save-httpswwwjslintcomjslintmjs-to-file)
     - [To run `jslint.mjs` in shell:](#to-run-jslintmjs-in-shell)
     - [To import `jslint.mjs` in ES Module environment:](#to-import-jslintmjs-in-es-module-environment)
     - [To import `jslint.mjs` in CommonJS environment:](#to-import-jslintmjs-in-commonjs-environment)
@@ -76,7 +76,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 <br><br>
-### To install, just download https://www.jslint.com/jslint.mjs and save to file:
+### To install, just download and save https://www.jslint.com/jslint.mjs to file:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_install_download.svg -->
 #!/bin/sh
 
@@ -223,18 +223,17 @@ node --input-type=module --eval '
 import jslint from "./jslint.mjs";
 import fs from "fs";
 (async function () {
-    let report;
     let result;
     let source = "function foo() {console.log(\u0027hello world\u0027);}\n";
 
 // Create JSLint report from <source> in javascript.
 
     result = jslint.jslint(source);
-    report = jslint.jslint_report(result);
-    report = `<body class="JSLINT_">\n${report}\n</body>\n`;
+    result = jslint.jslint_report(result);
+    result = `<body class="JSLINT_">\n${result}\n</body>\n`;
 
     await fs.promises.mkdir(".artifact/", {recursive: true});
-    await fs.promises.writeFile(".artifact/jslint_report_hello.html", report);
+    await fs.promises.writeFile(".artifact/jslint_report_hello.html", result);
     console.error("wrote file .artifact/jslint_report_hello.html");
 }());
 
@@ -336,58 +335,37 @@ import jslint from "../jslint.mjs";
 
 <br><br>
 # Quickstart JSLint in CodeMirror
-1. Download and save [`jslint.mjs`](https://www.jslint.com/jslint.mjs), [`jslint_wrapper_codemirror.js`](https://www.jslint.com/jslint_wrapper_codemirror.js)
-2. Create and serve static html-page below:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_jslint_wrapper_codemirror.svg -->
 #!/bin/sh
 
-# Copy jslint files.
+# 1. Download and save jslint.mjs, jslint_wrapper_codemirror.js to file:
 
 mkdir -p .artifact/
-cp jslint.mjs .artifact/
-cp jslint_wrapper_codemirror.js .artifact/
+curl -Ls https://www.jslint.com/jslint.mjs > .artifact/jslint.mjs
+curl -Ls https://www.jslint.com/jslint_wrapper_codemirror.js \
+    > .artifact/jslint_wrapper_codemirror.js
 
-# Create static html-page jslint_wrapper_codemirror.html.
+# 2. Create and serve static html-page below:
 
 printf '
 <!DOCTYPE html>
-<html lang="en">
 <head>
-    <title>CodeMirror: JSLint Demo</title>
     <link rel="stylesheet" href="https://codemirror.net/lib/codemirror.css">
     <link rel="stylesheet" href="https://codemirror.net/addon/lint/lint.css">
-    <style>
-    body {
-        background: lightgray;
-        color: darkslategray;
-        font-family: sans-serif;
-        margin: 0;
-        padding: 0 20px;
-    }
-    body > * {
-        margin: 20px 0 0 0;
-        padding: 0;
-    }
-    </style>
-</head>
-<body>
-    <h1>CodeMirror: JSLint Demo</h1>
-    <h2>
-        This demo will automatically lint code below,
-        and generate reports as you type.
-    </h2>
-    <textarea id="editor1">console.log('"'"'hello world'"'"');</textarea>
-    <div><div id="JSLINT_REPORT_HTML"></div></div>
-    <script defer
-        src="https://codemirror.net/lib/codemirror.js"></script>
+    <script defer src="https://codemirror.net/lib/codemirror.js"></script>
     <script defer
         src="https://codemirror.net/mode/javascript/javascript.js"></script>
-    <script defer
-        src="https://codemirror.net/addon/lint/lint.js"></script>
-    <script type="module"
-        src="./jslint.mjs?jslint_export_global=1"></script>
-    <script defer
-        src="./jslint_wrapper_codemirror.js"></script>
+    <script defer src="https://codemirror.net/addon/lint/lint.js"></script>
+    <script type="module" src="./jslint.mjs?window_jslint=1"></script>
+    <script defer src="./jslint_wrapper_codemirror.js"></script>
+</head>
+<body style="background:#bbb; font-family:sans-serif; margin:0; padding:20px;">
+    <h1>CodeMirror: JSLint Demo</h1>
+    <h3>
+This demo will auto-lint the code below, and auto-generate a report as you type.
+    </h3>
+    <textarea id="editor1">console.log(&apos;hello world&apos;);</textarea>
+    <div style="margin-top:20px;"><div id="JSLINT_REPORT_HTML"></div></div>
 <script type=module>
 window.addEventListener("load", function () {
     let editor = window.CodeMirror.fromTextArea(document.getElementById(
@@ -395,32 +373,24 @@ window.addEventListener("load", function () {
     ), {
         gutters: ["CodeMirror-lint-markers"],
         indentUnit: 4,
-        indentWithTabs: false,
         lineNumbers: true,
-        lint: {
-            lintOnChange: false
-        },
+        lint: {lintOnChange: false},
         mode: "javascript"
     });
     function onChange() {
-        let state = editor.state.lint;
-        if (!state) {
-            return;
-        }
-        clearTimeout(state.timeout);
-        state.timeout = setTimeout(function () {
+        clearTimeout(editor.state.lint.timeout);
+        editor.state.lint.timeout = setTimeout(function () {
             editor.performLint();
             document.getElementById(
                 "JSLINT_REPORT_HTML"
             ).outerHTML = window.jslint.jslint_report(window.jslint_result);
-        }, state.options.delay);
+        }, editor.state.lint.options.delay);
     }
     editor.on("change", onChange);
     onChange();
 });
 </script>
 </body>
-</html>
 ' > .artifact/jslint_wrapper_codemirror.html
 
 ```

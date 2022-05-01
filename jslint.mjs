@@ -251,8 +251,8 @@ let jslint_rgx_token = new RegExp(
     + ")"
     + "(.*)$"
 );
-let jslint_rgx_url_search_export_global = (
-    /[&?]jslint_export_global=1(?:$|&)/m
+let jslint_rgx_url_search_window_jslint = (
+    /[&?]window_jslint=1(?:$|&)/m
 );
 let jslint_rgx_weird_property = (
     /^_|\$|Sync$|_$/m
@@ -1709,15 +1709,18 @@ async function jslint_cli({
         return count;
     }
 
-// PR-xxx
-// Check import.meta.url for directive to export jslint globally.
-// This is useful for pre-ESM-era browser-scripts that rely on window.jslint
+// PR-396 - window.jslint
+// Check import.meta.url for directive to export jslint to window-object.
+// Useful for ES5-era browser-scripts that rely on window.jslint,
+// like CodeMirror.
+//
+// Example usage:
+// <script type="module" src="./jslint.mjs?window_jslint=1"></script>
 
     import_meta_url = import_meta_url || jslint_import_meta_url;
     if (
-        jslint_rgx_url_search_export_global.test(import_meta_url)
-        && typeof globalThis === "object"
-        && globalThis
+        jslint_rgx_url_search_window_jslint.test(import_meta_url)
+        && (typeof globalThis === "object" && globalThis)
     ) {
         globalThis.jslint = jslint;
     }
@@ -1725,8 +1728,7 @@ async function jslint_cli({
 // Feature-detect nodejs.
 
     if (!(
-        typeof process === "object"
-        && process
+        (typeof process === "object" && process)
         && process.versions
         && typeof process.versions.node === "string"
         && !mode_noop
@@ -1898,10 +1900,9 @@ async function jslint_cli({
         option
     });
     if (mode_report) {
-        await fsWriteFileWithParents(
-            mode_report,
-            `<body class="JSLINT_">\n${jslint_report(result)}\n</body>\n`
-        );
+        result = jslint.jslint_report(result);
+        result = `<body class="JSLINT_">\n${result}\n</body>\n`;
+        await fsWriteFileWithParents(mode_report, result);
     }
     process_exit(exit_code);
     return exit_code;
@@ -9172,20 +9173,36 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     ) format("woff2");
 }
 .JSLINT_,
-.JSLINT_ *,
-.JSLINT_ *:after,
-.JSLINT_ *:before,
-.JSLINT_:after,
-.JSLINT_:before {
+.JSLINT_ address,
+.JSLINT_ button,
+.JSLINT_ cite,
+.JSLINT_ dd,
+.JSLINT_ dfn,
+.JSLINT_ dl,
+.JSLINT_ dt,
+.JSLINT_ fieldset,
+.JSLINT_ fieldset > div,
+.JSLINT_ input,
+.JSLINT_ label,
+.JSLINT_ legend,
+.JSLINT_ ol,
+.JSLINT_ samp,
+.JSLINT_ style,
+.JSLINT_ textarea,
+.JSLINT_ ul {
     border: 0;
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
+/* disable text inflation algorithm used on some smartphones and tablets */
 .JSLINT_ {
     -ms-text-size-adjust: none;
     -webkit-text-size-adjust: none;
     text-size-adjust: none;
+}
+#JSLINT_REPORT_HTML div {
+    box-sizing: border-box;
 }
 /*csslint ignore:end*/
 
@@ -10402,9 +10419,19 @@ async function v8CoverageReportCreate({
 <style>
 /* jslint utility2:true */
 /*csslint ignore:start*/
-* {
-box-sizing: border-box;
-    font-family: consolas, menlo, monospace;
+.coverage,
+.coverage a,
+.coverage div,
+.coverage pre,
+.coverage span,
+.coverage table,
+.coverage tbody,
+.coverage td,
+.coverage th,
+.coverage thead,
+.coverage tr {
+    box-sizing: border-box;
+    font-family: monospace;
 }
 /*csslint ignore:end*/
 

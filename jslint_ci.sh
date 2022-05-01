@@ -2324,9 +2324,19 @@ async function v8CoverageReportCreate({
 <style>
 /* jslint utility2:true */
 /*csslint ignore:start*/
-* {
-box-sizing: border-box;
-  font-family: consolas, menlo, monospace;
+.coverage,
+.coverage a,
+.coverage div,
+.coverage pre,
+.coverage span,
+.coverage table,
+.coverage tbody,
+.coverage td,
+.coverage th,
+.coverage thead,
+.coverage tr {
+  box-sizing: border-box;
+  font-family: monospace;
 }
 /*csslint ignore:end*/
 

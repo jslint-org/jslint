@@ -75,6 +75,10 @@ echo "\
             + "$&\n"
             + "git checkout 60a022c511a37788e652c271af23174566a80c30\n"
         ));
+        // modify script - curl jslint_wrapper_codemirror.js
+        script = script.replace((
+            /curl -Ls https:\/\/www.jslint.com\//g
+        ), "cat ");
         // printf script
         script = (
             "(set -e\n"
