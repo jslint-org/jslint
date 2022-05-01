@@ -114,11 +114,17 @@ echo "\
 ' "$@" # '
     # screenshot asset_image_logo
     shImageLogoCreate &
+    # background http-file-server to serve webpages for screenshot
+    PORT=8080 npm_config_timeout_exit=10000 shHttpFileServer &
     # screenshot html
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
 (async function () {
     await Promise.all([
+        (
+            "http://localhost:8080"
+            + "/.artifact/jslint_wrapper_codemirror.html"
+        ),
         (
             "https://"
             + process.env.UPSTREAM_OWNER
@@ -304,7 +310,7 @@ import moduleFs from "fs";
         }, {
             file: "README.md",
             src: (
-                /\n### to run jslint in vs code:\n[\S\s]*?\n\n\n/i
+                /\n# quickstart jslint in vscode\n[\S\s]*?\n\n\n/i
             ).exec(fileDict["README.md"])[0]
         }, {
             file: "package.json",
@@ -380,7 +386,7 @@ import moduleFs from "fs";
                     "type": "git",
                     "url": "https://github.com/jslint-org/jslint.git"
                 },
-                "version": "0.0.4"
+                "version": "2022.5.1"
             }, undefined, 4)
         }
     ].map(async function ({

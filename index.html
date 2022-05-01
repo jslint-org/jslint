@@ -663,9 +663,12 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 /7xoEqvL+2E8VOyCTuT/7j269Zy4jUtN+g4="
     ) format("woff2");
 }
-*,
-*:after,
-*:before {
+.JSLINT_,
+.JSLINT_ *,
+.JSLINT_ *:after,
+.JSLINT_ *:before,
+.JSLINT_:after,
+.JSLINT_:before {
     border: 0;
     box-sizing: border-box;
     margin: 0;
@@ -709,7 +712,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 }
 
 /* css - jslint_report - general */
-body {
+.JSLINT_ {
     background: antiquewhite;
 }
 .JSLINT_ fieldset {
@@ -1179,7 +1182,9 @@ body {
 </fieldset>
 </main>
 <div id="JSLINT_REPORT_HTML"></div>
-<script defer src="asset_codemirror_rollup.js"></script>
+<script defer src="./asset_codemirror_rollup.js"></script>
+<script defer type="module" src="./jslint.mjs?jslint_export_global=1"></script>
+<script defer src="./jslint_wrapper_codemirror.js"></script>
 <script type="module">
 // browser.mjs
 // Original Author: Douglas Crockford (https://www.jslint.com).
@@ -1211,31 +1216,26 @@ body {
 
 
 /*jslint beta, browser*/
-
-/*global CodeMirror*/
-
 /*property
-    Pos, Tab, addEventListener, ch, checked, clear, click, closest, column,
+    CodeMirror, Tab, addEventListener, ch, checked, clear, click, closest,
     ctrlKey, display, dom_style_report_unmatched, editor, error, extraKeys,
     focus, forEach, from, fromTextArea, getItem, getValue, globals, gutters,
     indentSelection, indentUnit, indentWithTabs, innerHTML, jslint,
     jslint_edition, jslint_report, jslint_result, key, length, line,
-    lineNumbers, lineWrapping, lint, lintOnChange, map, matchBrackets, message,
-    metaKey, mode, mode_stop, name, offsetWidth, on, outerHTML, parse,
-    performLint, preventDefault, push, querySelector, querySelectorAll,
-    registerHelper, replace, replaceSelection, result, reverse, search,
-    setCursor, setItem, setSize, setValue, severity, showTrailingSpace,
-    somethingSelected, sort, split, stopPropagation, stringify, style,
-    styleActiveLine, tagName, target, test, textContent, to, trim, value,
-    warnings, width
+    lineNumbers, lineWrapping, lint, lintOnChange, matchBrackets, metaKey, mode,
+    name, offsetWidth, on, outerHTML, parse, performLint, preventDefault, push,
+    querySelector, querySelectorAll, replace, replaceSelection, reverse, search,
+    setCursor, setItem, setSize, setValue, showTrailingSpace, somethingSelected,
+    sort, split, stopPropagation, stringify, style, styleActiveLine, tagName,
+    target, test, textContent, trim, value, width
 */
-
-import jslint from "./jslint.mjs";
 
 // This is the web script companion file for JSLint. It includes code for
 // interacting with the browser and displaying the reports.
 
+let CodeMirror = window.CodeMirror;
 let editor;
+let jslint = window.jslint;
 let jslint_option_dict = {
     lintOnChange: false
 };
@@ -1312,7 +1312,7 @@ async function jslint_run() {
 
         document.querySelector(
             "#JSLINT_REPORT_HTML"
-        ).outerHTML = jslint.jslint_report(jslint_option_dict.result);
+        ).outerHTML = jslint.jslint_report(window.jslint_result);
         listener_window_onresize();
     } catch (err) {
         console.error(err); //jslint-quiet
@@ -1323,37 +1323,6 @@ async function jslint_run() {
     setTimeout(function () {
         document.querySelector("#uiLoader1").style.display = "none";
     }, 500);
-}
-
-function jslint_wrapper_codemirror(CodeMirror) {
-
-// This function will integrate jslint with CodeMirror's lint addon.
-// Requires CodeMirror and jslint.
-
-    CodeMirror.registerHelper("lint", "javascript", function (text, options) {
-        options.result = jslint.jslint(text, options, options.globals);
-
-// Debug jslint result.
-
-        window.jslint_result = options.result;
-        return options.result.warnings.map(function ({
-            column,
-            line,
-            message,
-            mode_stop
-        }) {
-            return {
-                from: CodeMirror.Pos(line - 1, column - 1), //jslint-quiet
-                message,
-                severity: (
-                    mode_stop
-                    ? "error"
-                    : "warning"
-                ),
-                to: CodeMirror.Pos(line - 1, column) //jslint-quiet
-            };
-        });
-    });
 }
 
 function listener_window_onresize() {
@@ -1600,12 +1569,12 @@ editor = CodeMirror.fromTextArea(document.querySelector(
 ), {
     extraKeys: {
         "Shift-Tab": "indentLess",
-        Tab: function (cm) {
-            if (cm.somethingSelected()) {
-                cm.indentSelection("add");
+        Tab: function () {
+            if (editor.somethingSelected()) {
+                editor.indentSelection("add");
                 return;
             }
-            cm.replaceSelection("    ");
+            editor.replaceSelection("    ");
         }
     },
     gutters: ["CodeMirror-lint-markers"],
@@ -1615,14 +1584,10 @@ editor = CodeMirror.fromTextArea(document.querySelector(
     lineWrapping: true,
     lint: jslint_option_dict,
     matchBrackets: true,
-    mode: "text/javascript",
+    mode: "javascript",
     showTrailingSpace: true,
     styleActiveLine: true
 });
-
-// Init CodeMirror linter.
-
-jslint_wrapper_codemirror(CodeMirror);
 
 // Init event-handling for CodeMirror editor.
 

@@ -92,8 +92,8 @@
 // WARNING: JSLint will hurt your feelings.
 
 /*jslint beta, node*/
-
 /*property
+    import_meta_url,
     JSLINT_BETA, NODE_V8_COVERAGE, a, all, argv, arity, artifact,
     assertErrorThrownAsync, assertJsonEqual, assertOrThrow, assign, async, b,
     beta, bitwise, block, body, browser, c, calls, catch, catch_list,
@@ -250,6 +250,9 @@ let jslint_rgx_token = new RegExp(
     + "|((?:0_?|[1-9][0-9_]*)n?)"
     + ")"
     + "(.*)$"
+);
+let jslint_rgx_url_search_export_global = (
+    /[&?]jslint_export_global=1(?:$|&)/m
 );
 let jslint_rgx_weird_property = (
     /^_|\$|Sync$|_$/m
@@ -1537,6 +1540,7 @@ async function jslint_cli({
     console_error,
     console_log,
     file,
+    import_meta_url,
     mode_cli,
     mode_noop,
     option,
@@ -1705,6 +1709,19 @@ async function jslint_cli({
         return count;
     }
 
+// PR-xxx
+// Check import.meta.url for directive to export jslint globally.
+// This is useful for pre-ESM-era browser-scripts that rely on window.jslint
+
+    import_meta_url = import_meta_url || jslint_import_meta_url;
+    if (
+        jslint_rgx_url_search_export_global.test(import_meta_url)
+        && typeof globalThis === "object"
+        && globalThis
+    ) {
+        globalThis.jslint = jslint;
+    }
+
 // Feature-detect nodejs.
 
     if (!(
@@ -1735,7 +1752,7 @@ async function jslint_cli({
                 ).test(process_argv[1])
                 || mode_cli
             )
-            && moduleUrl.fileURLToPath(jslint_import_meta_url)
+            && moduleUrl.fileURLToPath(import_meta_url)
             === modulePath.resolve(process_argv[1])
         )
         && !mode_cli
@@ -1881,7 +1898,10 @@ async function jslint_cli({
         option
     });
     if (mode_report) {
-        await fsWriteFileWithParents(mode_report, jslint_report(result));
+        await fsWriteFileWithParents(
+            mode_report,
+            `<body class="JSLINT_">\n${jslint_report(result)}\n</body>\n`
+        );
     }
     process_exit(exit_code);
     return exit_code;
@@ -8969,6 +8989,7 @@ function jslint_report({
 
 // This function will create human-readable, html-report
 // for warnings, properties, and functions from jslint-result-object.
+//
 // Example usage:
 //  let result = jslint("console.log('hello world')");
 //  let html = jslint_report(result);
@@ -9150,9 +9171,12 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 /7xoEqvL+2E8VOyCTuT/7j269Zy4jUtN+g4="
     ) format("woff2");
 }
-*,
-*:after,
-*:before {
+.JSLINT_,
+.JSLINT_ *,
+.JSLINT_ *:after,
+.JSLINT_ *:before,
+.JSLINT_:after,
+.JSLINT_:before {
     border: 0;
     box-sizing: border-box;
     margin: 0;
@@ -9196,7 +9220,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 }
 
 /* css - jslint_report - general */
-body {
+.JSLINT_ {
     background: antiquewhite;
 }
 .JSLINT_ fieldset {

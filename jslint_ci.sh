@@ -1065,6 +1065,13 @@ import moduleUrl from "url";
         ".xml": "application/xml; charset=utf-8",
         "/": "text/html; charset=utf-8"
     };
+    // exit after given timeout
+    if (process.env.npm_config_timeout_exit) {
+        setTimeout(
+            process.exit,
+            process.env.npm_config_timeout_exit
+        );
+    }
     if (process.argv[1]) {
         await import("file://" + modulePath.resolve(process.argv[1]));
     }
