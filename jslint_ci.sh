@@ -842,18 +842,10 @@ shGithubFileUpload() {(set -e
 # example use:
 # shGithubFileUpload octocat/hello-worId/master/hello.txt hello.txt
     node --input-type=module --eval '
+import moduleAssert from "assert";
 import moduleFs from "fs";
 import moduleHttps from "https";
 import modulePath from "path";
-function assertOrThrow(condition, message) {
-    if (!condition) {
-        throw (
-            (!message || typeof message === "string")
-            ? new Error(String(message).slice(0, 2048))
-            : message
-        );
-    }
-}
 (async function () {
     let branch;
     let content = process.argv[2];
@@ -880,7 +872,7 @@ function assertOrThrow(condition, message) {
                     responseText += chunk;
                 });
                 res.on("end", function () {
-                    assertOrThrow(res.statusCode === 200, (
+                    moduleAssert(res.statusCode === 200, (
                         "shGithubFileUpload"
                         + `- failed to download/upload file ${url} - `
                         + responseText

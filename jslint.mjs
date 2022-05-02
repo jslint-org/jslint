@@ -1901,7 +1901,7 @@ async function jslint_cli({
     });
     if (mode_report) {
         result = jslint.jslint_report(result);
-        result = `<body class="JSLINT_">\n${result}\n</body>\n`;
+        result = `<body class="JSLINT_ JSLINT_REPORT_">\n${result}</body>\n`;
         await fsWriteFileWithParents(mode_report, result);
     }
     process_exit(exit_code);
@@ -9023,7 +9023,6 @@ function jslint_report({
         );
     }
 
-    html += "<div class=\"JSLINT_ JSLINT_REPORT_HTML\">\n";
     html += String(`
 <style class="JSLINT_REPORT_STYLE">
 /* jslint utility2:true */
@@ -9201,7 +9200,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     -webkit-text-size-adjust: none;
     text-size-adjust: none;
 }
-.JSLINT_REPORT_HTML div {
+.JSLINT_REPORT_ div {
     box-sizing: border-box;
 }
 /*csslint ignore:end*/
@@ -9574,7 +9573,6 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     });
     html += "</div>\n";
     html += "</fieldset>\n";
-    html += "</div>\n";
     return html;
 }
 

@@ -230,7 +230,7 @@ import fs from "fs";
 
     result = jslint.jslint(source);
     result = jslint.jslint_report(result);
-    result = `<body class="JSLINT_">\n${result}\n</body>\n`;
+    result = `<body class="JSLINT_ JSLINT_REPORT_">\n${result}</body>\n`;
 
     await fs.promises.mkdir(".artifact/", {recursive: true});
     await fs.promises.writeFile(".artifact/jslint_report_hello.html", result);
@@ -335,69 +335,131 @@ import jslint from "../jslint.mjs";
 
 <br><br>
 # Quickstart JSLint in CodeMirror
-```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_jslint_wrapper_codemirror.svg -->
-#!/bin/sh
+1. Download and save [`jslint.mjs`](https://www.jslint.com/jslint.mjs), [`jslint_wrapper_codemirror.js`](https://www.jslint.com/jslint_wrapper_codemirror.js) to file.
 
-# 1. Download and save jslint.mjs, jslint_wrapper_codemirror.js to file:
-
-mkdir -p .artifact/
-curl -Ls https://www.jslint.com/jslint.mjs > .artifact/jslint.mjs
-curl -Ls https://www.jslint.com/jslint_wrapper_codemirror.js \
-    > .artifact/jslint_wrapper_codemirror.js
-
-# 2. Create and serve static html-page below:
-
-printf '
+2. Edit, save, and serve example html-file below:
+```html <!-- jslint_wrapper_codemirror.html -->
 <!DOCTYPE html>
+<html lang="en">
 <head>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/addon/lint/lint.css">
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.js"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/mode/javascript/javascript.js"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/addon/lint/lint.js"></script>
+    <meta charset="utf-8">
+    <title>CodeMirror: JSLint Demo</title>
+
+<!-- Assets from codemirror. -->
+
+    <link rel="stylesheet" href="https://codemirror.net/lib/codemirror.css">
+    <link rel="stylesheet" href="https://codemirror.net/addon/lint/lint.css">
+    <script defer src="https://codemirror.net/lib/codemirror.js"></script>
+    <script defer
+        src="https://codemirror.net/mode/javascript/javascript.js"></script>
+    <script defer src="https://codemirror.net/addon/lint/lint.js"></script>
+
+<!-- Assets from jslint. -->
+
     <script type="module" src="./jslint.mjs?window_jslint=1"></script>
     <script defer src="./jslint_wrapper_codemirror.js"></script>
+<style>
+body {
+    background: #bbb;
+    color: #333;
+    font-family: sans-serif;
+    margin: 20px;
+}
+.JSLINT_.JSLINT_REPORT_ {
+    margin-top: 20px;
+}
+</style>
 </head>
-<body style="background: #bbb; font-family: sans-serif; margin: 20px;">
+<body>
     <h1>CodeMirror: JSLint Demo</h1>
     <h3>
 This demo will auto-lint the code below, and auto-generate a report as you type.
     </h3>
-    <textarea id="editor1">console.log(&apos;hello world&apos;);</textarea>
-    <div style="margin-top: 20px;"><div class="JSLINT_REPORT_HTML"></div></div>
+
+<!-- Container for codemirror-editor. -->
+
+    <textarea id="editor1">console.log('hello world');</textarea>
+
+<!-- Container for jslint-report. -->
+
+    <div class="JSLINT_ JSLINT_REPORT_"></div>
 <script type=module>
 window.addEventListener("load", function () {
+
+// Initialize codemirror-editor.
+
     let editor = window.CodeMirror.fromTextArea(document.getElementById(
         "editor1"
     ), {
-        gutters: ["CodeMirror-lint-markers"],
+        gutters: [
+            "CodeMirror-lint-markers"
+        ],
         indentUnit: 4,
         lineNumbers: true,
-        lint: {lintOnChange: true, options: {}},
+        lint: {
+
+// Enable auto-lint.
+
+            lintOnChange: true,
+
+// Initialize jslint-options here.
+
+            options: {
+                // browser: true,
+                // node: true
+
+// Initialize jslint-globals here.
+
+                globals: [
+                    // "caches",
+                    // "indexedDb"
+                ]
+            }
+        },
         mode: "javascript"
     });
-    editor.on("lintJslintAfter", function ({
-        result
-    }) {
-        document.querySelector(
-            ".JSLINT_REPORT_HTML"
-        ).innerHTML = window.jslint.jslint_report(result);
+
+// Initialize event-handling before linter is run.
+
+    editor.on("lintJslintBefore", function (/* options */) {
+
+// Modify jslint-options here.
+
+        // options.browser = true;
+        // options.node = true;
+
+// Modify jslint-globals here.
+
+        // options.globals = [
+        //     "caches",
+        //     "indexedDb"
+        // ];
+        return;
     });
+
+// Initialize event-handling after linter is run.
+
+    editor.on("lintJslintAfter", function (options) {
+
+// Generate jslint-report from options.result.
+
+        document.querySelector(
+            ".JSLINT_REPORT_"
+        ).innerHTML = window.jslint.jslint_report(options.result);
+    });
+
+// Manually trigger linter.
+
     editor.performLint();
 });
 </script>
 </body>
 </html>
-' > .artifact/jslint_wrapper_codemirror.html
-
 ```
-- shell output
-
-![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_sh_jslint_wrapper_codemirror.svg)
 
 - screenshot
 
-[![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2f.artifact_2fjslint_wrapper_codemirror.html.png)](https://jslint-org.github.io/jslint/branch-beta/.artifact/jslint_wrapper_codemirror.html)
+[![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2fjslint_wrapper_codemirror.html.png)](https://jslint-org.github.io/jslint/branch-beta/jslint_wrapper_codemirror.html)
 
 
 <br><br>
