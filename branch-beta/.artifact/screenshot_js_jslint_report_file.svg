@@ -59,49 +59,49 @@
     textLength="768"
     x="10"
     y="208"
->&gt;     let report;                                                                                </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="230"
 >&gt;     let result;                                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="252"
+    y="230"
 >&gt;     let source = "function foo() {console.log(\u0027hello world\u0027);}\n";                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="274"
+    y="252"
 >&gt;                                                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="296"
+    y="274"
 >&gt; // Create JSLint report from &lt;source&gt; in javascript.                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="318"
+    y="296"
 >&gt;                                                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="340"
+    y="318"
 >&gt;     result = jslint.jslint(source);                                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
+    y="340"
+>&gt;     result = jslint.jslint_report(result);                                                     </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
     y="362"
->&gt;     report = jslint.jslint_report(result);                                                     </tspan>
+>&gt;     result = `&lt;body class="JSLINT_ JSLINT_REPORT_"&gt;\n${result}&lt;/body&gt;\n`;                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -119,7 +119,7 @@
     textLength="768"
     x="10"
     y="428"
->&gt;     await fs.promises.writeFile(".artifact/jslint_report_hello.html", report);                 </tspan>
+>&gt;     await fs.promises.writeFile(".artifact/jslint_report_hello.html", result);                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

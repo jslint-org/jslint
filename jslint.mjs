@@ -92,8 +92,8 @@
 // WARNING: JSLint will hurt your feelings.
 
 /*jslint beta, node*/
-
 /*property
+    import_meta_url,
     JSLINT_BETA, NODE_V8_COVERAGE, a, all, argv, arity, artifact,
     assertErrorThrownAsync, assertJsonEqual, assertOrThrow, assign, async, b,
     beta, bitwise, block, body, browser, c, calls, catch, catch_list,
@@ -250,6 +250,9 @@ let jslint_rgx_token = new RegExp(
     + "|((?:0_?|[1-9][0-9_]*)n?)"
     + ")"
     + "(.*)$"
+);
+let jslint_rgx_url_search_window_jslint = (
+    /[&?]window_jslint=1(?:$|&)/m
 );
 let jslint_rgx_weird_property = (
     /^_|\$|Sync$|_$/m
@@ -1537,6 +1540,7 @@ async function jslint_cli({
     console_error,
     console_log,
     file,
+    import_meta_url,
     mode_cli,
     mode_noop,
     option,
@@ -1705,11 +1709,26 @@ async function jslint_cli({
         return count;
     }
 
+// PR-396 - window.jslint
+// Check import.meta.url for directive to export jslint to window-object.
+// Useful for ES5-era browser-scripts that rely on window.jslint,
+// like CodeMirror.
+//
+// Example usage:
+// <script type="module" src="./jslint.mjs?window_jslint=1"></script>
+
+    import_meta_url = import_meta_url || jslint_import_meta_url;
+    if (
+        jslint_rgx_url_search_window_jslint.test(import_meta_url)
+        && (typeof globalThis === "object" && globalThis)
+    ) {
+        globalThis.jslint = jslint;
+    }
+
 // Feature-detect nodejs.
 
     if (!(
-        typeof process === "object"
-        && process
+        (typeof process === "object" && process)
         && process.versions
         && typeof process.versions.node === "string"
         && !mode_noop
@@ -1735,7 +1754,7 @@ async function jslint_cli({
                 ).test(process_argv[1])
                 || mode_cli
             )
-            && moduleUrl.fileURLToPath(jslint_import_meta_url)
+            && moduleUrl.fileURLToPath(import_meta_url)
             === modulePath.resolve(process_argv[1])
         )
         && !mode_cli
@@ -1881,7 +1900,9 @@ async function jslint_cli({
         option
     });
     if (mode_report) {
-        await fsWriteFileWithParents(mode_report, jslint_report(result));
+        result = jslint.jslint_report(result);
+        result = `<body class="JSLINT_ JSLINT_REPORT_">\n${result}</body>\n`;
+        await fsWriteFileWithParents(mode_report, result);
     }
     process_exit(exit_code);
     return exit_code;
@@ -8969,6 +8990,7 @@ function jslint_report({
 
 // This function will create human-readable, html-report
 // for warnings, properties, and functions from jslint-result-object.
+//
 // Example usage:
 //  let result = jslint("console.log('hello world')");
 //  let html = jslint_report(result);
@@ -9001,7 +9023,6 @@ function jslint_report({
         );
     }
 
-    html += "<div class=\"JSLINT_\" id=\"JSLINT_REPORT_HTML\">\n";
     html += String(`
 <style class="JSLINT_REPORT_STYLE">
 /* jslint utility2:true */
@@ -9150,18 +9171,37 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 /7xoEqvL+2E8VOyCTuT/7j269Zy4jUtN+g4="
     ) format("woff2");
 }
-*,
-*:after,
-*:before {
+.JSLINT_,
+.JSLINT_ address,
+.JSLINT_ button,
+.JSLINT_ cite,
+.JSLINT_ dd,
+.JSLINT_ dfn,
+.JSLINT_ dl,
+.JSLINT_ dt,
+.JSLINT_ fieldset,
+.JSLINT_ fieldset > div,
+.JSLINT_ input,
+.JSLINT_ label,
+.JSLINT_ legend,
+.JSLINT_ ol,
+.JSLINT_ samp,
+.JSLINT_ style,
+.JSLINT_ textarea,
+.JSLINT_ ul {
     border: 0;
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
+/* disable text inflation algorithm used on some smartphones and tablets */
 .JSLINT_ {
     -ms-text-size-adjust: none;
     -webkit-text-size-adjust: none;
     text-size-adjust: none;
+}
+.JSLINT_REPORT_ div {
+    box-sizing: border-box;
 }
 /*csslint ignore:end*/
 
@@ -9196,7 +9236,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 }
 
 /* css - jslint_report - general */
-body {
+.JSLINT_ {
     background: antiquewhite;
 }
 .JSLINT_ fieldset {
@@ -9533,7 +9573,6 @@ body {
     });
     html += "</div>\n";
     html += "</fieldset>\n";
-    html += "</div>\n";
     return html;
 }
 
@@ -10378,9 +10417,19 @@ async function v8CoverageReportCreate({
 <style>
 /* jslint utility2:true */
 /*csslint ignore:start*/
-* {
-box-sizing: border-box;
-    font-family: consolas, menlo, monospace;
+.coverage,
+.coverage a,
+.coverage div,
+.coverage pre,
+.coverage span,
+.coverage table,
+.coverage tbody,
+.coverage td,
+.coverage th,
+.coverage thead,
+.coverage tr {
+    box-sizing: border-box;
+    font-family: monospace;
 }
 /*csslint ignore:end*/
 

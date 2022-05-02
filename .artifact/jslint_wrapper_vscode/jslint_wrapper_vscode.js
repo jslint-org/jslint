@@ -24,7 +24,15 @@
 // For more information, please refer to <https://unlicense.org/>
 
 
-/*jslint beta node*/
+/*jslint beta, node*/
+/*property
+    Diagnostic, DiagnosticSeverity, ProgressLocation, Warning, Window, activate,
+    cancellable, character, clear, column, commands, createDiagnosticCollection,
+    document, end, exports, getText, increment, jslint, languages, line,
+    location, map, message, module, push, readFileSync,
+    registerTextEditorCommand, replace, report, runInNewContext, set, slice,
+    start, subscriptions, title, uri, warnings, window, withProgress
+*/
 
 "use strict";
 

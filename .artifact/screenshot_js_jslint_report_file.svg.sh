@@ -7,17 +7,17 @@ printf '> #!/bin/sh
 > import jslint from "./jslint.mjs";
 > import fs from "fs";
 > (async function () {
->     let report;
 >     let result;
 >     let source = "function foo() {console.log(\\u0027hello world\\u0027);}\\n";
 > 
 > // Create JSLint report from <source> in javascript.
 > 
 >     result = jslint.jslint(source);
->     report = jslint.jslint_report(result);
+>     result = jslint.jslint_report(result);
+>     result = `<body class="JSLINT_ JSLINT_REPORT_">\\n${result}</body>\\n`;
 > 
 >     await fs.promises.mkdir(".artifact/", {recursive: true});
->     await fs.promises.writeFile(".artifact/jslint_report_hello.html", report);
+>     await fs.promises.writeFile(".artifact/jslint_report_hello.html", result);
 >     console.error("wrote file .artifact/jslint_report_hello.html");
 > }());
 > 
@@ -33,17 +33,17 @@ node --input-type=module --eval '
 import jslint from "./jslint.mjs";
 import fs from "fs";
 (async function () {
-    let report;
     let result;
     let source = "function foo() {console.log(\u0027hello world\u0027);}\n";
 
 // Create JSLint report from <source> in javascript.
 
     result = jslint.jslint(source);
-    report = jslint.jslint_report(result);
+    result = jslint.jslint_report(result);
+    result = `<body class="JSLINT_ JSLINT_REPORT_">\n${result}</body>\n`;
 
     await fs.promises.mkdir(".artifact/", {recursive: true});
-    await fs.promises.writeFile(".artifact/jslint_report_hello.html", report);
+    await fs.promises.writeFile(".artifact/jslint_report_hello.html", result);
     console.error("wrote file .artifact/jslint_report_hello.html");
 }());
 

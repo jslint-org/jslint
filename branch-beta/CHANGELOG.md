@@ -15,7 +15,11 @@
 - perf - improve performance by hoisting inlined regexps out of loops and subfunctions
 
 # v2022.5.1-beta
-- vscode - add jslint-extension for vscode
+- add codemirror-example-file jslint_wrapper_codemirror.html
+- update codemirror-editor to v5.65.3
+- wrapper - add jslint-addon for codemirror
+- allow jslint.mjs to auto-export itself to globalThis when given search-param `?window_jslint=1`
+- wrapper - add jslint-extension for vscode
 - bugfix - fix jslint falsely believing megastring literals `0` and `1` are similar
 - bugfix - fix function jstestOnExit() from exiting prematurely and suppressing additional error-messages
 

@@ -209,25 +209,25 @@
     textLength="768"
     x="10"
     y="758"
->npm WARN deprecated querystring@0.2.0: The querystring API is considered Legacy. new code should\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="780"
->   use the URLSearchParams API instead.                                                          </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="802"
 >npm WARN deprecated circular-json@0.3.3: CircularJSON is in maintenance only, flatted is its suc\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="824"
+    y="780"
 >  cessor.                                                                                        </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="802"
+>npm WARN deprecated querystring@0.2.0: The querystring API is considered Legacy. new code should\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="824"
+>   use the URLSearchParams API instead.                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -251,25 +251,25 @@
     textLength="768"
     x="10"
     y="912"
->npm WARN deprecated mkdirp@0.5.1: Legacy versions of mkdirp are no longer supported. Please upda\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="934"
->  te to mkdirp 1.x. (Note that the API surface has changed to use Promises in 1.x.)              </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="956"
 >npm WARN deprecated request@2.88.2: request has been deprecated, see https://github.com/request/\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="978"
+    y="934"
 >  request/issues/3142                                                                            </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="956"
+>npm WARN deprecated mkdirp@0.5.1: Legacy versions of mkdirp are no longer supported. Please upda\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="978"
+>  te to mkdirp 1.x. (Note that the API surface has changed to use Promises in 1.x.)              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -425,7 +425,7 @@
     textLength="768"
     x="10"
     y="1550"
->added 245 packages, and audited 246 packages in 14s                                              </tspan>
+>added 245 packages, and audited 246 packages in 12s                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

@@ -158,6 +158,7 @@ function jslint_cli<span class="apidocSignatureSpan">({
     console_error,
     console_log,
     file,
+    import_meta_url,
     mode_cli,
     mode_noop,
     option,
@@ -591,18 +592,19 @@ await jslint.jslint_cli({
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
+import fs from "fs";
 (async function () {
-    let report;
     let result;
     let source = "function foo() {console.log(\u0027hello world\u0027);}\n";
 
 // Create JSLint report from &lt;source&gt; in javascript.
 
     result = jslint.<span class="apidocCodeKeywordSpan">jslint</span>(source);
-    report = jslint.jslint_report(result);
+    result = jslint.jslint_report(result);
+    result = `&lt;body class="JSLINT_ JSLINT_REPORT_"&gt;\n${result}&lt;/body&gt;\n`;
 
     await fs.promises.mkdir(".artifact/", {recursive: true});
-    await fs.promises.writeFile(".artifact/jslint_report_hello.html", report);
+    await fs.promises.writeFile(".artifact/jslint_report_hello.html", result);
     console.error("wrote file .artifact/jslint_report_hello.html");
 }());
 ...</pre></li>
@@ -761,6 +763,7 @@ case "{}":
     console_error,
     console_log,
     file,
+    import_meta_url,
     mode_cli,
     mode_noop,
     option,
@@ -776,6 +779,7 @@ case "{}":
     console_error,
     console_log,
     file,
+    import_meta_url,
     mode_cli,
     mode_noop,
     option,
@@ -855,8 +859,7 @@ case "{}":
                 option
             });
             return;
-        default:
-           ...
+       ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1316,6 +1319,7 @@ jslint_assert(
 <span class="apidocCodeCommentSpan">
 // This function will create human-readable, html-report
 // for warnings, properties, and functions from jslint-result-object.
+//
 // Example usage:
 //  let result = jslint("console.log('hello world')");
 //  let html = jslint_report(result);
@@ -1348,7 +1352,6 @@ jslint_assert(
         );
     }
 
-    html += "&lt;div class=\"JSLINT_\" id=\"JSLINT_REPORT_HTML\"&gt;\n";
     html += String(`
 &lt;style class="JSLINT_REPORT_STYLE"&gt;
 /* jslint utility2:true */
@@ -1364,25 +1367,26 @@ AAAAAAAAAAAAAAAABmAAgiQINAmcDBEICuc41DEBNgIkA4R2C4I+AAQgBYkuByAMgScfYUIF\
 KDflSQnlJ0bP+QnPQAy744n9mup6H9PaCDFwM5zjf8exB89bZ1cdrYOP0NgnuRDRWlk9u/fE\
 llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOtz\
 7sIKEGgLdDNl/IrfqWVZG/wr42ekomEm91VA1p4LhHBuFzHF8//u7vvbREHMQqGtNLmiOOD/\
-X7WWiwqyCE98qt0jk5JJmgR5WJJElBmzRb1F7a66MmSLT...
+X7WWiwqyCE98qt0jk5JJmgR5WJJElBmzRb1F7a66MmSLTNWZ2XSHfKBSKHoVteSEJ6EOdvVw\
+fNZOtXKDe39jXdRlkmMnOWIOFBgeEK/b0mFsgffnP...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-    let report;
-    let result;
-    let source = "function foo() {console.log(\u0027hello world\u0027);}\n";
 
-// Create JSLint report from &lt;source&gt; in javascript.
+    editor.on("lintJslintAfter", function (options) {
 
-    result = jslint.jslint(source);
-    report = jslint.<span class="apidocCodeKeywordSpan">jslint_report</span>(result);
+// Generate jslint-report from options.result.
 
-    await fs.promises.mkdir(".artifact/", {recursive: true});
-    await fs.promises.writeFile(".artifact/jslint_report_hello.html", report);
-    console.error("wrote file .artifact/jslint_report_hello.html");
-}());
+        document.querySelector(
+            ".JSLINT_REPORT_"
+        ).innerHTML = window.jslint.<span class="apidocCodeKeywordSpan">jslint_report</span>(options.result);
+    });
 
-'
+// Manually trigger linter.
+
+    editor.performLint();
+});
+&lt;/script&gt;
 ...</pre></li>
 
 <li>
@@ -1837,9 +1841,19 @@ jstestDescribe((
 &lt;style&gt;
 /* jslint utility2:true */
 /*csslint ignore:start*/
-* {
-box-sizing: border-box;
-    font-family: consolas, menlo, monospace;
+.coverage,
+.coverage a,
+.coverage div,
+.coverage pre,
+.coverage span,
+.coverage table,
+.coverage tbody,
+.coverage td,
+.coverage th,
+.coverage thead,
+.coverage tr {
+    box-sizing: border-box;
+    font-family: monospace;
 }
 /*csslint ignore:end*/
 
@@ -1886,16 +1900,7 @@ body {
     margin: 2px 0;
     min-width: 200px;
     position: relative;
-    width: 100%;
-}
-.coverage .percentbar div {
-    height: 100%;
-    position: absolute;
-}
-.coverage .title {
-    font-size: large;
-    font-weight: bold;
-...
+    widt...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
