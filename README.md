@@ -21,7 +21,7 @@ Douglas Crockford <douglas@crockford.com>
 3. [API Doc](#api-doc)
 
 4. [Quickstart Install](#quickstart-install)
-    - [To install, just download https://www.jslint.com/jslint.mjs and save to file:](#to-install-just-download-httpswwwjslintcomjslintmjs-and-save-to-file)
+    - [To install, just download and save https://www.jslint.com/jslint.mjs to file:](#to-install-just-download-and-save-httpswwwjslintcomjslintmjs-to-file)
     - [To run `jslint.mjs` in shell:](#to-run-jslintmjs-in-shell)
     - [To import `jslint.mjs` in ES Module environment:](#to-import-jslintmjs-in-es-module-environment)
     - [To import `jslint.mjs` in CommonJS environment:](#to-import-jslintmjs-in-commonjs-environment)
@@ -35,19 +35,19 @@ Douglas Crockford <douglas@crockford.com>
     - [To create V8 coverage report from Node.js / Npm program in shell:](#to-create-v8-coverage-report-from-nodejs--npm-program-in-shell)
     - [To create V8 coverage report from Node.js / Npm program in javascript:](#to-create-v8-coverage-report-from-nodejs--npm-program-in-javascript)
 
-7. [Quickstart JSLint in Vim](#quickstart-jslint-in-vim)
-    - [To run JSLint in Vim:](#to-run-jslint-in-vim)
+7. [Quickstart JSLint in CodeMirror](#quickstart-jslint-in-codemirror)
 
-8. [Quickstart JSLint in VS Code](#quickstart-jslint-in-vs-code)
-    - [To run JSLint in VS Code:](#to-run-jslint-in-vs-code)
+8. [Quickstart JSLint in Vim](#quickstart-jslint-in-vim)
 
-9. [Description](#description)
+9. [Quickstart JSLint in VSCode](#quickstart-jslint-in-vscode)
 
-10. [Package Listing](#package-listing)
+10. [Description](#description)
 
-11. [Changelog](#changelog)
+11. [Package Listing](#package-listing)
 
-12. [License](#license)
+12. [Changelog](#changelog)
+
+13. [License](#license)
 
 
 <br><br>
@@ -76,7 +76,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 <br><br>
-### To install, just download https://www.jslint.com/jslint.mjs and save to file:
+### To install, just download and save https://www.jslint.com/jslint.mjs to file:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_install_download.svg -->
 #!/bin/sh
 
@@ -223,17 +223,17 @@ node --input-type=module --eval '
 import jslint from "./jslint.mjs";
 import fs from "fs";
 (async function () {
-    let report;
     let result;
     let source = "function foo() {console.log(\u0027hello world\u0027);}\n";
 
 // Create JSLint report from <source> in javascript.
 
     result = jslint.jslint(source);
-    report = jslint.jslint_report(result);
+    result = jslint.jslint_report(result);
+    result = `<body class="JSLINT_ JSLINT_REPORT_">\n${result}</body>\n`;
 
     await fs.promises.mkdir(".artifact/", {recursive: true});
-    await fs.promises.writeFile(".artifact/jslint_report_hello.html", report);
+    await fs.promises.writeFile(".artifact/jslint_report_hello.html", result);
     console.error("wrote file .artifact/jslint_report_hello.html");
 }());
 
@@ -334,11 +334,121 @@ import jslint from "../jslint.mjs";
 
 
 <br><br>
-# Quickstart JSLint in Vim
+# Quickstart JSLint in CodeMirror
+1. Download and save [`jslint.mjs`](https://www.jslint.com/jslint.mjs), [`jslint_wrapper_codemirror.js`](https://www.jslint.com/jslint_wrapper_codemirror.js) to file.
+
+2. Edit, save, and serve example html-file below:
+```html <!-- jslint_wrapper_codemirror.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>CodeMirror: JSLint Demo</title>
+
+<!-- Assets from codemirror. -->
+
+    <link rel="stylesheet" href="https://codemirror.net/lib/codemirror.css">
+    <link rel="stylesheet" href="https://codemirror.net/addon/lint/lint.css">
+    <script defer src="https://codemirror.net/lib/codemirror.js"></script>
+    <script defer
+        src="https://codemirror.net/mode/javascript/javascript.js"></script>
+    <script defer src="https://codemirror.net/addon/lint/lint.js"></script>
+
+<!-- Assets from jslint. -->
+
+    <script type="module" src="./jslint.mjs?window_jslint=1"></script>
+    <script defer src="./jslint_wrapper_codemirror.js"></script>
+<style>
+body {
+    background: #bbb;
+    color: #333;
+    font-family: sans-serif;
+    margin: 20px;
+}
+.JSLINT_.JSLINT_REPORT_ {
+    margin-top: 20px;
+}
+</style>
+</head>
+
+
+<body>
+    <h1>CodeMirror: JSLint Demo</h1>
+    <h3>
+This demo will auto-lint the code below, and auto-generate a report as you type.
+    </h3>
+
+<!-- Container for codemirror-editor. -->
+
+    <textarea id="editor1">console.log('hello world');</textarea>
+
+<!-- Container for jslint-report. -->
+
+    <div class="JSLINT_ JSLINT_REPORT_"></div>
+
+
+<script type=module>
+window.addEventListener("load", function () {
+    let editor = window.CodeMirror.fromTextArea(document.getElementById(
+        "editor1"
+    ), {
+        gutters: [
+            "CodeMirror-lint-markers"
+        ],
+        indentUnit: 4,
+        lineNumbers: true,
+        lint: {
+            lintOnChange: true, // Enable auto-lint.
+            options: {
+                // browser: true,
+                // node: true
+                globals: [
+                    // "caches",
+                    // "indexedDb"
+                ]
+            }
+        },
+        mode: "javascript"
+    });
+
+// Initialize event-handling before linter is run.
+
+    editor.on("lintJslintBefore", function (/* options */) {
+        // options.browser = true;
+        // options.node = true;
+        // options.globals = [
+        //     "caches",
+        //     "indexedDb"
+        // ];
+        return;
+    });
+
+// Initialize event-handling after linter is run.
+
+    editor.on("lintJslintAfter", function (options) {
+
+// Generate jslint-report from options.result.
+
+        document.querySelector(
+            ".JSLINT_REPORT_"
+        ).innerHTML = window.jslint.jslint_report(options.result);
+    });
+
+// Manually trigger linter.
+
+    editor.performLint();
+});
+</script>
+</body>
+</html>
+```
+3. Live example at https://www.jslint.com/jslint_wrapper_codemirror.html
+
+[![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2fjslint_2fbranch-beta_2fjslint_wrapper_codemirror.html.png)](https://jslint-org.github.io/jslint/jslint_wrapper_codemirror.html)
 
 
 <br><br>
-### To run JSLint in Vim:
+# Quickstart JSLint in Vim
 1. Download and save [`jslint.mjs`](https://www.jslint.com/jslint.mjs), [`jslint_wrapper_vim.vim`](https://www.jslint.com/jslint_wrapper_vim.vim) to directory `~/.vim/`
 2. Add vim-command `:source ~/.vim/jslint_wrapper_vim.vim` to file `~/.vimrc`
 3. Vim can now jslint files (via nodejs):
@@ -350,16 +460,12 @@ import jslint from "../jslint.mjs";
 
 
 <br><br>
-# Quickstart JSLint in VS Code
-
-
-<br><br>
-### To run JSLint in VS Code:
-1. In VS Code, search and install extension [`vscode-jslint`](https://marketplace.visualstudio.com/items?itemName=jslint.vscode-jslint)
-2. In VS Code, while editing a javascript file:
+# Quickstart JSLint in VSCode
+1. In VSCode, search and install extension [`vscode-jslint`](https://marketplace.visualstudio.com/items?itemName=jslint.vscode-jslint)
+2. In VSCode, while editing a javascript file:
     - right-click context-menu and select `[JSLint - Lint File]`
     - or use key-binding `[Ctrl + Shift + J], [L]`
-    - or use key-binding `[ Cmd + Shift + J], [L]` (Mac)
+    - or use key-binding `[ Cmd + Shift + J], [L]` for Mac
 - screenshot
 
 [![screenshot](https://jslint-org.github.io/jslint/asset_image_jslint_wrapper_vscode.png)](https://marketplace.visualstudio.com/items?itemName=jslint.vscode-jslint)

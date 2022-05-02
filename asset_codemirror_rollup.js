@@ -5,40 +5,41 @@ shRawLibFetch
     "fetchList": [
         {
             "comment": true,
-            "url": "https://github.com/codemirror/CodeMirror/blob/5.62.0/LICENSE"
+            "url": "https://github.com/codemirror/CodeMirror/blob/5.65.3/LICENSE"
         },
         {
-            "url": "https://github.com/codemirror/CodeMirror/blob/5.62.0/codemirror.js",
-            "url2": "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.js"
+            "url": "https://github.com/codemirror/CodeMirror/blob/5.65.3/codemirror.js",
+            "url2": "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.3/codemirror.js"
         },
         {
-            "url": "https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/edit/matchbrackets.js"
+            "url": "https://github.com/codemirror/CodeMirror/blob/5.65.3/addon/edit/matchbrackets.js"
         },
         {
-            "url": "https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/edit/trailingspace.js"
+            "url": "https://github.com/codemirror/CodeMirror/blob/5.65.3/addon/edit/trailingspace.js"
         },
         {
-            "url": "https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/lint/lint.js"
+            "url": "https://github.com/codemirror/CodeMirror/blob/5.65.3/addon/lint/lint.js"
         },
         {
-            "url": "https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/selection/active-line.js"
+            "url": "https://github.com/codemirror/CodeMirror/blob/5.65.3/addon/selection/active-line.js"
         },
         {
-            "url": "https://github.com/codemirror/CodeMirror/blob/5.62.0/mode/javascript/javascript.js"
+            "url": "https://github.com/codemirror/CodeMirror/blob/5.65.3/mode/javascript/javascript.js"
         }
-    ]
+    ],
+    "replaceList": []
 }
 */
 
 
 /*
-repo https://github.com/codemirror/CodeMirror/tree/5.62.0
-committed 2021-06-21T07:13:20Z
+repo https://github.com/codemirror/CodeMirror/tree/5.65.3
+committed 2022-04-20T09:49:25Z
 */
 
 
 /*
-file https://github.com/codemirror/CodeMirror/blob/5.62.0/LICENSE
+file https://github.com/codemirror/CodeMirror/blob/5.65.3/LICENSE
 */
 /*
 MIT License
@@ -66,7 +67,7 @@ THE SOFTWARE.
 
 
 /*
-file https://github.com/codemirror/CodeMirror/blob/5.62.0/codemirror.js
+file https://github.com/codemirror/CodeMirror/blob/5.65.3/codemirror.js
 */
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: https://codemirror.net/LICENSE
@@ -1394,7 +1395,7 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/codemirror.js
   // Add a span to a line.
   function addMarkedSpan(line, span, op) {
     var inThisOp = op && window.WeakSet && (op.markedSpans || (op.markedSpans = new WeakSet));
-    if (inThisOp && inThisOp.has(line.markedSpans)) {
+    if (inThisOp && line.markedSpans && inThisOp.has(line.markedSpans)) {
       line.markedSpans.push(span);
     } else {
       line.markedSpans = line.markedSpans ? line.markedSpans.concat([span]) : [span];
@@ -2421,12 +2422,14 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/codemirror.js
   function mapFromLineView(lineView, line, lineN) {
     if (lineView.line == line)
       { return {map: lineView.measure.map, cache: lineView.measure.cache} }
-    for (var i = 0; i < lineView.rest.length; i++)
-      { if (lineView.rest[i] == line)
-        { return {map: lineView.measure.maps[i], cache: lineView.measure.caches[i]} } }
-    for (var i$1 = 0; i$1 < lineView.rest.length; i$1++)
-      { if (lineNo(lineView.rest[i$1]) > lineN)
-        { return {map: lineView.measure.maps[i$1], cache: lineView.measure.caches[i$1], before: true} } }
+    if (lineView.rest) {
+      for (var i = 0; i < lineView.rest.length; i++)
+        { if (lineView.rest[i] == line)
+          { return {map: lineView.measure.maps[i], cache: lineView.measure.caches[i]} } }
+      for (var i$1 = 0; i$1 < lineView.rest.length; i$1++)
+        { if (lineNo(lineView.rest[i$1]) > lineN)
+          { return {map: lineView.measure.maps[i$1], cache: lineView.measure.caches[i$1], before: true} } }
+    }
   }
 
   // Render a line into the hidden node display.externalMeasured. Used
@@ -2653,9 +2656,11 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/codemirror.js
   }
 
   function widgetTopHeight(lineObj) {
+    var ref = visualLine(lineObj);
+    var widgets = ref.widgets;
     var height = 0;
-    if (lineObj.widgets) { for (var i = 0; i < lineObj.widgets.length; ++i) { if (lineObj.widgets[i].above)
-      { height += widgetHeight(lineObj.widgets[i]); } } }
+    if (widgets) { for (var i = 0; i < widgets.length; ++i) { if (widgets[i].above)
+      { height += widgetHeight(widgets[i]); } } }
     return height
   }
 
@@ -3220,13 +3225,19 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/codemirror.js
     var curFragment = result.cursors = document.createDocumentFragment();
     var selFragment = result.selection = document.createDocumentFragment();
 
+    var customCursor = cm.options.$customCursor;
+    if (customCursor) { primary = true; }
     for (var i = 0; i < doc.sel.ranges.length; i++) {
       if (!primary && i == doc.sel.primIndex) { continue }
       var range = doc.sel.ranges[i];
       if (range.from().line >= cm.display.viewTo || range.to().line < cm.display.viewFrom) { continue }
       var collapsed = range.empty();
-      if (collapsed || cm.options.showCursorWhenSelecting)
-        { drawSelectionCursor(cm, range.head, curFragment); }
+      if (customCursor) {
+        var head = customCursor(cm, range);
+        if (head) { drawSelectionCursor(cm, head, curFragment); }
+      } else if (collapsed || cm.options.showCursorWhenSelecting) {
+        drawSelectionCursor(cm, range.head, curFragment);
+      }
       if (!collapsed)
         { drawSelectionRange(cm, range, selFragment); }
     }
@@ -3241,6 +3252,12 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/codemirror.js
     cursor.style.left = pos.left + "px";
     cursor.style.top = pos.top + "px";
     cursor.style.height = Math.max(0, pos.bottom - pos.top) * cm.options.cursorHeight + "px";
+
+    if (/\bcm-fat-cursor\b/.test(cm.getWrapperElement().className)) {
+      var charPos = charCoords(cm, head, "div", null, null);
+      var width = charPos.right - charPos.left;
+      cursor.style.width = (width > 0 ? width : cm.defaultCharWidth()) + "px";
+    }
 
     if (pos.other) {
       // Secondary cursor, shown when on a 'jump' in bi-directional text
@@ -3414,10 +3431,14 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/codemirror.js
   function updateHeightsInViewport(cm) {
     var display = cm.display;
     var prevBottom = display.lineDiv.offsetTop;
+    var viewTop = Math.max(0, display.scroller.getBoundingClientRect().top);
+    var oldHeight = display.lineDiv.getBoundingClientRect().top;
+    var mustScroll = 0;
     for (var i = 0; i < display.view.length; i++) {
       var cur = display.view[i], wrapping = cm.options.lineWrapping;
       var height = (void 0), width = 0;
       if (cur.hidden) { continue }
+      oldHeight += cur.line.height;
       if (ie && ie_version < 8) {
         var bot = cur.node.offsetTop + cur.node.offsetHeight;
         height = bot - prevBottom;
@@ -3432,6 +3453,7 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/codemirror.js
       }
       var diff = cur.line.height - height;
       if (diff > .005 || diff < -.005) {
+        if (oldHeight < viewTop) { mustScroll -= diff; }
         updateLineHeight(cur.line, height);
         updateWidgetHeight(cur.line);
         if (cur.rest) { for (var j = 0; j < cur.rest.length; j++)
@@ -3446,6 +3468,7 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/codemirror.js
         }
       }
     }
+    if (Math.abs(mustScroll) > 2) { display.scroller.scrollTop += mustScroll; }
   }
 
   // Read and store the height of line widgets associated with the
@@ -3706,6 +3729,7 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/codemirror.js
       this.vert.firstChild.style.height =
         Math.max(0, measure.scrollHeight - measure.clientHeight + totalHeight) + "px";
     } else {
+      this.vert.scrollTop = 0;
       this.vert.style.display = "";
       this.vert.firstChild.style.height = "0";
     }
@@ -4456,6 +4480,10 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/codemirror.js
     // The element in which the editor lives.
     d.wrapper = elt("div", [d.scrollbarFiller, d.gutterFiller, d.scroller], "CodeMirror");
 
+    // This attribute is respected by automatic translation systems such as Google Translate,
+    // and may also be respected by tools used by human translators.
+    d.wrapper.setAttribute('translate', 'no');
+
     // Work around IE7 z-index bug (not perfect, hence IE7 not really being supported)
     if (ie && ie_version < 8) { d.gutters.style.zIndex = -1; d.scroller.style.paddingRight = 0; }
     if (!webkit && !(gecko && mobile)) { d.scroller.draggable = true; }
@@ -4553,6 +4581,12 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/codemirror.js
 
   function onScrollWheel(cm, e) {
     var delta = wheelEventDelta(e), dx = delta.x, dy = delta.y;
+    var pixelsPerUnit = wheelPixelsPerUnit;
+    if (e.deltaMode === 0) {
+      dx = e.deltaX;
+      dy = e.deltaY;
+      pixelsPerUnit = 1;
+    }
 
     var display = cm.display, scroll = display.scroller;
     // Quit if there's nothing to scroll here
@@ -4581,10 +4615,10 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/codemirror.js
     // estimated pixels/delta value, we just handle horizontal
     // scrolling entirely here. It'll be slightly off from native, but
     // better than glitching out.
-    if (dx && !gecko && !presto && wheelPixelsPerUnit != null) {
+    if (dx && !gecko && !presto && pixelsPerUnit != null) {
       if (dy && canScrollY)
-        { updateScrollTop(cm, Math.max(0, scroll.scrollTop + dy * wheelPixelsPerUnit)); }
-      setScrollLeft(cm, Math.max(0, scroll.scrollLeft + dx * wheelPixelsPerUnit));
+        { updateScrollTop(cm, Math.max(0, scroll.scrollTop + dy * pixelsPerUnit)); }
+      setScrollLeft(cm, Math.max(0, scroll.scrollLeft + dx * pixelsPerUnit));
       // Only prevent default scrolling if vertical scrolling is
       // actually possible. Otherwise, it causes vertical scroll
       // jitter on OSX trackpads when deltaX is small and deltaY
@@ -4597,15 +4631,15 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/codemirror.js
 
     // 'Project' the visible viewport to cover the area that is being
     // scrolled into view (if we know enough to estimate it).
-    if (dy && wheelPixelsPerUnit != null) {
-      var pixels = dy * wheelPixelsPerUnit;
+    if (dy && pixelsPerUnit != null) {
+      var pixels = dy * pixelsPerUnit;
       var top = cm.doc.scrollTop, bot = top + display.wrapper.clientHeight;
       if (pixels < 0) { top = Math.max(0, top + pixels - 50); }
       else { bot = Math.min(cm.doc.height, bot + pixels + 50); }
       updateDisplaySimple(cm, {top: top, bottom: bot});
     }
 
-    if (wheelSamples < 20) {
+    if (wheelSamples < 20 && e.deltaMode !== 0) {
       if (display.wheelStartX == null) {
         display.wheelStartX = scroll.scrollLeft; display.wheelStartY = scroll.scrollTop;
         display.wheelDX = dx; display.wheelDY = dy;
@@ -8282,7 +8316,7 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/codemirror.js
   }
 
   function hiddenTextarea() {
-    var te = elt("textarea", null, null, "position: absolute; bottom: -1em; padding: 0; width: 1px; height: 1em; outline: none");
+    var te = elt("textarea", null, null, "position: absolute; bottom: -1em; padding: 0; width: 1px; height: 1em; min-height: 1em; outline: none");
     var div = elt("div", [te], null, "overflow: hidden; position: relative; width: 3px; height: 0px;");
     // The textarea is kept positioned near the cursor to prevent the
     // fact that it'll be scrolled into view on input from scrolling
@@ -9045,9 +9079,11 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/codemirror.js
   ContentEditableInput.prototype.supportsTouch = function () { return true };
 
   ContentEditableInput.prototype.receivedFocus = function () {
+      var this$1 = this;
+
     var input = this;
     if (this.selectionInEditor())
-      { this.pollSelection(); }
+      { setTimeout(function () { return this$1.pollSelection(); }, 20); }
     else
       { runInOp(this.cm, function () { return input.cm.curOp.selectionChanged = true; }); }
 
@@ -9876,14 +9912,14 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/codemirror.js
 
   addLegacyProps(CodeMirror);
 
-  CodeMirror.version = "5.62.0";
+  CodeMirror.version = "5.65.3";
 
   return CodeMirror;
 })));
 
 
 /*
-file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/edit/matchbrackets.js
+file https://github.com/codemirror/CodeMirror/blob/5.65.3/addon/edit/matchbrackets.js
 */
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: https://codemirror.net/LICENSE
@@ -10048,7 +10084,7 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/edit/matchbracke
 
 
 /*
-file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/edit/trailingspace.js
+file https://github.com/codemirror/CodeMirror/blob/5.65.3/addon/edit/trailingspace.js
 */
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: https://codemirror.net/LICENSE
@@ -10080,7 +10116,7 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/edit/trailingspa
 
 
 /*
-file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/lint/lint.js
+file https://github.com/codemirror/CodeMirror/blob/5.65.3/addon/lint/lint.js
 */
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: https://codemirror.net/LICENSE
@@ -10143,25 +10179,42 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/lint/lint.js
     CodeMirror.on(node, "mouseout", hide);
   }
 
-  function LintState(cm, options, hasGutter) {
+  function LintState(cm, conf, hasGutter) {
     this.marked = [];
-    this.options = options;
+    if (conf instanceof Function) conf = {getAnnotations: conf};
+    if (!conf || conf === true) conf = {};
+    this.options = {};
+    this.linterOptions = conf.options || {};
+    for (var prop in defaults) this.options[prop] = defaults[prop];
+    for (var prop in conf) {
+      if (defaults.hasOwnProperty(prop)) {
+        if (conf[prop] != null) this.options[prop] = conf[prop];
+      } else if (!conf.options) {
+        this.linterOptions[prop] = conf[prop];
+      }
+    }
     this.timeout = null;
     this.hasGutter = hasGutter;
     this.onMouseOver = function(e) { onMouseOver(cm, e); };
     this.waitingFor = 0
   }
 
-  function parseOptions(_cm, options) {
-    if (options instanceof Function) return {getAnnotations: options};
-    if (!options || options === true) options = {};
-    return options;
+  var defaults = {
+    highlightLines: false,
+    tooltips: true,
+    delay: 500,
+    lintOnChange: true,
+    getAnnotations: null,
+    async: false,
+    selfContain: null,
+    formatAnnotation: null,
+    onUpdateLinting: null
   }
 
   function clearMarks(cm) {
     var state = cm.state.lint;
     if (state.hasGutter) cm.clearGutter(GUTTER_ID);
-    if (isHighlightErrorLinesEnabled(state)) clearErrorLines(cm);
+    if (state.options.highlightLines) clearErrorLines(cm);
     for (var i = 0; i < state.marked.length; ++i)
       state.marked[i].clear();
     state.marked.length = 0;
@@ -10172,10 +10225,6 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/lint/lint.js
       var has = line.wrapClass && /\bCodeMirror-lint-line-\w+\b/.exec(line.wrapClass);
       if (has) cm.removeLineClass(line, "wrap", has[0]);
     })
-  }
-
-  function isHighlightErrorLinesEnabled(state) {
-    return state.options.highlightLines;
   }
 
   function makeMarker(cm, labels, severity, multiple, tooltips) {
@@ -10220,7 +10269,7 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/lint/lint.js
     return tip;
   }
 
-  function lintAsync(cm, getAnnotations, passOptions) {
+  function lintAsync(cm, getAnnotations) {
     var state = cm.state.lint
     var id = ++state.waitingFor
     function abort() {
@@ -10233,7 +10282,7 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/lint/lint.js
       if (state.waitingFor != id) return
       if (arg2 && annotations instanceof CodeMirror) annotations = arg2
       cm.operation(function() {updateLinting(cm, annotations)})
-    }, passOptions, cm);
+    }, state.linterOptions, cm);
   }
 
   function startLinting(cm) {
@@ -10244,13 +10293,12 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/lint/lint.js
      * Passing rules in `options` property prevents JSHint (and other linters) from complaining
      * about unrecognized rules like `onUpdateLinting`, `delay`, `lintOnChange`, etc.
      */
-    var passOptions = options.options || options;
     var getAnnotations = options.getAnnotations || cm.getHelper(CodeMirror.Pos(0, 0), "lint");
     if (!getAnnotations) return;
     if (options.async || getAnnotations.async) {
-      lintAsync(cm, getAnnotations, passOptions)
+      lintAsync(cm, getAnnotations)
     } else {
-      var annotations = getAnnotations(cm.getValue(), passOptions, cm);
+      var annotations = getAnnotations(cm.getValue(), state.linterOptions, cm);
       if (!annotations) return;
       if (annotations.then) annotations.then(function(issues) {
         cm.operation(function() {updateLinting(cm, issues)})
@@ -10295,9 +10343,9 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/lint/lint.js
       // use original annotations[line] to show multiple messages
       if (state.hasGutter)
         cm.setGutterMarker(line, GUTTER_ID, makeMarker(cm, tipLabel, maxSeverity, annotations[line].length > 1,
-                                                       state.options.tooltips));
+                                                       options.tooltips));
 
-      if (isHighlightErrorLinesEnabled(state))
+      if (options.highlightLines)
         cm.addLineClass(line, "wrap", LINT_LINE_ID + maxSeverity);
     }
     if (options.onUpdateLinting) options.onUpdateLinting(annotationsNotSorted, annotations, cm);
@@ -10307,7 +10355,7 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/lint/lint.js
     var state = cm.state.lint;
     if (!state) return;
     clearTimeout(state.timeout);
-    state.timeout = setTimeout(function(){startLinting(cm);}, state.options.delay || 500);
+    state.timeout = setTimeout(function(){startLinting(cm);}, state.options.delay);
   }
 
   function popupTooltips(cm, annotations, e) {
@@ -10347,8 +10395,8 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/lint/lint.js
     if (val) {
       var gutters = cm.getOption("gutters"), hasLintGutter = false;
       for (var i = 0; i < gutters.length; ++i) if (gutters[i] == GUTTER_ID) hasLintGutter = true;
-      var state = cm.state.lint = new LintState(cm, parseOptions(cm, val), hasLintGutter);
-      if (state.options.lintOnChange !== false)
+      var state = cm.state.lint = new LintState(cm, val, hasLintGutter);
+      if (state.options.lintOnChange)
         cm.on("change", onChange);
       if (state.options.tooltips != false && state.options.tooltips != "gutter")
         CodeMirror.on(cm.getWrapperElement(), "mouseover", state.onMouseOver);
@@ -10364,7 +10412,7 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/lint/lint.js
 
 
 /*
-file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/selection/active-line.js
+file https://github.com/codemirror/CodeMirror/blob/5.65.3/addon/selection/active-line.js
 */
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: https://codemirror.net/LICENSE
@@ -10441,7 +10489,7 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/selection/active
 
 
 /*
-file https://github.com/codemirror/CodeMirror/blob/5.62.0/mode/javascript/javascript.js
+file https://github.com/codemirror/CodeMirror/blob/5.65.3/mode/javascript/javascript.js
 */
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: https://codemirror.net/LICENSE
@@ -10775,6 +10823,7 @@ CodeMirror.defineMode("javascript", function(config, parserConfig) {
     cx.state.context = new Context(cx.state.context, cx.state.localVars, true)
     cx.state.localVars = null
   }
+  pushcontext.lex = pushblockcontext.lex = true
   function popcontext() {
     cx.state.localVars = cx.state.context.vars
     cx.state.context = cx.state.context.prev

@@ -90,6 +90,41 @@ jstestDescribe((
         });
     });
     jstestIt((
+        "test cli-window-jslint handling-behavior"
+    ), function () {
+        [
+            "&window_jslint=",
+            "&window_jslint=12",
+            "&window_jslint=1?",
+            "&window_jslint=?",
+            "?window_jslint=",
+            "?window_jslint=12",
+            "?window_jslint=1?",
+            "?window_jslint=?",
+            "window_jslint=1",
+            "window_jslint=1&",
+            "window_jslint=12",
+            "window_jslint=1?"
+        ].forEach(function (import_meta_url) {
+            jslint.jslint_cli({
+                import_meta_url
+            });
+            assertOrThrow(globalThis.jslint === undefined);
+        });
+        [
+            "&window_jslint=1",
+            "&window_jslint=1&",
+            "?window_jslint=1",
+            "?window_jslint=1&"
+        ].forEach(function (import_meta_url) {
+            jslint.jslint_cli({
+                import_meta_url
+            });
+            assertOrThrow(globalThis.jslint === jslint);
+            delete globalThis.jslint;
+        });
+    });
+    jstestIt((
         "test cli-cjs-and-invalid-file handling-behavior"
     ), async function () {
         await fsWriteFileWithParents(".test_dir.cjs/touch.txt", "");
