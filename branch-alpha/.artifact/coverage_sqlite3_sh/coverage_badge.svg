@@ -1,6 +1,6 @@
 <svg height="20" width="130" xmlns="http://www.w3.org/2000/svg">
 <rect fill="#555" height="20" width="130"/>
-<rect fill="#14c900" height="20" width="62" x="68"/>
+<rect fill="#12cb00" height="20" width="62" x="68"/>
 <g
     fill="#fff"
     font-family="verdana, geneva, dejavu sans, sans-serif"
@@ -9,6 +9,6 @@
     text-anchor="middle"
 >
 <text x="34" y="14">coverage</text>
-<text x="99" y="14">90.87 %</text>
+<text x="99" y="14">91.76 %</text>
 </g>
 </svg>

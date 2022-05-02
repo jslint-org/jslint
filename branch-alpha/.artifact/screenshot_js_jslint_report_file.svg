@@ -101,7 +101,7 @@
     textLength="768"
     x="10"
     y="362"
->&gt;     result = `&lt;body class="JSLINT_"&gt;\n${result}\n&lt;/body&gt;\n`;                                   </tspan>
+>&gt;     result = `&lt;body class="JSLINT_ JSLINT_REPORT_"&gt;\n${result}&lt;/body&gt;\n`;                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

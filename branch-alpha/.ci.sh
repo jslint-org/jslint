@@ -42,7 +42,13 @@ import moduleFs from "fs";
 import moduleFs from "fs";
 import moduleChildProcess from "child_process";
 (async function () {
+    let fileDict = {};
     let screenshotCurl;
+    await Promise.all([
+        "README.md"
+    ].map(async function (file) {
+        fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
+    }));
     screenshotCurl = await moduleFs.promises.stat("jslint.mjs");
     screenshotCurl = String(`
 echo "\
@@ -54,11 +60,11 @@ echo "\
         /250/g
     ), Math.floor(screenshotCurl.size / 1024));
     // parallel-task - run-and-screenshot example-shell-commands in README.md
-    await Promise.all(Array.from(String(
-        await moduleFs.promises.readFile("README.md", "utf8")
-    ).matchAll(
-        /\n```shell <!-- shRunWithScreenshotTxt (.*?) -->\n([\S\s]*?\n)```\n/g
-    )).map(async function ([
+    await Promise.all(Array.from(
+        fileDict["README.md"].matchAll(
+            /\n```shell <!-- shRunWithScreenshotTxt (.*?) -->\n([\S\s]*?\n)```\n/g
+        )
+    ).map(async function ([
         ignore, file, script0
     ]) {
         let script = script0;
@@ -119,22 +125,23 @@ echo "\
     # screenshot asset_image_logo
     shImageLogoCreate &
     # background http-file-server to serve webpages for screenshot
-    PORT=8080 npm_config_timeout_exit=10000 shHttpFileServer &
+    # PORT=8080 npm_config_timeout_exit=5000 shHttpFileServer &
     # screenshot html
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
 (async function () {
+    let {
+        GITHUB_BRANCH0,
+        GITHUB_GITHUB_IO
+    } = process.env;
     await Promise.all([
         (
-            "http://localhost:8080"
-            + "/.artifact/jslint_wrapper_codemirror.html"
+            `https://${GITHUB_GITHUB_IO}/branch-${GITHUB_BRANCH0}`
+            + `/jslint_wrapper_codemirror.html`
         ),
         (
-            "https://"
-            + process.env.UPSTREAM_OWNER
-            + ".github.io/"
-            + process.env.UPSTREAM_REPO
-            + "/branch-beta/index.html"
+            `https://${GITHUB_GITHUB_IO}/branch-${GITHUB_BRANCH0}`
+            + `/index.html`
         ),
         ".artifact/apidoc.html",
         ".artifact/coverage_sqlite3_js/index.html",
@@ -187,9 +194,11 @@ import moduleFs from "fs";
     let versionMaster;
     await Promise.all([
         "CHANGELOG.md",
+        "README.md",
         "index.html",
         "jslint.mjs",
-        "jslint_ci.sh"
+        "jslint_ci.sh",
+        "jslint_wrapper_codemirror.html"
     ].map(async function (file) {
         fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
     }));
@@ -203,6 +212,15 @@ import moduleFs from "fs";
     });
     await Promise.all([
         {
+            file: "README.md",
+            src: fileDict["README.md"].replace((
+                /\n```html <!-- jslint_wrapper_codemirror.html -->\n[\S\s]*?\n```\n/
+            ), (
+                "\n```html <!-- jslint_wrapper_codemirror.html -->\n"
+                + fileDict["jslint_wrapper_codemirror.html"]
+                + "```\n"
+            ))
+        }, {
             file: "index.html",
             src: fileDict["index.html"].replace((
                 /\n<style class="JSLINT_REPORT_STYLE">\n[\S\s]*?\n<\/style>\n/

@@ -280,10 +280,21 @@ shCiArtifactUpload() {(set -e
     git config --local user.name "github-actions"
     # init $GITHUB_BRANCH0
     git pull --unshallow origin "$GITHUB_BRANCH0"
-    # init $UPSTREAM_OWNER
-    export UPSTREAM_OWNER="${UPSTREAM_OWNER:-jslint-org}"
-    # init $UPSTREAM_REPO
-    export UPSTREAM_REPO="${UPSTREAM_REPO:-jslint}"
+    # init $UPSTREAM_REPOSITORY
+    export UPSTREAM_REPOSITORY="$(node -p '(
+    /^https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
+).exec(require("./package.json").repository.url)[1]
+')" # '
+    # init $UPSTREAM_GITHUB_IO
+    export UPSTREAM_GITHUB_IO="$(
+        printf "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
+    )"
+    # init $GITHUB_REPOSITORY
+    export GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-$UPSTREAM_REPOSITORY}"
+    # init $GITHUB_GITHUB_IO
+    export GITHUB_GITHUB_IO="$(
+        printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
+    )"
     # screenshot changelog and files
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
@@ -356,11 +367,10 @@ import moduleChildProcess from "child_process";
     fi
     # update README.md with branch-$GITHUB_BRANCH0 and $GITHUB_REPOSITORY
     sed -i \
-        -e "s|/branch-[0-9A-Z_a-z]*/|/branch-$GITHUB_BRANCH0/|g" \
-        -e "s|\b$UPSTREAM_OWNER/$UPSTREAM_REPO\b|$GITHUB_REPOSITORY|g" \
-        -e "s|\b$UPSTREAM_OWNER\.github\.io/$UPSTREAM_REPO\b|$(
-            printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
-        )|g" \
+        -e "s|/branch-[a-z]*/|/branch-$GITHUB_BRANCH0/|g" \
+        -e "s|\\b$UPSTREAM_GITHUB_IO\\b|$GITHUB_GITHUB_IO|g" \
+        -e "s|\\b$UPSTREAM_REPOSITORY\\b|$GITHUB_REPOSITORY|g" \
+        -e "s|_2fbranch-[a-z]*_2f|_2fbranch-${GITHUB_BRANCH0}_2f|g" \
         "branch-$GITHUB_BRANCH0/README.md"
     git status
     git commit -am "update dir branch-$GITHUB_BRANCH0" || true
@@ -573,11 +583,32 @@ shDiffFileFromDir() {(set -e
 
 shDirHttplinkValidate() {(set -e
 # this function will validate http-links embedded in .html and .md files
+    # init $UPSTREAM_REPOSITORY
+    export UPSTREAM_REPOSITORY="$(node -p '(
+    /^https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
+).exec(require("./package.json").repository.url)[1]
+')" # '
+    # init $UPSTREAM_GITHUB_IO
+    export UPSTREAM_GITHUB_IO="$(
+        printf "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
+    )"
+    # init $GITHUB_REPOSITORY
+    export GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-$UPSTREAM_REPOSITORY}"
+    # init $GITHUB_GITHUB_IO
+    export GITHUB_GITHUB_IO="$(
+        printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
+    )"
     node --input-type=module --eval '
 import moduleFs from "fs";
 import moduleHttps from "https";
 import moduleUrl from "url";
 (async function () {
+    let {
+        GITHUB_GITHUB_IO,
+        GITHUB_REPOSITORY,
+        UPSTREAM_GITHUB_IO,
+        UPSTREAM_REPOSITORY
+    } = process.env;
     let dict = {};
     Array.from(
         await moduleFs.promises.readdir(".")
@@ -596,14 +627,14 @@ import moduleUrl from "url";
             url = url.slice(0, -1).replace((
                 /[\u0022\u0027]/g
             ), "").replace((
-                /\/branch-\w+?\//g
-            ), "/branch-alpha/").replace((
-                /\bjslint-org\/jslint\b/g
-            ), process.env.GITHUB_REPOSITORY || "jslint-org/jslint").replace((
-                /\bjslint-org\.github\.io\/jslint\b/g
-            ), String(
-                process.env.GITHUB_REPOSITORY || "jslint-org/jslint"
-            ).replace("/", ".github.io/"));
+                /\/branch-[a-z]*?\//g
+            ), "/branch-alpha/").replace(new RegExp(
+                `\\b${UPSTREAM_REPOSITORY}\\b`,
+                "g"
+            ), GITHUB_REPOSITORY).replace(new RegExp(
+                `\\b${UPSTREAM_GITHUB_IO}\\b`,
+                "g"
+            ), GITHUB_GITHUB_IO);
             if (url.startsWith("http://")) {
                 throw new Error(
                     `shDirHttplinkValidate - ${file} - insecure link - ${url}`
@@ -842,18 +873,10 @@ shGithubFileUpload() {(set -e
 # example use:
 # shGithubFileUpload octocat/hello-worId/master/hello.txt hello.txt
     node --input-type=module --eval '
+import moduleAssert from "assert";
 import moduleFs from "fs";
 import moduleHttps from "https";
 import modulePath from "path";
-function assertOrThrow(condition, message) {
-    if (!condition) {
-        throw (
-            (!message || typeof message === "string")
-            ? new Error(String(message).slice(0, 2048))
-            : message
-        );
-    }
-}
 (async function () {
     let branch;
     let content = process.argv[2];
@@ -880,7 +903,7 @@ function assertOrThrow(condition, message) {
                     responseText += chunk;
                 });
                 res.on("end", function () {
-                    assertOrThrow(res.statusCode === 200, (
+                    moduleAssert(res.statusCode === 200, (
                         "shGithubFileUpload"
                         + `- failed to download/upload file ${url} - `
                         + responseText

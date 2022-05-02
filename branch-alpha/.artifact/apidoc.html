@@ -601,7 +601,7 @@ import fs from "fs";
 
     result = jslint.<span class="apidocCodeKeywordSpan">jslint</span>(source);
     result = jslint.jslint_report(result);
-    result = `&lt;body class="JSLINT_"&gt;\n${result}\n&lt;/body&gt;\n`;
+    result = `&lt;body class="JSLINT_ JSLINT_REPORT_"&gt;\n${result}&lt;/body&gt;\n`;
 
     await fs.promises.mkdir(".artifact/", {recursive: true});
     await fs.promises.writeFile(".artifact/jslint_report_hello.html", result);
@@ -1352,7 +1352,6 @@ jslint_assert(
         );
     }
 
-    html += "&lt;div class=\"JSLINT_ JSLINT_REPORT_HTML\"&gt;\n";
     html += String(`
 &lt;style class="JSLINT_REPORT_STYLE"&gt;
 /* jslint utility2:true */
@@ -1368,25 +1367,26 @@ AAAAAAAAAAAAAAAABmAAgiQINAmcDBEICuc41DEBNgIkA4R2C4I+AAQgBYkuByAMgScfYUIF\
 KDflSQnlJ0bP+QnPQAy744n9mup6H9PaCDFwM5zjf8exB89bZ1cdrYOP0NgnuRDRWlk9u/fE\
 llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOtz\
 7sIKEGgLdDNl/IrfqWVZG/wr42ekomEm91VA1p4LhHBuFzHF8//u7vvbREHMQqGtNLmiOOD/\
-X7WWiwqyCE98qt0jk5JJmgR5WJJElBmzRb1F7a66MmSLTNWZ2...
+X7WWiwqyCE98qt0jk5JJmgR5WJJElBmzRb1F7a66MmSLTNWZ2XSHfKBSKHoVteSEJ6EOdvVw\
+fNZOtXKDe39jXdRlkmMnOWIOFBgeEK/b0mFsgffnP...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-        mode: "javascript"
-    });
-    editor.on("lintJslintAfter", function ({
-        result
-    }) {
+
+    editor.on("lintJslintAfter", function (options) {
+
+// Generate jslint-report from options.result.
+
         document.querySelector(
-            ".JSLINT_REPORT_HTML"
-        ).innerHTML = window.jslint.<span class="apidocCodeKeywordSpan">jslint_report</span>(result);
+            ".JSLINT_REPORT_"
+        ).innerHTML = window.jslint.<span class="apidocCodeKeywordSpan">jslint_report</span>(options.result);
     });
+
+// Manually trigger linter.
+
     editor.performLint();
 });
 &lt;/script&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-' &gt; .artifact/jslint_wrapper_codemirror.html
 ...</pre></li>
 
 <li>

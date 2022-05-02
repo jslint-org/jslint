@@ -96,7 +96,15 @@ window.addEventListener("load", function () {
     ) {
         let result;
 
-// Emit <options> in case its needs updating before being passed to jslint.
+// Emit <options> before linter is run, so it can be modified
+// before passing to jslint.
+//
+// Example usage:
+//  editor.on("lintJslintBefore", function (options) {
+//      options.browser = true;
+//      options.node = true;
+//      options.globals = ["caches", "indexedDb"];
+//  });
 
         options.source = source;
         CodeMirror.signal(editor, "lintJslintBefore", options);
@@ -105,13 +113,11 @@ window.addEventListener("load", function () {
 
         result = jslint.jslint(source, options, options.globals);
 
-// Emit <result> in case its needed again to generate reports.
+// Emit <result> after linter is run, so it can be used to generate reports.
 //
-// E.g.:
-//  editor.on("lintJslintAfter", function ({
-//      result
-//  }) {
-//      divReport.innerHTML = jslint.jslint_report(result);
+// Example usage:
+//  editor.on("lintJslintAfter", function (options) {
+//      divReport.innerHTML = jslint.jslint_report(options.result);
 //  });
 
         options.result = result;

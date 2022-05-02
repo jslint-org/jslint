@@ -370,17 +370,17 @@ body {
 <pre><span class="lineno"><a href="#line_212" id="line_212">  212.</a></span><span class="count                ">      1</span><span>    it ('fuss-free incremental backups work', function(done) {</span></pre>
 <pre><span class="lineno"><a href="#line_213" id="line_213">  213.</a></span><span class="count                ">      1</span><span>        var backup = db.backup('test/tmp/backup.db');</span></pre>
 <pre><span class="lineno"><a href="#line_214" id="line_214">  214.</a></span><span class="count                ">      1</span><span>        var timer;</span></pre>
-<pre><span class="lineno"><a href="#line_215" id="line_215">  215.</a></span><span class="count                ">     81</span><span>        function makeProgress() {</span></pre>
+<pre><span class="lineno"><a href="#line_215" id="line_215">  215.</a></span><span class="count                ">     80</span><span>        function makeProgress() {</span></pre>
 <pre><span class="lineno"><a href="#line_216" id="line_216">  216.</a></span><span class="count                ">     80</span><span>            if (backup.idle) {</span></pre>
 <pre><span class="lineno"><a href="#line_217" id="line_217">  217.</a></span><span class="count                ">     80</span><span>                backup.step(1);</span></pre>
 <pre><span class="lineno"><a href="#line_218" id="line_218">  218.</a></span><span class="count                ">     80</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_219" id="line_219">  219.</a></span><span class="count                ">     80</span><span>            if (backup.completed || backup.failed) {</span></pre>
+<pre><span class="lineno"><a href="#line_219" id="line_219">  219.</a></span><span class="count                ">     79</span><span>            if (backup.completed || backup.failed) {</span></pre>
 <pre><span class="lineno"><a href="#line_220" id="line_220">  220.</a></span><span class="count                ">      1</span><span>                clearInterval(timer);</span></pre>
 <pre><span class="lineno"><a href="#line_221" id="line_221">  221.</a></span><span class="count                ">      1</span><span>                assert.equal(backup.completed, true);</span></pre>
 <pre><span class="lineno"><a href="#line_222" id="line_222">  222.</a></span><span class="count                ">      1</span><span>                assert.equal(backup.failed, false);</span></pre>
 <pre><span class="lineno"><a href="#line_223" id="line_223">  223.</a></span><span class="count                ">      1</span><span>                done();</span></pre>
 <pre><span class="lineno"><a href="#line_224" id="line_224">  224.</a></span><span class="count                ">      1</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_225" id="line_225">  225.</a></span><span class="count                ">     81</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_225" id="line_225">  225.</a></span><span class="count                ">     80</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_226" id="line_226">  226.</a></span><span class="count                ">      1</span><span>        timer = setInterval(makeProgress, 2);</span></pre>
 <pre><span class="lineno"><a href="#line_227" id="line_227">  227.</a></span><span class="count                ">      1</span><span>    });</span></pre>
 <pre><span class="lineno"><a href="#line_228" id="line_228">  228.</a></span><span class="count                ">      1</span><span></span></pre>
