@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>V8 Coverage Report</title>
+<style>
+/* jslint utility2:true */
+/*csslint ignore:start*/
+* {
+box-sizing: border-box;
+    font-family: consolas, menlo, monospace;
+}
+/*csslint ignore:end*/
+
+/* css - coverage_report - general */
+body {
+    margin: 0;
+}
+.coverage pre {
+    margin: 5px 0;
+}
+.coverage table {
+    border-collapse: collapse;
+}
+.coverage td,
+.coverage th {
+    border: 1px solid #777;
+    line-height: 20px;
+    margin: 0;
+    padding: 5px 10px;
+}
+.coverage td span {
+    display: inline-block;
+    width: 100%;
+}
+.coverage .content {
+    padding: 0 5px;
+}
+.coverage .content a {
+    text-decoration: none;
+}
+.coverage .count {
+    margin: 0 5px;
+    padding: 0 5px;
+}
+.coverage .footer,
+.coverage .header {
+    padding: 20px;
+}
+.coverage .footer {
+    text-align: center;
+}
+.coverage .percentbar {
+    height: 12px;
+    margin: 2px 0;
+    min-width: 200px;
+    position: relative;
+    width: 100%;
+}
+.coverage .percentbar div {
+    height: 100%;
+    position: absolute;
+}
+.coverage .title {
+    font-size: large;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* css - coverage_report - color */
+.coverage td,
+.coverage th {
+    background: #fff;
+}
+.coverage .count,
+.coverage .coverageHigh {
+    background: #9d9;
+}
+.coverage .count {
+    color: #666;
+}
+.coverage .coverageIgnore {
+    background: #ccc;
+}
+.coverage .coverageLow,
+.coverage .uncovered {
+    background: #ebb;
+}
+.coverage .coverageMedium {
+    background: #fd7;
+}
+.coverage .footer,
+.coverage .header,
+.coverage .lineno {
+    background: #ddd;
+}
+.coverage .percentbar {
+    background: #999;
+}
+.coverage .percentbar div {
+    background: #666;
+}
+
+/* css - coverage_report - important */
+.coverage pre:hover span,
+.coverage tr:hover td {
+    background: #7d7;
+}
+.coverage pre:hover span.uncovered,
+.coverage tr:hover td.coverageLow {
+    background: #f99;
+}
+</style>
+</head>
+<body class="coverage">
+<!-- header start -->
+<div class="header">
+<div class="title">V8 Coverage Report</div>
+<table>
+<thead>
+    <tr>
+    <th>Files covered</th>
+    <th>Lines</th>
+    <th>Remaining</th>
+    </tr>
+</thead>
+<tbody>
+<tr>
+    <td class="coverageHigh">
+            <a href="index.html">. / </a><br>
+        <div class="percentbar">
+            <div style="width: 91.76%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         91.76 %<br>
+        2474 / 2696
+    </td>
+    <td style="text-align: right;">
+        <br>
+        222 / 2696
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="lib/sqlite3-binding.js.html">. / lib/sqlite3-binding.js</a><br>
+        <div class="percentbar">
+            <div style="width: 100.00%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         100.00 %<br>
+        6 / 6
+    </td>
+    <td style="text-align: right;">
+        <br>
+        0 / 6
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="lib/sqlite3.js.html">. / lib/sqlite3.js</a><br>
+        <div class="percentbar">
+            <div style="width: 97.08%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         97.08 %<br>
+        200 / 206
+    </td>
+    <td style="text-align: right;">
+        <br>
+        6 / 206
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="lib/trace.js.html">. / lib/trace.js</a><br>
+        <div class="percentbar">
+            <div style="width: 100.00%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         100.00 %<br>
+        39 / 39
+    </td>
+    <td style="text-align: right;">
+        <br>
+        0 / 39
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/affected.test.js.html">. / test/affected.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 93.93%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         93.93 %<br>
+        31 / 33
+    </td>
+    <td style="text-align: right;">
+        <br>
+        2 / 33
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/backup.test.js.html">. / test/backup.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 83.21%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         83.21 %<br>
+        233 / 280
+    </td>
+    <td style="text-align: right;">
+        <br>
+        47 / 280
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/blob.test.js.html">. / test/blob.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 90.90%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         90.90 %<br>
+        50 / 55
+    </td>
+    <td style="text-align: right;">
+        <br>
+        5 / 55
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/cache.test.js.html">. / test/cache.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 90.69%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         90.69 %<br>
+        39 / 43
+    </td>
+    <td style="text-align: right;">
+        <br>
+        4 / 43
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/constants.test.js.html">. / test/constants.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 100.00%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         100.00 %<br>
+        45 / 45
+    </td>
+    <td style="text-align: right;">
+        <br>
+        0 / 45
+    </td>
+    </tr>
+<tr>
+    <td class="coverageMedium">
+            <a href="test/database_fail.test.js.html">. / test/database_fail.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 77.92%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         77.92 %<br>
+        120 / 154
+    </td>
+    <td style="text-align: right;">
+        <br>
+        34 / 154
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/each.test.js.html">. / test/each.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 95.00%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         95.00 %<br>
+        38 / 40
+    </td>
+    <td style="text-align: right;">
+        <br>
+        2 / 40
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/exec.test.js.html">. / test/exec.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 97.50%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         97.50 %<br>
+        39 / 40
+    </td>
+    <td style="text-align: right;">
+        <br>
+        1 / 40
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/extension.test.js.html">. / test/extension.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 96.15%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         96.15 %<br>
+        25 / 26
+    </td>
+    <td style="text-align: right;">
+        <br>
+        1 / 26
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/fts-content.test.js.html">. / test/fts-content.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 100.00%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         100.00 %<br>
+        14 / 14
+    </td>
+    <td style="text-align: right;">
+        <br>
+        0 / 14
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/interrupt.test.js.html">. / test/interrupt.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 92.59%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         92.59 %<br>
+        75 / 81
+    </td>
+    <td style="text-align: right;">
+        <br>
+        6 / 81
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/issue-108.test.js.html">. / test/issue-108.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 89.65%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         89.65 %<br>
+        26 / 29
+    </td>
+    <td style="text-align: right;">
+        <br>
+        3 / 29
+    </td>
+    </tr>
+<tr>
+    <td class="coverageMedium">
+            <a href="test/json.test.js.html">. / test/json.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 65.21%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         65.21 %<br>
+        15 / 23
+    </td>
+    <td style="text-align: right;">
+        <br>
+        8 / 23
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/map.test.js.html">. / test/map.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 93.75%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         93.75 %<br>
+        60 / 64
+    </td>
+    <td style="text-align: right;">
+        <br>
+        4 / 64
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/named_columns.test.js.html">. / test/named_columns.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 94.87%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         94.87 %<br>
+        37 / 39
+    </td>
+    <td style="text-align: right;">
+        <br>
+        2 / 39
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/named_params.test.js.html">. / test/named_params.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 98.57%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         98.57 %<br>
+        69 / 70
+    </td>
+    <td style="text-align: right;">
+        <br>
+        1 / 70
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/null_error.test.js.html">. / test/null_error.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 95.23%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         95.23 %<br>
+        40 / 42
+    </td>
+    <td style="text-align: right;">
+        <br>
+        2 / 42
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/open_close.test.js.html">. / test/open_close.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 93.61%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         93.61 %<br>
+        176 / 188
+    </td>
+    <td style="text-align: right;">
+        <br>
+        12 / 188
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/other_objects.test.js.html">. / test/other_objects.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 91.11%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         91.11 %<br>
+        82 / 90
+    </td>
+    <td style="text-align: right;">
+        <br>
+        8 / 90
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/parallel_insert.test.js.html">. / test/parallel_insert.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 100.00%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         100.00 %<br>
+        45 / 45
+    </td>
+    <td style="text-align: right;">
+        <br>
+        0 / 45
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/prepare.test.js.html">. / test/prepare.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 94.85%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         94.85 %<br>
+        406 / 428
+    </td>
+    <td style="text-align: right;">
+        <br>
+        22 / 428
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/profile.test.js.html">. / test/profile.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 89.65%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         89.65 %<br>
+        52 / 58
+    </td>
+    <td style="text-align: right;">
+        <br>
+        6 / 58
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/rerun.test.js.html">. / test/rerun.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 94.11%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         94.11 %<br>
+        48 / 51
+    </td>
+    <td style="text-align: right;">
+        <br>
+        3 / 51
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/scheduling.test.js.html">. / test/scheduling.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 91.11%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         91.11 %<br>
+        41 / 45
+    </td>
+    <td style="text-align: right;">
+        <br>
+        4 / 45
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/serialization.test.js.html">. / test/serialization.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 95.23%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         95.23 %<br>
+        100 / 105
+    </td>
+    <td style="text-align: right;">
+        <br>
+        5 / 105
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/support/createdb.js.html">. / test/support/createdb.js</a><br>
+        <div class="percentbar">
+            <div style="width: 89.58%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         89.58 %<br>
+        43 / 48
+    </td>
+    <td style="text-align: right;">
+        <br>
+        5 / 48
+    </td>
+    </tr>
+<tr>
+    <td class="coverageMedium">
+            <a href="test/support/helper.js.html">. / test/support/helper.js</a><br>
+        <div class="percentbar">
+            <div style="width: 72.97%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         72.97 %<br>
+        27 / 37
+    </td>
+    <td style="text-align: right;">
+        <br>
+        10 / 37
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/trace.test.js.html">. / test/trace.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 80.88%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         80.88 %<br>
+        55 / 68
+    </td>
+    <td style="text-align: right;">
+        <br>
+        13 / 68
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/unicode.test.js.html">. / test/unicode.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 98.26%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         98.26 %<br>
+        113 / 115
+    </td>
+    <td style="text-align: right;">
+        <br>
+        2 / 115
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/upsert.test.js.html">. / test/upsert.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 85.71%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         85.71 %<br>
+        24 / 28
+    </td>
+    <td style="text-align: right;">
+        <br>
+        4 / 28
+    </td>
+    </tr>
+<tr>
+    <td class="coverageHigh">
+            <a href="test/verbose.test.js.html">. / test/verbose.test.js</a><br>
+        <div class="percentbar">
+            <div style="width: 100.00%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         100.00 %<br>
+        61 / 61
+    </td>
+    <td style="text-align: right;">
+        <br>
+        0 / 61
+    </td>
+    </tr>
+</tbody>
+</table>
+</div>
+<!-- header end -->
+<div class="footer">
+    [
+    This document was created with
+    <a href="https://github.com/jslint-org/jslint">JSLint</a>
+    ]
+</div>
+</body>
+</html>

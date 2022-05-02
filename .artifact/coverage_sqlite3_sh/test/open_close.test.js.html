@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>V8 Coverage Report</title>
+<style>
+/* jslint utility2:true */
+/*csslint ignore:start*/
+* {
+box-sizing: border-box;
+    font-family: consolas, menlo, monospace;
+}
+/*csslint ignore:end*/
+
+/* css - coverage_report - general */
+body {
+    margin: 0;
+}
+.coverage pre {
+    margin: 5px 0;
+}
+.coverage table {
+    border-collapse: collapse;
+}
+.coverage td,
+.coverage th {
+    border: 1px solid #777;
+    line-height: 20px;
+    margin: 0;
+    padding: 5px 10px;
+}
+.coverage td span {
+    display: inline-block;
+    width: 100%;
+}
+.coverage .content {
+    padding: 0 5px;
+}
+.coverage .content a {
+    text-decoration: none;
+}
+.coverage .count {
+    margin: 0 5px;
+    padding: 0 5px;
+}
+.coverage .footer,
+.coverage .header {
+    padding: 20px;
+}
+.coverage .footer {
+    text-align: center;
+}
+.coverage .percentbar {
+    height: 12px;
+    margin: 2px 0;
+    min-width: 200px;
+    position: relative;
+    width: 100%;
+}
+.coverage .percentbar div {
+    height: 100%;
+    position: absolute;
+}
+.coverage .title {
+    font-size: large;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* css - coverage_report - color */
+.coverage td,
+.coverage th {
+    background: #fff;
+}
+.coverage .count,
+.coverage .coverageHigh {
+    background: #9d9;
+}
+.coverage .count {
+    color: #666;
+}
+.coverage .coverageIgnore {
+    background: #ccc;
+}
+.coverage .coverageLow,
+.coverage .uncovered {
+    background: #ebb;
+}
+.coverage .coverageMedium {
+    background: #fd7;
+}
+.coverage .footer,
+.coverage .header,
+.coverage .lineno {
+    background: #ddd;
+}
+.coverage .percentbar {
+    background: #999;
+}
+.coverage .percentbar div {
+    background: #666;
+}
+
+/* css - coverage_report - important */
+.coverage pre:hover span,
+.coverage tr:hover td {
+    background: #7d7;
+}
+.coverage pre:hover span.uncovered,
+.coverage tr:hover td.coverageLow {
+    background: #f99;
+}
+</style>
+</head>
+<body class="coverage">
+<!-- header start -->
+<div class="header">
+<div class="title">V8 Coverage Report</div>
+<table>
+<thead>
+    <tr>
+    <th>Files covered</th>
+    <th>Lines</th>
+    <th>Remaining</th>
+    </tr>
+</thead>
+<tbody>
+<tr>
+    <td class="coverageHigh">
+            <a href="../index.html">. / </a>test/open_close.test.js<br>
+        <div class="percentbar">
+            <div style="width: 93.61%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         93.61 %<br>
+        176 / 188
+    </td>
+    <td style="text-align: right;">
+        <br>
+        12 / 188
+    </td>
+    </tr>
+</tbody>
+</table>
+</div>
+<!-- header end -->
+<!-- content start -->
+<div class="content">
+<pre><span class="lineno"><a href="#line_1" id="line_1">    1.</a></span><span class="count                ">      1</span><span>var sqlite3 = require('..');</span></pre>
+<pre><span class="lineno"><a href="#line_2" id="line_2">    2.</a></span><span class="count                ">      1</span><span>var assert = require('assert');</span></pre>
+<pre><span class="lineno"><a href="#line_3" id="line_3">    3.</a></span><span class="count                ">      1</span><span>var fs = require('fs');</span></pre>
+<pre><span class="lineno"><a href="#line_4" id="line_4">    4.</a></span><span class="count                ">      1</span><span>var helper = require('./support/helper');</span></pre>
+<pre><span class="lineno"><a href="#line_5" id="line_5">    5.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_6" id="line_6">    6.</a></span><span class="count                ">      1</span><span>describe('open/close', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_7" id="line_7">    7.</a></span><span class="count                ">      1</span><span>    before(function() {</span></pre>
+<pre><span class="lineno"><a href="#line_8" id="line_8">    8.</a></span><span class="count                ">      1</span><span>        helper.ensureExists('test/tmp');</span></pre>
+<pre><span class="lineno"><a href="#line_9" id="line_9">    9.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_10" id="line_10">   10.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_11" id="line_11">   11.</a></span><span class="count                ">      1</span><span>    describe('open and close non-existant database', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_12" id="line_12">   12.</a></span><span class="count                ">      1</span><span>        before(function() {</span></pre>
+<pre><span class="lineno"><a href="#line_13" id="line_13">   13.</a></span><span class="count                ">      1</span><span>            helper.deleteFile('test/tmp/test_create.db');</span></pre>
+<pre><span class="lineno"><a href="#line_14" id="line_14">   14.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_15" id="line_15">   15.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_16" id="line_16">   16.</a></span><span class="count                ">      1</span><span>        var db;</span></pre>
+<pre><span class="lineno"><a href="#line_17" id="line_17">   17.</a></span><span class="count                ">      1</span><span>        it('should open the database', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_18" id="line_18">   18.</a></span><span class="count                ">      1</span><span>            db = new sqlite3.Database('test/tmp/test_create.db', done);</span></pre>
+<pre><span class="lineno"><a href="#line_19" id="line_19">   19.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_20" id="line_20">   20.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_21" id="line_21">   21.</a></span><span class="count                ">      1</span><span>        it('should close the database', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_22" id="line_22">   22.</a></span><span class="count                ">      1</span><span>            db.close(done);</span></pre>
+<pre><span class="lineno"><a href="#line_23" id="line_23">   23.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_24" id="line_24">   24.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_25" id="line_25">   25.</a></span><span class="count                ">      1</span><span>        it('should have created the file', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_26" id="line_26">   26.</a></span><span class="count                ">      1</span><span>            assert.fileExists('test/tmp/test_create.db');</span></pre>
+<pre><span class="lineno"><a href="#line_27" id="line_27">   27.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_28" id="line_28">   28.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_29" id="line_29">   29.</a></span><span class="count                ">      1</span><span>        after(function() {</span></pre>
+<pre><span class="lineno"><a href="#line_30" id="line_30">   30.</a></span><span class="count                ">      1</span><span>            helper.deleteFile('test/tmp/test_create.db');</span></pre>
+<pre><span class="lineno"><a href="#line_31" id="line_31">   31.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_32" id="line_32">   32.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_33" id="line_33">   33.</a></span><span class="count                ">      1</span><span>    </span></pre>
+<pre><span class="lineno"><a href="#line_34" id="line_34">   34.</a></span><span class="count                ">      1</span><span>    describe('open and close non-existant shared database', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_35" id="line_35">   35.</a></span><span class="count                ">      1</span><span>        before(function() {</span></pre>
+<pre><span class="lineno"><a href="#line_36" id="line_36">   36.</a></span><span class="count                ">      1</span><span>            helper.deleteFile('test/tmp/test_create_shared.db');</span></pre>
+<pre><span class="lineno"><a href="#line_37" id="line_37">   37.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_38" id="line_38">   38.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_39" id="line_39">   39.</a></span><span class="count                ">      1</span><span>        var db;</span></pre>
+<pre><span class="lineno"><a href="#line_40" id="line_40">   40.</a></span><span class="count                ">      1</span><span>        it('should open the database', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_41" id="line_41">   41.</a></span><span class="count                ">      1</span><span>            db = new sqlite3.Database('file:./test/tmp/test_create_shared.db', sqlite3.OPEN_URI | sqlite3.OPEN_SHAREDCACHE | sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, done);</span></pre>
+<pre><span class="lineno"><a href="#line_42" id="line_42">   42.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_43" id="line_43">   43.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_44" id="line_44">   44.</a></span><span class="count                ">      1</span><span>        it('should close the database', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_45" id="line_45">   45.</a></span><span class="count                ">      1</span><span>            db.close(done);</span></pre>
+<pre><span class="lineno"><a href="#line_46" id="line_46">   46.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_47" id="line_47">   47.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_48" id="line_48">   48.</a></span><span class="count                ">      1</span><span>        it('should have created the file', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_49" id="line_49">   49.</a></span><span class="count                ">      1</span><span>            assert.fileExists('test/tmp/test_create_shared.db');</span></pre>
+<pre><span class="lineno"><a href="#line_50" id="line_50">   50.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_51" id="line_51">   51.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_52" id="line_52">   52.</a></span><span class="count                ">      1</span><span>        after(function() {</span></pre>
+<pre><span class="lineno"><a href="#line_53" id="line_53">   53.</a></span><span class="count                ">      1</span><span>            helper.deleteFile('test/tmp/test_create_shared.db');</span></pre>
+<pre><span class="lineno"><a href="#line_54" id="line_54">   54.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_55" id="line_55">   55.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_56" id="line_56">   56.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_57" id="line_57">   57.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_58" id="line_58">   58.</a></span><span class="count                uncovered">     -0</span><span>    (sqlite3.VERSION_NUMBER &lt; 3008000 </span><span class="uncovered">? describe.skip</span><span> : describe)('open and close shared memory database', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_59" id="line_59">   59.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_60" id="line_60">   60.</a></span><span class="count                ">      1</span><span>        var db1;</span></pre>
+<pre><span class="lineno"><a href="#line_61" id="line_61">   61.</a></span><span class="count                ">      1</span><span>        var db2;</span></pre>
+<pre><span class="lineno"><a href="#line_62" id="line_62">   62.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_63" id="line_63">   63.</a></span><span class="count                ">      1</span><span>        it('should open the first database', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_64" id="line_64">   64.</a></span><span class="count                ">      1</span><span>            db1 = new sqlite3.Database('file:./test/tmp/test_memory.db?mode=memory', sqlite3.OPEN_URI | sqlite3.OPEN_SHAREDCACHE | sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, done);</span></pre>
+<pre><span class="lineno"><a href="#line_65" id="line_65">   65.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_66" id="line_66">   66.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_67" id="line_67">   67.</a></span><span class="count                ">      1</span><span>        it('should open the second database', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_68" id="line_68">   68.</a></span><span class="count                ">      1</span><span>            db2 = new sqlite3.Database('file:./test/tmp/test_memory.db?mode=memory', sqlite3.OPEN_URI | sqlite3.OPEN_SHAREDCACHE | sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, done);</span></pre>
+<pre><span class="lineno"><a href="#line_69" id="line_69">   69.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_70" id="line_70">   70.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_71" id="line_71">   71.</a></span><span class="count                ">      1</span><span>        it('first database should set the user_version', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_72" id="line_72">   72.</a></span><span class="count                ">      1</span><span>            db1.exec('PRAGMA user_version=42', done);</span></pre>
+<pre><span class="lineno"><a href="#line_73" id="line_73">   73.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_74" id="line_74">   74.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_75" id="line_75">   75.</a></span><span class="count                ">      1</span><span>        it('second database should get the user_version', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_76" id="line_76">   76.</a></span><span class="count                ">      1</span><span>            db2.get('PRAGMA user_version', function(err, row) {</span></pre>
+<pre><span class="lineno"><a href="#line_77" id="line_77">   77.</a></span><span class="count                uncovered">     -0</span><span>                if (err) </span><span class="uncovered">throw err;</span></pre>
+<pre><span class="lineno"><a href="#line_78" id="line_78">   78.</a></span><span class="count                ">      1</span><span>                assert.equal(row.user_version, 42);</span></pre>
+<pre><span class="lineno"><a href="#line_79" id="line_79">   79.</a></span><span class="count                ">      1</span><span>                done();</span></pre>
+<pre><span class="lineno"><a href="#line_80" id="line_80">   80.</a></span><span class="count                ">      1</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_81" id="line_81">   81.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_82" id="line_82">   82.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_83" id="line_83">   83.</a></span><span class="count                ">      1</span><span>        it('should close the first database', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_84" id="line_84">   84.</a></span><span class="count                ">      1</span><span>            db1.close(done);</span></pre>
+<pre><span class="lineno"><a href="#line_85" id="line_85">   85.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_86" id="line_86">   86.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_87" id="line_87">   87.</a></span><span class="count                ">      1</span><span>        it('should close the second database', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_88" id="line_88">   88.</a></span><span class="count                ">      1</span><span>            db2.close(done);</span></pre>
+<pre><span class="lineno"><a href="#line_89" id="line_89">   89.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_90" id="line_90">   90.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_91" id="line_91">   91.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_92" id="line_92">   92.</a></span><span class="count                ">      1</span><span>    it('should not be unable to open an inaccessible database', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_93" id="line_93">   93.</a></span><span class="count                ">      1</span><span>        // NOTE: test assumes that the user is not allowed to create new files</span></pre>
+<pre><span class="lineno"><a href="#line_94" id="line_94">   94.</a></span><span class="count                ">      1</span><span>        // in /usr/bin.</span></pre>
+<pre><span class="lineno"><a href="#line_95" id="line_95">   95.</a></span><span class="count                ">      1</span><span>        var db = new sqlite3.Database('/test/tmp/directory-does-not-exist/test.db', function(err) {</span></pre>
+<pre><span class="lineno"><a href="#line_96" id="line_96">   96.</a></span><span class="count                ">      1</span><span>            if (err &amp;&amp; err.errno === sqlite3.CANTOPEN) {</span></pre>
+<pre><span class="lineno"><a href="#line_97" id="line_97">   97.</a></span><span class="count                ">      1</span><span>                done();</span></pre>
+<pre><span class="lineno"><a href="#line_98" id="line_98">   98.</a></span><span class="count                uncovered">     -0</span><span>            }</span><span class="uncovered"> else if (err) {</span></pre>
+<pre><span class="lineno"><a href="#line_99" id="line_99">   99.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">                done(err);</span></pre>
+<pre><span class="lineno"><a href="#line_100" id="line_100">  100.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">            } else {</span></pre>
+<pre><span class="lineno"><a href="#line_101" id="line_101">  101.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">                done('Opened database that should be inaccessible');</span></pre>
+<pre><span class="lineno"><a href="#line_102" id="line_102">  102.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">            }</span></pre>
+<pre><span class="lineno"><a href="#line_103" id="line_103">  103.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_104" id="line_104">  104.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_105" id="line_105">  105.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_106" id="line_106">  106.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_107" id="line_107">  107.</a></span><span class="count                ">      1</span><span>    describe('creating database without create flag', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_108" id="line_108">  108.</a></span><span class="count                ">      1</span><span>        before(function() {</span></pre>
+<pre><span class="lineno"><a href="#line_109" id="line_109">  109.</a></span><span class="count                ">      1</span><span>            helper.deleteFile('test/tmp/test_readonly.db');</span></pre>
+<pre><span class="lineno"><a href="#line_110" id="line_110">  110.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_111" id="line_111">  111.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_112" id="line_112">  112.</a></span><span class="count                ">      1</span><span>        it('should fail to open the database', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_113" id="line_113">  113.</a></span><span class="count                ">      1</span><span>            new sqlite3.Database('tmp/test_readonly.db', sqlite3.OPEN_READONLY, function(err) {</span></pre>
+<pre><span class="lineno"><a href="#line_114" id="line_114">  114.</a></span><span class="count                ">      1</span><span>                if (err &amp;&amp; err.errno === sqlite3.CANTOPEN) {</span></pre>
+<pre><span class="lineno"><a href="#line_115" id="line_115">  115.</a></span><span class="count                ">      1</span><span>                    done();</span></pre>
+<pre><span class="lineno"><a href="#line_116" id="line_116">  116.</a></span><span class="count                uncovered">     -0</span><span>                }</span><span class="uncovered"> else if (err) {</span></pre>
+<pre><span class="lineno"><a href="#line_117" id="line_117">  117.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">                    done(err);</span></pre>
+<pre><span class="lineno"><a href="#line_118" id="line_118">  118.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">                } else {</span></pre>
+<pre><span class="lineno"><a href="#line_119" id="line_119">  119.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">                    done('Created database without create flag');</span></pre>
+<pre><span class="lineno"><a href="#line_120" id="line_120">  120.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">                }</span></pre>
+<pre><span class="lineno"><a href="#line_121" id="line_121">  121.</a></span><span class="count                ">      1</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_122" id="line_122">  122.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_123" id="line_123">  123.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_124" id="line_124">  124.</a></span><span class="count                ">      1</span><span>        it('should not have created the file', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_125" id="line_125">  125.</a></span><span class="count                ">      1</span><span>            assert.fileDoesNotExist('test/tmp/test_readonly.db');</span></pre>
+<pre><span class="lineno"><a href="#line_126" id="line_126">  126.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_127" id="line_127">  127.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_128" id="line_128">  128.</a></span><span class="count                ">      1</span><span>        after(function() {</span></pre>
+<pre><span class="lineno"><a href="#line_129" id="line_129">  129.</a></span><span class="count                ">      1</span><span>            helper.deleteFile('test/tmp/test_readonly.db');</span></pre>
+<pre><span class="lineno"><a href="#line_130" id="line_130">  130.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_131" id="line_131">  131.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_132" id="line_132">  132.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_133" id="line_133">  133.</a></span><span class="count                ">      1</span><span>    describe('open and close memory database queuing', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_134" id="line_134">  134.</a></span><span class="count                ">      1</span><span>        var db;</span></pre>
+<pre><span class="lineno"><a href="#line_135" id="line_135">  135.</a></span><span class="count                ">      1</span><span>        it('should open the database', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_136" id="line_136">  136.</a></span><span class="count                ">      1</span><span>            db = new sqlite3.Database(':memory:', done);</span></pre>
+<pre><span class="lineno"><a href="#line_137" id="line_137">  137.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_138" id="line_138">  138.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_139" id="line_139">  139.</a></span><span class="count                ">      1</span><span>        it('should close the database', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_140" id="line_140">  140.</a></span><span class="count                ">      1</span><span>            db.close(done);</span></pre>
+<pre><span class="lineno"><a href="#line_141" id="line_141">  141.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_142" id="line_142">  142.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_143" id="line_143">  143.</a></span><span class="count                ">      1</span><span>        it('shouldn\'t close the database again', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_144" id="line_144">  144.</a></span><span class="count                ">      1</span><span>            db.close(function(err) {</span></pre>
+<pre><span class="lineno"><a href="#line_145" id="line_145">  145.</a></span><span class="count                ">      1</span><span>                assert.ok(err, 'No error object received on second close');</span></pre>
+<pre><span class="lineno"><a href="#line_146" id="line_146">  146.</a></span><span class="count                ">      1</span><span>                assert.ok(err.errno === sqlite3.MISUSE);</span></pre>
+<pre><span class="lineno"><a href="#line_147" id="line_147">  147.</a></span><span class="count                ">      1</span><span>                done();</span></pre>
+<pre><span class="lineno"><a href="#line_148" id="line_148">  148.</a></span><span class="count                ">      1</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_149" id="line_149">  149.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_150" id="line_150">  150.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_151" id="line_151">  151.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_152" id="line_152">  152.</a></span><span class="count                ">      1</span><span>    describe('closing with unfinalized statements', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_153" id="line_153">  153.</a></span><span class="count                ">      1</span><span>        var completed = false;</span></pre>
+<pre><span class="lineno"><a href="#line_154" id="line_154">  154.</a></span><span class="count                ">      1</span><span>        var completedSecond = false;</span></pre>
+<pre><span class="lineno"><a href="#line_155" id="line_155">  155.</a></span><span class="count                ">      1</span><span>        var closed = false;</span></pre>
+<pre><span class="lineno"><a href="#line_156" id="line_156">  156.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_157" id="line_157">  157.</a></span><span class="count                ">      1</span><span>        var db;</span></pre>
+<pre><span class="lineno"><a href="#line_158" id="line_158">  158.</a></span><span class="count                ">      1</span><span>        before(function() {</span></pre>
+<pre><span class="lineno"><a href="#line_159" id="line_159">  159.</a></span><span class="count                ">      1</span><span>            db = new sqlite3.Database(':memory:', done);</span></pre>
+<pre><span class="lineno"><a href="#line_160" id="line_160">  160.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_161" id="line_161">  161.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_162" id="line_162">  162.</a></span><span class="count                ">      1</span><span>        it('should create a table', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_163" id="line_163">  163.</a></span><span class="count                ">      1</span><span>            db.run("CREATE TABLE foo (id INT, num INT)", done);</span></pre>
+<pre><span class="lineno"><a href="#line_164" id="line_164">  164.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_165" id="line_165">  165.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_166" id="line_166">  166.</a></span><span class="count                ">      1</span><span>        var stmt;</span></pre>
+<pre><span class="lineno"><a href="#line_167" id="line_167">  167.</a></span><span class="count                ">      1</span><span>        it('should prepare/run a statement', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_168" id="line_168">  168.</a></span><span class="count                ">      1</span><span>            stmt = db.prepare('INSERT INTO foo VALUES (?, ?)');</span></pre>
+<pre><span class="lineno"><a href="#line_169" id="line_169">  169.</a></span><span class="count                ">      1</span><span>            stmt.run(1, 2, done);</span></pre>
+<pre><span class="lineno"><a href="#line_170" id="line_170">  170.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_171" id="line_171">  171.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_172" id="line_172">  172.</a></span><span class="count                ">      1</span><span>        it('should fail to close the database', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_173" id="line_173">  173.</a></span><span class="count                ">      1</span><span>            db.close(function(err) {</span></pre>
+<pre><span class="lineno"><a href="#line_174" id="line_174">  174.</a></span><span class="count                ">      1</span><span>                assert.ok(err.message,</span></pre>
+<pre><span class="lineno"><a href="#line_175" id="line_175">  175.</a></span><span class="count                ">      1</span><span>                    "SQLITE_BUSY: unable to close due to unfinalised statements");</span></pre>
+<pre><span class="lineno"><a href="#line_176" id="line_176">  176.</a></span><span class="count                ">      1</span><span>                done();</span></pre>
+<pre><span class="lineno"><a href="#line_177" id="line_177">  177.</a></span><span class="count                ">      1</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_178" id="line_178">  178.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_179" id="line_179">  179.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_180" id="line_180">  180.</a></span><span class="count                ">      1</span><span>        it('should succeed to close the database after finalizing', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_181" id="line_181">  181.</a></span><span class="count                ">      1</span><span>            stmt.run(3, 4, function() {</span></pre>
+<pre><span class="lineno"><a href="#line_182" id="line_182">  182.</a></span><span class="count                ">      1</span><span>                stmt.finalize();</span></pre>
+<pre><span class="lineno"><a href="#line_183" id="line_183">  183.</a></span><span class="count                ">      1</span><span>                db.close(done);</span></pre>
+<pre><span class="lineno"><a href="#line_184" id="line_184">  184.</a></span><span class="count                ">      1</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_185" id="line_185">  185.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_186" id="line_186">  186.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_187" id="line_187">  187.</a></span><span class="count                ">      1</span><span>});</span></pre>
+<pre><span class="lineno"><a href="#line_188" id="line_188">  188.</a></span><span class="count                ">      1</span><span></span></pre>
+</div>
+<!-- content end -->
+<div class="footer">
+    [
+    This document was created with
+    <a href="https://github.com/jslint-org/jslint">JSLint</a>
+    ]
+</div>
+</body>
+</html>

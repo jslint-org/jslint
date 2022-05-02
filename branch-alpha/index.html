@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+        name="description"
+        content="JSLint, The JavaScript Code Quality and Coverage Tool.
+        This file allows JSLint to be run from a web browser.
+        It can accept a source program and analyze it
+        without sending it over the network."
+    >
+    <meta name="author" content="Douglas Crockford">
+    <link rel="icon" type="image/png" href="asset_image_logo_512.svg">
+    <title>JSLint: The JavaScript Code Quality and Coverage Tool</title>
+    <script defer src="./asset_codemirror_rollup.js?cc=york"></script>
+    <script type="module" src="./jslint.mjs?cc=york?window_jslint=1"></script>
+    <script defer src="./jslint_wrapper_codemirror.js?cc=york"></script>
+<style>
+/*jslint-disable*/
+/*
+shRawLibFetch
+{
+    "fetchList": [
+        {
+            "comment": true,
+            "url": "https://github.com/codemirror/CodeMirror/blob/5.65.3/LICENSE"
+        },
+        {
+            "url": "https://github.com/codemirror/CodeMirror/blob/5.65.3/lib/codemirror.css"
+        },
+        {
+            "url": "https://github.com/codemirror/CodeMirror/blob/5.65.3/addon/lint/lint.css"
+        }
+    ],
+    "replaceList": []
+}
+*/
+
+
+/*
+repo https://github.com/codemirror/CodeMirror/tree/5.65.3
+committed 2022-04-20T09:49:25Z
+*/
+
+
+/*
+file https://github.com/codemirror/CodeMirror/blob/5.65.3/LICENSE
+*/
+/*
+MIT License
+
+Copyright (C) 2017 by Marijn Haverbeke <marijnh@gmail.com> and others
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+
+
+/*
+file https://github.com/codemirror/CodeMirror/blob/5.65.3/lib/codemirror.css
+*/
+/* BASICS */
+
+.CodeMirror {
+  /* Set height, width, borders, and global font properties here */
+  font-family: monospace;
+  height: 300px;
+  color: black;
+  direction: ltr;
+}
+
+/* PADDING */
+
+.CodeMirror-lines {
+  padding: 4px 0; /* Vertical padding around content */
+}
+.CodeMirror pre.CodeMirror-line,
+.CodeMirror pre.CodeMirror-line-like {
+  padding: 0 4px; /* Horizontal padding of content */
+}
+
+.CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {
+  background-color: white; /* The little square between H and V scrollbars */
+}
+
+/* GUTTER */
+
+.CodeMirror-gutters {
+  border-right: 1px solid #ddd;
+  background-color: #f7f7f7;
+  white-space: nowrap;
+}
+.CodeMirror-linenumbers {}
+.CodeMirror-linenumber {
+  padding: 0 3px 0 5px;
+  min-width: 20px;
+  text-align: right;
+  color: #999;
+  white-space: nowrap;
+}
+
+.CodeMirror-guttermarker { color: black; }
+.CodeMirror-guttermarker-subtle { color: #999; }
+
+/* CURSOR */
+
+.CodeMirror-cursor {
+  border-left: 1px solid black;
+  border-right: none;
+  width: 0;
+}
+/* Shown when moving in bi-directional text */
+.CodeMirror div.CodeMirror-secondarycursor {
+  border-left: 1px solid silver;
+}
+.cm-fat-cursor .CodeMirror-cursor {
+  width: auto;
+  border: 0 !important;
+  background: #7e7;
+}
+.cm-fat-cursor div.CodeMirror-cursors {
+  z-index: 1;
+}
+.cm-fat-cursor .CodeMirror-line::selection,
+.cm-fat-cursor .CodeMirror-line > span::selection,
+.cm-fat-cursor .CodeMirror-line > span > span::selection { background: transparent; }
+.cm-fat-cursor .CodeMirror-line::-moz-selection,
+.cm-fat-cursor .CodeMirror-line > span::-moz-selection,
+.cm-fat-cursor .CodeMirror-line > span > span::-moz-selection { background: transparent; }
+.cm-fat-cursor { caret-color: transparent; }
+@-moz-keyframes blink {
+  0% {}
+  50% { background-color: transparent; }
+  100% {}
+}
+@-webkit-keyframes blink {
+  0% {}
+  50% { background-color: transparent; }
+  100% {}
+}
+@keyframes blink {
+  0% {}
+  50% { background-color: transparent; }
+  100% {}
+}
+
+/* Can style cursor different in overwrite (non-insert) mode */
+.CodeMirror-overwrite .CodeMirror-cursor {}
+
+.cm-tab { display: inline-block; text-decoration: inherit; }
+
+.CodeMirror-rulers {
+  position: absolute;
+  left: 0; right: 0; top: -50px; bottom: 0;
+  overflow: hidden;
+}
+.CodeMirror-ruler {
+  border-left: 1px solid #ccc;
+  top: 0; bottom: 0;
+  position: absolute;
+}
+
+/* DEFAULT THEME */
+
+.cm-s-default .cm-header {color: blue;}
+.cm-s-default .cm-quote {color: #090;}
+.cm-negative {color: #d44;}
+.cm-positive {color: #292;}
+.cm-header, .cm-strong {font-weight: bold;}
+.cm-em {font-style: italic;}
+.cm-link {text-decoration: underline;}
+.cm-strikethrough {text-decoration: line-through;}
+
+.cm-s-default .cm-keyword {color: #708;}
+.cm-s-default .cm-atom {color: #219;}
+.cm-s-default .cm-number {color: #164;}
+.cm-s-default .cm-def {color: #00f;}
+.cm-s-default .cm-variable,
+.cm-s-default .cm-punctuation,
+.cm-s-default .cm-property,
+.cm-s-default .cm-operator {}
+.cm-s-default .cm-variable-2 {color: #05a;}
+.cm-s-default .cm-variable-3, .cm-s-default .cm-type {color: #085;}
+.cm-s-default .cm-comment {color: #a50;}
+.cm-s-default .cm-string {color: #a11;}
+.cm-s-default .cm-string-2 {color: #f50;}
+.cm-s-default .cm-meta {color: #555;}
+.cm-s-default .cm-qualifier {color: #555;}
+.cm-s-default .cm-builtin {color: #30a;}
+.cm-s-default .cm-bracket {color: #997;}
+.cm-s-default .cm-tag {color: #170;}
+.cm-s-default .cm-attribute {color: #00c;}
+.cm-s-default .cm-hr {color: #999;}
+.cm-s-default .cm-link {color: #00c;}
+
+.cm-s-default .cm-error {color: #f00;}
+.cm-invalidchar {color: #f00;}
+
+.CodeMirror-composing { border-bottom: 2px solid; }
+
+/* Default styles for common addons */
+
+div.CodeMirror span.CodeMirror-matchingbracket {color: #0b0;}
+div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #a22;}
+.CodeMirror-matchingtag { background: rgba(255, 150, 0, .3); }
+.CodeMirror-activeline-background {background: #e8f2ff;}
+
+/* STOP */
+
+/* The rest of this file contains styles related to the mechanics of
+   the editor. You probably shouldn't touch them. */
+
+.CodeMirror {
+  position: relative;
+  overflow: hidden;
+  background: white;
+}
+
+.CodeMirror-scroll {
+  overflow: scroll !important; /* Things will break if this is overridden */
+  /* 50px is the magic margin used to hide the element's real scrollbars */
+  /* See overflow: hidden in .CodeMirror */
+  margin-bottom: -50px; margin-right: -50px;
+  padding-bottom: 50px;
+  height: 100%;
+  outline: none; /* Prevent dragging from highlighting the element */
+  position: relative;
+  z-index: 0;
+}
+.CodeMirror-sizer {
+  position: relative;
+  border-right: 50px solid transparent;
+}
+
+/* The fake, visible scrollbars. Used to force redraw during scrolling
+   before actual scrolling happens, thus preventing shaking and
+   flickering artifacts. */
+.CodeMirror-vscrollbar, .CodeMirror-hscrollbar, .CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {
+  position: absolute;
+  z-index: 6;
+  display: none;
+  outline: none;
+}
+.CodeMirror-vscrollbar {
+  right: 0; top: 0;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+.CodeMirror-hscrollbar {
+  bottom: 0; left: 0;
+  overflow-y: hidden;
+  overflow-x: scroll;
+}
+.CodeMirror-scrollbar-filler {
+  right: 0; bottom: 0;
+}
+.CodeMirror-gutter-filler {
+  left: 0; bottom: 0;
+}
+
+.CodeMirror-gutters {
+  position: absolute; left: 0; top: 0;
+  min-height: 100%;
+  z-index: 3;
+}
+.CodeMirror-gutter {
+  white-space: normal;
+  height: 100%;
+  display: inline-block;
+  vertical-align: top;
+  margin-bottom: -50px;
+}
+.CodeMirror-gutter-wrapper {
+  position: absolute;
+  z-index: 4;
+  background: none !important;
+  border: none !important;
+}
+.CodeMirror-gutter-background {
+  position: absolute;
+  top: 0; bottom: 0;
+  z-index: 4;
+}
+.CodeMirror-gutter-elt {
+  position: absolute;
+  cursor: default;
+  z-index: 4;
+}
+.CodeMirror-gutter-wrapper ::selection { background-color: transparent }
+.CodeMirror-gutter-wrapper ::-moz-selection { background-color: transparent }
+
+.CodeMirror-lines {
+  cursor: text;
+  min-height: 1px; /* prevents collapsing before first draw */
+}
+.CodeMirror pre.CodeMirror-line,
+.CodeMirror pre.CodeMirror-line-like {
+  /* Reset some styles that the rest of the page might have set */
+  -moz-border-radius: 0; -webkit-border-radius: 0; border-radius: 0;
+  border-width: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  margin: 0;
+  white-space: pre;
+  word-wrap: normal;
+  line-height: inherit;
+  color: inherit;
+  z-index: 2;
+  position: relative;
+  overflow: visible;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-variant-ligatures: contextual;
+  font-variant-ligatures: contextual;
+}
+.CodeMirror-wrap pre.CodeMirror-line,
+.CodeMirror-wrap pre.CodeMirror-line-like {
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  word-break: normal;
+}
+
+.CodeMirror-linebackground {
+  position: absolute;
+  left: 0; right: 0; top: 0; bottom: 0;
+  z-index: 0;
+}
+
+.CodeMirror-linewidget {
+  position: relative;
+  z-index: 2;
+  padding: 0.1px; /* Force widget margins to stay inside of the container */
+}
+
+.CodeMirror-widget {}
+
+.CodeMirror-rtl pre { direction: rtl; }
+
+.CodeMirror-code {
+  outline: none;
+}
+
+/* Force content-box sizing for the elements where we expect it */
+.CodeMirror-scroll,
+.CodeMirror-sizer,
+.CodeMirror-gutter,
+.CodeMirror-gutters,
+.CodeMirror-linenumber {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+
+.CodeMirror-measure {
+  position: absolute;
+  width: 100%;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+.CodeMirror-cursor {
+  position: absolute;
+  pointer-events: none;
+}
+.CodeMirror-measure pre { position: static; }
+
+div.CodeMirror-cursors {
+  visibility: hidden;
+  position: relative;
+  z-index: 3;
+}
+div.CodeMirror-dragcursors {
+  visibility: visible;
+}
+
+.CodeMirror-focused div.CodeMirror-cursors {
+  visibility: visible;
+}
+
+.CodeMirror-selected { background: #d9d9d9; }
+.CodeMirror-focused .CodeMirror-selected { background: #d7d4f0; }
+.CodeMirror-crosshair { cursor: crosshair; }
+.CodeMirror-line::selection, .CodeMirror-line > span::selection, .CodeMirror-line > span > span::selection { background: #d7d4f0; }
+.CodeMirror-line::-moz-selection, .CodeMirror-line > span::-moz-selection, .CodeMirror-line > span > span::-moz-selection { background: #d7d4f0; }
+
+.cm-searching {
+  background-color: #ffa;
+  background-color: rgba(255, 255, 0, .4);
+}
+
+/* Used to force a border model for a node */
+.cm-force-border { padding-right: .1px; }
+
+@media print {
+  /* Hide the cursor when printing */
+  .CodeMirror div.CodeMirror-cursors {
+    visibility: hidden;
+  }
+}
+
+/* See issue #2901 */
+.cm-tab-wrap-hack:after { content: ''; }
+
+/* Help users use markselection to safely style text background */
+span.CodeMirror-selectedtext { background: none; }
+
+
+/*
+file https://github.com/codemirror/CodeMirror/blob/5.65.3/addon/lint/lint.css
+*/
+/* The lint marker gutter */
+.CodeMirror-lint-markers {
+  width: 16px;
+}
+
+.CodeMirror-lint-tooltip {
+  background-color: #ffd;
+  border: 1px solid black;
+  border-radius: 4px 4px 4px 4px;
+  color: black;
+  font-family: monospace;
+  font-size: 10pt;
+  overflow: hidden;
+  padding: 2px 5px;
+  position: fixed;
+  white-space: pre;
+  white-space: pre-wrap;
+  z-index: 100;
+  max-width: 600px;
+  opacity: 0;
+  transition: opacity .4s;
+  -moz-transition: opacity .4s;
+  -webkit-transition: opacity .4s;
+  -o-transition: opacity .4s;
+  -ms-transition: opacity .4s;
+}
+
+.CodeMirror-lint-mark {
+  background-position: left bottom;
+  background-repeat: repeat-x;
+}
+
+.CodeMirror-lint-mark-warning {
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9sJFhQXEbhTg7YAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAAMklEQVQI12NkgIIvJ3QXMjAwdDN+OaEbysDA4MPAwNDNwMCwiOHLCd1zX07o6kBVGQEAKBANtobskNMAAAAASUVORK5CYII=");
+}
+
+.CodeMirror-lint-mark-error {
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9sJDw4cOCW1/KIAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAAHElEQVQI12NggIL/DAz/GdA5/xkY/qPKMDAwAADLZwf5rvm+LQAAAABJRU5ErkJggg==");
+}
+
+.CodeMirror-lint-marker {
+  background-position: center center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  display: inline-block;
+  height: 16px;
+  width: 16px;
+  vertical-align: middle;
+  position: relative;
+}
+
+.CodeMirror-lint-message {
+  padding-left: 18px;
+  background-position: top left;
+  background-repeat: no-repeat;
+}
+
+.CodeMirror-lint-marker-warning, .CodeMirror-lint-message-warning {
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAANlBMVEX/uwDvrwD/uwD/uwD/uwD/uwD/uwD/uwD/uwD6twD/uwAAAADurwD2tQD7uAD+ugAAAAD/uwDhmeTRAAAADHRSTlMJ8mN1EYcbmiixgACm7WbuAAAAVklEQVR42n3PUQqAIBBFUU1LLc3u/jdbOJoW1P08DA9Gba8+YWJ6gNJoNYIBzAA2chBth5kLmG9YUoG0NHAUwFXwO9LuBQL1giCQb8gC9Oro2vp5rncCIY8L8uEx5ZkAAAAASUVORK5CYII=");
+}
+
+.CodeMirror-lint-marker-error, .CodeMirror-lint-message-error {
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAHlBMVEW7AAC7AACxAAC7AAC7AAAAAAC4AAC5AAD///+7AAAUdclpAAAABnRSTlMXnORSiwCK0ZKSAAAATUlEQVR42mWPOQ7AQAgDuQLx/z8csYRmPRIFIwRGnosRrpamvkKi0FTIiMASR3hhKW+hAN6/tIWhu9PDWiTGNEkTtIOucA5Oyr9ckPgAWm0GPBog6v4AAAAASUVORK5CYII=");
+}
+
+.CodeMirror-lint-marker-multiple {
+  background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAHCAMAAADzjKfhAAAACVBMVEUAAAAAAAC/v7914kyHAAAAAXRSTlMAQObYZgAAACNJREFUeNo1ioEJAAAIwmz/H90iFFSGJgFMe3gaLZ0od+9/AQZ0ADosbYraAAAAAElFTkSuQmCC");
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  width: 100%; height: 100%;
+}
+
+.CodeMirror-lint-line-error {
+  background-color: rgba(183, 76, 81, 0.08);
+}
+
+.CodeMirror-lint-line-warning {
+  background-color: rgba(255, 211, 0, 0.1);
+}
+
+
+/*
+file none
+*/
+/*jslint-enable*/
+
+
+</style>
+<style class="JSLINT_REPORT_STYLE">
+/* jslint utility2:true */
+/*csslint box-model: false, ids:false */
+/*csslint ignore:start*/
+@font-face {
+    font-display: swap;
+    font-family: "Daley";
+    src: url(
+"data:font/woff2;base64,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\
+/7xoEqvL+2E8VOyCTuT/7j269Zy4jUtN+g4="
+    ) format("woff2");
+}
+.JSLINT_,
+.JSLINT_ address,
+.JSLINT_ button,
+.JSLINT_ cite,
+.JSLINT_ dd,
+.JSLINT_ dfn,
+.JSLINT_ dl,
+.JSLINT_ dt,
+.JSLINT_ fieldset,
+.JSLINT_ fieldset > div,
+.JSLINT_ input,
+.JSLINT_ label,
+.JSLINT_ legend,
+.JSLINT_ ol,
+.JSLINT_ samp,
+.JSLINT_ style,
+.JSLINT_ textarea,
+.JSLINT_ ul {
+    border: 0;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+/* disable text inflation algorithm used on some smartphones and tablets */
+.JSLINT_ {
+    -ms-text-size-adjust: none;
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
+}
+.JSLINT_REPORT_HTML div {
+    box-sizing: border-box;
+}
+/*csslint ignore:end*/
+
+/* css - jslint_report - font */
+.JSLINT_,
+.JSLINT_ fieldset legend,
+.JSLINT_ .center {
+    font-family: daley, sans-serif;
+    font-size: 14px;
+}
+.JSLINT_ fieldset textarea,
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS dt,
+.JSLINT_ #JSLINT_REPORT_WARNINGS samp {
+    font-size: 12px;
+}
+.JSLINT_ fieldset textarea,
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS > div {
+    font-family: monospace;
+}
+.JSLINT_ fieldset > div {
+    font-family: sans-serif;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS .level dfn {
+    font-style: normal;
+    font-weight: bold;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS .level dt {
+    font-style: italic;
+}
+.JSLINT_ #JSLINT_REPORT_TITLE {
+    font-size: 32px;
+}
+
+/* css - jslint_report - general */
+.JSLINT_ {
+    background: antiquewhite;
+}
+.JSLINT_ fieldset {
+    background: gainsboro;
+    clear: both;
+    margin: 16px 40px;
+    width: auto;
+}
+.JSLINT_ fieldset address {
+    float: right;
+}
+.JSLINT_ fieldset legend,
+.JSLINT_ .center {
+    text-align: center;
+}
+.JSLINT_ fieldset legend {
+    background: darkslategray;
+    color: white;
+    padding: 4px 0;
+    width: 100%;
+}
+.JSLINT_ fieldset textarea {
+    padding: 4px;
+    resize: none;
+    white-space: pre;
+    width: 100%;
+}
+.JSLINT_ fieldset textarea::selection {
+    background: wheat;
+}
+.JSLINT_ fieldset > div {
+    padding: 16px;
+    width: 100%;
+    word-wrap: break-word;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS .level {
+    background: cornsilk;
+    padding: 8px 16px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS .level dd {
+    line-height: 20px;
+    padding-left: 120px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS .level dfn {
+    display: block;
+    line-height: 20px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS .level dl {
+    position: relative
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS .level dt {
+    line-height: 20px;
+    position: absolute;
+    text-align: right;
+    width: 100px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS .level0 {
+    background: white;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS .level1 {
+    /* yellow */
+    background: #ffffe0;
+    margin-left: 16px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS .level2 {
+    /* green */
+    background: #e0ffe0;
+    margin-left: 32px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS .level3 {
+    /* blue */
+    background: #D0D0ff;
+    margin-left: 48px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS .level4 {
+    /* purple */
+    background: #ffe0ff;
+    margin-left: 64px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS .level5 {
+    /* red */
+    background: #ffe0e0;
+    margin-left: 80px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS .level6 {
+    /* orange */
+    background: #ffe390;
+    margin-left: 96px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS .level7 {
+    /* gray */
+    background: #e0e0e0;
+    margin-left: 112px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS .level8 {
+    margin-left: 128px;
+}
+.JSLINT_ #JSLINT_REPORT_FUNCTIONS .level9 {
+    margin-left: 144px;
+}
+.JSLINT_ #JSLINT_REPORT_PROPERTIES {
+    background: transparent;
+}
+.JSLINT_ #JSLINT_REPORT_PROPERTIES textarea {
+    background: honeydew;
+    height: 100px;
+}
+.JSLINT_ #JSLINT_REPORT_TITLE {
+    color: darkslategray;
+    padding-top: 16px;
+}
+.JSLINT_ #JSLINT_REPORT_WARNINGS cite {
+    display: block;
+    margin: 16px 0 4px 0;
+    overflow-x: hidden;
+    white-space: pre-line;
+}
+.JSLINT_ #JSLINT_REPORT_WARNINGS cite:nth-child(1) {
+    margin-top: 0;
+}
+.JSLINT_ #JSLINT_REPORT_WARNINGS samp {
+    background: lavenderblush;
+    display: block;
+    padding: 4px;
+    white-space: pre-wrap;
+}
+.JSLINT_ #JSLINT_REPORT_WARNINGS > div {
+    background: pink;
+    max-height: 400px;
+    overflow-y: auto;
+}
+.JSLINT_ #JSLINT_REPORT_WARNINGS > legend {
+/* Google Lighthouse Accessibility - Background and foreground colors do not */
+/* have a sufficient contrast ratio. */
+    /* background: indianred; */
+    background: #b44;
+}
+</style>
+<style>
+/* jslint utility2:true */
+/*csslint
+    box-model: false,
+    ids:false,
+    overqualified-elements: false
+*/
+/*csslint ignore:start*/
+@keyframes uiLoaderEllipsis1 {
+    from {
+        opacity: 0;
+    }
+    25% {
+        opacity: 1;
+    }
+}
+@keyframes uiLoaderEllipsis2 {
+    from {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+@keyframes uiLoaderEllipsis3 {
+    from {
+        opacity: 0;
+    }
+    75% {
+        opacity: 1;
+    }
+}
+.JSLINT_ .CodeMirror .cm-trailingspace,
+.JSLINT_ .CodeMirror-lint-mark-warning {
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAAXNSR0IArs4c6QAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB9sJDw4cOCW1/KIAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRoIEdJTVBXgQ4XAAAAHElEQVQI12NggIL/DAz/GdA5/xkY/qPKMDAwAADLZwf5rvm+LQAAAABJRU5ErkJggg==");
+    background-position: bottom left;
+    background-repeat: repeat-x;
+}
+/*csslint ignore:end*/
+
+/* css - website - font */
+.JSLINT_ #JSLINT_BUTTONS button,
+.JSLINT_ #JSLINT_OPTIONS .legend {
+    font-family: daley, sans-serif;
+}
+.JSLINT_ #JSLINT_SOURCE .CodeMirror,
+.JSLINT_ #JSLINT_SOURCE .CodeMirror pre {
+    font-family: monospace;
+    font-size: 12px;
+}
+.JSLINT_ #bannerFork1 div {
+    font-size: 12px;
+}
+
+/* css - website - general */
+.JSLINT_ fieldset address {
+    cursor: pointer;
+    text-decoration: underline;
+}
+.JSLINT_ .CodeMirror {
+    padding: 0;
+}
+.JSLINT_ .CodeMirror-activeline-background {
+    background: #ddd;
+}
+.JSLINT_ .CodeMirror-linenumber {
+/* Google Lighthouse Accessibility - Background and foreground colors do not */
+/* have a sufficient contrast ratio. */
+    color: darkslategray;
+}
+.JSLINT_ .CodeMirror-lint-marker {
+    background-position: 1px -1px;
+}
+.JSLINT_ .CodeMirror-overwrite .CodeMirror-cursor {
+    background: #333;
+    border-left: #777;
+    opacity: 0.5;
+    width: auto;
+}
+.JSLINT_ .CodeMirror-selected {
+    background: wheat;
+}
+.JSLINT_ .skip-link {
+    background: darkslategray;
+    color: white;
+    left: 0;
+    opacity: 0.75;
+    padding: 4px;
+    position: absolute;
+    top: -40px;
+}
+.JSLINT_ .skip-link:focus {
+    top: 0;
+}
+.JSLINT_ .uiLoaderEllipsis span {
+    animation: uiLoaderEllipsis1 1s infinite steps(1);
+}
+.JSLINT_ .uiLoaderEllipsis span:first-child + span {
+    animation-name: uiLoaderEllipsis2;
+}
+.JSLINT_ .uiLoaderEllipsis span:first-child + span + span {
+    animation-name: uiLoaderEllipsis3;
+}
+.JSLINT_ #JSLINT_BUTTONS,
+.JSLINT_ #JSLINT_BUTTONS button {
+    text-align: center;
+}
+.JSLINT_ #JSLINT_BUTTONS button {
+    background: darkslategray;
+    color: white;
+    cursor: pointer;
+    margin: 16px 16px 0 16px;
+    padding: 4px 16px;
+}
+.JSLINT_ #JSLINT_GLOBALS {
+    height: 40px;
+    white-space: normal;
+}
+.JSLINT_ #JSLINT_INPUT > div {
+    margin: 16px 40px;
+    width: auto;
+}
+.JSLINT_ #JSLINT_INPUT > #JSLINT_BUTTONS {
+    margin-top: -16px;
+}
+.JSLINT_ #JSLINT_OPTIONS div[title],
+.JSLINT_ #JSLINT_OPTIONS div[title] input,
+.JSLINT_ #JSLINT_OPTIONS div[title] label {
+    cursor: pointer;
+    user-select: none;
+}
+.JSLINT_ #JSLINT_OPTIONS div[title] input {
+    margin: 0 4px 1px 0;
+    vertical-align: middle;
+    zoom: 1.1;
+}
+.JSLINT_ #JSLINT_OPTIONS label {
+    padding: 4px;
+}
+.JSLINT_ #JSLINT_OPTIONS > div > div {
+    float: left;
+    line-height: 20px;
+    padding: 0 16px 16px 0;
+}
+.JSLINT_ #JSLINT_REPORT_TITLE {
+    display: none;
+}
+.JSLINT_ #JSLINT_SOURCE textarea {
+/* Google Lighthouse Performance - Reduce Cumulative Layout Shift. */
+    height: 298px;
+}
+.JSLINT_ #JSLINT_TITLEBOX {
+    color: darkslategray;
+}
+.JSLINT_ #JSLINT_TITLEBOX ul li {
+    line-height: 28px;
+}
+.JSLINT_ #JSLINT_TITLEBOX ul li a:link {
+    color: black;
+}
+.JSLINT_ #JSLINT_TITLEBOX ul li a:visited {
+    color: #69565c;
+}
+.JSLINT_ #bannerFork1 {
+    height: 100px;
+    left: 0;
+    opacity: 0.75;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    width: 200px;
+    z-index: 1;
+}
+.JSLINT_ #bannerFork1 a {
+    color: white;
+}
+.JSLINT_ #bannerFork1 div {
+    background: darkslategray;
+    height: 20px;
+    line-height: 20px;
+    opacity: 0.75;
+    overflow: visible;
+    position: absolute;
+    right: 65px;
+    text-align: center;
+    top: 25px;
+    transform: rotate(-45deg);
+    width: 100%;
+}
+.JSLINT_ #uiLoader1 {
+    align-items: center;
+    background: lightslategray;
+    color: white;
+    display: flex;
+    height: 50px;
+    justify-content: center;
+    left: 50%;
+    margin: -50px 0 0 -100px;
+    opacity: 0.85;
+    position: fixed;
+    top: 40%;
+    width: 200px;
+    z-index: 10;
+}
+
+/* css - website - important */
+.JSLINT_ #JSLINT_BUTTONS button:hover,
+.JSLINT_ #JSLINT_OPTIONS div[title]:hover {
+    background: slategray;
+    color: white;
+}
+
+/* css - website - important */
+.JSLINT_ #JSLINT_BUTTONS button:active {
+    color: black;
+}
+</style>
+</head>
+<body class="JSLINT_">
+<!-- Google Lighthouse Accessibility -->
+<!-- The page does not contain a heading, skip link, or landmark region -->
+<a class="skip-link" href="#JSLINT_INPUT">Skip to main</a>
+<div id="bannerFork1">
+    <div><a href="https://github.com/jslint-org/jslint">Fork on github</a></div>
+</div>
+<div id="uiLoader1">
+    <div>Loading modules</div>
+    &nbsp;
+    <span class="uiLoaderEllipsis">
+        <span>.</span>
+        <span>.</span>
+        <span>.</span>
+    </span>
+</div>
+<main id="JSLINT_INPUT">
+<div id="JSLINT_TITLEBOX">
+    <div style="float: left; margin-bottom: 16px;">
+    <div style="font-size: 50px;">JSLint</div>
+    <div id="JSLINT_EDITION" style="font-size: 14px;">&nbsp;</div>
+    </div>
+    <ul style="float: right; font-size: 14.5px; margin-top: -10px;">
+    <li><a href="help.html">Read the instructions.</a></li>
+    <li><a href="https://www.amazon.com/dp/1949815005/wrrrldwideweb"><i>How JavaScript Works</i> by Douglas Crockford.</a></li>
+    <li><a href="https://github.com/jslint-org/jslint/issues">Report a bug or issue.</a></li>
+    </ul>
+</div>
+<fieldset id="JSLINT_SOURCE">
+    <legend>Source</legend>
+    <textarea></textarea>
+</fieldset>
+<div id="JSLINT_BUTTONS">
+    <button name="JSLint" title="Ctrl + Enter">JSLint</button>
+    <button name="clear_source">Clear Source</button>
+    <button name="clear_options">Clear Options</button>
+</div>
+<fieldset id="JSLINT_OPTIONS">
+    <legend>Options</legend>
+    <div>
+    <div>
+        <span class="legend">Env...</span>
+        <div title="Assume browser environment.">
+        <label><input type="checkbox" value="browser">browser</label>
+        </div>
+        <div title="Allow console.log() and friends.">
+        <label><input type="checkbox" value="devel">devel</label>
+        </div>
+        <div title="Assume Node.js environment.">
+        <label><input type="checkbox" value="node">node</label>
+        </div>
+        <div title="Include jslint stack-trace in warnings.">
+        <label><input type="checkbox" value="trace">trace</label>
+        </div>
+    </div>
+    <div>
+        <span class="legend">Allow...</span>
+        <div title="Enable experimental warnings.">
+        <label><input type="checkbox" value="beta">beta</label>
+        </div>
+        <div title="Allow bitwise operators.">
+        <label><input type="checkbox" value="bitwise">bitwise</label>
+        </div>
+        <div title="Allow conversion operators.">
+        <label><input type="checkbox" value="convert">convert</label>
+        </div>
+        <div title="Allow for-statement.">
+        <label><input type="checkbox" value="for">for</label>
+        </div>
+    </div>
+    <div>&nbsp;
+        <div title="Allow get() and set().">
+        <label><input type="checkbox" value="getset">getset</label>
+        </div>
+        <div title="Use 2-space indent.">
+        <label><input type="checkbox" value="indent2">indent2</label>
+        </div>
+        <div title="Allow long lines.">
+        <label><input type="checkbox" value="long">long</label>
+        </div>
+        <div title="Allow weird property names.">
+        <label><input type="checkbox" value="name">name</label>
+        </div>
+    </div>
+    <div>&nbsp;
+        <div title="Allow single-quote strings.">
+        <label><input type="checkbox" value="single">single</label>
+        </div>
+        <div title="Allow 'this'.">
+        <label><input type="checkbox" value="this">this</label>
+        </div>
+        <div title="Allow unordered cases, params, properties, and variables.">
+        <label><input type="checkbox" value="unordered">unordered</label>
+        </div>
+        <div title="Allow unordered const and let declarations that are not at top of function-scope.">
+        <label><input type="checkbox" value="variable">variable</label>
+        </div>
+    </div>
+    <div>&nbsp;
+        <div title="Allow messy whitespace.">
+        <label><input type="checkbox" value="white">white</label>
+        </div>
+    </div>
+    <textarea
+        id="JSLINT_GLOBALS"
+        placeholder="imported globals (e.g. caches, indexedDb)"
+        spellcheck="false"
+        title="globals"
+    ></textarea>
+    </div>
+</fieldset>
+</main>
+<div class="JSLINT_ JSLINT_REPORT_HTML"></div>
+<script type="module">
+// browser.mjs
+// Original Author: Douglas Crockford (https://www.jslint.com).
+
+// This is free and unencumbered software released into the public domain.
+
+// Anyone is free to copy, modify, publish, use, compile, sell, or
+// distribute this software, either in source code form or as a compiled
+// binary, for any purpose, commercial or non-commercial, and by any
+// means.
+
+// In jurisdictions that recognize copyright laws, the author or authors
+// of this software dedicate any and all copyright interest in the
+// software to the public domain. We make this dedication for the benefit
+// of the public at large and to the detriment of our heirs and
+// successors. We intend this dedication to be an overt act of
+// relinquishment in perpetuity of all present and future rights to this
+// software under copyright law.
+
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+// IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+// OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+// ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+// OTHER DEALINGS IN THE SOFTWARE.
+
+// For more information, please refer to <https://unlicense.org/>
+
+
+/*jslint beta, browser*/
+/*property
+    CodeMirror, Tab, addEventListener, ch, checked, clear, click, closest,
+    ctrlKey, display, dom_style_report_unmatched, editor, error, extraKeys,
+    focus, forEach, from, fromTextArea, getItem, getValue, globals, gutters,
+    indentSelection, indentUnit, innerHTML, jslint, jslint_edition,
+    jslint_report, key, length, line, lineNumbers, lineWrapping, lint,
+    lintOnChange, matchBrackets, metaKey, mode, name, offsetWidth, on, options,
+    parse, performLint, preventDefault, push, querySelector, querySelectorAll,
+    replace, replaceSelection, result, reverse, search, setCursor, setItem,
+    setSize, setValue, showTrailingSpace, somethingSelected, sort, split,
+    stopPropagation, stringify, style, styleActiveLine, tagName, target, test,
+    textContent, trim, value, width
+*/
+
+// This is the web script companion file for JSLint. It includes code for
+// interacting with the browser and displaying the reports.
+
+let CodeMirror = window.CodeMirror;
+let editor;
+let jslint = window.jslint;
+let jslint_option_dict = {};
+let mode_debug;
+let mode_persist_state_debouncing;
+
+function dom_style_report_unmatched() {
+
+// Debug css-style.
+
+    let style_list = [];
+    Array.from(document.querySelectorAll("style")).forEach(function (elem) {
+        elem.innerHTML.replace((
+            /\/\*[\S\s]*?\*\/|;|\}/g
+        ), "\n").replace((
+            /^([^\n @].*?)[,{:].*?$/gm
+        ), function (match0, match1) {
+            let ii;
+            try {
+                ii = document.querySelectorAll(match1).length;
+            } catch (err) {
+                console.error(match1 + "\n" + err); //jslint-quiet
+            }
+            if (ii <= 1 && !(
+                /^0 (?:(body > )?(?:\.button|\.readonly|\.styleColorError|\.textarea|\.uiAnimateSlide|a|base64|body|code|div|input|pre|textarea)(?:,| \{))|^[1-9]\d*? #/m
+            ).test(ii + " " + match0)) {
+                style_list.push(ii + " " + match0);
+            }
+            return "";
+        });
+    });
+    style_list.sort().reverse().forEach(function (elem, ii, list) {
+        console.error( //jslint-quiet
+            "dom_style_report_unmatched " + (list.length - ii) + ". " + elem
+        );
+    });
+}
+
+async function jslint_run() {
+
+// This function will run jslint in browser and create html-reports.
+
+// Show ui-loader-animation.
+
+    document.querySelector("#uiLoader1 > div").textContent = "Linting";
+    document.querySelector("#uiLoader1").style.display = "flex";
+    try {
+
+// Wait awhile before running cpu-intensive linter so ui-loader doesn't jank.
+
+        await new Promise(function (resolve) {
+            setTimeout(resolve);
+        });
+
+// Update jslint_option_dict from ui-inputs.
+
+        document.querySelectorAll(
+            "#JSLINT_OPTIONS input[type=checkbox]"
+        ).forEach(function (elem) {
+            jslint_option_dict[elem.value] = elem.checked;
+        });
+        jslint_option_dict.globals = document.querySelector(
+            "#JSLINT_GLOBALS"
+        ).value.trim().split(
+            /[\s,;'"]+/
+        );
+
+// Execute linter.
+
+        editor.performLint();
+
+// Generate the reports.
+// Display the reports.
+
+        document.querySelector(
+            ".JSLINT_REPORT_HTML"
+        ).innerHTML = jslint.jslint_report(jslint_option_dict.result);
+        listener_window_onresize();
+    } catch (err) {
+        console.error(err); //jslint-quiet
+    }
+
+// Hide ui-loader-animation.
+
+    setTimeout(function () {
+        document.querySelector("#uiLoader1").style.display = "none";
+    }, 500);
+}
+
+function listener_window_onresize() {
+
+// This function will properly size ui-elements given current browser
+// dimensions.
+
+    let content_width = document.querySelector(
+        "#JSLINT_OPTIONS"
+    ).offsetWidth;
+
+// Set explicit content-width for overflow to work properly.
+
+    document.querySelectorAll(
+        ".JSLINT_ fieldset > div"
+    ).forEach(function (elem) {
+        if (!elem.closest("#JSLINT_OPTIONS")) {
+            elem.style.width = content_width + "px";
+        }
+    });
+    editor.setSize(content_width);
+}
+
+function persist_state(mode) {
+
+// PR-391 - Persist ui-state to localStorage and sessionStorage.
+
+    let state;
+
+// Debounce this function.
+
+    if (mode !== "mode_debounced") {
+        if (!mode_persist_state_debouncing) {
+            mode_persist_state_debouncing = true;
+            setTimeout(persist_state, 100, "mode_debounced");
+        }
+        return;
+    }
+    mode_persist_state_debouncing = undefined;
+
+// Persist jslint-options to localStorage.
+
+    state = {};
+    document.querySelectorAll(
+        "#JSLINT_OPTIONS input[type=checkbox]"
+    ).forEach(function (elem) {
+        state[elem.value] = elem.checked;
+    });
+    try {
+        localStorage.setItem("jslint_persist_options", JSON.stringify(state));
+    } catch (ignore) {
+        localStorage.clear();
+        localStorage.setItem("jslint_persist_options", JSON.stringify(state));
+    }
+
+// Persist jslint-globals to sessionStorage.
+
+    if (mode_debug) {
+        state = document.querySelector("#JSLINT_GLOBALS").value;
+        if (state.length <= 0x10000) {
+            try {
+                sessionStorage.setItem("jslint_persist_globals", state);
+            } catch (ignore) {
+                sessionStorage.clear();
+                sessionStorage.setItem("jslint_persist_globals", state);
+            }
+        }
+    }
+
+// Persist jslint-source to sessionStorage.
+
+    if (mode_debug) {
+        state = editor.getValue();
+        if (state.length <= 0x10000) {
+            try {
+                sessionStorage.setItem("jslint_persist_source", state);
+            } catch (ignore) {
+                sessionStorage.clear();
+                sessionStorage.setItem("jslint_persist_source", state);
+            }
+        }
+    }
+}
+
+// Init event-handling for hotkeys.
+
+document.addEventListener("keydown", function (evt) {
+    switch ((evt.ctrlKey || evt.metaKey) && evt.key) {
+    case "Enter":
+    case "e":
+        evt.preventDefault();
+        evt.stopPropagation();
+        jslint_run();
+        break;
+    }
+});
+
+// Init event-handling for .JSLINT_.
+
+document.querySelector(
+    ".JSLINT_"
+).addEventListener("click", function ({
+    target
+}) {
+    switch (target.tagName) {
+
+// PR-368 - website
+// Add clickable-links to editor-code in report-warnings and report-functions.
+
+    case "ADDRESS":
+        editor.focus();
+        editor.setCursor({
+            ch: Number(target.textContent.split(":")[1] - 1),
+            line: Number(target.textContent.split(":")[0] - 1)
+        });
+        break;
+    }
+});
+
+// Init event-handling for #JSLINT_BUTTONS.
+
+document.querySelector(
+    "#JSLINT_BUTTONS"
+).addEventListener("click", function ({
+    target
+}) {
+    switch (target.name) {
+    case "JSLint":
+        jslint_run();
+        break;
+    case "clear_options":
+        document.querySelectorAll(
+            "#JSLINT_OPTIONS input[type=checkbox]"
+        ).forEach(function (elem) {
+            elem.checked = false;
+        });
+        document.querySelector("#JSLINT_OPTIONS").click();
+        document.querySelector("#JSLINT_GLOBALS").value = "";
+        persist_state();
+        break;
+    case "clear_source":
+        editor.setValue("");
+        editor.focus();
+        break;
+    }
+});
+
+// Init event-handling for #JSLINT_GLOBALS.
+
+document.querySelector(
+    "#JSLINT_GLOBALS"
+).addEventListener("keyup", persist_state);
+
+// Init event-handling for #JSLINT_OPTIONS.
+
+document.querySelector(
+    "#JSLINT_OPTIONS"
+).addEventListener("click", function (evt) {
+    let elem = evt.target.closest(
+        "#JSLINT_OPTIONS div[title]"
+    );
+    elem = elem && elem.querySelector("input[type=checkbox]");
+    if (elem) {
+        if (elem !== evt.target) {
+            evt.preventDefault();
+            evt.stopPropagation();
+            elem.checked = !elem.checked;
+        }
+        persist_state();
+    }
+});
+
+// Init event-handling for window.onload.
+
+window.addEventListener("load", function () {
+    let state;
+
+// Resize ui-elements.
+
+    listener_window_onresize();
+
+// PR-391 - Initialize jslint-options from localStorage.
+
+    try {
+        state = JSON.parse(localStorage.getItem("jslint_persist_options"));
+    } catch (ignore) {}
+    state = state || {};
+    document.querySelectorAll(
+        "#JSLINT_OPTIONS input[type=checkbox]"
+    ).forEach(function (elem) {
+        if (state[elem.value] === true) {
+            elem.checked = true;
+        }
+    });
+
+// PR-391 - Initialize jslint-globals from sessionStorage.
+
+    if (mode_debug) {
+        try {
+            document.querySelector(
+                "#JSLINT_GLOBALS"
+            ).value = sessionStorage.getItem("jslint_persist_globals");
+        } catch (ignore) {}
+    }
+
+// PR-391 - Initialize jslint-source from sessionStorage.
+
+    if (mode_debug) {
+        try {
+            editor.setValue(sessionStorage.getItem("jslint_persist_source"));
+        } catch (ignore) {}
+    }
+
+// JSLint current source code.
+
+    document.querySelector("button[name='JSLint']").click();
+});
+
+// Init event-handling for window.onresize.
+
+window.addEventListener("resize", listener_window_onresize);
+
+// Init edition.
+
+document.querySelector("#JSLINT_EDITION").textContent = (
+    "Edition: " + jslint.jslint_edition
+);
+
+// Init mode_debug.
+
+mode_debug = (
+    /\bdebug=1\b/
+).test(location.search);
+if (mode_debug) {
+    document.querySelector(
+        "#JSLINT_OPTIONS input[value=trace]"
+    ).click();
+}
+
+// Init CodeMirror editor.
+
+editor = CodeMirror.fromTextArea(document.querySelector(
+    "#JSLINT_SOURCE textarea"
+), {
+    extraKeys: {
+        "Shift-Tab": "indentLess",
+        Tab: function () {
+            if (editor.somethingSelected()) {
+                editor.indentSelection("add");
+                return;
+            }
+            editor.replaceSelection("    ");
+        }
+    },
+    gutters: ["CodeMirror-lint-markers"],
+    indentUnit: 4,
+    lineNumbers: true,
+    lineWrapping: true,
+    lint: {
+        lintOnChange: false,
+        options: jslint_option_dict
+    },
+    matchBrackets: true,
+    mode: "javascript",
+    showTrailingSpace: true,
+    styleActiveLine: true
+});
+
+// Init event-handling for CodeMirror editor.
+
+editor.on("change", persist_state);
+
+// Init default source code to lint.
+
+if (!mode_debug) {
+    editor.setValue(String(`
+#!/usr/bin/env node
+/*jslint browser, node*/
+/*global caches, indexedDb*/
+import https from "https";
+import jslint from \u0022./jslint.mjs\u0022;
+
+/*jslint-disable*/
+    Syntax error.\u0020\u0020\u0020\u0020
+/*jslint-enable*/
+
+eval("console.log(\\"hello world\\");"); //jslint-quiet
+
+eval("console.log(\\"hello world\\");");
+
+// Optional directives.
+// .... /*jslint beta*/ .......... Enable experimental warnings.
+// .... /*jslint bitwise*/ ....... Allow bitwise operators.
+// .... /*jslint browser*/ ....... Assume browser environment.
+// .... /*jslint convert*/ ....... Allow conversion operators.
+// .... /*jslint devel*/ ......... Allow console.log() and friends.
+// .... /*jslint for*/ ........... Allow for-statement.
+// .... /*jslint getset*/ ........ Allow get() and set().
+// .... /*jslint indent2*/ ....... Use 2-space indent.
+// .... /*jslint long*/ .......... Allow long lines.
+// .... /*jslint name*/ .......... Allow weird property names.
+// .... /*jslint node*/ .......... Assume Node.js environment.
+// .... /*jslint single*/ ........ Allow single-quote strings.
+// .... /*jslint this*/ .......... Allow 'this'.
+// .... /*jslint trace*/ ......... Include jslint stack-trace in warnings.
+// .... /*jslint unordered*/ ..... Allow unordered cases, params, properties,
+// ................................... and variables.
+// .... /*jslint variable*/ ...... Allow unordered const and let declarations
+// ................................... that are not at top of function-scope.
+// .... /*jslint white*/ ......... Allow messy whitespace.
+
+(async function () {
+    let result = await new Promise(function (resolve) {
+        https.request("https://www.jslint.com/jslint.mjs", function (res) {
+            result = "";
+            res.on("data", function (chunk) {
+                result += chunk;
+            }).on("end", function () {
+                resolve(result);
+            }).setEncoding("utf8");
+        }).end();
+    });
+    result = jslint.jslint(result);
+    result.warnings.forEach(function ({
+        formatted_message
+    }) {
+        console.error(formatted_message);
+    });
+}());
+    `).trim() + "\n");
+}
+
+// Init exports.
+
+window.dom_style_report_unmatched = dom_style_report_unmatched;
+window.editor = editor;
+</script>
+</body></html>

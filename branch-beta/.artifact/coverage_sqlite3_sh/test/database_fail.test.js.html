@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>V8 Coverage Report</title>
+<style>
+/* jslint utility2:true */
+/*csslint ignore:start*/
+* {
+box-sizing: border-box;
+    font-family: consolas, menlo, monospace;
+}
+/*csslint ignore:end*/
+
+/* css - coverage_report - general */
+body {
+    margin: 0;
+}
+.coverage pre {
+    margin: 5px 0;
+}
+.coverage table {
+    border-collapse: collapse;
+}
+.coverage td,
+.coverage th {
+    border: 1px solid #777;
+    line-height: 20px;
+    margin: 0;
+    padding: 5px 10px;
+}
+.coverage td span {
+    display: inline-block;
+    width: 100%;
+}
+.coverage .content {
+    padding: 0 5px;
+}
+.coverage .content a {
+    text-decoration: none;
+}
+.coverage .count {
+    margin: 0 5px;
+    padding: 0 5px;
+}
+.coverage .footer,
+.coverage .header {
+    padding: 20px;
+}
+.coverage .footer {
+    text-align: center;
+}
+.coverage .percentbar {
+    height: 12px;
+    margin: 2px 0;
+    min-width: 200px;
+    position: relative;
+    width: 100%;
+}
+.coverage .percentbar div {
+    height: 100%;
+    position: absolute;
+}
+.coverage .title {
+    font-size: large;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* css - coverage_report - color */
+.coverage td,
+.coverage th {
+    background: #fff;
+}
+.coverage .count,
+.coverage .coverageHigh {
+    background: #9d9;
+}
+.coverage .count {
+    color: #666;
+}
+.coverage .coverageIgnore {
+    background: #ccc;
+}
+.coverage .coverageLow,
+.coverage .uncovered {
+    background: #ebb;
+}
+.coverage .coverageMedium {
+    background: #fd7;
+}
+.coverage .footer,
+.coverage .header,
+.coverage .lineno {
+    background: #ddd;
+}
+.coverage .percentbar {
+    background: #999;
+}
+.coverage .percentbar div {
+    background: #666;
+}
+
+/* css - coverage_report - important */
+.coverage pre:hover span,
+.coverage tr:hover td {
+    background: #7d7;
+}
+.coverage pre:hover span.uncovered,
+.coverage tr:hover td.coverageLow {
+    background: #f99;
+}
+</style>
+</head>
+<body class="coverage">
+<!-- header start -->
+<div class="header">
+<div class="title">V8 Coverage Report</div>
+<table>
+<thead>
+    <tr>
+    <th>Files covered</th>
+    <th>Lines</th>
+    <th>Remaining</th>
+    </tr>
+</thead>
+<tbody>
+<tr>
+    <td class="coverageMedium">
+            <a href="../index.html">. / </a>test/database_fail.test.js<br>
+        <div class="percentbar">
+            <div style="width: 77.92%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         77.92 %<br>
+        120 / 154
+    </td>
+    <td style="text-align: right;">
+        <br>
+        34 / 154
+    </td>
+    </tr>
+</tbody>
+</table>
+</div>
+<!-- header end -->
+<!-- content start -->
+<div class="content">
+<pre><span class="lineno"><a href="#line_1" id="line_1">    1.</a></span><span class="count                ">      1</span><span>var sqlite3 = require('..');</span></pre>
+<pre><span class="lineno"><a href="#line_2" id="line_2">    2.</a></span><span class="count                ">      1</span><span>var assert = require('assert');</span></pre>
+<pre><span class="lineno"><a href="#line_3" id="line_3">    3.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_4" id="line_4">    4.</a></span><span class="count                ">      1</span><span>describe('error handling', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_5" id="line_5">    5.</a></span><span class="count                ">      1</span><span>    var db;</span></pre>
+<pre><span class="lineno"><a href="#line_6" id="line_6">    6.</a></span><span class="count                ">      1</span><span>    before(function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_7" id="line_7">    7.</a></span><span class="count                ">      1</span><span>        db = new sqlite3.Database(':memory:', done);</span></pre>
+<pre><span class="lineno"><a href="#line_8" id="line_8">    8.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_9" id="line_9">    9.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_10" id="line_10">   10.</a></span><span class="count                ">      1</span><span>    it('throw when calling Database() without new', function() {</span></pre>
+<pre><span class="lineno"><a href="#line_11" id="line_11">   11.</a></span><span class="count                ">      1</span><span>        assert.throws(function() {</span></pre>
+<pre><span class="lineno"><a href="#line_12" id="line_12">   12.</a></span><span class="count                ">      1</span><span>            sqlite3.Database(':memory:');</span></pre>
+<pre><span class="lineno"><a href="#line_13" id="line_13">   13.</a></span><span class="count                ">      1</span><span>        }, (/Class constructors cannot be invoked without 'new'/));</span></pre>
+<pre><span class="lineno"><a href="#line_14" id="line_14">   14.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_15" id="line_15">   15.</a></span><span class="count                ">      1</span><span>        assert.throws(function() {</span></pre>
+<pre><span class="lineno"><a href="#line_16" id="line_16">   16.</a></span><span class="count                ">      1</span><span>            sqlite3.Statement();</span></pre>
+<pre><span class="lineno"><a href="#line_17" id="line_17">   17.</a></span><span class="count                ">      1</span><span>        }, (/Class constructors cannot be invoked without 'new'/));</span></pre>
+<pre><span class="lineno"><a href="#line_18" id="line_18">   18.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_19" id="line_19">   19.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_20" id="line_20">   20.</a></span><span class="count                ">      1</span><span>    it('should error when calling Database#get on a missing table', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_21" id="line_21">   21.</a></span><span class="count                ">      1</span><span>        db.get('SELECT id, txt FROM foo', function(err, row) {</span></pre>
+<pre><span class="lineno"><a href="#line_22" id="line_22">   22.</a></span><span class="count                ">      1</span><span>            if (err) {</span></pre>
+<pre><span class="lineno"><a href="#line_23" id="line_23">   23.</a></span><span class="count                ">      1</span><span>                assert.equal(err.message, 'SQLITE_ERROR: no such table: foo');</span></pre>
+<pre><span class="lineno"><a href="#line_24" id="line_24">   24.</a></span><span class="count                ">      1</span><span>                assert.equal(err.errno, sqlite3.ERROR);</span></pre>
+<pre><span class="lineno"><a href="#line_25" id="line_25">   25.</a></span><span class="count                ">      1</span><span>                assert.equal(err.code, 'SQLITE_ERROR');</span></pre>
+<pre><span class="lineno"><a href="#line_26" id="line_26">   26.</a></span><span class="count                ">      1</span><span>                done();</span></pre>
+<pre><span class="lineno"><a href="#line_27" id="line_27">   27.</a></span><span class="count                uncovered">     -0</span><span>            }</span><span class="uncovered"> else {</span></pre>
+<pre><span class="lineno"><a href="#line_28" id="line_28">   28.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">                done(new Error('Completed query without error, but expected error'));</span></pre>
+<pre><span class="lineno"><a href="#line_29" id="line_29">   29.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">            }</span></pre>
+<pre><span class="lineno"><a href="#line_30" id="line_30">   30.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_31" id="line_31">   31.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_32" id="line_32">   32.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_33" id="line_33">   33.</a></span><span class="count                ">      1</span><span>    it('Database#all prepare fail', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_34" id="line_34">   34.</a></span><span class="count                ">      1</span><span>        db.all('SELECT id, txt FROM foo', function(err, row) {</span></pre>
+<pre><span class="lineno"><a href="#line_35" id="line_35">   35.</a></span><span class="count                ">      1</span><span>            if (err) {</span></pre>
+<pre><span class="lineno"><a href="#line_36" id="line_36">   36.</a></span><span class="count                ">      1</span><span>                assert.equal(err.message, 'SQLITE_ERROR: no such table: foo');</span></pre>
+<pre><span class="lineno"><a href="#line_37" id="line_37">   37.</a></span><span class="count                ">      1</span><span>                assert.equal(err.errno, sqlite3.ERROR);</span></pre>
+<pre><span class="lineno"><a href="#line_38" id="line_38">   38.</a></span><span class="count                ">      1</span><span>                assert.equal(err.code, 'SQLITE_ERROR');</span></pre>
+<pre><span class="lineno"><a href="#line_39" id="line_39">   39.</a></span><span class="count                ">      1</span><span>                done();</span></pre>
+<pre><span class="lineno"><a href="#line_40" id="line_40">   40.</a></span><span class="count                uncovered">     -0</span><span>            }</span><span class="uncovered"> else {</span></pre>
+<pre><span class="lineno"><a href="#line_41" id="line_41">   41.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">                done(new Error('Completed query without error, but expected error'));</span></pre>
+<pre><span class="lineno"><a href="#line_42" id="line_42">   42.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">            }</span></pre>
+<pre><span class="lineno"><a href="#line_43" id="line_43">   43.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_44" id="line_44">   44.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_45" id="line_45">   45.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_46" id="line_46">   46.</a></span><span class="count                ">      1</span><span>    it('Database#run prepare fail', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_47" id="line_47">   47.</a></span><span class="count                ">      1</span><span>        db.run('SELECT id, txt FROM foo', function(err, row) {</span></pre>
+<pre><span class="lineno"><a href="#line_48" id="line_48">   48.</a></span><span class="count                ">      1</span><span>            if (err) {</span></pre>
+<pre><span class="lineno"><a href="#line_49" id="line_49">   49.</a></span><span class="count                ">      1</span><span>                assert.equal(err.message, 'SQLITE_ERROR: no such table: foo');</span></pre>
+<pre><span class="lineno"><a href="#line_50" id="line_50">   50.</a></span><span class="count                ">      1</span><span>                assert.equal(err.errno, sqlite3.ERROR);</span></pre>
+<pre><span class="lineno"><a href="#line_51" id="line_51">   51.</a></span><span class="count                ">      1</span><span>                assert.equal(err.code, 'SQLITE_ERROR');</span></pre>
+<pre><span class="lineno"><a href="#line_52" id="line_52">   52.</a></span><span class="count                ">      1</span><span>                done();</span></pre>
+<pre><span class="lineno"><a href="#line_53" id="line_53">   53.</a></span><span class="count                uncovered">     -0</span><span>            }</span><span class="uncovered"> else {</span></pre>
+<pre><span class="lineno"><a href="#line_54" id="line_54">   54.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">                done(new Error('Completed query without error, but expected error'));</span></pre>
+<pre><span class="lineno"><a href="#line_55" id="line_55">   55.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">            }</span></pre>
+<pre><span class="lineno"><a href="#line_56" id="line_56">   56.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_57" id="line_57">   57.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_58" id="line_58">   58.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_59" id="line_59">   59.</a></span><span class="count                ">      1</span><span>    it('Database#each prepare fail', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_60" id="line_60">   60.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">        db.each('SELECT id, txt FROM foo', function(err, row) {</span></pre>
+<pre><span class="lineno"><a href="#line_61" id="line_61">   61.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">            assert.ok(false, "this should not be called");</span></pre>
+<pre><span class="lineno"><a href="#line_62" id="line_62">   62.</a></span><span class="count                ">      1</span><span>        }, function(err, num) {</span></pre>
+<pre><span class="lineno"><a href="#line_63" id="line_63">   63.</a></span><span class="count                ">      1</span><span>            if (err) {</span></pre>
+<pre><span class="lineno"><a href="#line_64" id="line_64">   64.</a></span><span class="count                ">      1</span><span>                assert.equal(err.message, 'SQLITE_ERROR: no such table: foo');</span></pre>
+<pre><span class="lineno"><a href="#line_65" id="line_65">   65.</a></span><span class="count                ">      1</span><span>                assert.equal(err.errno, sqlite3.ERROR);</span></pre>
+<pre><span class="lineno"><a href="#line_66" id="line_66">   66.</a></span><span class="count                ">      1</span><span>                assert.equal(err.code, 'SQLITE_ERROR');</span></pre>
+<pre><span class="lineno"><a href="#line_67" id="line_67">   67.</a></span><span class="count                ">      1</span><span>                done();</span></pre>
+<pre><span class="lineno"><a href="#line_68" id="line_68">   68.</a></span><span class="count                uncovered">     -0</span><span>            }</span><span class="uncovered"> else {</span></pre>
+<pre><span class="lineno"><a href="#line_69" id="line_69">   69.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">                done(new Error('Completed query without error, but expected error'));</span></pre>
+<pre><span class="lineno"><a href="#line_70" id="line_70">   70.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">            }</span></pre>
+<pre><span class="lineno"><a href="#line_71" id="line_71">   71.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_72" id="line_72">   72.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_73" id="line_73">   73.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_74" id="line_74">   74.</a></span><span class="count                ">      1</span><span>    it('Database#each prepare fail without completion handler', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_75" id="line_75">   75.</a></span><span class="count                ">      1</span><span>        db.each('SELECT id, txt FROM foo', function(err, row) {</span></pre>
+<pre><span class="lineno"><a href="#line_76" id="line_76">   76.</a></span><span class="count                ">      1</span><span>            if (err) {</span></pre>
+<pre><span class="lineno"><a href="#line_77" id="line_77">   77.</a></span><span class="count                ">      1</span><span>                assert.equal(err.message, 'SQLITE_ERROR: no such table: foo');</span></pre>
+<pre><span class="lineno"><a href="#line_78" id="line_78">   78.</a></span><span class="count                ">      1</span><span>                assert.equal(err.errno, sqlite3.ERROR);</span></pre>
+<pre><span class="lineno"><a href="#line_79" id="line_79">   79.</a></span><span class="count                ">      1</span><span>                assert.equal(err.code, 'SQLITE_ERROR');</span></pre>
+<pre><span class="lineno"><a href="#line_80" id="line_80">   80.</a></span><span class="count                ">      1</span><span>                done();</span></pre>
+<pre><span class="lineno"><a href="#line_81" id="line_81">   81.</a></span><span class="count                uncovered">     -0</span><span>            }</span><span class="uncovered"> else {</span></pre>
+<pre><span class="lineno"><a href="#line_82" id="line_82">   82.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">                done(new Error('Completed query without error, but expected error'));</span></pre>
+<pre><span class="lineno"><a href="#line_83" id="line_83">   83.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">            }</span></pre>
+<pre><span class="lineno"><a href="#line_84" id="line_84">   84.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_85" id="line_85">   85.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_86" id="line_86">   86.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_87" id="line_87">   87.</a></span><span class="count                ">      1</span><span>    it('Database#get prepare fail with param binding', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_88" id="line_88">   88.</a></span><span class="count                ">      1</span><span>        db.get('SELECT id, txt FROM foo WHERE id = ?', 1, function(err, row) {</span></pre>
+<pre><span class="lineno"><a href="#line_89" id="line_89">   89.</a></span><span class="count                ">      1</span><span>            if (err) {</span></pre>
+<pre><span class="lineno"><a href="#line_90" id="line_90">   90.</a></span><span class="count                ">      1</span><span>                assert.equal(err.message, 'SQLITE_ERROR: no such table: foo');</span></pre>
+<pre><span class="lineno"><a href="#line_91" id="line_91">   91.</a></span><span class="count                ">      1</span><span>                assert.equal(err.errno, sqlite3.ERROR);</span></pre>
+<pre><span class="lineno"><a href="#line_92" id="line_92">   92.</a></span><span class="count                ">      1</span><span>                assert.equal(err.code, 'SQLITE_ERROR');</span></pre>
+<pre><span class="lineno"><a href="#line_93" id="line_93">   93.</a></span><span class="count                ">      1</span><span>                done();</span></pre>
+<pre><span class="lineno"><a href="#line_94" id="line_94">   94.</a></span><span class="count                uncovered">     -0</span><span>            }</span><span class="uncovered"> else {</span></pre>
+<pre><span class="lineno"><a href="#line_95" id="line_95">   95.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">                done(new Error('Completed query without error, but expected error'));</span></pre>
+<pre><span class="lineno"><a href="#line_96" id="line_96">   96.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">            }</span></pre>
+<pre><span class="lineno"><a href="#line_97" id="line_97">   97.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_98" id="line_98">   98.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_99" id="line_99">   99.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_100" id="line_100">  100.</a></span><span class="count                ">      1</span><span>    it('Database#all prepare fail with param binding', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_101" id="line_101">  101.</a></span><span class="count                ">      1</span><span>        db.all('SELECT id, txt FROM foo WHERE id = ?', 1, function(err, row) {</span></pre>
+<pre><span class="lineno"><a href="#line_102" id="line_102">  102.</a></span><span class="count                ">      1</span><span>            if (err) {</span></pre>
+<pre><span class="lineno"><a href="#line_103" id="line_103">  103.</a></span><span class="count                ">      1</span><span>                assert.equal(err.message, 'SQLITE_ERROR: no such table: foo');</span></pre>
+<pre><span class="lineno"><a href="#line_104" id="line_104">  104.</a></span><span class="count                ">      1</span><span>                assert.equal(err.errno, sqlite3.ERROR);</span></pre>
+<pre><span class="lineno"><a href="#line_105" id="line_105">  105.</a></span><span class="count                ">      1</span><span>                assert.equal(err.code, 'SQLITE_ERROR');</span></pre>
+<pre><span class="lineno"><a href="#line_106" id="line_106">  106.</a></span><span class="count                ">      1</span><span>                done();</span></pre>
+<pre><span class="lineno"><a href="#line_107" id="line_107">  107.</a></span><span class="count                uncovered">     -0</span><span>            }</span><span class="uncovered"> else {</span></pre>
+<pre><span class="lineno"><a href="#line_108" id="line_108">  108.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">                done(new Error('Completed query without error, but expected error'));</span></pre>
+<pre><span class="lineno"><a href="#line_109" id="line_109">  109.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">            }</span></pre>
+<pre><span class="lineno"><a href="#line_110" id="line_110">  110.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_111" id="line_111">  111.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_112" id="line_112">  112.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_113" id="line_113">  113.</a></span><span class="count                ">      1</span><span>    it('Database#run prepare fail with param binding', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_114" id="line_114">  114.</a></span><span class="count                ">      1</span><span>        db.run('SELECT id, txt FROM foo WHERE id = ?', 1, function(err, row) {</span></pre>
+<pre><span class="lineno"><a href="#line_115" id="line_115">  115.</a></span><span class="count                ">      1</span><span>            if (err) {</span></pre>
+<pre><span class="lineno"><a href="#line_116" id="line_116">  116.</a></span><span class="count                ">      1</span><span>                assert.equal(err.message, 'SQLITE_ERROR: no such table: foo');</span></pre>
+<pre><span class="lineno"><a href="#line_117" id="line_117">  117.</a></span><span class="count                ">      1</span><span>                assert.equal(err.errno, sqlite3.ERROR);</span></pre>
+<pre><span class="lineno"><a href="#line_118" id="line_118">  118.</a></span><span class="count                ">      1</span><span>                assert.equal(err.code, 'SQLITE_ERROR');</span></pre>
+<pre><span class="lineno"><a href="#line_119" id="line_119">  119.</a></span><span class="count                ">      1</span><span>                done();</span></pre>
+<pre><span class="lineno"><a href="#line_120" id="line_120">  120.</a></span><span class="count                uncovered">     -0</span><span>            }</span><span class="uncovered"> else {</span></pre>
+<pre><span class="lineno"><a href="#line_121" id="line_121">  121.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">                done(new Error('Completed query without error, but expected error'));</span></pre>
+<pre><span class="lineno"><a href="#line_122" id="line_122">  122.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">            }</span></pre>
+<pre><span class="lineno"><a href="#line_123" id="line_123">  123.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_124" id="line_124">  124.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_125" id="line_125">  125.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_126" id="line_126">  126.</a></span><span class="count                ">      1</span><span>    it('Database#each prepare fail with param binding', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_127" id="line_127">  127.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">        db.each('SELECT id, txt FROM foo WHERE id = ?', 1, function(err, row) {</span></pre>
+<pre><span class="lineno"><a href="#line_128" id="line_128">  128.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">            assert.ok(false, "this should not be called");</span></pre>
+<pre><span class="lineno"><a href="#line_129" id="line_129">  129.</a></span><span class="count                ">      1</span><span>        }, function(err, num) {</span></pre>
+<pre><span class="lineno"><a href="#line_130" id="line_130">  130.</a></span><span class="count                ">      1</span><span>            if (err) {</span></pre>
+<pre><span class="lineno"><a href="#line_131" id="line_131">  131.</a></span><span class="count                ">      1</span><span>                assert.equal(err.message, 'SQLITE_ERROR: no such table: foo');</span></pre>
+<pre><span class="lineno"><a href="#line_132" id="line_132">  132.</a></span><span class="count                ">      1</span><span>                assert.equal(err.errno, sqlite3.ERROR);</span></pre>
+<pre><span class="lineno"><a href="#line_133" id="line_133">  133.</a></span><span class="count                ">      1</span><span>                assert.equal(err.code, 'SQLITE_ERROR');</span></pre>
+<pre><span class="lineno"><a href="#line_134" id="line_134">  134.</a></span><span class="count                ">      1</span><span>                done();</span></pre>
+<pre><span class="lineno"><a href="#line_135" id="line_135">  135.</a></span><span class="count                uncovered">     -0</span><span>            }</span><span class="uncovered"> else {</span></pre>
+<pre><span class="lineno"><a href="#line_136" id="line_136">  136.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">                done(new Error('Completed query without error, but expected error'));</span></pre>
+<pre><span class="lineno"><a href="#line_137" id="line_137">  137.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">            }</span></pre>
+<pre><span class="lineno"><a href="#line_138" id="line_138">  138.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_139" id="line_139">  139.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_140" id="line_140">  140.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_141" id="line_141">  141.</a></span><span class="count                ">      1</span><span>    it('Database#each prepare fail with param binding without completion handler', function(done) {</span></pre>
+<pre><span class="lineno"><a href="#line_142" id="line_142">  142.</a></span><span class="count                ">      1</span><span>        db.each('SELECT id, txt FROM foo WHERE id = ?', 1, function(err, row) {</span></pre>
+<pre><span class="lineno"><a href="#line_143" id="line_143">  143.</a></span><span class="count                ">      1</span><span>            if (err) {</span></pre>
+<pre><span class="lineno"><a href="#line_144" id="line_144">  144.</a></span><span class="count                ">      1</span><span>                assert.equal(err.message, 'SQLITE_ERROR: no such table: foo');</span></pre>
+<pre><span class="lineno"><a href="#line_145" id="line_145">  145.</a></span><span class="count                ">      1</span><span>                assert.equal(err.errno, sqlite3.ERROR);</span></pre>
+<pre><span class="lineno"><a href="#line_146" id="line_146">  146.</a></span><span class="count                ">      1</span><span>                assert.equal(err.code, 'SQLITE_ERROR');</span></pre>
+<pre><span class="lineno"><a href="#line_147" id="line_147">  147.</a></span><span class="count                ">      1</span><span>                done();</span></pre>
+<pre><span class="lineno"><a href="#line_148" id="line_148">  148.</a></span><span class="count                uncovered">     -0</span><span>            }</span><span class="uncovered"> else {</span></pre>
+<pre><span class="lineno"><a href="#line_149" id="line_149">  149.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">                done(new Error('Completed query without error, but expected error'));</span></pre>
+<pre><span class="lineno"><a href="#line_150" id="line_150">  150.</a></span><span class="count                uncovered">     -0</span><span></span><span class="uncovered">            }</span></pre>
+<pre><span class="lineno"><a href="#line_151" id="line_151">  151.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_152" id="line_152">  152.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_153" id="line_153">  153.</a></span><span class="count                ">      1</span><span>});</span></pre>
+<pre><span class="lineno"><a href="#line_154" id="line_154">  154.</a></span><span class="count                ">      1</span><span></span></pre>
+</div>
+<!-- content end -->
+<div class="footer">
+    [
+    This document was created with
+    <a href="https://github.com/jslint-org/jslint">JSLint</a>
+    ]
+</div>
+</body>
+</html>
