@@ -370,6 +370,8 @@ body {
 }
 </style>
 </head>
+
+
 <body>
     <h1>CodeMirror: JSLint Demo</h1>
     <h3>
@@ -383,11 +385,10 @@ This demo will auto-lint the code below, and auto-generate a report as you type.
 <!-- Container for jslint-report. -->
 
     <div class="JSLINT_ JSLINT_REPORT_"></div>
+
+
 <script type=module>
 window.addEventListener("load", function () {
-
-// Initialize codemirror-editor.
-
     let editor = window.CodeMirror.fromTextArea(document.getElementById(
         "editor1"
     ), {
@@ -397,19 +398,10 @@ window.addEventListener("load", function () {
         indentUnit: 4,
         lineNumbers: true,
         lint: {
-
-// Enable auto-lint.
-
-            lintOnChange: true,
-
-// Initialize jslint-options here.
-
+            lintOnChange: true, // Enable auto-lint.
             options: {
                 // browser: true,
                 // node: true
-
-// Initialize jslint-globals here.
-
                 globals: [
                     // "caches",
                     // "indexedDb"
@@ -422,14 +414,8 @@ window.addEventListener("load", function () {
 // Initialize event-handling before linter is run.
 
     editor.on("lintJslintBefore", function (/* options */) {
-
-// Modify jslint-options here.
-
         // options.browser = true;
         // options.node = true;
-
-// Modify jslint-globals here.
-
         // options.globals = [
         //     "caches",
         //     "indexedDb"
@@ -456,10 +442,9 @@ window.addEventListener("load", function () {
 </body>
 </html>
 ```
+3. Live example at https://www.jslint.com/jslint_wrapper_codemirror.html
 
-- screenshot
-
-[![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2fjslint_wrapper_codemirror.html.png)](https://jslint-org.github.io/jslint/branch-beta/jslint_wrapper_codemirror.html)
+[![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2fjslint_2fbranch-beta_2fjslint_wrapper_codemirror.html.png)](https://jslint-org.github.io/jslint/jslint_wrapper_codemirror.html)
 
 
 <br><br>

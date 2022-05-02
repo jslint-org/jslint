@@ -125,19 +125,23 @@ echo "\
     # screenshot asset_image_logo
     shImageLogoCreate &
     # background http-file-server to serve webpages for screenshot
-    PORT=8080 npm_config_timeout_exit=5000 shHttpFileServer &
+    # PORT=8080 npm_config_timeout_exit=5000 shHttpFileServer &
     # screenshot html
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
 (async function () {
+    let {
+        GITHUB_BRANCH0,
+        GITHUB_GITHUB_IO
+    } = process.env;
     await Promise.all([
-        "http://localhost:8080/jslint_wrapper_codemirror.html",
         (
-            "https://"
-            + process.env.UPSTREAM_OWNER
-            + ".github.io/"
-            + process.env.UPSTREAM_REPO
-            + "/branch-beta/index.html"
+            `https://${GITHUB_GITHUB_IO}/branch-${GITHUB_BRANCH0}`
+            + `/jslint_wrapper_codemirror.html`
+        ),
+        (
+            `https://${GITHUB_GITHUB_IO}/branch-${GITHUB_BRANCH0}`
+            + `/index.html`
         ),
         ".artifact/apidoc.html",
         ".artifact/coverage_sqlite3_js/index.html",
