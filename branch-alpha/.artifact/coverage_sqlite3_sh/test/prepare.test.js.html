@@ -443,20 +443,20 @@ body {
 <pre><span class="lineno"><a href="#line_285" id="line_285">  285.</a></span><span class="count                ">      1</span><span>        var db;</span></pre>
 <pre><span class="lineno"><a href="#line_286" id="line_286">  286.</a></span><span class="count                ">      1</span><span>        before(function(done) { db = new sqlite3.Database(':memory:', done); });</span></pre>
 <pre><span class="lineno"><a href="#line_287" id="line_287">  287.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_288" id="line_288">  288.</a></span><span class="count                ">    693</span><span>        function randomString() {</span></pre>
-<pre><span class="lineno"><a href="#line_289" id="line_289">  289.</a></span><span class="count                ">    693</span><span>            var str = '';</span></pre>
-<pre><span class="lineno"><a href="#line_290" id="line_290">  290.</a></span><span class="count                "> 101954</span><span>            for (var i = Math.random() * 300; i &gt; 0; i--) {</span></pre>
-<pre><span class="lineno"><a href="#line_291" id="line_291">  291.</a></span><span class="count                "> 101954</span><span>                str += String.fromCharCode(Math.floor(Math.random() * 256));</span></pre>
-<pre><span class="lineno"><a href="#line_292" id="line_292">  292.</a></span><span class="count                "> 101954</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_293" id="line_293">  293.</a></span><span class="count                ">    693</span><span>            return str;</span></pre>
-<pre><span class="lineno"><a href="#line_294" id="line_294">  294.</a></span><span class="count                ">    693</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_288" id="line_288">  288.</a></span><span class="count                ">   1191</span><span>        function randomString() {</span></pre>
+<pre><span class="lineno"><a href="#line_289" id="line_289">  289.</a></span><span class="count                ">   1191</span><span>            var str = '';</span></pre>
+<pre><span class="lineno"><a href="#line_290" id="line_290">  290.</a></span><span class="count                "> 178471</span><span>            for (var i = Math.random() * 300; i &gt; 0; i--) {</span></pre>
+<pre><span class="lineno"><a href="#line_291" id="line_291">  291.</a></span><span class="count                "> 178471</span><span>                str += String.fromCharCode(Math.floor(Math.random() * 256));</span></pre>
+<pre><span class="lineno"><a href="#line_292" id="line_292">  292.</a></span><span class="count                "> 178471</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_293" id="line_293">  293.</a></span><span class="count                ">   1191</span><span>            return str;</span></pre>
+<pre><span class="lineno"><a href="#line_294" id="line_294">  294.</a></span><span class="count                ">   1191</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_295" id="line_295">  295.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_296" id="line_296">  296.</a></span><span class="count                ">      1</span><span>        // Generate random data.</span></pre>
 <pre><span class="lineno"><a href="#line_297" id="line_297">  297.</a></span><span class="count                ">      1</span><span>        var data = [];</span></pre>
 <pre><span class="lineno"><a href="#line_298" id="line_298">  298.</a></span><span class="count                ">      1</span><span>        var length = Math.floor(Math.random() * 1000) + 200;</span></pre>
-<pre><span class="lineno"><a href="#line_299" id="line_299">  299.</a></span><span class="count                ">    693</span><span>        for (var i = 0; i &lt; length; i++) {</span></pre>
-<pre><span class="lineno"><a href="#line_300" id="line_300">  300.</a></span><span class="count                ">    693</span><span>            data.push([ randomString(), i, i * Math.random(), null ]);</span></pre>
-<pre><span class="lineno"><a href="#line_301" id="line_301">  301.</a></span><span class="count                ">    693</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_299" id="line_299">  299.</a></span><span class="count                ">   1191</span><span>        for (var i = 0; i &lt; length; i++) {</span></pre>
+<pre><span class="lineno"><a href="#line_300" id="line_300">  300.</a></span><span class="count                ">   1191</span><span>            data.push([ randomString(), i, i * Math.random(), null ]);</span></pre>
+<pre><span class="lineno"><a href="#line_301" id="line_301">  301.</a></span><span class="count                ">   1191</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_302" id="line_302">  302.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_303" id="line_303">  303.</a></span><span class="count                ">      1</span><span>        var inserted = 0;</span></pre>
 <pre><span class="lineno"><a href="#line_304" id="line_304">  304.</a></span><span class="count                ">      1</span><span>        var retrieved = 0;</span></pre>
@@ -466,16 +466,16 @@ body {
 <pre><span class="lineno"><a href="#line_308" id="line_308">  308.</a></span><span class="count                ">      1</span><span>        });</span></pre>
 <pre><span class="lineno"><a href="#line_309" id="line_309">  309.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_310" id="line_310">  310.</a></span><span class="count                ">      1</span><span>        it('should insert all values', function(done) {</span></pre>
-<pre><span class="lineno"><a href="#line_311" id="line_311">  311.</a></span><span class="count                ">    693</span><span>            for (var i = 0; i &lt; data.length; i++) {</span></pre>
-<pre><span class="lineno"><a href="#line_312" id="line_312">  312.</a></span><span class="count                ">    693</span><span>                var stmt = db.prepare("INSERT INTO foo VALUES(?, ?, ?, ?)");</span></pre>
-<pre><span class="lineno"><a href="#line_313" id="line_313">  313.</a></span><span class="count                ">    693</span><span>                stmt.run(data[i][0], data[i][1], data[i][2], data[i][3], function(err) {</span></pre>
+<pre><span class="lineno"><a href="#line_311" id="line_311">  311.</a></span><span class="count                ">   1191</span><span>            for (var i = 0; i &lt; data.length; i++) {</span></pre>
+<pre><span class="lineno"><a href="#line_312" id="line_312">  312.</a></span><span class="count                ">   1191</span><span>                var stmt = db.prepare("INSERT INTO foo VALUES(?, ?, ?, ?)");</span></pre>
+<pre><span class="lineno"><a href="#line_313" id="line_313">  313.</a></span><span class="count                ">   1191</span><span>                stmt.run(data[i][0], data[i][1], data[i][2], data[i][3], function(err) {</span></pre>
 <pre><span class="lineno"><a href="#line_314" id="line_314">  314.</a></span><span class="count                uncovered">     -0</span><span>                    if (err) </span><span class="uncovered">throw err;</span></pre>
-<pre><span class="lineno"><a href="#line_315" id="line_315">  315.</a></span><span class="count                ">    693</span><span>                    inserted++;</span></pre>
-<pre><span class="lineno"><a href="#line_316" id="line_316">  316.</a></span><span class="count                ">    693</span><span>                }).finalize(function(err) {</span></pre>
+<pre><span class="lineno"><a href="#line_315" id="line_315">  315.</a></span><span class="count                ">   1191</span><span>                    inserted++;</span></pre>
+<pre><span class="lineno"><a href="#line_316" id="line_316">  316.</a></span><span class="count                ">   1191</span><span>                }).finalize(function(err) {</span></pre>
 <pre><span class="lineno"><a href="#line_317" id="line_317">  317.</a></span><span class="count                uncovered">     -0</span><span>                    if (err) </span><span class="uncovered">throw err;</span></pre>
-<pre><span class="lineno"><a href="#line_318" id="line_318">  318.</a></span><span class="count                ">    693</span><span>                    if (inserted == data.length) done();</span></pre>
-<pre><span class="lineno"><a href="#line_319" id="line_319">  319.</a></span><span class="count                ">    693</span><span>                });</span></pre>
-<pre><span class="lineno"><a href="#line_320" id="line_320">  320.</a></span><span class="count                ">    693</span><span>            }</span></pre>
+<pre><span class="lineno"><a href="#line_318" id="line_318">  318.</a></span><span class="count                ">   1191</span><span>                    if (inserted == data.length) done();</span></pre>
+<pre><span class="lineno"><a href="#line_319" id="line_319">  319.</a></span><span class="count                ">   1191</span><span>                });</span></pre>
+<pre><span class="lineno"><a href="#line_320" id="line_320">  320.</a></span><span class="count                ">   1191</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_321" id="line_321">  321.</a></span><span class="count                ">      1</span><span>        });</span></pre>
 <pre><span class="lineno"><a href="#line_322" id="line_322">  322.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_323" id="line_323">  323.</a></span><span class="count                ">      1</span><span>        it('should retrieve all values', function(done) {</span></pre>
@@ -483,19 +483,19 @@ body {
 <pre><span class="lineno"><a href="#line_325" id="line_325">  325.</a></span><span class="count                ">      1</span><span>                .all(function(err, rows) {</span></pre>
 <pre><span class="lineno"><a href="#line_326" id="line_326">  326.</a></span><span class="count                uncovered">     -0</span><span>                    if (err) </span><span class="uncovered">throw err;</span></pre>
 <pre><span class="lineno"><a href="#line_327" id="line_327">  327.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_328" id="line_328">  328.</a></span><span class="count                ">    693</span><span>                    for (var i = 0; i &lt; rows.length; i++) {</span></pre>
-<pre><span class="lineno"><a href="#line_329" id="line_329">  329.</a></span><span class="count                ">    693</span><span>                        assert.ok(data[rows[i].num] !== true);</span></pre>
-<pre><span class="lineno"><a href="#line_330" id="line_330">  330.</a></span><span class="count                ">    693</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_331" id="line_331">  331.</a></span><span class="count                ">    693</span><span>                        assert.equal(rows[i].txt, data[rows[i].num][0]);</span></pre>
-<pre><span class="lineno"><a href="#line_332" id="line_332">  332.</a></span><span class="count                ">    693</span><span>                        assert.equal(rows[i].num, data[rows[i].num][1]);</span></pre>
-<pre><span class="lineno"><a href="#line_333" id="line_333">  333.</a></span><span class="count                ">    693</span><span>                        assert.equal(rows[i].flt, data[rows[i].num][2]);</span></pre>
-<pre><span class="lineno"><a href="#line_334" id="line_334">  334.</a></span><span class="count                ">    693</span><span>                        assert.equal(rows[i].blb, data[rows[i].num][3]);</span></pre>
-<pre><span class="lineno"><a href="#line_335" id="line_335">  335.</a></span><span class="count                ">    693</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_336" id="line_336">  336.</a></span><span class="count                ">    693</span><span>                        // Mark the data row as already retrieved.</span></pre>
-<pre><span class="lineno"><a href="#line_337" id="line_337">  337.</a></span><span class="count                ">    693</span><span>                        data[rows[i].num] = true;</span></pre>
-<pre><span class="lineno"><a href="#line_338" id="line_338">  338.</a></span><span class="count                ">    693</span><span>                        retrieved++;</span></pre>
-<pre><span class="lineno"><a href="#line_339" id="line_339">  339.</a></span><span class="count                ">    693</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_340" id="line_340">  340.</a></span><span class="count                ">    693</span><span>                    }</span></pre>
+<pre><span class="lineno"><a href="#line_328" id="line_328">  328.</a></span><span class="count                ">   1191</span><span>                    for (var i = 0; i &lt; rows.length; i++) {</span></pre>
+<pre><span class="lineno"><a href="#line_329" id="line_329">  329.</a></span><span class="count                ">   1191</span><span>                        assert.ok(data[rows[i].num] !== true);</span></pre>
+<pre><span class="lineno"><a href="#line_330" id="line_330">  330.</a></span><span class="count                ">   1191</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_331" id="line_331">  331.</a></span><span class="count                ">   1191</span><span>                        assert.equal(rows[i].txt, data[rows[i].num][0]);</span></pre>
+<pre><span class="lineno"><a href="#line_332" id="line_332">  332.</a></span><span class="count                ">   1191</span><span>                        assert.equal(rows[i].num, data[rows[i].num][1]);</span></pre>
+<pre><span class="lineno"><a href="#line_333" id="line_333">  333.</a></span><span class="count                ">   1191</span><span>                        assert.equal(rows[i].flt, data[rows[i].num][2]);</span></pre>
+<pre><span class="lineno"><a href="#line_334" id="line_334">  334.</a></span><span class="count                ">   1191</span><span>                        assert.equal(rows[i].blb, data[rows[i].num][3]);</span></pre>
+<pre><span class="lineno"><a href="#line_335" id="line_335">  335.</a></span><span class="count                ">   1191</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_336" id="line_336">  336.</a></span><span class="count                ">   1191</span><span>                        // Mark the data row as already retrieved.</span></pre>
+<pre><span class="lineno"><a href="#line_337" id="line_337">  337.</a></span><span class="count                ">   1191</span><span>                        data[rows[i].num] = true;</span></pre>
+<pre><span class="lineno"><a href="#line_338" id="line_338">  338.</a></span><span class="count                ">   1191</span><span>                        retrieved++;</span></pre>
+<pre><span class="lineno"><a href="#line_339" id="line_339">  339.</a></span><span class="count                ">   1191</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_340" id="line_340">  340.</a></span><span class="count                ">   1191</span><span>                    }</span></pre>
 <pre><span class="lineno"><a href="#line_341" id="line_341">  341.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_342" id="line_342">  342.</a></span><span class="count                ">      1</span><span>                    assert.equal(retrieved, data.length);</span></pre>
 <pre><span class="lineno"><a href="#line_343" id="line_343">  343.</a></span><span class="count                ">      1</span><span>                    assert.equal(retrieved, inserted);</span></pre>
