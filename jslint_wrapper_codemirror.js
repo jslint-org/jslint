@@ -58,8 +58,8 @@ window.addEventListener("load", function () {
 /*jslint browser devel*/
 /*global CodeMirror define exports jslint module require*/
 /*property
-    Pos, amd, column, error, from, globals, jslint, jslint_result, line, map,
-    message, mode_stop, registerHelper, severity, to, warnings
+    Pos, amd, column, error, from, globals, jslint, line, map, message,
+    mode_stop, registerHelper, result, severity, signal, source, to, warnings
 */
 
 (function (mod) {
@@ -89,17 +89,36 @@ window.addEventListener("load", function () {
         );
         return [];
     }
-    CodeMirror.registerHelper("lint", "javascript", function (text, options) {
-        let result = jslint.jslint(text, options, options.globals);
+    CodeMirror.registerHelper("lint", "javascript", function (
+        source,
+        options,
+        editor
+    ) {
+        let result;
 
-// Save JSLint result to global-object, in case its needed again
-// to generate reports.
+// Emit <options> in case its needs updating before being passed to jslint.
+
+        options.source = source;
+        CodeMirror.signal(editor, "lintJslintBefore", options);
+
+// Run jslint.
+
+        result = jslint.jslint(source, options, options.globals);
+
+// Emit <result> in case its needed again to generate reports.
 //
 // E.g.:
-//  cm.performLint();
-//  divReport.outerHTML = jslint.jslint_report(window.jslint_result);
+//  editor.on("lintJslintAfter", function ({
+//      result
+//  }) {
+//      divReport.innerHTML = jslint.jslint_report(result);
+//  });
 
-        window.jslint_result = result;
+        options.result = result;
+        CodeMirror.signal(editor, "lintJslintAfter", options);
+
+// Return warnings.
+
         return result.warnings.map(function ({
             column,
             line,

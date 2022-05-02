@@ -688,7 +688,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     -webkit-text-size-adjust: none;
     text-size-adjust: none;
 }
-#JSLINT_REPORT_HTML div {
+.JSLINT_REPORT_HTML div {
     box-sizing: border-box;
 }
 /*csslint ignore:end*/
@@ -1193,7 +1193,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     </div>
 </fieldset>
 </main>
-<div class="JSLINT_" id="JSLINT_REPORT_HTML"></div>
+<div class="JSLINT_ JSLINT_REPORT_HTML"></div>
 <script type="module">
 // browser.mjs
 // Original Author: Douglas Crockford (https://www.jslint.com).
@@ -1229,14 +1229,14 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     CodeMirror, Tab, addEventListener, ch, checked, clear, click, closest,
     ctrlKey, display, dom_style_report_unmatched, editor, error, extraKeys,
     focus, forEach, from, fromTextArea, getItem, getValue, globals, gutters,
-    indentSelection, indentUnit, indentWithTabs, innerHTML, jslint,
-    jslint_edition, jslint_report, jslint_result, key, length, line,
-    lineNumbers, lineWrapping, lint, lintOnChange, matchBrackets, metaKey, mode,
-    name, offsetWidth, on, outerHTML, parse, performLint, preventDefault, push,
-    querySelector, querySelectorAll, replace, replaceSelection, reverse, search,
-    setCursor, setItem, setSize, setValue, showTrailingSpace, somethingSelected,
-    sort, split, stopPropagation, stringify, style, styleActiveLine, tagName,
-    target, test, textContent, trim, value, width
+    indentSelection, indentUnit, innerHTML, jslint, jslint_edition,
+    jslint_report, key, length, line, lineNumbers, lineWrapping, lint,
+    lintOnChange, matchBrackets, metaKey, mode, name, offsetWidth, on, options,
+    parse, performLint, preventDefault, push, querySelector, querySelectorAll,
+    replace, replaceSelection, result, reverse, search, setCursor, setItem,
+    setSize, setValue, showTrailingSpace, somethingSelected, sort, split,
+    stopPropagation, stringify, style, styleActiveLine, tagName, target, test,
+    textContent, trim, value, width
 */
 
 // This is the web script companion file for JSLint. It includes code for
@@ -1245,9 +1245,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 let CodeMirror = window.CodeMirror;
 let editor;
 let jslint = window.jslint;
-let jslint_option_dict = {
-    lintOnChange: false
-};
+let jslint_option_dict = {};
 let mode_debug;
 let mode_persist_state_debouncing;
 
@@ -1320,8 +1318,8 @@ async function jslint_run() {
 // Display the reports.
 
         document.querySelector(
-            "#JSLINT_REPORT_HTML"
-        ).outerHTML = jslint.jslint_report(window.jslint_result);
+            ".JSLINT_REPORT_HTML"
+        ).innerHTML = jslint.jslint_report(jslint_option_dict.result);
         listener_window_onresize();
     } catch (err) {
         console.error(err); //jslint-quiet
@@ -1590,7 +1588,10 @@ editor = CodeMirror.fromTextArea(document.querySelector(
     indentUnit: 4,
     lineNumbers: true,
     lineWrapping: true,
-    lint: jslint_option_dict,
+    lint: {
+        lintOnChange: false,
+        options: jslint_option_dict
+    },
     matchBrackets: true,
     mode: "javascript",
     showTrailingSpace: true,

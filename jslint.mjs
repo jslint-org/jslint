@@ -9023,7 +9023,7 @@ function jslint_report({
         );
     }
 
-    html += "<div class=\"JSLINT_\" id=\"JSLINT_REPORT_HTML\">\n";
+    html += "<div class=\"JSLINT_ JSLINT_REPORT_HTML\">\n";
     html += String(`
 <style class="JSLINT_REPORT_STYLE">
 /* jslint utility2:true */
@@ -9201,7 +9201,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     -webkit-text-size-adjust: none;
     text-size-adjust: none;
 }
-#JSLINT_REPORT_HTML div {
+.JSLINT_REPORT_HTML div {
     box-sizing: border-box;
 }
 /*csslint ignore:end*/

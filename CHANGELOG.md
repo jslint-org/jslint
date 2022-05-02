@@ -15,6 +15,7 @@
 - perf - improve performance by hoisting inlined regexps out of loops and subfunctions
 
 # v2022.5.1-beta
+- update codemirror-editor to v5.65.3
 - wrapper - add jslint-addon for codemirror
 - allow jslint.mjs to auto-export itself to globalThis when given search-param `?window_jslint=1`
 - wrapper - add jslint-extension for vscode
