@@ -269,29 +269,27 @@ import moduleUrl from "url";
 
 shCiArtifactUpload() {(set -e
 # this function will upload build-artifacts to branch-gh-pages
+    local FILE
     if (! shCiIsMainJob)
     then
         return
     fi
-    export GITHUB_BRANCH0="$(git rev-parse --abbrev-ref HEAD)"
-    local FILE
     # init .git/config
     git config --local user.email "github-actions@users.noreply.github.com"
     git config --local user.name "github-actions"
     # init $GITHUB_BRANCH0
+    export GITHUB_BRANCH0="$(git rev-parse --abbrev-ref HEAD)"
     git pull --unshallow origin "$GITHUB_BRANCH0"
-    # init $UPSTREAM_REPOSITORY
+    # init $UPSTREAM_XXX
     export UPSTREAM_REPOSITORY="$(node -p '(
     /^https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
 ).exec(require("./package.json").repository.url)[1]
 ')" # '
-    # init $UPSTREAM_GITHUB_IO
     export UPSTREAM_GITHUB_IO="$(
         printf "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
-    # init $GITHUB_REPOSITORY
+    # init $GITHUB_XXX
     export GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-$UPSTREAM_REPOSITORY}"
-    # init $GITHUB_GITHUB_IO
     export GITHUB_GITHUB_IO="$(
         printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
@@ -583,18 +581,18 @@ shDiffFileFromDir() {(set -e
 
 shDirHttplinkValidate() {(set -e
 # this function will validate http-links embedded in .html and .md files
-    # init $UPSTREAM_REPOSITORY
+    # init $GITHUB_BRANCH0
+    export GITHUB_BRANCH0="${GITHUB_BRANCH0:-alpha}"
+    # init $UPSTREAM_XXX
     export UPSTREAM_REPOSITORY="$(node -p '(
     /^https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
 ).exec(require("./package.json").repository.url)[1]
 ')" # '
-    # init $UPSTREAM_GITHUB_IO
     export UPSTREAM_GITHUB_IO="$(
         printf "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
-    # init $GITHUB_REPOSITORY
+    # init $GITHUB_XXX
     export GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-$UPSTREAM_REPOSITORY}"
-    # init $GITHUB_GITHUB_IO
     export GITHUB_GITHUB_IO="$(
         printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
@@ -604,6 +602,7 @@ import moduleHttps from "https";
 import moduleUrl from "url";
 (async function () {
     let {
+        GITHUB_BRANCH0,
         GITHUB_GITHUB_IO,
         GITHUB_REPOSITORY,
         UPSTREAM_GITHUB_IO,
@@ -628,7 +627,7 @@ import moduleUrl from "url";
                 /[\u0022\u0027]/g
             ), "").replace((
                 /\/branch-[a-z]*?\//g
-            ), "/branch-alpha/").replace(new RegExp(
+            ), `/branch-${GITHUB_BRANCH0}/`).replace(new RegExp(
                 `\\b${UPSTREAM_REPOSITORY}\\b`,
                 "g"
             ), GITHUB_REPOSITORY).replace(new RegExp(
@@ -1854,6 +1853,137 @@ async function fsWriteFileWithParents(pathname, data) {
   }
   console.error("wrote file " + pathname);
 }
+function globPathExclude(patternList, pathList, mode) {
+  pathList.forEach(function (path) {
+    path.replace((
+      /[\u0000-\u0007]/g
+    ), function (chr) {
+      throw new Error(
+        "Weird character "
+        + JSON.stringify(chr)
+        + " found in path "
+        + JSON.stringify(path)
+      );
+    });
+  });
+  pathList = pathList.join("\n");
+  if (mode === "include") {
+    patternList.forEach(function (pattern) {
+      pathList = pathList.replace(globPathToRegexp(pattern), "\u0000$&");
+    });
+    pathList = pathList.replace((
+      /^[^\u0000].*/gm
+    ), "");
+    pathList = pathList.replace((
+      /^\u0000*/gm
+    ), "");
+  } else {
+    patternList.forEach(function (pattern) {
+      pathList = pathList.replace(globPathToRegexp(pattern), "");
+    });
+  }
+  pathList = pathList.split("\n").filter(function (elem) {
+    return elem;
+  });
+  return pathList;
+}
+function globPathInclude(patternList, pathList) {
+  return globPathExclude(patternList, pathList, "include");
+}
+function globPathToRegexp(pattern) {
+  let ii = 0;
+  let isClass = false;
+  let strClass = "";
+  let strRegex = "";
+  pattern.replace((
+    /[\u0000-\u0007]/g
+  ), function (chr) {
+    throw new Error(
+      "Weird character "
+      + JSON.stringify(chr)
+      + " found in pattern "
+      + JSON.stringify(pattern)
+    );
+  });
+  pattern = pattern.replace((
+    /\/{2,}/g
+  ), "/");
+  pattern = pattern.replace((
+    /\*{3,}/g
+  ), "**");
+  pattern.replace((
+    /\\\\|\\\[|\\\]|\[|\]|./g
+  ), function (match0) {
+    switch (match0) {
+    case "[":
+      if (isClass) {
+        strClass += "[";
+        return;
+      }
+      strClass += "\u0000";
+      strRegex += "\u0000";
+      isClass = true;
+      return;
+    case "]":
+      if (isClass) {
+        isClass = false;
+        return;
+      }
+      strRegex += "]";
+      return;
+    default:
+      if (isClass) {
+        strClass += match0;
+        return;
+      }
+      strRegex += match0;
+    }
+    return "";
+  });
+  strClass += "\u0000";
+  strClass = strClass.replace((
+    /\u0000!/g
+  ), "\u0000^");
+  strClass = strClass.replace((
+    /\u0000-/g
+  ), "\u0000\\-");
+  strClass = strClass.replace((
+    /-\u0000/g
+  ), "\\-\u0000");
+  strClass = strClass.replace((
+    /[\[\]]/g
+  ), "\\$&");
+  strRegex = strRegex.replace((
+    // /[$()*+-.\/?\[\\\]\^{|}]/g
+    /[$()*+.?\[\\\]\^{|}]/g
+  ), "\\$&");
+
+  strRegex = strRegex.replace((
+    /(?:\\\*){2,}\/(?:\\\*){1,}/gm
+  ), ".*?");
+  strRegex = strRegex.replace((
+    /(^|\/)\\\*\\\*(\/|$)/gm
+  ), "$1.*?$2");
+  strRegex = strRegex.replace((
+    /(?:\\\*){1,}/g
+  ), "[^\\/]*?");
+  strRegex = strRegex.replace((
+    /\\\?/g
+  ), "[^\\/]");
+  ii = 0;
+  strClass = strClass.split("\u0000");
+  strRegex = strRegex.replace((
+    /\u0000/g
+  ), function () {
+    ii += 1;
+    if (strClass[ii] === "") {
+      return "";
+    }
+    return "[" + strClass[ii] + "]";
+  });
+  strRegex = new RegExp("^" + strRegex + "$", "gm");
+  return strRegex;
+}
 function htmlEscape(str) {
   return String(str).replace((
     /&/g
@@ -2320,9 +2450,8 @@ async function v8CoverageReportCreate({
   let cwd;
   let exitCode = 0;
   let fileDict;
-  let fileExcludeList = [];
-  let fileIncludeList = [];
-  let fileIncludeNodeModules;
+  let pathExcludeList = [];
+  let pathIncludeList = [];
   let processArgElem;
   let promiseList = [];
   let v8CoverageObj;
@@ -2505,6 +2634,7 @@ body {
     }
     txtBorder = (
       "+" + "-".repeat(padPathname + 2) + "+"
+      + "-".repeat(padLines + 2) + "+"
       + "-".repeat(padLines + 2) + "+\n"
     );
     txt = "";
@@ -2512,7 +2642,8 @@ body {
     txt += txtBorder;
     txt += (
       "| " + String("Files covered").padEnd(padPathname, " ") + " | "
-      + String("Lines").padStart(padLines, " ") + " |\n"
+      + String("Lines").padStart(padLines, " ") + " | "
+      + String("Remaining").padStart(padLines, " ") + " |\n"
     );
     txt += txtBorder;
     fileList.forEach(function ({
@@ -2580,7 +2711,8 @@ body {
         + String("./" + pathname).padEnd(padPathname, " ") + " | "
         + String(
           modeCoverageIgnoreFile + " " + coveragePct + " %"
-        ).padStart(padLines, " ") + " |\n"
+        ).padStart(padLines, " ") + " | "
+        + " ".repeat(padLines) + " |\n"
       );
       txt += (
         "| " + "*".repeat(
@@ -2588,6 +2720,9 @@ body {
         ).padEnd(padPathname, "_") + " | "
         + String(
           linesCovered + " / " + linesTotal
+        ).padStart(padLines, " ") + " | "
+        + String(
+          (linesTotal - linesCovered) + " / " + linesTotal
         ).padStart(padLines, " ") + " |\n"
       );
       txt += txtBorder;
@@ -2738,17 +2873,6 @@ ${String(count || "-0").padStart(7, " ")}
     ), txt));
   }
 
-  function pathnameRelativeCwd(pathname) {
-    pathname = modulePath.resolve(pathname).replace((
-      /\\/g
-    ), "/");
-    if (!pathname.startsWith(cwd)) {
-      return;
-    }
-    pathname = pathname.slice(cwd.length);
-    return pathname;
-  }
-
 /*
 function sentinel() {}
 */
@@ -2769,19 +2893,10 @@ function sentinel() {}
     processArgElem[1] = processArgElem.slice(1).join("=");
     switch (processArgElem[0]) {
     case "--exclude":
-      fileExcludeList = fileExcludeList.concat(
-        processArgElem[1].split(",")
-      );
-      break;
-    case "--exclude-node-modules":
-      fileIncludeNodeModules = (
-        /0|false|null|undefined/
-      ).test(processArgElem[1]);
+      pathExcludeList.push(processArgElem[1]);
       break;
     case "--include":
-      fileIncludeList = fileIncludeList.concat(
-        processArgElem[1].split(",")
-      );
+      pathIncludeList.push(processArgElem[1]);
       break;
     }
   }
@@ -2822,33 +2937,34 @@ function sentinel() {}
     ).test(file);
   });
   v8CoverageObj = await Promise.all(v8CoverageObj.map(async function (file) {
-    let data = await moduleFs.promises.readFile(coverageDir + file, "utf8");
+    let data;
+    let pathDict = Object.create(null);
+    let pathList = [];
+    data = await moduleFs.promises.readFile(coverageDir + file, "utf8");
     data = JSON.parse(data);
-    data.result = data.result.filter(function (scriptCov) {
+    data.result.forEach(function (scriptCov) {
       let pathname = scriptCov.url;
       if (!pathname.startsWith("file:///")) {
         return;
       }
-      pathname = pathnameRelativeCwd(moduleUrl.fileURLToPath(pathname));
-      if (
-        !pathname
-        || pathname.startsWith("[")
-        || (
-          !fileIncludeNodeModules
-          && (
-            /(?:^|\/)node_modules\//m
-          ).test(pathname)
-        )
-        || fileExcludeList.indexOf(pathname) >= 0
-        || (
-          fileIncludeList.length > 0
-          && fileIncludeList.indexOf(pathname) === -1
-        )
-      ) {
+      pathname = moduleUrl.fileURLToPath(pathname);
+      pathname = modulePath.resolve(pathname).replace((
+        /\\/g
+      ), "/");
+      if (!pathname.startsWith(cwd)) {
         return;
       }
+      pathname = pathname.slice(cwd.length);
       scriptCov.url = pathname;
-      return true;
+      pathDict[pathname] = scriptCov;
+    });
+    pathList = Object.keys(pathDict);
+    if (pathIncludeList.length > 0) {
+      pathList = globPathInclude(pathIncludeList, pathList);
+    }
+    pathList = globPathExclude(pathExcludeList, pathList);
+    data.result = pathList.map(function (pathname) {
+      return pathDict[pathname];
     });
     return data;
   }));

@@ -269,9 +269,21 @@ npm install
 
 node ../jslint.mjs \
     v8_coverage_report=../.artifact/coverage_sqlite3_sh/ \
-    --exclude-node-modules=true \
-    --exclude=test/foo.js,test/bar.js \
-    --exclude=test/baz.js \
+    --exclude=**/node_modules/**/* \
+    --exclude=node_modules/**/* \
+    --exclude=tes[!0-9A-Z_a-z-]/**/* \
+    --exclude=tes[0-9A-Z_a-z-]/**/* \
+    --exclude=tes[^0-9A-Z_a-z-]/**/* \
+    --exclude=test/**/* \
+    --exclude=test/**/*.js \
+    --exclude=test/suppor*/*elper.js \
+    --exclude=test/suppor?/?elper.js \
+    --exclude=test/support/helper.js \
+    --include=** \
+    --include=li*/* \
+    --include=li?/* \
+    --include=lib/* \
+    --include=lib/*.js \
     npm run test
 ```
 - shell output
@@ -311,8 +323,21 @@ import jslint from "../jslint.mjs";
     await jslint.v8CoverageReportCreate({
         coverageDir: "../.artifact/coverage_sqlite3_js/",
         processArgv: [
-            "--include=lib/sqlite3-binding.js,lib/sqlite3.js",
-            "--include=lib/trace.js",
+            "--exclude=**/node_modules/**/*",
+            "--exclude=node_modules/**/*",
+            "--exclude=tes[!0-9A-Z_a-z-]/**/*",
+            "--exclude=tes[0-9A-Z_a-z-]/**/*",
+            "--exclude=tes[^0-9A-Z_a-z-]/**/*",
+            "--exclude=test/**/*",
+            "--exclude=test/**/*.js",
+            "--exclude=test/suppor*/*elper.js",
+            "--exclude=test/suppor?/?elper.js",
+            "--exclude=test/support/helper.js",
+            "--include=**",
+            "--include=li*/*",
+            "--include=li?/*",
+            "--include=lib/*",
+            "--include=lib/*.js",
             "npm", "run", "test"
         ]
     });

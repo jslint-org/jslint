@@ -10,6 +10,8 @@ let {
     assertOrThrow,
     debugInline,
     fsWriteFileWithParents,
+    globPathExclude,
+    globPathToRegexp,
     jstestDescribe,
     jstestIt,
     jstestOnExit,
@@ -69,6 +71,112 @@ jstestDescribe((
             ),
             "aa"
         );
+    });
+});
+
+jstestDescribe((
+    "test globPathXxx handling-behavior"
+), function testBehaviorGlobPathXxx() {
+    jstestIt((
+        "test globPathExclude-error handling-behavior"
+    ), async function () {
+        await assertErrorThrownAsync(function () {
+            return globPathExclude(
+                [],
+                [
+                    "\u0000"
+                ]
+            );
+        }, "Weird character \"\\\\u0000\" found in path");
+    });
+    jstestIt((
+        "test globPathToRegexp handling-behavior"
+    ), function () {
+        Object.entries({
+            "*": (
+                /^[^\/]*?$/gm
+            ),
+            "**": (
+                /^.*?$/gm
+            ),
+            "**/*": (
+                /^.*?$/gm
+            ),
+            "**/node_modules/**/*": (
+                /^.*?\/node_modules\/.*?$/gm
+            ),
+            "?": (
+                /^[^\/]$/gm
+            ),
+            "[!0-9A-Za-z-]": (
+                /^[^0-9A-Za-z\-]$/gm
+            ),
+            "[0-9A-Za-z-]": (
+                /^[0-9A-Za-z\-]$/gm
+            ),
+            "[[]] ]][[": (
+                /^[\[]\] \]\][\[]$/gm
+            ),
+            "[]": (
+                /^$/gm
+            ),
+            "[^0-9A-Za-z-]": (
+                /^[^0-9A-Za-z\-]$/gm
+            ),
+            "aa/bb/cc": (
+                /^aa\/bb\/cc$/gm
+            ),
+            "li*/*": (
+                /^li[^\/]*?\/[^\/]*?$/gm
+            ),
+            "li?/*": (
+                /^li[^\/]\/[^\/]*?$/gm
+            ),
+            "lib/*": (
+                /^lib\/[^\/]*?$/gm
+            ),
+            "lib/*.js": (
+                /^lib\/[^\/]*?\.js$/gm
+            ),
+            "node_modules/**/*": (
+                /^node_modules\/.*?$/gm
+            ),
+            "tes[!0-9A-Z_a-z-]/**/*": (
+                /^tes[^0-9A-Z_a-z\-]\/.*?$/gm
+            ),
+            "tes[0-9A-Z_a-z-]/**/*": (
+                /^tes[0-9A-Z_a-z\-]\/.*?$/gm
+            ),
+            "tes[^0-9A-Z_a-z-]/**/*": (
+                /^tes[^0-9A-Z_a-z\-]\/.*?$/gm
+            ),
+            "test/**/*": (
+                /^test\/.*?$/gm
+            ),
+            "test/**/*.js": (
+                /^test\/.*?\.js$/gm
+            ),
+            "test/suppor*/*elper.js": (
+                /^test\/suppor[^\/]*?\/[^\/]*?elper\.js$/gm
+            ),
+            "test/suppor?/?elper.js": (
+                /^test\/suppor[^\/]\/[^\/]elper\.js$/gm
+            ),
+            "test/support/helper.js": (
+                /^test\/support\/helper\.js$/gm
+            )
+        }).forEach(function ([
+            pattern, rgx
+        ]) {
+            assertJsonEqual(globPathToRegexp(pattern).source, rgx.source);
+        });
+    });
+    jstestIt((
+        "test globPathToRegexp-error handling-behavior"
+    ), async function () {
+        await assertErrorThrownAsync(function () {
+            return globPathToRegexp("/\u0000/");
+        }, "Weird character \"\\\\u0000\" found in pattern");
     });
 });
 
@@ -1057,12 +1165,11 @@ jstestDescribe((
             ""
         );
         await jslint.jslint_cli({
-            console_error: noop, // uncomment to debug
+            console_error: noop, // comment to debug
             mode_cli: true,
             process_argv: [
                 "node", "jslint.mjs",
                 "v8_coverage_report=.tmp/coverage_jslint",
-                "--exclude-node-modules=0",
                 "--exclude=aa.js",
                 "--include=jslint.mjs",
                 "node", "jslint.mjs"
@@ -1109,7 +1216,7 @@ jstestDescribe((
             file = dir + file;
             await fsWriteFileWithParents(file, data);
             await jslint.jslint_cli({
-                console_error: noop, // uncomment to debug
+                console_error: noop, // comment to debug
                 mode_cli: true,
                 process_argv: [
                     "node", "jslint.mjs",
@@ -1124,7 +1231,7 @@ jstestDescribe((
         "test npm handling-behavior"
     ), async function () {
         await jslint.jslint_cli({
-            console_error: noop, // uncomment to debug
+            console_error: noop, // comment to debug
             mode_cli: true,
             process_argv: [
                 "node", "jslint.mjs",
@@ -1190,7 +1297,7 @@ jstestDescribe((
             await fsWriteFileWithParents(file, data);
         }));
         await jslint.jslint_cli({
-            console_error: noop, // uncomment to debug
+            console_error: noop, // comment to debug
             mode_cli: true,
             process_argv: [
                 "node", "jslint.mjs",
