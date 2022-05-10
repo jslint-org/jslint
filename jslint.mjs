@@ -92,9 +92,10 @@
 
 /*jslint beta, node*/
 /*property
-    globPathExclude, globPathInclude, globPathToRegexp,
-    import_meta_url,
-    values,
+    excludeList,
+    globExclude,
+    import_meta_url, includeList,
+    pathnameList,
     JSLINT_BETA, NODE_V8_COVERAGE, a, all, argv, arity, artifact,
     assertErrorThrownAsync, assertJsonEqual, assertOrThrow, assign, async, b,
     beta, bitwise, block, body, browser, c, calls, catch, catch_list,
@@ -353,197 +354,209 @@ async function fsWriteFileWithParents(pathname, data) {
     console.error("wrote file " + pathname);
 }
 
-function globPathExclude(patternList, pathList, mode) {
+function globExclude({
+    excludeList = [],
+    includeList = [],
+    pathnameList = []
+}) {
 
-// This function will exclude paths in <pathList> that match glob-patterns in
-// <patternList>.
+// This function will
+// 1. Exclude pathnames in <pathnameList> that don't match glob-patterns in
+//    <includeList>.
+// 2. Exclude pathnames in <pathnameList> that match glob-patterns in
+//    <excludeList>.
 
-    pathList.forEach(function (path) {
-        path.replace((
-            /[\u0000-\u0007]/g
-        ), function (chr) {
+    function globAssertNotWeird(list, name) {
+
+// This function will check if <str> has weird characters.
+
+        list.join("\n").replace((
+            /^.*?([\u0000-\u0007]).*/gm
+        ), function (match0, chr) {
             throw new Error(
                 "Weird character "
                 + JSON.stringify(chr)
-                + " found in path "
-                + JSON.stringify(path)
+                + " found in " + name + " "
+                + JSON.stringify(match0)
             );
         });
-    });
-    pathList = pathList.join("\n");
-
-// Exclude paths in <pathList> that don't match glob-patterns in <patternList>.
-
-    if (mode === "include") {
-        patternList.forEach(function (pattern) {
-            pathList = pathList.replace(globPathToRegexp(pattern), "\u0000$&");
-        });
-        pathList = pathList.replace((
-            /^[^\u0000].*/gm
-        ), "");
-        pathList = pathList.replace((
-            /^\u0000*/gm
-        ), "");
-
-// Exclude paths in <pathList> that match glob-patterns in <patternList>.
-
-    } else {
-        patternList.forEach(function (pattern) {
-            pathList = pathList.replace(globPathToRegexp(pattern), "");
-        });
     }
-    pathList = pathList.split("\n").filter(function (elem) {
-        return elem;
-    });
-    return pathList;
-}
 
-function globPathInclude(patternList, pathList) {
+    function globToRegexp(pattern) {
 
-// This function will exclude paths in <pathList> that don't match
-// glob-patterns in <patternList>.
+// This function will translate shell-glob <pattern> to javascript-regexp,
+// that javascript can then use to "glob" pathnames.
 
-    return globPathExclude(patternList, pathList, "include");
-}
-
-function globPathToRegexp(pattern) {
-
-// This function will translate glob <pattern> into regexp that javascript can
-// then use to "glob" paths.
-//
-// E.g.:
-//  "*"                         -> /^[^\/]*?$/gm
-//  "**"                        -> /^.*?$/gm
-//  "**/*"                      -> /^.*?$/gm
-//  "**/node_modules/**/*"      -> /^.*?\/node_modules\/.*?$/gm
-//  "?"                         -> /^[^\/]$/gm
-//  "[!0-9A-Za-z-]"             -> /^[^0-9A-Za-z\-]$/gm
-//  "[0-9A-Za-z-]"              -> /^[0-9A-Za-z\-]$/gm
-//  "[^0-9A-Za-z-]"             -> /^[^0-9A-Za-z\-]$/gm
-//  "tes[!0-9A-Z_a-z-]/**/*"    -> /^tes[^0-9A-Z_a-z\-]\/.*?$/gm
-//  "test/suppor?/?elper.js"    -> /^test\/suppor[^\/]\/[^\/]elper\.js$/gm
-//  "test/suppor*/*elper.js"    -> /^test\/suppor[^\/]*?\/[^\/]*?elper\.js$/gm
-//  "test/support/helper.js"    -> /^test\/support\/helper\.js$/gm
-
-    let ii = 0;
-    let isClass = false;
-    let strClass = "";
-    let strRegex = "";
-    pattern.replace((
-        /[\u0000-\u0007]/g
-    ), function (chr) {
-        throw new Error(
-            "Weird character "
-            + JSON.stringify(chr)
-            + " found in pattern "
-            + JSON.stringify(pattern)
-        );
-    });
-    pattern = pattern.replace((
-        /\/{2,}/g
-    ), "/");
-    pattern = pattern.replace((
-        /\*{3,}/g
-    ), "**");
-    pattern.replace((
-        /\\\\|\\\[|\\\]|\[|\]|./g
-    ), function (match0) {
-        switch (match0) {
-        case "[":
-            if (isClass) {
-                strClass += "[";
+        let ii = 0;
+        let isClass = false;
+        let strClass = "";
+        let strRegex = "";
+        pattern = pattern.replace((
+            /\/\/+/g
+        ), "/");
+        pattern = pattern.replace((
+            /\*\*\*+/g
+        ), "**");
+        pattern.replace((
+            /\\\\|\\\[|\\\]|\[|\]|./g
+        ), function (match0) {
+            switch (match0) {
+            case "[":
+                if (isClass) {
+                    strClass += "[";
+                    return;
+                }
+                strClass += "\u0000";
+                strRegex += "\u0000";
+                isClass = true;
                 return;
-            }
-            strClass += "\u0000";
-            strRegex += "\u0000";
-            isClass = true;
-            return;
-        case "]":
-            if (isClass) {
-                isClass = false;
+            case "]":
+                if (isClass) {
+                    isClass = false;
+                    return;
+                }
+                strRegex += "]";
                 return;
+            default:
+                if (isClass) {
+                    strClass += match0;
+                    return;
+                }
+                strRegex += match0;
             }
-            strRegex += "]";
-            return;
-        default:
-            if (isClass) {
-                strClass += match0;
-                return;
-            }
-            strRegex += match0;
-        }
-        return "";
-    });
-    strClass += "\u0000";
+            return "";
+        });
+        strClass += "\u0000";
 
 // An expression "[!...]" matches a single character, namely any character that
 // is not matched by the expression obtained by removing the first '!' from it.
 // (Thus, "[!a-]" matches any single character except 'a', and '-'.)
 
-    strClass = strClass.replace((
-        /\u0000!/g
-    ), "\u0000^");
+        strClass = strClass.replace((
+            /\u0000!/g
+        ), "\u0000^");
 
 // One may include '-' in its literal meaning by making it the first or last
 // character between the brackets.
 
-    strClass = strClass.replace((
-        /\u0000-/g
-    ), "\u0000\\-");
-    strClass = strClass.replace((
-        /-\u0000/g
-    ), "\\-\u0000");
+        strClass = strClass.replace((
+            /\u0000-/g
+        ), "\u0000\\-");
+        strClass = strClass.replace((
+            /-\u0000/g
+        ), "\\-\u0000");
 
 // Escape brackets '[', ']' in character class.
 
-    strClass = strClass.replace((
-        /[\[\]]/g
-    ), "\\$&");
+        strClass = strClass.replace((
+            /[\[\]]/g
+        ), "\\$&");
 
 // https://stackoverflow.com/questions/3561493
 // /is-there-a-regexp-escape-function-in-javascript
 // $()*+-./?[\]^{|}
 
-    strRegex = strRegex.replace((
-        // /[$()*+-.\/?\[\\\]\^{|}]/g
-        /[$()*+.?\[\\\]\^{|}]/g
-    ), "\\$&");
+        strRegex = strRegex.replace((
+            // ignore [-/]
+            /[$()*+.?\[\\\]\^{|}]/g
+        ), "\\$&");
 
-// Escape path-delimiter '/'.
+// Expand wildcard '**/*'.
 
-// Expand wildcards '*', '*', '?'.
+        strRegex = strRegex.replace((
+            /\\\*\\\*\/(?:\\\*)+/g
+        ), ".*?");
 
-    strRegex = strRegex.replace((
-        /(?:\\\*){2,}\/(?:\\\*){1,}/gm
-    ), ".*?");
-    strRegex = strRegex.replace((
-        /(^|\/)\\\*\\\*(\/|$)/gm
-    ), "$1.*?$2");
-    strRegex = strRegex.replace((
-        /(?:\\\*){1,}/g
-    ), "[^\\/]*?");
-    strRegex = strRegex.replace((
-        /\\\?/g
-    ), "[^\\/]");
+// Expand wildcard '**'.
+
+        strRegex = strRegex.replace((
+            /(^|\/)\\\*\\\*(\/|$)/gm
+        ), "$1.*?$2");
+
+// Expand wildcard '*'.
+
+        strRegex = strRegex.replace((
+            /(?:\\\*)+/g
+        ), "[^\\/]*?");
+
+// Expand wildcard '?'.
+
+        strRegex = strRegex.replace((
+            /\\\?/g
+        ), "[^\\/]");
+
+// Expand directory-with-trailing-slash '.../'.
+
+        strRegex = strRegex.replace((
+            /\/$/gm
+        ), "\\/.*?");
 
 // Merge strClass into strRegex.
 
-    ii = 0;
-    strClass = strClass.split("\u0000");
-    strRegex = strRegex.replace((
-        /\u0000/g
-    ), function () {
-        ii += 1;
-        if (strClass[ii] === "") {
-            return "";
-        }
-        return "[" + strClass[ii] + "]";
-    });
+        ii = 0;
+        strClass = strClass.split("\u0000");
+        strRegex = strRegex.replace((
+            /\u0000/g
+        ), function () {
+            ii += 1;
+            if (strClass[ii] === "") {
+                return "";
+            }
+            return "[" + strClass[ii] + "]";
+        });
 
 // Change strRegex from text to regexp.
 
-    strRegex = new RegExp("^" + strRegex + "$", "gm");
-    return strRegex;
+        strRegex = new RegExp("^" + strRegex + "$", "gm");
+        return strRegex;
+    }
+
+// Validate excludeList, includeList, pathnameList.
+
+    globAssertNotWeird(excludeList, "pattern");
+    globAssertNotWeird(includeList, "pattern");
+    globAssertNotWeird(pathnameList, "pathname");
+
+// Optimization
+// Concat pathnames to a single, newline-separated string,
+// whose pathnames can all be filtered with a single, regexp-pass.
+
+    pathnameList = pathnameList.join("\n");
+
+// 1. Exclude pathnames in <pathnameList> that don't match glob-patterns in
+//    <includeList>.
+
+    if (includeList.length > 0) {
+        includeList = includeList.map(globToRegexp);
+        includeList.forEach(function (pattern) {
+            pathnameList = pathnameList.replace(pattern, "\u0000$&");
+        });
+        pathnameList = pathnameList.replace((
+            /^[^\u0000].*/gm
+        ), "");
+        pathnameList = pathnameList.replace((
+            /^\u0000+/gm
+        ), "");
+    }
+
+// 2. Exclude pathnames in <pathnameList> that match glob-patterns in
+//    <excludeList>.
+
+    excludeList = excludeList.map(globToRegexp);
+    excludeList.forEach(function (pattern) {
+        pathnameList = pathnameList.replace(pattern, "");
+    });
+
+// Split newline-separated pathnames back to list.
+
+    pathnameList = pathnameList.split("\n").filter(function (elem) {
+        return elem;
+    });
+    return {
+        excludeList,
+        includeList,
+        pathnameList
+    };
 }
 
 function htmlEscape(str) {
@@ -10582,10 +10595,10 @@ async function v8CoverageReportCreate({
 // 3. Create html-coverage-reports in <coverageDir>.
 
     let cwd;
+    let excludeList = [];
     let exitCode = 0;
     let fileDict;
-    let pathExcludeList = [];
-    let pathIncludeList = [];
+    let includeList = [];
     let processArgElem;
     let promiseList = [];
     let v8CoverageObj;
@@ -11064,17 +11077,17 @@ function sentinel() {}
         switch (processArgElem[0]) {
 
 // PR-371
-// Add cli-option `--exclude=aa,bb`.
+// Add cli-option `--exclude=...`.
 
         case "--exclude":
-            pathExcludeList.push(processArgElem[1]);
+            excludeList.push(processArgElem[1]);
             break;
 
 // PR-371
-// Add cli-option `--include=aa,bb`
+// Add cli-option `--include=...`
 
         case "--include":
-            pathIncludeList.push(processArgElem[1]);
+            includeList.push(processArgElem[1]);
             break;
         }
     }
@@ -11129,12 +11142,14 @@ function sentinel() {}
     });
     v8CoverageObj = await Promise.all(v8CoverageObj.map(async function (file) {
         let data;
-        let pathDict = Object.create(null);
-        let pathList = [];
+        let pathnameDict = Object.create(null);
         data = await moduleFs.promises.readFile(coverageDir + file, "utf8");
         data = JSON.parse(data);
         data.result.forEach(function (scriptCov) {
             let pathname = scriptCov.url;
+
+// Filter out internal coverages.
+
             if (!pathname.startsWith("file:///")) {
                 return;
             }
@@ -11156,19 +11171,18 @@ function sentinel() {}
 
             pathname = pathname.slice(cwd.length);
             scriptCov.url = pathname;
-            pathDict[pathname] = scriptCov;
+            pathnameDict[pathname] = scriptCov;
         });
 
 // PR-xxx
-// Filter files by glob-patterns in pathExcludeList, pathIncludeList.
+// Filter files by glob-patterns in excludeList, includeList.
 
-        pathList = Object.keys(pathDict);
-        if (pathIncludeList.length > 0) {
-            pathList = globPathInclude(pathIncludeList, pathList);
-        }
-        pathList = globPathExclude(pathExcludeList, pathList);
-        data.result = pathList.map(function (pathname) {
-            return pathDict[pathname];
+        data.result = globExclude({
+            excludeList,
+            includeList,
+            pathnameList: Object.keys(pathnameDict)
+        }).pathnameList.map(function (pathname) {
+            return pathnameDict[pathname];
         });
         return data;
     }));
@@ -11317,9 +11331,7 @@ jslint_export = Object.freeze(Object.assign(jslint, {
     assertOrThrow,
     debugInline,
     fsWriteFileWithParents,
-    globPathExclude,
-    globPathInclude,
-    globPathToRegexp,
+    globExclude,
     htmlEscape,
     jslint,
     jslint_apidoc,

@@ -1853,136 +1853,138 @@ async function fsWriteFileWithParents(pathname, data) {
   }
   console.error("wrote file " + pathname);
 }
-function globPathExclude(patternList, pathList, mode) {
-  pathList.forEach(function (path) {
-    path.replace((
-      /[\u0000-\u0007]/g
-    ), function (chr) {
+function globExclude({
+  excludeList = [],
+  includeList = [],
+  pathnameList = []
+}) {
+  function globAssertNotWeird(list, name) {
+    list.join("\n").replace((
+      /^.*?([\u0000-\u0007]).*/gm
+    ), function (match0, chr) {
       throw new Error(
         "Weird character "
         + JSON.stringify(chr)
-        + " found in path "
-        + JSON.stringify(path)
+        + " found in " + name + " "
+        + JSON.stringify(match0)
       );
     });
-  });
-  pathList = pathList.join("\n");
-  if (mode === "include") {
-    patternList.forEach(function (pattern) {
-      pathList = pathList.replace(globPathToRegexp(pattern), "\u0000$&");
+  }
+
+  function globToRegexp(pattern) {
+    let ii = 0;
+    let isClass = false;
+    let strClass = "";
+    let strRegex = "";
+    pattern = pattern.replace((
+      /\/\/+/g
+    ), "/");
+    pattern = pattern.replace((
+      /\*\*\*+/g
+    ), "**");
+    pattern.replace((
+      /\\\\|\\\[|\\\]|\[|\]|./g
+    ), function (match0) {
+      switch (match0) {
+      case "[":
+        if (isClass) {
+          strClass += "[";
+          return;
+        }
+        strClass += "\u0000";
+        strRegex += "\u0000";
+        isClass = true;
+        return;
+      case "]":
+        if (isClass) {
+          isClass = false;
+          return;
+        }
+        strRegex += "]";
+        return;
+      default:
+        if (isClass) {
+          strClass += match0;
+          return;
+        }
+        strRegex += match0;
+      }
+      return "";
     });
-    pathList = pathList.replace((
+    strClass += "\u0000";
+    strClass = strClass.replace((
+      /\u0000!/g
+    ), "\u0000^");
+    strClass = strClass.replace((
+      /\u0000-/g
+    ), "\u0000\\-");
+    strClass = strClass.replace((
+      /-\u0000/g
+    ), "\\-\u0000");
+    strClass = strClass.replace((
+      /[\[\]]/g
+    ), "\\$&");
+    strRegex = strRegex.replace((
+      // ignore [-/]
+      /[$()*+.?\[\\\]\^{|}]/g
+    ), "\\$&");
+    strRegex = strRegex.replace((
+      /\\\*\\\*\/(?:\\\*)+/g
+    ), ".*?");
+    strRegex = strRegex.replace((
+      /(^|\/)\\\*\\\*(\/|$)/gm
+    ), "$1.*?$2");
+    strRegex = strRegex.replace((
+      /(?:\\\*)+/g
+    ), "[^\\/]*?");
+    strRegex = strRegex.replace((
+      /\\\?/g
+    ), "[^\\/]");
+    strRegex = strRegex.replace((
+      /\/$/gm
+    ), "\\/.*?");
+    ii = 0;
+    strClass = strClass.split("\u0000");
+    strRegex = strRegex.replace((
+      /\u0000/g
+    ), function () {
+      ii += 1;
+      if (strClass[ii] === "") {
+        return "";
+      }
+      return "[" + strClass[ii] + "]";
+    });
+    strRegex = new RegExp("^" + strRegex + "$", "gm");
+    return strRegex;
+  }
+  globAssertNotWeird(excludeList, "pattern");
+  globAssertNotWeird(includeList, "pattern");
+  globAssertNotWeird(pathnameList, "pathname");
+  pathnameList = pathnameList.join("\n");
+  if (includeList.length > 0) {
+    includeList = includeList.map(globToRegexp);
+    includeList.forEach(function (pattern) {
+      pathnameList = pathnameList.replace(pattern, "\u0000$&");
+    });
+    pathnameList = pathnameList.replace((
       /^[^\u0000].*/gm
     ), "");
-    pathList = pathList.replace((
-      /^\u0000*/gm
+    pathnameList = pathnameList.replace((
+      /^\u0000+/gm
     ), "");
-  } else {
-    patternList.forEach(function (pattern) {
-      pathList = pathList.replace(globPathToRegexp(pattern), "");
-    });
   }
-  pathList = pathList.split("\n").filter(function (elem) {
+  excludeList = excludeList.map(globToRegexp);
+  excludeList.forEach(function (pattern) {
+    pathnameList = pathnameList.replace(pattern, "");
+  });
+  pathnameList = pathnameList.split("\n").filter(function (elem) {
     return elem;
   });
-  return pathList;
-}
-function globPathInclude(patternList, pathList) {
-  return globPathExclude(patternList, pathList, "include");
-}
-function globPathToRegexp(pattern) {
-  let ii = 0;
-  let isClass = false;
-  let strClass = "";
-  let strRegex = "";
-  pattern.replace((
-    /[\u0000-\u0007]/g
-  ), function (chr) {
-    throw new Error(
-      "Weird character "
-      + JSON.stringify(chr)
-      + " found in pattern "
-      + JSON.stringify(pattern)
-    );
-  });
-  pattern = pattern.replace((
-    /\/{2,}/g
-  ), "/");
-  pattern = pattern.replace((
-    /\*{3,}/g
-  ), "**");
-  pattern.replace((
-    /\\\\|\\\[|\\\]|\[|\]|./g
-  ), function (match0) {
-    switch (match0) {
-    case "[":
-      if (isClass) {
-        strClass += "[";
-        return;
-      }
-      strClass += "\u0000";
-      strRegex += "\u0000";
-      isClass = true;
-      return;
-    case "]":
-      if (isClass) {
-        isClass = false;
-        return;
-      }
-      strRegex += "]";
-      return;
-    default:
-      if (isClass) {
-        strClass += match0;
-        return;
-      }
-      strRegex += match0;
-    }
-    return "";
-  });
-  strClass += "\u0000";
-  strClass = strClass.replace((
-    /\u0000!/g
-  ), "\u0000^");
-  strClass = strClass.replace((
-    /\u0000-/g
-  ), "\u0000\\-");
-  strClass = strClass.replace((
-    /-\u0000/g
-  ), "\\-\u0000");
-  strClass = strClass.replace((
-    /[\[\]]/g
-  ), "\\$&");
-  strRegex = strRegex.replace((
-    // /[$()*+-.\/?\[\\\]\^{|}]/g
-    /[$()*+.?\[\\\]\^{|}]/g
-  ), "\\$&");
-
-  strRegex = strRegex.replace((
-    /(?:\\\*){2,}\/(?:\\\*){1,}/gm
-  ), ".*?");
-  strRegex = strRegex.replace((
-    /(^|\/)\\\*\\\*(\/|$)/gm
-  ), "$1.*?$2");
-  strRegex = strRegex.replace((
-    /(?:\\\*){1,}/g
-  ), "[^\\/]*?");
-  strRegex = strRegex.replace((
-    /\\\?/g
-  ), "[^\\/]");
-  ii = 0;
-  strClass = strClass.split("\u0000");
-  strRegex = strRegex.replace((
-    /\u0000/g
-  ), function () {
-    ii += 1;
-    if (strClass[ii] === "") {
-      return "";
-    }
-    return "[" + strClass[ii] + "]";
-  });
-  strRegex = new RegExp("^" + strRegex + "$", "gm");
-  return strRegex;
+  return {
+    excludeList,
+    includeList,
+    pathnameList
+  };
 }
 function htmlEscape(str) {
   return String(str).replace((
@@ -2448,10 +2450,10 @@ async function v8CoverageReportCreate({
   processArgv = []
 }) {
   let cwd;
+  let excludeList = [];
   let exitCode = 0;
   let fileDict;
-  let pathExcludeList = [];
-  let pathIncludeList = [];
+  let includeList = [];
   let processArgElem;
   let promiseList = [];
   let v8CoverageObj;
@@ -2893,10 +2895,10 @@ function sentinel() {}
     processArgElem[1] = processArgElem.slice(1).join("=");
     switch (processArgElem[0]) {
     case "--exclude":
-      pathExcludeList.push(processArgElem[1]);
+      excludeList.push(processArgElem[1]);
       break;
     case "--include":
-      pathIncludeList.push(processArgElem[1]);
+      includeList.push(processArgElem[1]);
       break;
     }
   }
@@ -2938,8 +2940,7 @@ function sentinel() {}
   });
   v8CoverageObj = await Promise.all(v8CoverageObj.map(async function (file) {
     let data;
-    let pathDict = Object.create(null);
-    let pathList = [];
+    let pathnameDict = Object.create(null);
     data = await moduleFs.promises.readFile(coverageDir + file, "utf8");
     data = JSON.parse(data);
     data.result.forEach(function (scriptCov) {
@@ -2956,15 +2957,14 @@ function sentinel() {}
       }
       pathname = pathname.slice(cwd.length);
       scriptCov.url = pathname;
-      pathDict[pathname] = scriptCov;
+      pathnameDict[pathname] = scriptCov;
     });
-    pathList = Object.keys(pathDict);
-    if (pathIncludeList.length > 0) {
-      pathList = globPathInclude(pathIncludeList, pathList);
-    }
-    pathList = globPathExclude(pathExcludeList, pathList);
-    data.result = pathList.map(function (pathname) {
-      return pathDict[pathname];
+    data.result = globExclude({
+      excludeList,
+      includeList,
+      pathnameList: Object.keys(pathnameDict)
+    }).pathnameList.map(function (pathname) {
+      return pathnameDict[pathname];
     });
     return data;
   }));

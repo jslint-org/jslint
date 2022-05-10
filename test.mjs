@@ -10,8 +10,7 @@ let {
     assertOrThrow,
     debugInline,
     fsWriteFileWithParents,
-    globPathExclude,
-    globPathToRegexp,
+    globExclude,
     jstestDescribe,
     jstestIt,
     jstestOnExit,
@@ -75,22 +74,166 @@ jstestDescribe((
 });
 
 jstestDescribe((
-    "test globPathXxx handling-behavior"
-), function testBehaviorGlobPathXxx() {
+    "test globXxx handling-behavior"
+), function testBehaviorGlobXxx() {
     jstestIt((
-        "test globPathExclude-error handling-behavior"
+        "test globAssertNotWeird-error handling-behavior"
     ), async function () {
         await assertErrorThrownAsync(function () {
-            return globPathExclude(
-                [],
-                [
-                    "\u0000"
+            return globExclude({
+                pathnameList: [
+                    "aa",
+                    "cc/\u0000/dd",
+                    "bb"
                 ]
-            );
-        }, "Weird character \"\\\\u0000\" found in path");
+            });
+        }, `Weird character "\\\\u0000" found in pathname "cc/\\\\u0000/dd"`);
     });
     jstestIt((
-        "test globPathToRegexp handling-behavior"
+        "test globExclude handling-behavior"
+    ), function () {
+        let pathnameList = [
+            ".dockerignore",
+            ".eslintrc.js",
+            ".gitignore",
+            ".npmignore",
+            ".travis.yml",
+            "CHANGELOG.md",
+            "CONTRIBUTING.md",
+            "Dockerfile",
+            "LICENSE",
+            "Makefile",
+            "README.md",
+            "appveyor.yml",
+            "benchmark/insert-transaction.sql",
+            "benchmark/insert.js",
+            "binding.gyp",
+            "cloudformation/ci.template.js",
+            "deps/common-sqlite.gypi",
+            "deps/extract.py",
+            "deps/sqlite-autoconf-3340000.tar.gz",
+            "deps/sqlite3.gyp",
+            "examples/simple-chaining.js",
+            "lib/index.js",
+            "lib/sqlite3-binding.js",
+            "lib/sqlite3.js",
+            "lib/trace.js",
+            "package.json",
+            "scripts/build-appveyor.bat",
+            "scripts/build-local.bat",
+            "scripts/build_against_electron.sh",
+            "scripts/build_against_node.sh",
+            "scripts/build_against_node_webkit.sh",
+            "scripts/build_for_node_webkit.cmd",
+            "scripts/install_node.sh",
+            "scripts/validate_tag.sh",
+            "sqlite3.js",
+            "src/async.h",
+            "src/backup.cc",
+            "src/backup.h",
+            "src/database.cc",
+            "src/database.h",
+            "src/gcc-preinclude.h",
+            "src/macros.h",
+            "src/node_sqlite3.cc",
+            "src/statement.cc",
+            "src/statement.h",
+            "src/threading.h",
+            "test/affected.test.js",
+            "test/backup.test.js",
+            "test/blob.test.js",
+            "test/cache.test.js",
+            "test/constants.test.js",
+            "test/database_fail.test.js",
+            "test/each.test.js",
+            "test/exec.test.js",
+            "test/extension.test.js",
+            "test/fts-content.test.js",
+            "test/interrupt.test.js",
+            "test/issue-108.test.js",
+            "test/json.test.js",
+            "test/map.test.js",
+            "test/named_columns.test.js",
+            "test/named_params.test.js",
+            "test/null_error.test.js",
+            "test/nw/.gitignore",
+            "test/nw/Makefile",
+            "test/nw/index.html",
+            "test/nw/package.json",
+            "test/open_close.test.js",
+            "test/other_objects.test.js",
+            "test/parallel_insert.test.js",
+            "test/prepare.test.js",
+            "test/profile.test.js",
+            "test/rerun.test.js",
+            "test/scheduling.test.js",
+            "test/serialization.test.js",
+            "test/support/createdb-electron.js",
+            "test/support/createdb.js",
+            "test/support/elmo.png",
+            "test/support/helper.js",
+            "test/support/prepare.db",
+            "test/support/script.sql",
+            "test/trace.test.js",
+            "test/unicode.test.js",
+            "test/upsert.test.js",
+            "test/verbose.test.js",
+            "tools/docker/architecture/linux-arm/Dockerfile",
+            "tools/docker/architecture/linux-arm/run.sh",
+            "tools/docker/architecture/linux-arm64/Dockerfile",
+            "tools/docker/architecture/linux-arm64/run.sh"
+        ];
+        [
+            "tes?/",
+            "tes[-t-]/",
+            "tes[-t]/",
+            "tes[0-9A-Z_a-z-]/",
+            "tes[t-]/",
+            "test/**/*.js"
+        ].forEach(function (aa) {
+            [
+                "li*/*.js",
+                "li?/*.js",
+                "lib/*",
+                "lib/**/*.js",
+                "lib/*.js"
+            ].forEach(function (bb) {
+                assertJsonEqual(
+                    globExclude({
+                        excludeList: [
+                            "**/node_modules/",
+                            "node_modules/",
+                            "tes[!0-9A-Z_a-z-]/",
+                            "tes[^0-9A-Z_a-z-]/",
+                            "test/suppor*/*elper.js",
+                            "test/suppor?/?elper.js",
+                            "test/support/helper.js"
+                        ].concat(aa),
+                        includeList: [
+                            "**/*.cjs",
+                            "**/*.js",
+                            "**/*.mjs",
+                            "lib/sqlite3.js"
+                        ].concat(bb),
+                        pathnameList
+                    }).pathnameList,
+                    [
+                        ".eslintrc.js",
+                        "benchmark/insert.js",
+                        "cloudformation/ci.template.js",
+                        "examples/simple-chaining.js",
+                        "lib/index.js",
+                        "lib/sqlite3-binding.js",
+                        "lib/sqlite3.js",
+                        "lib/trace.js",
+                        "sqlite3.js"
+                    ]
+                );
+            });
+        });
+    });
+    jstestIt((
+        "test globToRegexp handling-behavior"
     ), function () {
         Object.entries({
             "*": (
@@ -99,8 +242,23 @@ jstestDescribe((
             "**": (
                 /^.*?$/gm
             ),
+            "***": (
+                /^.*?$/gm
+            ),
+            "****": (
+                /^.*?$/gm
+            ),
+            "****////****": (
+                /^.*?$/gm
+            ),
+            "***///***": (
+                /^.*?$/gm
+            ),
             "**/*": (
                 /^.*?$/gm
+            ),
+            "**/node_modules/": (
+                /^.*?\/node_modules\/.*?$/gm
             ),
             "**/node_modules/**/*": (
                 /^.*?\/node_modules\/.*?$/gm
@@ -126,17 +284,26 @@ jstestDescribe((
             "aa/bb/cc": (
                 /^aa\/bb\/cc$/gm
             ),
+            "aa/bb/cc/": (
+                /^aa\/bb\/cc\/.*?$/gm
+            ),
             "li*/*": (
                 /^li[^\/]*?\/[^\/]*?$/gm
             ),
             "li?/*": (
                 /^li[^\/]\/[^\/]*?$/gm
             ),
+            "lib/": (
+                /^lib\/.*?$/gm
+            ),
             "lib/*": (
                 /^lib\/[^\/]*?$/gm
             ),
             "lib/*.js": (
                 /^lib\/[^\/]*?\.js$/gm
+            ),
+            "node_modules/": (
+                /^node_modules\/.*?$/gm
             ),
             "node_modules/**/*": (
                 /^node_modules\/.*?$/gm
@@ -168,15 +335,23 @@ jstestDescribe((
         }).forEach(function ([
             pattern, rgx
         ]) {
-            assertJsonEqual(globPathToRegexp(pattern).source, rgx.source);
+            assertJsonEqual(
+                globExclude({
+                    excludeList: [
+                        pattern
+                    ]
+                }).excludeList[0].source,
+                rgx.source
+            );
+            assertJsonEqual(
+                globExclude({
+                    includeList: [
+                        pattern
+                    ]
+                }).includeList[0].source,
+                rgx.source
+            );
         });
-    });
-    jstestIt((
-        "test globPathToRegexp-error handling-behavior"
-    ), async function () {
-        await assertErrorThrownAsync(function () {
-            return globPathToRegexp("/\u0000/");
-        }, "Weird character \"\\\\u0000\" found in pattern");
     });
 });
 
