@@ -1,5 +1,5 @@
-<svg height="1482" width="800" xmlns="http://www.w3.org/2000/svg">
-<rect height="1482" fill="#222" width="800"></rect>
+<svg height="1636" width="800" xmlns="http://www.w3.org/2000/svg">
+<rect height="1636" fill="#222" width="800"></rect>
 <text
     fill="#7f7"
     font-family="consolas, menlo, monospace"
@@ -137,151 +137,151 @@
     textLength="768"
     x="10"
     y="494"
->&gt;             "--include=lib/sqlite3-binding.js,lib/sqlite3.js",                                 </tspan>
+>&gt;             "--exclude=**/node_modules/",                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="516"
->&gt;             "--include=lib/trace.js",                                                          </tspan>
+>&gt;             "--exclude=node_modules/",                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="538"
->&gt;             "npm", "run", "test"                                                               </tspan>
+>&gt;             "--exclude=tes?/",                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="560"
->&gt;         ]                                                                                      </tspan>
+>&gt;             "--exclude=tes[!0-9A-Z_a-z-]/",                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="582"
->&gt;     });                                                                                        </tspan>
+>&gt;             "--exclude=tes[0-9A-Z_a-z-]/",                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="604"
->&gt; }());                                                                                          </tspan>
+>&gt;             "--exclude=tes[^0-9A-Z_a-z-]/",                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="626"
->&gt;                                                                                                </tspan>
+>&gt;             "--exclude=test/**/*.js",                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="648"
->&gt; '                                                                                              </tspan>
+>&gt;             "--exclude=test/suppor*/*elper.js",                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="670"
->                                                                                                 </tspan>
+>&gt;             "--exclude=test/suppor?/?elper.js",                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="692"
->                                                                                                 </tspan>
+>&gt;             "--exclude=test/support/helper.js",                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="714"
->HEAD is now at 60a022c napi: temporarily disable v6 (see issue #1444)                            </tspan>
+>&gt;             "--include=**/*.cjs",                                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="736"
->                                                                                                 </tspan>
+>&gt;             "--include=**/*.js",                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="758"
->&gt; sqlite3@5.0.2 install                                                                          </tspan>
+>&gt;             "--include=**/*.mjs",                                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="780"
->&gt; node-pre-gyp install --fallback-to-build                                                       </tspan>
+>&gt;             "--include=li*/*.js",                                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="802"
->                                                                                                 </tspan>
+>&gt;             "--include=li?/*.js",                                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="824"
->node-pre-gyp info it worked if it ends with ok                                                   </tspan>
+>&gt;             "--include=lib/*",                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="846"
->node-pre-gyp info using node-pre-gyp@0.11.0                                                      </tspan>
+>&gt;             "--include=lib/**/*.js",                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="868"
->node-pre-gyp info using node@16.14.2 | linux | x64                                               </tspan>
+>&gt;             "--include=lib/*.js",                                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="890"
->node-pre-gyp WARN Using request for node-pre-gyp https download                                  </tspan>
+>&gt;             "--include=lib/sqlite3.js",                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="912"
->[sqlite3] Success: "/home/runner/work/jslint/jslint/node-sqlite3-js/lib/binding/napi-v3-linux-x6\</tspan>
+>&gt;             "npm", "run", "test"                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="934"
->  4/node_sqlite3.node" already installed                                                         </tspan>
+>&gt;         ]                                                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="956"
->Pass --update-binary to reinstall or --build-from-source to recompile                            </tspan>
+>&gt;     });                                                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="978"
->node-pre-gyp info ok                                                                             </tspan>
+>&gt; }());                                                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1000"
->                                                                                                 </tspan>
+>&gt;                                                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1022"
->up to date, audited 246 packages in 2s                                                           </tspan>
+>&gt; '                                                                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -293,115 +293,157 @@
     textLength="768"
     x="10"
     y="1066"
->4 packages are looking for funding                                                               </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1088"
->  run `npm fund` for details                                                                     </tspan>
+>HEAD is now at 60a022c napi: temporarily disable v6 (see issue #1444)                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1110"
->                                                                                                 </tspan>
+>npm WARN deprecated har-validator@5.1.5: this library is no longer supported                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1132"
->9 vulnerabilities (4 moderate, 4 high, 1 critical)                                               </tspan>
+>npm WARN deprecated circular-json@0.3.3: CircularJSON is in maintenance only, flatted is its suc\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1154"
->                                                                                                 </tspan>
+>  cessor.                                                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1176"
->To address issues that do not require attention, run:                                            </tspan>
+>npm WARN deprecated querystring@0.2.0: The querystring API is considered Legacy. new code should\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1198"
->  npm audit fix                                                                                  </tspan>
+>   use the URLSearchParams API instead.                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1220"
->                                                                                                 </tspan>
+>npm WARN deprecated uuid@3.3.2: Please upgrade  to version 7 or higher.  Older versions may use \</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1242"
->To address all issues (including breaking changes), run:                                         </tspan>
+>  Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1264"
->  npm audit fix --force                                                                          </tspan>
+>  blog/math-random for details.                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1286"
->                                                                                                 </tspan>
+>npm WARN deprecated mkdirp@0.5.1: Legacy versions of mkdirp are no longer supported. Please upda\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1308"
->Run `npm audit` for details.                                                                     </tspan>
+>  te to mkdirp 1.x. (Note that the API surface has changed to use Promises in 1.x.)              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1330"
->wrote file /home/runner/work/jslint/jslint/.artifact/coverage_sqlite3_js//touch.txt              </tspan>
+>npm WARN deprecated request@2.88.2: request has been deprecated, see https://github.com/request/\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1352"
->                                                                                                 </tspan>
+>  request/issues/3142                                                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1374"
->&gt; sqlite3@5.0.2 pretest                                                                          </tspan>
+>npm WARN deprecated node-pre-gyp@0.11.0: Please upgrade to @mapbox/node-pre-gyp: the non-scoped \</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1396"
->&gt; node test/support/createdb.js                                                                  </tspan>
+>  node-pre-gyp package is deprecated and only the @mapbox scoped package will recieve updates in\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1418"
->                                                                                                 </tspan>
+>   the future                                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1440"
->okay: database already created (/home/runner/work/jslint/jslint/node-sqlite3-js/test/support/big\</tspan>
+>npm WARN deprecated tar@2.2.2: This version of tar is no longer supported, and will not receive \</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1462"
->  .db)                                                                                           </tspan>
+>  security updates. Please upgrade asap.                                                         </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1484"
+>                                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1506"
+>&gt; sqlite3@5.0.2 install                                                                          </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1528"
+>&gt; node-pre-gyp install --fallback-to-build                                                       </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1550"
+>                                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1572"
+>node-pre-gyp info it worked if it ends with ok                                                   </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1594"
+>node-pre-gyp info using node-pre-gyp@0.11.0                                                      </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1616"
+>node-pre-gyp info using node@16.15.0 | linux | x64                                               </tspan>
 
 </text>
 </svg>

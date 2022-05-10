@@ -1,6 +1,5 @@
 // #!/usr/bin/env node
 // JSLint
-// Original Author: Douglas Crockford (https://www.jslint.com).
 
 // This is free and unencumbered software released into the public domain.
 
@@ -93,7 +92,10 @@
 
 /*jslint beta, node*/
 /*property
-    import_meta_url,
+    excludeList,
+    globExclude,
+    import_meta_url, includeList,
+    pathnameList,
     JSLINT_BETA, NODE_V8_COVERAGE, a, all, argv, arity, artifact,
     assertErrorThrownAsync, assertJsonEqual, assertOrThrow, assign, async, b,
     beta, bitwise, block, body, browser, c, calls, catch, catch_list,
@@ -350,6 +352,211 @@ async function fsWriteFileWithParents(pathname, data) {
         await moduleFs.promises.writeFile(pathname, data);
     }
     console.error("wrote file " + pathname);
+}
+
+function globExclude({
+    excludeList = [],
+    includeList = [],
+    pathnameList = []
+}) {
+
+// This function will
+// 1. Exclude pathnames in <pathnameList> that don't match glob-patterns in
+//    <includeList>.
+// 2. Exclude pathnames in <pathnameList> that match glob-patterns in
+//    <excludeList>.
+
+    function globAssertNotWeird(list, name) {
+
+// This function will check if <str> has weird characters.
+
+        list.join("\n").replace((
+            /^.*?([\u0000-\u0007]).*/gm
+        ), function (match0, chr) {
+            throw new Error(
+                "Weird character "
+                + JSON.stringify(chr)
+                + " found in " + name + " "
+                + JSON.stringify(match0)
+            );
+        });
+    }
+
+    function globToRegexp(pattern) {
+
+// This function will translate shell-glob <pattern> to javascript-regexp,
+// that javascript can then use to "glob" pathnames.
+
+        let ii = 0;
+        let isClass = false;
+        let strClass = "";
+        let strRegex = "";
+        pattern = pattern.replace((
+            /\/\/+/g
+        ), "/");
+        pattern = pattern.replace((
+            /\*\*\*+/g
+        ), "**");
+        pattern.replace((
+            /\\\\|\\\[|\\\]|\[|\]|./g
+        ), function (match0) {
+            switch (match0) {
+            case "[":
+                if (isClass) {
+                    strClass += "[";
+                    return;
+                }
+                strClass += "\u0000";
+                strRegex += "\u0000";
+                isClass = true;
+                return;
+            case "]":
+                if (isClass) {
+                    isClass = false;
+                    return;
+                }
+                strRegex += "]";
+                return;
+            default:
+                if (isClass) {
+                    strClass += match0;
+                    return;
+                }
+                strRegex += match0;
+            }
+            return "";
+        });
+        strClass += "\u0000";
+
+// An expression "[!...]" matches a single character, namely any character that
+// is not matched by the expression obtained by removing the first '!' from it.
+// (Thus, "[!a-]" matches any single character except 'a', and '-'.)
+
+        strClass = strClass.replace((
+            /\u0000!/g
+        ), "\u0000^");
+
+// One may include '-' in its literal meaning by making it the first or last
+// character between the brackets.
+
+        strClass = strClass.replace((
+            /\u0000-/g
+        ), "\u0000\\-");
+        strClass = strClass.replace((
+            /-\u0000/g
+        ), "\\-\u0000");
+
+// Escape brackets '[', ']' in character class.
+
+        strClass = strClass.replace((
+            /[\[\]]/g
+        ), "\\$&");
+
+// https://stackoverflow.com/questions/3561493
+// /is-there-a-regexp-escape-function-in-javascript
+// $()*+-./?[\]^{|}
+
+        strRegex = strRegex.replace((
+            // ignore [-/]
+            /[$()*+.?\[\\\]\^{|}]/g
+        ), "\\$&");
+
+// Expand wildcard '**/*'.
+
+        strRegex = strRegex.replace((
+            /\\\*\\\*\/(?:\\\*)+/g
+        ), ".*?");
+
+// Expand wildcard '**'.
+
+        strRegex = strRegex.replace((
+            /(^|\/)\\\*\\\*(\/|$)/gm
+        ), "$1.*?$2");
+
+// Expand wildcard '*'.
+
+        strRegex = strRegex.replace((
+            /(?:\\\*)+/g
+        ), "[^\\/]*?");
+
+// Expand wildcard '?'.
+
+        strRegex = strRegex.replace((
+            /\\\?/g
+        ), "[^\\/]");
+
+// Expand directory-with-trailing-slash '.../'.
+
+        strRegex = strRegex.replace((
+            /\/$/gm
+        ), "\\/.*?");
+
+// Merge strClass into strRegex.
+
+        ii = 0;
+        strClass = strClass.split("\u0000");
+        strRegex = strRegex.replace((
+            /\u0000/g
+        ), function () {
+            ii += 1;
+            if (strClass[ii] === "") {
+                return "";
+            }
+            return "[" + strClass[ii] + "]";
+        });
+
+// Change strRegex from text to regexp.
+
+        strRegex = new RegExp("^" + strRegex + "$", "gm");
+        return strRegex;
+    }
+
+// Validate excludeList, includeList, pathnameList.
+
+    globAssertNotWeird(excludeList, "pattern");
+    globAssertNotWeird(includeList, "pattern");
+    globAssertNotWeird(pathnameList, "pathname");
+
+// Optimization
+// Concat pathnames to a single, newline-separated string,
+// whose pathnames can all be filtered with a single, regexp-pass.
+
+    pathnameList = pathnameList.join("\n");
+
+// 1. Exclude pathnames in <pathnameList> that don't match glob-patterns in
+//    <includeList>.
+
+    if (includeList.length > 0) {
+        includeList = includeList.map(globToRegexp);
+        includeList.forEach(function (pattern) {
+            pathnameList = pathnameList.replace(pattern, "\u0000$&");
+        });
+        pathnameList = pathnameList.replace((
+            /^[^\u0000].*/gm
+        ), "");
+        pathnameList = pathnameList.replace((
+            /^\u0000+/gm
+        ), "");
+    }
+
+// 2. Exclude pathnames in <pathnameList> that match glob-patterns in
+//    <excludeList>.
+
+    excludeList = excludeList.map(globToRegexp);
+    excludeList.forEach(function (pattern) {
+        pathnameList = pathnameList.replace(pattern, "");
+    });
+
+// Split newline-separated pathnames back to list.
+
+    pathnameList = pathnameList.split("\n").filter(function (elem) {
+        return elem;
+    });
+    return {
+        excludeList,
+        includeList,
+        pathnameList
+    };
 }
 
 function htmlEscape(str) {
@@ -10388,11 +10595,10 @@ async function v8CoverageReportCreate({
 // 3. Create html-coverage-reports in <coverageDir>.
 
     let cwd;
+    let excludeList = [];
     let exitCode = 0;
     let fileDict;
-    let fileExcludeList = [];
-    let fileIncludeList = [];
-    let fileIncludeNodeModules;
+    let includeList = [];
     let processArgElem;
     let promiseList = [];
     let v8CoverageObj;
@@ -10575,6 +10781,7 @@ body {
         }
         txtBorder = (
             "+" + "-".repeat(padPathname + 2) + "+"
+            + "-".repeat(padLines + 2) + "+"
             + "-".repeat(padLines + 2) + "+\n"
         );
         txt = "";
@@ -10582,7 +10789,8 @@ body {
         txt += txtBorder;
         txt += (
             "| " + String("Files covered").padEnd(padPathname, " ") + " | "
-            + String("Lines").padStart(padLines, " ") + " |\n"
+            + String("Lines").padStart(padLines, " ") + " | "
+            + String("Remaining").padStart(padLines, " ") + " |\n"
         );
         txt += txtBorder;
         fileList.forEach(function ({
@@ -10662,7 +10870,8 @@ body {
                 + String("./" + pathname).padEnd(padPathname, " ") + " | "
                 + String(
                     modeCoverageIgnoreFile + " " + coveragePct + " %"
-                ).padStart(padLines, " ") + " |\n"
+                ).padStart(padLines, " ") + " | "
+                + " ".repeat(padLines) + " |\n"
             );
             txt += (
                 "| " + "*".repeat(
@@ -10670,6 +10879,9 @@ body {
                 ).padEnd(padPathname, "_") + " | "
                 + String(
                     linesCovered + " / " + linesTotal
+                ).padStart(padLines, " ") + " | "
+                + String(
+                    (linesTotal - linesCovered) + " / " + linesTotal
                 ).padStart(padLines, " ") + " |\n"
             );
             txt += txtBorder;
@@ -10833,21 +11045,6 @@ ${String(count || "-0").padStart(7, " ")}
         ), txt));
     }
 
-    function pathnameRelativeCwd(pathname) {
-
-// This function will if <pathname> is inside <cwd>,
-// return it relative to <cwd>, else empty-string.
-
-        pathname = modulePath.resolve(pathname).replace((
-            /\\/g
-        ), "/");
-        if (!pathname.startsWith(cwd)) {
-            return;
-        }
-        pathname = pathname.slice(cwd.length);
-        return pathname;
-    }
-
 /*
 function sentinel() {}
 */
@@ -10879,28 +11076,18 @@ function sentinel() {}
         processArgElem[1] = processArgElem.slice(1).join("=");
         switch (processArgElem[0]) {
 
-// PR-371 - add cli-option `--exclude=aa,bb`
+// PR-371
+// Add cli-option `--exclude=...`.
 
         case "--exclude":
-            fileExcludeList = fileExcludeList.concat(
-                processArgElem[1].split(",")
-            );
+            excludeList.push(processArgElem[1]);
             break;
 
-// PR-371 - add cli-option `--exclude-node-modules=false`
-
-        case "--exclude-node-modules":
-            fileIncludeNodeModules = (
-                /0|false|null|undefined/
-            ).test(processArgElem[1]);
-            break;
-
-// PR-371 - add cli-option `--include=aa,bb`
+// PR-371
+// Add cli-option `--include=...`
 
         case "--include":
-            fileIncludeList = fileIncludeList.concat(
-                processArgElem[1].split(",")
-            );
+            includeList.push(processArgElem[1]);
             break;
         }
     }
@@ -10954,9 +11141,11 @@ function sentinel() {}
         ).test(file);
     });
     v8CoverageObj = await Promise.all(v8CoverageObj.map(async function (file) {
-        let data = await moduleFs.promises.readFile(coverageDir + file, "utf8");
+        let data;
+        let pathnameDict = Object.create(null);
+        data = await moduleFs.promises.readFile(coverageDir + file, "utf8");
         data = JSON.parse(data);
-        data.result = data.result.filter(function (scriptCov) {
+        data.result.forEach(function (scriptCov) {
             let pathname = scriptCov.url;
 
 // Filter out internal coverages.
@@ -10967,38 +11156,33 @@ function sentinel() {}
 
 // Normalize pathname.
 
-            pathname = pathnameRelativeCwd(moduleUrl.fileURLToPath(pathname));
-            if (
+            pathname = moduleUrl.fileURLToPath(pathname);
+            pathname = modulePath.resolve(pathname).replace((
+                /\\/g
+            ), "/");
 
 // Filter files outside of cwd.
 
-                !pathname
-                || pathname.startsWith("[")
-
-// PR-371 - Filter directory node_modules.
-
-                || (
-                    !fileIncludeNodeModules
-                    && (
-                        /(?:^|\/)node_modules\//m
-                    ).test(pathname)
-                )
-
-// PR-371 - Filter fileExcludeList.
-
-                || fileExcludeList.indexOf(pathname) >= 0
-
-// PR-371 - Filter fileIncludeList.
-
-                || (
-                    fileIncludeList.length > 0
-                    && fileIncludeList.indexOf(pathname) === -1
-                )
-            ) {
+            if (!pathname.startsWith(cwd)) {
                 return;
             }
+
+// Normalize pathname relative to cwd.
+
+            pathname = pathname.slice(cwd.length);
             scriptCov.url = pathname;
-            return true;
+            pathnameDict[pathname] = scriptCov;
+        });
+
+// PR-xxx
+// Filter files by glob-patterns in excludeList, includeList.
+
+        data.result = globExclude({
+            excludeList,
+            includeList,
+            pathnameList: Object.keys(pathnameDict)
+        }).pathnameList.map(function (pathname) {
+            return pathnameDict[pathname];
         });
         return data;
     }));
@@ -11007,7 +11191,7 @@ function sentinel() {}
 
     v8CoverageObj = v8CoverageListMerge(v8CoverageObj);
 
-// debug v8CoverageObj.
+// Debug v8CoverageObj.
 
     await fsWriteFileWithParents(
         coverageDir + "v8_coverage_merged.json",
@@ -11147,6 +11331,7 @@ jslint_export = Object.freeze(Object.assign(jslint, {
     assertOrThrow,
     debugInline,
     fsWriteFileWithParents,
+    globExclude,
     htmlEscape,
     jslint,
     jslint_apidoc,

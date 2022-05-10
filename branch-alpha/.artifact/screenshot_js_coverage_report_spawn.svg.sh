@@ -20,8 +20,25 @@ printf '> #!/bin/sh
 >     await jslint.v8CoverageReportCreate({
 >         coverageDir: "../.artifact/coverage_sqlite3_js/",
 >         processArgv: [
->             "--include=lib/sqlite3-binding.js,lib/sqlite3.js",
->             "--include=lib/trace.js",
+>             "--exclude=**/node_modules/",
+>             "--exclude=node_modules/",
+>             "--exclude=tes?/",
+>             "--exclude=tes[!0-9A-Z_a-z-]/",
+>             "--exclude=tes[0-9A-Z_a-z-]/",
+>             "--exclude=tes[^0-9A-Z_a-z-]/",
+>             "--exclude=test/**/*.js",
+>             "--exclude=test/suppor*/*elper.js",
+>             "--exclude=test/suppor?/?elper.js",
+>             "--exclude=test/support/helper.js",
+>             "--include=**/*.cjs",
+>             "--include=**/*.js",
+>             "--include=**/*.mjs",
+>             "--include=li*/*.js",
+>             "--include=li?/*.js",
+>             "--include=lib/*",
+>             "--include=lib/**/*.js",
+>             "--include=lib/*.js",
+>             "--include=lib/sqlite3.js",
 >             "npm", "run", "test"
 >         ]
 >     });
@@ -55,8 +72,25 @@ import jslint from "../jslint.mjs";
     await jslint.v8CoverageReportCreate({
         coverageDir: "../.artifact/coverage_sqlite3_js/",
         processArgv: [
-            "--include=lib/sqlite3-binding.js,lib/sqlite3.js",
-            "--include=lib/trace.js",
+            "--exclude=**/node_modules/",
+            "--exclude=node_modules/",
+            "--exclude=tes?/",
+            "--exclude=tes[!0-9A-Z_a-z-]/",
+            "--exclude=tes[0-9A-Z_a-z-]/",
+            "--exclude=tes[^0-9A-Z_a-z-]/",
+            "--exclude=test/**/*.js",
+            "--exclude=test/suppor*/*elper.js",
+            "--exclude=test/suppor?/?elper.js",
+            "--exclude=test/support/helper.js",
+            "--include=**/*.cjs",
+            "--include=**/*.js",
+            "--include=**/*.mjs",
+            "--include=li*/*.js",
+            "--include=li?/*.js",
+            "--include=lib/*",
+            "--include=lib/**/*.js",
+            "--include=lib/*.js",
+            "--include=lib/sqlite3.js",
             "npm", "run", "test"
         ]
     });
