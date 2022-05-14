@@ -1859,15 +1859,28 @@ function globExclude({
   pathnameList = []
 }) {
   function globAssertNotWeird(list, name) {
-    list.join("\n").replace((
-      /^.*?([\u0000-\u0007]).*/gm
-    ), function (match0, chr) {
-      throw new Error(
-        "Weird character "
-        + JSON.stringify(chr)
-        + " found in " + name + " "
-        + JSON.stringify(match0)
-      );
+    [
+      [
+        "\n", (
+          /^.*?([\u0000-\u0007\r]).*/gm
+        )
+      ],
+      [
+        "\r", (
+          /^.*?([\n]).*/gm
+        )
+      ]
+    ].forEach(function ([
+      separator, rgx
+    ]) {
+      list.join(separator).replace(rgx, function (match0, char) {
+        throw new Error(
+          "Weird character "
+          + JSON.stringify(char)
+          + " found in " + name + " "
+          + JSON.stringify(match0)
+        );
+      });
     });
   }
 
@@ -2454,6 +2467,7 @@ async function v8CoverageReportCreate({
   let exitCode = 0;
   let fileDict;
   let includeList = [];
+  let modeIncludeNodeModules;
   let processArgElem;
   let promiseList = [];
   let v8CoverageObj;
@@ -2900,6 +2914,11 @@ function sentinel() {}
     case "--include":
       includeList.push(processArgElem[1]);
       break;
+    case "--include-node-modules":
+      modeIncludeNodeModules = !(
+        /0|false|null|undefined/
+      ).test(processArgElem[1]);
+      break;
     }
   }
   if (processArgv.length > 0) {
@@ -2952,13 +2971,16 @@ function sentinel() {}
       pathname = modulePath.resolve(pathname).replace((
         /\\/g
       ), "/");
-      if (!pathname.startsWith(cwd)) {
+      if (pathname.indexOf("[") >= 0 || !pathname.startsWith(cwd)) {
         return;
       }
       pathname = pathname.slice(cwd.length);
       scriptCov.url = pathname;
       pathnameDict[pathname] = scriptCov;
     });
+    if (!modeIncludeNodeModules) {
+      excludeList.push("node_modules/");
+    }
     data.result = globExclude({
       excludeList,
       includeList,
