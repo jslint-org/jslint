@@ -15,6 +15,8 @@
 - perf - improve performance by hoisting inlined regexps out of loops and subfunctions
 
 # v2022.5.1-beta
+- coverage-report - disable default-coverage of directory `node_modules`, but allow override with cli-option `--include-node-modules=1`
+- coverage-report - add function globExclude() to revamp coverage-report to exclude files using glob-pattern-matching
 - add codemirror-example-file jslint_wrapper_codemirror.html
 - update codemirror-editor to v5.65.3
 - wrapper - add jslint-addon for codemirror
