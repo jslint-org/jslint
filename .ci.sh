@@ -242,6 +242,7 @@ import moduleFs from "fs";
                     + [
                         jslint.assertOrThrow,
                         jslint.fsWriteFileWithParents,
+                        jslint.globExclude,
                         jslint.htmlEscape,
                         jslint.moduleFsInit,
                         jslint.v8CoverageListMerge,
