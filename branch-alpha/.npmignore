@@ -1,7 +1,6 @@
 *
 .*
 node_modules
-
 !.npmignore
 !CHANGELOG.md
 !LICENSE

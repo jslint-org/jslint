@@ -531,24 +531,37 @@ await jslint.jslint_cli({
 
 </span>    function globAssertNotWeird(list, name) {
 
-// This function will check if &lt;str&gt; has weird characters.
+// This function will check if &lt;list&gt; of strings contain weird characters.
 
-        list.join("\n").replace((
-            /^.*?([\u0000-\u0007]).*/gm
-        ), function (match0, chr) {
-            throw new Error(
-                "Weird character "
-                + JSON.stringify(chr)
-                + " found in " + name + " "
-                + JSON.stringify(match0)
-            );
+        [
+            [
+                "\n", (
+                    /^.*?([\u0000-\u0007\r]).*/gm
+                )
+            ],
+            [
+                "\r", (
+                    /^.*?([\n]).*/gm
+                )
+            ]
+        ].forEach(function ([
+            separator, rgx
+        ]) {
+            list.join(separator).replace(rgx, function (match0, char) {
+                throw new Error(
+                    "Weird character "
+                    + JSON.stringify(char)
+                    + " found in " + name + " "
+                    + JSON.stringify(match0)
+                );
+            });
         });
     }
 
     function globToRegexp(pattern) {
 
-// This function will translate shell-glob &lt;pattern&gt; to javascript-regexp,
-// that javascript can then use to "glob" pathnames.
+// This function will translate glob &lt;pattern&gt; to javascript-regexp,
+// which javascript can then use to "glob" pathnames.
 
         let ii = 0;
         let isClass = false;
@@ -575,20 +588,7 @@ await jslint.jslint_cli({
                 return;
             case "]":
                 if (isClass) {
-                    isClass = false;
-                    return;
-                }
-                strRegex += "]";
-                return;
-            default:
-                if (isClass) {
-                    strClass += match0;
-                    return;
-                }
-                strRegex += match0;
-            }
-            return "";
-       ...
+                    isClass = false;...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1930,6 +1930,7 @@ jstestDescribe((
     let exitCode = 0;
     let fileDict;
     let includeList = [];
+    let modeIncludeNodeModules;
     let processArgElem;
     let promiseList = [];
     let v8CoverageObj;
@@ -2013,10 +2014,7 @@ body {
     margin: 2px 0;
     min-width: 200px;
     position: relative;
-    width: 100%;
-}
-.coverage .percentbar div {
- ...
+    width: 100%;...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -2030,11 +2028,11 @@ import jslint from "../jslint.mjs";
 await jslint.<span class="apidocCodeKeywordSpan">v8CoverageReportCreate</span>({
     coverageDir: "../.artifact/coverage_sqlite3_js/",
     processArgv: [
-        "--exclude=**/node_modules/",
-        "--exclude=node_modules/",
         "--exclude=tes?/",
         "--exclude=tes[!0-9A-Z_a-z-]/",
         "--exclude=tes[0-9A-Z_a-z-]/",
+        "--exclude=tes[^0-9A-Z_a-z-]/",
+        "--exclude=test/**/*.js",
 ...</pre></li>
 
 <li>

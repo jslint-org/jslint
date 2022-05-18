@@ -1,13 +1,15 @@
 // #!/usr/bin/env node
 // JSLint
 
+// The Unlicense
+//
 // This is free and unencumbered software released into the public domain.
-
+//
 // Anyone is free to copy, modify, publish, use, compile, sell, or
 // distribute this software, either in source code form or as a compiled
 // binary, for any purpose, commercial or non-commercial, and by any
 // means.
-
+//
 // In jurisdictions that recognize copyright laws, the author or authors
 // of this software dedicate any and all copyright interest in the
 // software to the public domain. We make this dedication for the benefit
@@ -15,7 +17,7 @@
 // successors. We intend this dedication to be an overt act of
 // relinquishment in perpetuity of all present and future rights to this
 // software under copyright law.
-
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -23,7 +25,7 @@
 // OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
-
+//
 // For more information, please refer to <https://unlicense.org/>
 
 
@@ -368,24 +370,37 @@ function globExclude({
 
     function globAssertNotWeird(list, name) {
 
-// This function will check if <str> has weird characters.
+// This function will check if <list> of strings contain weird characters.
 
-        list.join("\n").replace((
-            /^.*?([\u0000-\u0007]).*/gm
-        ), function (match0, chr) {
-            throw new Error(
-                "Weird character "
-                + JSON.stringify(chr)
-                + " found in " + name + " "
-                + JSON.stringify(match0)
-            );
+        [
+            [
+                "\n", (
+                    /^.*?([\u0000-\u0007\r]).*/gm
+                )
+            ],
+            [
+                "\r", (
+                    /^.*?([\n]).*/gm
+                )
+            ]
+        ].forEach(function ([
+            separator, rgx
+        ]) {
+            list.join(separator).replace(rgx, function (match0, char) {
+                throw new Error(
+                    "Weird character "
+                    + JSON.stringify(char)
+                    + " found in " + name + " "
+                    + JSON.stringify(match0)
+                );
+            });
         });
     }
 
     function globToRegexp(pattern) {
 
-// This function will translate shell-glob <pattern> to javascript-regexp,
-// that javascript can then use to "glob" pathnames.
+// This function will translate glob <pattern> to javascript-regexp,
+// which javascript can then use to "glob" pathnames.
 
         let ii = 0;
         let isClass = false;
@@ -505,7 +520,7 @@ function globExclude({
             return "[" + strClass[ii] + "]";
         });
 
-// Change strRegex from text to regexp.
+// Change strRegex from string to regexp.
 
         strRegex = new RegExp("^" + strRegex + "$", "gm");
         return strRegex;
@@ -518,7 +533,7 @@ function globExclude({
     globAssertNotWeird(pathnameList, "pathname");
 
 // Optimization
-// Concat pathnames to a single, newline-separated string,
+// Concat pathnames into a single, newline-separated string,
 // whose pathnames can all be filtered with a single, regexp-pass.
 
     pathnameList = pathnameList.join("\n");
@@ -10599,6 +10614,7 @@ async function v8CoverageReportCreate({
     let exitCode = 0;
     let fileDict;
     let includeList = [];
+    let modeIncludeNodeModules;
     let processArgElem;
     let promiseList = [];
     let v8CoverageObj;
@@ -11089,6 +11105,16 @@ function sentinel() {}
         case "--include":
             includeList.push(processArgElem[1]);
             break;
+
+// PR-400
+// Disable default-coverage of directory `node_modules`,
+// but allow override with cli-option `--include-node-modules=1`.
+
+        case "--include-node-modules":
+            modeIncludeNodeModules = !(
+                /0|false|null|undefined/
+            ).test(processArgElem[1]);
+            break;
         }
     }
 
@@ -11163,7 +11189,7 @@ function sentinel() {}
 
 // Filter files outside of cwd.
 
-            if (!pathname.startsWith(cwd)) {
+            if (pathname.indexOf("[") >= 0 || !pathname.startsWith(cwd)) {
                 return;
             }
 
@@ -11174,7 +11200,14 @@ function sentinel() {}
             pathnameDict[pathname] = scriptCov;
         });
 
-// PR-xxx
+// PR-400
+// Filter directory `node_modules`.
+
+        if (!modeIncludeNodeModules) {
+            excludeList.push("node_modules/");
+        }
+
+// PR-400
 // Filter files by glob-patterns in excludeList, includeList.
 
         data.result = globExclude({

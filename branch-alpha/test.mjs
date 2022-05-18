@@ -79,15 +79,25 @@ jstestDescribe((
     jstestIt((
         "test globAssertNotWeird-error handling-behavior"
     ), async function () {
-        await assertErrorThrownAsync(function () {
-            return globExclude({
-                pathnameList: [
-                    "aa",
-                    "cc/\u0000/dd",
-                    "bb"
-                ]
-            });
-        }, `Weird character "\\\\u0000" found in pathname "cc/\\\\u0000/dd"`);
+        await Promise.all([
+            "\n",
+            "\r",
+            "\u0000"
+        ].map(async function (char) {
+            await assertErrorThrownAsync(function () {
+                return globExclude({
+                    pathnameList: [
+                        "aa",
+                        `cc/${char}/dd`,
+                        "bb"
+                    ]
+                });
+            }, (
+                "Weird character "
+                + JSON.stringify(char).replace("\\", "\\\\")
+                + " found in "
+            ));
+        }));
     });
     jstestIt((
         "test globExclude handling-behavior"
@@ -98,6 +108,8 @@ jstestDescribe((
             ".gitignore",
             ".npmignore",
             ".travis.yml",
+            "/node_modules/aa/bb/cc.js",
+            "/node_modules/aa/bb/dd.js",
             "CHANGELOG.md",
             "CONTRIBUTING.md",
             "Dockerfile",
@@ -118,6 +130,8 @@ jstestDescribe((
             "lib/sqlite3-binding.js",
             "lib/sqlite3.js",
             "lib/trace.js",
+            "node_modules/aa/bb/cc.js",
+            "node_modules/aa/bb/dd.js",
             "package.json",
             "scripts/build-appveyor.bat",
             "scripts/build-local.bat",
@@ -194,41 +208,63 @@ jstestDescribe((
             [
                 "li*/*.js",
                 "li?/*.js",
+                "lib/",
                 "lib/*",
                 "lib/**/*.js",
                 "lib/*.js"
             ].forEach(function (bb) {
-                assertJsonEqual(
-                    globExclude({
-                        excludeList: [
-                            "**/node_modules/",
-                            "node_modules/",
-                            "tes[!0-9A-Z_a-z-]/",
-                            "tes[^0-9A-Z_a-z-]/",
-                            "test/suppor*/*elper.js",
-                            "test/suppor?/?elper.js",
-                            "test/support/helper.js"
-                        ].concat(aa),
-                        includeList: [
-                            "**/*.cjs",
-                            "**/*.js",
-                            "**/*.mjs",
-                            "lib/sqlite3.js"
-                        ].concat(bb),
-                        pathnameList
-                    }).pathnameList,
-                    [
-                        ".eslintrc.js",
-                        "benchmark/insert.js",
-                        "cloudformation/ci.template.js",
-                        "examples/simple-chaining.js",
-                        "lib/index.js",
-                        "lib/sqlite3-binding.js",
-                        "lib/sqlite3.js",
-                        "lib/trace.js",
-                        "sqlite3.js"
-                    ]
-                );
+                [
+                    "",
+                    "**/node_modules/",
+                    "node_modules/"
+                ].forEach(function (cc) {
+                    assertJsonEqual(
+                        globExclude({
+                            excludeList: [
+                                "tes[!0-9A-Z_a-z-]/",
+                                "tes[^0-9A-Z_a-z-]/",
+                                "test/suppor*/*elper.js",
+                                "test/suppor?/?elper.js",
+                                "test/support/helper.js"
+                            ].concat(aa, cc),
+                            includeList: [
+                                "**/*.cjs",
+                                "**/*.js",
+                                "**/*.mjs",
+                                "lib/sqlite3.js"
+                            ].concat(bb),
+                            pathnameList
+                        }).pathnameList,
+                        [
+                            ".eslintrc.js",
+                            "benchmark/insert.js",
+                            "cloudformation/ci.template.js",
+                            "examples/simple-chaining.js",
+                            "lib/index.js",
+                            "lib/sqlite3-binding.js",
+                            "lib/sqlite3.js",
+                            "lib/trace.js",
+                            "sqlite3.js"
+                        ].concat(
+                            cc === "**/node_modules/"
+                            ? [
+                                "node_modules/aa/bb/cc.js",
+                                "node_modules/aa/bb/dd.js"
+                            ]
+                            : cc === "node_modules/"
+                            ? [
+                                "/node_modules/aa/bb/cc.js",
+                                "/node_modules/aa/bb/dd.js"
+                            ]
+                            : [
+                                "/node_modules/aa/bb/cc.js",
+                                "/node_modules/aa/bb/dd.js",
+                                "node_modules/aa/bb/cc.js",
+                                "node_modules/aa/bb/dd.js"
+                            ]
+                        ).sort()
+                    );
+                });
             });
         });
     });
@@ -298,6 +334,9 @@ jstestDescribe((
             ),
             "lib/*": (
                 /^lib\/[^\/]*?$/gm
+            ),
+            "lib/**/*.js": (
+                /^lib\/.*?\.js$/gm
             ),
             "lib/*.js": (
                 /^lib\/[^\/]*?\.js$/gm
@@ -1346,6 +1385,7 @@ jstestDescribe((
                 "node", "jslint.mjs",
                 "v8_coverage_report=.tmp/coverage_jslint",
                 "--exclude=aa.js",
+                "--include-node-modules=1",
                 "--include=jslint.mjs",
                 "node", "jslint.mjs"
             ]
