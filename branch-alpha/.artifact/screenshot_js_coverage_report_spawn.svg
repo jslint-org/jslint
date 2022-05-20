@@ -341,25 +341,25 @@
     textLength="768"
     x="10"
     y="1242"
->npm WARN deprecated request@2.88.2: request has been deprecated, see https://github.com/request/\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1264"
->  request/issues/3142                                                                            </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1286"
 >npm WARN deprecated mkdirp@0.5.1: Legacy versions of mkdirp are no longer supported. Please upda\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1308"
+    y="1264"
 >  te to mkdirp 1.x. (Note that the API surface has changed to use Promises in 1.x.)              </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1286"
+>npm WARN deprecated request@2.88.2: request has been deprecated, see https://github.com/request/\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1308"
+>  request/issues/3142                                                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

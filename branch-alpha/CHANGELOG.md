@@ -3,7 +3,6 @@
 # Todo
 - cli - remove cli-option `--mode-vim-plugin`
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
-- coverage - support globbing `*` in cli-options `--exclude` and `--include`
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - relax warning against console.log and friends and deprecate directive `devel`
@@ -12,9 +11,8 @@
 - jslint - unify analysis of variable-assignment/function-parameters into one function
 - jslint - add new warning "Expected Object.create(null) instead of {}"
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
-- perf - improve performance by hoisting inlined regexps out of loops and subfunctions
 
-# v2022.5.1-beta
+# v2022.5.20
 - coverage-report - disable default-coverage of directory `node_modules`, but allow override with cli-option `--include-node-modules=1`
 - coverage-report - add function globExclude() to revamp coverage-report to exclude files using glob-pattern-matching
 - add codemirror-example-file jslint_wrapper_codemirror.html
