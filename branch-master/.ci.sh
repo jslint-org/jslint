@@ -42,7 +42,13 @@ import moduleFs from "fs";
 import moduleFs from "fs";
 import moduleChildProcess from "child_process";
 (async function () {
+    let fileDict = {};
     let screenshotCurl;
+    await Promise.all([
+        "README.md"
+    ].map(async function (file) {
+        fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
+    }));
     screenshotCurl = await moduleFs.promises.stat("jslint.mjs");
     screenshotCurl = String(`
 echo "\
@@ -54,11 +60,11 @@ echo "\
         /250/g
     ), Math.floor(screenshotCurl.size / 1024));
     // parallel-task - run-and-screenshot example-shell-commands in README.md
-    await Promise.all(Array.from(String(
-        await moduleFs.promises.readFile("README.md", "utf8")
-    ).matchAll(
-        /\n```shell <!-- shRunWithScreenshotTxt (.*?) -->\n([\S\s]*?\n)```\n/g
-    )).map(async function ([
+    await Promise.all(Array.from(
+        fileDict["README.md"].matchAll(
+            /\n```shell <!-- shRunWithScreenshotTxt (.*?) -->\n([\S\s]*?\n)```\n/g
+        )
+    ).map(async function ([
         ignore, file, script0
     ]) {
         let script = script0;
@@ -114,17 +120,24 @@ echo "\
 ' "$@" # '
     # screenshot asset_image_logo
     shImageLogoCreate &
+    # background http-file-server to serve webpages for screenshot
+    # PORT=8080 npm_config_timeout_exit=5000 shHttpFileServer &
     # screenshot html
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
 (async function () {
+    let {
+        GITHUB_BRANCH0,
+        GITHUB_GITHUB_IO
+    } = process.env;
     await Promise.all([
         (
-            "https://"
-            + process.env.UPSTREAM_OWNER
-            + ".github.io/"
-            + process.env.UPSTREAM_REPO
-            + "/branch-beta/index.html"
+            `https://${GITHUB_GITHUB_IO}/branch-${GITHUB_BRANCH0}`
+            + `/jslint_wrapper_codemirror.html`
+        ),
+        (
+            `https://${GITHUB_GITHUB_IO}/branch-${GITHUB_BRANCH0}`
+            + `/index.html`
         ),
         ".artifact/apidoc.html",
         ".artifact/coverage_sqlite3_js/index.html",
@@ -152,6 +165,8 @@ import moduleChildProcess from "child_process";
     # remove bloated json-coverage-files
     rm .artifact/coverage/*.json # js-hack - */
     rm .artifact/coverage_sqlite3_*/*.json # js-hack - */
+    # jslint_wrapper_vscode - build
+    shCiVscePackageJslintWrapperVscode
     # .github_cache - save
     if [ "$GITHUB_ACTION" ] && [ ! -d .github_cache ]
     then
@@ -175,9 +190,11 @@ import moduleFs from "fs";
     let versionMaster;
     await Promise.all([
         "CHANGELOG.md",
+        "README.md",
         "index.html",
         "jslint.mjs",
-        "jslint_ci.sh"
+        "jslint_ci.sh",
+        "jslint_wrapper_codemirror.html"
     ].map(async function (file) {
         fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
     }));
@@ -191,6 +208,15 @@ import moduleFs from "fs";
     });
     await Promise.all([
         {
+            file: "README.md",
+            src: fileDict["README.md"].replace((
+                /\n```html <!-- jslint_wrapper_codemirror.html -->\n[\S\s]*?\n```\n/
+            ), (
+                "\n```html <!-- jslint_wrapper_codemirror.html -->\n"
+                + fileDict["jslint_wrapper_codemirror.html"]
+                + "```\n"
+            ))
+        }, {
             file: "index.html",
             src: fileDict["index.html"].replace((
                 /\n<style class="JSLINT_REPORT_STYLE">\n[\S\s]*?\n<\/style>\n/
@@ -216,6 +242,7 @@ import moduleFs from "fs";
                     + [
                         jslint.assertOrThrow,
                         jslint.fsWriteFileWithParents,
+                        jslint.globExclude,
                         jslint.htmlEscape,
                         jslint.moduleFsInit,
                         jslint.v8CoverageListMerge,
@@ -259,4 +286,137 @@ import moduleFs from "fs";
 shCiNpmPublishCustom() {(set -e
 # this function will run custom-code to npm-publish package
     npm publish --access public
+)}
+
+shCiVscePackageJslintWrapperVscode() {(set -e
+# this function will vsce-package jslint_wrapper_vscode
+    mkdir -p .artifact/jslint_wrapper_vscode/.vscode
+    (set -e
+    cd .artifact/jslint_wrapper_vscode
+    ln -f ../../.npmignore .vscodeignore
+    ln -f ../../LICENSE
+    ln -f ../../asset_image_logo_512.png
+    ln -f ../../jslint.mjs
+    ln -f ../../jslint_wrapper_vscode.js
+    node --input-type=module --eval '
+import moduleFs from "fs";
+(async function () {
+    let fileDict = {};
+    await Promise.all([
+        "README.md"
+    ].map(async function (file) {
+        fileDict[file] = await moduleFs.promises.readFile(
+            `../../${file}`,
+            "utf8"
+        );
+    }));
+    await Promise.all([
+        {
+            file: ".vscode/launch.json",
+            src: JSON.stringify({
+                "configurations": [
+                    {
+                        "args": [
+                            "--extensionDevelopmentPath=${workspaceFolder}"
+                        ],
+                        "name": "Run Extension",
+                        "request": "launch",
+                        "type": "extensionHost"
+                    }
+                ],
+                "version": "0.2.0"
+            }, undefined, 4)
+        }, {
+            file: "README.md",
+            src: (
+                /\n# quickstart jslint in vscode\n[\S\s]*?\n\n\n/i
+            ).exec(fileDict["README.md"])[0]
+        }, {
+            file: "package.json",
+            src: JSON.stringify({
+                "activationEvents": [
+                    "onCommand:jslint.clear",
+                    "onCommand:jslint.lint"
+                ],
+                "bugs": {
+                    "url": "https://github.com/jslint-org/jslint/issues"
+                },
+                "categories": [
+                    "Linters"
+                ],
+                "contributes": {
+                    "commands": [
+                        {
+                            "category": "jslint",
+                            "command": "jslint.clear",
+                            "title": "JSLint - Clear Warnings"
+                        },
+                        {
+                            "category": "jslint",
+                            "command": "jslint.lint",
+                            "title": "JSLint - Lint File"
+                        }
+                    ],
+                    "keybindings": [
+                        {
+                            "command": "jslint.clear",
+                            "key": "ctrl+shift+j c",
+                            "mac": "cmd+shift+j c",
+                            "when": "editorTextFocus"
+                        },
+                        {
+                            "command": "jslint.lint",
+                            "key": "ctrl+shift+j l",
+                            "mac": "cmd+shift+j l",
+                            "when": "editorTextFocus"
+                        }
+                    ],
+                    "menus": {
+                        "editor/context": [
+                            {
+                                "command": "jslint.clear",
+                                "group": "7_modification",
+                                "when": "resourceLangId == javascript"
+                            },
+                            {
+                                "command": "jslint.lint",
+                                "group": "7_modification",
+                                "when": "resourceLangId == javascript"
+                            }
+                        ]
+                    }
+                },
+                "description": "Integrates JSLint into VS Code.",
+                "displayName": "vscode-jslint",
+                "engines": {
+                    "vscode": "^1.66.0"
+                },
+                "icon": "asset_image_logo_512.png",
+                "keywords": [
+                    "javascript",
+                    "jslint",
+                    "linter"
+                ],
+                "license": "UNLICENSE",
+                "main": "./jslint_wrapper_vscode.js",
+                "name": "vscode-jslint",
+                "publisher": "jslint",
+                "repository": {
+                    "type": "git",
+                    "url": "https://github.com/jslint-org/jslint.git"
+                },
+                "version": "2022.5.1"
+            }, undefined, 4)
+        }
+    ].map(async function ({
+        file,
+        src
+    }) {
+        await moduleFs.promises.writeFile(file, src.trim() + "\n");
+    }));
+}());
+' "$@" # '
+    npx vsce package
+    rm -rf node_modules
+    )
 )}

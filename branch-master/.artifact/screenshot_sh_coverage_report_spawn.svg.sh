@@ -13,9 +13,23 @@ printf '> #!/bin/sh
 > 
 > node ../jslint.mjs \\
 >     v8_coverage_report=../.artifact/coverage_sqlite3_sh/ \\
->     --exclude-node-modules=true \\
->     --exclude=test/foo.js,test/bar.js \\
->     --exclude=test/baz.js \\
+>         --exclude=tes?/ \\
+>         --exclude=tes[!0-9A-Z_a-z-]/ \\
+>         --exclude=tes[0-9A-Z_a-z-]/ \\
+>         --exclude=tes[^0-9A-Z_a-z-]/ \\
+>         --exclude=test/**/*.js \\
+>         --exclude=test/suppor*/*elper.js \\
+>         --exclude=test/suppor?/?elper.js \\
+>         --exclude=test/support/helper.js \\
+>         --include=**/*.cjs \\
+>         --include=**/*.js \\
+>         --include=**/*.mjs \\
+>         --include=li*/*.js \\
+>         --include=li?/*.js \\
+>         --include=lib/ \\
+>         --include=lib/**/*.js \\
+>         --include=lib/*.js \\
+>         --include=lib/sqlite3.js \\
 >     npm run test
 
 
@@ -37,8 +51,22 @@ npm install
 
 node ../jslint.mjs \
     v8_coverage_report=../.artifact/coverage_sqlite3_sh/ \
-    --exclude-node-modules=true \
-    --exclude=test/foo.js,test/bar.js \
-    --exclude=test/baz.js \
+        --exclude=tes?/ \
+        --exclude=tes[!0-9A-Z_a-z-]/ \
+        --exclude=tes[0-9A-Z_a-z-]/ \
+        --exclude=tes[^0-9A-Z_a-z-]/ \
+        --exclude=test/**/*.js \
+        --exclude=test/suppor*/*elper.js \
+        --exclude=test/suppor?/?elper.js \
+        --exclude=test/support/helper.js \
+        --include=**/*.cjs \
+        --include=**/*.js \
+        --include=**/*.mjs \
+        --include=li*/*.js \
+        --include=li?/*.js \
+        --include=lib/ \
+        --include=lib/**/*.js \
+        --include=lib/*.js \
+        --include=lib/sqlite3.js \
     npm run test
 )

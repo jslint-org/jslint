@@ -1,5 +1,33 @@
 #!/bin/sh
 
+## The Unlicense
+##
+## This is free and unencumbered software released into the public domain.
+##
+## Anyone is free to copy, modify, publish, use, compile, sell, or
+## distribute this software, either in source code form or as a compiled
+## binary, for any purpose, commercial or non-commercial, and by any
+## means.
+##
+## In jurisdictions that recognize copyright laws, the author or authors
+## of this software dedicate any and all copyright interest in the
+## software to the public domain. We make this dedication for the benefit
+## of the public at large and to the detriment of our heirs and
+## successors. We intend this dedication to be an overt act of
+## relinquishment in perpetuity of all present and future rights to this
+## software under copyright law.
+##
+## THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+## EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+## MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+## IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+## OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+## ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+## OTHER DEALINGS IN THE SOFTWARE.
+##
+## For more information, please refer to <https://unlicense.org/>
+
+
 # POSIX reference
 # http://pubs.opengroup.org/onlinepubs/9699919799/utilities/test.html
 # http://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
@@ -243,21 +271,30 @@ import moduleUrl from "url";
 
 shCiArtifactUpload() {(set -e
 # this function will upload build-artifacts to branch-gh-pages
+    local FILE
     if (! shCiIsMainJob)
     then
         return
     fi
-    export GITHUB_BRANCH0="$(git rev-parse --abbrev-ref HEAD)"
-    local FILE
     # init .git/config
     git config --local user.email "github-actions@users.noreply.github.com"
     git config --local user.name "github-actions"
     # init $GITHUB_BRANCH0
+    export GITHUB_BRANCH0="$(git rev-parse --abbrev-ref HEAD)"
     git pull --unshallow origin "$GITHUB_BRANCH0"
-    # init $UPSTREAM_OWNER
-    export UPSTREAM_OWNER="${UPSTREAM_OWNER:-jslint-org}"
-    # init $UPSTREAM_REPO
-    export UPSTREAM_REPO="${UPSTREAM_REPO:-jslint}"
+    # init $UPSTREAM_XXX
+    export UPSTREAM_REPOSITORY="$(node -p '(
+    /^https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
+).exec(require("./package.json").repository.url)[1]
+')" # '
+    export UPSTREAM_GITHUB_IO="$(
+        printf "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
+    )"
+    # init $GITHUB_XXX
+    export GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-$UPSTREAM_REPOSITORY}"
+    export GITHUB_GITHUB_IO="$(
+        printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
+    )"
     # screenshot changelog and files
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
@@ -330,11 +367,10 @@ import moduleChildProcess from "child_process";
     fi
     # update README.md with branch-$GITHUB_BRANCH0 and $GITHUB_REPOSITORY
     sed -i \
-        -e "s|/branch-[0-9A-Z_a-z]*/|/branch-$GITHUB_BRANCH0/|g" \
-        -e "s|\b$UPSTREAM_OWNER/$UPSTREAM_REPO\b|$GITHUB_REPOSITORY|g" \
-        -e "s|\b$UPSTREAM_OWNER\.github\.io/$UPSTREAM_REPO\b|$(
-            printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
-        )|g" \
+        -e "s|/branch-[a-z]*/|/branch-$GITHUB_BRANCH0/|g" \
+        -e "s|\\b$UPSTREAM_GITHUB_IO\\b|$GITHUB_GITHUB_IO|g" \
+        -e "s|\\b$UPSTREAM_REPOSITORY\\b|$GITHUB_REPOSITORY|g" \
+        -e "s|_2fbranch-[a-z]*_2f|_2fbranch-${GITHUB_BRANCH0}_2f|g" \
         "branch-$GITHUB_BRANCH0/README.md"
     git status
     git commit -am "update dir branch-$GITHUB_BRANCH0" || true
@@ -547,11 +583,33 @@ shDiffFileFromDir() {(set -e
 
 shDirHttplinkValidate() {(set -e
 # this function will validate http-links embedded in .html and .md files
+    # init $GITHUB_BRANCH0
+    export GITHUB_BRANCH0="${GITHUB_BRANCH0:-alpha}"
+    # init $UPSTREAM_XXX
+    export UPSTREAM_REPOSITORY="$(node -p '(
+    /^https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
+).exec(require("./package.json").repository.url)[1]
+')" # '
+    export UPSTREAM_GITHUB_IO="$(
+        printf "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
+    )"
+    # init $GITHUB_XXX
+    export GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-$UPSTREAM_REPOSITORY}"
+    export GITHUB_GITHUB_IO="$(
+        printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
+    )"
     node --input-type=module --eval '
 import moduleFs from "fs";
 import moduleHttps from "https";
 import moduleUrl from "url";
 (async function () {
+    let {
+        GITHUB_BRANCH0,
+        GITHUB_GITHUB_IO,
+        GITHUB_REPOSITORY,
+        UPSTREAM_GITHUB_IO,
+        UPSTREAM_REPOSITORY
+    } = process.env;
     let dict = {};
     Array.from(
         await moduleFs.promises.readdir(".")
@@ -570,14 +628,14 @@ import moduleUrl from "url";
             url = url.slice(0, -1).replace((
                 /[\u0022\u0027]/g
             ), "").replace((
-                /\/branch-\w+?\//g
-            ), "/branch-alpha/").replace((
-                /\bjslint-org\/jslint\b/g
-            ), process.env.GITHUB_REPOSITORY || "jslint-org/jslint").replace((
-                /\bjslint-org\.github\.io\/jslint\b/g
-            ), String(
-                process.env.GITHUB_REPOSITORY || "jslint-org/jslint"
-            ).replace("/", ".github.io/"));
+                /\/branch-[a-z]*?\//g
+            ), `/branch-${GITHUB_BRANCH0}/`).replace(new RegExp(
+                `\\b${UPSTREAM_REPOSITORY}\\b`,
+                "g"
+            ), GITHUB_REPOSITORY).replace(new RegExp(
+                `\\b${UPSTREAM_GITHUB_IO}\\b`,
+                "g"
+            ), GITHUB_GITHUB_IO);
             if (url.startsWith("http://")) {
                 throw new Error(
                     `shDirHttplinkValidate - ${file} - insecure link - ${url}`
@@ -816,18 +874,10 @@ shGithubFileUpload() {(set -e
 # example use:
 # shGithubFileUpload octocat/hello-worId/master/hello.txt hello.txt
     node --input-type=module --eval '
+import moduleAssert from "assert";
 import moduleFs from "fs";
 import moduleHttps from "https";
 import modulePath from "path";
-function assertOrThrow(condition, message) {
-    if (!condition) {
-        throw (
-            (!message || typeof message === "string")
-            ? new Error(String(message).slice(0, 2048))
-            : message
-        );
-    }
-}
 (async function () {
     let branch;
     let content = process.argv[2];
@@ -854,7 +904,7 @@ function assertOrThrow(condition, message) {
                     responseText += chunk;
                 });
                 res.on("end", function () {
-                    assertOrThrow(res.statusCode === 200, (
+                    moduleAssert(res.statusCode === 200, (
                         "shGithubFileUpload"
                         + `- failed to download/upload file ${url} - `
                         + responseText
@@ -1039,6 +1089,13 @@ import moduleUrl from "url";
         ".xml": "application/xml; charset=utf-8",
         "/": "text/html; charset=utf-8"
     };
+    // exit after given timeout
+    if (process.env.npm_config_timeout_exit) {
+        setTimeout(
+            process.exit,
+            process.env.npm_config_timeout_exit
+        );
+    }
     if (process.argv[1]) {
         await import("file://" + modulePath.resolve(process.argv[1]));
     }
@@ -1798,6 +1855,152 @@ async function fsWriteFileWithParents(pathname, data) {
   }
   console.error("wrote file " + pathname);
 }
+function globExclude({
+  excludeList = [],
+  includeList = [],
+  pathnameList = []
+}) {
+  function globAssertNotWeird(list, name) {
+    [
+      [
+        "\n", (
+          /^.*?([\u0000-\u0007\r]).*/gm
+        )
+      ],
+      [
+        "\r", (
+          /^.*?([\n]).*/gm
+        )
+      ]
+    ].forEach(function ([
+      separator, rgx
+    ]) {
+      list.join(separator).replace(rgx, function (match0, char) {
+        throw new Error(
+          "Weird character "
+          + JSON.stringify(char)
+          + " found in " + name + " "
+          + JSON.stringify(match0)
+        );
+      });
+    });
+  }
+
+  function globToRegexp(pattern) {
+    let ii = 0;
+    let isClass = false;
+    let strClass = "";
+    let strRegex = "";
+    pattern = pattern.replace((
+      /\/\/+/g
+    ), "/");
+    pattern = pattern.replace((
+      /\*\*\*+/g
+    ), "**");
+    pattern.replace((
+      /\\\\|\\\[|\\\]|\[|\]|./g
+    ), function (match0) {
+      switch (match0) {
+      case "[":
+        if (isClass) {
+          strClass += "[";
+          return;
+        }
+        strClass += "\u0000";
+        strRegex += "\u0000";
+        isClass = true;
+        return;
+      case "]":
+        if (isClass) {
+          isClass = false;
+          return;
+        }
+        strRegex += "]";
+        return;
+      default:
+        if (isClass) {
+          strClass += match0;
+          return;
+        }
+        strRegex += match0;
+      }
+      return "";
+    });
+    strClass += "\u0000";
+    strClass = strClass.replace((
+      /\u0000!/g
+    ), "\u0000^");
+    strClass = strClass.replace((
+      /\u0000-/g
+    ), "\u0000\\-");
+    strClass = strClass.replace((
+      /-\u0000/g
+    ), "\\-\u0000");
+    strClass = strClass.replace((
+      /[\[\]]/g
+    ), "\\$&");
+    strRegex = strRegex.replace((
+      // ignore [-/]
+      /[$()*+.?\[\\\]\^{|}]/g
+    ), "\\$&");
+    strRegex = strRegex.replace((
+      /\\\*\\\*\/(?:\\\*)+/g
+    ), ".*?");
+    strRegex = strRegex.replace((
+      /(^|\/)\\\*\\\*(\/|$)/gm
+    ), "$1.*?$2");
+    strRegex = strRegex.replace((
+      /(?:\\\*)+/g
+    ), "[^\\/]*?");
+    strRegex = strRegex.replace((
+      /\\\?/g
+    ), "[^\\/]");
+    strRegex = strRegex.replace((
+      /\/$/gm
+    ), "\\/.*?");
+    ii = 0;
+    strClass = strClass.split("\u0000");
+    strRegex = strRegex.replace((
+      /\u0000/g
+    ), function () {
+      ii += 1;
+      if (strClass[ii] === "") {
+        return "";
+      }
+      return "[" + strClass[ii] + "]";
+    });
+    strRegex = new RegExp("^" + strRegex + "$", "gm");
+    return strRegex;
+  }
+  globAssertNotWeird(excludeList, "pattern");
+  globAssertNotWeird(includeList, "pattern");
+  globAssertNotWeird(pathnameList, "pathname");
+  pathnameList = pathnameList.join("\n");
+  if (includeList.length > 0) {
+    includeList = includeList.map(globToRegexp);
+    includeList.forEach(function (pattern) {
+      pathnameList = pathnameList.replace(pattern, "\u0000$&");
+    });
+    pathnameList = pathnameList.replace((
+      /^[^\u0000].*/gm
+    ), "");
+    pathnameList = pathnameList.replace((
+      /^\u0000+/gm
+    ), "");
+  }
+  excludeList = excludeList.map(globToRegexp);
+  excludeList.forEach(function (pattern) {
+    pathnameList = pathnameList.replace(pattern, "");
+  });
+  pathnameList = pathnameList.split("\n").filter(function (elem) {
+    return elem;
+  });
+  return {
+    excludeList,
+    includeList,
+    pathnameList
+  };
+}
 function htmlEscape(str) {
   return String(str).replace((
     /&/g
@@ -2262,11 +2465,11 @@ async function v8CoverageReportCreate({
   processArgv = []
 }) {
   let cwd;
+  let excludeList = [];
   let exitCode = 0;
   let fileDict;
-  let fileExcludeList = [];
-  let fileIncludeList = [];
-  let fileIncludeNodeModules;
+  let includeList = [];
+  let modeIncludeNodeModules;
   let processArgElem;
   let promiseList = [];
   let v8CoverageObj;
@@ -2291,9 +2494,19 @@ async function v8CoverageReportCreate({
 <style>
 /* jslint utility2:true */
 /*csslint ignore:start*/
-* {
-box-sizing: border-box;
-  font-family: consolas, menlo, monospace;
+.coverage,
+.coverage a,
+.coverage div,
+.coverage pre,
+.coverage span,
+.coverage table,
+.coverage tbody,
+.coverage td,
+.coverage th,
+.coverage thead,
+.coverage tr {
+  box-sizing: border-box;
+  font-family: monospace;
 }
 /*csslint ignore:end*/
 
@@ -2439,6 +2652,7 @@ body {
     }
     txtBorder = (
       "+" + "-".repeat(padPathname + 2) + "+"
+      + "-".repeat(padLines + 2) + "+"
       + "-".repeat(padLines + 2) + "+\n"
     );
     txt = "";
@@ -2446,7 +2660,8 @@ body {
     txt += txtBorder;
     txt += (
       "| " + String("Files covered").padEnd(padPathname, " ") + " | "
-      + String("Lines").padStart(padLines, " ") + " |\n"
+      + String("Lines").padStart(padLines, " ") + " | "
+      + String("Remaining").padStart(padLines, " ") + " |\n"
     );
     txt += txtBorder;
     fileList.forEach(function ({
@@ -2514,7 +2729,8 @@ body {
         + String("./" + pathname).padEnd(padPathname, " ") + " | "
         + String(
           modeCoverageIgnoreFile + " " + coveragePct + " %"
-        ).padStart(padLines, " ") + " |\n"
+        ).padStart(padLines, " ") + " | "
+        + " ".repeat(padLines) + " |\n"
       );
       txt += (
         "| " + "*".repeat(
@@ -2522,6 +2738,9 @@ body {
         ).padEnd(padPathname, "_") + " | "
         + String(
           linesCovered + " / " + linesTotal
+        ).padStart(padLines, " ") + " | "
+        + String(
+          (linesTotal - linesCovered) + " / " + linesTotal
         ).padStart(padLines, " ") + " |\n"
       );
       txt += txtBorder;
@@ -2672,17 +2891,6 @@ ${String(count || "-0").padStart(7, " ")}
     ), txt));
   }
 
-  function pathnameRelativeCwd(pathname) {
-    pathname = modulePath.resolve(pathname).replace((
-      /\\/g
-    ), "/");
-    if (!pathname.startsWith(cwd)) {
-      return;
-    }
-    pathname = pathname.slice(cwd.length);
-    return pathname;
-  }
-
 /*
 function sentinel() {}
 */
@@ -2703,19 +2911,15 @@ function sentinel() {}
     processArgElem[1] = processArgElem.slice(1).join("=");
     switch (processArgElem[0]) {
     case "--exclude":
-      fileExcludeList = fileExcludeList.concat(
-        processArgElem[1].split(",")
-      );
-      break;
-    case "--exclude-node-modules":
-      fileIncludeNodeModules = (
-        /0|false|null|undefined/
-      ).test(processArgElem[1]);
+      excludeList.push(processArgElem[1]);
       break;
     case "--include":
-      fileIncludeList = fileIncludeList.concat(
-        processArgElem[1].split(",")
-      );
+      includeList.push(processArgElem[1]);
+      break;
+    case "--include-node-modules":
+      modeIncludeNodeModules = !(
+        /0|false|null|undefined/
+      ).test(processArgElem[1]);
       break;
     }
   }
@@ -2756,33 +2960,35 @@ function sentinel() {}
     ).test(file);
   });
   v8CoverageObj = await Promise.all(v8CoverageObj.map(async function (file) {
-    let data = await moduleFs.promises.readFile(coverageDir + file, "utf8");
+    let data;
+    let pathnameDict = Object.create(null);
+    data = await moduleFs.promises.readFile(coverageDir + file, "utf8");
     data = JSON.parse(data);
-    data.result = data.result.filter(function (scriptCov) {
+    data.result.forEach(function (scriptCov) {
       let pathname = scriptCov.url;
       if (!pathname.startsWith("file:///")) {
         return;
       }
-      pathname = pathnameRelativeCwd(moduleUrl.fileURLToPath(pathname));
-      if (
-        !pathname
-        || pathname.startsWith("[")
-        || (
-          !fileIncludeNodeModules
-          && (
-            /(?:^|\/)node_modules\//m
-          ).test(pathname)
-        )
-        || fileExcludeList.indexOf(pathname) >= 0
-        || (
-          fileIncludeList.length > 0
-          && fileIncludeList.indexOf(pathname) === -1
-        )
-      ) {
+      pathname = moduleUrl.fileURLToPath(pathname);
+      pathname = modulePath.resolve(pathname).replace((
+        /\\/g
+      ), "/");
+      if (pathname.indexOf("[") >= 0 || !pathname.startsWith(cwd)) {
         return;
       }
+      pathname = pathname.slice(cwd.length);
       scriptCov.url = pathname;
-      return true;
+      pathnameDict[pathname] = scriptCov;
+    });
+    if (!modeIncludeNodeModules) {
+      excludeList.push("node_modules/");
+    }
+    data.result = globExclude({
+      excludeList,
+      includeList,
+      pathnameList: Object.keys(pathnameDict)
+    }).pathnameList.map(function (pathname) {
+      return pathnameDict[pathname];
     });
     return data;
   }));

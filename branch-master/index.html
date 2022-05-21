@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta
-    name="description"
-    content="JSLint, The JavaScript Code Quality and Coverage Tool. This file allows JSLint
-    to be run from a web browser. It can accept a source program and analyze
-    it without sending it over the network."
->
-<meta name="author" content="Douglas Crockford">
-<link rel="icon" type="image/png" href="asset_image_logo_512.svg">
-<title>JSLint: The JavaScript Code Quality and Coverage Tool</title>
-<!-- Google Lighthouse Performance - Reduce Largest Contentful Paint. -->
-<link as="script" rel="preload" href="asset_codemirror_rollup.js?cc=u5g9">
-<link rel="modulepreload" href="jslint.mjs?cc=u5g9">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+        name="description"
+        content="JSLint, The JavaScript Code Quality and Coverage Tool.
+        This file allows JSLint to be run from a web browser.
+        It can accept a source program and analyze it
+        without sending it over the network."
+    >
+    <meta name="author" content="Douglas Crockford">
+    <link rel="icon" type="image/png" href="asset_image_logo_512.svg">
+    <title>JSLint: The JavaScript Code Quality and Coverage Tool</title>
+    <script defer src="./asset_codemirror_rollup.js?cc=nnwr"></script>
+    <script type="module" src="./jslint.mjs?cc=nnwr?window_jslint=1"></script>
+    <script defer src="./jslint_wrapper_codemirror.js?cc=nnwr"></script>
 <style>
 /*jslint-disable*/
 /*
@@ -23,27 +24,28 @@ shRawLibFetch
     "fetchList": [
         {
             "comment": true,
-            "url": "https://github.com/codemirror/CodeMirror/blob/5.62.0/LICENSE"
+            "url": "https://github.com/codemirror/CodeMirror/blob/5.65.3/LICENSE"
         },
         {
-            "url": "https://github.com/codemirror/CodeMirror/blob/5.62.0/lib/codemirror.css"
+            "url": "https://github.com/codemirror/CodeMirror/blob/5.65.3/lib/codemirror.css"
         },
         {
-            "url": "https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/lint/lint.css"
+            "url": "https://github.com/codemirror/CodeMirror/blob/5.65.3/addon/lint/lint.css"
         }
-    ]
+    ],
+    "replaceList": []
 }
 */
 
 
 /*
-repo https://github.com/codemirror/CodeMirror/tree/5.62.0
-committed 2021-06-21T07:13:20Z
+repo https://github.com/codemirror/CodeMirror/tree/5.65.3
+committed 2022-04-20T09:49:25Z
 */
 
 
 /*
-file https://github.com/codemirror/CodeMirror/blob/5.62.0/LICENSE
+file https://github.com/codemirror/CodeMirror/blob/5.65.3/LICENSE
 */
 /*
 MIT License
@@ -71,7 +73,7 @@ THE SOFTWARE.
 
 
 /*
-file https://github.com/codemirror/CodeMirror/blob/5.62.0/lib/codemirror.css
+file https://github.com/codemirror/CodeMirror/blob/5.65.3/lib/codemirror.css
 */
 /* BASICS */
 
@@ -135,20 +137,13 @@ file https://github.com/codemirror/CodeMirror/blob/5.62.0/lib/codemirror.css
 .cm-fat-cursor div.CodeMirror-cursors {
   z-index: 1;
 }
-.cm-fat-cursor-mark {
-  background-color: rgba(20, 255, 20, 0.5);
-  -webkit-animation: blink 1.06s steps(1) infinite;
-  -moz-animation: blink 1.06s steps(1) infinite;
-  animation: blink 1.06s steps(1) infinite;
-}
-.cm-animate-fat-cursor {
-  width: auto;
-  border: 0;
-  -webkit-animation: blink 1.06s steps(1) infinite;
-  -moz-animation: blink 1.06s steps(1) infinite;
-  animation: blink 1.06s steps(1) infinite;
-  background-color: #7e7;
-}
+.cm-fat-cursor .CodeMirror-line::selection,
+.cm-fat-cursor .CodeMirror-line > span::selection,
+.cm-fat-cursor .CodeMirror-line > span > span::selection { background: transparent; }
+.cm-fat-cursor .CodeMirror-line::-moz-selection,
+.cm-fat-cursor .CodeMirror-line > span::-moz-selection,
+.cm-fat-cursor .CodeMirror-line > span > span::-moz-selection { background: transparent; }
+.cm-fat-cursor { caret-color: transparent; }
 @-moz-keyframes blink {
   0% {}
   50% { background-color: transparent; }
@@ -246,6 +241,7 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #a22;}
   height: 100%;
   outline: none; /* Prevent dragging from highlighting the element */
   position: relative;
+  z-index: 0;
 }
 .CodeMirror-sizer {
   position: relative;
@@ -426,7 +422,7 @@ span.CodeMirror-selectedtext { background: none; }
 
 
 /*
-file https://github.com/codemirror/CodeMirror/blob/5.62.0/addon/lint/lint.css
+file https://github.com/codemirror/CodeMirror/blob/5.65.3/addon/lint/lint.css
 */
 /* The lint marker gutter */
 .CodeMirror-lint-markers {
@@ -663,18 +659,37 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 /7xoEqvL+2E8VOyCTuT/7j269Zy4jUtN+g4="
     ) format("woff2");
 }
-*,
-*:after,
-*:before {
+.JSLINT_,
+.JSLINT_ address,
+.JSLINT_ button,
+.JSLINT_ cite,
+.JSLINT_ dd,
+.JSLINT_ dfn,
+.JSLINT_ dl,
+.JSLINT_ dt,
+.JSLINT_ fieldset,
+.JSLINT_ fieldset > div,
+.JSLINT_ input,
+.JSLINT_ label,
+.JSLINT_ legend,
+.JSLINT_ ol,
+.JSLINT_ samp,
+.JSLINT_ style,
+.JSLINT_ textarea,
+.JSLINT_ ul {
     border: 0;
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
+/* disable text inflation algorithm used on some smartphones and tablets */
 .JSLINT_ {
     -ms-text-size-adjust: none;
     -webkit-text-size-adjust: none;
     text-size-adjust: none;
+}
+.JSLINT_REPORT_ div {
+    box-sizing: border-box;
 }
 /*csslint ignore:end*/
 
@@ -709,7 +724,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 }
 
 /* css - jslint_report - general */
-body {
+.JSLINT_ {
     background: antiquewhite;
 }
 .JSLINT_ fieldset {
@@ -1178,19 +1193,19 @@ body {
     </div>
 </fieldset>
 </main>
-<div id="JSLINT_REPORT_HTML"></div>
-<script defer src="asset_codemirror_rollup.js?cc=u5g9"></script>
+<div class="JSLINT_ JSLINT_REPORT_"></div>
 <script type="module">
 // browser.mjs
-// Original Author: Douglas Crockford (https://www.jslint.com).
 
+// The Unlicense
+//
 // This is free and unencumbered software released into the public domain.
-
+//
 // Anyone is free to copy, modify, publish, use, compile, sell, or
 // distribute this software, either in source code form or as a compiled
 // binary, for any purpose, commercial or non-commercial, and by any
 // means.
-
+//
 // In jurisdictions that recognize copyright laws, the author or authors
 // of this software dedicate any and all copyright interest in the
 // software to the public domain. We make this dedication for the benefit
@@ -1198,7 +1213,7 @@ body {
 // successors. We intend this dedication to be an overt act of
 // relinquishment in perpetuity of all present and future rights to this
 // software under copyright law.
-
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
 // EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 // MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
@@ -1206,39 +1221,32 @@ body {
 // OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 // OTHER DEALINGS IN THE SOFTWARE.
-
+//
 // For more information, please refer to <https://unlicense.org/>
 
 
 /*jslint beta, browser*/
-
-/*global CodeMirror*/
-
 /*property
-    Pos, Tab, addEventListener, ch, checked, clear, click, closest, column,
+    CodeMirror, Tab, addEventListener, ch, checked, clear, click, closest,
     ctrlKey, display, dom_style_report_unmatched, editor, error, extraKeys,
     focus, forEach, from, fromTextArea, getItem, getValue, globals, gutters,
-    indentSelection, indentUnit, indentWithTabs, innerHTML, jslint,
-    jslint_edition, jslint_report, jslint_result, key, length, line,
-    lineNumbers, lineWrapping, lint, lintOnChange, map, matchBrackets, message,
-    metaKey, mode, mode_stop, name, offsetWidth, on, outerHTML, parse,
-    performLint, preventDefault, push, querySelector, querySelectorAll,
-    registerHelper, replace, replaceSelection, result, reverse, search,
-    setCursor, setItem, setSize, setValue, severity, showTrailingSpace,
-    somethingSelected, sort, split, stopPropagation, stringify, style,
-    styleActiveLine, tagName, target, test, textContent, to, trim, value,
-    warnings, width
+    indentSelection, indentUnit, innerHTML, jslint, jslint_edition,
+    jslint_report, key, length, line, lineNumbers, lineWrapping, lint,
+    lintOnChange, matchBrackets, metaKey, mode, name, offsetWidth, on, options,
+    parse, performLint, preventDefault, push, querySelector, querySelectorAll,
+    replace, replaceSelection, result, reverse, search, setCursor, setItem,
+    setSize, setValue, showTrailingSpace, somethingSelected, sort, split,
+    stopPropagation, stringify, style, styleActiveLine, tagName, target, test,
+    textContent, trim, value, width
 */
-
-import jslint from "./jslint.mjs";
 
 // This is the web script companion file for JSLint. It includes code for
 // interacting with the browser and displaying the reports.
 
+let CodeMirror = window.CodeMirror;
 let editor;
-let jslint_option_dict = {
-    lintOnChange: false
-};
+let jslint = window.jslint;
+let jslint_option_dict = {};
 let mode_debug;
 let mode_persist_state_debouncing;
 
@@ -1311,8 +1319,8 @@ async function jslint_run() {
 // Display the reports.
 
         document.querySelector(
-            "#JSLINT_REPORT_HTML"
-        ).outerHTML = jslint.jslint_report(jslint_option_dict.result);
+            ".JSLINT_REPORT_"
+        ).innerHTML = jslint.jslint_report(jslint_option_dict.result);
         listener_window_onresize();
     } catch (err) {
         console.error(err); //jslint-quiet
@@ -1323,37 +1331,6 @@ async function jslint_run() {
     setTimeout(function () {
         document.querySelector("#uiLoader1").style.display = "none";
     }, 500);
-}
-
-function jslint_wrapper_codemirror(CodeMirror) {
-
-// This function will integrate jslint with CodeMirror's lint addon.
-// Requires CodeMirror and jslint.
-
-    CodeMirror.registerHelper("lint", "javascript", function (text, options) {
-        options.result = jslint.jslint(text, options, options.globals);
-
-// Debug jslint result.
-
-        window.jslint_result = options.result;
-        return options.result.warnings.map(function ({
-            column,
-            line,
-            message,
-            mode_stop
-        }) {
-            return {
-                from: CodeMirror.Pos(line - 1, column - 1), //jslint-quiet
-                message,
-                severity: (
-                    mode_stop
-                    ? "error"
-                    : "warning"
-                ),
-                to: CodeMirror.Pos(line - 1, column) //jslint-quiet
-            };
-        });
-    });
 }
 
 function listener_window_onresize() {
@@ -1451,7 +1428,7 @@ document.addEventListener("keydown", function (evt) {
     }
 });
 
-// Init event-handling for #JSLINT_.
+// Init event-handling for .JSLINT_.
 
 document.querySelector(
     ".JSLINT_"
@@ -1600,29 +1577,27 @@ editor = CodeMirror.fromTextArea(document.querySelector(
 ), {
     extraKeys: {
         "Shift-Tab": "indentLess",
-        Tab: function (cm) {
-            if (cm.somethingSelected()) {
-                cm.indentSelection("add");
+        Tab: function () {
+            if (editor.somethingSelected()) {
+                editor.indentSelection("add");
                 return;
             }
-            cm.replaceSelection("    ");
+            editor.replaceSelection("    ");
         }
     },
     gutters: ["CodeMirror-lint-markers"],
     indentUnit: 4,
-    indentWithTabs: false,
     lineNumbers: true,
     lineWrapping: true,
-    lint: jslint_option_dict,
+    lint: {
+        lintOnChange: false,
+        options: jslint_option_dict
+    },
     matchBrackets: true,
-    mode: "text/javascript",
+    mode: "javascript",
     showTrailingSpace: true,
     styleActiveLine: true
 });
-
-// Init CodeMirror linter.
-
-jslint_wrapper_codemirror(CodeMirror);
 
 // Init event-handling for CodeMirror editor.
 
@@ -1689,6 +1664,7 @@ eval("console.log(\\"hello world\\");");
 }
 
 // Init exports.
+
 window.dom_style_report_unmatched = dom_style_report_unmatched;
 window.editor = editor;
 </script>

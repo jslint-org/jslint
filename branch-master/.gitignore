@@ -4,6 +4,8 @@
 *.lock
 *.log
 *.pyc
+*.tgz
+*.vsix
 *~
 .*
 _*
@@ -12,7 +14,6 @@ package-lock.json
 temp*
 tmp
 undefined
-
 !.gitconfig
 !.github
 !.gitignore

@@ -2,17 +2,21 @@
     "bin": {
         "jslint": "./jslint.mjs"
     },
+    "bugs": {
+        "url": "https://github.com/jslint-org/jslint/issues"
+    },
     "counter": 7,
     "description": "JSLint, The JavaScript Code Quality and Coverage Tool",
     "exports": {
         "default": "./jslint_wrapper_cjs.cjs",
         "import": "./jslint.mjs"
     },
-    "fileCount": 29,
+    "fileCount": 34,
     "keywords": [
         "coverage-report",
         "javascript",
         "jslint",
+        "linter",
         "zero-config",
         "zero-dependency"
     ],
@@ -29,5 +33,5 @@
         "test2": "sh jslint_ci.sh shCiBase"
     },
     "type": "module",
-    "version": "2022.3.30"
+    "version": "2022.5.20"
 }
