@@ -437,7 +437,7 @@ import moduleFs from "fs";
         fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
     }));
     Array.from(fileDict["CHANGELOG.md"].matchAll(
-        /\n\n# (v\d\d\d\d\.\d\d?\.\d\d?(.*?)?)\n/g
+        /\n\n# v(\d\d\d\d\.\d\d?\.\d\d?(-.*?)?)\n/g
     )).slice(0, 2).forEach(function ([
         ignore, version, isBeta
     ]) {
@@ -449,12 +449,12 @@ import moduleFs from "fs";
             file: "README.md",
             src: fileDict["README.md"].replace((
                 /\bv\d\d\d\d\.\d\d?\.\d\d?\b/m
-            ), versionMaster)
+            ), `v${versionMaster}`)
         }, {
             file: "package.json",
             src: fileDict["package.json"].replace((
-                /("version": )".*?"/
-            ), "$1" + JSON.stringify(versionBeta.slice(1)))
+                /    "version": "\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
+            ), `    "version": "${versionBeta}"`)
         }
     ].map(async function ({
         file,
