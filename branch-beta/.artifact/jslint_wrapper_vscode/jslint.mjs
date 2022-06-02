@@ -94,10 +94,6 @@
 
 /*jslint beta, node*/
 /*property
-    excludeList,
-    globExclude,
-    import_meta_url, includeList,
-    pathnameList,
     JSLINT_BETA, NODE_V8_COVERAGE, a, all, argv, arity, artifact,
     assertErrorThrownAsync, assertJsonEqual, assertOrThrow, assign, async, b,
     beta, bitwise, block, body, browser, c, calls, catch, catch_list,
@@ -106,39 +102,39 @@
     convert, count, coverageDir, create, cwd, d, dead, debugInline, default,
     delta, devel, directive, directive_list, directive_quiet, directives,
     dirname, disrupt, dot, edition, elem_list, ellipsis, else, end, endOffset,
-    endsWith, entries, env, error, eval, every, example_list, exec, execArgv,
-    exit, exitCode, export_dict, exports, expression, extra, file, fileList,
-    fileURLToPath, filter, finally, flag, floor, for, forEach,
+    endsWith, entries, env, error, eval, every, example_list, excludeList, exec,
+    execArgv, exit, exitCode, export_dict, exports, expression, extra, file,
+    fileList, fileURLToPath, filter, finally, flag, floor, for, forEach,
     formatted_message, free, freeze, from, froms, fsWriteFileWithParents,
     fud_stmt, functionName, function_list, function_stack, functions, get,
-    getset, github_repo, global, global_dict, global_list, holeList, htmlEscape,
-    id, identifier, import, import_list, inc, indent2, index, indexOf, init,
-    initial, isArray, isBlockCoverage, isHole, isNaN, is_equal, is_fart,
-    is_weird, join, jslint, jslint_apidoc, jslint_assert, jslint_charset_ascii,
-    jslint_cli, jslint_edition, jslint_phase1_split, jslint_phase2_lex,
-    jslint_phase3_parse, jslint_phase4_walk, jslint_phase5_whitage,
-    jslint_report, json, jstestDescribe, jstestIt, jstestOnExit, keys, label,
-    lbp, led_infix, length, level, line, lineList, line_list, line_offset,
-    line_source, lines, linesCovered, linesTotal, live, log, long, loop, m, map,
-    margin, match, max, message, meta, min, mkdir, modeCoverageIgnoreFile,
-    modeIndex, mode_cli, mode_conditional, mode_json, mode_module, mode_noop,
-    mode_property, mode_shebang, mode_stop, module, moduleFsInit, moduleName,
-    module_list, name, names, node, noop, now, nr, nud_prefix,
-    objectDeepCopyWithKeysSorted, ok, on, open, opening, option, option_dict,
-    order, package_name, padEnd, padStart, parameters, parent, parentIi, parse,
-    pathname, platform, pop, processArgv, process_argv, process_env,
-    process_exit, promises, property, property_dict, push, quote, ranges,
-    readFile, readdir, readonly, recursive, reduce, repeat, replace, resolve,
-    result, reverse, role, round, scriptId, search, set, shebang, shift,
-    signature, single, slice, some, sort, source, spawn, splice, split, stack,
-    stack_trace, start, startOffset, startsWith, statement, statement_prv,
-    stdio, stop, stop_at, stringify, switch, syntax_dict, tenure, test,
-    test_cause, test_internal_error, this, thru, toString, token, token_global,
-    token_list, token_nxt, token_tree, tokens, trace, tree, trim, trimEnd,
-    trimRight, try, type, unlink, unordered, unshift, url, used,
-    v8CoverageListMerge, v8CoverageReportCreate, value, variable, version,
-    versions, warn, warn_at, warning, warning_list, warnings, white, wrapped,
-    writeFile
+    getset, github_repo, globExclude, global, global_dict, global_list,
+    holeList, htmlEscape, id, identifier, import, import_list, import_meta_url,
+    inc, includeList, indent2, index, indexOf, init, initial, isArray,
+    isBlockCoverage, isHole, isNaN, is_equal, is_fart, is_weird, join, jslint,
+    jslint_apidoc, jslint_assert, jslint_charset_ascii, jslint_cli,
+    jslint_edition, jslint_phase1_split, jslint_phase2_lex, jslint_phase3_parse,
+    jslint_phase4_walk, jslint_phase5_whitage, jslint_report, json,
+    jstestDescribe, jstestIt, jstestOnExit, keys, label, lbp, led_infix, length,
+    level, line, lineList, line_list, line_offset, line_source, lines,
+    linesCovered, linesTotal, live, log, long, loop, m, map, margin, match, max,
+    message, meta, min, mkdir, modeCoverageIgnoreFile, modeIndex, mode_cli,
+    mode_conditional, mode_json, mode_module, mode_noop, mode_property,
+    mode_shebang, mode_stop, module, moduleFsInit, moduleName, module_list,
+    name, names, node, noop, now, nr, nud_prefix, objectDeepCopyWithKeysSorted,
+    ok, on, open, opening, option, option_dict, order, package_name, padEnd,
+    padStart, parameters, parent, parentIi, parse, pathname, pathnameList,
+    platform, pop, processArgv, process_argv, process_env, process_exit,
+    promises, property, property_dict, push, quote, ranges, readFile, readdir,
+    readonly, recursive, reduce, repeat, replace, resolve, result, reverse,
+    role, round, scriptId, search, set, shebang, shift, signature, single,
+    slice, some, sort, source, spawn, splice, split, stack, stack_trace, start,
+    startOffset, startsWith, statement, statement_prv, stdio, stop, stop_at,
+    stringify, switch, syntax_dict, tenure, test, test_cause,
+    test_internal_error, this, thru, toString, token, token_global, token_list,
+    token_nxt, token_tree, tokens, trace, tree, trim, trimEnd, trimRight, try,
+    type, unlink, unordered, unshift, url, used, v8CoverageListMerge,
+    v8CoverageReportCreate, value, variable, version, versions, warn, warn_at,
+    warning, warning_list, warnings, white, wrapped, writeFile
 */
 
 // init debugInline
@@ -168,7 +164,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2022.5.20";
+let jslint_edition = "v2022.6.1-beta";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -716,10 +712,11 @@ function jslint(
             return false;
         }
         if (aa.arity === bb.arity && aa.id === bb.id) {
-            if (aa.id === ".") {
+            if (aa.id === "." || aa.id === "?.") {
 
 // test_cause:
 // ["aa.bb&&aa.bb", "is_equal", "recurse_arity_id", "", 0]
+// ["aa?.bb&&aa?.bb", "is_equal", "recurse_arity_id", "", 0]
 
                 test_cause("recurse_arity_id");
                 return (
@@ -4487,6 +4484,8 @@ function jslint_phase3_parse(state) {
                 left.id !== "["
                 || (
                     name.id !== "concat"
+                    && name.id !== "flat"
+                    && name.id !== "flatMap"
                     && name.id !== "forEach"
                     && name.id !== "join"
                     && name.id !== "map"
@@ -9805,6 +9804,7 @@ async function jstestDescribe(description, testFunction) {
 
     let message;
     let result;
+    let timerTimeout;
 
 // Init jstestTimeStart.
 
@@ -9820,7 +9820,9 @@ async function jstestDescribe(description, testFunction) {
 
 // Wait for jstestItList to resolve.
 
+    timerTimeout = setTimeout(noop, 0x7fffffff);
     result = await Promise.all(jstestItList);
+    clearTimeout(timerTimeout);
 
 // Print test results.
 
