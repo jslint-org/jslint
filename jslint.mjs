@@ -469,7 +469,9 @@ function globExclude({
 // $()*+-./?[\]^{|}
 
         strRegex = strRegex.replace((
-            // ignore [-/]
+
+// Ignore [-/].
+
             /[$()*+.?\[\\\]\^{|}]/g
         ), "\\$&");
 
@@ -1256,7 +1258,7 @@ function jslint(
             mode_json: false,           // true if parsing JSON.
             mode_module: false,         // true if import or export was used.
             mode_property: false,       // true if directive /*property*/ is
-                                        // used.
+                                        // ... used.
             mode_shebang: false,        // true if #! is seen on the first line.
             option_dict,
             property_dict,
@@ -2471,6 +2473,7 @@ function jslint_phase2_lex(state) {
                 global_dict[key] = "user-defined";
 
 // PR-347 - Disable warning "unexpected_directive_a".
+//
 //                 state.mode_module = the_comment;
 
                 break;
@@ -3289,7 +3292,7 @@ function jslint_phase2_lex(state) {
         case "node":            // Assume Node.js environment.
         case "nomen":           // Allow weird property names.
         case "single":          // Allow single-quote strings.
-        case "subscript":       // Allow identifiers in subscript-notation.
+        case "subscript":       // Allow identifier in subscript-notation.
         case "test_cause":      // Test jslint's causes.
         case "test_internal_error":     // Test jslint's internal-error
                                         // ... handling-ability.
@@ -3302,10 +3305,14 @@ function jslint_phase2_lex(state) {
         case "white":           // Allow messy whitespace.
             option_dict[key] = val;
             break;
-        // alias for eval
+
+// PR-404 - Alias "evil" to jslint-directive "eval" for backwards-compat.
+
         case "evil":
             return option_set_item("eval", val);
-        // alias for nomen
+
+// PR-404 - Alias "nomen" to jslint-directive "name" for backwards-compat.
+
         case "name":
             return option_set_item("nomen", val);
         default:
@@ -4555,9 +4562,7 @@ function jslint_phase3_parse(state) {
         if (the_subscript.id === "(string)" || the_subscript.id === "`") {
             name = survey(the_subscript);
 
-// PR-xxx - directive
-// Add new directive "subscript" allowing JSLint to be used with scripts
-// targeting Google Closure Compiler.
+// PR-404 - Add new directive "subscript" to play nice with Google Closure.
 
             if (!option_dict.subscript && jslint_rgx_identifier.test(name)) {
 
@@ -6357,6 +6362,7 @@ function jslint_phase3_parse(state) {
         let names;
 
 // PR-347 - Disable warning "unexpected_directive_a".
+//
 //         if (typeof state.mode_module === "object") {
 //
 // // test_cause:
@@ -6715,8 +6721,7 @@ function jslint_phase3_parse(state) {
 
             catchage = catch_stack.pop();
 
-// PR-xxx - warning
-// Relax warning about missing `catch` in `try...finally` statement.
+// PR-404 - Relax warning about missing `catch` in `try...finally` statement.
 //
 //         } else {
 //
@@ -6845,12 +6850,14 @@ function jslint_phase3_parse(state) {
                             return stop("expected_identifier_a");
                         }
 
-// PR-363 - Bugfix - fix false-warning
-// <uninitialized 'bb'> in code '/*jslint node*/\nlet {aa:bb} = {}; bb();'
+// PR-363 - Bugfix
+// Add test against false-warning <uninitialized 'bb'> in code
+// '/*jslint node*/\nlet {aa:bb} = {}; bb();'.
+//
+//                         token_nxt.label = name;
+//                         the_variable.names.push(token_nxt);
+//                         enroll(token_nxt, "variable", mode_const);
 
-                        // token_nxt.label = name;
-                        // the_variable.names.push(token_nxt);
-                        // enroll(token_nxt, "variable", mode_const);
                         name = token_nxt;
                         the_variable.names.push(name);
                         survey(name);
@@ -11113,15 +11120,13 @@ function sentinel() {}
         processArgElem[1] = processArgElem.slice(1).join("=");
         switch (processArgElem[0]) {
 
-// PR-371
-// Add cli-option `--exclude=...`.
+// PR-371 - Add cli-option `--exclude=...`.
 
         case "--exclude":
             excludeList.push(processArgElem[1]);
             break;
 
-// PR-371
-// Add cli-option `--include=...`
+// PR-371 - Add cli-option `--include=...`
 
         case "--include":
             includeList.push(processArgElem[1]);
@@ -11221,15 +11226,13 @@ function sentinel() {}
             pathnameDict[pathname] = scriptCov;
         });
 
-// PR-400
-// Filter directory `node_modules`.
+// PR-400 - Filter directory `node_modules`.
 
         if (!modeIncludeNodeModules) {
             excludeList.push("node_modules/");
         }
 
-// PR-400
-// Filter files by glob-patterns in excludeList, includeList.
+// PR-400 - Filter files by glob-patterns in excludeList, includeList.
 
         data.result = globExclude({
             excludeList,

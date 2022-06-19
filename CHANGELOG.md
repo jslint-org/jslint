@@ -15,9 +15,9 @@
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 
 # v2022.6.1-beta
-- directive - add new directive `subscript` allowing JSLint to be used with scripts targeting Google Closure Compiler
+- directive - add new directive `subscript` for linting of scripts targeting Google Closure Compiler
 - warning - relax warning about missing `catch` in `try...finally` statement
-- jslint - allow aliases `evil, nomen` for jslint-directives `eval, name`, respectively
+- jslint - allow aliases `evil, nomen` for jslint-directives `eval, name`, respectively for backwards-compat
 - bugfix - fix broken codemirror example
 - bugfix - fix jslint not-recognizing option-chaining when comparing operands of binary operator
 - allow array-literals to directly call [...].flat() and [...].flatMap()
