@@ -72,10 +72,11 @@ th {
 td {
     background-color: white;
 }
-button {
+.button,
+.button:hover {
     background-color: lightsteelblue;
     border: 0;
-    color: black;
+    color: black !important;
     cursor: pointer;
     font-family: "Daley", serif;
     font-size: 100%;
@@ -87,6 +88,7 @@ button {
     padding-left: 1em;
     padding-right: 1em;
     text-align: center;
+    text-decoration: none;
 }
 s {
     display: inline-block;
@@ -144,7 +146,9 @@ ul {
 }
 table {
     border: 0;
-    margin: 1em;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
     max-width: 76%;
 }
 th, td {
@@ -186,16 +190,16 @@ a:active {
   </a></li>
 </ul>
 <div id=title>Help</div>
-<br clear=all>
+<br>
 <blockquote>Il semble que la perfection soit atteinte non quand il n&#8217;y a
     plus rien &agrave; ajouter, mais quand il n&#8217;y a plus rien &agrave;
     retrancher.</blockquote>
-<center>
+<div style="text-align: center;">
     Antoine de Saint-Exupéry
-</center>
-<center>
+</div>
+<div style="text-align: center;">
     <i>Terre des Hommes</i> (1939)
-</center>
+</div>
 <h1 id=good>Good Parts</h1>
 <p>The Principle of the Good Parts is</p>
 <blockquote> If a feature is sometimes useful and sometimes dangerous and if
@@ -330,7 +334,6 @@ a:active {
     options. These options can also be set from the
     <a href="https://www.jslint.com/">jslint.com</a> user interface.</p>
 
-<center>
 <table>
     <tbody>
         <tr>
@@ -339,17 +342,34 @@ a:active {
             <th>Meaning</th>
         </tr>
         <tr>
-            <td id="bitwise">Tolerate bitwise operators</td>
+            <td id="beta">Enable experimental warnings.</td>
+            <td><code>beta</code></td>
+            <td><code>true</code> will enable the following additional warnings:
+            <ul style="margin-left: 0; margin-right: 0;">
+                <li>Warn if global variables are redefined.</li>
+                <li>Warn if <code>const / let</code> statements are not declared
+                at top of function or script,
+                similar to <code>var</code> statements.</li>
+                <li>Warn if <code>const / let / var</code> statements
+                are not declared in ascii-order.</li>
+                <li>Warn if named-functions
+                are not declared in ascii-order.</li>
+            </ul>
+            </td>
+        </tr>
+        <tr>
+            <td id="bitwise">Allow bitwise operators.</td>
             <td><code>bitwise</code></td>
             <td><code>true</code> if bitwise operators should  be allowed. The
                 bitwise operators are rarely used in JavaScript programs, so it
                 is usually more likely that <code>&amp;</code> is a mistyping of
-                <code>&amp;&amp;</code> than that it indicates a bitwise <i>and</i>.
+                <code>&amp;&amp;</code> than that it indicates a bitwise
+                <i>and</i>.
                 JSLint will give warnings on the bitwise operators
                 unless this option is selected.</td>
         </tr>
         <tr>
-            <td id="browser">Assume a browser </td>
+            <td id="browser">Assume browser environment.</td>
             <td><code>browser</code></td>
             <td><code>true</code> if the standard browser globals should be
                 predefined. This option will reject the use of
@@ -370,7 +390,7 @@ a:active {
             </td>
         </tr>
         <tr>
-            <td id="convert">Tolerate conversion operators</td>
+            <td id="convert">Allow conversion operators.</td>
             <td><code>convert</code></td>
             <td><code>true</code> if <code>!!</code>, <code>+</code> prefix,
                 and concatenation with <code>&quot;&quot;</code> are allowed.
@@ -378,7 +398,8 @@ a:active {
                 <code>String</code> functions are preferred</td>
         </tr>
         <tr>
-            <td id="couch">Assume <a href="https://couchdb.apache.org/">CouchDB</a></td>
+            <td id="couch">Assume
+            <a href="https://couchdb.apache.org/">CouchDB</a> environment.</td>
             <td><code>couch</code></td>
             <td><code>true</code> if
                 <a href="https://couchdb.apache.org/">Couch DB</a>
@@ -390,7 +411,7 @@ a:active {
     <code> */</code></blockquote></td>
         </tr>
         <tr>
-            <td id="devel">Assume in development</td>
+            <td id="devel">Assume in development.</td>
             <td><code>devel</code></td>
             <td><code>true</code> if browser globals that are useful in
                 development should be predefined, and if <code>debugger</code>
@@ -403,40 +424,39 @@ a:active {
         into production.</td>
         </tr>
         <tr>
-            <td id="eval">Tolerate <code>eval</code></td>
+            <td id="eval">Allow <code>eval</code>.</td>
             <td><code>eval</code></td>
             <td><code>true</code> if <code>eval</code> should be allowed. In the
                 past, the <code>eval</code> function was the most misused
                 feature of the language.</td>
         </tr>
         <tr>
-            <td>Tolerate <code>for</code> statement</td>
+            <td>Allow <code>for</code> statement.</td>
             <td><code>for</code></td>
             <td><code>true</code> if the <code>for</code> statement should be
                 allowed. It is almost always better to use the array methods
                 instead.</td>
         </tr>
         <tr>
-            <td id="getsest">Tolerate <code>get</code> and <code>set</code></td>
+            <td id="getsest">Allow <code>get</code> and <code>set</code>.</td>
             <td><code>getset</code></td>
-            <td><code>true</code> if accessor properties are allowed in object literals.</td>
+            <td><code>true</code> if accessor properties are allowed in object
+            literals.</td>
         </tr>
         <tr>
-            <td id="long">Tolerate long source lines</td>
+            <td id="indent2">Use 2-space indent.</td>
+            <td><code>indent2</code></td>
+            <td><code>true</code> if using 2-space indent.</td>
+        </tr>
+        <tr>
+            <td id="long">Allow long lines.</td>
             <td><code>long</code></td>
-            <td><code>true</code> if a line can contain more than 80 characters.</td>
-        </tr>
-        <tr>
-            <td id="name">Tolerate bad property names</td>
-            <td><code>name</code></td>
-            <td>
-                <code>true</code> if bad property names like
-                <code>$, _foo, fooSync, foo_</code>
-                are allowed.
+            <td><code>true</code> if a line can contain more than 80 characters.
             </td>
         </tr>
         <tr>
-            <td id="node">Assume <a href="https://nodejs.org/">Node.js</a></td>
+            <td id="node">Assume <a href="https://nodejs.org/">Node.js</a>
+            environment.</td>
             <td><code>node</code></td>
             <td><code>true</code> if Node.js globals should be predefined. It
                 will predefine globals that are used in the Node.js environment.
@@ -451,29 +471,54 @@ a:active {
     <code>*/</code></blockquote></td>
         </tr>
         <tr>
-            <td id="single">Tolerate single quote strings</td>
+            <td id="nomen">Allow weird property names.</td>
+            <td><code>nomen</code></td>
+            <td>
+                <code>true</code> if weird property names like
+                <code>$, _foo, fooSync, foo_</code>
+                are allowed.
+            </td>
+        </tr>
+        <tr>
+            <td id="single">Allow single quote strings.</td>
             <td><code>single</code></td>
             <td><code>true</code> if <code>'</code><small>single quote</small>
-                should be allowed to enclose string literals. </td>
+                should be allowed to enclose string literals.</td>
         </tr>
         <tr>
-            <td>Tolerate <code>this</code><br></td>
+            <td id="subscript">Allow identifiers in subscript-notation.</td>
+            <td><code>subscript</code></td>
+            <td><code>true</code> to allow identifiers in
+            subscript-notation, e.g.: <code>foo["bar"] = 1;</code>.
+            This allows linting of scripts targeting Google Closure Compiler,
+            where subscript-notation is commonly used to prevent renaming of
+            properties.</td>
+        </tr>
+        <tr>
+            <td>Allow <code>this</code>.<br></td>
             <td><code>this</code></td>
-            <td><code>true</code> if <code>this</code> should be allowed. </td>
+            <td><code>true</code> if <code>this</code> should be allowed.</td>
         </tr>
         <tr>
-            <td id="unordered">Tolerate unordered case-statements, params, properties.</td>
+            <td id="trace">Include jslint stack-trace in warnings.<br></td>
+            <td><code>trace</code></td>
+            <td><code>true</code> is used by developers to debug JSLint.</td>
+        </tr>
+        <tr>
+            <td id="unordered">Allow unordered case-statements, params,
+            properties.</td>
             <td><code>unordered</code></td>
-            <td><code>true</code> if objects and functions are allowed to declare properties and params in non-alphabetical order.</td>
+            <td><code>true</code> if objects and functions are allowed
+            to declare properties and params in non-ascii order.</td>
         </tr>
         <tr>
-            <td id="white">Tolerate whitespace mess</td>
+            <td id="white">Allow messy whitespace.</td>
             <td><code>white</code></td>
-            <td><code>true</code> if the whitespace rules should be ignored.</td>
+            <td><code>true</code> if the whitespace rules should be ignored.
+            </td>
         </tr>
     </tbody>
 </table>
-</center>
 
 <p>For example:</p>
 <pre>/*jslint
@@ -497,8 +542,8 @@ a:active {
     names against the list. That way, you can have JSLint look for
     misspellings for you.</p>
 <p>For example,</p>
-<blockquote><code>/*property
-    <div>charAt, slice, _$_</div>
+<blockquote><code>/*property<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;charAt, slice, _$_<br>
     */</code></blockquote>
 <h1 id=ignore><code>ignore</code></h1>
 <p>JSLint introduces a new reserved word: <code>ignore</code>. It
@@ -525,7 +570,7 @@ a:active {
     parameter in an outer function. Do not mix <code>var</code> and
     <code>let</code>. Declare one name per statement.</p>
 <h1 id=eq><code>= == ===</code></h1>
-<p><span style="asset_font_variant: small-caps;">Fortran</span> made a terrible
+<p>FORTRAN made a terrible
     mistake in using the equality operator as its assignment operator. That
     mistake has been replicated in most languages since then. C compounded that
     mistake by making <code>==</code> its equality operator. The visual
@@ -783,7 +828,7 @@ a:active {
 <h1 id=try>Try it</h1>
 <p><a href="https://www.jslint.com/">Try it.</a> Paste your script
     into the window and click the
-    <a href="https://www.jslint.com/"><button>JSLint</button></a>
+    <a class="button" href="https://www.jslint.com/">JSLint</a>
     button. The analysis is done by a script running on your machine.
     Your script is not sent over the network. You can set the options used.</p>
 <p>JSLint is written entirely in JavaScript, so it can run
@@ -807,7 +852,7 @@ a:active {
 
 <h1 id=jslint>JSLint</h1>
 <p>JSLint is delivered as a set of files:</p>
-<center><table align="center">
+<table style="max-width: 450px;">
 <tr><th>Filename</th><th>Content</th></tr>
 <tr><td><code>help.html</code></td>
 <td>Using <code>jslint</code> as a single page JSLint application.</td></tr>
@@ -816,12 +861,12 @@ a:active {
         <code>js</code> files.</td></tr>
 <tr><td><code>jslint.mjs</code></td>
 <td>The <code>jslint</code> function.</td></tr>
-</table></center>
+</table>
 <h1><code>function jslint</code></h1>
 <p>The <code>jslint</code> function is written in ES6 JavaScript. It has no
     dependence on other files.</p>
 <p>The <code>jslint</code> function has three arguments:</p>
-<center><table>
+<table>
 <tr>
     <th>Parameter name</th>
     <th>Type</th>
@@ -841,11 +886,11 @@ a:active {
         may be used by the program. Listing names here will silence warnings
         about the names. It will not introduce the names into the runtime
         environment.</td></tr>
-</table></center>
+</table>
 <p>The <code>jslint</code> function will not modify any of its arguments.</p>
 <p>The <code>jslint</code> function will return a result object contain the
     following properties:</p>
-<center><table>
+<table>
 <tr>
     <th>Property name</th>
     <th>Type</th>
@@ -1218,15 +1263,14 @@ a:active {
         </tr>
     </table>
     <p>&nbsp;</p>
-</center>
 
 <h1 id=reading>Further Reading</h1>
-<center>
+<div style="text-align: center">
     <p><a href="https://www.crockford.com/javascript/code.html">
         Code Conventions for the JavaScript Programming Language.</a></p>
-    <a href="https://www.jslint.com/"><img src="asset_image_logo_512.svg" height="20"></a>
-    <a href="https://github.com/jslint-org/jslint"><img src="asset_image_github_brands.svg" height="20"></a>
-    <a href="https://www.json.org/"><img src="asset_image_json_160.svg" height="20"></a>
-</center>
+    <a href="https://www.jslint.com/"><img alt="jslint" src="asset_image_logo_512.svg" height="20"></a>
+    <a href="https://github.com/jslint-org/jslint"><img alt="github" src="asset_image_github_brands.svg" height="20"></a>
+    <a href="https://www.json.org/"><img alt="json" src="asset_image_json_160.svg" height="20"></a>
+</div>
 </body>
 </html>

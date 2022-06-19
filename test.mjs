@@ -839,6 +839,16 @@ jstestDescribe((
                     + "aa();\n"
                 )
             ],
+            try_finally: [
+                (
+                    "let aa = 0;\n"
+                    + "try {\n"
+                    + "    aa();\n"
+                    + "} finally {\n"
+                    + "    aa();\n"
+                    + "}\n"
+                )
+            ],
             use_strict: [
                 (
                     "\"use strict\";\n"
@@ -911,7 +921,7 @@ jstestDescribe((
         ], [
             "debugger;", {devel: true}, []
         ], [
-            "new Function();\neval();", {eval: true}, []
+            "new Function();\neval();", {eval: true, evil: true}, []
         ], [
             (
                 "function aa(aa) {\n"
@@ -933,11 +943,13 @@ jstestDescribe((
         ], [
             "/".repeat(100), {long: true}, []
         ], [
-            "let aa = aa._;", {name: true}, []
+            "let aa = aa._;", {name: true, nomen: true}, []
         ], [
             "require();", {node: true}, []
         ], [
             "let aa = 'aa';", {single: true}, []
+        ], [
+            "aa[\"aa\"] = 1;", {subscript: true}, ["aa"]
         ], [
             "", {test_internal_error: true}, []
         ], [
@@ -1112,7 +1124,7 @@ jstestDescribe((
     });
 });
 
-await jstestDescribe((
+jstestDescribe((
     "test misc handling-behavior"
 ), function testBehaviorMisc() {
     jstestIt((
