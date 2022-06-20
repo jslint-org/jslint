@@ -450,9 +450,9 @@ jstestIt((
 <span class="apidocCodeCommentSpan">
 // This function will print &lt;argv&gt; to stderr and then return &lt;argv&gt;[0].
 
-</span>    consoleError("\n\ndebugInline");
-    consoleError(...argv);
-    consoleError("\n");
+</span>    __consoleError("\n\ndebugInline");
+    __consoleError(...argv);
+    __consoleError("\n");
     return argv[0];
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">N/A</pre></li>
@@ -1666,7 +1666,7 @@ jstestIt((
 });
 });
 
-await jstestDescribe((
+jstestDescribe((
 "test misc handling-behavior"
 ), function testBehaviorMisc() {
 jstestIt((
@@ -1748,7 +1748,7 @@ await moduleFs.promises.rm(".tmp", {
 </span>    return val;
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-await jstestDescribe((
+jstestDescribe((
 "test misc handling-behavior"
 ), function testBehaviorMisc() {
 jstestIt((
