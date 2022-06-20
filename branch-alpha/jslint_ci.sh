@@ -1713,7 +1713,11 @@ function objectDeepCopyWithKeysSorted(obj) {
             flags
         }) {
             result0 = result;
-            result = result.replace(new RegExp(aa, flags), bb);
+            result = result.replace(new RegExp(aa, flags), bb.replace((
+                /\*\\\\\//g
+            ), "*/").replace((
+                /\/\\\\\*/g
+            ), "/*"));
             if (result0 === result) {
                 throw new Error(
                     "shRawLibFetch - cannot find-and-replace snippet "
@@ -1940,7 +1944,6 @@ function globExclude({
       /[\[\]]/g
     ), "\\$&");
     strRegex = strRegex.replace((
-      // ignore [-/]
       /[$()*+.?\[\\\]\^{|}]/g
     ), "\\$&");
     strRegex = strRegex.replace((

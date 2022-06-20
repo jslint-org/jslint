@@ -13,9 +13,9 @@
     <meta name="author" content="Douglas Crockford">
     <link rel="icon" type="image/png" href="asset_image_logo_512.svg">
     <title>JSLint: The JavaScript Code Quality and Coverage Tool</title>
-    <script defer src="./asset_codemirror_rollup.js?cc=465z"></script>
-    <script type="module" src="./jslint.mjs?cc=465z?window_jslint=1"></script>
-    <script defer src="./jslint_wrapper_codemirror.js?cc=465z"></script>
+    <script defer src="./asset_codemirror_rollup.js?cc=pqtn"></script>
+    <script type="module" src="./jslint.mjs?cc=pqtn?window_jslint=1"></script>
+    <script defer src="./jslint_wrapper_codemirror.js?cc=pqtn"></script>
 <style>
 /*jslint-disable*/
 /*
@@ -1147,11 +1147,14 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         <div title="Allow conversion operators.">
         <label><input type="checkbox" value="convert">convert</label>
         </div>
-        <div title="Allow for-statement.">
-        <label><input type="checkbox" value="for">for</label>
+        <div title="Allow eval().">
+        <label><input type="checkbox" value="eval">eval</label>
         </div>
     </div>
     <div>&nbsp;
+        <div title="Allow for-statement.">
+        <label><input type="checkbox" value="for">for</label>
+        </div>
         <div title="Allow get() and set().">
         <label><input type="checkbox" value="getset">getset</label>
         </div>
@@ -1161,25 +1164,28 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         <div title="Allow long lines.">
         <label><input type="checkbox" value="long">long</label>
         </div>
-        <div title="Allow weird property names.">
-        <label><input type="checkbox" value="name">name</label>
-        </div>
     </div>
     <div>&nbsp;
+        <div title="Allow weird property names.">
+        <label><input type="checkbox" value="nomen">nomen</label>
+        </div>
         <div title="Allow single-quote strings.">
         <label><input type="checkbox" value="single">single</label>
+        </div>
+        <div title="Allow identifier in subscript-notation.">
+        <label><input type="checkbox" value="subscript">subscript</label>
         </div>
         <div title="Allow 'this'.">
         <label><input type="checkbox" value="this">this</label>
         </div>
+    </div>
+    <div>&nbsp;
         <div title="Allow unordered cases, params, properties, and variables.">
         <label><input type="checkbox" value="unordered">unordered</label>
         </div>
         <div title="Allow unordered const and let declarations that are not at top of function-scope.">
         <label><input type="checkbox" value="variable">variable</label>
         </div>
-    </div>
-    <div>&nbsp;
         <div title="Allow messy whitespace.">
         <label><input type="checkbox" value="white">white</label>
         </div>
@@ -1437,7 +1443,7 @@ document.querySelector(
 }) {
     switch (target.tagName) {
 
-// PR-368 - website
+// PR-368 - Website
 // Add clickable-links to editor-code in report-warnings and report-functions.
 
     case "ADDRESS":
@@ -1626,14 +1632,17 @@ eval("console.log(\\"hello world\\");");
 // .... /*jslint bitwise*/ ....... Allow bitwise operators.
 // .... /*jslint browser*/ ....... Assume browser environment.
 // .... /*jslint convert*/ ....... Allow conversion operators.
+// .... /*jslint couch*/ ......... Assume CouchDb environment.
 // .... /*jslint devel*/ ......... Allow console.log() and friends.
+// .... /*jslint eval*/ .......... Allow eval().
 // .... /*jslint for*/ ........... Allow for-statement.
 // .... /*jslint getset*/ ........ Allow get() and set().
 // .... /*jslint indent2*/ ....... Use 2-space indent.
 // .... /*jslint long*/ .......... Allow long lines.
-// .... /*jslint name*/ .......... Allow weird property names.
 // .... /*jslint node*/ .......... Assume Node.js environment.
+// .... /*jslint nomen*/ ......... Allow weird property names.
 // .... /*jslint single*/ ........ Allow single-quote strings.
+// .... /*jslint subscript*/ ..... Allow identifier in subscript-notation.
 // .... /*jslint this*/ .......... Allow 'this'.
 // .... /*jslint trace*/ ......... Include jslint stack-trace in warnings.
 // .... /*jslint unordered*/ ..... Allow unordered cases, params, properties,

@@ -376,12 +376,11 @@ import jslint from "../jslint.mjs";
 
 <!-- Assets from codemirror. -->
 
-    <link rel="stylesheet" href="https://codemirror.net/lib/codemirror.css">
-    <link rel="stylesheet" href="https://codemirror.net/addon/lint/lint.css">
-    <script defer src="https://codemirror.net/lib/codemirror.js"></script>
-    <script defer
-        src="https://codemirror.net/mode/javascript/javascript.js"></script>
-    <script defer src="https://codemirror.net/addon/lint/lint.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/lint/lint.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.js"></script>
+    <script defer src="https://codemirror.net/mode/javascript/javascript.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/lint/lint.js"></script>
 
 <!-- Assets from jslint. -->
 
@@ -396,6 +395,10 @@ body {
 }
 .JSLINT_.JSLINT_REPORT_ {
     margin-top: 20px;
+}
+#editor1 {
+    height: 300px;
+    width: 100%;
 }
 </style>
 </head>
