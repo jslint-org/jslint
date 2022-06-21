@@ -15,6 +15,7 @@
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 
 # v2022.6.1-beta
+- bugfix - fix expression after "await" mis-identified as statement
 - directive - add new directive `subscript` for linting of scripts targeting Google Closure Compiler
 - warning - relax warning about missing `catch` in `try...finally` statement
 - jslint - allow aliases `evil, nomen` for jslint-directives `eval, name`, respectively for backwards-compat

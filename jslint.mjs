@@ -5293,10 +5293,13 @@ function jslint_phase3_parse(state) {
             functionage.async += 1;
         }
         if (the_await.arity === "statement") {
-            the_await.block = parse_expression();
+
+// PR-405 - Bugfix - fix expression after "await" mis-identified as statement.
+
+            the_await.expression = parse_expression(150);
             semicolon();
         } else {
-            the_await.expression = parse_expression();
+            the_await.expression = parse_expression(150);
         }
         return the_await;
     }
@@ -8493,9 +8496,6 @@ function jslint_phase4_walk(state) {
 // ["+[]", "walk_statement", "unexpected_expression_a", "+", 1]
 // ["+new aa()", "walk_statement", "unexpected_expression_a", "+", 1]
 // ["0", "walk_statement", "unexpected_expression_a", "0", 1]
-// ["
-// async function aa(){await 0;}
-// ", "walk_statement", "unexpected_expression_a", "0", 27]
 // ["typeof 0", "walk_statement", "unexpected_expression_a", "typeof", 1]
 
                     warn("unexpected_expression_a", thing);
