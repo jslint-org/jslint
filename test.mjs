@@ -647,6 +647,10 @@ jstestDescribe((
             ],
             async_await: [
                 "async function aa() {\n    await aa();\n}",
+
+// PR-405 - Bugfix - fix expression after "await" mis-identified as statement.
+
+                "async function aa() {\n    await aa;\n}",
                 (
                     "async function aa() {\n"
                     + "    try {\n"
