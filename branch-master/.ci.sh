@@ -189,6 +189,7 @@ import moduleFs from "fs";
     let versionBeta;
     let versionMaster;
     await Promise.all([
+        ".ci.sh",
         "CHANGELOG.md",
         "README.md",
         "index.html",
@@ -199,7 +200,7 @@ import moduleFs from "fs";
         fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
     }));
     Array.from(fileDict["CHANGELOG.md"].matchAll(
-        /\n\n# (v\d\d\d\d\.\d\d?\.\d\d?(.*?)?)\n/g
+        /\n\n# v(\d\d\d\d\.\d\d?\.\d\d?(-.*?)?)\n/g
     )).slice(0, 2).forEach(function ([
         ignore, version, isBeta
     ]) {
@@ -208,6 +209,12 @@ import moduleFs from "fs";
     });
     await Promise.all([
         {
+            file: ".ci.sh",
+            // update version
+            src: fileDict[".ci.sh"].replace((
+                /    "version": "\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
+            ), `    "version": "${versionBeta}"`)
+        }, {
             file: "README.md",
             src: fileDict["README.md"].replace((
                 /\n```html <!-- jslint_wrapper_codemirror.html -->\n[\S\s]*?\n```\n/
@@ -227,10 +234,10 @@ import moduleFs from "fs";
             })
         }, {
             file: "jslint.mjs",
-            // inline css-assets
+            // update version
             src: fileDict["jslint.mjs"].replace((
                 /^let jslint_edition = ".*?";$/m
-            ), `let jslint_edition = "${versionBeta}";`)
+            ), `let jslint_edition = "v${versionBeta}";`)
         }, {
             file: "jslint_ci.sh",
             // update coverage-code
@@ -405,7 +412,7 @@ import moduleFs from "fs";
                     "type": "git",
                     "url": "https://github.com/jslint-org/jslint.git"
                 },
-                "version": "2022.5.1"
+                "version": "2022.6.21"
             }, undefined, 4)
         }
     ].map(async function ({

@@ -3,7 +3,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Status
-| Branch | [master<br>(v2022.5.20)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
+| Branch | [master<br>(v2022.6.21)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jslint-org/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/jslint-org/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/jslint-org/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/index.html) |
@@ -376,12 +376,11 @@ import jslint from "../jslint.mjs";
 
 <!-- Assets from codemirror. -->
 
-    <link rel="stylesheet" href="https://codemirror.net/lib/codemirror.css">
-    <link rel="stylesheet" href="https://codemirror.net/addon/lint/lint.css">
-    <script defer src="https://codemirror.net/lib/codemirror.js"></script>
-    <script defer
-        src="https://codemirror.net/mode/javascript/javascript.js"></script>
-    <script defer src="https://codemirror.net/addon/lint/lint.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/lint/lint.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.js"></script>
+    <script defer src="https://codemirror.net/mode/javascript/javascript.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/addon/lint/lint.js"></script>
 
 <!-- Assets from jslint. -->
 
@@ -396,6 +395,10 @@ body {
 }
 .JSLINT_.JSLINT_REPORT_ {
     margin-top: 20px;
+}
+#editor1 {
+    height: 300px;
+    width: 100%;
 }
 </style>
 </head>

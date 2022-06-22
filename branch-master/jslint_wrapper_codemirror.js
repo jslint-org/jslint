@@ -57,7 +57,7 @@ window.addEventListener("load", function () {
 </html>
 */
 
-/*jslint browser devel*/
+/*jslint browser, devel*/
 /*global CodeMirror define exports jslint module require*/
 /*property
     Pos, amd, column, error, from, globals, jslint, line, map, message,

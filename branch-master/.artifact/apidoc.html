@@ -67,7 +67,7 @@ body {
 </head>
 <body>
 <div class="apidocDiv">
-<h1>API Doc for <a href="https://github.com/jslint-org/jslint">JSLint (v2022.5.20)</a></h1>
+<h1>API Doc for <a href="https://github.com/jslint-org/jslint">JSLint (v2022.6.21)</a></h1>
 <div class="apidocSectionDiv">
     <a href="#apidocTableOfContents1" id="apidocTableOfContents1">
         <h1>Table of Contents</h1>
@@ -450,9 +450,9 @@ jstestIt((
 <span class="apidocCodeCommentSpan">
 // This function will print &lt;argv&gt; to stderr and then return &lt;argv&gt;[0].
 
-</span>    consoleError("\n\ndebugInline");
-    consoleError(...argv);
-    consoleError("\n");
+</span>    __consoleError("\n\ndebugInline");
+    __consoleError(...argv);
+    __consoleError("\n");
     return argv[0];
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">N/A</pre></li>
@@ -1517,6 +1517,7 @@ fNZOtXKDe39jXdRlkmMnOWIOFBgeEK/b0mFsgffnP...
 
 </span>    let message;
     let result;
+    let timerTimeout;
 
 // Init jstestTimeStart.
 
@@ -1532,7 +1533,9 @@ fNZOtXKDe39jXdRlkmMnOWIOFBgeEK/b0mFsgffnP...
 
 // Wait for jstestItList to resolve.
 
+    timerTimeout = setTimeout(noop, 0x7fffffff);
     result = await Promise.all(jstestItList);
+    clearTimeout(timerTimeout);
 
 // Print test results.
 
@@ -1663,7 +1666,7 @@ jstestIt((
 });
 });
 
-await jstestDescribe((
+jstestDescribe((
 "test misc handling-behavior"
 ), function testBehaviorMisc() {
 jstestIt((
@@ -1745,7 +1748,7 @@ await moduleFs.promises.rm(".tmp", {
 </span>    return val;
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-await jstestDescribe((
+jstestDescribe((
 "test misc handling-behavior"
 ), function testBehaviorMisc() {
 jstestIt((

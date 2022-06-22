@@ -647,6 +647,10 @@ jstestDescribe((
             ],
             async_await: [
                 "async function aa() {\n    await aa();\n}",
+
+// PR-405 - Bugfix - fix expression after "await" mis-identified as statement.
+
+                "async function aa() {\n    await aa;\n}",
                 (
                     "async function aa() {\n"
                     + "    try {\n"
@@ -839,6 +843,16 @@ jstestDescribe((
                     + "aa();\n"
                 )
             ],
+            try_finally: [
+                (
+                    "let aa = 0;\n"
+                    + "try {\n"
+                    + "    aa();\n"
+                    + "} finally {\n"
+                    + "    aa();\n"
+                    + "}\n"
+                )
+            ],
             use_strict: [
                 (
                     "\"use strict\";\n"
@@ -851,8 +865,9 @@ jstestDescribe((
             ],
             var: [
 
-// PR-363 - Bugfix - add test against false-warning
-// <uninitialized 'bb'> in code '/*jslint node*/\nlet {aa:bb} = {}; bb();'
+// PR-363 - Bugfix
+// Add test against false-warning <uninitialized 'bb'> in code
+// '/*jslint node*/\nlet {aa:bb} = {}; bb();'.
 
                 "/*jslint node*/\n",
                 ""
@@ -911,7 +926,10 @@ jstestDescribe((
         ], [
             "debugger;", {devel: true}, []
         ], [
-            "new Function();\neval();", {eval: true}, []
+
+// PR-404 - Alias "evil" to jslint-directive "eval" for backwards-compat.
+
+            "new Function();\neval();", {eval: true, evil: true}, []
         ], [
             (
                 "function aa(aa) {\n"
@@ -933,11 +951,19 @@ jstestDescribe((
         ], [
             "/".repeat(100), {long: true}, []
         ], [
-            "let aa = aa._;", {name: true}, []
+
+// PR-404 - Alias "nomen" to jslint-directive "name" for backwards-compat.
+
+            "let aa = aa._;", {name: true, nomen: true}, []
         ], [
             "require();", {node: true}, []
         ], [
             "let aa = 'aa';", {single: true}, []
+        ], [
+
+// PR-404 - Add new directive "subscript" to play nice with Google Closure.
+
+            "aa[\"aa\"] = 1;", {subscript: true}, ["aa"]
         ], [
             "", {test_internal_error: true}, []
         ], [
@@ -1112,7 +1138,7 @@ jstestDescribe((
     });
 });
 
-await jstestDescribe((
+jstestDescribe((
     "test misc handling-behavior"
 ), function testBehaviorMisc() {
     jstestIt((

@@ -1,6 +1,8 @@
 # Changelog
 
 # Todo
+- wrapper - add vscode-command to suppress minor warnings on given line
+- doc - document jslint directives and supported/unsupported es6+ features
 - cli - remove cli-option `--mode-vim-plugin`
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
 - jslint - add html and css linting back into jslint.
@@ -11,6 +13,15 @@
 - jslint - unify analysis of variable-assignment/function-parameters into one function
 - jslint - add new warning "Expected Object.create(null) instead of {}"
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
+
+# v2022.6.21
+- directive - add new directive `subscript` for linting of scripts targeting Google Closure Compiler
+- bugfix - fix expression after "await" mis-identified as statement
+- warning - relax warning about missing `catch` in `try...finally` statement
+- jslint - allow aliases `evil, nomen` for jslint-directives `eval, name`, respectively for backwards-compat
+- bugfix - fix broken codemirror example
+- bugfix - fix jslint not-recognizing option-chaining when comparing operands of binary operator
+- allow array-literals to directly call [...].flat() and [...].flatMap()
 
 # v2022.5.20
 - coverage-report - disable default-coverage of directory `node_modules`, but allow override with cli-option `--include-node-modules=1`

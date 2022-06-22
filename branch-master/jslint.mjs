@@ -94,10 +94,6 @@
 
 /*jslint beta, node*/
 /*property
-    excludeList,
-    globExclude,
-    import_meta_url, includeList,
-    pathnameList,
     JSLINT_BETA, NODE_V8_COVERAGE, a, all, argv, arity, artifact,
     assertErrorThrownAsync, assertJsonEqual, assertOrThrow, assign, async, b,
     beta, bitwise, block, body, browser, c, calls, catch, catch_list,
@@ -106,57 +102,58 @@
     convert, count, coverageDir, create, cwd, d, dead, debugInline, default,
     delta, devel, directive, directive_list, directive_quiet, directives,
     dirname, disrupt, dot, edition, elem_list, ellipsis, else, end, endOffset,
-    endsWith, entries, env, error, eval, every, example_list, exec, execArgv,
-    exit, exitCode, export_dict, exports, expression, extra, file, fileList,
-    fileURLToPath, filter, finally, flag, floor, for, forEach,
+    endsWith, entries, env, error, eval, every, example_list, excludeList, exec,
+    execArgv, exit, exitCode, export_dict, exports, expression, extra, file,
+    fileList, fileURLToPath, filter, finally, flag, floor, for, forEach,
     formatted_message, free, freeze, from, froms, fsWriteFileWithParents,
     fud_stmt, functionName, function_list, function_stack, functions, get,
-    getset, github_repo, global, global_dict, global_list, holeList, htmlEscape,
-    id, identifier, import, import_list, inc, indent2, index, indexOf, init,
-    initial, isArray, isBlockCoverage, isHole, isNaN, is_equal, is_fart,
-    is_weird, join, jslint, jslint_apidoc, jslint_assert, jslint_charset_ascii,
-    jslint_cli, jslint_edition, jslint_phase1_split, jslint_phase2_lex,
-    jslint_phase3_parse, jslint_phase4_walk, jslint_phase5_whitage,
-    jslint_report, json, jstestDescribe, jstestIt, jstestOnExit, keys, label,
-    lbp, led_infix, length, level, line, lineList, line_list, line_offset,
-    line_source, lines, linesCovered, linesTotal, live, log, long, loop, m, map,
-    margin, match, max, message, meta, min, mkdir, modeCoverageIgnoreFile,
-    modeIndex, mode_cli, mode_conditional, mode_json, mode_module, mode_noop,
-    mode_property, mode_shebang, mode_stop, module, moduleFsInit, moduleName,
-    module_list, name, names, node, noop, now, nr, nud_prefix,
+    getset, github_repo, globExclude, global, global_dict, global_list,
+    holeList, htmlEscape, id, identifier, import, import_list, import_meta_url,
+    inc, includeList, indent2, index, indexOf, init, initial, isArray,
+    isBlockCoverage, isHole, isNaN, is_equal, is_fart, is_weird, join, jslint,
+    jslint_apidoc, jslint_assert, jslint_charset_ascii, jslint_cli,
+    jslint_edition, jslint_phase1_split, jslint_phase2_lex, jslint_phase3_parse,
+    jslint_phase4_walk, jslint_phase5_whitage, jslint_report, json,
+    jstestDescribe, jstestIt, jstestOnExit, keys, label, lbp, led_infix, length,
+    level, line, lineList, line_list, line_offset, line_source, lines,
+    linesCovered, linesTotal, live, log, long, loop, m, map, margin, match, max,
+    message, meta, min, mkdir, modeCoverageIgnoreFile, modeIndex, mode_cli,
+    mode_conditional, mode_json, mode_module, mode_noop, mode_property,
+    mode_shebang, mode_stop, module, moduleFsInit, moduleName, module_list,
+    name, names, node, nomen, noop, now, nr, nud_prefix,
     objectDeepCopyWithKeysSorted, ok, on, open, opening, option, option_dict,
     order, package_name, padEnd, padStart, parameters, parent, parentIi, parse,
-    pathname, platform, pop, processArgv, process_argv, process_env,
-    process_exit, promises, property, property_dict, push, quote, ranges,
-    readFile, readdir, readonly, recursive, reduce, repeat, replace, resolve,
-    result, reverse, role, round, scriptId, search, set, shebang, shift,
-    signature, single, slice, some, sort, source, spawn, splice, split, stack,
-    stack_trace, start, startOffset, startsWith, statement, statement_prv,
-    stdio, stop, stop_at, stringify, switch, syntax_dict, tenure, test,
-    test_cause, test_internal_error, this, thru, toString, token, token_global,
-    token_list, token_nxt, token_tree, tokens, trace, tree, trim, trimEnd,
-    trimRight, try, type, unlink, unordered, unshift, url, used,
-    v8CoverageListMerge, v8CoverageReportCreate, value, variable, version,
-    versions, warn, warn_at, warning, warning_list, warnings, white, wrapped,
-    writeFile
+    pathname, pathnameList, platform, pop, processArgv, process_argv,
+    process_env, process_exit, promises, property, property_dict, push, quote,
+    ranges, readFile, readdir, readonly, recursive, reduce, repeat, replace,
+    resolve, result, reverse, role, round, scriptId, search, set, shebang,
+    shift, signature, single, slice, some, sort, source, spawn, splice, split,
+    stack, stack_trace, start, startOffset, startsWith, statement,
+    statement_prv, stdio, stop, stop_at, stringify, subscript, switch,
+    syntax_dict, tenure, test, test_cause, test_internal_error, this, thru,
+    toString, token, token_global, token_list, token_nxt, token_tree, tokens,
+    trace, tree, trim, trimEnd, trimRight, try, type, unlink, unordered,
+    unshift, url, used, v8CoverageListMerge, v8CoverageReportCreate, value,
+    variable, version, versions, warn, warn_at, warning, warning_list, warnings,
+    white, wrapped, writeFile
 */
 
 // init debugInline
 let debugInline = (function () {
-    let consoleError = function () {
+    let __consoleError = function () {
         return;
     };
     function debug(...argv) {
 
 // This function will print <argv> to stderr and then return <argv>[0].
 
-        consoleError("\n\ndebugInline");
-        consoleError(...argv);
-        consoleError("\n");
+        __consoleError("\n\ndebugInline");
+        __consoleError(...argv);
+        __consoleError("\n");
         return argv[0];
     }
     debug(); // Coverage-hack.
-    consoleError = console.error;
+    __consoleError = console.error;
     return debug;
 }());
 let jslint_charset_ascii = (
@@ -168,7 +165,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2022.5.20";
+let jslint_edition = "v2022.6.21";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -472,7 +469,9 @@ function globExclude({
 // $()*+-./?[\]^{|}
 
         strRegex = strRegex.replace((
-            // ignore [-/]
+
+// Ignore [-/].
+
             /[$()*+.?\[\\\]\^{|}]/g
         ), "\\$&");
 
@@ -716,10 +715,11 @@ function jslint(
             return false;
         }
         if (aa.arity === bb.arity && aa.id === bb.id) {
-            if (aa.id === ".") {
+            if (aa.id === "." || aa.id === "?.") {
 
 // test_cause:
 // ["aa.bb&&aa.bb", "is_equal", "recurse_arity_id", "", 0]
+// ["aa?.bb&&aa?.bb", "is_equal", "recurse_arity_id", "", 0]
 
                 test_cause("recurse_arity_id");
                 return (
@@ -1258,7 +1258,7 @@ function jslint(
             mode_json: false,           // true if parsing JSON.
             mode_module: false,         // true if import or export was used.
             mode_property: false,       // true if directive /*property*/ is
-                                        // used.
+                                        // ... used.
             mode_shebang: false,        // true if #! is seen on the first line.
             option_dict,
             property_dict,
@@ -2473,6 +2473,7 @@ function jslint_phase2_lex(state) {
                 global_dict[key] = "user-defined";
 
 // PR-347 - Disable warning "unexpected_directive_a".
+//
 //                 state.mode_module = the_comment;
 
                 break;
@@ -3288,9 +3289,10 @@ function jslint_phase2_lex(state) {
         case "getset":          // Allow get() and set().
         case "indent2":         // Use 2-space indent.
         case "long":            // Allow long lines.
-        case "name":            // Allow weird property names.
         case "node":            // Assume Node.js environment.
+        case "nomen":           // Allow weird property names.
         case "single":          // Allow single-quote strings.
+        case "subscript":       // Allow identifier in subscript-notation.
         case "test_cause":      // Test jslint's causes.
         case "test_internal_error":     // Test jslint's internal-error
                                         // ... handling-ability.
@@ -3303,6 +3305,16 @@ function jslint_phase2_lex(state) {
         case "white":           // Allow messy whitespace.
             option_dict[key] = val;
             break;
+
+// PR-404 - Alias "evil" to jslint-directive "eval" for backwards-compat.
+
+        case "evil":
+            return option_set_item("eval", val);
+
+// PR-404 - Alias "nomen" to jslint-directive "name" for backwards-compat.
+
+        case "name":
+            return option_set_item("nomen", val);
         default:
             return false;
         }
@@ -3391,6 +3403,7 @@ console.log(JSON.stringify(Object.keys(window).sort(), undefined, 4));
                 "location",
                 // "name",
                 "navigator",
+                "postMessage",
                 // "screen",
                 "sessionStorage",
                 // "setInterval",
@@ -4487,6 +4500,8 @@ function jslint_phase3_parse(state) {
                 left.id !== "["
                 || (
                     name.id !== "concat"
+                    && name.id !== "flat"
+                    && name.id !== "flatMap"
                     && name.id !== "forEach"
                     && name.id !== "join"
                     && name.id !== "map"
@@ -4546,7 +4561,10 @@ function jslint_phase3_parse(state) {
         let the_subscript = parse_expression(0);
         if (the_subscript.id === "(string)" || the_subscript.id === "`") {
             name = survey(the_subscript);
-            if (jslint_rgx_identifier.test(name)) {
+
+// PR-404 - Add new directive "subscript" to play nice with Google Closure.
+
+            if (!option_dict.subscript && jslint_rgx_identifier.test(name)) {
 
 // test_cause:
 // ["aa[`aa`]", "infix_lbracket", "subscript_a", "aa", 4]
@@ -5275,10 +5293,13 @@ function jslint_phase3_parse(state) {
             functionage.async += 1;
         }
         if (the_await.arity === "statement") {
-            the_await.block = parse_expression();
+
+// PR-405 - Bugfix - fix expression after "await" mis-identified as statement.
+
+            the_await.expression = parse_expression(150);
             semicolon();
         } else {
-            the_await.expression = parse_expression();
+            the_await.expression = parse_expression(150);
         }
         return the_await;
     }
@@ -6344,6 +6365,7 @@ function jslint_phase3_parse(state) {
         let names;
 
 // PR-347 - Disable warning "unexpected_directive_a".
+//
 //         if (typeof state.mode_module === "object") {
 //
 // // test_cause:
@@ -6701,12 +6723,16 @@ function jslint_phase3_parse(state) {
 // Restore previous catch-scope after catch-block.
 
             catchage = catch_stack.pop();
-        } else {
 
-// test_cause:
-// ["try{}finally{break;}", "stmt_try", "expected_a_before_b", "finally", 6]
+// PR-404 - Relax warning about missing `catch` in `try...finally` statement.
+//
+//         } else {
+//
+// // test_cause:
+// // ["try{}finally{break;}", "stmt_try", "expected_a_before_b", "finally", 6]
+//
+//             warn("expected_a_before_b", token_nxt, "catch", artifact());
 
-            warn("expected_a_before_b", token_nxt, "catch", artifact());
         }
         if (token_nxt.id === "finally") {
             functionage.finally += 1;
@@ -6827,12 +6853,14 @@ function jslint_phase3_parse(state) {
                             return stop("expected_identifier_a");
                         }
 
-// PR-363 - Bugfix - fix false-warning
-// <uninitialized 'bb'> in code '/*jslint node*/\nlet {aa:bb} = {}; bb();'
+// PR-363 - Bugfix
+// Add test against false-warning <uninitialized 'bb'> in code
+// '/*jslint node*/\nlet {aa:bb} = {}; bb();'.
+//
+//                         token_nxt.label = name;
+//                         the_variable.names.push(token_nxt);
+//                         enroll(token_nxt, "variable", mode_const);
 
-                        // token_nxt.label = name;
-                        // the_variable.names.push(token_nxt);
-                        // enroll(token_nxt, "variable", mode_const);
                         name = token_nxt;
                         the_variable.names.push(name);
                         survey(name);
@@ -7055,7 +7083,7 @@ function jslint_phase3_parse(state) {
                     warn("unregistered_property_a", name);
                 }
             } else if (
-                !option_dict.name
+                !option_dict.nomen
                 && name.identifier
                 && jslint_rgx_weird_property.test(id)
             ) {
@@ -8468,9 +8496,6 @@ function jslint_phase4_walk(state) {
 // ["+[]", "walk_statement", "unexpected_expression_a", "+", 1]
 // ["+new aa()", "walk_statement", "unexpected_expression_a", "+", 1]
 // ["0", "walk_statement", "unexpected_expression_a", "0", 1]
-// ["
-// async function aa(){await 0;}
-// ", "walk_statement", "unexpected_expression_a", "0", 27]
 // ["typeof 0", "walk_statement", "unexpected_expression_a", "typeof", 1]
 
                     warn("unexpected_expression_a", thing);
@@ -9805,6 +9830,7 @@ async function jstestDescribe(description, testFunction) {
 
     let message;
     let result;
+    let timerTimeout;
 
 // Init jstestTimeStart.
 
@@ -9820,7 +9846,9 @@ async function jstestDescribe(description, testFunction) {
 
 // Wait for jstestItList to resolve.
 
+    timerTimeout = setTimeout(noop, 0x7fffffff);
     result = await Promise.all(jstestItList);
+    clearTimeout(timerTimeout);
 
 // Print test results.
 
@@ -11092,15 +11120,13 @@ function sentinel() {}
         processArgElem[1] = processArgElem.slice(1).join("=");
         switch (processArgElem[0]) {
 
-// PR-371
-// Add cli-option `--exclude=...`.
+// PR-371 - Add cli-option `--exclude=...`.
 
         case "--exclude":
             excludeList.push(processArgElem[1]);
             break;
 
-// PR-371
-// Add cli-option `--include=...`
+// PR-371 - Add cli-option `--include=...`
 
         case "--include":
             includeList.push(processArgElem[1]);
@@ -11200,15 +11226,13 @@ function sentinel() {}
             pathnameDict[pathname] = scriptCov;
         });
 
-// PR-400
-// Filter directory `node_modules`.
+// PR-400 - Filter directory `node_modules`.
 
         if (!modeIncludeNodeModules) {
             excludeList.push("node_modules/");
         }
 
-// PR-400
-// Filter files by glob-patterns in excludeList, includeList.
+// PR-400 - Filter files by glob-patterns in excludeList, includeList.
 
         data.result = globExclude({
             excludeList,
