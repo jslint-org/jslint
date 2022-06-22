@@ -113,25 +113,25 @@
     textLength="768"
     x="10"
     y="406"
-># v2022.6.1-beta                                                                                 </tspan>
+># v2022.6.21                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="428"
->- bugfix - fix expression after "await" mis-identified as statement                              </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="450"
 >- directive - add new directive `subscript` for linting of scripts targeting Google Closure Comp\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="472"
+    y="450"
 >  iler                                                                                           </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="472"
+>- bugfix - fix expression after "await" mis-identified as statement                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
