@@ -14,9 +14,9 @@
 - jslint - add new warning "Expected Object.create(null) instead of {}"
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 
-# v2022.6.1-beta
-- bugfix - fix expression after "await" mis-identified as statement
+# v2022.6.21
 - directive - add new directive `subscript` for linting of scripts targeting Google Closure Compiler
+- bugfix - fix expression after "await" mis-identified as statement
 - warning - relax warning about missing `catch` in `try...finally` statement
 - jslint - allow aliases `evil, nomen` for jslint-directives `eval, name`, respectively for backwards-compat
 - bugfix - fix broken codemirror example
