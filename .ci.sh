@@ -213,7 +213,7 @@ import moduleFs from "fs";
             // update version
             src: fileDict[".ci.sh"].replace((
                 /    "version": "\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
-            ), `    "version": "${versionBeta}"`)
+            ), `    "version": "${versionBeta.split("-")[0]}"`)
         }, {
             file: "README.md",
             src: fileDict["README.md"].replace((
@@ -343,6 +343,8 @@ import moduleFs from "fs";
             src: JSON.stringify({
                 "activationEvents": [
                     "onCommand:jslint.clear",
+                    "onCommand:jslint.disableRegion",
+                    "onCommand:jslint.ignoreLine",
                     "onCommand:jslint.lint"
                 ],
                 "bugs": {
@@ -360,6 +362,16 @@ import moduleFs from "fs";
                         },
                         {
                             "category": "jslint",
+                            "command": "jslint.disableRegion",
+                            "title": "JSLint - Do Not Lint Selected Region"
+                        },
+                        {
+                            "category": "jslint",
+                            "command": "jslint.ignoreLine",
+                            "title": "JSLint - Ignore Current Line"
+                        },
+                        {
+                            "category": "jslint",
                             "command": "jslint.lint",
                             "title": "JSLint - Lint File"
                         }
@@ -372,6 +384,18 @@ import moduleFs from "fs";
                             "when": "editorTextFocus"
                         },
                         {
+                            "command": "jslint.disableRegion",
+                            "key": "ctrl+shift+j d",
+                            "mac": "cmd+shift+j d",
+                            "when": "editorTextFocus"
+                        },
+                        {
+                            "command": "jslint.ignoreLine",
+                            "key": "ctrl+shift+j i",
+                            "mac": "cmd+shift+j i",
+                            "when": "editorTextFocus"
+                        },
+                        {
                             "command": "jslint.lint",
                             "key": "ctrl+shift+j l",
                             "mac": "cmd+shift+j l",
@@ -381,13 +405,23 @@ import moduleFs from "fs";
                     "menus": {
                         "editor/context": [
                             {
-                                "command": "jslint.clear",
-                                "group": "7_modification",
+                                "command": "jslint.lint",
+                                "group": "7_modification@1",
                                 "when": "resourceLangId == javascript"
                             },
                             {
-                                "command": "jslint.lint",
-                                "group": "7_modification",
+                                "command": "jslint.disableRegion",
+                                "group": "7_modification@2",
+                                "when": "resourceLangId == javascript"
+                            },
+                            {
+                                "command": "jslint.ignoreLine",
+                                "group": "7_modification@3",
+                                "when": "resourceLangId == javascript"
+                            },
+                            {
+                                "command": "jslint.clear",
+                                "group": "7_modification@4",
                                 "when": "resourceLangId == javascript"
                             }
                         ]
@@ -412,7 +446,7 @@ import moduleFs from "fs";
                     "type": "git",
                     "url": "https://github.com/jslint-org/jslint.git"
                 },
-                "version": "2022.6.21"
+                "version": "2022.7.1"
             }, undefined, 4)
         }
     ].map(async function ({
