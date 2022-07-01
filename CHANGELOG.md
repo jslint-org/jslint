@@ -1,8 +1,7 @@
 # Changelog
 
 # Todo
-- wrapper - add vscode-command to suppress minor warnings on given line
-- doc - document jslint directives and supported/unsupported es6+ features
+- doc - document supported/unsupported es6+ features
 - cli - remove cli-option `--mode-vim-plugin`
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
 - jslint - add html and css linting back into jslint.
@@ -13,6 +12,10 @@
 - jslint - unify analysis of variable-assignment/function-parameters into one function
 - jslint - add new warning "Expected Object.create(null) instead of {}"
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
+
+# v2022.7.1-beta
+- doc - document jslint directives
+- vscode - add extra contextmenu commands "JSLint - Do Not Lint Selected Region", "JSLint - Ignore Current Line"
 
 # v2022.6.21
 - directive - add new directive `subscript` for linting of scripts targeting Google Closure Compiler
