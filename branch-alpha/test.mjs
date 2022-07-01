@@ -709,8 +709,8 @@ jstestDescribe((
             jslint_disable: [
                 "/*jslint-disable*/\n0\n/*jslint-enable*/"
             ],
-            jslint_quiet: [
-                "0 //jslint-quiet"
+            jslint_ignore_line: [
+                "0 //jslint-ignore-line"
             ],
             json: [
                 "{\"aa\":[[],-0,null]}"
@@ -1088,7 +1088,7 @@ jstestDescribe((
                 assertOrThrow(source.length > (80 - 3), source);
                 return source;
             }).replace((
-                / \/\/jslint-quiet$/gm
+                / \/\/jslint-ignore-line$/gm
             ), "");
             tmp = causeList.split("\n").map(function (cause) {
                 return (

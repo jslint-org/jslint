@@ -18,36 +18,59 @@ Douglas Crockford <douglas@crockford.com>
 
 2. [Web Demo Archived](#web-demo-archived)
 
-3. [API Doc](#api-doc)
-
-4. [Quickstart Install](#quickstart-install)
+3. [Quickstart Install](#quickstart-install)
     - [To install, just download and save https://www.jslint.com/jslint.mjs to file:](#to-install-just-download-and-save-httpswwwjslintcomjslintmjs-to-file)
     - [To run `jslint.mjs` in shell:](#to-run-jslintmjs-in-shell)
     - [To import `jslint.mjs` in ES Module environment:](#to-import-jslintmjs-in-es-module-environment)
     - [To import `jslint.mjs` in CommonJS environment:](#to-import-jslintmjs-in-commonjs-environment)
     - [To JSLint entire directory in shell:](#to-jslint-entire-directory-in-shell)
 
-5. [Quickstart JSLint Report](#quickstart-jslint-report)
+4. [Quickstart JSLint Report](#quickstart-jslint-report)
     - [To create a JSLint report in shell:](#to-create-a-jslint-report-in-shell)
     - [To create a JSLint report in javascript:](#to-create-a-jslint-report-in-javascript)
 
-6. [Quickstart V8 Coverage Report](#quickstart-v8-coverage-report)
+5. [Quickstart V8 Coverage Report](#quickstart-v8-coverage-report)
     - [To create V8 coverage report from Node.js / Npm program in shell:](#to-create-v8-coverage-report-from-nodejs--npm-program-in-shell)
     - [To create V8 coverage report from Node.js / Npm program in javascript:](#to-create-v8-coverage-report-from-nodejs--npm-program-in-javascript)
 
-7. [Quickstart JSLint in CodeMirror](#quickstart-jslint-in-codemirror)
+6. [Quickstart JSLint in CodeMirror](#quickstart-jslint-in-codemirror)
 
-8. [Quickstart JSLint in Vim](#quickstart-jslint-in-vim)
+7. [Quickstart JSLint in Vim](#quickstart-jslint-in-vim)
 
-9. [Quickstart JSLint in VSCode](#quickstart-jslint-in-vscode)
+8. [Quickstart JSLint in VSCode](#quickstart-jslint-in-vscode)
 
-10. [Description](#description)
+9. [Documentation](#documentation)
+    - [API Doc](#api-doc)
+    - [Directive `/*jslint*/`](#directive-jslint)
+        - [`/*jslint beta*/`](#jslint-beta)
+        - [`/*jslint bitwise*/`](#jslint-bitwise)
+        - [`/*jslint browser*/`](#jslint-browser)
+        - [`/*jslint convert*/`](#jslint-convert)
+        - [`/*jslint couch*/`](#jslint-couch)
+        - [`/*jslint devel*/`](#jslint-devel)
+        - [`/*jslint eval*/`](#jslint-eval)
+        - [`/*jslint for*/`](#jslint-for)
+        - [`/*jslint getset*/`](#jslint-getset)
+        - [`/*jslint indent2*/`](#jslint-indent2)
+        - [`/*jslint long*/`](#jslint-long)
+        - [`/*jslint node*/`](#jslint-node)
+        - [`/*jslint nomen*/`](#jslint-nomen)
+        - [`/*jslint single*/`](#jslint-single)
+        - [`/*jslint subscript*/`](#jslint-subscript)
+        - [`/*jslint this*/`](#jslint-this)
+        - [`/*jslint trace*/`](#jslint-trace)
+        - [`/*jslint unordered*/`](#jslint-unordered)
+        - [`/*jslint white*/`](#jslint-white)
+    - [Directive `/*global*/`](#directive-global)
+    - [Directive `/*property*/`](#directive-property)
+    - [Directive `/*jslint-disable*/.../*jslint-enable*/`](#directive-jslint-disablejslint-enable)
+    - [Directive `//jslint-ignore-line`](#directive-jslint-ignore-line)
 
-11. [Package Listing](#package-listing)
+10. [Package Listing](#package-listing)
 
-12. [Changelog](#changelog)
+11. [Changelog](#changelog)
 
-13. [License](#license)
+12. [License](#license)
 
 
 <br><br>
@@ -62,13 +85,6 @@ Douglas Crockford <douglas@crockford.com>
 - [Web Demo 2020](https://www.jslint.com/branch-v2020.11.6/index.html)
 - [Web Demo 2014 (ES5 only)](https://www.jslint.com/branch-v2014.7.8/jslint.html)
 - [Web Demo 2013 (ES5, CSS, HTML)](https://www.jslint.com/branch-v2013.3.13/jslint.html)
-
-
-<br><br>
-# API Doc
-- https://www.jslint.com/apidoc.html
-
-[![screenshot](https://jslint-org.github.io/jslint/branch-alpha/.artifact/screenshot_browser__2f.artifact_2fapidoc.html.png)](https://www.jslint.com/apidoc.html)
 
 
 <br><br>
@@ -504,7 +520,9 @@ window.addEventListener("load", function () {
 
 
 <br><br>
-# Description
+# Documentation
+
+
 - [jslint.mjs](jslint.mjs) contains the jslint function. It parses and analyzes a source file, returning an object with information about the file. It can also take an object that sets options.
 
 - [index.html](index.html) runs the jslint.mjs function in a web page.
@@ -526,6 +544,324 @@ This applies to programming as well. Conforming to a consistent style improves
 readability, and frees you to express yourself in ways that matter. JSLint here
 plays the part of a stern but benevolent editor, helping you to get the style
 right so that you can focus your creative energy where it is most needed.
+
+
+<br><br>
+### API Doc
+- https://www.jslint.com/apidoc.html
+
+[![screenshot](https://jslint-org.github.io/jslint/branch-alpha/.artifact/screenshot_browser__2f.artifact_2fapidoc.html.png)](https://www.jslint.com/apidoc.html)
+
+
+<br><br>
+### Directive `/*jslint*/`
+
+<br>
+
+##### `/*jslint beta*/`
+
+```js
+/*jslint beta*/
+// Enable experimental warnings.
+// Warn if global variables are redefined.
+// Warn if const / let statements are not declared at top of function or
+//    script, similar to var statements.
+// Warn if const / let / var statements are not declared in ascii-order.
+// Warn if named-functions are not declared in ascii-order.
+```
+
+<br>
+
+##### `/*jslint bitwise*/`
+
+```js
+/*jslint bitwise*/
+// Allow bitwise operators.
+
+let foo = 0 | 1;
+```
+
+<br>
+
+##### `/*jslint browser*/`
+
+```js
+/*jslint browser*/
+// Assume browser environment.
+
+localStorage.getItem("foo");
+```
+
+<br>
+
+##### `/*jslint convert*/`
+
+```js
+/*jslint convert*/
+// Allow conversion operators.
+
+let foo = new Date() + "";
+let bar = !!0;
+```
+
+<br>
+
+##### `/*jslint couch*/`
+
+```js
+/*jslint couch*/
+// Assume CouchDb environment.
+
+registerType("text-json", "text/json");
+```
+
+<br>
+
+##### `/*jslint devel*/`
+
+```js
+/*jslint devel*/
+// Allow console.log() and friends.
+
+console.log("hello");
+```
+
+<br>
+
+##### `/*jslint eval*/`
+
+```js
+/*jslint eval*/
+// Allow eval().
+
+eval("1");
+```
+
+<br>
+
+##### `/*jslint for*/`
+
+```js
+/*jslint for*/
+// Allow for-loop.
+
+function foo() {
+    let ii;
+    for (ii = 0; ii < 10; ii += 1) {
+        foo();
+    }
+}
+```
+
+<br>
+
+##### `/*jslint getset*/`
+
+```js
+/*jslint getset, this, devel*/
+// Allow get() and set().
+
+let foo = {
+    bar: 0,
+    get getBar() {
+        return this.bar;
+    },
+    set setBar(value) {
+        this.bar = value;
+    }
+};
+console.log(foo.getBar); // 0
+foo.setBar = 1;
+console.log(foo.getBar); // 1
+```
+
+<br>
+
+##### `/*jslint indent2*/`
+
+```js
+/*jslint indent2*/
+// Use 2-space indent.
+
+function foo() {
+  return;
+}
+```
+
+<br>
+
+##### `/*jslint long*/`
+
+```js
+/*jslint long*/
+// Allow long lines.
+
+let foo = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+```
+
+<br>
+
+##### `/*jslint node*/`
+
+```js
+/*jslint node*/
+// Assume Node.js environment.
+
+require("fs");
+```
+
+<br>
+
+##### `/*jslint nomen*/`
+
+```js
+/*jslint nomen*/
+// Allow weird property names.
+
+let foo = {};
+foo._bar = 1;
+```
+
+<br>
+
+##### `/*jslint single*/`
+
+```js
+/*jslint single*/
+// Allow single-quote strings.
+
+let foo = '';
+```
+
+<br>
+
+##### `/*jslint subscript*/`
+
+```js
+/*jslint subscript*/
+// Allow identifiers in subscript-notation.
+
+let foo = {};
+foo["bar"] = 1;
+```
+
+<br>
+
+##### `/*jslint this*/`
+
+```js
+/*jslint this*/
+// Allow 'this'.
+
+function foo() {
+    return this;
+}
+```
+
+<br>
+
+##### `/*jslint trace*/`
+
+```js
+/*jslint trace*/
+// Include jslint stack-trace in warnings.
+
+console.log('hello world');
+/*
+1. Undeclared 'console'.
+console.log('hello world');
+Error
+    at warn_at (...)
+    at warn (...)
+    at lookup (...)
+    at pre_v (...)
+    at jslint.mjs
+2. Use double quotes, not single quotes.
+console.log(...);
+Error
+    at warn_at (...)
+    at lex_string (...)
+    at lex_token (...)
+    at jslint_phase2_lex (...)
+    at Function.jslint (...)
+    at jslint.mjs
+*/
+```
+
+<br>
+
+##### `/*jslint unordered*/`
+
+```js
+/*jslint unordered*/
+// Allow unordered cases, params, properties, and variables.
+
+let foo = {bb: 1, aa: 0};
+
+function bar({
+    bb = 1,
+    aa = 0
+}) {
+    return aa + bb;
+}
+```
+
+<br>
+
+##### `/*jslint white*/`
+
+```js
+/*jslint white*/
+// Allow messy whitespace.
+
+let foo = 1; let bar = 2;
+```
+
+
+<br><br>
+### Directive `/*global*/`
+
+```js
+/*global foo, bar*/
+// Declare global variables foo, bar.
+
+foo();
+bar();
+```
+
+
+<br><br>
+### Directive `/*property*/`
+
+```js
+/*property foo, bar*/
+// Restrict property-access to only .foo, .bar.
+
+let aa = {bar: 1, foo: 2};
+```
+
+
+<br><br>
+### Directive `/*jslint-disable*/.../*jslint-enable*/`
+
+```js
+/*jslint-disable*/
+
+JSLint will ignore and treat this region as blank-lines.
+Syntax error.
+
+/*jslint-enable*/
+```
+
+
+<br><br>
+### Directive `//jslint-ignore-line`
+
+```js
+// JSLint will ignore non-fatal warnings at given line.
+
+eval("1"); //jslint-ignore-line
+```
 
 
 <br><br>
