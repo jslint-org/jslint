@@ -13,9 +13,9 @@
     <meta name="author" content="Douglas Crockford">
     <link rel="icon" type="image/png" href="asset_image_logo_512.svg">
     <title>JSLint: The JavaScript Code Quality and Coverage Tool</title>
-    <script defer src="./asset_codemirror_rollup.js?cc=w7t4"></script>
-    <script type="module" src="./jslint.mjs?cc=w7t4?window_jslint=1"></script>
-    <script defer src="./jslint_wrapper_codemirror.js?cc=w7t4"></script>
+    <script defer src="./asset_codemirror_rollup.js?cc=v7bp"></script>
+    <script type="module" src="./jslint.mjs?cc=v7bp?window_jslint=1"></script>
+    <script defer src="./jslint_wrapper_codemirror.js?cc=v7bp"></script>
 <style>
 /*jslint-disable*/
 /*
@@ -1271,7 +1271,7 @@ function dom_style_report_unmatched() {
             try {
                 ii = document.querySelectorAll(match1).length;
             } catch (err) {
-                console.error(match1 + "\n" + err); //jslint-quiet
+                console.error(match1 + "\n" + err); //jslint-ignore-line
             }
             if (ii <= 1 && !(
                 /^0 (?:(body > )?(?:\.button|\.readonly|\.styleColorError|\.textarea|\.uiAnimateSlide|a|base64|body|code|div|input|pre|textarea)(?:,| \{))|^[1-9]\d*? #/m
@@ -1282,7 +1282,7 @@ function dom_style_report_unmatched() {
         });
     });
     style_list.sort().reverse().forEach(function (elem, ii, list) {
-        console.error( //jslint-quiet
+        console.error( //jslint-ignore-line
             "dom_style_report_unmatched " + (list.length - ii) + ". " + elem
         );
     });
@@ -1329,7 +1329,7 @@ async function jslint_run() {
         ).innerHTML = jslint.jslint_report(jslint_option_dict.result);
         listener_window_onresize();
     } catch (err) {
-        console.error(err); //jslint-quiet
+        console.error(err); //jslint-ignore-line
     }
 
 // Hide ui-loader-animation.
@@ -1620,10 +1620,11 @@ import https from "https";
 import jslint from \u0022./jslint.mjs\u0022;
 
 /*jslint-disable*/
+    JSLint will ignore and treat this region as blank-lines.
     Syntax error.\u0020\u0020\u0020\u0020
 /*jslint-enable*/
 
-eval("console.log(\\"hello world\\");"); //jslint-quiet
+eval("console.log(\\"hello world\\");"); //jslint-ignore-line
 
 eval("console.log(\\"hello world\\");");
 
@@ -1647,11 +1648,9 @@ eval("console.log(\\"hello world\\");");
 // .... /*jslint trace*/ ......... Include jslint stack-trace in warnings.
 // .... /*jslint unordered*/ ..... Allow unordered cases, params, properties,
 // ................................... and variables.
-// .... /*jslint variable*/ ...... Allow unordered const and let declarations
-// ................................... that are not at top of function-scope.
 // .... /*jslint white*/ ......... Allow messy whitespace.
 
-(async function () {
+await (async function () {
     let result = await new Promise(function (resolve) {
         https.request("https://www.jslint.com/jslint.mjs", function (res) {
             result = "";

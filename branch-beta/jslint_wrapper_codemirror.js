@@ -134,14 +134,14 @@ window.addEventListener("load", function () {
             mode_stop
         }) {
             return {
-                from: CodeMirror.Pos(line - 1, column - 1), //jslint-quiet
+                from: CodeMirror.Pos(line - 1, column - 1), //jslint-ignore-line
                 message,
                 severity: (
                     mode_stop
                     ? "error"
                     : "warning"
                 ),
-                to: CodeMirror.Pos(line - 1, column) //jslint-quiet
+                to: CodeMirror.Pos(line - 1, column) //jslint-ignore-line
             };
         });
     });

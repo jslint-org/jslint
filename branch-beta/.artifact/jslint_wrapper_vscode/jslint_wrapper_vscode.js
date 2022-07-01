@@ -30,10 +30,11 @@
 /*property
     Diagnostic, DiagnosticSeverity, ProgressLocation, Warning, Window, activate,
     cancellable, character, clear, column, commands, createDiagnosticCollection,
-    document, end, exports, getText, increment, jslint, languages, line,
-    location, map, message, module, push, readFileSync,
-    registerTextEditorCommand, replace, report, runInNewContext, set, slice,
-    start, subscriptions, title, uri, warnings, window, withProgress
+    document, end, endsWith, exports, getText, increment, insert, isEmpty,
+    jslint, languages, line, lineAt, location, map, message, module, push,
+    range, rangeIncludingLineBreak, readFileSync, registerTextEditorCommand,
+    replace, report, runInNewContext, selection, set, slice, start,
+    subscriptions, title, uri, warnings, window, withProgress
 */
 
 "use strict";
@@ -80,6 +81,48 @@ function activate({
                 increment: 100
             });
         });
+    }
+
+    function jslintDisableRegion({
+        document,
+        selection
+    }, edit) {
+        let range;
+        let text;
+        edit.insert({
+            character: 0,
+            line: selection.start.line
+        }, "/*jslint-disable*/\n");
+        range = document.lineAt(selection.end).rangeIncludingLineBreak;
+        text = document.getText(range);
+
+// If selection-end is EOL without preceding line-break,
+// then prepend line-break before directive.
+
+        if (!text.endsWith("\n")) {
+            text += "\n/*jslint-enable*/";
+
+// If selection-end is start of a new line, then prepend directive before it.
+
+        } else if (!selection.isEmpty && selection.end.character === 0) {
+            text = "/*jslint-enable*/\n" + text;
+
+// Append directive to selection-end.
+
+        } else {
+            text += "/*jslint-enable*/\n";
+        }
+        edit.replace(range, text);
+    }
+
+    function jslintIgnoreLine({
+        document,
+        selection
+    }, edit) {
+        edit.insert({
+            character: document.lineAt(selection.end).range.end.character,
+            line: selection.end.line
+        }, " //jslint-ignore-line");
     }
 
     function jslintLint({
@@ -148,7 +191,7 @@ function activate({
     require("vm").runInNewContext(
         (
             "\"use strict\";"
-            + require("fs").readFileSync( //jslint-quiet
+            + require("fs").readFileSync( //jslint-ignore-line
                 __dirname + "/jslint.mjs",
                 "utf8"
             ).replace(
@@ -170,6 +213,12 @@ function activate({
     subscriptions.push(vscode.commands.registerTextEditorCommand((
         "jslint.clear"
     ), jslintClear));
+    subscriptions.push(vscode.commands.registerTextEditorCommand((
+        "jslint.disableRegion"
+    ), jslintDisableRegion));
+    subscriptions.push(vscode.commands.registerTextEditorCommand((
+        "jslint.ignoreLine"
+    ), jslintIgnoreLine));
     subscriptions.push(vscode.commands.registerTextEditorCommand((
         "jslint.lint"
     ), jslintLint));

@@ -100,7 +100,7 @@
     catch_stack, causes, char, children, clear, closer, closure, code, column,
     concat, consoleError, console_error, console_log, constant, context,
     convert, count, coverageDir, create, cwd, d, dead, debugInline, default,
-    delta, devel, directive, directive_list, directive_quiet, directives,
+    delta, devel, directive, directive_ignore_line, directive_list, directives,
     dirname, disrupt, dot, edition, elem_list, ellipsis, else, end, endOffset,
     endsWith, entries, env, error, eval, every, example_list, excludeList, exec,
     execArgv, exit, exitCode, export_dict, exports, expression, extra, file,
@@ -165,7 +165,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2022.6.21";
+let jslint_edition = "v2022.7.1-beta";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -1219,12 +1219,12 @@ function jslint(
         if (option_dict.trace) {
             warning.stack_trace = new Error().stack;
         }
-        if (warning.directive_quiet) {
+        if (warning.directive_ignore_line) {
 
 // test_cause:
-// ["0 //jslint-quiet", "semicolon", "directive_quiet", "", 0]
+// ["0 //jslint-ignore-line", "semicolon", "directive_ignore_line", "", 0]
 
-            test_cause("directive_quiet");
+            test_cause("directive_ignore_line");
             return warning;
         }
         warning_list.push(warning);
@@ -2413,7 +2413,7 @@ function jslint_phase2_lex(state) {
         if (!option_dict.devel && jslint_rgx_todo.test(snippet)) {
 
 // test_cause:
-// ["//todo", "lex_comment", "todo_comment", "(comment)", 1] //jslint-quiet
+// ["//todo", "lex_comment", "todo_comment", "(comment)", 1] //jslint-ignore-line
 
             warn("todo_comment", the_comment);
         }
@@ -3658,7 +3658,7 @@ import moduleHttps from "https";
         ) {
 
 // test_cause:
-// ["/////////////////////////////////////////////////////////////////////////////////", "read_line", "too_long", "", 1] //jslint-quiet
+// ["/////////////////////////////////////////////////////////////////////////////////", "read_line", "too_long", "", 1] //jslint-ignore-line
 
             warn_at("too_long", line);
         }
@@ -3676,7 +3676,7 @@ import moduleHttps from "https";
 // Scan each line for following ignore-directives:
 // "/*jslint-disable*/"
 // "/*jslint-enable*/"
-// "//jslint-quiet"
+// "//jslint-ignore-line"
 
         if (line_source === "/*jslint-disable*/") {
 
@@ -3694,13 +3694,16 @@ import moduleHttps from "https";
                 stop_at("unopened_enable", line);
             }
             line_disable = undefined;
-        } else if (line_source.endsWith(" //jslint-quiet")) {
+        } else if (
+            line_source.endsWith(" //jslint-ignore-line")
+            || line_source.endsWith(" //jslint-quiet")
+        ) {
 
 // test_cause:
-// ["0 //jslint-quiet", "read_line", "jslint_quiet", "", 0]
+// ["0 //jslint-ignore-line", "read_line", "jslint_ignore_line", "", 0]
 
-            test_cause("jslint_quiet");
-            line_list[line].directive_quiet = true;
+            test_cause("jslint_ignore_line");
+            line_list[line].directive_ignore_line = true;
         }
         if (line_disable !== undefined) {
 
@@ -10214,7 +10217,7 @@ function v8CoverageListMerge(processCovs) {
             let resultTree;
             let rightChildren;
 
-// TODO(perf): Binary search (check overhead) //jslint-quiet
+// TODO(perf): Binary search (check overhead) //jslint-ignore-line
 
             while (ii < tree.children.length) {
                 child = tree.children[ii];
@@ -10292,7 +10295,7 @@ function v8CoverageListMerge(processCovs) {
 
 // This function will normalize-and-sort <funcCov>.ranges.
 // Sorts the ranges (pre-order sort).
-// TODO: Tree-based normalization of the ranges. //jslint-quiet
+// TODO: Tree-based normalization of the ranges. //jslint-ignore-line
 // @param funcCov Function coverage to normalize.
 
         funcCov.ranges = treeToRanges(treeFromSortedRanges(
