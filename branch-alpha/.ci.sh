@@ -384,18 +384,6 @@ import moduleFs from "fs";
                             "when": "editorTextFocus"
                         },
                         {
-                            "command": "jslint.disableRegion",
-                            "key": "ctrl+shift+j d",
-                            "mac": "cmd+shift+j d",
-                            "when": "editorTextFocus"
-                        },
-                        {
-                            "command": "jslint.ignoreLine",
-                            "key": "ctrl+shift+j i",
-                            "mac": "cmd+shift+j i",
-                            "when": "editorTextFocus"
-                        },
-                        {
                             "command": "jslint.lint",
                             "key": "ctrl+shift+j l",
                             "mac": "cmd+shift+j l",
@@ -410,17 +398,17 @@ import moduleFs from "fs";
                                 "when": "resourceLangId == javascript"
                             },
                             {
-                                "command": "jslint.disableRegion",
+                                "command": "jslint.clear",
                                 "group": "7_modification@2",
                                 "when": "resourceLangId == javascript"
                             },
                             {
-                                "command": "jslint.ignoreLine",
+                                "command": "jslint.disableRegion",
                                 "group": "7_modification@3",
                                 "when": "resourceLangId == javascript"
                             },
                             {
-                                "command": "jslint.clear",
+                                "command": "jslint.ignoreLine",
                                 "group": "7_modification@4",
                                 "when": "resourceLangId == javascript"
                             }
