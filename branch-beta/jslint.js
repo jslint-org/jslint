@@ -153,7 +153,7 @@ let debugInline = (function () {
         return argv[0];
     }
     debug(); // Coverage-hack.
-    __consoleError = console.error;
+    __consoleError = console.error; //jslint-ignore-line
     return debug;
 }());
 let jslint_charset_ascii = (
@@ -165,7 +165,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2022.7.1-beta";
+let jslint_edition = "v2022.7.2-beta";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -860,11 +860,22 @@ function jslint(
             c,
             d
         );
-        if (the_token.warning === undefined) {
-            the_token.warning = the_warning;
-        } else {
-            warning_list.pop();
+
+// Issue #408
+// Warnings that should be ignored sometimes suppress legitimate warnings.
+
+        if (the_warning.directive_ignore_line) {
+            return the_warning;
         }
+
+// If there is already a warning on this token, suppress the new one. It is
+// likely that the first warning will be the most meaningful.
+
+        if (the_token.warning) {
+            warning_list.pop();
+            return the_warning;
+        }
+        the_token.warning = the_warning;
         return the_warning;
     }
 
@@ -1014,6 +1025,7 @@ function jslint(
             break;
 
 // PR-347 - Disable warning "missing_browser".
+//
 //         case "missing_browser":
 //             mm = `/*global*/ requires the Assume a browser option.`;
 //             break;
@@ -1098,6 +1110,7 @@ function jslint(
             break;
 
 // PR-347 - Disable warning "unexpected_directive_a".
+//
 //         case "unexpected_directive_a":
 //             mm = `When using modules, don't use directive '/\u002a${a}'.`;
 //             break;
@@ -1328,6 +1341,7 @@ function jslint(
         );
 
 // PR-347 - Disable warning "missing_browser".
+//
 //         if (!option_dict.browser) {
 //             directive_list.forEach(function (comment) {
 //                 if (comment.directive === "global") {
@@ -2700,6 +2714,7 @@ function jslint_phase2_lex(state) {
                     return char_after("]");
 
 // PR-362 - Relax regexp-warning against using <space>.
+//
 //                 case " ":
 //
 // // test_cause:
@@ -2780,6 +2795,7 @@ function jslint_phase2_lex(state) {
                     return;
 
 // PR-362 - Relax regexp-warning against using <space>.
+//
 //                 case " ":
 //
 // // test_cause:
@@ -3336,12 +3352,16 @@ console.log(JSON.stringify(Object.keys(window).sort(), undefined, 4));
 
                 "AbortController",
                 // "Buffer",
-                "DOMException",
+                // "Crypto",
+                // "CryptoKey",
                 "Event",
                 "EventTarget",
                 "MessageChannel",
                 "MessageEvent",
                 "MessagePort",
+                // "Request",
+                // "Response",
+                // "SubtleCrypto",
                 "TextDecoder",
                 "TextEncoder",
                 "URL",
@@ -3355,7 +3375,9 @@ console.log(JSON.stringify(Object.keys(window).sort(), undefined, 4));
                 "clearInterval",
                 "clearTimeout",
                 // "console",
+                // "crypto",
                 // "exports",
+                // "fetch",
                 // "global",
                 // "module",
                 "performance",
@@ -3365,7 +3387,6 @@ console.log(JSON.stringify(Object.keys(window).sort(), undefined, 4));
                 // "setImmediate",
                 "setInterval",
                 "setTimeout",
-                "structuredClone",
 
 // Web worker only.
 // https://github.com/mdn/content/blob/main/files/en-us/web/api
@@ -3408,6 +3429,7 @@ console.log(JSON.stringify(Object.keys(window).sort(), undefined, 4));
                 "sessionStorage",
                 // "setInterval",
                 // "setTimeout",
+                "structuredClone",
                 "window"
             ], "browser");
             break;
@@ -3469,6 +3491,7 @@ import https from "https";
 
         case "ecma":
             object_assign_from_list(global_dict, [
+                "AggregateError",
                 "Array",
                 "ArrayBuffer",
                 "Atomics",
@@ -3539,7 +3562,7 @@ import moduleHttps from "https";
     let result = "";
     await new Promise(function (resolve) {
         moduleHttps.get((
-            "https://raw.githubusercontent.com/nodejs/node/master/doc/api"
+            "https://raw.githubusercontent.com/nodejs/node/v16.x/doc/api"
             + "/globals.md"
         ), function (res) {
             res.on("data", function (chunk) {
@@ -3562,12 +3585,16 @@ import moduleHttps from "https";
             object_assign_from_list(global_dict, [
                 "AbortController",
                 "Buffer",
-                "DOMException",
+                // "Crypto",
+                // "CryptoKey",
                 "Event",
                 "EventTarget",
                 "MessageChannel",
                 "MessageEvent",
                 "MessagePort",
+                // "Request",
+                // "Response",
+                // "SubtleCrypto",
                 "TextDecoder",
                 "TextEncoder",
                 "URL",
@@ -3581,7 +3608,9 @@ import moduleHttps from "https";
                 "clearInterval",
                 "clearTimeout",
                 "console",
+                // "crypto",
                 "exports",
+                // "fetch",
                 "global",
                 "module",
                 "performance",
@@ -3590,8 +3619,7 @@ import moduleHttps from "https";
                 "require",
                 "setImmediate",
                 "setInterval",
-                "setTimeout",
-                "structuredClone"
+                "setTimeout"
             ], "Node.js");
             break;
         }
