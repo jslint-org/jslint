@@ -100,7 +100,7 @@
     catch_stack, causes, char, children, clear, closer, closure, code, column,
     concat, consoleError, console_error, console_log, constant, context,
     convert, count, coverageDir, create, cwd, d, dead, debugInline, default,
-    delta, devel, directive, directive_list, directive_quiet, directives,
+    delta, devel, directive, directive_ignore_line, directive_list, directives,
     dirname, disrupt, dot, edition, elem_list, ellipsis, else, end, endOffset,
     endsWith, entries, env, error, eval, every, example_list, excludeList, exec,
     execArgv, exit, exitCode, export_dict, exports, expression, extra, file,
@@ -153,7 +153,7 @@ let debugInline = (function () {
         return argv[0];
     }
     debug(); // Coverage-hack.
-    __consoleError = console.error;
+    __consoleError = console.error; //jslint-ignore-line
     return debug;
 }());
 let jslint_charset_ascii = (
@@ -165,7 +165,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2022.6.21";
+let jslint_edition = "v2022.7.20";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -860,11 +860,22 @@ function jslint(
             c,
             d
         );
-        if (the_token.warning === undefined) {
-            the_token.warning = the_warning;
-        } else {
-            warning_list.pop();
+
+// Issue #408
+// Warnings that should be ignored sometimes suppress legitimate warnings.
+
+        if (the_warning.directive_ignore_line) {
+            return the_warning;
         }
+
+// If there is already a warning on this token, suppress the new one. It is
+// likely that the first warning will be the most meaningful.
+
+        if (the_token.warning) {
+            warning_list.pop();
+            return the_warning;
+        }
+        the_token.warning = the_warning;
         return the_warning;
     }
 
@@ -1014,6 +1025,7 @@ function jslint(
             break;
 
 // PR-347 - Disable warning "missing_browser".
+//
 //         case "missing_browser":
 //             mm = `/*global*/ requires the Assume a browser option.`;
 //             break;
@@ -1098,6 +1110,7 @@ function jslint(
             break;
 
 // PR-347 - Disable warning "unexpected_directive_a".
+//
 //         case "unexpected_directive_a":
 //             mm = `When using modules, don't use directive '/\u002a${a}'.`;
 //             break;
@@ -1219,12 +1232,12 @@ function jslint(
         if (option_dict.trace) {
             warning.stack_trace = new Error().stack;
         }
-        if (warning.directive_quiet) {
+        if (warning.directive_ignore_line) {
 
 // test_cause:
-// ["0 //jslint-quiet", "semicolon", "directive_quiet", "", 0]
+// ["0 //jslint-ignore-line", "semicolon", "directive_ignore_line", "", 0]
 
-            test_cause("directive_quiet");
+            test_cause("directive_ignore_line");
             return warning;
         }
         warning_list.push(warning);
@@ -1328,6 +1341,7 @@ function jslint(
         );
 
 // PR-347 - Disable warning "missing_browser".
+//
 //         if (!option_dict.browser) {
 //             directive_list.forEach(function (comment) {
 //                 if (comment.directive === "global") {
@@ -2413,7 +2427,7 @@ function jslint_phase2_lex(state) {
         if (!option_dict.devel && jslint_rgx_todo.test(snippet)) {
 
 // test_cause:
-// ["//todo", "lex_comment", "todo_comment", "(comment)", 1] //jslint-quiet
+// ["//todo", "lex_comment", "todo_comment", "(comment)", 1] //jslint-ignore-line
 
             warn("todo_comment", the_comment);
         }
@@ -2700,6 +2714,7 @@ function jslint_phase2_lex(state) {
                     return char_after("]");
 
 // PR-362 - Relax regexp-warning against using <space>.
+//
 //                 case " ":
 //
 // // test_cause:
@@ -2780,6 +2795,7 @@ function jslint_phase2_lex(state) {
                     return;
 
 // PR-362 - Relax regexp-warning against using <space>.
+//
 //                 case " ":
 //
 // // test_cause:
@@ -3336,12 +3352,16 @@ console.log(JSON.stringify(Object.keys(window).sort(), undefined, 4));
 
                 "AbortController",
                 // "Buffer",
-                "DOMException",
+                // "Crypto",
+                // "CryptoKey",
                 "Event",
                 "EventTarget",
                 "MessageChannel",
                 "MessageEvent",
                 "MessagePort",
+                // "Request",
+                // "Response",
+                // "SubtleCrypto",
                 "TextDecoder",
                 "TextEncoder",
                 "URL",
@@ -3355,7 +3375,9 @@ console.log(JSON.stringify(Object.keys(window).sort(), undefined, 4));
                 "clearInterval",
                 "clearTimeout",
                 // "console",
+                // "crypto",
                 // "exports",
+                // "fetch",
                 // "global",
                 // "module",
                 "performance",
@@ -3365,7 +3387,6 @@ console.log(JSON.stringify(Object.keys(window).sort(), undefined, 4));
                 // "setImmediate",
                 "setInterval",
                 "setTimeout",
-                "structuredClone",
 
 // Web worker only.
 // https://github.com/mdn/content/blob/main/files/en-us/web/api
@@ -3408,6 +3429,7 @@ console.log(JSON.stringify(Object.keys(window).sort(), undefined, 4));
                 "sessionStorage",
                 // "setInterval",
                 // "setTimeout",
+                "structuredClone",
                 "window"
             ], "browser");
             break;
@@ -3469,6 +3491,7 @@ import https from "https";
 
         case "ecma":
             object_assign_from_list(global_dict, [
+                "AggregateError",
                 "Array",
                 "ArrayBuffer",
                 "Atomics",
@@ -3539,7 +3562,7 @@ import moduleHttps from "https";
     let result = "";
     await new Promise(function (resolve) {
         moduleHttps.get((
-            "https://raw.githubusercontent.com/nodejs/node/master/doc/api"
+            "https://raw.githubusercontent.com/nodejs/node/v16.x/doc/api"
             + "/globals.md"
         ), function (res) {
             res.on("data", function (chunk) {
@@ -3562,12 +3585,16 @@ import moduleHttps from "https";
             object_assign_from_list(global_dict, [
                 "AbortController",
                 "Buffer",
-                "DOMException",
+                // "Crypto",
+                // "CryptoKey",
                 "Event",
                 "EventTarget",
                 "MessageChannel",
                 "MessageEvent",
                 "MessagePort",
+                // "Request",
+                // "Response",
+                // "SubtleCrypto",
                 "TextDecoder",
                 "TextEncoder",
                 "URL",
@@ -3581,7 +3608,9 @@ import moduleHttps from "https";
                 "clearInterval",
                 "clearTimeout",
                 "console",
+                // "crypto",
                 "exports",
+                // "fetch",
                 "global",
                 "module",
                 "performance",
@@ -3590,8 +3619,7 @@ import moduleHttps from "https";
                 "require",
                 "setImmediate",
                 "setInterval",
-                "setTimeout",
-                "structuredClone"
+                "setTimeout"
             ], "Node.js");
             break;
         }
@@ -3658,7 +3686,7 @@ import moduleHttps from "https";
         ) {
 
 // test_cause:
-// ["/////////////////////////////////////////////////////////////////////////////////", "read_line", "too_long", "", 1] //jslint-quiet
+// ["/////////////////////////////////////////////////////////////////////////////////", "read_line", "too_long", "", 1] //jslint-ignore-line
 
             warn_at("too_long", line);
         }
@@ -3676,7 +3704,7 @@ import moduleHttps from "https";
 // Scan each line for following ignore-directives:
 // "/*jslint-disable*/"
 // "/*jslint-enable*/"
-// "//jslint-quiet"
+// "//jslint-ignore-line"
 
         if (line_source === "/*jslint-disable*/") {
 
@@ -3694,13 +3722,16 @@ import moduleHttps from "https";
                 stop_at("unopened_enable", line);
             }
             line_disable = undefined;
-        } else if (line_source.endsWith(" //jslint-quiet")) {
+        } else if (
+            line_source.endsWith(" //jslint-ignore-line")
+            || line_source.endsWith(" //jslint-quiet")
+        ) {
 
 // test_cause:
-// ["0 //jslint-quiet", "read_line", "jslint_quiet", "", 0]
+// ["0 //jslint-ignore-line", "read_line", "jslint_ignore_line", "", 0]
 
-            test_cause("jslint_quiet");
-            line_list[line].directive_quiet = true;
+            test_cause("jslint_ignore_line");
+            line_list[line].directive_ignore_line = true;
         }
         if (line_disable !== undefined) {
 
@@ -10214,7 +10245,7 @@ function v8CoverageListMerge(processCovs) {
             let resultTree;
             let rightChildren;
 
-// TODO(perf): Binary search (check overhead) //jslint-quiet
+// TODO(perf): Binary search (check overhead) //jslint-ignore-line
 
             while (ii < tree.children.length) {
                 child = tree.children[ii];
@@ -10292,7 +10323,7 @@ function v8CoverageListMerge(processCovs) {
 
 // This function will normalize-and-sort <funcCov>.ranges.
 // Sorts the ranges (pre-order sort).
-// TODO: Tree-based normalization of the ranges. //jslint-quiet
+// TODO: Tree-based normalization of the ranges. //jslint-ignore-line
 // @param funcCov Function coverage to normalize.
 
         funcCov.ranges = treeToRanges(treeFromSortedRanges(

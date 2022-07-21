@@ -13,9 +13,9 @@
     <meta name="author" content="Douglas Crockford">
     <link rel="icon" type="image/png" href="asset_image_logo_512.svg">
     <title>JSLint: The JavaScript Code Quality and Coverage Tool</title>
-    <script defer src="./asset_codemirror_rollup.js?cc=untc"></script>
-    <script type="module" src="./jslint.mjs?cc=untc?window_jslint=1"></script>
-    <script defer src="./jslint_wrapper_codemirror.js?cc=untc"></script>
+    <script defer src="./asset_codemirror_rollup.js?cc=7r2q"></script>
+    <script type="module" src="./jslint.mjs?cc=7r2q?window_jslint=1"></script>
+    <script defer src="./jslint_wrapper_codemirror.js?cc=7r2q"></script>
 <style>
 /*jslint-disable*/
 /*
@@ -23,14 +23,10 @@ shRawLibFetch
 {
     "fetchList": [
         {
-            "comment": true,
-            "url": "https://github.com/codemirror/CodeMirror/blob/5.65.3/LICENSE"
+            "url": "https://github.com/codemirror/CodeMirror5/blob/5.65.5/lib/codemirror.css"
         },
         {
-            "url": "https://github.com/codemirror/CodeMirror/blob/5.65.3/lib/codemirror.css"
-        },
-        {
-            "url": "https://github.com/codemirror/CodeMirror/blob/5.65.3/addon/lint/lint.css"
+            "url": "https://github.com/codemirror/CodeMirror5/blob/5.65.5/addon/lint/lint.css"
         }
     ],
     "replaceList": []
@@ -39,41 +35,13 @@ shRawLibFetch
 
 
 /*
-repo https://github.com/codemirror/CodeMirror/tree/5.65.3
-committed 2022-04-20T09:49:25Z
+repo https://github.com/codemirror/CodeMirror5/tree/5.65.5
+committed 2022-05-30T09:58:15Z
 */
 
 
 /*
-file https://github.com/codemirror/CodeMirror/blob/5.65.3/LICENSE
-*/
-/*
-MIT License
-
-Copyright (C) 2017 by Marijn Haverbeke <marijnh@gmail.com> and others
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-*/
-
-
-/*
-file https://github.com/codemirror/CodeMirror/blob/5.65.3/lib/codemirror.css
+file https://github.com/codemirror/CodeMirror5/blob/5.65.5/lib/codemirror.css
 */
 /* BASICS */
 
@@ -422,7 +390,7 @@ span.CodeMirror-selectedtext { background: none; }
 
 
 /*
-file https://github.com/codemirror/CodeMirror/blob/5.65.3/addon/lint/lint.css
+file https://github.com/codemirror/CodeMirror5/blob/5.65.5/addon/lint/lint.css
 */
 /* The lint marker gutter */
 .CodeMirror-lint-markers {
@@ -1271,7 +1239,7 @@ function dom_style_report_unmatched() {
             try {
                 ii = document.querySelectorAll(match1).length;
             } catch (err) {
-                console.error(match1 + "\n" + err); //jslint-quiet
+                console.error(match1 + "\n" + err); //jslint-ignore-line
             }
             if (ii <= 1 && !(
                 /^0 (?:(body > )?(?:\.button|\.readonly|\.styleColorError|\.textarea|\.uiAnimateSlide|a|base64|body|code|div|input|pre|textarea)(?:,| \{))|^[1-9]\d*? #/m
@@ -1282,7 +1250,7 @@ function dom_style_report_unmatched() {
         });
     });
     style_list.sort().reverse().forEach(function (elem, ii, list) {
-        console.error( //jslint-quiet
+        console.error( //jslint-ignore-line
             "dom_style_report_unmatched " + (list.length - ii) + ". " + elem
         );
     });
@@ -1329,7 +1297,7 @@ async function jslint_run() {
         ).innerHTML = jslint.jslint_report(jslint_option_dict.result);
         listener_window_onresize();
     } catch (err) {
-        console.error(err); //jslint-quiet
+        console.error(err); //jslint-ignore-line
     }
 
 // Hide ui-loader-animation.
@@ -1620,10 +1588,11 @@ import https from "https";
 import jslint from \u0022./jslint.mjs\u0022;
 
 /*jslint-disable*/
+    JSLint will ignore and treat this region as blank-lines.
     Syntax error.\u0020\u0020\u0020\u0020
 /*jslint-enable*/
 
-eval("console.log(\\"hello world\\");"); //jslint-quiet
+eval("console.log(\\"hello world\\");"); //jslint-ignore-line
 
 eval("console.log(\\"hello world\\");");
 
@@ -1647,11 +1616,9 @@ eval("console.log(\\"hello world\\");");
 // .... /*jslint trace*/ ......... Include jslint stack-trace in warnings.
 // .... /*jslint unordered*/ ..... Allow unordered cases, params, properties,
 // ................................... and variables.
-// .... /*jslint variable*/ ...... Allow unordered const and let declarations
-// ................................... that are not at top of function-scope.
 // .... /*jslint white*/ ......... Allow messy whitespace.
 
-(async function () {
+await (async function () {
     let result = await new Promise(function (resolve) {
         https.request("https://www.jslint.com/jslint.mjs", function (res) {
             result = "";

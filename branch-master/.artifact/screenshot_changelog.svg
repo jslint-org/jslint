@@ -1,5 +1,5 @@
-<svg height="1328" width="800" xmlns="http://www.w3.org/2000/svg">
-<rect height="1328" fill="#222" width="800"></rect>
+<svg height="1350" width="800" xmlns="http://www.w3.org/2000/svg">
+<rect height="1350" fill="#222" width="800"></rect>
 <text
     fill="#7f7"
     font-family="consolas, menlo, monospace"
@@ -29,337 +29,343 @@
     textLength="768"
     x="10"
     y="98"
->- wrapper - add vscode-command to suppress minor warnings on given line                          </tspan>
+>- doc - document supported/unsupported es6+ features                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="120"
->- doc - document jslint directives and supported/unsupported es6+ features                       </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="142"
 >- cli - remove cli-option `--mode-vim-plugin`                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="164"
+    y="142"
 >- coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="186"
+    y="164"
 >- jslint - add html and css linting back into jslint.                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="208"
+    y="186"
 >- jslint - add new warning requiring paren around plus-separated concatenations.                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="230"
+    y="208"
 >- jslint - relax warning against console.log and friends and deprecate directive `devel`         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="252"
+    y="230"
 >- jslint - require regexp to use open-form.                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="274"
+    y="252"
 >- jslint - try to improve parser to be able to parse jquery.js without stopping.                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="296"
+    y="274"
 >- jslint - unify analysis of variable-assignment/function-parameters into one function           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="318"
+    y="296"
 >- jslint - add new warning "Expected Object.create(null) instead of {}"                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="340"
+    y="318"
 >- node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejec\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="362"
+    y="340"
 >  tions=strict"`.                                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="384"
+    y="362"
 >                                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="384"
+># v2022.7.20                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="406"
-># v2022.6.21                                                                                     </tspan>
+>- bugfix - warnings that should be ignored sometimes suppress legitimate warnings                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="428"
->- directive - add new directive `subscript` for linting of scripts targeting Google Closure Comp\</tspan>
+>- doc - document jslint directives                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="450"
->  iler                                                                                           </tspan>
+>- vscode - add extra contextmenu commands "JSLint - Do Not Lint Selected Region", "JSLint - Igno\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="472"
->- bugfix - fix expression after "await" mis-identified as statement                              </tspan>
+>  re Current Line"                                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="494"
->- warning - relax warning about missing `catch` in `try...finally` statement                     </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="516"
->- jslint - allow aliases `evil, nomen` for jslint-directives `eval, name`, respectively for back\</tspan>
+># v2022.6.21                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="538"
->  wards-compat                                                                                   </tspan>
+>- directive - add new directive `subscript` for linting of scripts targeting Google Closure Comp\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="560"
->- bugfix - fix broken codemirror example                                                         </tspan>
+>  iler                                                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="582"
->- bugfix - fix jslint not-recognizing option-chaining when comparing operands of binary operator </tspan>
+>- bugfix - fix expression after "await" mis-identified as statement                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="604"
->- allow array-literals to directly call [...].flat() and [...].flatMap()                         </tspan>
+>- warning - relax warning about missing `catch` in `try...finally` statement                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="626"
->                                                                                                 </tspan>
+>- jslint - allow aliases `evil, nomen` for jslint-directives `eval, name`, respectively for back\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="648"
-># v2022.5.20                                                                                     </tspan>
+>  wards-compat                                                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="670"
->- coverage-report - disable default-coverage of directory `node_modules`, but allow override wit\</tspan>
+>- bugfix - fix broken codemirror example                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="692"
->  h cli-option `--include-node-modules=1`                                                        </tspan>
+>- bugfix - fix jslint not-recognizing option-chaining when comparing operands of binary operator </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="714"
->- coverage-report - add function globExclude() to revamp coverage-report to exclude files using \</tspan>
+>- allow array-literals to directly call [...].flat() and [...].flatMap()                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="736"
->  glob-pattern-matching                                                                          </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="758"
->- add codemirror-example-file jslint_wrapper_codemirror.html                                     </tspan>
+># v2022.5.20                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="780"
->- update codemirror-editor to v5.65.3                                                            </tspan>
+>- coverage-report - disable default-coverage of directory `node_modules`, but allow override wit\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="802"
->- wrapper - add jslint-addon for codemirror                                                      </tspan>
+>  h cli-option `--include-node-modules=1`                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="824"
->- allow jslint.mjs to auto-export itself to globalThis when given search-param `?window_jslint=1\</tspan>
+>- coverage-report - add function globExclude() to revamp coverage-report to exclude files using \</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="846"
->  `                                                                                              </tspan>
+>  glob-pattern-matching                                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="868"
->- wrapper - add jslint-extension for vscode                                                      </tspan>
+>- add codemirror-example-file jslint_wrapper_codemirror.html                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="890"
->- bugfix - fix jslint falsely believing megastring literals `0` and `1` are similar              </tspan>
+>- update codemirror-editor to v5.65.3                                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="912"
->- bugfix - fix function jstestOnExit() from exiting prematurely and suppressing additional error\</tspan>
+>- wrapper - add jslint-addon for codemirror                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="934"
->  -messages                                                                                      </tspan>
+>- allow jslint.mjs to auto-export itself to globalThis when given search-param `?window_jslint=1\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="956"
->                                                                                                 </tspan>
+>  `                                                                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="978"
-># v2022.3.30                                                                                     </tspan>
+>- wrapper - add jslint-extension for vscode                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1000"
->- website - use localStorage to persist jslint-options selected in ui                            </tspan>
+>- bugfix - fix jslint falsely believing megastring literals `0` and `1` are similar              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1022"
->- website - add optional debug-mode to use sessionStorage to persist jslint-globals and jslint-s\</tspan>
+>- bugfix - fix function jstestOnExit() from exiting prematurely and suppressing additional error\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1044"
->  ource from ui                                                                                  </tspan>
+>  -messages                                                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1066"
->- jslint - add numeric-separator support                                                         </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1088"
->- jslint - move regexp-literals to module-level so they are explicitly cached, to improve perfor\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1110"
->  mance                                                                                          </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1132"
->- ci - add check for package.json.fileCount                                                      </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1154"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
+    y="1088"
+># v2022.3.30                                                                                     </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1110"
+>- website - use localStorage to persist jslint-options selected in ui                            </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1132"
+>- website - add optional debug-mode to use sessionStorage to persist jslint-globals and jslint-s\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1154"
+>  ource from ui                                                                                  </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
     y="1176"
-># v2022.2.20                                                                                     </tspan>
+>- jslint - add numeric-separator support                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1198"
->- test - migrate all tests to use jstestDescribe(), jstestIt()                                   </tspan>
+>- jslint - move regexp-literals to module-level so they are explicitly cached, to improve perfor\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1220"
->- fs - rename jslint-wrapper-files to jslint_wrapper_xxx.xxx                                     </tspan>
+>  mance                                                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1242"
->- bugfix - fix issue #382 - make fart-related warnings more readable                             </tspan>
+>- ci - add check for package.json.fileCount                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1264"
->- bugfix - fix issue #382 - fix warnings against destructured fart                               </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1286"
->- bugfix - fix issue #379 - warn against naked-statement in fart.                                </tspan>
+># v2022.2.20                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1308"
->- update commonjs-wrapper jslint.cjs to load jslint in strict-mode.                              </tspan>
+>- test - migrate all tests to use jstestDescribe(), jstestIt()                                   </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1330"
+>- fs - rename jslint-wrapper-files to jslint_wrapper_xxx.xxx                                     </tspan>
 
 </text>
 </svg>
