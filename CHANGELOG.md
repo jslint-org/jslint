@@ -13,7 +13,7 @@
 - jslint - add new warning "Expected Object.create(null) instead of {}"
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 
-# v2022.7.2-beta
+# v2022.7.20
 - bugfix - warnings that should be ignored sometimes suppress legitimate warnings
 - doc - document jslint directives
 - vscode - add extra contextmenu commands "JSLint - Do Not Lint Selected Region", "JSLint - Ignore Current Line"
