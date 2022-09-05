@@ -694,7 +694,8 @@ jstestDescribe((
                 "/*property aa bb*/"
             ],
             fart: [
-                "function aa() {\n    return () => 0;\n}"
+                "let aa = () => 0;",
+                "let aa = ({aa}) => aa;"
             ],
             for: [
                 (

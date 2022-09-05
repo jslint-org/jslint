@@ -165,7 +165,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2022.7.20";
+let jslint_edition = "v2022.9.1-beta";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -4911,13 +4911,14 @@ function jslint_phase3_parse(state) {
                 enroll(name, "parameter", true);
             } else {
 
-// PR-385 - Bugfix - Fixes issue #382 - fix warnings against destructured fart.
+// PR-385 - Bugfix - Fixes issue #382 - failure to detect destructured fart.
+// PR-xxx - Fixes issue #413 - relax warning against destructured fart.
 
 // test_cause:
-// ["([aa])=>0", "enroll_parameter", "use_function_not_fart", "=>", 7]
-// ["({aa})=>0", "enroll_parameter", "use_function_not_fart", "=>", 7]
+// ["([aa])=>0", "enroll_parameter", "destructured_fart", "=>", 0]
+// ["({aa})=>0", "enroll_parameter", "destructured_fart", "=>", 0]
 
-                warn("use_function_not_fart", the_fart);
+                test_cause("destructured_fart", token_now.id);
 
 // Recurse enroll_parameter().
 
