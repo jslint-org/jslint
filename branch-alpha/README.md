@@ -49,6 +49,7 @@ Douglas Crockford <douglas@crockford.com>
         - [`/*jslint couch*/`](#jslint-couch)
         - [`/*jslint devel*/`](#jslint-devel)
         - [`/*jslint eval*/`](#jslint-eval)
+        - [`/*jslint fart*/`](#jslint-fart)
         - [`/*jslint for*/`](#jslint-for)
         - [`/*jslint getset*/`](#jslint-getset)
         - [`/*jslint indent2*/`](#jslint-indent2)
@@ -635,6 +636,17 @@ console.log("hello");
 // Allow eval().
 
 eval("1");
+```
+
+<br>
+
+##### `/*jslint fart*/`
+
+```js
+/*jslint for*/
+// Allow fat-arrow.
+
+let foo = ({bar, baz}) => bar + baz;
 ```
 
 <br>

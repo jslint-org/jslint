@@ -113,7 +113,7 @@
     textLength="768"
     x="10"
     y="406"
->- jslint - relax warning against destructured-parameters in fat-arrow                            </tspan>
+>- directive - add new directive `fart` to allow fat-arrow                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

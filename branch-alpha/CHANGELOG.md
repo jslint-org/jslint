@@ -14,7 +14,7 @@
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
 
 # v2022.9.1-beta
-- jslint - relax warning against destructured-parameters in fat-arrow
+- directive - add new directive `fart` to allow fat-arrow
 
 # v2022.7.20
 - bugfix - warnings that should be ignored sometimes suppress legitimate warnings

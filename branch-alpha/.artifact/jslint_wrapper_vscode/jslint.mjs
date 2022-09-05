@@ -103,14 +103,14 @@
     delta, devel, directive, directive_ignore_line, directive_list, directives,
     dirname, disrupt, dot, edition, elem_list, ellipsis, else, end, endOffset,
     endsWith, entries, env, error, eval, every, example_list, excludeList, exec,
-    execArgv, exit, exitCode, export_dict, exports, expression, extra, file,
-    fileList, fileURLToPath, filter, finally, flag, floor, for, forEach,
+    execArgv, exit, exitCode, export_dict, exports, expression, extra, fart,
+    file, fileList, fileURLToPath, filter, finally, flag, floor, for, forEach,
     formatted_message, free, freeze, from, froms, fsWriteFileWithParents,
     fud_stmt, functionName, function_list, function_stack, functions, get,
     getset, github_repo, globExclude, global, global_dict, global_list,
     holeList, htmlEscape, id, identifier, import, import_list, import_meta_url,
     inc, includeList, indent2, index, indexOf, init, initial, isArray,
-    isBlockCoverage, isHole, isNaN, is_equal, is_fart, is_weird, join, jslint,
+    isBlockCoverage, isHole, isNaN, is_equal, is_weird, join, jslint,
     jslint_apidoc, jslint_assert, jslint_charset_ascii, jslint_cli,
     jslint_edition, jslint_phase1_split, jslint_phase2_lex, jslint_phase3_parse,
     jslint_phase4_walk, jslint_phase5_whitage, jslint_report, json,
@@ -130,9 +130,9 @@
     shift, signature, single, slice, some, sort, source, spawn, splice, split,
     stack, stack_trace, start, startOffset, startsWith, statement,
     statement_prv, stdio, stop, stop_at, stringify, subscript, switch,
-    syntax_dict, tenure, test, test_cause, test_internal_error, this, thru,
-    toString, token, token_global, token_list, token_nxt, token_tree, tokens,
-    trace, tree, trim, trimEnd, trimRight, try, type, unlink, unordered,
+    syntax_dict, tenure, test, test_cause, test_internal_error, the_fart, this,
+    thru, toString, token, token_global, token_list, token_nxt, token_tree,
+    tokens, trace, tree, trim, trimEnd, trimRight, try, type, unlink, unordered,
     unshift, url, used, v8CoverageListMerge, v8CoverageReportCreate, value,
     variable, version, versions, warn, warn_at, warning, warning_list, warnings,
     white, wrapped, writeFile
@@ -1163,10 +1163,7 @@ function jslint(
 // PR-386 - Fix issue #382 - Make fart-related warnings more readable.
 
         case "use_function_not_fart":
-            mm = (
-                `Use 'function (...)', not '(...) =>' when arrow functions`
-                + ` become too complex.`
-            );
+            mm = `Use 'function (...)', not '(...) =>'`;
             break;
         case "use_open":
             mm = (
@@ -3294,19 +3291,20 @@ function jslint_phase2_lex(state) {
 
         switch (key) {
         case "beta":            // Enable experimental warnings.
-        case "bitwise":         // Allow bitwise operators.
+        case "bitwise":         // Allow bitwise operator.
         case "browser":         // Assume browser environment.
-        case "convert":         // Allow conversion operators.
+        case "convert":         // Allow conversion operator.
         case "couch":           // Assume CouchDb environment.
         case "devel":           // Allow console.log() and friends.
         case "ecma":            // Assume ECMAScript environment.
         case "eval":            // Allow eval().
+        case "fart":            // Allow fat-arrow.
         case "for":             // Allow for-statement.
         case "getset":          // Allow get() and set().
         case "indent2":         // Use 2-space indent.
         case "long":            // Allow long lines.
         case "node":            // Assume Node.js environment.
-        case "nomen":           // Allow weird property names.
+        case "nomen":           // Allow weird property name.
         case "single":          // Allow single-quote strings.
         case "subscript":       // Allow identifier in subscript-notation.
         case "test_cause":      // Test jslint's causes.
@@ -3770,9 +3768,9 @@ import moduleHttps from "https";
             from,
             id,
             identifier: Boolean(identifier),
-            is_fart: false,
             line,
             nr: token_list.length,
+            the_fart: false,
             thru: column,
             value
         };
@@ -3835,7 +3833,7 @@ import moduleHttps from "https";
                 token_prv_expr.id === ")"
                 && paren_backtrack_list[paren_depth]
             ) {
-                paren_backtrack_list[paren_depth].is_fart = true;
+                paren_backtrack_list[paren_depth].the_fart = the_token;
             }
             break;
         }
@@ -4870,16 +4868,30 @@ function jslint_phase3_parse(state) {
     }
 
     function parse_fart() {
-        let parameters;
-        let signature;
-        let the_fart;
-        [parameters, signature] = prefix_function_arg();
-        advance("=>");
-        the_fart = token_now;
-        the_fart.arity = "binary";
-        the_fart.name = "=>";
-        the_fart.level = functionage.level + 1;
-        function_list.push(the_fart);
+
+// Give the function properties storing its names and for observing the depth
+// of loops and switches.
+
+        let the_fart = Object.assign(token_now.the_fart, {
+            arity: "binary",
+            context: empty(),
+            finally: 0,
+            level: functionage.level + 1,
+            loop: 0,
+            name: anon,
+            switch: 0,
+            try: 0
+        });
+
+// PR-xxx - Directive - add new directive `fart` to allow fat-arrow.
+
+        if (option_dict.beta && !option_dict.fart) {
+
+// test_cause:
+// ["()=>{}", "parse_fart", "use_function_not_fart", "=>", 3]
+
+            warn("use_function_not_fart", the_fart);
+        }
 
 // PR-384 - Relax warning "function_in_loop".
 //
@@ -4891,46 +4903,17 @@ function jslint_phase3_parse(state) {
 //             warn("function_in_loop", the_fart);
 //         }
 
-// Give the function properties storing its names and for observing the depth
-// of loops and switches.
-
-        the_fart.context = empty();
-        the_fart.finally = 0;
-        the_fart.loop = 0;
-        the_fart.parameters = parameters;
-        the_fart.signature = signature;
-        the_fart.switch = 0;
-        the_fart.try = 0;
-
 // Push the current function context and establish a new one.
 
+        function_list.push(the_fart);
         function_stack.push(functionage);
         functionage = the_fart;
-        the_fart.parameters.forEach(function enroll_parameter(name) {
-            if (name.identifier) {
-                enroll(name, "parameter", true);
-            } else {
 
-// PR-385 - Bugfix - Fixes issue #382 - failure to detect destructured fart.
-// PR-xxx - Fixes issue #413 - relax warning against destructured fart.
+// Parse the parameter list.
 
-// test_cause:
-// ["([aa])=>0", "enroll_parameter", "destructured_fart", "=>", 0]
-// ["({aa})=>0", "enroll_parameter", "destructured_fart", "=>", 0]
-
-                test_cause("destructured_fart", token_now.id);
-
-// Recurse enroll_parameter().
-
-                name.names.forEach(enroll_parameter);
-            }
-        });
+        prefix_function_arg(the_fart);
+        advance("=>");
         if (token_nxt.id === "{") {
-
-// test_cause:
-// ["()=>{}", "parse_fart", "use_function_not_fart", "=>", 3]
-
-            warn("use_function_not_fart", the_fart);
             the_fart.block = block("body");
         } else if (
             syntax_dict[token_nxt.id] !== undefined
@@ -4946,6 +4929,9 @@ function jslint_phase3_parse(state) {
         } else {
             the_fart.expression = parse_expression(0);
         }
+
+// Restore the previous context.
+
         functionage = function_stack.pop();
         return the_fart;
     }
@@ -5383,7 +5369,6 @@ function jslint_phase3_parse(state) {
                 }
             }
         }
-        the_function.level = functionage.level + 1;
 
 //  Probably deadcode.
 //  if (mode_mega) {
@@ -5413,6 +5398,7 @@ function jslint_phase3_parse(state) {
             async: the_function.async || 0,
             context: empty(),
             finally: 0,
+            level: functionage.level + 1,
             loop: 0,
             statement_prv: undefined,
             switch: 0,
@@ -5430,34 +5416,18 @@ function jslint_phase3_parse(state) {
             name.used = 1;
         }
 
-// Bugfix - fix function-redefinitions not warned inside function-calls.
+// PR-334 - Bugfix - fix function-redefinition not warned inside function-call.
 // Push the current function context and establish a new one.
 
-        function_stack.push(functionage);
         function_list.push(the_function);
+        function_stack.push(functionage);
         functionage = the_function;
 
 // Parse the parameter list.
 
         advance("(");
-
-// test_cause:
-// ["function aa(){}", "prefix_function", "opener", "", 0]
-
-        test_cause("opener");
-        token_now.free = false;
         token_now.arity = "function";
-        [functionage.parameters, functionage.signature] = prefix_function_arg();
-        functionage.parameters.forEach(function enroll_parameter(name) {
-            if (name.identifier) {
-                enroll(name, "parameter", false);
-            } else {
-
-// Recurse enroll_parameter().
-
-                name.names.forEach(enroll_parameter);
-            }
-        });
+        prefix_function_arg(the_function);
 
 // The function's body is a block.
 
@@ -5508,19 +5478,29 @@ function jslint_phase3_parse(state) {
         return the_function;
     }
 
-    function prefix_function_arg() {
-        const list = [];
-        const signature = ["("];
+    function prefix_function_arg(the_function) {
         let optional;
+        let parameters = [];
+        let signature = ["("];
         let subparam;
-        function parameter() {
+        function param_enroll(name) {
+            if (name.identifier) {
+                enroll(name, "parameter", false);
+            } else {
+
+// Recurse param_enroll().
+
+                name.names.forEach(param_enroll);
+            }
+        }
+        function param_parse() {
             let ellipsis = false;
             let param;
             if (token_nxt.id === "{") {
                 if (optional !== undefined) {
 
 // test_cause:
-// ["function aa(aa=0,{}){}", "parameter", "required_a_optional_b", "aa", 18]
+// ["function aa(aa=0,{}){}", "param_parse", "required_a_optional_b", "aa", 18]
 
                     warn(
                         "required_a_optional_b",
@@ -5538,8 +5518,8 @@ function jslint_phase3_parse(state) {
                     if (!subparam.identifier) {
 
 // test_cause:
-// ["function aa(aa=0,{}){}", "parameter", "expected_identifier_a", "}", 19]
-// ["function aa({0}){}", "parameter", "expected_identifier_a", "0", 14]
+// ["function aa(aa=0,{}){}", "param_parse", "expected_identifier_a", "}", 19]
+// ["function aa({0}){}", "param_parse", "expected_identifier_a", "0", 14]
 
                         return stop("expected_identifier_a");
                     }
@@ -5554,7 +5534,7 @@ function jslint_phase3_parse(state) {
                         if (!subparam.identifier) {
 
 // test_cause:
-// ["function aa({aa:0}){}", "parameter", "expected_identifier_a", "}", 18]
+// ["function aa({aa:0}){}", "param_parse", "expected_identifier_a", "}", 18]
 
                             return stop(
                                 "expected_identifier_a",
@@ -5564,7 +5544,7 @@ function jslint_phase3_parse(state) {
                     }
 
 // test_cause:
-// ["function aa({aa=aa},aa){}", "parameter", "equal", "", 0]
+// ["function aa({aa=aa},aa){}", "param_parse", "equal", "", 0]
 
                     test_cause("equal");
                     if (token_nxt.id === "=") {
@@ -5580,7 +5560,7 @@ function jslint_phase3_parse(state) {
                         break;
                     }
                 }
-                list.push(param);
+                parameters.push(param);
 
 // test_cause:
 // ["
@@ -5593,13 +5573,14 @@ function jslint_phase3_parse(state) {
                 if (token_nxt.id === ",") {
                     advance(",");
                     signature.push(", ");
-                    return parameter();
+                    param_parse();
+                    return;
                 }
             } else if (token_nxt.id === "[") {
                 if (optional !== undefined) {
 
 // test_cause:
-// ["function aa(aa=0,[]){}", "parameter", "required_a_optional_b", "aa", 18]
+// ["function aa(aa=0,[]){}", "param_parse", "required_a_optional_b", "aa", 18]
 
                     warn(
                         "required_a_optional_b",
@@ -5617,7 +5598,7 @@ function jslint_phase3_parse(state) {
                     if (!subparam.identifier) {
 
 // test_cause:
-// ["function aa(aa=0,[]){}", "parameter", "expected_identifier_a", "]", 19]
+// ["function aa(aa=0,[]){}", "param_parse", "expected_identifier_a", "]", 19]
 
                         return stop("expected_identifier_a");
                     }
@@ -5625,7 +5606,7 @@ function jslint_phase3_parse(state) {
                     param.names.push(subparam);
 
 // test_cause:
-// ["function aa([aa=aa],aa){}", "parameter", "id", "", 0]
+// ["function aa([aa=aa],aa){}", "param_parse", "id", "", 0]
 
                     test_cause("id");
                     if (token_nxt.id === "=") {
@@ -5639,12 +5620,13 @@ function jslint_phase3_parse(state) {
                         break;
                     }
                 }
-                list.push(param);
+                parameters.push(param);
                 advance("]");
                 if (token_nxt.id === ",") {
                     advance(",");
                     signature.push(", ");
-                    return parameter();
+                    param_parse();
+                    return;
                 }
             } else {
                 if (token_nxt.id === "...") {
@@ -5654,7 +5636,7 @@ function jslint_phase3_parse(state) {
                     if (optional !== undefined) {
 
 // test_cause:
-// ["function aa(aa=0,...){}", "parameter", "required_a_optional_b", "aa", 21]
+// ["function aa(aa=0,...){}", "param_parse", "required_a_optional_b", "aa", 21]
 
                         warn(
                             "required_a_optional_b",
@@ -5667,12 +5649,12 @@ function jslint_phase3_parse(state) {
                 if (!token_nxt.identifier) {
 
 // test_cause:
-// ["function aa(0){}", "parameter", "expected_identifier_a", "0", 13]
+// ["function aa(0){}", "param_parse", "expected_identifier_a", "0", 13]
 
                     return stop("expected_identifier_a");
                 }
                 param = token_nxt;
-                list.push(param);
+                parameters.push(param);
                 advance();
                 signature.push(param.id);
                 if (ellipsis) {
@@ -5686,7 +5668,7 @@ function jslint_phase3_parse(state) {
                         if (optional !== undefined) {
 
 // test_cause:
-// ["function aa(aa=0,bb){}", "parameter", "required_a_optional_b", "aa", 18]
+// ["function aa(aa=0,bb){}", "param_parse", "required_a_optional_b", "aa", 18]
 
                             warn(
                                 "required_a_optional_b",
@@ -5699,17 +5681,26 @@ function jslint_phase3_parse(state) {
                     if (token_nxt.id === ",") {
                         advance(",");
                         signature.push(", ");
-                        return parameter();
+                        param_parse();
+                        return;
                     }
                 }
             }
         }
+
+// test_cause:
+// ["function aa(){}", "prefix_function_arg", "opener", "(", 0]
+
+        test_cause("opener", token_now.id);
+        token_now.free = false;
         if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
-            parameter();
+            param_parse();
         }
         advance(")");
         signature.push(")");
-        return [list, signature.join("")];
+        parameters.forEach(param_enroll);
+        the_function.parameters = parameters;
+        the_function.signature = signature.join("");
     }
 
     function prefix_lbrace() {
@@ -5920,8 +5911,7 @@ function jslint_phase3_parse(state) {
 
 // PR-385 - Bugfix - Fixes issue #382 - failure to detect destructured fart.
 
-        if (token_now.is_fart) {
-            the_paren.free = false;
+        if (token_now.the_fart) {
             return parse_fart();
         }
 
@@ -9774,6 +9764,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         let {
             context,
             from,
+            id,
             level,
             line,
             name,
@@ -9790,14 +9781,18 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
             + address(line, from + 1)
             + "<dfn>"
             + (
-                name === "=>"
-                ? htmlEscape(signature) + " =>"
+                id === "=>"
+                ? (
+                    "\u00ab" + htmlEscape(name) + "\u00bb"
+                    + htmlEscape(signature)
+                    + " =>"
+                )
                 : (
                     typeof name === "string"
                     ? "\u00ab" + htmlEscape(name) + "\u00bb"
                     : htmlEscape(name.id)
-                )
-            ) + htmlEscape(signature)
+                ) + htmlEscape(signature)
+            )
             + "</dfn>"
         );
         params = [];
