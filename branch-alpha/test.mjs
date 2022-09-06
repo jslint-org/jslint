@@ -930,11 +930,12 @@ jstestDescribe((
         ], [
             "let aa = () => 0;", {fart: true}, []
         ], [
-            "let aa = ([aa, bb]) => aa + bb;", {fart: true}, []
-        ], [
-            "let aa = (aa) => aa;", {fart: true}, []
-        ], [
-            "let aa = ({aa, bb}) => aa + bb;", {fart: true}, []
+            (
+                "let aa = async (bb, {cc, dd}, [ee, ff], ...gg) => {\n"
+                + "    bb += 1;\n"
+                + "    return await (bb + cc + dd + ee + ff + gg);\n"
+                + "};\n"
+            ), {fart: true}, []
         ], [
             (
                 "function aa(aa) {\n"

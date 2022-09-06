@@ -1159,16 +1159,16 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
 
 // Attempt to give helpful names to anonymous functions.
 
-        if (token_now.identifier &amp;&amp; token_now.id !== "function") {
+        if (
+            token_now.identifier
+            &amp;&amp; token_now.id !== "function"
+            &amp;&amp; token_now.id !== "async"
+        ) {
             anon = token_now.id;
         } else if (
             token_now.id === "(string)"
             &amp;&amp; jslint_rgx_identifier.test(token_now.value)
-        ) {
-            anon = token_now.value;
-        }
-
-// Attempt to match token_nxt ...
+       ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

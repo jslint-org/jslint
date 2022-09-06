@@ -130,9 +130,9 @@
     shift, signature, single, slice, some, sort, source, spawn, splice, split,
     stack, stack_trace, start, startOffset, startsWith, statement,
     statement_prv, stdio, stop, stop_at, stringify, subscript, switch,
-    syntax_dict, tenure, test, test_cause, test_internal_error, the_fart, this,
-    thru, toString, token, token_global, token_list, token_nxt, token_tree,
-    tokens, trace, tree, trim, trimEnd, trimRight, try, type, unlink, unordered,
+    syntax_dict, tenure, test, test_cause, test_internal_error, this, thru,
+    toString, token, token_global, token_list, token_nxt, token_tree, tokens,
+    trace, tree, trim, trimEnd, trimRight, try, type, unlink, unordered,
     unshift, url, used, v8CoverageListMerge, v8CoverageReportCreate, value,
     variable, version, versions, warn, warn_at, warning, warning_list, warnings,
     white, wrapped, writeFile
@@ -1163,7 +1163,10 @@ function jslint(
 // PR-386 - Fix issue #382 - Make fart-related warnings more readable.
 
         case "use_function_not_fart":
-            mm = `Use 'function (...)', not '(...) =>'`;
+            mm = (
+                `Use 'function (...)', not '(...) =>' when arrow functions`
+                + ` become too complex.`
+            );
             break;
         case "use_open":
             mm = (
@@ -3298,7 +3301,7 @@ function jslint_phase2_lex(state) {
         case "devel":           // Allow console.log() and friends.
         case "ecma":            // Assume ECMAScript environment.
         case "eval":            // Allow eval().
-        case "fart":            // Allow fat-arrow.
+        case "fart":            // Allow complex fat-arrow.
         case "for":             // Allow for-statement.
         case "getset":          // Allow get() and set().
         case "indent2":         // Use 2-space indent.
@@ -3770,7 +3773,6 @@ import moduleHttps from "https";
             identifier: Boolean(identifier),
             line,
             nr: token_list.length,
-            the_fart: false,
             thru: column,
             value
         };
@@ -3833,7 +3835,7 @@ import moduleHttps from "https";
                 token_prv_expr.id === ")"
                 && paren_backtrack_list[paren_depth]
             ) {
-                paren_backtrack_list[paren_depth].the_fart = the_token;
+                paren_backtrack_list[paren_depth].fart = the_token;
             }
             break;
         }
@@ -3934,7 +3936,11 @@ function jslint_phase3_parse(state) {
 
 // Attempt to give helpful names to anonymous functions.
 
-        if (token_now.identifier && token_now.id !== "function") {
+        if (
+            token_now.identifier
+            && token_now.id !== "function"
+            && token_now.id !== "async"
+        ) {
             anon = token_now.id;
         } else if (
             token_now.id === "(string)"
@@ -4867,12 +4873,12 @@ function jslint_phase3_parse(state) {
         return left;
     }
 
-    function parse_fart() {
+    function parse_fart(the_fart) {
 
 // Give the function properties storing its names and for observing the depth
 // of loops and switches.
 
-        let the_fart = Object.assign(token_now.the_fart, {
+        Object.assign(the_fart, {
             arity: "binary",
             context: empty(),
             finally: 0,
@@ -4882,16 +4888,6 @@ function jslint_phase3_parse(state) {
             switch: 0,
             try: 0
         });
-
-// PR-xxx - Directive - add new directive `fart` to allow fat-arrow.
-
-        if (option_dict.beta && !option_dict.fart) {
-
-// test_cause:
-// ["()=>{}", "parse_fart", "use_function_not_fart", "=>", 3]
-
-            warn("use_function_not_fart", the_fart);
-        }
 
 // PR-384 - Relax warning "function_in_loop".
 //
@@ -4911,9 +4907,19 @@ function jslint_phase3_parse(state) {
 
 // Parse the parameter list.
 
-        prefix_function_arg(the_fart);
+        prefix_function_parameter(the_fart);
         advance("=>");
+
+// The function's body is a block.
+
         if (token_nxt.id === "{") {
+            if (!option_dict.fart) {
+
+// test_cause:
+// ["()=>{}", "parse_fart", "use_function_not_fart", "=>", 3]
+
+                warn("use_function_not_fart", the_fart);
+            }
             the_fart.block = block("body");
         } else if (
             syntax_dict[token_nxt.id] !== undefined
@@ -4926,6 +4932,9 @@ function jslint_phase3_parse(state) {
 // ["()=>delete aa", "parse_fart", "unexpected_a_after_b", "=>", 5]
 
             stop("unexpected_a_after_b", token_nxt, token_nxt.id, "=>");
+
+// The function's body is an expression.
+
         } else {
             the_fart.expression = parse_expression(0);
         }
@@ -5274,15 +5283,35 @@ function jslint_phase3_parse(state) {
     }
 
     function prefix_async() {
-        let the_async;
+        let the_async = token_now;
         let the_function;
-        the_async = token_now;
-        advance("function");
-        the_function = Object.assign(token_now, {
-            arity: the_async.arity,
-            async: 1
-        });
-        prefix_function();
+        token_nxt.arity = the_async.arity;
+
+// PR-xxx - Parse async fart.
+
+        if (token_nxt.fart) {
+            advance("(");
+            the_function = Object.assign(token_now.fart, {
+                async: 1
+            });
+            if (!option_dict.fart) {
+
+// test_cause:
+// ["async()=>0", "prefix_async", "use_function_not_fart", "=>", 8]
+
+                warn("use_function_not_fart", the_function);
+            }
+            prefix_lparen();
+
+// Parse async function.
+
+        } else {
+            advance("function");
+            the_function = Object.assign(token_now, {
+                async: 1
+            });
+            prefix_function();
+        }
         if (the_function.async === 1) {
 
 // test_cause:
@@ -5407,9 +5436,9 @@ function jslint_phase3_parse(state) {
         if (the_function.arity !== "statement" && typeof name === "object") {
 
 // test_cause:
-// ["let aa=function bb(){return;};", "prefix_function", "expression", "", 0]
+// ["let aa=function bb(){return;};", "prefix_function", "expression", "bb", 0]
 
-            test_cause("expression");
+            test_cause("expression", name.id);
             enroll(name, "function", true);
             name.dead = false;
             name.init = true;
@@ -5427,7 +5456,7 @@ function jslint_phase3_parse(state) {
 
         advance("(");
         token_now.arity = "function";
-        prefix_function_arg(the_function);
+        prefix_function_parameter(the_function);
 
 // The function's body is a block.
 
@@ -5478,7 +5507,10 @@ function jslint_phase3_parse(state) {
         return the_function;
     }
 
-    function prefix_function_arg(the_function) {
+    function prefix_function_parameter(the_function) {
+
+// This function will parse input <parameters> at beginning of <the_function>
+
         let optional;
         let parameters = [];
         let signature = ["("];
@@ -5487,6 +5519,14 @@ function jslint_phase3_parse(state) {
             if (name.identifier) {
                 enroll(name, "parameter", false);
             } else {
+
+// test_cause:
+// ["([aa])=>0", "param_enroll", "use_function_not_fart", "=>", 7]
+// ["({aa})=>0", "param_enroll", "use_function_not_fart", "=>", 7]
+
+                if (the_function.id === "=>" && !option_dict.fart) {
+                    warn("use_function_not_fart", the_function);
+                }
 
 // Recurse param_enroll().
 
@@ -5689,7 +5729,7 @@ function jslint_phase3_parse(state) {
         }
 
 // test_cause:
-// ["function aa(){}", "prefix_function_arg", "opener", "(", 0]
+// ["function aa(){}", "prefix_function_parameter", "opener", "(", 0]
 
         test_cause("opener", token_now.id);
         token_now.free = false;
@@ -5911,8 +5951,8 @@ function jslint_phase3_parse(state) {
 
 // PR-385 - Bugfix - Fixes issue #382 - failure to detect destructured fart.
 
-        if (token_now.the_fart) {
-            return parse_fart();
+        if (token_now.fart) {
+            return parse_fart(token_now.fart);
         }
 
 // test_cause:
@@ -7442,7 +7482,7 @@ function jslint_phase4_walk(state) {
                 i_set = a_set[the_token.id];
                 if (i_set !== undefined) {
                     i_set.forEach(function (task) {
-                        return task(the_token);
+                        task(the_token);
                     });
                 }
 
@@ -7451,7 +7491,7 @@ function jslint_phase4_walk(state) {
                 i_set = a_set["(all)"];
                 if (i_set !== undefined) {
                     i_set.forEach(function (task) {
-                        return task(the_token);
+                        task(the_token);
                     });
                 }
             }
@@ -8444,12 +8484,16 @@ function jslint_phase4_walk(state) {
             } else {
                 preamble(thing);
                 walk_expression(thing.expression);
-                if (thing.id === "function") {
+
+// PR-xxx - Bugfix - fix fart-body not being walked.
+
+                if (thing.id === "function" || thing.id === "=>") {
 
 // test_cause:
-// ["aa=function(){}", "walk_expression", "function", "", 0]
+// ["aa=()=>0", "walk_expression", "function", "=>", 0]
+// ["aa=function(){}", "walk_expression", "function", "function", 0]
 
-                    test_cause("function");
+                    test_cause("function", thing.id);
 
 // Recurse walk_statement().
 
@@ -8485,33 +8529,36 @@ function jslint_phase4_walk(state) {
     }
 
     function walk_statement(thing) {
-        if (thing) {
-            if (Array.isArray(thing)) {
+        if (!thing) {
+            return;
+        }
+        if (Array.isArray(thing)) {
 
 // test_cause:
 // ["+[]", "walk_statement", "isArray", "", 0]
 
-                test_cause("isArray");
+            test_cause("isArray");
 
 // Recurse walk_statement().
 
-                thing.forEach(walk_statement);
-            } else {
-                preamble(thing);
-                walk_expression(thing.expression);
-                if (thing.arity === "binary") {
-                    if (thing.id !== "(") {
+            thing.forEach(walk_statement);
+            return;
+        }
+        preamble(thing);
+        walk_expression(thing.expression);
+        if (thing.arity === "binary") {
+            if (thing.id !== "(") {
 
 // test_cause:
 // ["0&&0", "walk_statement", "unexpected_expression_a", "&&", 2]
 
-                        warn("unexpected_expression_a", thing);
-                    }
-                } else if (
-                    thing.arity !== "statement"
-                    && thing.arity !== "assignment"
-                    && thing.id !== "import"
-                ) {
+                warn("unexpected_expression_a", thing);
+            }
+        } else if (
+            thing.arity !== "statement"
+            && thing.arity !== "assignment"
+            && thing.id !== "import"
+        ) {
 
 // test_cause:
 // ["!0", "walk_statement", "unexpected_expression_a", "!", 1]
@@ -8520,16 +8567,14 @@ function jslint_phase4_walk(state) {
 // ["0", "walk_statement", "unexpected_expression_a", "0", 1]
 // ["typeof 0", "walk_statement", "unexpected_expression_a", "typeof", 1]
 
-                    warn("unexpected_expression_a", thing);
-                }
+            warn("unexpected_expression_a", thing);
+        }
 
 // Recurse walk_statement().
 
-                walk_statement(thing.block);
-                walk_statement(thing.else);
-                postamble(thing);
-            }
-        }
+        walk_statement(thing.block);
+        walk_statement(thing.else);
+        postamble(thing);
     }
 
     postaction = action(posts);
@@ -9208,6 +9253,7 @@ function jslint_phase5_whitage(state) {
                         )
                         || left.id === "function"
                         || left.id === ":"
+                        || left.id === "async"
                         || (
                             (
                                 left.identifier

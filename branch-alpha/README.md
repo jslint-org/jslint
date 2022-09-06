@@ -643,10 +643,12 @@ eval("1");
 ##### `/*jslint fart*/`
 
 ```js
-/*jslint for*/
-// Allow fat-arrow.
+/*jslint fart*/
+// Allow complex fat-arrow.
 
-let foo = ({bar, baz}) => bar + baz;
+let foo = async ({bar, baz}) => {
+    return await bar(baz);
+};
 ```
 
 <br>
