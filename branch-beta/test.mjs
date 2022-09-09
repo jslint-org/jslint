@@ -693,9 +693,6 @@ jstestDescribe((
                 "#!\n/*jslint browser:false, node*/\n\"use strict\";",
                 "/*property aa bb*/"
             ],
-            fart: [
-                "function aa() {\n    return () => 0;\n}"
-            ],
             for: [
                 (
                     "/*jslint for*/\n"
@@ -930,6 +927,15 @@ jstestDescribe((
 // PR-404 - Alias "evil" to jslint-directive "eval" for backwards-compat.
 
             "new Function();\neval();", {eval: true, evil: true}, []
+        ], [
+            "let aa = () => 0;", {fart: true}, []
+        ], [
+            (
+                "let aa = async (bb, {cc, dd}, [ee, ff], ...gg) => {\n"
+                + "    bb += 1;\n"
+                + "    return await (bb + cc + dd + ee + ff + gg);\n"
+                + "};\n"
+            ), {fart: true}, []
         ], [
             (
                 "function aa(aa) {\n"

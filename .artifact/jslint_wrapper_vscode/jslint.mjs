@@ -103,14 +103,14 @@
     delta, devel, directive, directive_ignore_line, directive_list, directives,
     dirname, disrupt, dot, edition, elem_list, ellipsis, else, end, endOffset,
     endsWith, entries, env, error, eval, every, example_list, excludeList, exec,
-    execArgv, exit, exitCode, export_dict, exports, expression, extra, file,
-    fileList, fileURLToPath, filter, finally, flag, floor, for, forEach,
+    execArgv, exit, exitCode, export_dict, exports, expression, extra, fart,
+    file, fileList, fileURLToPath, filter, finally, flag, floor, for, forEach,
     formatted_message, free, freeze, from, froms, fsWriteFileWithParents,
     fud_stmt, functionName, function_list, function_stack, functions, get,
     getset, github_repo, globExclude, global, global_dict, global_list,
     holeList, htmlEscape, id, identifier, import, import_list, import_meta_url,
     inc, includeList, indent2, index, indexOf, init, initial, isArray,
-    isBlockCoverage, isHole, isNaN, is_equal, is_fart, is_weird, join, jslint,
+    isBlockCoverage, isHole, isNaN, is_equal, is_weird, join, jslint,
     jslint_apidoc, jslint_assert, jslint_charset_ascii, jslint_cli,
     jslint_edition, jslint_phase1_split, jslint_phase2_lex, jslint_phase3_parse,
     jslint_phase4_walk, jslint_phase5_whitage, jslint_report, json,
@@ -165,7 +165,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2022.7.20";
+let jslint_edition = "v2022.9.1-beta";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -3294,19 +3294,20 @@ function jslint_phase2_lex(state) {
 
         switch (key) {
         case "beta":            // Enable experimental warnings.
-        case "bitwise":         // Allow bitwise operators.
+        case "bitwise":         // Allow bitwise operator.
         case "browser":         // Assume browser environment.
-        case "convert":         // Allow conversion operators.
+        case "convert":         // Allow conversion operator.
         case "couch":           // Assume CouchDb environment.
         case "devel":           // Allow console.log() and friends.
         case "ecma":            // Assume ECMAScript environment.
         case "eval":            // Allow eval().
+        case "fart":            // Allow complex fat-arrow.
         case "for":             // Allow for-statement.
         case "getset":          // Allow get() and set().
         case "indent2":         // Use 2-space indent.
         case "long":            // Allow long lines.
         case "node":            // Assume Node.js environment.
-        case "nomen":           // Allow weird property names.
+        case "nomen":           // Allow weird property name.
         case "single":          // Allow single-quote strings.
         case "subscript":       // Allow identifier in subscript-notation.
         case "test_cause":      // Test jslint's causes.
@@ -3770,7 +3771,6 @@ import moduleHttps from "https";
             from,
             id,
             identifier: Boolean(identifier),
-            is_fart: false,
             line,
             nr: token_list.length,
             thru: column,
@@ -3835,7 +3835,7 @@ import moduleHttps from "https";
                 token_prv_expr.id === ")"
                 && paren_backtrack_list[paren_depth]
             ) {
-                paren_backtrack_list[paren_depth].is_fart = true;
+                paren_backtrack_list[paren_depth].fart = the_token;
             }
             break;
         }
@@ -3936,7 +3936,11 @@ function jslint_phase3_parse(state) {
 
 // Attempt to give helpful names to anonymous functions.
 
-        if (token_now.identifier && token_now.id !== "function") {
+        if (
+            token_now.identifier
+            && token_now.id !== "function"
+            && token_now.id !== "async"
+        ) {
             anon = token_now.id;
         } else if (
             token_now.id === "(string)"
@@ -4869,17 +4873,21 @@ function jslint_phase3_parse(state) {
         return left;
     }
 
-    function parse_fart() {
-        let parameters;
-        let signature;
-        let the_fart;
-        [parameters, signature] = prefix_function_arg();
-        advance("=>");
-        the_fart = token_now;
-        the_fart.arity = "binary";
-        the_fart.name = "=>";
-        the_fart.level = functionage.level + 1;
-        function_list.push(the_fart);
+    function parse_fart(the_fart) {
+
+// Give the function properties storing its names and for observing the depth
+// of loops and switches.
+
+        Object.assign(the_fart, {
+            arity: "binary",
+            context: empty(),
+            finally: 0,
+            level: functionage.level + 1,
+            loop: 0,
+            name: anon,
+            switch: 0,
+            try: 0
+        });
 
 // PR-384 - Relax warning "function_in_loop".
 //
@@ -4891,45 +4899,27 @@ function jslint_phase3_parse(state) {
 //             warn("function_in_loop", the_fart);
 //         }
 
-// Give the function properties storing its names and for observing the depth
-// of loops and switches.
-
-        the_fart.context = empty();
-        the_fart.finally = 0;
-        the_fart.loop = 0;
-        the_fart.parameters = parameters;
-        the_fart.signature = signature;
-        the_fart.switch = 0;
-        the_fart.try = 0;
-
 // Push the current function context and establish a new one.
 
+        function_list.push(the_fart);
         function_stack.push(functionage);
         functionage = the_fart;
-        the_fart.parameters.forEach(function enroll_parameter(name) {
-            if (name.identifier) {
-                enroll(name, "parameter", true);
-            } else {
 
-// PR-385 - Bugfix - Fixes issue #382 - fix warnings against destructured fart.
+// Parse the parameter list.
 
-// test_cause:
-// ["([aa])=>0", "enroll_parameter", "use_function_not_fart", "=>", 7]
-// ["({aa})=>0", "enroll_parameter", "use_function_not_fart", "=>", 7]
+        prefix_function_parameter(the_fart);
+        advance("=>");
 
-                warn("use_function_not_fart", the_fart);
+// The function's body is a block.
 
-// Recurse enroll_parameter().
-
-                name.names.forEach(enroll_parameter);
-            }
-        });
         if (token_nxt.id === "{") {
+            if (!option_dict.fart) {
 
 // test_cause:
 // ["()=>{}", "parse_fart", "use_function_not_fart", "=>", 3]
 
-            warn("use_function_not_fart", the_fart);
+                warn("use_function_not_fart", the_fart);
+            }
             the_fart.block = block("body");
         } else if (
             syntax_dict[token_nxt.id] !== undefined
@@ -4942,9 +4932,15 @@ function jslint_phase3_parse(state) {
 // ["()=>delete aa", "parse_fart", "unexpected_a_after_b", "=>", 5]
 
             stop("unexpected_a_after_b", token_nxt, token_nxt.id, "=>");
+
+// The function's body is an expression.
+
         } else {
             the_fart.expression = parse_expression(0);
         }
+
+// Restore the previous context.
+
         functionage = function_stack.pop();
         return the_fart;
     }
@@ -5287,15 +5283,35 @@ function jslint_phase3_parse(state) {
     }
 
     function prefix_async() {
-        let the_async;
+        let the_async = token_now;
         let the_function;
-        the_async = token_now;
-        advance("function");
-        the_function = Object.assign(token_now, {
-            arity: the_async.arity,
-            async: 1
-        });
-        prefix_function();
+        token_nxt.arity = the_async.arity;
+
+// PR-414 - Parse async fart.
+
+        if (token_nxt.fart) {
+            advance("(");
+            the_function = Object.assign(token_now.fart, {
+                async: 1
+            });
+            if (!option_dict.fart) {
+
+// test_cause:
+// ["async()=>0", "prefix_async", "use_function_not_fart", "=>", 8]
+
+                warn("use_function_not_fart", the_function);
+            }
+            prefix_lparen();
+
+// Parse async function.
+
+        } else {
+            advance("function");
+            the_function = Object.assign(token_now, {
+                async: 1
+            });
+            prefix_function();
+        }
         if (the_function.async === 1) {
 
 // test_cause:
@@ -5382,7 +5398,6 @@ function jslint_phase3_parse(state) {
                 }
             }
         }
-        the_function.level = functionage.level + 1;
 
 //  Probably deadcode.
 //  if (mode_mega) {
@@ -5412,6 +5427,7 @@ function jslint_phase3_parse(state) {
             async: the_function.async || 0,
             context: empty(),
             finally: 0,
+            level: functionage.level + 1,
             loop: 0,
             statement_prv: undefined,
             switch: 0,
@@ -5420,43 +5436,27 @@ function jslint_phase3_parse(state) {
         if (the_function.arity !== "statement" && typeof name === "object") {
 
 // test_cause:
-// ["let aa=function bb(){return;};", "prefix_function", "expression", "", 0]
+// ["let aa=function bb(){return;};", "prefix_function", "expression", "bb", 0]
 
-            test_cause("expression");
+            test_cause("expression", name.id);
             enroll(name, "function", true);
             name.dead = false;
             name.init = true;
             name.used = 1;
         }
 
-// Bugfix - fix function-redefinitions not warned inside function-calls.
+// PR-334 - Bugfix - fix function-redefinition not warned inside function-call.
 // Push the current function context and establish a new one.
 
-        function_stack.push(functionage);
         function_list.push(the_function);
+        function_stack.push(functionage);
         functionage = the_function;
 
 // Parse the parameter list.
 
         advance("(");
-
-// test_cause:
-// ["function aa(){}", "prefix_function", "opener", "", 0]
-
-        test_cause("opener");
-        token_now.free = false;
         token_now.arity = "function";
-        [functionage.parameters, functionage.signature] = prefix_function_arg();
-        functionage.parameters.forEach(function enroll_parameter(name) {
-            if (name.identifier) {
-                enroll(name, "parameter", false);
-            } else {
-
-// Recurse enroll_parameter().
-
-                name.names.forEach(enroll_parameter);
-            }
-        });
+        prefix_function_parameter(the_function);
 
 // The function's body is a block.
 
@@ -5507,19 +5507,40 @@ function jslint_phase3_parse(state) {
         return the_function;
     }
 
-    function prefix_function_arg() {
-        const list = [];
-        const signature = ["("];
+    function prefix_function_parameter(the_function) {
+
+// This function will parse input <parameters> at beginning of <the_function>
+
         let optional;
+        let parameters = [];
+        let signature = ["("];
         let subparam;
-        function parameter() {
+        function param_enroll(name) {
+            if (name.identifier) {
+                enroll(name, "parameter", false);
+            } else {
+
+// test_cause:
+// ["([aa])=>0", "param_enroll", "use_function_not_fart", "=>", 7]
+// ["({aa})=>0", "param_enroll", "use_function_not_fart", "=>", 7]
+
+                if (the_function.id === "=>" && !option_dict.fart) {
+                    warn("use_function_not_fart", the_function);
+                }
+
+// Recurse param_enroll().
+
+                name.names.forEach(param_enroll);
+            }
+        }
+        function param_parse() {
             let ellipsis = false;
             let param;
             if (token_nxt.id === "{") {
                 if (optional !== undefined) {
 
 // test_cause:
-// ["function aa(aa=0,{}){}", "parameter", "required_a_optional_b", "aa", 18]
+// ["function aa(aa=0,{}){}", "param_parse", "required_a_optional_b", "aa", 18]
 
                     warn(
                         "required_a_optional_b",
@@ -5537,8 +5558,8 @@ function jslint_phase3_parse(state) {
                     if (!subparam.identifier) {
 
 // test_cause:
-// ["function aa(aa=0,{}){}", "parameter", "expected_identifier_a", "}", 19]
-// ["function aa({0}){}", "parameter", "expected_identifier_a", "0", 14]
+// ["function aa(aa=0,{}){}", "param_parse", "expected_identifier_a", "}", 19]
+// ["function aa({0}){}", "param_parse", "expected_identifier_a", "0", 14]
 
                         return stop("expected_identifier_a");
                     }
@@ -5553,7 +5574,7 @@ function jslint_phase3_parse(state) {
                         if (!subparam.identifier) {
 
 // test_cause:
-// ["function aa({aa:0}){}", "parameter", "expected_identifier_a", "}", 18]
+// ["function aa({aa:0}){}", "param_parse", "expected_identifier_a", "}", 18]
 
                             return stop(
                                 "expected_identifier_a",
@@ -5563,7 +5584,7 @@ function jslint_phase3_parse(state) {
                     }
 
 // test_cause:
-// ["function aa({aa=aa},aa){}", "parameter", "equal", "", 0]
+// ["function aa({aa=aa},aa){}", "param_parse", "equal", "", 0]
 
                     test_cause("equal");
                     if (token_nxt.id === "=") {
@@ -5579,7 +5600,7 @@ function jslint_phase3_parse(state) {
                         break;
                     }
                 }
-                list.push(param);
+                parameters.push(param);
 
 // test_cause:
 // ["
@@ -5592,13 +5613,14 @@ function jslint_phase3_parse(state) {
                 if (token_nxt.id === ",") {
                     advance(",");
                     signature.push(", ");
-                    return parameter();
+                    param_parse();
+                    return;
                 }
             } else if (token_nxt.id === "[") {
                 if (optional !== undefined) {
 
 // test_cause:
-// ["function aa(aa=0,[]){}", "parameter", "required_a_optional_b", "aa", 18]
+// ["function aa(aa=0,[]){}", "param_parse", "required_a_optional_b", "aa", 18]
 
                     warn(
                         "required_a_optional_b",
@@ -5616,7 +5638,7 @@ function jslint_phase3_parse(state) {
                     if (!subparam.identifier) {
 
 // test_cause:
-// ["function aa(aa=0,[]){}", "parameter", "expected_identifier_a", "]", 19]
+// ["function aa(aa=0,[]){}", "param_parse", "expected_identifier_a", "]", 19]
 
                         return stop("expected_identifier_a");
                     }
@@ -5624,7 +5646,7 @@ function jslint_phase3_parse(state) {
                     param.names.push(subparam);
 
 // test_cause:
-// ["function aa([aa=aa],aa){}", "parameter", "id", "", 0]
+// ["function aa([aa=aa],aa){}", "param_parse", "id", "", 0]
 
                     test_cause("id");
                     if (token_nxt.id === "=") {
@@ -5638,12 +5660,13 @@ function jslint_phase3_parse(state) {
                         break;
                     }
                 }
-                list.push(param);
+                parameters.push(param);
                 advance("]");
                 if (token_nxt.id === ",") {
                     advance(",");
                     signature.push(", ");
-                    return parameter();
+                    param_parse();
+                    return;
                 }
             } else {
                 if (token_nxt.id === "...") {
@@ -5653,7 +5676,7 @@ function jslint_phase3_parse(state) {
                     if (optional !== undefined) {
 
 // test_cause:
-// ["function aa(aa=0,...){}", "parameter", "required_a_optional_b", "aa", 21]
+// ["function aa(aa=0,...){}", "param_parse", "required_a_optional_b", "aa", 21]
 
                         warn(
                             "required_a_optional_b",
@@ -5666,12 +5689,12 @@ function jslint_phase3_parse(state) {
                 if (!token_nxt.identifier) {
 
 // test_cause:
-// ["function aa(0){}", "parameter", "expected_identifier_a", "0", 13]
+// ["function aa(0){}", "param_parse", "expected_identifier_a", "0", 13]
 
                     return stop("expected_identifier_a");
                 }
                 param = token_nxt;
-                list.push(param);
+                parameters.push(param);
                 advance();
                 signature.push(param.id);
                 if (ellipsis) {
@@ -5685,7 +5708,7 @@ function jslint_phase3_parse(state) {
                         if (optional !== undefined) {
 
 // test_cause:
-// ["function aa(aa=0,bb){}", "parameter", "required_a_optional_b", "aa", 18]
+// ["function aa(aa=0,bb){}", "param_parse", "required_a_optional_b", "aa", 18]
 
                             warn(
                                 "required_a_optional_b",
@@ -5698,17 +5721,26 @@ function jslint_phase3_parse(state) {
                     if (token_nxt.id === ",") {
                         advance(",");
                         signature.push(", ");
-                        return parameter();
+                        param_parse();
+                        return;
                     }
                 }
             }
         }
+
+// test_cause:
+// ["function aa(){}", "prefix_function_parameter", "opener", "(", 0]
+
+        test_cause("opener", token_now.id);
+        token_now.free = false;
         if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
-            parameter();
+            param_parse();
         }
         advance(")");
         signature.push(")");
-        return [list, signature.join("")];
+        parameters.forEach(param_enroll);
+        the_function.parameters = parameters;
+        the_function.signature = signature.join("");
     }
 
     function prefix_lbrace() {
@@ -5919,9 +5951,8 @@ function jslint_phase3_parse(state) {
 
 // PR-385 - Bugfix - Fixes issue #382 - failure to detect destructured fart.
 
-        if (token_now.is_fart) {
-            the_paren.free = false;
-            return parse_fart();
+        if (token_now.fart) {
+            return parse_fart(token_now.fart);
         }
 
 // test_cause:
@@ -7451,7 +7482,7 @@ function jslint_phase4_walk(state) {
                 i_set = a_set[the_token.id];
                 if (i_set !== undefined) {
                     i_set.forEach(function (task) {
-                        return task(the_token);
+                        task(the_token);
                     });
                 }
 
@@ -7460,7 +7491,7 @@ function jslint_phase4_walk(state) {
                 i_set = a_set["(all)"];
                 if (i_set !== undefined) {
                     i_set.forEach(function (task) {
-                        return task(the_token);
+                        task(the_token);
                     });
                 }
             }
@@ -8453,12 +8484,16 @@ function jslint_phase4_walk(state) {
             } else {
                 preamble(thing);
                 walk_expression(thing.expression);
-                if (thing.id === "function") {
+
+// PR-414 - Bugfix - fix fart-body not being walked.
+
+                if (thing.id === "function" || thing.id === "=>") {
 
 // test_cause:
-// ["aa=function(){}", "walk_expression", "function", "", 0]
+// ["aa=()=>0", "walk_expression", "function", "=>", 0]
+// ["aa=function(){}", "walk_expression", "function", "function", 0]
 
-                    test_cause("function");
+                    test_cause("function", thing.id);
 
 // Recurse walk_statement().
 
@@ -8494,33 +8529,36 @@ function jslint_phase4_walk(state) {
     }
 
     function walk_statement(thing) {
-        if (thing) {
-            if (Array.isArray(thing)) {
+        if (!thing) {
+            return;
+        }
+        if (Array.isArray(thing)) {
 
 // test_cause:
 // ["+[]", "walk_statement", "isArray", "", 0]
 
-                test_cause("isArray");
+            test_cause("isArray");
 
 // Recurse walk_statement().
 
-                thing.forEach(walk_statement);
-            } else {
-                preamble(thing);
-                walk_expression(thing.expression);
-                if (thing.arity === "binary") {
-                    if (thing.id !== "(") {
+            thing.forEach(walk_statement);
+            return;
+        }
+        preamble(thing);
+        walk_expression(thing.expression);
+        if (thing.arity === "binary") {
+            if (thing.id !== "(") {
 
 // test_cause:
 // ["0&&0", "walk_statement", "unexpected_expression_a", "&&", 2]
 
-                        warn("unexpected_expression_a", thing);
-                    }
-                } else if (
-                    thing.arity !== "statement"
-                    && thing.arity !== "assignment"
-                    && thing.id !== "import"
-                ) {
+                warn("unexpected_expression_a", thing);
+            }
+        } else if (
+            thing.arity !== "statement"
+            && thing.arity !== "assignment"
+            && thing.id !== "import"
+        ) {
 
 // test_cause:
 // ["!0", "walk_statement", "unexpected_expression_a", "!", 1]
@@ -8529,16 +8567,14 @@ function jslint_phase4_walk(state) {
 // ["0", "walk_statement", "unexpected_expression_a", "0", 1]
 // ["typeof 0", "walk_statement", "unexpected_expression_a", "typeof", 1]
 
-                    warn("unexpected_expression_a", thing);
-                }
+            warn("unexpected_expression_a", thing);
+        }
 
 // Recurse walk_statement().
 
-                walk_statement(thing.block);
-                walk_statement(thing.else);
-                postamble(thing);
-            }
-        }
+        walk_statement(thing.block);
+        walk_statement(thing.else);
+        postamble(thing);
     }
 
     postaction = action(posts);
@@ -9217,6 +9253,7 @@ function jslint_phase5_whitage(state) {
                         )
                         || left.id === "function"
                         || left.id === ":"
+                        || left.id === "async"
                         || (
                             (
                                 left.identifier
@@ -9773,6 +9810,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         let {
             context,
             from,
+            id,
             level,
             line,
             name,
@@ -9789,14 +9827,18 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
             + address(line, from + 1)
             + "<dfn>"
             + (
-                name === "=>"
-                ? htmlEscape(signature) + " =>"
+                id === "=>"
+                ? (
+                    "\u00ab" + htmlEscape(name) + "\u00bb"
+                    + htmlEscape(signature)
+                    + " =>"
+                )
                 : (
                     typeof name === "string"
                     ? "\u00ab" + htmlEscape(name) + "\u00bb"
                     : htmlEscape(name.id)
-                )
-            ) + htmlEscape(signature)
+                ) + htmlEscape(signature)
+            )
             + "</dfn>"
         );
         params = [];
