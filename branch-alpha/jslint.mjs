@@ -5287,7 +5287,7 @@ function jslint_phase3_parse(state) {
         let the_function;
         token_nxt.arity = the_async.arity;
 
-// PR-xxx - Parse async fart.
+// PR-414 - Parse async fart.
 
         if (token_nxt.fart) {
             advance("(");
@@ -8485,7 +8485,7 @@ function jslint_phase4_walk(state) {
                 preamble(thing);
                 walk_expression(thing.expression);
 
-// PR-xxx - Bugfix - fix fart-body not being walked.
+// PR-414 - Bugfix - fix fart-body not being walked.
 
                 if (thing.id === "function" || thing.id === "=>") {
 
