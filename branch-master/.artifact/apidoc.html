@@ -67,7 +67,7 @@ body {
 </head>
 <body>
 <div class="apidocDiv">
-<h1>API Doc for <a href="https://github.com/jslint-org/jslint">JSLint (v2022.7.20)</a></h1>
+<h1>API Doc for <a href="https://github.com/jslint-org/jslint">JSLint (v2022.9.20)</a></h1>
 <div class="apidocSectionDiv">
     <a href="#apidocTableOfContents1" id="apidocTableOfContents1">
         <h1>Table of Contents</h1>
@@ -1159,16 +1159,16 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
 
 // Attempt to give helpful names to anonymous functions.
 
-        if (token_now.identifier &amp;&amp; token_now.id !== "function") {
+        if (
+            token_now.identifier
+            &amp;&amp; token_now.id !== "function"
+            &amp;&amp; token_now.id !== "async"
+        ) {
             anon = token_now.id;
         } else if (
             token_now.id === "(string)"
             &amp;&amp; jslint_rgx_identifier.test(token_now.value)
-        ) {
-            anon = token_now.value;
-        }
-
-// Attempt to match token_nxt ...
+       ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

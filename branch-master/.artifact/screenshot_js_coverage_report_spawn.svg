@@ -329,7 +329,7 @@
     textLength="768"
     x="10"
     y="1198"
->node-pre-gyp info using node@16.16.0 | linux | x64                                               </tspan>
+>node-pre-gyp info using node@16.17.0 | linux | x64                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -371,7 +371,7 @@
     textLength="768"
     x="10"
     y="1352"
->up to date, audited 289 packages in 4s                                                           </tspan>
+>up to date, audited 289 packages in 2s                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
