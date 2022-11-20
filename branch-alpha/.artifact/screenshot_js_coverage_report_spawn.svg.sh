@@ -1,8 +1,8 @@
 (set -e
 printf '> #!/bin/sh
 > 
-> git clone https://github.com/mapbox/node-sqlite3 node-sqlite3-js \\
->     --branch=v5.0.2 \\
+> git clone https://github.com/tryghost/node-sqlite3 node-sqlite3-js \\
+>     --branch=v5.0.11 \\
 >     --depth=1 \\
 >     --single-branch
 > 
@@ -48,15 +48,15 @@ printf '> #!/bin/sh
 '
 #!/bin/sh
 
-git clone https://github.com/mapbox/node-sqlite3 node-sqlite3-js \
-    --branch=v5.0.2 \
+git clone https://github.com/tryghost/node-sqlite3 node-sqlite3-js \
+    --branch=v5.0.11 \
     --depth=1 \
     --single-branch 2>/dev/null || true
 
 
 cd node-sqlite3-js
 
-git checkout 60a022c511a37788e652c271af23174566a80c30
+git checkout 61194ec2aee4b56e8e17f757021434122772f145
 npm install
 
 node --input-type=module --eval '

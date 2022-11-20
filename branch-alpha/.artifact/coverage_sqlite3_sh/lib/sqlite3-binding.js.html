@@ -156,10 +156,10 @@ body {
 <!-- header end -->
 <!-- content start -->
 <div class="content">
-<pre><span class="lineno"><a href="#line_1" id="line_1">    1.</a></span><span class="count                ">      2</span><span>var binary = require('node-pre-gyp');</span></pre>
-<pre><span class="lineno"><a href="#line_2" id="line_2">    2.</a></span><span class="count                ">      2</span><span>var path = require('path');</span></pre>
-<pre><span class="lineno"><a href="#line_3" id="line_3">    3.</a></span><span class="count                ">      2</span><span>var binding_path = binary.find(path.resolve(path.join(__dirname,'../package.json')));</span></pre>
-<pre><span class="lineno"><a href="#line_4" id="line_4">    4.</a></span><span class="count                ">      2</span><span>var binding = require(binding_path);</span></pre>
+<pre><span class="lineno"><a href="#line_1" id="line_1">    1.</a></span><span class="count                ">      2</span><span>const binary = require('@mapbox/node-pre-gyp');</span></pre>
+<pre><span class="lineno"><a href="#line_2" id="line_2">    2.</a></span><span class="count                ">      2</span><span>const path = require('path');</span></pre>
+<pre><span class="lineno"><a href="#line_3" id="line_3">    3.</a></span><span class="count                ">      2</span><span>const binding_path = binary.find(path.resolve(path.join(__dirname,'../package.json')));</span></pre>
+<pre><span class="lineno"><a href="#line_4" id="line_4">    4.</a></span><span class="count                ">      2</span><span>const binding = require(binding_path);</span></pre>
 <pre><span class="lineno"><a href="#line_5" id="line_5">    5.</a></span><span class="count                ">      2</span><span>module.exports = exports = binding;</span></pre>
 <pre><span class="lineno"><a href="#line_6" id="line_6">    6.</a></span><span class="count                ">      2</span><span></span></pre>
 </div>
