@@ -15,6 +15,7 @@
 - ci - update ci from node-v16 to node-v18
 - cli - remove deprecated cli-option `--mode-vim-plugin`
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
+- editor - update codemirror-editor to v5.65.10
 - remove obsolete help.html
 
 # v2022.9.20
