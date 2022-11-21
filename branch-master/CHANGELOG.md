@@ -2,7 +2,6 @@
 
 # Todo
 - doc - document supported/unsupported es6+ features
-- cli - remove cli-option `--mode-vim-plugin`
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning requiring paren around plus-separated concatenations.
@@ -11,7 +10,13 @@
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 - jslint - unify analysis of variable-assignment/function-parameters into one function
 - jslint - add new warning "Expected Object.create(null) instead of {}"
+
+# v2022.11.20
+- ci - update ci from node-v16 to node-v18
+- cli - remove deprecated cli-option `--mode-vim-plugin`
 - node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejections=strict"`.
+- editor - update codemirror-editor to v5.65.10
+- remove obsolete help.html
 
 # v2022.9.20
 - directive - add new directive `fart` to allow complex fat-arrow

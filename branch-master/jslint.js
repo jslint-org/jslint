@@ -165,7 +165,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2022.9.20";
+let jslint_edition = "v2022.11.20";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -2037,13 +2037,6 @@ async function jslint_cli({
         });
         return;
     }
-
-// PR-349 - Detect cli-option --mode-vim-plugin.
-
-    mode_wrapper_vim = (
-        process_argv.slice(2).indexOf("--mode-vim-plugin") >= 0
-        || mode_wrapper_vim
-    );
 
 // Normalize file relative to process.cwd().
 
