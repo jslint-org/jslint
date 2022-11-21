@@ -1,0 +1,39 @@
+# this workflow will run nodejs coverages and tests
+name: on-pull-request
+on:
+  - pull_request
+  - workflow_dispatch
+# shCiBase - start
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        architecture:
+          # - arm64
+          - x64
+          # - x86
+        node_version:
+          - 16
+          - 18
+          - 19
+        os:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
+    name: node . v${{ matrix.node_version }} . ${{ matrix.architecture }} . ${{ matrix.os }}
+    steps:
+      # disable autocrlf in windows
+      - run: git config --global core.autocrlf false
+      # https://github.com/actions/checkout
+      - uses: actions/checkout@v3
+      # https://github.com/actions/setup-node
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node_version }}
+          architecture: ${{ matrix.architecture }}
+      # fetch jslint_ci.sh from trusted source
+      - run: git fetch origin alpha && git checkout origin/alpha jslint_ci.sh
+      # run nodejs coverages and tests
+      - run: sh jslint_ci.sh shCiBase
+# shCiBase - end

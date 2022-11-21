@@ -1,0 +1,37 @@
+{
+    "bin": {
+        "jslint": "./jslint.mjs"
+    },
+    "bugs": {
+        "url": "https://github.com/jslint-org/jslint/issues"
+    },
+    "counter": 7,
+    "description": "JSLint, The JavaScript Code Quality and Coverage Tool",
+    "exports": {
+        "default": "./jslint_wrapper_cjs.cjs",
+        "import": "./jslint.mjs"
+    },
+    "fileCount": 34,
+    "keywords": [
+        "coverage-report",
+        "javascript",
+        "jslint",
+        "linter",
+        "zero-config",
+        "zero-dependency"
+    ],
+    "license": "UNLICENSE",
+    "main": "./jslint_wrapper_cjs.cjs",
+    "module": "./jslint.mjs",
+    "name": "@jslint-org/jslint",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jslint-org/jslint.git"
+    },
+    "scripts": {
+        "test": "node jslint.mjs v8_coverage_report=.artifact/coverage node test.mjs",
+        "test2": "sh jslint_ci.sh shCiBase"
+    },
+    "type": "module",
+    "version": "2022.9.20"
+}

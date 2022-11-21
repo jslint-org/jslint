@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>V8 Coverage Report</title>
+<style>
+/* jslint utility2:true */
+/*csslint ignore:start*/
+.coverage,
+.coverage a,
+.coverage div,
+.coverage pre,
+.coverage span,
+.coverage table,
+.coverage tbody,
+.coverage td,
+.coverage th,
+.coverage thead,
+.coverage tr {
+    box-sizing: border-box;
+    font-family: monospace;
+}
+/*csslint ignore:end*/
+
+/* css - coverage_report - general */
+body {
+    margin: 0;
+}
+.coverage pre {
+    margin: 5px 0;
+}
+.coverage table {
+    border-collapse: collapse;
+}
+.coverage td,
+.coverage th {
+    border: 1px solid #777;
+    line-height: 20px;
+    margin: 0;
+    padding: 5px 10px;
+}
+.coverage td span {
+    display: inline-block;
+    width: 100%;
+}
+.coverage .content {
+    padding: 0 5px;
+}
+.coverage .content a {
+    text-decoration: none;
+}
+.coverage .count {
+    margin: 0 5px;
+    padding: 0 5px;
+}
+.coverage .footer,
+.coverage .header {
+    padding: 20px;
+}
+.coverage .footer {
+    text-align: center;
+}
+.coverage .percentbar {
+    height: 12px;
+    margin: 2px 0;
+    min-width: 200px;
+    position: relative;
+    width: 100%;
+}
+.coverage .percentbar div {
+    height: 100%;
+    position: absolute;
+}
+.coverage .title {
+    font-size: large;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* css - coverage_report - color */
+.coverage td,
+.coverage th {
+    background: #fff;
+}
+.coverage .count,
+.coverage .coverageHigh {
+    background: #9d9;
+}
+.coverage .count {
+    color: #666;
+}
+.coverage .coverageIgnore {
+    background: #ccc;
+}
+.coverage .coverageLow,
+.coverage .uncovered {
+    background: #ebb;
+}
+.coverage .coverageMedium {
+    background: #fd7;
+}
+.coverage .footer,
+.coverage .header,
+.coverage .lineno {
+    background: #ddd;
+}
+.coverage .percentbar {
+    background: #999;
+}
+.coverage .percentbar div {
+    background: #666;
+}
+
+/* css - coverage_report - important */
+.coverage pre:hover span,
+.coverage tr:hover td {
+    background: #7d7;
+}
+.coverage pre:hover span.uncovered,
+.coverage tr:hover td.coverageLow {
+    background: #f99;
+}
+</style>
+</head>
+<body class="coverage">
+<!-- header start -->
+<div class="header">
+<div class="title">V8 Coverage Report</div>
+<table>
+<thead>
+    <tr>
+    <th>Files covered</th>
+    <th>Lines</th>
+    <th>Remaining</th>
+    </tr>
+</thead>
+<tbody>
+<tr>
+    <td class="coverageHigh">
+            <a href="index.html">. / </a>jslint_wrapper_cjs.cjs<br>
+        <div class="percentbar">
+            <div style="width: 100.00%;"></div>
+        </div>
+    </td>
+    <td style="text-align: right;">
+         100.00 %<br>
+        51 / 51
+    </td>
+    <td style="text-align: right;">
+        <br>
+        0 / 51
+    </td>
+    </tr>
+</tbody>
+</table>
+</div>
+<!-- header end -->
+<!-- content start -->
+<div class="content">
+<pre><span class="lineno"><a href="#line_1" id="line_1">    1.</a></span><span class="count                ">      1</span><span>// The Unlicense</span></pre>
+<pre><span class="lineno"><a href="#line_2" id="line_2">    2.</a></span><span class="count                ">      1</span><span>//</span></pre>
+<pre><span class="lineno"><a href="#line_3" id="line_3">    3.</a></span><span class="count                ">      1</span><span>// This is free and unencumbered software released into the public domain.</span></pre>
+<pre><span class="lineno"><a href="#line_4" id="line_4">    4.</a></span><span class="count                ">      1</span><span>//</span></pre>
+<pre><span class="lineno"><a href="#line_5" id="line_5">    5.</a></span><span class="count                ">      1</span><span>// Anyone is free to copy, modify, publish, use, compile, sell, or</span></pre>
+<pre><span class="lineno"><a href="#line_6" id="line_6">    6.</a></span><span class="count                ">      1</span><span>// distribute this software, either in source code form or as a compiled</span></pre>
+<pre><span class="lineno"><a href="#line_7" id="line_7">    7.</a></span><span class="count                ">      1</span><span>// binary, for any purpose, commercial or non-commercial, and by any</span></pre>
+<pre><span class="lineno"><a href="#line_8" id="line_8">    8.</a></span><span class="count                ">      1</span><span>// means.</span></pre>
+<pre><span class="lineno"><a href="#line_9" id="line_9">    9.</a></span><span class="count                ">      1</span><span>//</span></pre>
+<pre><span class="lineno"><a href="#line_10" id="line_10">   10.</a></span><span class="count                ">      1</span><span>// In jurisdictions that recognize copyright laws, the author or authors</span></pre>
+<pre><span class="lineno"><a href="#line_11" id="line_11">   11.</a></span><span class="count                ">      1</span><span>// of this software dedicate any and all copyright interest in the</span></pre>
+<pre><span class="lineno"><a href="#line_12" id="line_12">   12.</a></span><span class="count                ">      1</span><span>// software to the public domain. We make this dedication for the benefit</span></pre>
+<pre><span class="lineno"><a href="#line_13" id="line_13">   13.</a></span><span class="count                ">      1</span><span>// of the public at large and to the detriment of our heirs and</span></pre>
+<pre><span class="lineno"><a href="#line_14" id="line_14">   14.</a></span><span class="count                ">      1</span><span>// successors. We intend this dedication to be an overt act of</span></pre>
+<pre><span class="lineno"><a href="#line_15" id="line_15">   15.</a></span><span class="count                ">      1</span><span>// relinquishment in perpetuity of all present and future rights to this</span></pre>
+<pre><span class="lineno"><a href="#line_16" id="line_16">   16.</a></span><span class="count                ">      1</span><span>// software under copyright law.</span></pre>
+<pre><span class="lineno"><a href="#line_17" id="line_17">   17.</a></span><span class="count                ">      1</span><span>//</span></pre>
+<pre><span class="lineno"><a href="#line_18" id="line_18">   18.</a></span><span class="count                ">      1</span><span>// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,</span></pre>
+<pre><span class="lineno"><a href="#line_19" id="line_19">   19.</a></span><span class="count                ">      1</span><span>// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF</span></pre>
+<pre><span class="lineno"><a href="#line_20" id="line_20">   20.</a></span><span class="count                ">      1</span><span>// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.</span></pre>
+<pre><span class="lineno"><a href="#line_21" id="line_21">   21.</a></span><span class="count                ">      1</span><span>// IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR</span></pre>
+<pre><span class="lineno"><a href="#line_22" id="line_22">   22.</a></span><span class="count                ">      1</span><span>// OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,</span></pre>
+<pre><span class="lineno"><a href="#line_23" id="line_23">   23.</a></span><span class="count                ">      1</span><span>// ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR</span></pre>
+<pre><span class="lineno"><a href="#line_24" id="line_24">   24.</a></span><span class="count                ">      1</span><span>// OTHER DEALINGS IN THE SOFTWARE.</span></pre>
+<pre><span class="lineno"><a href="#line_25" id="line_25">   25.</a></span><span class="count                ">      1</span><span>//</span></pre>
+<pre><span class="lineno"><a href="#line_26" id="line_26">   26.</a></span><span class="count                ">      1</span><span>// For more information, please refer to &lt;https://unlicense.org/&gt;</span></pre>
+<pre><span class="lineno"><a href="#line_27" id="line_27">   27.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_28" id="line_28">   28.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_29" id="line_29">   29.</a></span><span class="count                ">      1</span><span>/*jslint beta, node*/</span></pre>
+<pre><span class="lineno"><a href="#line_30" id="line_30">   30.</a></span><span class="count                ">      1</span><span>/*property</span></pre>
+<pre><span class="lineno"><a href="#line_31" id="line_31">   31.</a></span><span class="count                ">      1</span><span>    module, readFileSync, replace, runInNewContext</span></pre>
+<pre><span class="lineno"><a href="#line_32" id="line_32">   32.</a></span><span class="count                ">      1</span><span>*/</span></pre>
+<pre><span class="lineno"><a href="#line_33" id="line_33">   33.</a></span><span class="count                ">      1</span><span>require("vm").runInNewContext(</span></pre>
+<pre><span class="lineno"><a href="#line_34" id="line_34">   34.</a></span><span class="count                ">      1</span><span>    (</span></pre>
+<pre><span class="lineno"><a href="#line_35" id="line_35">   35.</a></span><span class="count                ">      1</span><span>        "\"use strict\";"</span></pre>
+<pre><span class="lineno"><a href="#line_36" id="line_36">   36.</a></span><span class="count                ">      1</span><span>        + require("fs").readFileSync(</span></pre>
+<pre><span class="lineno"><a href="#line_37" id="line_37">   37.</a></span><span class="count                ">      1</span><span>            __dirname + "/jslint.mjs",</span></pre>
+<pre><span class="lineno"><a href="#line_38" id="line_38">   38.</a></span><span class="count                ">      1</span><span>            "utf8"</span></pre>
+<pre><span class="lineno"><a href="#line_39" id="line_39">   39.</a></span><span class="count                ">      1</span><span>        ).replace(</span></pre>
+<pre><span class="lineno"><a href="#line_40" id="line_40">   40.</a></span><span class="count                ">      1</span><span>            "\nexport default Object.freeze(jslint_export);",</span></pre>
+<pre><span class="lineno"><a href="#line_41" id="line_41">   41.</a></span><span class="count                ">      1</span><span>            "\nmodule.exports = jslint_export;"</span></pre>
+<pre><span class="lineno"><a href="#line_42" id="line_42">   42.</a></span><span class="count                ">      1</span><span>        ).replace(</span></pre>
+<pre><span class="lineno"><a href="#line_43" id="line_43">   43.</a></span><span class="count                ">      1</span><span>            "\njslint_import_meta_url = import.meta.url;",</span></pre>
+<pre><span class="lineno"><a href="#line_44" id="line_44">   44.</a></span><span class="count                ">      1</span><span>            "\n// jslint_import_meta_url = import.meta.url;"</span></pre>
+<pre><span class="lineno"><a href="#line_45" id="line_45">   45.</a></span><span class="count                ">      1</span><span>        )</span></pre>
+<pre><span class="lineno"><a href="#line_46" id="line_46">   46.</a></span><span class="count                ">      1</span><span>    ),</span></pre>
+<pre><span class="lineno"><a href="#line_47" id="line_47">   47.</a></span><span class="count                ">      1</span><span>    {</span></pre>
+<pre><span class="lineno"><a href="#line_48" id="line_48">   48.</a></span><span class="count                ">      1</span><span>        module</span></pre>
+<pre><span class="lineno"><a href="#line_49" id="line_49">   49.</a></span><span class="count                ">      1</span><span>    }</span></pre>
+<pre><span class="lineno"><a href="#line_50" id="line_50">   50.</a></span><span class="count                ">      1</span><span>);</span></pre>
+<pre><span class="lineno"><a href="#line_51" id="line_51">   51.</a></span><span class="count                ">      1</span><span></span></pre>
+</div>
+<!-- content end -->
+<div class="footer">
+    [
+    This document was created with
+    <a href="https://github.com/jslint-org/jslint">JSLint</a>
+    ]
+</div>
+</body>
+</html>
