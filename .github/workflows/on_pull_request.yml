@@ -14,9 +14,9 @@ jobs:
           - x64
           # - x86
         node_version:
-          - 14
           - 16
           - 18
+          - 19
         os:
           - macos-latest
           - ubuntu-latest
@@ -26,9 +26,9 @@ jobs:
       # disable autocrlf in windows
       - run: git config --global core.autocrlf false
       # https://github.com/actions/checkout
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       # https://github.com/actions/setup-node
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node_version }}
           architecture: ${{ matrix.architecture }}

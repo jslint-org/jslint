@@ -3236,7 +3236,6 @@ shCiMain() {(set -e
         ;;
     esac
     # run "$@"
-    export NODE_OPTIONS="--unhandled-rejections=strict"
     if [ -f ./.ci.sh ]
     then
         . ./.ci.sh
@@ -3245,6 +3244,6 @@ shCiMain() {(set -e
 )}
 
 # init ubuntu .bashrc
-shBashrcDebianInit || return "$?"
+shBashrcDebianInit || exit "$?"
 
 shCiMain "$@"
