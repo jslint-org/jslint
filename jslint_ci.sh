@@ -638,6 +638,11 @@ import moduleUrl from "url";
                 `\\b${UPSTREAM_GITHUB_IO}\\b`,
                 "g"
             ), GITHUB_GITHUB_IO);
+            if ((
+                /^http:\/\/(?:127\.0\.0\.1|localhost)[\/:]/
+            ).test(url)) {
+                return;
+            }
             if (url.startsWith("http://")) {
                 throw new Error(
                     `shDirHttplinkValidate - ${file} - insecure link - ${url}`

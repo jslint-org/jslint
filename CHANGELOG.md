@@ -11,6 +11,9 @@
 - jslint - unify analysis of variable-assignment/function-parameters into one function
 - jslint - add new warning "Expected Object.create(null) instead of {}"
 
+# v2022.12.1-beta
+- ci - update shell-function shDirHttplinkValidate() to ignore insecure-links http://127.0.0.1, http://localhost
+
 # v2022.11.20
 - ci - update ci from node-v16 to node-v18
 - cli - remove deprecated cli-option `--mode-vim-plugin`
