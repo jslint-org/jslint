@@ -11,7 +11,7 @@
         "default": "./jslint_wrapper_cjs.cjs",
         "import": "./jslint.mjs"
     },
-    "fileCount": 32,
+    "fileCount": 33,
     "keywords": [
         "coverage-report",
         "javascript",
