@@ -17,9 +17,9 @@ jobs:
           - x64
           # - x86
         node_version:
-          # - 14
-          - 16
-          # - 18
+          # - 16
+          - 18
+          # - 19
         os:
           # - macos-latest
           - ubuntu-latest
@@ -38,8 +38,8 @@ jobs:
 
       # Setup .npmrc file to publish to GitHub Packages
       - run: rm -f /home/runner/work/_temp/.npmrc
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node_version }}
           architecture: ${{ matrix.architecture }}
@@ -54,8 +54,8 @@ jobs:
 
       # Setup .npmrc file to publish to npm
       - run: rm -f /home/runner/work/_temp/.npmrc
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node_version }}
           architecture: ${{ matrix.architecture }}

@@ -11,8 +11,8 @@ on:
       - sandbox
   workflow_dispatch:
 env:
-  CI_MAIN_JOB: node.v16.x64.linux
-  GITHUB_ARTIFACT_UPLOAD_NODE_VERSION: v16
+  CI_MAIN_JOB: node.v18.x64.linux
+  GITHUB_ARTIFACT_UPLOAD_NODE_VERSION: v18
   # MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
 jobs:
 
@@ -26,9 +26,9 @@ jobs:
           - x64
           # - x86
         node_version:
-          - 14
           - 16
           - 18
+          - 19
         os:
           - macos-latest
           - ubuntu-latest
@@ -44,7 +44,7 @@ jobs:
       # disable autocrlf in windows
       - run: git config --global core.autocrlf false
       # https://github.com/actions/checkout
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       # fetch jslint_ci.sh from trusted source
       - run: |
           git fetch origin alpha
@@ -52,7 +52,7 @@ jobs:
       # pre-run .ci.sh
       - run: sh jslint_ci.sh shCiPre
       # https://github.com/actions/cache
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           key: >
             ${{ hashFiles('./package.json') }}
@@ -61,7 +61,7 @@ jobs:
             ${{ matrix.os }}
           path: .github_cache
       # https://github.com/actions/setup-node
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node_version }}
           architecture: ${{ matrix.architecture }}

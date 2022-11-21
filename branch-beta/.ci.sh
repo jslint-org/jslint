@@ -79,7 +79,7 @@ echo "\
         ), (
             " 2>/dev/null || true\n"
             + "$&\n"
-            + "git checkout 60a022c511a37788e652c271af23174566a80c30\n"
+            + "git checkout 61194ec2aee4b56e8e17f757021434122772f145\n"
         ));
         // printf script
         script = (
@@ -434,7 +434,7 @@ import moduleFs from "fs";
                     "type": "git",
                     "url": "https://github.com/jslint-org/jslint.git"
                 },
-                "version": "2022.9.20"
+                "version": "2022.11.20"
             }, undefined, 4)
         }
     ].map(async function ({
