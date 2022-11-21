@@ -439,7 +439,7 @@ import moduleFs from "fs";
         fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
         if (file === "package.json") {
             packageJson = JSON.parse(fileDict[file]);
-            fileMain = packageJson.module || packageJson.main;
+            fileMain = packageJson.module || packageJson.main || "package.json";
             fileDict[fileMain] = (
                 await moduleFs.promises.readFile(fileMain, "utf8")
             );
