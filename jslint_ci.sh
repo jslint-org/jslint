@@ -426,7 +426,9 @@ globalThis.assert(
 import moduleFs from "fs";
 (async function () {
     let fileDict = {};
+    let fileMain;
     let fileModified;
+    let packageJson;
     let versionBeta;
     let versionMaster;
     await Promise.all([
@@ -435,6 +437,13 @@ import moduleFs from "fs";
         "package.json"
     ].map(async function (file) {
         fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
+        if (file === "package.json") {
+            packageJson = JSON.parse(fileDict[file]);
+            fileMain = packageJson.module || packageJson.main;
+            fileDict[fileMain] = (
+                await moduleFs.promises.readFile(fileMain, "utf8")
+            );
+        }
     }));
     Array.from(fileDict["CHANGELOG.md"].matchAll(
         /\n\n# v(\d\d\d\d\.\d\d?\.\d\d?(-.*?)?)\n/g
@@ -455,6 +464,12 @@ import moduleFs from "fs";
             src: fileDict["package.json"].replace((
                 /    "version": "\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
             ), `    "version": "${versionBeta}"`)
+        }, {
+            file: fileMain,
+            // update version
+            src: fileDict[fileMain].replace((
+                /^let version = ".*?";$/m
+            ), `let version = "v${versionBeta}";`)
         }
     ].map(async function ({
         file,

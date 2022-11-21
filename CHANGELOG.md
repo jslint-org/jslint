@@ -12,6 +12,7 @@
 - jslint - add new warning "Expected Object.create(null) instead of {}"
 
 # v2022.12.1-beta
+- ci - auto-update version-number in main mjs-module
 - ci - update shell-function shDirHttplinkValidate() to ignore insecure-links http://127.0.0.1, http://localhost
 
 # v2022.11.20
