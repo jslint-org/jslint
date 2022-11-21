@@ -5,26 +5,26 @@ shRawLibFetch
     "fetchList": [
         {
             "comment": true,
-            "url": "https://github.com/codemirror/CodeMirror5/blob/5.65.5/LICENSE"
+            "url": "https://github.com/codemirror/codemirror5/blob/5.65.5/LICENSE"
         },
         {
-            "url": "https://github.com/codemirror/CodeMirror5/blob/5.65.5/codemirror.js",
+            "url": "https://github.com/codemirror/codemirror5/blob/5.65.5/codemirror.js",
             "url2": "https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.js"
         },
         {
-            "url": "https://github.com/codemirror/CodeMirror5/blob/5.65.5/addon/edit/matchbrackets.js"
+            "url": "https://github.com/codemirror/codemirror5/blob/5.65.5/addon/edit/matchbrackets.js"
         },
         {
-            "url": "https://github.com/codemirror/CodeMirror5/blob/5.65.5/addon/edit/trailingspace.js"
+            "url": "https://github.com/codemirror/codemirror5/blob/5.65.5/addon/edit/trailingspace.js"
         },
         {
-            "url": "https://github.com/codemirror/CodeMirror5/blob/5.65.5/addon/lint/lint.js"
+            "url": "https://github.com/codemirror/codemirror5/blob/5.65.5/addon/lint/lint.js"
         },
         {
-            "url": "https://github.com/codemirror/CodeMirror5/blob/5.65.5/addon/selection/active-line.js"
+            "url": "https://github.com/codemirror/codemirror5/blob/5.65.5/addon/selection/active-line.js"
         },
         {
-            "url": "https://github.com/codemirror/CodeMirror5/blob/5.65.5/mode/javascript/javascript.js"
+            "url": "https://github.com/codemirror/codemirror5/blob/5.65.5/mode/javascript/javascript.js"
         }
     ],
     "replaceList": []
@@ -33,13 +33,13 @@ shRawLibFetch
 
 
 /*
-repo https://github.com/codemirror/CodeMirror5/tree/5.65.5
+repo https://github.com/codemirror/codemirror5/tree/5.65.5
 committed 2022-05-30T09:58:15Z
 */
 
 
 /*
-file https://github.com/codemirror/CodeMirror5/blob/5.65.5/LICENSE
+file https://github.com/codemirror/codemirror5/blob/5.65.5/LICENSE
 */
 /*
 MIT License
@@ -67,7 +67,7 @@ THE SOFTWARE.
 
 
 /*
-file https://github.com/codemirror/CodeMirror5/blob/5.65.5/codemirror.js
+file https://github.com/codemirror/codemirror5/blob/5.65.5/codemirror.js
 */
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: https://codemirror.net/LICENSE
@@ -9931,7 +9931,7 @@ file https://github.com/codemirror/CodeMirror5/blob/5.65.5/codemirror.js
 
 
 /*
-file https://github.com/codemirror/CodeMirror5/blob/5.65.5/addon/edit/matchbrackets.js
+file https://github.com/codemirror/codemirror5/blob/5.65.5/addon/edit/matchbrackets.js
 */
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: https://codemirror.net/LICENSE
@@ -10096,7 +10096,7 @@ file https://github.com/codemirror/CodeMirror5/blob/5.65.5/addon/edit/matchbrack
 
 
 /*
-file https://github.com/codemirror/CodeMirror5/blob/5.65.5/addon/edit/trailingspace.js
+file https://github.com/codemirror/codemirror5/blob/5.65.5/addon/edit/trailingspace.js
 */
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: https://codemirror.net/LICENSE
@@ -10128,7 +10128,7 @@ file https://github.com/codemirror/CodeMirror5/blob/5.65.5/addon/edit/trailingsp
 
 
 /*
-file https://github.com/codemirror/CodeMirror5/blob/5.65.5/addon/lint/lint.js
+file https://github.com/codemirror/codemirror5/blob/5.65.5/addon/lint/lint.js
 */
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: https://codemirror.net/LICENSE
@@ -10424,7 +10424,7 @@ file https://github.com/codemirror/CodeMirror5/blob/5.65.5/addon/lint/lint.js
 
 
 /*
-file https://github.com/codemirror/CodeMirror5/blob/5.65.5/addon/selection/active-line.js
+file https://github.com/codemirror/codemirror5/blob/5.65.5/addon/selection/active-line.js
 */
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: https://codemirror.net/LICENSE
@@ -10501,7 +10501,7 @@ file https://github.com/codemirror/CodeMirror5/blob/5.65.5/addon/selection/activ
 
 
 /*
-file https://github.com/codemirror/CodeMirror5/blob/5.65.5/mode/javascript/javascript.js
+file https://github.com/codemirror/codemirror5/blob/5.65.5/mode/javascript/javascript.js
 */
 // CodeMirror, copyright (c) by Marijn Haverbeke and others
 // Distributed under an MIT license: https://codemirror.net/LICENSE
