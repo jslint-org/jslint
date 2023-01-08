@@ -33,5 +33,5 @@
         "test2": "sh jslint_ci.sh shCiBase"
     },
     "type": "module",
-    "version": "2022.12.1-beta"
+    "version": "2023.1.1-beta"
 }
