@@ -426,7 +426,9 @@ globalThis.assert(
 import moduleFs from "fs";
 (async function () {
     let fileDict = {};
+    let fileMain;
     let fileModified;
+    let packageJson;
     let versionBeta;
     let versionMaster;
     await Promise.all([
@@ -435,6 +437,13 @@ import moduleFs from "fs";
         "package.json"
     ].map(async function (file) {
         fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
+        if (file === "package.json") {
+            packageJson = JSON.parse(fileDict[file]);
+            fileMain = packageJson.module || packageJson.main || "package.json";
+            fileDict[fileMain] = (
+                await moduleFs.promises.readFile(fileMain, "utf8")
+            );
+        }
     }));
     Array.from(fileDict["CHANGELOG.md"].matchAll(
         /\n\n# v(\d\d\d\d\.\d\d?\.\d\d?(-.*?)?)\n/g
@@ -455,6 +464,12 @@ import moduleFs from "fs";
             src: fileDict["package.json"].replace((
                 /    "version": "\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
             ), `    "version": "${versionBeta}"`)
+        }, {
+            file: fileMain,
+            // update version
+            src: fileDict[fileMain].replace((
+                /^let version = ".*?";$/m
+            ), `let version = "v${versionBeta}";`)
         }
     ].map(async function ({
         file,
@@ -638,6 +653,11 @@ import moduleUrl from "url";
                 `\\b${UPSTREAM_GITHUB_IO}\\b`,
                 "g"
             ), GITHUB_GITHUB_IO);
+            if ((
+                /^http:\/\/(?:127\.0\.0\.1|localhost)[\/:]/
+            ).test(url)) {
+                return;
+            }
             if (url.startsWith("http://")) {
                 throw new Error(
                     `shDirHttplinkValidate - ${file} - insecure link - ${url}`
@@ -885,7 +905,7 @@ import modulePath from "path";
     let content = process.argv[2];
     let path = process.argv[1];
     let repo;
-    let responseText;
+    let responseBuf;
     let url;
     function httpRequest({
         method,
@@ -894,22 +914,26 @@ import modulePath from "path";
         return new Promise(function (resolve) {
             moduleHttps.request(`${url}?ref=${branch}`, {
                 headers: {
-                    accept: "application/vnd.github.v3+json",
+                    accept: (
+                        content
+                        ? "application/vnd.github.v3+json"
+                        : "application/vnd.github.v3.raw"
+                    ),
                     authorization: `token ${process.env.MY_GITHUB_TOKEN}`,
                     "user-agent": "undefined"
                 },
                 method
             }, function (res) {
-                responseText = "";
-                res.setEncoding("utf8");
+                responseBuf = [];
                 res.on("data", function (chunk) {
-                    responseText += chunk;
+                    responseBuf.push(chunk);
                 });
                 res.on("end", function () {
+                    responseBuf = Buffer.concat(responseBuf);
                     moduleAssert(res.statusCode === 200, (
                         "shGithubFileUpload"
                         + `- failed to download/upload file ${url} - `
-                        + responseText
+                        + responseBuf.slice(0, 1024).toString()
                     ));
                     resolve();
                 });
@@ -925,7 +949,7 @@ import modulePath from "path";
     if (!content) {
         await moduleFs.promises.writeFile(
             modulePath.basename(url),
-            Buffer.from(JSON.parse(responseText).content, "base64")
+            responseBuf
         );
         return;
     }
@@ -936,7 +960,7 @@ import modulePath from "path";
             branch,
             content: content.toString("base64"),
             "message": `upload file ${path}`,
-            sha: JSON.parse(responseText).sha
+            sha: JSON.parse(responseBuf).sha
         })
     });
 }());
