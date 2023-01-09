@@ -567,6 +567,7 @@ right so that you can focus your creative energy where it is most needed.
 //    script, similar to var statements.
 // Warn if const / let / var statements are not declared in ascii-order.
 // Warn if named-functions are not declared in ascii-order.
+// Warn if cases in switch-statements are not in ascii-order.
 ```
 
 <br>

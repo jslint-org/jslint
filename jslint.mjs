@@ -165,7 +165,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2022.11.20";
+let jslint_edition = "v2023.1.1-beta";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -4185,7 +4185,11 @@ function jslint_phase3_parse(state) {
             }
         }).reduce(function (aa, bb) {
             if (
-                !option_dict.unordered
+
+// PR-419 - Hide warning about unordered case-statements behind beta-flag.
+
+                option_dict.beta
+                && !option_dict.unordered
                 && aa && bb
                 && (
                     aa.order > bb.order

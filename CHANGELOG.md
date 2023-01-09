@@ -11,6 +11,12 @@
 - jslint - unify analysis of variable-assignment/function-parameters into one function
 - jslint - add new warning "Expected Object.create(null) instead of {}"
 
+# v2023.1.1-beta
+- jslint - hide warning about unordered case-statements behind beta-flag
+- ci - bugfix - update shell-function shCiBase() to handle undefined fileMain
+- ci - auto-update version-number in main mjs-module
+- ci - update shell-function shDirHttplinkValidate() to ignore insecure-links http://127.0.0.1, http://localhost
+
 # v2022.11.20
 - ci - update ci from node-v16 to node-v18
 - cli - remove deprecated cli-option `--mode-vim-plugin`
