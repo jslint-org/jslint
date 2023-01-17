@@ -930,12 +930,12 @@ shGithubCheckoutRemote() {(set -e
     rm -rf tmp
     git reset "origin/$GITHUB_REF_NAME" --hard
     # fetch jslint_ci.sh from trusted source
-    shGitCmdWithGithubToken fetch origin alpha --depth=1
+    shGitCmdWithGithubToken fetch origin alpha:alpha2 --depth=1
     for FILE in .ci.sh .ci2.sh jslint_ci.sh myci2.sh
     do
         if [ -f "$FILE" ]
         then
-            git checkout origin/alpha "$FILE"
+            git checkout alpha2 "$FILE"
         fi
     done
 )}
