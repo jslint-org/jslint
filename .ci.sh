@@ -1,5 +1,5 @@
 shCiArtifactUploadCustom() {(set -e
-# this function will custom-upload build-artifacts to branch-gh-pages
+# this function will run custom-code to upload build-artifacts
     # .github_cache - restore
     if [ "$GITHUB_ACTION" ] && [ -d .github_cache ]
     then
@@ -176,7 +176,7 @@ import moduleChildProcess from "child_process";
 )}
 
 shCiBaseCustom() {(set -e
-# this function will run base-ci
+# this function will run custom-code for base-ci
     # update files
     if [ "$(git branch --show-current)" = alpha ]
     then

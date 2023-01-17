@@ -271,11 +271,18 @@ import moduleUrl from "url";
 
 shCiArtifactUpload() {(set -e
 # this function will upload build-artifacts to branch-gh-pages
+# shCiArtifactUploadCustom() {(set -e
+# # this function will run custom-code to upload build-artifacts
+#     return
+# )}
     local FILE
-    if (! shCiIsMainJob)
+    if ! (shCiIsMainJob \
+        && [ -f package.json ] \
+        && grep -q '^    "shCiArtifactUpload": 1,$' package.json)
     then
         return
     fi
+    mkdir -p .artifact
     # init .git/config
     git config --local user.email "github-actions@users.noreply.github.com"
     git config --local user.name "github-actions"
@@ -329,7 +336,10 @@ import moduleChildProcess from "child_process";
     });
 }());
 ' "$@" # '
-    shCiArtifactUploadCustom
+    if [ "$(command -v shCiArtifactUploadCustom)" = shCiArtifactUploadCustom ]
+    then
+        shCiArtifactUploadCustom
+    fi
     # 1px-border around browser-screenshot
     if (ls .artifact/screenshot_browser_*.png 2>/dev/null \
             && mogrify -version 2>&1 | grep -i imagemagick)
@@ -374,40 +384,24 @@ import moduleChildProcess from "child_process";
         "branch-$GITHUB_BRANCH0/README.md"
     git status
     git commit -am "update dir branch-$GITHUB_BRANCH0" || true
-    # if branch-gh-pages has more than 50 commits,
-    # then backup and squash commits
-    if [ "$(git rev-list --count gh-pages)" -gt 50 ]
-    then
-        # backup
-        git push origin -f gh-pages:gh-pages-backup
-        # squash commits
-        git checkout --orphan squash1
-        git commit --quiet -am squash || true
-        # reset branch-gh-pages to squashed-commit
-        git push . -f squash1:gh-pages
-        git checkout gh-pages
-        # force-push squashed-commit
-        git push origin -f gh-pages
-    fi
+    # git push
+    shGithubPushBackupAndSquash origin gh-pages 50
     # list files
     shGitLsTree
-    # push branch-gh-pages
-    git push origin gh-pages
     # validate http-links
-    (set -e
-        cd "branch-$GITHUB_BRANCH0"
-        sleep 15
-        shDirHttplinkValidate
+    (
+    cd "branch-$GITHUB_BRANCH0"
+    sleep 15
+    shDirHttplinkValidate
     )
-)}
-
-shCiArtifactUploadCustom() {(set -e
-# this function will run custom-code to upload build-artifacts
-    return
 )}
 
 shCiBase() {(set -e
 # this function will run base-ci
+# shCiBaseCustom() {(set -e
+# # this function will run custom-code for base-ci
+#     return
+# )}
     export GITHUB_BRANCH0="$(git rev-parse --abbrev-ref HEAD)"
     # validate package.json.fileCount
     node --input-type=module --eval '
@@ -535,13 +529,12 @@ import moduleFs from "fs";
     await moduleFs.promises.writeFile("README.md", data);
 }());
 ' "$@" # '
-    shCiBaseCustom
+    node jslint.mjs .
+    if [ "$(command -v shCiBaseCustom)" = shCiBaseCustom ]
+    then
+        shCiBaseCustom
+    fi
     git diff
-)}
-
-shCiBaseCustom() {(set -e
-# this function will run custom-ci
-    return
 )}
 
 shCiBranchPromote() {(set -e
@@ -571,6 +564,15 @@ process.exit(Number(
 
 shCiNpmPublish() {(set -e
 # this function will npm-publish package
+# shCiNpmPublishCustom() {(set -e
+# # this function will run custom-code to npm-publish package
+#     # npm publish --access public
+# )}
+    if ! ([ -f package.json ] \
+        && grep -q '^    "shCiNpmPublish": 1,$' package.json)
+    then
+        return
+    fi
     # init package.json for npm-publish
     npm install
     # update package-name
@@ -580,17 +582,27 @@ shCiNpmPublish() {(set -e
             "s|^    \"name\":.*|    \"name\": \"@$GITHUB_REPOSITORY\",|" \
             package.json
     fi
-    shCiNpmPublishCustom
-)}
-
-shCiNpmPublishCustom() {(set -e
-# this function will run custom-code to npm-publish package
-    # npm publish --access public
+    if [ "$(command -v shCiNpmPublishCustom)" = shCiNpmPublishCustom ]
+    then
+        shCiNpmPublishCustom
+    fi
 )}
 
 shCiPre() {(set -e
 # this function will run pre-ci
-    return
+# shCiPreCustom() {(set -e
+# # this function will run custom-code for pre-ci
+#     return
+# )}
+    if [ -f ./myci2.sh ]
+    then
+        . ./myci2.sh :
+        shMyciInit
+    fi
+    if [ "$(command -v shCiPreCustom)" = shCiPreCustom ]
+    then
+        shCiPreCustom
+    fi
 )}
 
 shDiffFileFromDir() {(set -e
@@ -733,6 +745,11 @@ shGitCmdWithGithubToken() {(set -e
     local CMD
     local EXIT_CODE
     local URL
+    if [ ! "$MY_GITHUB_TOKEN" ]
+    then
+        git "$@"
+        return
+    fi
     printf "shGitCmdWithGithubToken $*\n"
     CMD="$1"
     shift
@@ -742,13 +759,10 @@ shGitCmdWithGithubToken() {(set -e
     then
         URL="$(git config "remote.$URL.url")"
     fi
-    if [ "$MY_GITHUB_TOKEN" ]
-    then
-        URL="$(
-            printf "$URL" \
-            | sed -e "s|https://|https://x-access-token:$MY_GITHUB_TOKEN@|"
-        )"
-    fi
+    URL="$(
+        printf "$URL" \
+        | sed -e "s|https://|https://x-access-token:$MY_GITHUB_TOKEN@|"
+    )"
     EXIT_CODE=0
     # hide $MY_GITHUB_TOKEN in case of err
     git "$CMD" "$URL" "$@" 2>/dev/null || EXIT_CODE="$?"
@@ -882,6 +896,50 @@ shGitSquashPop() {(set -e
     git commit -am "$MESSAGE" || true
 )}
 
+shGithubCheckoutRemote() {(set -e
+# this function will run like actions/checkout, except checkout remote-branch
+    # GITHUB_REF_NAME="owner/repo/branch"
+    GITHUB_REF_NAME="$1"
+    if (printf "$GITHUB_REF_NAME" | grep -q ".*/.*/.*")
+    then
+        # branch - */*/*
+        git fetch origin alpha
+        # assert latest ci
+        if (git rev-parse "$GITHUB_REF_NAME" >/dev/null 2>&1) \
+            && [ "$(git rev-parse "$GITHUB_REF_NAME")" \
+            != "$(git rev-parse origin/alpha)" ]
+        then
+            git push -f origin "origin/alpha:$GITHUB_REF_NAME"
+            shGithubWorkflowDispatch "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME"
+            return 1
+        fi
+    else
+        # branch - alpha, beta, master
+        GITHUB_REF_NAME="$GITHUB_REPOSITORY/$GITHUB_REF_NAME"
+    fi
+    GITHUB_REPOSITORY="$(printf "$GITHUB_REF_NAME" | cut -d'/' -f1,2)"
+    GITHUB_REF_NAME="$(printf "$GITHUB_REF_NAME" | cut -d'/' -f3)"
+    # replace current git-checkout with $GITHUB_REF_NAME
+    rm -rf * ..?* .[!.]*
+    shGitCmdWithGithubToken clone "https://github.com/$GITHUB_REPOSITORY" tmp \
+        --branch="$GITHUB_REF_NAME" \
+        --depth=1 \
+        --single-branch
+    mv tmp/.git .
+    cp tmp/.gitconfig .git/config
+    rm -rf tmp
+    git reset "origin/$GITHUB_REF_NAME" --hard
+    # fetch jslint_ci.sh from trusted source
+    shGitCmdWithGithubToken fetch origin alpha --depth=1
+    for FILE in .ci.sh .ci2.sh jslint_ci.sh myci2.sh
+    do
+        if [ -f "$FILE" ]
+        then
+            git checkout origin/alpha "$FILE"
+        fi
+    done
+)}
+
 shGithubFileDownload() {(set -e
 # this function will download file $1 from github repo/branch
 # https://docs.github.com/en/rest/reference/repos#create-or-update-file-contents
@@ -967,10 +1025,48 @@ import modulePath from "path";
 ' "$@" # '
 )}
 
+shGithubPushBackupAndSquash() {
+# this function will, if $GIT_BRANCH has more than $COMMITS commits,
+# then backup, squash, force-push,
+# else normal-push
+    local GIT_REPO="$1"
+    shift
+    local GIT_BRANCH="$1"
+    shift
+    local COMMITS="$1"
+    shift
+    local COMMIT_MESSAGE="squash - $(git log "$GIT_BRANCH" -1 --pretty=%B)"
+    if [ "$(git rev-list --count "$GIT_BRANCH")" -gt "$COMMITS" ]
+    then
+        # backup
+        shGitCmdWithGithubToken push "$GIT_REPO" \
+            "$GIT_BRANCH:$GIT_BRANCH-backup" -f
+        # squash commits
+        git checkout --orphan squash1
+        git commit --quiet -am "$COMMIT_MESSAGE" || true
+        # reset branc to squashed-commit
+        git push . "squash1:$GIT_BRANCH" -f
+        git checkout "$GIT_BRANCH"
+        # force-push squashed-commit
+        shGitCmdWithGithubToken push "$GIT_REPO" "$GIT_BRANCH" -f
+    else
+        shGitCmdWithGithubToken push "$GIT_REPO" "$GIT_BRANCH"
+    fi
+}
+
+shGithubTokenExport() {
+# this function will export $MY_GITHUB_TOKEN from file
+    if [ ! "$MY_GITHUB_TOKEN" ]
+    then
+        export MY_GITHUB_TOKEN="$(cat "$HOME/.mysecret2/.my_github_token")"
+    fi
+}
+
 shGithubWorkflowDispatch() {(set -e
 # this function will trigger-workflow to ci-repo $1 for owner.repo.branch $2
 # example use:
-# shGithubWorkflowDispatch octocat/my_ci octocat/my_project/master
+# shGithubWorkflowDispatch octocat/my-ci octocat/my-project/master
+    shGithubTokenExport
     curl "https://api.github.com/repos/$1"\
 "/actions/workflows/ci.yml/dispatches" \
         -H "accept: application/vnd.github.v3+json" \
@@ -3148,14 +3244,13 @@ v8CoverageReportCreate({
 shRunWithScreenshotTxt() {(set -e
 # this function will run cmd $@ and screenshot text-output
 # https://www.cnx-software.com/2011/09/22/how-to-convert-a-command-line-result-into-an-image-in-linux/
-    local EXIT_CODE
-    EXIT_CODE=0
-    export SCREENSHOT_SVG="$1"
+    local EXIT_CODE=0
+    local SCREENSHOT_SVG="$1"
     shift
     printf "0\n" > "$SCREENSHOT_SVG.exit_code"
     printf "shRunWithScreenshotTxt - ($* 2>&1)\n" 1>&2
     # run "$@" with screenshot
-    (set -e
+    (
         "$@" 2>&1 || printf "$?\n" > "$SCREENSHOT_SVG.exit_code"
     ) | tee "$SCREENSHOT_SVG.txt"
     EXIT_CODE="$(cat "$SCREENSHOT_SVG.exit_code")"
@@ -3248,7 +3343,7 @@ shCiMain() {(set -e
         return
     fi
     # run "$@" with winpty
-    export CI_UNAME="${CI_UNAME:-$(uname)}"
+    local CI_UNAME="${CI_UNAME:-$(uname)}"
     case "$CI_UNAME" in
     MSYS*)
         if [ ! "$CI_WINPTY" ] && [ "$1" != shHttpFileServer ]
@@ -3260,9 +3355,17 @@ shCiMain() {(set -e
         ;;
     esac
     # run "$@"
+    if [ -f ./myci2.sh ]
+    then
+        . ./myci2.sh :
+    fi
     if [ -f ./.ci.sh ]
     then
-        . ./.ci.sh
+        . ./.ci.sh :
+    fi
+    if [ -f ./.ci2.sh ]
+    then
+        . ./.ci2.sh :
     fi
     "$@"
 )}
