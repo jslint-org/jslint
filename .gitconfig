@@ -1,3 +1,4 @@
+# base - .gitconfig - beg
 [branch "alpha"]
     merge = refs/heads/alpha
     remote = origin
@@ -17,9 +18,10 @@
     ff = only
 [receive]
     denyCurrentBranch = warn
+# base - .gitconfig - end
 [remote "origin"]
     fetch = +refs/heads/*:refs/remotes/origin/*
     url = https://github.com/owner/repo
 # [remote "upstream"]
-    # fetch = +refs/heads/*:refs/remotes/upstream/*
-    # url = https://github.com/owner/repo
+#     fetch = +refs/heads/*:refs/remotes/upstream/*
+#     url = https://github.com/owner/repo

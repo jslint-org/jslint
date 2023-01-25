@@ -1,9 +1,12 @@
+# base - .gitignore - beg
 "*
 '*
 *.[0123456789][0123456789]
 *.lock
 *.log
 *.pyc
+*.tgz
+*.vsix
 *~
 .*
 _*
@@ -16,3 +19,5 @@ undefined
 !.gitconfig
 !.github
 !.gitignore
+!.npmignore
+# base - .gitignore - end
