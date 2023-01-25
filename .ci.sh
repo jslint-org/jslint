@@ -118,8 +118,6 @@ echo "\
     }));
 }());
 ' "$@" # '
-    # screenshot asset_image_logo
-    shImageLogoCreate &
     # background http-file-server to serve webpages for screenshot
     # PORT=8080 npm_config_timeout_exit=5000 shHttpFileServer &
     # screenshot html

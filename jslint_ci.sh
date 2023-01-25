@@ -276,7 +276,7 @@ shCiArtifactUpload() {(set -e
 #     return
 # )}
     local FILE
-    if ! (shCiIsMainJob \
+    if ! (shCiMatrixIsmainName \
         && [ -f package.json ] \
         && grep -q '^    "shCiArtifactUpload": 1,$' package.json)
     then
@@ -322,6 +322,11 @@ import moduleChildProcess from "child_process";
             "shRunWithScreenshotTxt",
             ".artifact/screenshot_package_listing.svg",
             "shGitLsTree"
+        ],
+        // parallel-task - screenshot logo
+        [
+            "jslint_ci.sh",
+            "shImageLogoCreate"
         ]
     ].forEach(function (argList) {
         moduleChildProcess.spawn("sh", argList, {
@@ -552,14 +557,16 @@ shCiBranchPromote() {(set -e
     git push "$REMOTE" "$REMOTE/$BRANCH1:$BRANCH2" "$@"
 )}
 
-shCiIsMainJob() {(set -e
+shCiMatrixIsmainName() {(set -e
 # this function will return 0 if current ci-job is main job
-    node --input-type=module --eval '
-process.exit(Number(
-    `node.${process.version.split(".")[0]}.${process.arch}.${process.platform}`
-    !== process.env.CI_MAIN_JOB
-));
-' "$@" # '
+    CI_MATRIX_NAME="$(printf "$CI_MATRIX_NAME" | xargs)"
+    [ "$CI_MATRIX_NAME" ] && [ "$CI_MATRIX_NAME" = "$CI_MATRIX_NAME_MAIN" ]
+)}
+
+shCiMatrixIsmainNodeversion() {(set -e
+# this function will return 0 if current ci-job is main job
+    [ "$CI_MATRIX_NODE_VERSION" ] \
+        && [ "$CI_MATRIX_NODE_VERSION" = "$CI_MATRIX_NODE_VERSION_MAIN" ]
 )}
 
 shCiNpmPublish() {(set -e
@@ -628,6 +635,7 @@ shDirHttplinkValidate() {(set -e
         printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
     node --input-type=module --eval '
+import moduleAssert from "assert";
 import moduleFs from "fs";
 import moduleHttps from "https";
 import moduleUrl from "url";
@@ -666,15 +674,14 @@ import moduleUrl from "url";
                 "g"
             ), GITHUB_GITHUB_IO);
             if ((
-                /^http:\/\/(?:127\.0\.0\.1|localhost)[\/:]/
+                /^http:\/\/(?:127\.0\.0\.1|localhost|www\.w3\.org\/2000\/svg)(?:[\/:]|$)/m
             ).test(url)) {
-                return;
+                return "";
             }
-            if (url.startsWith("http://")) {
-                throw new Error(
-                    `shDirHttplinkValidate - ${file} - insecure link - ${url}`
-                );
-            }
+            moduleAssert.ok(
+                !url.startsWith("http://"),
+                `shDirHttplinkValidate - ${file} - insecure link - ${url}`
+            );
             // ignore duplicate-link
             if (dict.hasOwnProperty(url)) {
                 return "";
@@ -686,12 +693,10 @@ import moduleUrl from "url";
                 console.error(
                     "shDirHttplinkValidate " + res.statusCode + " " + url
                 );
-                if (!(res.statusCode < 400)) {
-                    throw new Error(
-                        "shDirHttplinkValidate - " + file
-                        + " - unreachable link " + url
-                    );
-                }
+                moduleAssert.ok(
+                    res.statusCode < 400,
+                    `shDirHttplinkValidate - ${file} - unreachable link ${url}`
+                );
                 req.abort();
                 res.destroy();
             });
@@ -705,8 +710,10 @@ import moduleUrl from "url";
             if (!linkType.startsWith("[")) {
                 url = url.slice(1);
             }
-            if (url.length === 0 || url.startsWith("data:")) {
-                return;
+            if ((
+                /^$|^\\|^data:/m
+            ).test(url)) {
+                return "";
             }
             // ignore duplicate-link
             if (dict.hasOwnProperty(url)) {
@@ -720,12 +727,13 @@ import moduleUrl from "url";
                     console.error(
                         "shDirHttplinkValidate " + Boolean(exists) + " " + url
                     );
-                    if (!exists) {
-                        throw new Error(
-                            "shDirHttplinkValidate - " + file
-                            + " - unreachable link " + url
-                        );
-                    }
+                    moduleAssert.ok(
+                        exists,
+                        (
+                            `shDirHttplinkValidate - ${file}`
+                            + `- unreachable link ${url}`
+                        )
+                    );
                 });
             }
             return "";
@@ -745,11 +753,6 @@ shGitCmdWithGithubToken() {(set -e
     local CMD
     local EXIT_CODE
     local URL
-    if [ ! "$MY_GITHUB_TOKEN" ]
-    then
-        git "$@"
-        return
-    fi
     printf "shGitCmdWithGithubToken $*\n"
     CMD="$1"
     shift
@@ -763,6 +766,11 @@ shGitCmdWithGithubToken() {(set -e
         printf "$URL" \
         | sed -e "s|https://|https://x-access-token:$MY_GITHUB_TOKEN@|"
     )"
+    if [ ! "$MY_GITHUB_TOKEN" ]
+    then
+        git "$CMD" "$URL" "$@"
+        return
+    fi
     EXIT_CODE=0
     # hide $MY_GITHUB_TOKEN in case of err
     git "$CMD" "$URL" "$@" 2>/dev/null || EXIT_CODE="$?"
@@ -905,7 +913,7 @@ shGithubCheckoutRemote() {(set -e
         # branch - */*/*
         git fetch origin alpha
         # assert latest ci
-        if (git rev-parse "$GITHUB_REF_NAME" >/dev/null 2>&1) \
+        if (git rev-parse "$GITHUB_REF_NAME" &>/dev/null) \
             && [ "$(git rev-parse "$GITHUB_REF_NAME")" \
             != "$(git rev-parse origin/alpha)" ]
         then
@@ -921,21 +929,21 @@ shGithubCheckoutRemote() {(set -e
     GITHUB_REF_NAME="$(printf "$GITHUB_REF_NAME" | cut -d'/' -f3)"
     # replace current git-checkout with $GITHUB_REF_NAME
     rm -rf * ..?* .[!.]*
-    shGitCmdWithGithubToken clone "https://github.com/$GITHUB_REPOSITORY" tmp \
-        --branch="$GITHUB_REF_NAME" \
-        --depth=1 \
-        --single-branch
-    mv tmp/.git .
-    cp tmp/.gitconfig .git/config
-    rm -rf tmp
+    shGitCmdWithGithubToken clone \
+        "https://github.com/$GITHUB_REPOSITORY" __tmp1 \
+        --branch="$GITHUB_REF_NAME" --depth=1 --single-branch
+    mv __tmp1/.git .
+    cp __tmp1/.gitconfig .git/config
+    rm -rf __tmp1
     git reset "origin/$GITHUB_REF_NAME" --hard
     # fetch jslint_ci.sh from trusted source
-    shGitCmdWithGithubToken fetch origin alpha:alpha2 --depth=1
+    git branch -D __tmp1 &>/dev/null || true
+    shGitCmdWithGithubToken fetch origin alpha:__tmp1 --depth=1
     for FILE in .ci.sh .ci2.sh jslint_ci.sh myci2.sh
     do
         if [ -f "$FILE" ]
         then
-            git checkout alpha2 "$FILE"
+            git checkout __tmp1 "$FILE"
         fi
     done
 )}
@@ -953,6 +961,7 @@ shGithubFileUpload() {(set -e
 # https://docs.github.com/en/rest/reference/repos#create-or-update-file-contents
 # example use:
 # shGithubFileUpload octocat/hello-worId/master/hello.txt hello.txt
+    shGithubTokenExport
     node --input-type=module --eval '
 import moduleAssert from "assert";
 import moduleFs from "fs";
@@ -988,7 +997,7 @@ import modulePath from "path";
                 });
                 res.on("end", function () {
                     responseBuf = Buffer.concat(responseBuf);
-                    moduleAssert(res.statusCode === 200, (
+                    moduleAssert.ok(res.statusCode === 200, (
                         "shGithubFileUpload"
                         + `- failed to download/upload file ${url} - `
                         + responseBuf.slice(0, 1024).toString()
@@ -1040,7 +1049,7 @@ shGithubPushBackupAndSquash() {
     then
         # backup
         shGitCmdWithGithubToken push "$GIT_REPO" \
-            "$GIT_BRANCH:$GIT_BRANCH-backup" -f
+            "$GIT_BRANCH:$GIT_BRANCH.backup_wday$(date -u +%w)" -f
         # squash commits
         git checkout --orphan squash1
         git commit --quiet -am "$COMMIT_MESSAGE" || true
@@ -1423,76 +1432,16 @@ import moduleUrl from "url";
 
 shImageLogoCreate() {(set -e
 # this function will create .png logo
-    local SIZE
-    echo '
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<title>logo</title>
-<style>
-/* sh jslint_ci.sh shBrowserScreenshot asset_image_logo.html --window-size=512x512 */
-/* csslint box-model:false */
-/* csslint ignore:start */
-*,
-*:after,
-*:before {
-    box-sizing: border-box;
-}
-@font-face {
-    font-family: Daley;
-    font-weight: bold;
-    src: url("asset_font_daley_bold.woff2") format("woff2");
-}
-/* csslint ignore:end */
-body,
-div {
-    margin: 0;
-}
-.container1 {
-    background: antiquewhite;
-    border: 24px solid darkslategray;
-    border-radius: 96px;
-    color: darkslategray;
-    font-family: Daley;
-    height: 512px;
-    margin: 0;
-    position: relative;
-    width: 512px;
-    zoom: 100%;
-/*
-    background: transparent;
-    border: 24px solid black;
-    color: black;
-*/
-}
-.text1 {
-    font-size: 256px;
-    left: 44px;
-    position: absolute;
-    top: 32px;
-}
-.text2 {
-    bottom: 8px;
-    font-size: 192px;
-    left: 44px;
-    position: absolute;
-}
-</style>
-</head>
-<body>
-<div class="container1">
-<div class="text1">JS</div>
-<div class="text2">Lint</div>
-</div>
-</body>
-</html>
-' > .artifact/asset_image_logo_512.html
-    cp asset_font_daley_bold.woff2 .artifact || true
+    if [ ! -f asset_image_logo_512.html ]
+    then
+        return
+    fi
     # screenshot asset_image_logo_512.png
-    shBrowserScreenshot .artifact/asset_image_logo_512.html \
+    shBrowserScreenshot asset_image_logo_512.html \
         --window-size=512x512 \
         -screenshot=.artifact/asset_image_logo_512.png
     # create various smaller thumbnails
+    local SIZE
     for SIZE in 32 64 128 256
     do
         convert -resize "${SIZE}x${SIZE}" .artifact/asset_image_logo_512.png \
