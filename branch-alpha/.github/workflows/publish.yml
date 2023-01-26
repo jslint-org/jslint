@@ -1,3 +1,4 @@
+# base - .github/workflows/publish.yml - beg
 # Publishing packages to npm and GitHub Packages
 # https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages#publishing-packages-to-npm-and-github-packages
 name: publish
@@ -8,7 +9,6 @@ on:
 jobs:
 
 
-# npm publish - start
   job1:
     strategy:
       matrix:
@@ -65,4 +65,4 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_REGISTRY: npm
-# npm publish - end
+# base - .github/workflows/publish.yml - end
