@@ -131,11 +131,11 @@
     stack, stack_trace, start, startOffset, startsWith, statement,
     statement_prv, stdio, stop, stop_at, stringify, subscript, switch,
     syntax_dict, tenure, test, test_cause, test_internal_error, this, thru,
-    toString, token, token_global, token_list, token_nxt, token_tree, tokens,
-    trace, tree, trim, trimEnd, trimRight, try, type, unlink, unordered,
-    unshift, url, used, v8CoverageListMerge, v8CoverageReportCreate, value,
-    variable, version, versions, warn, warn_at, warning, warning_list, warnings,
-    white, wrapped, writeFile
+    toLocaleString, toString, token, token_global, token_list, token_nxt,
+    token_tree, tokens, trace, tree, trim, trimEnd, trimRight, try, type,
+    unlink, unordered, unshift, url, used, v8CoverageListMerge,
+    v8CoverageReportCreate, value, variable, version, versions, warn, warn_at,
+    warning, warning_list, warnings, white, wrapped, writeFile
 */
 
 // init debugInline
@@ -165,7 +165,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2022.11.20";
+let jslint_edition = "v2023.1.29";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -4185,7 +4185,11 @@ function jslint_phase3_parse(state) {
             }
         }).reduce(function (aa, bb) {
             if (
-                !option_dict.unordered
+
+// PR-419 - Hide warning about unordered case-statements behind beta-flag.
+
+                option_dict.beta
+                && !option_dict.unordered
                 && aa && bb
                 && (
                     aa.order > bb.order
@@ -9977,6 +9981,10 @@ function jstestOnExit(exitCode, mode) {
         )
         + "  tests total  - " + jstestCountTotal + "\n"
         + "  tests failed - " + jstestCountFailed + "\n"
+        + "\n"
+        + "  time finished - "
+        + Number(Date.now() - jstestTimeStart).toLocaleString()
+        + " ms\n"
         + "\u001b[39m"
     );
     if (mode !== "testsFailed") {

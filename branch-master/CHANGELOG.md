@@ -5,11 +5,21 @@
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning requiring paren around plus-separated concatenations.
-- jslint - relax warning against console.log and friends and deprecate directive `devel`
 - jslint - require regexp to use open-form.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 - jslint - unify analysis of variable-assignment/function-parameters into one function
-- jslint - add new warning "Expected Object.create(null) instead of {}"
+
+# v2023.1.29
+- ci - in windows-ci-env, alias node=node.exe instead of using winpty for pipes
+- ci - bugfix - fix ci-shell-function shGithubFileUpload unable to upload new asset
+- ci - auto-create asset_image_logo_512.png from asset_image_logo_512.html
+- bugfix - fix shell-function shGithubCheckoutRemote not able to checkout trusted-files in non-alpha branches
+- jslint-ci - revamp auto-updating and add shell-function shGithubCheckoutRemote
+- test - print time-finished after test-run
+- jslint - hide warning about unordered case-statements behind beta-flag
+- ci - bugfix - update shell-function shCiBase() to handle undefined fileMain
+- ci - auto-update version-number in main mjs-module
+- ci - update shell-function shDirHttplinkValidate() to ignore insecure-links http://127.0.0.1, http://localhost
 
 # v2022.11.20
 - ci - update ci from node-v16 to node-v18

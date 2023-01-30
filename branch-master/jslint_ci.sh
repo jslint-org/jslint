@@ -271,11 +271,18 @@ import moduleUrl from "url";
 
 shCiArtifactUpload() {(set -e
 # this function will upload build-artifacts to branch-gh-pages
+# shCiArtifactUploadCustom() {(set -e
+# # this function will run custom-code to upload build-artifacts
+#     return
+# )}
     local FILE
-    if (! shCiIsMainJob)
+    if ! (shCiMatrixIsmainName \
+        && [ -f package.json ] \
+        && grep -q '^    "shCiArtifactUpload": 1,$' package.json)
     then
         return
     fi
+    mkdir -p .artifact
     # init .git/config
     git config --local user.email "github-actions@users.noreply.github.com"
     git config --local user.name "github-actions"
@@ -315,6 +322,11 @@ import moduleChildProcess from "child_process";
             "shRunWithScreenshotTxt",
             ".artifact/screenshot_package_listing.svg",
             "shGitLsTree"
+        ],
+        // parallel-task - screenshot logo
+        [
+            "jslint_ci.sh",
+            "shImageLogoCreate"
         ]
     ].forEach(function (argList) {
         moduleChildProcess.spawn("sh", argList, {
@@ -329,7 +341,10 @@ import moduleChildProcess from "child_process";
     });
 }());
 ' "$@" # '
-    shCiArtifactUploadCustom
+    if [ "$(command -v shCiArtifactUploadCustom)" = shCiArtifactUploadCustom ]
+    then
+        shCiArtifactUploadCustom
+    fi
     # 1px-border around browser-screenshot
     if (ls .artifact/screenshot_browser_*.png 2>/dev/null \
             && mogrify -version 2>&1 | grep -i imagemagick)
@@ -374,40 +389,24 @@ import moduleChildProcess from "child_process";
         "branch-$GITHUB_BRANCH0/README.md"
     git status
     git commit -am "update dir branch-$GITHUB_BRANCH0" || true
-    # if branch-gh-pages has more than 50 commits,
-    # then backup and squash commits
-    if [ "$(git rev-list --count gh-pages)" -gt 50 ]
-    then
-        # backup
-        git push origin -f gh-pages:gh-pages-backup
-        # squash commits
-        git checkout --orphan squash1
-        git commit --quiet -am squash || true
-        # reset branch-gh-pages to squashed-commit
-        git push . -f squash1:gh-pages
-        git checkout gh-pages
-        # force-push squashed-commit
-        git push origin -f gh-pages
-    fi
+    # git push
+    shGithubPushBackupAndSquash origin gh-pages 50
     # list files
     shGitLsTree
-    # push branch-gh-pages
-    git push origin gh-pages
     # validate http-links
-    (set -e
-        cd "branch-$GITHUB_BRANCH0"
-        sleep 15
-        shDirHttplinkValidate
+    (
+    cd "branch-$GITHUB_BRANCH0"
+    sleep 15
+    shDirHttplinkValidate
     )
-)}
-
-shCiArtifactUploadCustom() {(set -e
-# this function will run custom-code to upload build-artifacts
-    return
 )}
 
 shCiBase() {(set -e
 # this function will run base-ci
+# shCiBaseCustom() {(set -e
+# # this function will run custom-code for base-ci
+#     return
+# )}
     export GITHUB_BRANCH0="$(git rev-parse --abbrev-ref HEAD)"
     # validate package.json.fileCount
     node --input-type=module --eval '
@@ -426,7 +425,9 @@ globalThis.assert(
 import moduleFs from "fs";
 (async function () {
     let fileDict = {};
+    let fileMain;
     let fileModified;
+    let packageJson;
     let versionBeta;
     let versionMaster;
     await Promise.all([
@@ -435,6 +436,13 @@ import moduleFs from "fs";
         "package.json"
     ].map(async function (file) {
         fileDict[file] = await moduleFs.promises.readFile(file, "utf8");
+        if (file === "package.json") {
+            packageJson = JSON.parse(fileDict[file]);
+            fileMain = packageJson.module || packageJson.main || "package.json";
+            fileDict[fileMain] = (
+                await moduleFs.promises.readFile(fileMain, "utf8")
+            );
+        }
     }));
     Array.from(fileDict["CHANGELOG.md"].matchAll(
         /\n\n# v(\d\d\d\d\.\d\d?\.\d\d?(-.*?)?)\n/g
@@ -455,6 +463,12 @@ import moduleFs from "fs";
             src: fileDict["package.json"].replace((
                 /    "version": "\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
             ), `    "version": "${versionBeta}"`)
+        }, {
+            file: fileMain,
+            // update version
+            src: fileDict[fileMain].replace((
+                /^let version = ".*?";$/m
+            ), `let version = "v${versionBeta}";`)
         }
     ].map(async function ({
         file,
@@ -520,13 +534,12 @@ import moduleFs from "fs";
     await moduleFs.promises.writeFile("README.md", data);
 }());
 ' "$@" # '
-    shCiBaseCustom
+    node jslint.mjs .
+    if [ "$(command -v shCiBaseCustom)" = shCiBaseCustom ]
+    then
+        shCiBaseCustom
+    fi
     git diff
-)}
-
-shCiBaseCustom() {(set -e
-# this function will run custom-ci
-    return
 )}
 
 shCiBranchPromote() {(set -e
@@ -544,18 +557,29 @@ shCiBranchPromote() {(set -e
     git push "$REMOTE" "$REMOTE/$BRANCH1:$BRANCH2" "$@"
 )}
 
-shCiIsMainJob() {(set -e
+shCiMatrixIsmainName() {(set -e
 # this function will return 0 if current ci-job is main job
-    node --input-type=module --eval '
-process.exit(Number(
-    `node.${process.version.split(".")[0]}.${process.arch}.${process.platform}`
-    !== process.env.CI_MAIN_JOB
-));
-' "$@" # '
+    CI_MATRIX_NAME="$(printf "$CI_MATRIX_NAME" | xargs)"
+    [ "$CI_MATRIX_NAME" ] && [ "$CI_MATRIX_NAME" = "$CI_MATRIX_NAME_MAIN" ]
+)}
+
+shCiMatrixIsmainNodeversion() {(set -e
+# this function will return 0 if current ci-job is main job
+    [ "$CI_MATRIX_NODE_VERSION" ] \
+        && [ "$CI_MATRIX_NODE_VERSION" = "$CI_MATRIX_NODE_VERSION_MAIN" ]
 )}
 
 shCiNpmPublish() {(set -e
 # this function will npm-publish package
+# shCiNpmPublishCustom() {(set -e
+# # this function will run custom-code to npm-publish package
+#     # npm publish --access public
+# )}
+    if ! ([ -f package.json ] \
+        && grep -q '^    "shCiNpmPublish": 1,$' package.json)
+    then
+        return
+    fi
     # init package.json for npm-publish
     npm install
     # update package-name
@@ -565,17 +589,27 @@ shCiNpmPublish() {(set -e
             "s|^    \"name\":.*|    \"name\": \"@$GITHUB_REPOSITORY\",|" \
             package.json
     fi
-    shCiNpmPublishCustom
-)}
-
-shCiNpmPublishCustom() {(set -e
-# this function will run custom-code to npm-publish package
-    # npm publish --access public
+    if [ "$(command -v shCiNpmPublishCustom)" = shCiNpmPublishCustom ]
+    then
+        shCiNpmPublishCustom
+    fi
 )}
 
 shCiPre() {(set -e
 # this function will run pre-ci
-    return
+# shCiPreCustom() {(set -e
+# # this function will run custom-code for pre-ci
+#     return
+# )}
+    if [ -f ./myci2.sh ]
+    then
+        . ./myci2.sh :
+        shMyciInit
+    fi
+    if [ "$(command -v shCiPreCustom)" = shCiPreCustom ]
+    then
+        shCiPreCustom
+    fi
 )}
 
 shDiffFileFromDir() {(set -e
@@ -601,6 +635,7 @@ shDirHttplinkValidate() {(set -e
         printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
     node --input-type=module --eval '
+import moduleAssert from "assert";
 import moduleFs from "fs";
 import moduleHttps from "https";
 import moduleUrl from "url";
@@ -623,6 +658,10 @@ import moduleUrl from "url";
             return;
         }
         data = await moduleFs.promises.readFile(file, "utf8");
+        // ignore link-rel-preconnect
+        data = data.replace((
+            /<link\b.*?\brel="preconnect".*?>/g
+        ), "");
         data.replace((
             /\bhttps?:\/\/.*?(?:[\s")\]]|\W?$)/gm
         ), function (url) {
@@ -638,11 +677,15 @@ import moduleUrl from "url";
                 `\\b${UPSTREAM_GITHUB_IO}\\b`,
                 "g"
             ), GITHUB_GITHUB_IO);
-            if (url.startsWith("http://")) {
-                throw new Error(
-                    `shDirHttplinkValidate - ${file} - insecure link - ${url}`
-                );
+            if ((
+                /^http:\/\/(?:127\.0\.0\.1|localhost|www\.w3\.org\/2000\/svg)(?:[\/:]|$)/m
+            ).test(url)) {
+                return "";
             }
+            moduleAssert.ok(
+                !url.startsWith("http://"),
+                `shDirHttplinkValidate - ${file} - insecure link - ${url}`
+            );
             // ignore duplicate-link
             if (dict.hasOwnProperty(url)) {
                 return "";
@@ -654,12 +697,10 @@ import moduleUrl from "url";
                 console.error(
                     "shDirHttplinkValidate " + res.statusCode + " " + url
                 );
-                if (!(res.statusCode < 400)) {
-                    throw new Error(
-                        "shDirHttplinkValidate - " + file
-                        + " - unreachable link " + url
-                    );
-                }
+                moduleAssert.ok(
+                    res.statusCode < 400,
+                    `shDirHttplinkValidate - ${file} - unreachable link ${url}`
+                );
                 req.abort();
                 res.destroy();
             });
@@ -673,8 +714,10 @@ import moduleUrl from "url";
             if (!linkType.startsWith("[")) {
                 url = url.slice(1);
             }
-            if (url.length === 0 || url.startsWith("data:")) {
-                return;
+            if ((
+                /^$|^\\|^data:/m
+            ).test(url)) {
+                return "";
             }
             // ignore duplicate-link
             if (dict.hasOwnProperty(url)) {
@@ -688,12 +731,13 @@ import moduleUrl from "url";
                     console.error(
                         "shDirHttplinkValidate " + Boolean(exists) + " " + url
                     );
-                    if (!exists) {
-                        throw new Error(
-                            "shDirHttplinkValidate - " + file
-                            + " - unreachable link " + url
-                        );
-                    }
+                    moduleAssert.ok(
+                        exists,
+                        (
+                            `shDirHttplinkValidate - ${file}`
+                            + `- unreachable link ${url}`
+                        )
+                    );
                 });
             }
             return "";
@@ -722,12 +766,14 @@ shGitCmdWithGithubToken() {(set -e
     then
         URL="$(git config "remote.$URL.url")"
     fi
-    if [ "$MY_GITHUB_TOKEN" ]
+    URL="$(
+        printf "$URL" \
+        | sed -e "s|https://|https://x-access-token:$MY_GITHUB_TOKEN@|"
+    )"
+    if [ ! "$MY_GITHUB_TOKEN" ]
     then
-        URL="$(
-            printf "$URL" \
-            | sed -e "s|https://|https://x-access-token:$MY_GITHUB_TOKEN@|"
-        )"
+        git "$CMD" "$URL" "$@"
+        return
     fi
     EXIT_CODE=0
     # hide $MY_GITHUB_TOKEN in case of err
@@ -862,6 +908,50 @@ shGitSquashPop() {(set -e
     git commit -am "$MESSAGE" || true
 )}
 
+shGithubCheckoutRemote() {(set -e
+# this function will run like actions/checkout, except checkout remote-branch
+    # GITHUB_REF_NAME="owner/repo/branch"
+    GITHUB_REF_NAME="$1"
+    if (printf "$GITHUB_REF_NAME" | grep -q ".*/.*/.*")
+    then
+        # branch - */*/*
+        git fetch origin alpha
+        # assert latest ci
+        if (git rev-parse "$GITHUB_REF_NAME" &>/dev/null) \
+            && [ "$(git rev-parse "$GITHUB_REF_NAME")" \
+            != "$(git rev-parse origin/alpha)" ]
+        then
+            git push -f origin "origin/alpha:$GITHUB_REF_NAME"
+            shGithubWorkflowDispatch "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME"
+            return 1
+        fi
+    else
+        # branch - alpha, beta, master
+        GITHUB_REF_NAME="$GITHUB_REPOSITORY/$GITHUB_REF_NAME"
+    fi
+    GITHUB_REPOSITORY="$(printf "$GITHUB_REF_NAME" | cut -d'/' -f1,2)"
+    GITHUB_REF_NAME="$(printf "$GITHUB_REF_NAME" | cut -d'/' -f3)"
+    # replace current git-checkout with $GITHUB_REF_NAME
+    rm -rf * ..?* .[!.]*
+    shGitCmdWithGithubToken clone \
+        "https://github.com/$GITHUB_REPOSITORY" __tmp1 \
+        --branch="$GITHUB_REF_NAME" --depth=1 --single-branch
+    mv __tmp1/.git .
+    cp __tmp1/.gitconfig .git/config
+    rm -rf __tmp1
+    git reset "origin/$GITHUB_REF_NAME" --hard
+    # fetch jslint_ci.sh from trusted source
+    git branch -D __tmp1 &>/dev/null || true
+    shGitCmdWithGithubToken fetch origin alpha:__tmp1 --depth=1
+    for FILE in .ci.sh .ci2.sh jslint_ci.sh myci2.sh
+    do
+        if [ -f "$FILE" ]
+        then
+            git checkout __tmp1 "$FILE"
+        fi
+    done
+)}
+
 shGithubFileDownload() {(set -e
 # this function will download file $1 from github repo/branch
 # https://docs.github.com/en/rest/reference/repos#create-or-update-file-contents
@@ -875,6 +965,7 @@ shGithubFileUpload() {(set -e
 # https://docs.github.com/en/rest/reference/repos#create-or-update-file-contents
 # example use:
 # shGithubFileUpload octocat/hello-worId/master/hello.txt hello.txt
+    shGithubTokenExport
     node --input-type=module --eval '
 import moduleAssert from "assert";
 import moduleFs from "fs";
@@ -885,47 +976,65 @@ import modulePath from "path";
     let content = process.argv[2];
     let path = process.argv[1];
     let repo;
-    let responseText;
+    let responseBuf;
     let url;
     function httpRequest({
         method,
+        modeSha,
         payload
     }) {
         return new Promise(function (resolve) {
             moduleHttps.request(`${url}?ref=${branch}`, {
                 headers: {
-                    accept: "application/vnd.github.v3+json",
+                    accept: (
+                        content
+                        ? "application/vnd.github.v3+json"
+                        : "application/vnd.github.v3.raw"
+                    ),
                     authorization: `token ${process.env.MY_GITHUB_TOKEN}`,
                     "user-agent": "undefined"
                 },
                 method
             }, function (res) {
-                responseText = "";
-                res.setEncoding("utf8");
+                responseBuf = [];
                 res.on("data", function (chunk) {
-                    responseText += chunk;
+                    responseBuf.push(chunk);
                 });
                 res.on("end", function () {
-                    moduleAssert(res.statusCode === 200, (
-                        "shGithubFileUpload"
-                        + `- failed to download/upload file ${url} - `
-                        + responseText
-                    ));
+                    responseBuf = Buffer.concat(responseBuf);
+                    moduleAssert.ok(
+                        (
+                            res.statusCode < 400
+                            || (res.statusCode === 404 && modeSha)
+                        ),
+                        (
+                            `shGithubFileUpload - ${res.statusCode}`
+                            + ` - failed to download/upload file ${url} - `
+                            + responseBuf.slice(0, 1024).toString()
+                        )
+                    );
                     resolve();
                 });
             }).end(payload);
         });
     }
+    console.error(
+        content
+        ? `shGithubFileUpload - ${process.argv[1]}`
+        : `shGithubFileDownload - ${process.argv[1]}`
+    );
     path = path.split("/");
     repo = path.slice(0, 2).join("/");
     branch = path[2];
     path = path.slice(3).join("/");
     url = `https://api.github.com/repos/${repo}/contents/${path}`;
-    await httpRequest({});
+    await httpRequest({
+        modeSha: content
+    });
     if (!content) {
         await moduleFs.promises.writeFile(
             modulePath.basename(url),
-            Buffer.from(JSON.parse(responseText).content, "base64")
+            responseBuf
         );
         return;
     }
@@ -936,17 +1045,56 @@ import modulePath from "path";
             branch,
             content: content.toString("base64"),
             "message": `upload file ${path}`,
-            sha: JSON.parse(responseText).sha
+            sha: JSON.parse(responseBuf).sha
         })
     });
 }());
 ' "$@" # '
 )}
 
+shGithubPushBackupAndSquash() {
+# this function will, if $GIT_BRANCH has more than $COMMITS commits,
+# then backup, squash, force-push,
+# else normal-push
+    local GIT_REPO="$1"
+    shift
+    local GIT_BRANCH="$1"
+    shift
+    local COMMITS="$1"
+    shift
+    local COMMIT_MESSAGE="squash - $(git log "$GIT_BRANCH" -1 --pretty=%B)"
+    if [ "$(git rev-list --count "$GIT_BRANCH")" -gt "$COMMITS" ]
+    then
+        # backup
+        shGitCmdWithGithubToken push "$GIT_REPO" \
+            "$GIT_BRANCH:$GIT_BRANCH.backup_wday$(date -u +%w)" -f
+        # squash commits
+        git branch -D __tmp1 &>/dev/null || true
+        git checkout --orphan __tmp1
+        git commit --quiet -am "$COMMIT_MESSAGE" || true
+        # reset branch to squashed-commit
+        git push . "__tmp1:$GIT_BRANCH" -f
+        git checkout "$GIT_BRANCH"
+        # force-push squashed-commit
+        shGitCmdWithGithubToken push "$GIT_REPO" "$GIT_BRANCH" -f
+    else
+        shGitCmdWithGithubToken push "$GIT_REPO" "$GIT_BRANCH"
+    fi
+}
+
+shGithubTokenExport() {
+# this function will export $MY_GITHUB_TOKEN from file
+    if [ ! "$MY_GITHUB_TOKEN" ]
+    then
+        export MY_GITHUB_TOKEN="$(cat "$HOME/.mysecret2/.my_github_token")"
+    fi
+}
+
 shGithubWorkflowDispatch() {(set -e
 # this function will trigger-workflow to ci-repo $1 for owner.repo.branch $2
 # example use:
-# shGithubWorkflowDispatch octocat/my_ci octocat/my_project/master
+# shGithubWorkflowDispatch octocat/my-ci octocat/my-project/master
+    shGithubTokenExport
     curl "https://api.github.com/repos/$1"\
 "/actions/workflows/ci.yml/dispatches" \
         -H "accept: application/vnd.github.v3+json" \
@@ -1303,76 +1451,16 @@ import moduleUrl from "url";
 
 shImageLogoCreate() {(set -e
 # this function will create .png logo
-    local SIZE
-    echo '
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<title>logo</title>
-<style>
-/* sh jslint_ci.sh shBrowserScreenshot asset_image_logo.html --window-size=512x512 */
-/* csslint box-model:false */
-/* csslint ignore:start */
-*,
-*:after,
-*:before {
-    box-sizing: border-box;
-}
-@font-face {
-    font-family: Daley;
-    font-weight: bold;
-    src: url("asset_font_daley_bold.woff2") format("woff2");
-}
-/* csslint ignore:end */
-body,
-div {
-    margin: 0;
-}
-.container1 {
-    background: antiquewhite;
-    border: 24px solid darkslategray;
-    border-radius: 96px;
-    color: darkslategray;
-    font-family: Daley;
-    height: 512px;
-    margin: 0;
-    position: relative;
-    width: 512px;
-    zoom: 100%;
-/*
-    background: transparent;
-    border: 24px solid black;
-    color: black;
-*/
-}
-.text1 {
-    font-size: 256px;
-    left: 44px;
-    position: absolute;
-    top: 32px;
-}
-.text2 {
-    bottom: 8px;
-    font-size: 192px;
-    left: 44px;
-    position: absolute;
-}
-</style>
-</head>
-<body>
-<div class="container1">
-<div class="text1">JS</div>
-<div class="text2">Lint</div>
-</div>
-</body>
-</html>
-' > .artifact/asset_image_logo_512.html
-    cp asset_font_daley_bold.woff2 .artifact || true
+    if [ ! -f asset_image_logo_512.html ]
+    then
+        return
+    fi
     # screenshot asset_image_logo_512.png
-    shBrowserScreenshot .artifact/asset_image_logo_512.html \
+    shBrowserScreenshot asset_image_logo_512.html \
         --window-size=512x512 \
         -screenshot=.artifact/asset_image_logo_512.png
     # create various smaller thumbnails
+    local SIZE
     for SIZE in 32 64 128 256
     do
         convert -resize "${SIZE}x${SIZE}" .artifact/asset_image_logo_512.png \
@@ -3124,14 +3212,13 @@ v8CoverageReportCreate({
 shRunWithScreenshotTxt() {(set -e
 # this function will run cmd $@ and screenshot text-output
 # https://www.cnx-software.com/2011/09/22/how-to-convert-a-command-line-result-into-an-image-in-linux/
-    local EXIT_CODE
-    EXIT_CODE=0
-    export SCREENSHOT_SVG="$1"
+    local EXIT_CODE=0
+    local SCREENSHOT_SVG="$1"
     shift
     printf "0\n" > "$SCREENSHOT_SVG.exit_code"
     printf "shRunWithScreenshotTxt - ($* 2>&1)\n" 1>&2
     # run "$@" with screenshot
-    (set -e
+    (
         "$@" 2>&1 || printf "$?\n" > "$SCREENSHOT_SVG.exit_code"
     ) | tee "$SCREENSHOT_SVG.txt"
     EXIT_CODE="$(cat "$SCREENSHOT_SVG.exit_code")"
@@ -3223,22 +3310,27 @@ shCiMain() {(set -e
     then
         return
     fi
-    # run "$@" with winpty
-    export CI_UNAME="${CI_UNAME:-$(uname)}"
-    case "$CI_UNAME" in
+    # alias node.exe
+    case "$(uname)" in
+    MINGW*)
+        if (! alias node &>/dev/null); then alias node=node.exe; fi
+        ;;
     MSYS*)
-        if [ ! "$CI_WINPTY" ] && [ "$1" != shHttpFileServer ]
-        then
-            export CI_WINPTY=1
-            winpty -Xallow-non-tty -Xplain sh "$0" "$@"
-            return
-        fi
+        if (! alias node &>/dev/null); then alias node=node.exe; fi
         ;;
     esac
     # run "$@"
+    if [ -f ./myci2.sh ]
+    then
+        . ./myci2.sh :
+    fi
     if [ -f ./.ci.sh ]
     then
-        . ./.ci.sh
+        . ./.ci.sh :
+    fi
+    if [ -f ./.ci2.sh ]
+    then
+        . ./.ci2.sh :
     fi
     "$@"
 )}

@@ -4,20 +4,16 @@ name: ci
 on:
   push:
     branches:
-      # - '*/*/*'
       - alpha
       - beta
       - master
-      - sandbox
   workflow_dispatch:
 env:
-  CI_MAIN_JOB: node.v18.x64.linux
-  GITHUB_ARTIFACT_UPLOAD_NODE_VERSION: v18
-  # MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+  MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+  zzzz1234: 1
 jobs:
 
 
-# shCiBase - start
   job1:
     strategy:
       matrix:
@@ -33,24 +29,45 @@ jobs:
           - macos-latest
           - ubuntu-latest
           - windows-latest
+# base - .github/workflows/ci.yml - beg
+    env:
+      CI_MATRIX_NAME: >
+        node
+        v${{ matrix.node_version }}
+        ${{ matrix.architecture }}
+        ${{ matrix.os }}
+      CI_MATRIX_NAME_MAIN: "node v18 x64 ubuntu-latest"
+      CI_MATRIX_NODE_VERSION: v${{ matrix.node_version }}
+      CI_MATRIX_NODE_VERSION_MAIN: v18
+      CI_WORKFLOW_NAME: >
+        ${{ github.workflow }}
+        - ${{ github.event_name }}
+        - ${{ github.event.inputs.workflow_dispatch_name }}
+        - ${{ github.ref_name }}
     name: >
-      job1
       node
       v${{ matrix.node_version }}
       ${{ matrix.architecture }}
       ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
+      - run: echo "$(date -u +'%F %TZ') - ${{ env.CI_WORKFLOW_NAME }}"
       # disable autocrlf in windows
       - run: git config --global core.autocrlf false
       # https://github.com/actions/checkout
       - uses: actions/checkout@v3
       # fetch jslint_ci.sh from trusted source
       - run: |
-          git fetch origin alpha
-          git checkout origin/alpha .ci.sh jslint_ci.sh
+          git fetch origin alpha --depth=1
+          sh -c 'for FILE in .ci.sh .ci2.sh jslint_ci.sh myci2.sh; do
+          if [ -f "$FILE" ]; then git checkout origin/alpha "$FILE"; fi; done'
       # pre-run .ci.sh
       - run: sh jslint_ci.sh shCiPre
+      # https://github.com/actions/setup-node
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node_version }}
+          architecture: ${{ matrix.architecture }}
       # https://github.com/actions/cache
       - uses: actions/cache@v3
         with:
@@ -60,21 +77,8 @@ jobs:
             ${{ matrix.node_version }}
             ${{ matrix.os }}
           path: .github_cache
-      # https://github.com/actions/setup-node
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node_version }}
-          architecture: ${{ matrix.architecture }}
       # run nodejs coverages and tests
       - run: sh jslint_ci.sh shCiBase
-# shCiBase - end
-
-
-# shCiArtifactUpload - start
-      # fetch jslint_ci.sh from trusted source
-      - run: |
-          git fetch origin alpha
-          git checkout origin/alpha .ci.sh jslint_ci.sh
       # upload build-artifacts to branch-gh-pages
       - run: sh jslint_ci.sh shCiArtifactUpload
-# shCiArtifactUpload - end
+# base - .github/workflows/ci.yml - end

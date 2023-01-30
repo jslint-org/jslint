@@ -11,7 +11,7 @@
         "default": "./jslint_wrapper_cjs.cjs",
         "import": "./jslint.mjs"
     },
-    "fileCount": 33,
+    "fileCount": 34,
     "keywords": [
         "coverage-report",
         "javascript",
@@ -32,6 +32,8 @@
         "test": "node jslint.mjs v8_coverage_report=.artifact/coverage node test.mjs",
         "test2": "sh jslint_ci.sh shCiBase"
     },
+    "shCiArtifactUpload": 1,
+    "shCiNpmPublish": 1,
     "type": "module",
-    "version": "2022.11.20"
+    "version": "2023.1.29"
 }

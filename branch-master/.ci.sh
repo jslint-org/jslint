@@ -1,5 +1,5 @@
 shCiArtifactUploadCustom() {(set -e
-# this function will custom-upload build-artifacts to branch-gh-pages
+# this function will run custom-code to upload build-artifacts
     # .github_cache - restore
     if [ "$GITHUB_ACTION" ] && [ -d .github_cache ]
     then
@@ -118,8 +118,6 @@ echo "\
     }));
 }());
 ' "$@" # '
-    # screenshot asset_image_logo
-    shImageLogoCreate &
     # background http-file-server to serve webpages for screenshot
     # PORT=8080 npm_config_timeout_exit=5000 shHttpFileServer &
     # screenshot html
@@ -176,7 +174,7 @@ import moduleChildProcess from "child_process";
 )}
 
 shCiBaseCustom() {(set -e
-# this function will run base-ci
+# this function will run custom-code for base-ci
     # update files
     if [ "$(git branch --show-current)" = alpha ]
     then
@@ -434,7 +432,7 @@ import moduleFs from "fs";
                     "type": "git",
                     "url": "https://github.com/jslint-org/jslint.git"
                 },
-                "version": "2022.11.20"
+                "version": "2023.1.29"
             }, undefined, 4)
         }
     ].map(async function ({
