@@ -9,7 +9,7 @@
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 - jslint - unify analysis of variable-assignment/function-parameters into one function
 
-# v2023.1.1-beta
+# v2023.1.29
 - ci - bugfix - fix ci-shell-function shGithubFileUpload unable to upload new asset
 - ci - auto-create asset_image_logo_512.png from asset_image_logo_512.html
 - bugfix - fix shell-function shGithubCheckoutRemote not able to checkout trusted-files in non-alpha branches
