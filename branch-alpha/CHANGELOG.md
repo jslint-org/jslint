@@ -10,6 +10,7 @@
 - jslint - unify analysis of variable-assignment/function-parameters into one function
 
 # v2023.1.29
+- ci - in windows-ci-env, alias node=node.exe instead of using winpty for pipes
 - ci - bugfix - fix ci-shell-function shGithubFileUpload unable to upload new asset
 - ci - auto-create asset_image_logo_512.png from asset_image_logo_512.html
 - bugfix - fix shell-function shGithubCheckoutRemote not able to checkout trusted-files in non-alpha branches
