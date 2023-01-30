@@ -1646,6 +1646,10 @@ jstestIt((
         )
         + "  tests total  - " + jstestCountTotal + "\n"
         + "  tests failed - " + jstestCountFailed + "\n"
+        + "\n"
+        + "  time finished - "
+        + Number(Date.now() - jstestTimeStart).toLocaleString()
+        + " ms\n"
         + "\u001b[39m"
     );
     if (mode !== "testsFailed") {

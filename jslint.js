@@ -131,11 +131,11 @@
     stack, stack_trace, start, startOffset, startsWith, statement,
     statement_prv, stdio, stop, stop_at, stringify, subscript, switch,
     syntax_dict, tenure, test, test_cause, test_internal_error, this, thru,
-    toString, token, token_global, token_list, token_nxt, token_tree, tokens,
-    trace, tree, trim, trimEnd, trimRight, try, type, unlink, unordered,
-    unshift, url, used, v8CoverageListMerge, v8CoverageReportCreate, value,
-    variable, version, versions, warn, warn_at, warning, warning_list, warnings,
-    white, wrapped, writeFile
+    toLocaleString, toString, token, token_global, token_list, token_nxt,
+    token_tree, tokens, trace, tree, trim, trimEnd, trimRight, try, type,
+    unlink, unordered, unshift, url, used, v8CoverageListMerge,
+    v8CoverageReportCreate, value, variable, version, versions, warn, warn_at,
+    warning, warning_list, warnings, white, wrapped, writeFile
 */
 
 // init debugInline
@@ -9981,6 +9981,10 @@ function jstestOnExit(exitCode, mode) {
         )
         + "  tests total  - " + jstestCountTotal + "\n"
         + "  tests failed - " + jstestCountFailed + "\n"
+        + "\n"
+        + "  time finished - "
+        + Number(Date.now() - jstestTimeStart).toLocaleString()
+        + " ms\n"
         + "\u001b[39m"
     );
     if (mode !== "testsFailed") {

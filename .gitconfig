@@ -1,3 +1,4 @@
+# base - .gitconfig - beg
 [branch "alpha"]
     merge = refs/heads/alpha
     remote = origin
@@ -17,6 +18,7 @@
     ff = only
 [receive]
     denyCurrentBranch = warn
+# base - .gitconfig - end
 [remote "origin"]
     fetch = +refs/heads/*:refs/remotes/origin/*
     url = https://github.com/user/jslint

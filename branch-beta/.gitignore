@@ -1,3 +1,4 @@
+# base - .gitignore - beg
 "*
 '*
 *.[0123456789][0123456789]
@@ -19,3 +20,4 @@ undefined
 !.github
 !.gitignore
 !.npmignore
+# base - .gitignore - end
