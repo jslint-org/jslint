@@ -3310,16 +3310,13 @@ shCiMain() {(set -e
     then
         return
     fi
-    # run "$@" with winpty
-    local CI_UNAME="${CI_UNAME:-$(uname)}"
-    case "$CI_UNAME" in
+    # alias node.exe
+    case "$(uname)" in
+    MINGW*)
+        if (! alias node &>/dev/null); then alias node=node.exe; fi
+        ;;
     MSYS*)
-        if [ ! "$CI_WINPTY" ] && [ "$1" != shHttpFileServer ]
-        then
-            export CI_WINPTY=1
-            winpty -Xallow-non-tty -Xplain sh "$0" "$@"
-            return
-        fi
+        if (! alias node &>/dev/null); then alias node=node.exe; fi
         ;;
     esac
     # run "$@"
