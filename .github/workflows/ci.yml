@@ -51,7 +51,7 @@ jobs:
       ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
-      - run: echo "$(date -u +'%F %TZ') - ${{ env.CI_WORKFLOW_NAME }}"
+      - run: echo "$(date -u +"%Y-%m-%d %TZ") - ${{ env.CI_WORKFLOW_NAME }}" # "
       # disable autocrlf in windows
       - run: git config --global core.autocrlf false
       # https://github.com/actions/checkout
