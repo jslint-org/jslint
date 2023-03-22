@@ -1135,6 +1135,7 @@ shGithubWorkflowDispatch() {(set -e
     shift
     BRANCH="$1"
     shift
+    EXIT_CODE=0
     "$(shCurlExe)" \
 "https://api.github.com/repos/$REPO/actions/workflows/ci.yml/dispatches" \
         -H "accept: application/vnd.github.v3+json" \
@@ -1142,7 +1143,9 @@ shGithubWorkflowDispatch() {(set -e
         -X POST \
         -d '{"ref":"'"$BRANCH"'"}' \
         -s \
-        "$@"
+        "$@" || EXIT_CODE="$?"
+    printf "shGithubWorkflowDispatch - EXIT_CODE=$EXIT_CODE\n" 1>&2
+    return "$EXIT_CODE"
 )}
 
 shGrep() {(set -e
@@ -1676,10 +1679,59 @@ function objectDeepCopyWithKeysSorted(obj) {
     });
     return sorted;
 }
+function replaceListReplace(replaceList, data) {
+    // replaceList - normalize regexp
+    replaceList.forEach(function (elem) {
+        ["aa", "substr"].forEach(function (key) {
+            elem[key] = (
+                elem[key]
+                ? new RegExp(elem[key]).source
+                : ""
+            );
+        });
+    });
+    // replaceList - sort
+    replaceList.sort(function (aa, bb) {
+        return (
+            (aa.substr !== bb.substr)
+            ? 0.5 - Boolean(aa.substr < bb.substr)
+            : (aa.aa !== bb.aa)
+            ? 0.5 - Boolean(aa.aa < bb.aa)
+            : 0.5 - Boolean(aa.bb < bb.bb)
+        );
+    });
+    // replaceList - replace
+    replaceList.forEach(function ({
+        aa,
+        bb,
+        flags,
+        substr
+    }) {
+        let data0 = data;
+        data = data.replace(new RegExp(
+            substr || "[\\S\\s]*"
+        ), function (match0) {
+            return match0.replace(
+                new RegExp(aa, flags),
+                bb.replace((
+                    /\*\\\\\//g
+                ), "*/").replace((
+                    /\/\\\\\*/g
+                ), "/*")
+            );
+        });
+        if (data0 === data) {
+            throw new Error(
+                "shRawLibFetch - cannot find-and-replace snippet "
+                + JSON.stringify(aa)
+            );
+        }
+    });
+    return data;
+}
 (async function () {
     let fetchList;
     let matchObj;
-    let replaceList;
     let repoDict;
     function pipeToBuffer(res, dict, key) {
 
@@ -1703,18 +1755,6 @@ function objectDeepCopyWithKeysSorted(obj) {
         replaceList: []
     }, JSON.parse(matchObj[1]));
     fetchList = JSON.parse(JSON.stringify(matchObj[1].fetchList));
-    // normalize replaceList sorted by aa
-    replaceList = matchObj[1].replaceList.sort(function ({
-        aa
-    }, {
-        aa: bb
-    }) {
-        return (
-            aa < bb
-            ? -1
-            : 1
-        );
-    });
     // init repoDict, fetchList
     repoDict = {};
     fetchList.forEach(function (elem) {
@@ -1769,56 +1809,73 @@ function objectDeepCopyWithKeysSorted(obj) {
         let result;
         let result0;
         result = "";
-        fetchList.forEach(function (elem, ii, list) {
-            let prefix;
-            if (!elem.url) {
+        fetchList.forEach(function ({
+            comment,
+            data,
+            dataUriType,
+            dateCommitted,
+            footer = "",
+            header = "",
+            prefix,
+            replaceList = [],
+            url
+        }, ii, list) {
+            if (!url) {
                 return;
             }
-            // init prefix
-            prefix = "exports_" + modulePath.dirname(elem.url).replace(
-                "https://github.com/",
-                ""
-            ).replace((
-                /\/blob\/[^\/]*/
-            ), "/").replace((
-                /\W/g
-            ), "_").replace((
-                /(_)_+|_+$/g
-            ), "$1");
-            list[ii].exports = prefix + "_" + modulePath.basename(
-                elem.url
-            ).replace((
-                /\.js$/
-            ), "").replace((
-                /\W/g
-            ), "_");
-            if (elem.dataUriType) {
+            list[ii].exports = (
+                (
+                    "exports_" + modulePath.dirname(url).replace(
+                        "https://github.com/",
+                        ""
+                    ).replace((
+                        /\/blob\/[^\/]*/
+                    ), "/").replace((
+                        /\W/g
+                    ), "_").replace((
+                        /(_)_+|_+$/g
+                    ), "$1")
+                )
+                + "_"
+                + (
+                    modulePath.basename(
+                        url
+                    ).replace((
+                        /\.js$/
+                    ), "").replace((
+                        /\W/g
+                    ), "_")
+                )
+            );
+            if (dataUriType) {
                 return;
             }
-            if (elem.dateCommitted) {
+            if (dateCommitted) {
                 result += (
                     "\n\n\n/*\n"
-                    + "repo " + elem.prefix.replace("/blob/", "/tree/") + "\n"
+                    + "repo " + prefix.replace("/blob/", "/tree/") + "\n"
                     + "committed " + (
                         /\b\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ\b|$/
-                    ).exec(elem.dateCommitted.toString())[0] + "\n"
+                    ).exec(dateCommitted.toString())[0] + "\n"
                     + "*/"
                 );
             }
+            data = data.toString();
             // comment /*...*/
-            if (elem.comment) {
-                elem.data = "/*\n" + elem.data.toString().trim().replace((
+            if (comment) {
+                data = "/*\n" + data.trim().replace((
                     /\/\*/g
                 ), "/\\*").replace((
                     /\*\//g
                 ), "*\\/") + "\n*/";
             }
+            data = replaceListReplace(replaceList, data);
             // init header and footer
             result += (
-                "\n\n\n/*\nfile " + elem.url + "\n*/\n"
-                + (elem.header || "")
-                + elem.data.toString().trim()
-                + (elem.footer || "")
+                "\n\n\n/*\nfile " + url + "\n*/\n"
+                + header
+                + data.trim()
+                + footer
             );
         });
         result = (
@@ -1847,24 +1904,7 @@ function objectDeepCopyWithKeysSorted(obj) {
             /\n{4,}/g
         ), "\n\n\n");
         // replace from replaceList
-        replaceList.forEach(function ({
-            aa,
-            bb,
-            flags
-        }) {
-            result0 = result;
-            result = result.replace(new RegExp(aa, flags), bb.replace((
-                /\*\\\\\//g
-            ), "*/").replace((
-                /\/\\\\\*/g
-            ), "/*"));
-            if (result0 === result) {
-                throw new Error(
-                    "shRawLibFetch - cannot find-and-replace snippet "
-                    + JSON.stringify(aa)
-                );
-            }
-        });
+        result = replaceListReplace(matchObj[1].replaceList, result);
         // init header
         header = (
             matchObj.input.slice(0, matchObj.index)
