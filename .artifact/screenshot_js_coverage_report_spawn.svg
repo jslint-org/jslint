@@ -353,7 +353,7 @@
     textLength="768"
     x="10"
     y="1286"
->node-pre-gyp info using node@18.13.0 | linux | x64                                               </tspan>
+>node-pre-gyp info using node@18.15.0 | linux | x64                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -419,7 +419,7 @@
     textLength="768"
     x="10"
     y="1528"
->added 353 packages, and audited 354 packages in 10s                                              </tspan>
+>added 355 packages, and audited 356 packages in 14s                                              </tspan>
 
 </text>
 </svg>
