@@ -890,7 +890,7 @@ import moduleChildProcess from "child_process";
         moduleChildProcess.spawn(
             "git",
             ["ls-tree", "-lr", "HEAD"],
-            {encoding: "utf8", stdio: ["ignore", "overlapped", 2]}
+            {stdio: ["ignore", "overlapped", 2]}
         ).on("exit", function () {
             resolve(result);
         }).stdout.on("data", function (chunk) {
