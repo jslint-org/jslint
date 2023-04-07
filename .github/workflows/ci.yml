@@ -29,6 +29,8 @@ jobs:
           - macos-latest
           - ubuntu-latest
           - windows-latest
+        python_version:
+          - "3.10"
 # base - .github/workflows/ci.yml - beg
     env:
       CI_MATRIX_NAME: >
@@ -66,8 +68,12 @@ jobs:
       # https://github.com/actions/setup-node
       - uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node_version }}
           architecture: ${{ matrix.architecture }}
+          node-version: ${{ matrix.node_version }}
+      # https://github.com/actions/setup-python
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python_version }}
       # https://github.com/actions/cache
       - uses: actions/cache@v3
         with:
