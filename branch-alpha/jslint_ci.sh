@@ -46,7 +46,6 @@
 # head CHANGELOG.md -n50
 # ln -f jslint.mjs ~/jslint.mjs
 # openssl rand -base64 32 # random key
-# sh jslint_ci.sh shCiBranchPromote origin alpha beta
 # sh jslint_ci.sh shRunWithScreenshotTxt .artifact/screenshot_changelog.svg head -n50 CHANGELOG.md
 # vim rgx-lowercase \L\1\e
 
@@ -177,6 +176,31 @@ shBashrcDebianInit() {
     fi
 }
 
+shBashrcWindowsInit() {
+# this function will init windows-environment
+    case "$(uname)" in
+    CYGWIN*)
+        ;;
+    MINGW*)
+        ;;
+    MSYS*)
+        ;;
+    *)
+        return
+        ;;
+    esac
+    # alias curl.exe
+    # if (! alias curl &>/dev/null) && [ -f c:/windows/system32/curl.exe ]
+    # then
+    #     alias curl=c:/windows/system32/curl.exe
+    # fi
+    # alias node.exe
+    if (! alias node &>/dev/null)
+    then
+        alias node=node.exe
+    fi
+}
+
 shBrowserScreenshot() {(set -e
 # this function will run headless-chrome to screenshot url $1 with
 # window-size $2
@@ -249,11 +273,7 @@ import moduleUrl from "url";
         })).filter(function (elem) {
             return elem;
         }),
-        {
-            stdio: [
-                "ignore", 1, 2
-            ]
-        }
+        {stdio: ["ignore", 1, 2]}
     );
     exitCode = await new Promise(function (resolve) {
         child.on("exit", resolve);
@@ -329,11 +349,11 @@ import moduleChildProcess from "child_process";
             "shImageLogoCreate"
         ]
     ].forEach(function (argList) {
-        moduleChildProcess.spawn("sh", argList, {
-            stdio: [
-                "ignore", 1, 2
-            ]
-        }).on("exit", function (exitCode) {
+        moduleChildProcess.spawn(
+            "sh",
+            argList,
+            {stdio: ["ignore", 1, 2]}
+        ).on("exit", function (exitCode) {
             if (exitCode) {
                 process.exit(exitCode);
             }
@@ -388,9 +408,8 @@ import moduleChildProcess from "child_process";
         -e "s|_2fbranch-[a-z]*_2f|_2fbranch-${GITHUB_BRANCH0}_2f|g" \
         "branch-$GITHUB_BRANCH0/README.md"
     git status
-    git commit -am "update dir branch-$GITHUB_BRANCH0" || true
     # git push
-    shGithubPushBackupAndSquash origin gh-pages 50
+    shGitCommitPushOrSquash "" 50
     # list files
     shGitLsTree
     # validate http-links
@@ -534,27 +553,12 @@ import moduleFs from "fs";
     await moduleFs.promises.writeFile("README.md", data);
 }());
 ' "$@" # '
-    node jslint.mjs .
+    JSLINT_BETA=1 node jslint.mjs .
     if [ "$(command -v shCiBaseCustom)" = shCiBaseCustom ]
     then
         shCiBaseCustom
     fi
     git diff
-)}
-
-shCiBranchPromote() {(set -e
-# this function will promote branch $REMOTE/$BRANCH1 to branch $REMOTE/$BRANCH2
-    local BRANCH1
-    local BRANCH2
-    local REMOTE
-    REMOTE="$1"
-    shift
-    BRANCH1="$1"
-    shift
-    BRANCH2="$1"
-    shift
-    git fetch "$REMOTE" "$BRANCH1"
-    git push "$REMOTE" "$REMOTE/$BRANCH1:$BRANCH2" "$@"
 )}
 
 shCiMatrixIsmainName() {(set -e
@@ -612,9 +616,14 @@ shCiPre() {(set -e
     fi
 )}
 
-shDiffFileFromDir() {(set -e
-# this function print diff of file $1 against same file in dir $2
-    diff -u "$1" "$2/$1"
+shCurlExe() {(set -e
+# this function will print to stdout "curl.exe", if it exists, else "curl"
+    if [ -f c:/windows/system32/curl.exe ]
+    then
+        printf c:/windows/system32/curl.exe
+        return
+    fi
+    printf curl
 )}
 
 shDirHttplinkValidate() {(set -e
@@ -754,11 +763,27 @@ shDuList() {(set -e
 
 shGitCmdWithGithubToken() {(set -e
 # this function will run git $CMD with $MY_GITHUB_TOKEN
-    local CMD
-    local EXIT_CODE
-    local URL
     printf "shGitCmdWithGithubToken $*\n"
-    CMD="$1"
+    if [ -f .git/config ]
+    then
+        # security - scrub token from url
+        sed -i.bak "s|://.*@|://|g" .git/config
+        rm -f .git/config.bak
+    fi
+    local CMD="$1"
+    case "$CMD" in
+    clone)
+        ;;
+    ls-remote)
+        ;;
+    *)
+        if [ ! "$MY_GITHUB_TOKEN" ]
+        then
+            git "$@"
+            return
+        fi
+        ;;
+    esac
     shift
     URL="$1"
     shift
@@ -766,20 +791,57 @@ shGitCmdWithGithubToken() {(set -e
     then
         URL="$(git config "remote.$URL.url")"
     fi
-    URL="$(
-        printf "$URL" \
-        | sed -e "s|https://|https://x-access-token:$MY_GITHUB_TOKEN@|"
-    )"
-    if [ ! "$MY_GITHUB_TOKEN" ]
+    if [ "$MY_GITHUB_TOKEN" ]
     then
-        git "$CMD" "$URL" "$@"
-        return
+        URL="$(
+            printf "$URL" \
+            | sed -e "s|https://|https://x-access-token:$MY_GITHUB_TOKEN@|"
+        )"
     fi
     EXIT_CODE=0
     # hide $MY_GITHUB_TOKEN in case of err
     git "$CMD" "$URL" "$@" 2>/dev/null || EXIT_CODE="$?"
     printf "shGitCmdWithGithubToken - EXIT_CODE=$EXIT_CODE\n" 1>&2
     return "$EXIT_CODE"
+)}
+
+shGitCommitPushOrSquash() {(set -e
+# this function will, if $COMMIT_COUNT > $COMMIT_LIMIT,
+# then backup, squash, force-push,
+# else normal-push
+    BRANCH="$(git branch --show-current)"
+    COMMIT_MESSAGE="${1:-$(git diff HEAD --stat)}"
+    COMMIT_LIMIT="$2"
+    MODE_NOBACKUP="$3"
+    MODE_FORCE="$4"
+    git commit -am "$COMMIT_MESSAGE" || true
+    COMMIT_COUNT="$(git rev-list --count HEAD)"
+    if (! [ "$COMMIT_COUNT" -gt "$COMMIT_LIMIT" ] &>/dev/null)
+    then
+        if [ "$MODE_FORCE" = force ]
+        then
+            shGitCmdWithGithubToken push origin "$BRANCH" -f
+        else
+            shGitCmdWithGithubToken push origin "$BRANCH"
+        fi
+        return
+    fi
+    # backup
+    if [ "$MODE_NOBACKUP" != nobackup ]
+    then
+        shGitCmdWithGithubToken push origin \
+            "$BRANCH:$BRANCH.backup_wday$(date -u +%w)" -f
+    fi
+    # squash commits
+    COMMIT_MESSAGE="[squashed $COMMIT_COUNT commits] $COMMIT_MESSAGE"
+    git branch -D __tmp1 &>/dev/null || true
+    git checkout --orphan __tmp1
+    git commit --quiet -am "$COMMIT_MESSAGE" || true
+    # reset branch to squashed-commit
+    git push . "__tmp1:$BRANCH" -f
+    git checkout "$BRANCH"
+    # force-push squashed-commit
+    shGitCmdWithGithubToken push origin "$BRANCH" -f
 )}
 
 shGitGc() {(set -e
@@ -808,7 +870,7 @@ shGitInitBase() {(set -e
         git checkout -b "$BRANCH" base/base
     done
     sed -i.bak "s|owner/repo|${1:-owner/repo}|" .gitconfig
-    rm .gitconfig.bak
+    rm -f .gitconfig.bak
     cp .gitconfig .git/config
     git commit -am "update owner/repo to $1" || true
 )}
@@ -825,14 +887,11 @@ import moduleChildProcess from "child_process";
     // get file, mode, size
     result = await new Promise(function (resolve) {
         result = "";
-        moduleChildProcess.spawn("git", [
-            "ls-tree", "-lr", "HEAD"
-        ], {
-            encoding: "utf8",
-            stdio: [
-                "ignore", "pipe", 2
-            ]
-        }).on("exit", function () {
+        moduleChildProcess.spawn(
+            "git",
+            ["ls-tree", "-lr", "HEAD"],
+            {stdio: ["ignore", "overlapped", 2]}
+        ).on("exit", function () {
             resolve(result);
         }).stdout.on("data", function (chunk) {
             result += chunk;
@@ -861,13 +920,11 @@ import moduleChildProcess from "child_process";
     // get date
     result.forEach(function (elem) {
         result[0].size += elem.size;
-        moduleChildProcess.spawn("git", [
-            "log", "--max-count=1", "--format=%at", elem.file
-        ], {
-            stdio: [
-                "ignore", "pipe", 2
-            ]
-        }).stdout.on("data", function (chunk) {
+        moduleChildProcess.spawn(
+            "git",
+            ["log", "--max-count=1", "--format=%at", elem.file],
+            {stdio: ["ignore", "overlapped", 2]}
+        ).stdout.on("data", function (chunk) {
             elem.date = new Date(
                 Number(chunk) * 1000
             ).toISOString().slice(0, 19) + "Z";
@@ -956,15 +1013,15 @@ shGithubFileDownload() {(set -e
 # this function will download file $1 from github repo/branch
 # https://docs.github.com/en/rest/reference/repos#create-or-update-file-contents
 # example use:
-# shGithubFileDownload octocat/hello-worId/master/hello.txt
-    shGithubFileUpload $1
+# shGithubFileDownload octocat/hello-world/master/hello.txt
+    shGithubFileDownloadUpload download "$1" "$2"
 )}
 
-shGithubFileUpload() {(set -e
+shGithubFileDownloadUpload() {(set -e
 # this function will upload file $2 to github repo/branch $1
 # https://docs.github.com/en/rest/reference/repos#create-or-update-file-contents
 # example use:
-# shGithubFileUpload octocat/hello-worId/master/hello.txt hello.txt
+# shGithubFileUpload octocat/hello-world/master/hello.txt hello.txt
     shGithubTokenExport
     node --input-type=module --eval '
 import moduleAssert from "assert";
@@ -973,25 +1030,23 @@ import moduleHttps from "https";
 import modulePath from "path";
 (async function () {
     let branch;
-    let content = process.argv[2];
-    let path = process.argv[1];
+    let [mode, path, content] = process.argv.slice(1);
     let repo;
     let responseBuf;
     let url;
     function httpRequest({
         method,
-        modeSha,
         payload
     }) {
         return new Promise(function (resolve) {
             moduleHttps.request(`${url}?ref=${branch}`, {
                 headers: {
                     accept: (
-                        content
-                        ? "application/vnd.github.v3+json"
-                        : "application/vnd.github.v3.raw"
+                        mode === "download"
+                        ? "application/vnd.github.v3.raw"
+                        : "application/vnd.github.v3+json"
                     ),
-                    authorization: `token ${process.env.MY_GITHUB_TOKEN}`,
+                    authorization: `Bearer ${process.env.MY_GITHUB_TOKEN}`,
                     "user-agent": "undefined"
                 },
                 method
@@ -1005,7 +1060,7 @@ import modulePath from "path";
                     moduleAssert.ok(
                         (
                             res.statusCode < 400
-                            || (res.statusCode === 404 && modeSha)
+                            || (res.statusCode === 404 && mode === "upload")
                         ),
                         (
                             `shGithubFileUpload - ${res.statusCode}`
@@ -1019,21 +1074,19 @@ import modulePath from "path";
         });
     }
     console.error(
-        content
-        ? `shGithubFileUpload - ${process.argv[1]}`
-        : `shGithubFileDownload - ${process.argv[1]}`
+        mode === "download"
+        ? `shGithubFileDownload - ${process.argv[1]}`
+        : `shGithubFileUpload - ${process.argv[1]}`
     );
     path = path.split("/");
     repo = path.slice(0, 2).join("/");
     branch = path[2];
     path = path.slice(3).join("/");
     url = `https://api.github.com/repos/${repo}/contents/${path}`;
-    await httpRequest({
-        modeSha: content
-    });
-    if (!content) {
+    await httpRequest({});
+    if (mode === "download") {
         await moduleFs.promises.writeFile(
-            modulePath.basename(url),
+            content || modulePath.basename(url),
             responseBuf
         );
         return;
@@ -1048,60 +1101,51 @@ import modulePath from "path";
             sha: JSON.parse(responseBuf).sha
         })
     });
+    console.error(
+        mode === "download"
+        ? `shGithubFileDownload - done`
+        : `shGithubFileUpload - done`
+    );
 }());
 ' "$@" # '
 )}
 
-shGithubPushBackupAndSquash() {
-# this function will, if $GIT_BRANCH has more than $COMMITS commits,
-# then backup, squash, force-push,
-# else normal-push
-    local GIT_REPO="$1"
-    shift
-    local GIT_BRANCH="$1"
-    shift
-    local COMMITS="$1"
-    shift
-    local COMMIT_MESSAGE="squash - $(git log "$GIT_BRANCH" -1 --pretty=%B)"
-    if [ "$(git rev-list --count "$GIT_BRANCH")" -gt "$COMMITS" ]
-    then
-        # backup
-        shGitCmdWithGithubToken push "$GIT_REPO" \
-            "$GIT_BRANCH:$GIT_BRANCH.backup_wday$(date -u +%w)" -f
-        # squash commits
-        git branch -D __tmp1 &>/dev/null || true
-        git checkout --orphan __tmp1
-        git commit --quiet -am "$COMMIT_MESSAGE" || true
-        # reset branch to squashed-commit
-        git push . "__tmp1:$GIT_BRANCH" -f
-        git checkout "$GIT_BRANCH"
-        # force-push squashed-commit
-        shGitCmdWithGithubToken push "$GIT_REPO" "$GIT_BRANCH" -f
-    else
-        shGitCmdWithGithubToken push "$GIT_REPO" "$GIT_BRANCH"
-    fi
-}
+shGithubFileUpload() {(set -e
+# this function will upload file $2 to github repo/branch $1
+# https://docs.github.com/en/rest/reference/repos#create-or-update-file-contents
+# example use:
+# shGithubFileUpload octocat/hello-world/master/hello.txt hello.txt
+    shGithubFileDownloadUpload upload "$1" "$2"
+)}
 
 shGithubTokenExport() {
 # this function will export $MY_GITHUB_TOKEN from file
     if [ ! "$MY_GITHUB_TOKEN" ]
     then
-        export MY_GITHUB_TOKEN="$(cat "$HOME/.mysecret2/.my_github_token")"
+        export MY_GITHUB_TOKEN="$(cat ~/.mysecret2/.my_github_token)"
     fi
 }
 
 shGithubWorkflowDispatch() {(set -e
-# this function will trigger-workflow to ci-repo $1 for owner.repo.branch $2
+# this function will trigger github-workflow on given $REPO and $BRANCH
 # example use:
-# shGithubWorkflowDispatch octocat/my-ci octocat/my-project/master
+# shGithubWorkflowDispatch octocat/hello-world master
     shGithubTokenExport
-    curl "https://api.github.com/repos/$1"\
-"/actions/workflows/ci.yml/dispatches" \
+    REPO="$1"
+    shift
+    BRANCH="$1"
+    shift
+    EXIT_CODE=0
+    "$(shCurlExe)" \
+"https://api.github.com/repos/$REPO/actions/workflows/ci.yml/dispatches" \
         -H "accept: application/vnd.github.v3+json" \
-        -H "authorization: token $MY_GITHUB_TOKEN" \
+        -H "authorization: Bearer $MY_GITHUB_TOKEN" \
         -X POST \
-        -d '{"ref":"'"$2"'"}' \
-        -s
+        -d '{"ref":"'"$BRANCH"'"}' \
+        -s \
+        "$@" || EXIT_CODE="$?"
+    printf "shGithubWorkflowDispatch - EXIT_CODE=$EXIT_CODE\n" 1>&2
+    return "$EXIT_CODE"
 )}
 
 shGrep() {(set -e
@@ -1314,13 +1358,11 @@ import moduleUrl from "url";
         process.env.HOME + "/jslint.mjs"
     ), function (ignore, exists) {
         if (exists) {
-            moduleChildProcess.spawn("node", [
-                process.env.HOME + "/jslint.mjs", "."
-            ], {
-                stdio: [
-                    "ignore", 1, 2
-                ]
-            });
+            moduleChildProcess.spawn(
+                "node",
+                [process.env.HOME + "/jslint.mjs", "."],
+                {stdio: ["ignore", 1, 2]}
+            );
         }
     });
 }());
@@ -1368,13 +1410,12 @@ import moduleUrl from "url";
                 ), "git --no-pager ");
                 // run shell-cmd
                 console.error("$ " + match2);
-                moduleChildProcess.spawn(match2, {
-                    shell: true,
-                    stdio: [
-                        "ignore", 1, 2
-                    ]
-                // print exitCode
-                }).on("exit", function (exitCode) {
+                moduleChildProcess.spawn(
+                    "sh",
+                    ["-c", match2],
+                    {stdio: ["ignore", 1, 2]}
+                ).on("exit", function (exitCode) {
+                    // print exitCode
                     console.error("$ EXIT_CODE=" + exitCode);
                     that.evalDefault("\n", context, file, onError);
                 });
@@ -1580,6 +1621,21 @@ shNpmPublishV0() {(set -e
     npm publish "$@"
 )}
 
+shPidListWait() {
+# this will wait for all process-pid in $PID_LIST to exit
+    local EXIT_CODE=0
+    local PID_LIST="$2"
+    local TASK="$1"
+    for PID in $PID_LIST
+    do
+        printf "$TASK - pid=$PID ...\n"
+        wait "$PID" || EXIT_CODE="$?"
+        printf "$TASK - pid=$PID EXIT_CODE=$EXIT_CODE\n"
+    done
+    printf "$TASK - pid=done EXIT_CODE=$EXIT_CODE\n\n\n\n"
+    return "$EXIT_CODE"
+}
+
 shRawLibFetch() {(set -e
 # this function will fetch raw-lib from $1
     node --input-type=module --eval '
@@ -1623,10 +1679,59 @@ function objectDeepCopyWithKeysSorted(obj) {
     });
     return sorted;
 }
+function replaceListReplace(replaceList, data) {
+    // replaceList - normalize regexp
+    replaceList.forEach(function (elem) {
+        ["aa", "substr"].forEach(function (key) {
+            elem[key] = (
+                elem[key]
+                ? new RegExp(elem[key]).source
+                : ""
+            );
+        });
+    });
+    // replaceList - sort
+    replaceList.sort(function (aa, bb) {
+        return (
+            (aa.substr !== bb.substr)
+            ? 0.5 - Boolean(aa.substr < bb.substr)
+            : (aa.aa !== bb.aa)
+            ? 0.5 - Boolean(aa.aa < bb.aa)
+            : 0.5 - Boolean(aa.bb < bb.bb)
+        );
+    });
+    // replaceList - replace
+    replaceList.forEach(function ({
+        aa,
+        bb,
+        flags,
+        substr
+    }) {
+        let data0 = data;
+        data = data.replace(new RegExp(
+            substr || "[\\S\\s]*"
+        ), function (match0) {
+            return match0.replace(
+                new RegExp(aa, flags),
+                bb.replace((
+                    /\*\\\\\//g
+                ), "*/").replace((
+                    /\/\\\\\*/g
+                ), "/*")
+            );
+        });
+        if (data0 === data) {
+            throw new Error(
+                "shRawLibFetch - cannot find-and-replace snippet "
+                + JSON.stringify(aa)
+            );
+        }
+    });
+    return data;
+}
 (async function () {
     let fetchList;
     let matchObj;
-    let replaceList;
     let repoDict;
     function pipeToBuffer(res, dict, key) {
 
@@ -1650,18 +1755,6 @@ function objectDeepCopyWithKeysSorted(obj) {
         replaceList: []
     }, JSON.parse(matchObj[1]));
     fetchList = JSON.parse(JSON.stringify(matchObj[1].fetchList));
-    // normalize replaceList sorted by aa
-    replaceList = matchObj[1].replaceList.sort(function ({
-        aa
-    }, {
-        aa: bb
-    }) {
-        return (
-            aa < bb
-            ? -1
-            : 1
-        );
-    });
     // init repoDict, fetchList
     repoDict = {};
     fetchList.forEach(function (elem) {
@@ -1681,22 +1774,19 @@ function objectDeepCopyWithKeysSorted(obj) {
         }
         // fetch file
         if (elem.node) {
-            pipeToBuffer(moduleChildProcess.spawn("node", [
-                "-e", elem.node
-            ], {
-                stdio: [
-                    "ignore", "pipe", 2
-                ]
-            }).stdout, elem, "data");
+            pipeToBuffer(moduleChildProcess.spawn(
+                "node",
+                ["-e", elem.node],
+                {stdio: ["ignore", "overlapped", 2]}
+            ).stdout, elem, "data");
             return;
         }
         if (elem.sh) {
-            pipeToBuffer(moduleChildProcess.spawn(elem.sh, {
-                shell: true,
-                stdio: [
-                    "ignore", "pipe", 2
-                ]
-            }).stdout, elem, "data");
+            pipeToBuffer(moduleChildProcess.spawn(
+                "sh",
+                ["-c", elem.sh],
+                {stdio: ["ignore", "overlapped", 2]}
+            ).stdout, elem, "data");
             return;
         }
         moduleHttps.get(elem.url2 || elem.url.replace(
@@ -1719,56 +1809,73 @@ function objectDeepCopyWithKeysSorted(obj) {
         let result;
         let result0;
         result = "";
-        fetchList.forEach(function (elem, ii, list) {
-            let prefix;
-            if (!elem.url) {
+        fetchList.forEach(function ({
+            comment,
+            data,
+            dataUriType,
+            dateCommitted,
+            footer = "",
+            header = "",
+            prefix,
+            replaceList = [],
+            url
+        }, ii, list) {
+            if (!url) {
                 return;
             }
-            // init prefix
-            prefix = "exports_" + modulePath.dirname(elem.url).replace(
-                "https://github.com/",
-                ""
-            ).replace((
-                /\/blob\/[^\/]*/
-            ), "/").replace((
-                /\W/g
-            ), "_").replace((
-                /(_)_+|_+$/g
-            ), "$1");
-            list[ii].exports = prefix + "_" + modulePath.basename(
-                elem.url
-            ).replace((
-                /\.js$/
-            ), "").replace((
-                /\W/g
-            ), "_");
-            if (elem.dataUriType) {
+            list[ii].exports = (
+                (
+                    "exports_" + modulePath.dirname(url).replace(
+                        "https://github.com/",
+                        ""
+                    ).replace((
+                        /\/blob\/[^\/]*/
+                    ), "/").replace((
+                        /\W/g
+                    ), "_").replace((
+                        /(_)_+|_+$/g
+                    ), "$1")
+                )
+                + "_"
+                + (
+                    modulePath.basename(
+                        url
+                    ).replace((
+                        /\.js$/
+                    ), "").replace((
+                        /\W/g
+                    ), "_")
+                )
+            );
+            if (dataUriType) {
                 return;
             }
-            if (elem.dateCommitted) {
+            if (dateCommitted) {
                 result += (
                     "\n\n\n/*\n"
-                    + "repo " + elem.prefix.replace("/blob/", "/tree/") + "\n"
+                    + "repo " + prefix.replace("/blob/", "/tree/") + "\n"
                     + "committed " + (
                         /\b\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ\b|$/
-                    ).exec(elem.dateCommitted.toString())[0] + "\n"
+                    ).exec(dateCommitted.toString())[0] + "\n"
                     + "*/"
                 );
             }
+            data = data.toString();
             // comment /*...*/
-            if (elem.comment) {
-                elem.data = "/*\n" + elem.data.toString().trim().replace((
+            if (comment) {
+                data = "/*\n" + data.trim().replace((
                     /\/\*/g
                 ), "/\\*").replace((
                     /\*\//g
                 ), "*\\/") + "\n*/";
             }
+            data = replaceListReplace(replaceList, data);
             // init header and footer
             result += (
-                "\n\n\n/*\nfile " + elem.url + "\n*/\n"
-                + (elem.header || "")
-                + elem.data.toString().trim()
-                + (elem.footer || "")
+                "\n\n\n/*\nfile " + url + "\n*/\n"
+                + header
+                + data.trim()
+                + footer
             );
         });
         result = (
@@ -1797,24 +1904,7 @@ function objectDeepCopyWithKeysSorted(obj) {
             /\n{4,}/g
         ), "\n\n\n");
         // replace from replaceList
-        replaceList.forEach(function ({
-            aa,
-            bb,
-            flags
-        }) {
-            result0 = result;
-            result = result.replace(new RegExp(aa, flags), bb.replace((
-                /\*\\\\\//g
-            ), "*/").replace((
-                /\/\\\\\*/g
-            ), "/*"));
-            if (result0 === result) {
-                throw new Error(
-                    "shRawLibFetch - cannot find-and-replace snippet "
-                    + JSON.stringify(aa)
-                );
-            }
-        });
+        result = replaceListReplace(matchObj[1].replaceList, result);
         // init header
         header = (
             matchObj.input.slice(0, matchObj.index)
@@ -3029,21 +3119,23 @@ function sentinel() {}
       }
     }));
     exitCode = await new Promise(function (resolve) {
-      moduleChildProcess.spawn((
-        processArgv[0] === "npm"
-        ? process.platform.replace("win32", "npm.cmd").replace(
-          process.platform,
-          "npm"
-        )
-        : processArgv[0]
-      ), processArgv.slice(1), {
-        env: Object.assign({}, process.env, {
-          NODE_V8_COVERAGE: coverageDir
-        }),
-        stdio: [
-          "ignore", 1, 2
-        ]
-      }).on("exit", resolve);
+      moduleChildProcess.spawn(
+        (
+          processArgv[0] === "npm"
+          ? process.platform.replace("win32", "npm.cmd").replace(
+            process.platform,
+            "npm"
+          )
+          : processArgv[0]
+        ),
+        processArgv.slice(1),
+        {
+          env: Object.assign({}, process.env, {
+            NODE_V8_COVERAGE: coverageDir
+          }),
+          stdio: ["ignore", 1, 2]
+        }
+      ).on("exit", resolve);
     });
   }
   v8CoverageObj = await moduleFs.promises.readdir(coverageDir);
@@ -3304,22 +3396,24 @@ ${result}
     return "$EXIT_CODE"
 )}
 
-shCiMain() {(set -e
-# this function will run $@
-    if [ "$1" = "" ]
+# init ubuntu .bashrc
+shBashrcDebianInit || exit "$?"
+
+# init windows-environment
+shBashrcWindowsInit
+
+# source myci2.sh
+if [ -f ~/myci2.sh ]
+then
+    . ~/myci2.sh :
+fi
+
+# run "$@"
+(set -e
+    if [ ! "$1" ]
     then
         return
     fi
-    # alias node.exe
-    case "$(uname)" in
-    MINGW*)
-        if (! alias node &>/dev/null); then alias node=node.exe; fi
-        ;;
-    MSYS*)
-        if (! alias node &>/dev/null); then alias node=node.exe; fi
-        ;;
-    esac
-    # run "$@"
     if [ -f ./myci2.sh ]
     then
         . ./myci2.sh :
@@ -3333,9 +3427,4 @@ shCiMain() {(set -e
         . ./.ci2.sh :
     fi
     "$@"
-)}
-
-# init ubuntu .bashrc
-shBashrcDebianInit || exit "$?"
-
-shCiMain "$@"
+)
