@@ -361,7 +361,7 @@ import moduleChildProcess from "child_process";
     });
 }());
 ' "$@" # '
-    if [ "$(command -v shCiArtifactUploadCustom)" = shCiArtifactUploadCustom ]
+    if (command -v shCiArtifactUploadCustom >/dev/null)
     then
         shCiArtifactUploadCustom
     fi
@@ -425,6 +425,9 @@ shCiBase() {(set -e
 # shCiBaseCustom() {(set -e
 # # this function will run custom-code for base-ci
 #     return
+# )}
+# shCiLintCustom2() {(set -e
+# # this function will run custom-code to lint files
 # )}
     export GITHUB_BRANCH0="$(git rev-parse --abbrev-ref HEAD)"
     # validate package.json.fileCount
@@ -554,9 +557,21 @@ import moduleFs from "fs";
 }());
 ' "$@" # '
     JSLINT_BETA=1 node jslint.mjs .
-    if [ "$(command -v shCiBaseCustom)" = shCiBaseCustom ]
+    if (command -v shCiLintCustom >/dev/null)
+    then
+        shCiLintCustom
+    fi
+    if (command -v shCiLintCustom2 >/dev/null)
+    then
+        shCiLintCustom2
+    fi
+    if (command -v shCiBaseCustom >/dev/null)
     then
         shCiBaseCustom
+    fi
+    if (command -v shCiBaseCustom2 >/dev/null)
+    then
+        shCiBaseCustom2
     fi
     git diff
 )}
@@ -593,7 +608,7 @@ shCiNpmPublish() {(set -e
             "s|^    \"name\":.*|    \"name\": \"@$GITHUB_REPOSITORY\",|" \
             package.json
     fi
-    if [ "$(command -v shCiNpmPublishCustom)" = shCiNpmPublishCustom ]
+    if (command -v shCiNpmPublishCustom >/dev/null)
     then
         shCiNpmPublishCustom
     fi
@@ -610,9 +625,13 @@ shCiPre() {(set -e
         . ./myci2.sh :
         shMyciInit
     fi
-    if [ "$(command -v shCiPreCustom)" = shCiPreCustom ]
+    if (command -v shCiPreCustom >/dev/null)
     then
         shCiPreCustom
+    fi
+    if (command -v shCiPreCustom2 >/dev/null)
+    then
+        shCiPreCustom2
     fi
 )}
 
@@ -3412,8 +3431,16 @@ fi
 (set -e
     if [ ! "$1" ]
     then
-        return
+        exit
     fi
+    unset shCiArtifactUploadCustom
+    unset shCiBaseCustom
+    unset shCiBaseCustom2
+    unset shCiLintCustom
+    unset shCiLintCustom2
+    unset shCiNpmPublishCustom
+    unset shCiPreCustom
+    unset shCiPreCustom2
     if [ -f ./myci2.sh ]
     then
         . ./myci2.sh :
