@@ -10,6 +10,15 @@
 - jslint - unify analysis of variable-assignment/function-parameters into one function
 
 # v2022.4.1-beta
+- ci - add custom-shell-ci hooks to script jslint_ci.sh:
+    shCiArtifactUploadCustom()
+    shCiBaseCustom()
+    shCiBaseCustom2()
+    shCiLintCustom()
+    shCiLintCustom2()
+    shCiNpmPublishCustom()
+    shCiPreCustom()
+    shCiPreCustom2()
 - ci - housekeeping of ci-file jslint_ci.sh
 - ci - update shell-function shGitCommitPushOrSquash() to be able to save to specified filename
 - ci - remove little-used shell-function shCiBranchPromote()
