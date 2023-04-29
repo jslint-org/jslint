@@ -109,9 +109,7 @@ echo "\
                         // limit stdout to xxx lines
                         SH_RUN_WITH_SCREENSHOT_TXT_MAX_LINES: 64
                     }, process.env),
-                    stdio: [
-                        "ignore", 1, 2
-                    ]
+                    stdio: ["ignore", 1, 2]
                 }
             ).on("exit", resolve);
         });
@@ -147,14 +145,8 @@ import moduleChildProcess from "child_process";
         await new Promise(function (resolve) {
             moduleChildProcess.spawn(
                 "sh",
-                [
-                    "jslint_ci.sh", "shBrowserScreenshot", url
-                ],
-                {
-                    stdio: [
-                        "ignore", 1, 2
-                    ]
-                }
+                ["jslint_ci.sh", "shBrowserScreenshot", url],
+                {stdio: ["ignore", 1, 2]}
             ).on("exit", resolve);
         });
     }));
@@ -432,7 +424,7 @@ import moduleFs from "fs";
                     "type": "git",
                     "url": "https://github.com/jslint-org/jslint.git"
                 },
-                "version": "2023.1.29"
+                "version": "2022.4.1"
             }, undefined, 4)
         }
     ].map(async function ({
