@@ -1,5 +1,5 @@
-<svg height="1460" width="800" xmlns="http://www.w3.org/2000/svg">
-<rect height="1460" fill="#222" width="800"></rect>
+<svg height="1548" width="800" xmlns="http://www.w3.org/2000/svg">
+<rect height="1548" fill="#222" width="800"></rect>
 <text
     fill="#7f7"
     font-family="consolas, menlo, monospace"
@@ -293,109 +293,133 @@
     textLength="768"
     x="10"
     y="1066"
->                                                                                                 </tspan>
+>npm WARN deprecated @npmcli/move-file@1.1.2: This functionality has been moved to @npmcli/fs     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1088"
->&gt; sqlite3@5.0.11 install                                                                         </tspan>
+>npm WARN deprecated debug@3.2.6: Debug versions &gt;=3.2.0 &lt;3.2.7 || &gt;=4 &lt;4.3.1 have a low-severity\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1110"
->&gt; node-pre-gyp install --fallback-to-build                                                       </tspan>
+>   ReDos regression when used in a Node.js environment. It is recommended you upgrade to 3.2.7 o\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1132"
->                                                                                                 </tspan>
+>  r 4.3.1. (https://github.com/visionmedia/debug/issues/797)                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1154"
->node-pre-gyp info it worked if it ends with ok                                                   </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1176"
->node-pre-gyp info using node-pre-gyp@1.0.10                                                      </tspan>
+>&gt; sqlite3@5.0.11 install                                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1198"
->node-pre-gyp info using node@18.16.0 | linux | x64                                               </tspan>
+>&gt; node-pre-gyp install --fallback-to-build                                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1220"
->[sqlite3] Success: "/home/runner/work/jslint/jslint/node-sqlite3-js/lib/binding/napi-v6-linux-gl\</tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1242"
->  ibc-x64/node_sqlite3.node" already installed                                                   </tspan>
+>node-pre-gyp info it worked if it ends with ok                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1264"
->Pass --update-binary to reinstall or --build-from-source to recompile                            </tspan>
+>node-pre-gyp info using node-pre-gyp@1.0.10                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1286"
->node-pre-gyp info ok                                                                             </tspan>
+>node-pre-gyp info using node@18.16.0 | linux | x64                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1308"
->                                                                                                 </tspan>
+>node-pre-gyp info check checked for "/home/runner/work/jslint/jslint/node-sqlite3-js/lib/binding\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1330"
->up to date, audited 358 packages in 1s                                                           </tspan>
+>  /napi-v6-linux-glibc-x64/node_sqlite3.node" (not found)                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1352"
->                                                                                                 </tspan>
+>node-pre-gyp http GET https://github.com/TryGhost/node-sqlite3/releases/download/v5.0.11/napi-v6\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1374"
->66 packages are looking for funding                                                              </tspan>
+>  -linux-glibc-x64.tar.gz                                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1396"
->  run `npm fund` for details                                                                     </tspan>
+>node-pre-gyp info install unpacking napi-v6-linux-glibc-x64/node_sqlite3.node                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1418"
->                                                                                                 </tspan>
+>node-pre-gyp info extracted file count: 1                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1440"
->4 vulnerabilities (1 high, 3 critical)                                                           </tspan>
+>[sqlite3] Success: "/home/runner/work/jslint/jslint/node-sqlite3-js/lib/binding/napi-v6-linux-gl\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1462"
+>  ibc-x64/node_sqlite3.node" is installed via remote                                             </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1484"
+>node-pre-gyp info ok                                                                             </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1506"
+>                                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1528"
+>added 357 packages, and audited 358 packages in 12s                                              </tspan>
 
 </text>
 </svg>
