@@ -727,7 +727,7 @@ import moduleUrl from "url";
                 );
                 moduleAssert.ok(
                     res.statusCode < 400,
-                    `shDirHttplinkValidate - ${file} - unreachable link ${url}`
+                    `shDirHttplinkValidate - ${file} - unreachable url ${url}`
                 );
                 req.abort();
                 res.destroy();
@@ -763,7 +763,7 @@ import moduleUrl from "url";
                         exists,
                         (
                             `shDirHttplinkValidate - ${file}`
-                            + `- unreachable link ${url}`
+                            + `- unreachable file ${url}`
                         )
                     );
                 });
@@ -3133,7 +3133,7 @@ function sentinel() {}
       if ((
         /^coverage-\d+?-\d+?-\d+?\.json$/
       ).test(file)) {
-        console.error("rm file " + coverageDir + file);
+        consoleError("rm file " + coverageDir + file);
         await moduleFs.promises.unlink(coverageDir + file);
       }
     }));
@@ -3156,7 +3156,11 @@ function sentinel() {}
         }
       ).on("exit", resolve);
     });
+    consoleError(
+      `v8CoverageReportCreate - program exited with exitCode=${exitCode}`
+    );
   }
+  consoleError("v8CoverageReportCreate - merging coverage files...");
   v8CoverageObj = await moduleFs.promises.readdir(coverageDir);
   v8CoverageObj = v8CoverageObj.filter(function (file) {
     return (
@@ -3201,6 +3205,7 @@ function sentinel() {}
     coverageDir + "v8_coverage_merged.json",
     JSON.stringify(v8CoverageObj, undefined, 1)
   );
+  consoleError("v8CoverageReportCreate - creating html-coverage-report...");
   fileDict = Object.create(null);
   await Promise.all(v8CoverageObj.result.map(async function ({
     functions,

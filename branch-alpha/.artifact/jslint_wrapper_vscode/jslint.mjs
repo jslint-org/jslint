@@ -11231,7 +11231,7 @@ function sentinel() {}
             if ((
                 /^coverage-\d+?-\d+?-\d+?\.json$/
             ).test(file)) {
-                console.error("rm file " + coverageDir + file);
+                consoleError("rm file " + coverageDir + file);
                 await moduleFs.promises.unlink(coverageDir + file);
             }
         }));
@@ -11258,10 +11258,14 @@ function sentinel() {}
                 }
             ).on("exit", resolve);
         });
+        consoleError(
+            `v8CoverageReportCreate - program exited with exitCode=${exitCode}`
+        );
     }
 
 // 2. Merge JSON v8-coverage-files in <coverageDir>.
 
+    consoleError("v8CoverageReportCreate - merging coverage files...");
     v8CoverageObj = await moduleFs.promises.readdir(coverageDir);
     v8CoverageObj = v8CoverageObj.filter(function (file) {
         return (
@@ -11333,6 +11337,7 @@ function sentinel() {}
 
 // 3. Create html-coverage-reports in <coverageDir>.
 
+    consoleError("v8CoverageReportCreate - creating html-coverage-report...");
     fileDict = Object.create(null);
     await Promise.all(v8CoverageObj.result.map(async function ({
         functions,
