@@ -9,7 +9,8 @@
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 - jslint - unify analysis of variable-assignment/function-parameters into one function
 
-# v2022.4.1-beta
+# v2022.4.2-beta
+- vscode - Add manual lint-on-save command to vscode-jslint extension.
 - ci - add custom-shell-ci hooks to script jslint_ci.sh:
     shCiArtifactUploadCustom()
     shCiBaseCustom()
