@@ -30,11 +30,12 @@
 /*property
     Diagnostic, DiagnosticSeverity, ProgressLocation, Warning, Window, activate,
     cancellable, character, clear, column, commands, createDiagnosticCollection,
-    document, end, endsWith, exports, getText, increment, insert, isEmpty,
-    jslint, languages, line, lineAt, location, map, message, module, push,
-    range, rangeIncludingLineBreak, readFileSync, registerTextEditorCommand,
-    replace, report, runInNewContext, selection, set, slice, start,
-    subscriptions, title, uri, warnings, window, withProgress
+    document, end, endsWith, exports, fsPath, getText, increment, insert,
+    isEmpty, jslint, languages, line, lineAt, location, map, message, module,
+    promises, push, range, rangeIncludingLineBreak, readFileSync,
+    registerTextEditorCommand, replace, report, runInNewContext, selection, set,
+    slice, start, subscriptions, title, uri, warnings, window, withProgress,
+    writeFile
 */
 
 "use strict";
@@ -182,6 +183,20 @@ function activate({
         });
     }
 
+// PR-429 - Add manual lint-on-save command.
+
+    async function jslintLintAndSave({
+        document
+    }) {
+        jslintLint({
+            document
+        });
+        await require("fs").promises.writeFile(
+            document.uri.fsPath,
+            document.getText()
+        );
+    }
+
 // Initialize vscode and jslint.
 
     vscode = require("vscode");
@@ -222,6 +237,9 @@ function activate({
     subscriptions.push(vscode.commands.registerTextEditorCommand((
         "jslint.lint"
     ), jslintLint));
+    subscriptions.push(vscode.commands.registerTextEditorCommand((
+        "jslint.lintAndSave"
+    ), jslintLintAndSave));
 }
 
 exports.activate = activate;
