@@ -165,7 +165,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2023.1.29";
+let jslint_edition = "v2023.4.29";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -11231,35 +11231,41 @@ function sentinel() {}
             if ((
                 /^coverage-\d+?-\d+?-\d+?\.json$/
             ).test(file)) {
-                console.error("rm file " + coverageDir + file);
+                consoleError("rm file " + coverageDir + file);
                 await moduleFs.promises.unlink(coverageDir + file);
             }
         }));
         exitCode = await new Promise(function (resolve) {
-            moduleChildProcess.spawn((
-                processArgv[0] === "npm"
+            moduleChildProcess.spawn(
+                (
+                    processArgv[0] === "npm"
 
 // If win32 environment, then replace program npm with npm.cmd.
 // Coverage-hack - Ugly-hack to get test-coverage under both win32 and linux.
 
-                ? process.platform.replace("win32", "npm.cmd").replace(
-                    process.platform,
-                    "npm"
-                )
-                : processArgv[0]
-            ), processArgv.slice(1), {
-                env: Object.assign({}, process.env, {
-                    NODE_V8_COVERAGE: coverageDir
-                }),
-                stdio: [
-                    "ignore", 1, 2
-                ]
-            }).on("exit", resolve);
+                    ? process.platform.replace("win32", "npm.cmd").replace(
+                        process.platform,
+                        "npm"
+                    )
+                    : processArgv[0]
+                ),
+                processArgv.slice(1),
+                {
+                    env: Object.assign({}, process.env, {
+                        NODE_V8_COVERAGE: coverageDir
+                    }),
+                    stdio: ["ignore", 1, 2]
+                }
+            ).on("exit", resolve);
         });
+        consoleError(
+            `v8CoverageReportCreate - program exited with exitCode=${exitCode}`
+        );
     }
 
 // 2. Merge JSON v8-coverage-files in <coverageDir>.
 
+    consoleError("v8CoverageReportCreate - merging coverage files...");
     v8CoverageObj = await moduleFs.promises.readdir(coverageDir);
     v8CoverageObj = v8CoverageObj.filter(function (file) {
         return (
@@ -11331,6 +11337,7 @@ function sentinel() {}
 
 // 3. Create html-coverage-reports in <coverageDir>.
 
+    consoleError("v8CoverageReportCreate - creating html-coverage-report...");
     fileDict = Object.create(null);
     await Promise.all(v8CoverageObj.result.map(async function ({
         functions,

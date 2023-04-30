@@ -1,5 +1,5 @@
-<svg height="1306" width="800" xmlns="http://www.w3.org/2000/svg">
-<rect height="1306" fill="#222" width="800"></rect>
+<svg height="1196" width="800" xmlns="http://www.w3.org/2000/svg">
+<rect height="1196" fill="#222" width="800"></rect>
 <text
     fill="#7f7"
     font-family="consolas, menlo, monospace"
@@ -77,283 +77,253 @@
     textLength="768"
     x="10"
     y="274"
-># v2023.1.29                                                                                     </tspan>
+># v2023.4.29                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="296"
->- ci - in windows-ci-env, alias node=node.exe instead of using winpty for pipes                  </tspan>
+>- vscode - Add manual lint-on-save command to vscode-jslint extension.                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="318"
->- ci - bugfix - fix ci-shell-function shGithubFileUpload unable to upload new asset              </tspan>
+>- ci - add custom-shell-ci hooks to script jslint_ci.sh:                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="340"
->- ci - auto-create asset_image_logo_512.png from asset_image_logo_512.html                       </tspan>
+>    shCiArtifactUploadCustom()                                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="362"
->- bugfix - fix shell-function shGithubCheckoutRemote not able to checkout trusted-files in non-a\</tspan>
+>    shCiBaseCustom()                                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="384"
->  lpha branches                                                                                  </tspan>
+>    shCiBaseCustom2()                                                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="406"
->- jslint-ci - revamp auto-updating and add shell-function shGithubCheckoutRemote                 </tspan>
+>    shCiLintCustom()                                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="428"
->- test - print time-finished after test-run                                                      </tspan>
+>    shCiLintCustom2()                                                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="450"
->- jslint - hide warning about unordered case-statements behind beta-flag                         </tspan>
+>    shCiNpmPublishCustom()                                                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="472"
->- ci - bugfix - update shell-function shCiBase() to handle undefined fileMain                    </tspan>
+>    shCiPreCustom()                                                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="494"
->- ci - auto-update version-number in main mjs-module                                             </tspan>
+>    shCiPreCustom2()                                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="516"
->- ci - update shell-function shDirHttplinkValidate() to ignore insecure-links http://127.0.0.1, \</tspan>
+>- ci - housekeeping of ci-file jslint_ci.sh                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="538"
->  http://localhost                                                                               </tspan>
+>- ci - update shell-function shGitCommitPushOrSquash() to be able to save to specified filename  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="560"
->                                                                                                 </tspan>
+>- ci - remove little-used shell-function shCiBranchPromote()                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="582"
-># v2022.11.20                                                                                    </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="604"
->- ci - update ci from node-v16 to node-v18                                                       </tspan>
+># v2023.1.29                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="626"
->- cli - remove deprecated cli-option `--mode-vim-plugin`                                         </tspan>
+>- ci - in windows-ci-env, alias node=node.exe instead of using winpty for pipes                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="648"
->- node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejec\</tspan>
+>- ci - bugfix - fix ci-shell-function shGithubFileUpload unable to upload new asset              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="670"
->  tions=strict"`.                                                                                </tspan>
+>- ci - auto-create asset_image_logo_512.png from asset_image_logo_512.html                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="692"
->- editor - update codemirror-editor to v5.65.10                                                  </tspan>
+>- bugfix - fix shell-function shGithubCheckoutRemote not able to checkout trusted-files in non-a\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="714"
->- remove obsolete help.html                                                                      </tspan>
+>  lpha branches                                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="736"
->                                                                                                 </tspan>
+>- jslint-ci - revamp auto-updating and add shell-function shGithubCheckoutRemote                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="758"
-># v2022.9.20                                                                                     </tspan>
+>- test - print time-finished after test-run                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="780"
->- directive - add new directive `fart` to allow complex fat-arrow                                </tspan>
+>- jslint - hide warning about unordered case-statements behind beta-flag                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="802"
->                                                                                                 </tspan>
+>- ci - bugfix - update shell-function shCiBase() to handle undefined fileMain                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="824"
-># v2022.7.20                                                                                     </tspan>
+>- ci - auto-update version-number in main mjs-module                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="846"
->- bugfix - warnings that should be ignored sometimes suppress legitimate warnings                </tspan>
+>- ci - update shell-function shDirHttplinkValidate() to ignore insecure-links http://127.0.0.1, \</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="868"
->- doc - document jslint directives                                                               </tspan>
+>  http://localhost                                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="890"
->- vscode - add extra contextmenu commands "JSLint - Do Not Lint Selected Region", "JSLint - Igno\</tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="912"
->  re Current Line"                                                                               </tspan>
+># v2022.11.20                                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="934"
->                                                                                                 </tspan>
+>- ci - update ci from node-v16 to node-v18                                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="956"
-># v2022.6.21                                                                                     </tspan>
+>- cli - remove deprecated cli-option `--mode-vim-plugin`                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="978"
->- directive - add new directive `subscript` for linting of scripts targeting Google Closure Comp\</tspan>
+>- node - after node-v14 is deprecated, remove shell-code `export "NODE_OPTIONS=--unhandled-rejec\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1000"
->  iler                                                                                           </tspan>
+>  tions=strict"`.                                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1022"
->- bugfix - fix expression after "await" mis-identified as statement                              </tspan>
+>- editor - update codemirror-editor to v5.65.10                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1044"
->- warning - relax warning about missing `catch` in `try...finally` statement                     </tspan>
+>- remove obsolete help.html                                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1066"
->- jslint - allow aliases `evil, nomen` for jslint-directives `eval, name`, respectively for back\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1088"
->  wards-compat                                                                                   </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1110"
->- bugfix - fix broken codemirror example                                                         </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1132"
->- bugfix - fix jslint not-recognizing option-chaining when comparing operands of binary operator </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1154"
->- allow array-literals to directly call [...].flat() and [...].flatMap()                         </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1176"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1198"
-># v2022.5.20                                                                                     </tspan>
+    y="1088"
+># v2022.9.20                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1220"
->- coverage-report - disable default-coverage of directory `node_modules`, but allow override wit\</tspan>
+    y="1110"
+>- directive - add new directive `fart` to allow complex fat-arrow                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1242"
->  h cli-option `--include-node-modules=1`                                                        </tspan>
+    y="1132"
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1264"
->- coverage-report - add function globExclude() to revamp coverage-report to exclude files using \</tspan>
+    y="1154"
+># v2022.7.20                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1286"
->  glob-pattern-matching                                                                          </tspan>
+    y="1176"
+>- bugfix - warnings that should be ignored sometimes suppress legitimate warnings                </tspan>
 
 </text>
 </svg>

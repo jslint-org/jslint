@@ -109,9 +109,7 @@ echo "\
                         // limit stdout to xxx lines
                         SH_RUN_WITH_SCREENSHOT_TXT_MAX_LINES: 64
                     }, process.env),
-                    stdio: [
-                        "ignore", 1, 2
-                    ]
+                    stdio: ["ignore", 1, 2]
                 }
             ).on("exit", resolve);
         });
@@ -147,14 +145,8 @@ import moduleChildProcess from "child_process";
         await new Promise(function (resolve) {
             moduleChildProcess.spawn(
                 "sh",
-                [
-                    "jslint_ci.sh", "shBrowserScreenshot", url
-                ],
-                {
-                    stdio: [
-                        "ignore", 1, 2
-                    ]
-                }
+                ["jslint_ci.sh", "shBrowserScreenshot", url],
+                {stdio: ["ignore", 1, 2]}
             ).on("exit", resolve);
         });
     }));
@@ -343,7 +335,8 @@ import moduleFs from "fs";
                     "onCommand:jslint.clear",
                     "onCommand:jslint.disableRegion",
                     "onCommand:jslint.ignoreLine",
-                    "onCommand:jslint.lint"
+                    "onCommand:jslint.lint",
+                    "onCommand:jslint.lintAndSave"
                 ],
                 "bugs": {
                     "url": "https://github.com/jslint-org/jslint/issues"
@@ -372,6 +365,11 @@ import moduleFs from "fs";
                             "category": "jslint",
                             "command": "jslint.lint",
                             "title": "JSLint - Lint File"
+                        },
+                        {
+                            "category": "jslint",
+                            "command": "jslint.lintAndSave",
+                            "title": "JSLint - Lint File and Save"
                         }
                     ],
                     "keybindings": [
@@ -386,6 +384,12 @@ import moduleFs from "fs";
                             "key": "ctrl+shift+j l",
                             "mac": "cmd+shift+j l",
                             "when": "editorTextFocus"
+                        },
+                        {
+                            "command": "jslint.lintAndSave",
+                            "key": "ctrl+shift+j s",
+                            "mac": "cmd+shift+j s",
+                            "when": "editorTextFocus"
                         }
                     ],
                     "menus": {
@@ -396,18 +400,23 @@ import moduleFs from "fs";
                                 "when": "resourceLangId == javascript"
                             },
                             {
-                                "command": "jslint.clear",
+                                "command": "jslint.lintAndSave",
                                 "group": "7_modification@2",
                                 "when": "resourceLangId == javascript"
                             },
                             {
-                                "command": "jslint.disableRegion",
+                                "command": "jslint.clear",
                                 "group": "7_modification@3",
                                 "when": "resourceLangId == javascript"
                             },
                             {
-                                "command": "jslint.ignoreLine",
+                                "command": "jslint.disableRegion",
                                 "group": "7_modification@4",
+                                "when": "resourceLangId == javascript"
+                            },
+                            {
+                                "command": "jslint.ignoreLine",
+                                "group": "7_modification@5",
                                 "when": "resourceLangId == javascript"
                             }
                         ]
@@ -432,7 +441,7 @@ import moduleFs from "fs";
                     "type": "git",
                     "url": "https://github.com/jslint-org/jslint.git"
                 },
-                "version": "2023.1.29"
+                "version": "2023.4.29"
             }, undefined, 4)
         }
     ].map(async function ({

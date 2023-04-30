@@ -257,7 +257,7 @@
     textLength="768"
     x="10"
     y="934"
->node-pre-gyp info using node@18.13.0 | linux | x64                                               </tspan>
+>node-pre-gyp info using node@18.16.0 | linux | x64                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -293,7 +293,7 @@
     textLength="768"
     x="10"
     y="1066"
->up to date, audited 354 packages in 2s                                                           </tspan>
+>up to date, audited 358 packages in 1s                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -305,7 +305,7 @@
     textLength="768"
     x="10"
     y="1110"
->63 packages are looking for funding                                                              </tspan>
+>66 packages are looking for funding                                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
