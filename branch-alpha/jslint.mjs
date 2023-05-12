@@ -165,7 +165,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2023.4.29";
+let jslint_edition = "v2023.5.1-beta";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -1584,7 +1584,9 @@ ${name}<span class="apidocSignatureSpan">${signature}</span>
         ), "\n");
         return result;
     }));
-    // init module_list
+
+// Init module_list.
+
     module_list = await Promise.all(module_list.map(async function ({
         pathname
     }) {
@@ -1990,8 +1992,11 @@ async function jslint_cli({
                 ).test(process_argv[1])
                 || mode_cli
             )
-            && moduleUrl.fileURLToPath(import_meta_url)
-            === modulePath.resolve(process_argv[1])
+            && (
+                moduleUrl.fileURLToPath(import_meta_url)
+                ===
+                modulePath.resolve(process_argv[1])
+            )
         )
         && !mode_cli
     ) {
@@ -6441,6 +6446,20 @@ function jslint_phase3_parse(state) {
 //         }
 
         state.mode_module = true;
+        if (token_nxt.id === "(string)") {
+
+// PR-436 - Add grammar for side-effect import-statement.
+
+            warn("expected_a_b", token_nxt, "{", artifact());
+            advance();
+            semicolon();
+
+// test_cause:
+// ["import \"./aa.mjs\";", "stmt_import", "import_side_effect", "", 0]
+
+            test_cause("import_side_effect");
+            return the_import;
+        }
         if (token_nxt.identifier) {
             name = token_nxt;
             advance();
