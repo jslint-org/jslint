@@ -1,6 +1,6 @@
 /*jslint-disable*/
 /*
-shRawLibFetch
+shRollupFetch
 {
     "fetchList": [
         {
