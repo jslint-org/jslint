@@ -73,6 +73,12 @@ Douglas Crockford <douglas@crockford.com>
 
 12. [License](#license)
 
+13. [Devops Instruction](#devops-instruction)
+    - [branch-master commit](#branch-master-commit)
+    - [branch-master publish](#branch-master-publish)
+    - [pull-request merge](#pull-request-merge)
+    - [vscode-jslint publish](#vscode-jslint-publish)
+
 
 <br><br>
 # Web Demo
@@ -894,6 +900,88 @@ eval("1"); //jslint-ignore-line
 - JSLint is under [Unlicense License](LICENSE).
 - CodeMirror editor is under [MIT License](https://github.com/codemirror/codemirror5/blob/d0e3b2e727c41aa4fd89fbad0adfb3815339174c/LICENSE).
 - Function `v8CoverageListMerge` is derived from [MIT Licensed v8-coverage](https://github.com/demurgos/v8-coverage/blob/73446087dc38f61b09832c9867122a23f8577099/ts/LICENSE.md).
+
+
+<br><br>
+# Devops Instruction
+
+
+<br><br>
+### branch-master commit
+- $ `shGitSquashPop <commit-beta> '# v20yy.mm.dd\n<release notes from CHANGELOG.md>'`
+    - verify correct-year `20yy`
+- $ `git push origin alpha:branch-v20yy.mm.dd`
+- $ `git push upstream alpha -f`
+- verify ci-success for upstream-branch-alpha
+    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+- goto https://github.com/kaizhu256/jslint/pulls
+- click `New pull request`
+- click `base repository: jslint-org/jslint base:beta`
+- click `head repository: kaizhu256/jslint compare:branch-v20yy.mm.dd`
+- click `Create pull request`
+- verify ci-success for pull-request
+    - https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
+- click `Rebase and merge`
+- verify ci-success for upstream-branch-beta
+    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+```shell
+git fetch upstream beta
+git diff alpha..upstream/beta
+# verify no diff between alpha..upstream/beta
+git reset upstream/beta
+git push origin alpha -f
+git push origin alpha:beta
+git push upstream alpha -f
+git push origin :branch-v20yy.mm.dd -f
+```
+- verify ci-success for origin-branch-alpha
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- verify ci-success for upstream-branch-alpha
+    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+
+
+<br><br>
+### branch-master publish
+- $ `git push upstream beta:master`
+- verify ci-success for upstream-branch-master
+    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+- goto https://github.com/jslint-org/jslint/releases/new
+- input tag `v20yy.mm.dd`
+- click `Create new tag: v20yy.mm.dd on publish`
+    - verify correct-year `20yy`
+- click `Target: master`
+- input `Release title: v20yy.mm.dd - <description>`
+- copy-paste release notes from CHANGELOG.md
+- click `Generate release notes`
+- click `Set as the latest release`
+- click `Publish release`
+- verify ci-success for upstream-branch-publish
+    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+- verify email-notification `Successfully published @jslint-org/jslint@20yy.mm.dd`
+
+
+<br><br>
+### pull-request merge
+- find highest issue-number at https://github.com/jslint-org/jslint/issues/, and add +1 to it for PR-xxx
+- verify `commit into jslint-org:beta`
+- verify ci-success for pull-request
+    - https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
+- click `Rebase and merge`
+- verify ci-success for upstream-branch-beta
+    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+
+
+<br><br>
+### vscode-jslint publish
+- goto https://github.com/jslint-org/jslint/tree/gh-pages/branch-beta/.artifact/jslint_wrapper_vscode
+- click `vscode-jslint-20yy.mm.dd.vsix`
+- click `Download`
+- goto https://marketplace.visualstudio.com/manage/publishers/jslint
+- right-click `Update`
+- drag-and-drop downloaded `vscode-jslint-20yy.mm.dd.vsix`
+- click 'Upload'
+- verify email-notification `[Succeeded] Extension publish on Visual Studio Marketplace - vscode-jslint`
+
 
 <!--
 Coverage-hack

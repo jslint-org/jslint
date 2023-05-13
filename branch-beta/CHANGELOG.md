@@ -9,6 +9,11 @@
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 - jslint - unify analysis of variable-assignment/function-parameters into one function
 
+# v2023.5.1-beta
+- jslint - Add grammar for side-effect import-statement.
+- ci - Rename shell-function shRawLibFetch() to shRollupFetch().
+- doc - document devop procedures to maintain jslint-repo
+
 # v2023.4.29
 - vscode - Add manual lint-on-save command to vscode-jslint extension.
 - ci - add custom-shell-ci hooks to script jslint_ci.sh:

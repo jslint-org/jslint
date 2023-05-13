@@ -83,25 +83,25 @@
     textLength="768"
     x="10"
     y="296"
-> 1. Undeclared 'console'. // line 1, column 1                                                    </tspan>
+> 1. Undeclared 'console'. // line 1, column 17                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="318"
->    console.log('hello world');                                                                  </tspan>
+>    function foo() {console.log('hello world');}                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="340"
-> 2. Use double quotes, not single quotes. // line 1, column 13                                   </tspan>
+> 2. Use double quotes, not single quotes. // line 1, column 29                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="362"
->    console.log('hello world');                                                                  </tspan>
+>    function foo() {console.log('hello world');}                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

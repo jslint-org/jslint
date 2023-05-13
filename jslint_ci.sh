@@ -1655,7 +1655,17 @@ shPidListWait() {
     return "$EXIT_CODE"
 }
 
-shRawLibFetch() {(set -e
+shRmDsStore() {(set -e
+# this function will recursively rm .DS_Store from current-dir
+# http://stackoverflow.com/questions/2016844/bash-recursively-remove-files
+    local NAME
+    for NAME in "._*" ".DS_Store" "desktop.ini" "npm-debug.log" "*~"
+    do
+        find . -iname "$NAME" -print0 | xargs -0 rm -f || true
+    done
+)}
+
+shRollupFetch() {(set -e
 # this function will fetch raw-lib from $1
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
@@ -1741,7 +1751,7 @@ function replaceListReplace(replaceList, data) {
         });
         if (data0 === data) {
             throw new Error(
-                "shRawLibFetch - cannot find-and-replace snippet "
+                "shRollupFetch - cannot find-and-replace snippet "
                 + JSON.stringify(aa)
             );
         }
@@ -1749,6 +1759,7 @@ function replaceListReplace(replaceList, data) {
     return data;
 }
 (async function () {
+    let fetchCount = 0;
     let fetchList;
     let matchObj;
     let repoDict;
@@ -1766,7 +1777,7 @@ function replaceListReplace(replaceList, data) {
     }
     // init matchObj
     matchObj = (
-        /^\/\*jslint-disable\*\/\n\/\*\nshRawLibFetch\n(\{\n[\S\s]*?\n\})([\S\s]*?)\n\*\/\n/m
+        /^\/\*jslint-disable\*\/\n\/\*\nshRollupFetch\n(\{\n[\S\s]*?\n\})([\S\s]*?)\n\*\/\n/m
     ).exec(await moduleFs.promises.readFile(process.argv[1], "utf8"));
     // JSON.parse match1 with comment
     matchObj[1] = Object.assign({
@@ -1776,7 +1787,7 @@ function replaceListReplace(replaceList, data) {
     fetchList = JSON.parse(JSON.stringify(matchObj[1].fetchList));
     // init repoDict, fetchList
     repoDict = {};
-    fetchList.forEach(function (elem) {
+    fetchList.forEach(async function (elem) {
         if (!elem.url) {
             return;
         }
@@ -1808,10 +1819,16 @@ function replaceListReplace(replaceList, data) {
             ).stdout, elem, "data");
             return;
         }
+        fetchCount += 1;
+        await new Promise(function (resolve) {
+            setTimeout(resolve, fetchCount * 50);
+        });
         moduleHttps.get(elem.url2 || elem.url.replace(
             "https://github.com/",
             "https://raw.githubusercontent.com/"
         ).replace("/blob/", "/"), function (res) {
+            fetchCount -= 1;
+            console.error(`shRollupFetch - ${fetchCount} remaining fetches`);
             // http-redirect
             if (res.statusCode === 302) {
                 moduleHttps.get(res.headers.location, function (res) {
@@ -1927,7 +1944,7 @@ function replaceListReplace(replaceList, data) {
         // init header
         header = (
             matchObj.input.slice(0, matchObj.index)
-            + "/*jslint-disable*/\n/*\nshRawLibFetch\n"
+            + "/*jslint-disable*/\n/*\nshRollupFetch\n"
             + JSON.stringify(
                 objectDeepCopyWithKeysSorted(matchObj[1]),
                 undefined,
@@ -1968,7 +1985,7 @@ function replaceListReplace(replaceList, data) {
             });
             if (result0 === result) {
                 throw new Error(
-                    "shRawLibFetch - cannot find-and-replace snippet "
+                    "shRollupFetch - cannot find-and-replace snippet "
                     + JSON.stringify(aa)
                 );
             }
@@ -1997,7 +2014,7 @@ function replaceListReplace(replaceList, data) {
             );
             if (result0 === result) {
                 throw new Error(
-                    "shRawLibFetch - cannot find-and-replace snippet "
+                    "shRollupFetch - cannot find-and-replace snippet "
                     + JSON.stringify(exports)
                 );
             }
@@ -2015,16 +2032,6 @@ function replaceListReplace(replaceList, data) {
 }());
 ' "$@" # '
     git diff
-)}
-
-shRmDsStore() {(set -e
-# this function will recursively rm .DS_Store from current-dir
-# http://stackoverflow.com/questions/2016844/bash-recursively-remove-files
-    local NAME
-    for NAME in "._*" ".DS_Store" "desktop.ini" "npm-debug.log" "*~"
-    do
-        find . -iname "$NAME" -print0 | xargs -0 rm -f || true
-    done
 )}
 
 shRunWithCoverage() {(set -e
