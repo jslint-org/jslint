@@ -2815,20 +2815,30 @@ function jslint_phase2_lex(state) {
 // Match a group that starts with left paren.
 
                     char_after("(");
-                    if (char === "?") {
-                        char_after("?");
-                        if (char === "=" || char === "!") {
-                            char_after();
-                        } else {
-                            char_after(":");
-                        }
-                    } else if (char === ":") {
+                    switch (char) {
+                    case ":":
 
 // test_cause:
 // ["aa=/(:)/", "lex_regexp_group", "expected_a_before_b", ":", 6]
 // ["aa=/?/", "lex_regexp_group", "expected_a_before_b", "?", 5]
 
                         warn_at("expected_a_before_b", line, column, "?", ":");
+                        break;
+                    case "?":
+                        char_after("?");
+                        switch (char) {
+                        case "!":
+
+// PR-437 - Add grammar for regexp-named-capture-group.
+
+                        case "<":
+                        case "=":
+                            char_after();
+                            break;
+                        default:
+                            char_after(":");
+                        }
+                        break;
                     }
 
 // RegExp
@@ -2862,7 +2872,10 @@ function jslint_phase2_lex(state) {
 // ["aa=/\\/", "lex_regexp_group", "escape", "", 0]
 
                     test_cause("escape");
-                    char_after_escape("BbDdSsWw^${}[]():=!.|*+?");
+
+// PR-437 - Add grammar for regexp-named-backreference.
+
+                    char_after_escape("BbDdSsWw^${}[]():=!.|*+?k");
                     break;
                 case "^":
                     if (snippet !== "^") {
@@ -6446,18 +6459,18 @@ function jslint_phase3_parse(state) {
 //         }
 
         state.mode_module = true;
-        if (token_nxt.id === "(string)") {
 
 // PR-436 - Add grammar for side-effect import-statement.
 
-            warn("expected_a_b", token_nxt, "{", artifact());
-            advance();
-            semicolon();
+        if (token_nxt.id === "(string)") {
 
 // test_cause:
 // ["import \"./aa.mjs\";", "stmt_import", "import_side_effect", "", 0]
 
             test_cause("import_side_effect");
+            warn("expected_a_b", token_nxt, "{", artifact());
+            advance();
+            semicolon();
             return the_import;
         }
         if (token_nxt.identifier) {
