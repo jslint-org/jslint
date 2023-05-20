@@ -1626,6 +1626,72 @@ function objectDeepCopyWithKeysSorted(obj) {
 ' "$@" # '
 )}
 
+shLintPython() {(set -e
+# this function will lint python file
+    FILE_LIST="$@"
+    (
+    printf "\n\nlint ruff\n"
+    OPTION=""
+    # autofix
+    OPTION="$OPTION --fix"
+    # ANN flake8-annotations
+    OPTION="$OPTION --ignore=ANN"
+    # obsolete - one-blank-line-before-class (D203)
+    # * 1 blank line required before class docstring
+    OPTION="$OPTION --ignore=D203"
+    # multi-line-summary-first-line (D212)
+    # * Multi-line docstring summary should start at the first line
+    OPTION="$OPTION --ignore=D212"
+    # non-imperative-mood (D401)
+    # * First line of docstring should be in imperative mood: "{first_line}"
+    OPTION="$OPTION --ignore=D401"
+    # docstring-starts-with-this (D404)
+    # * First word of the docstring should not be "This"
+    OPTION="$OPTION --ignore=D404"
+    # commented-out-code (ERA001)
+    # Commented-out code is dead code, and is often included inadvertently.
+    OPTION="$OPTION --ignore=ERA001"
+    # too-many-statements (PLR0915)
+    # * Too many statements ({statements} > {max_statements})
+    OPTION="$OPTION --ignore=PLR0915"
+    # subprocess-without-shell-equals-true (S603)
+    # * `subprocess` call: check for execution of untrusted input
+    OPTION="$OPTION --ignore=S603"
+    # start-process-with-partial-path (S607)
+    # * Starting a process with a partial executable path
+    OPTION="$OPTION --ignore=S607"
+    # hardcoded-sql-expression (S608)
+    # SQL injection is a common attack vector for web applications.
+    OPTION="$OPTION --ignore=S608"
+    # print (T201)
+    # * `print` found
+    OPTION="$OPTION --ignore=T201"
+    OPTION="$OPTION --select=ALL"
+    ruff check $OPTION $FILE_LIST
+    ) &
+    PID_LIST="$PID_LIST $!"
+    #
+    (
+    printf "lint pycodestyle\n"
+    OPTION="--ignore="
+    # Unexpected indentation (comment) (E116)
+    # Comments should be indented relative to the code in the block they are in.
+    OPTION="$OPTION,E116"
+    # At least two spaces before inline comment (E261)
+    # Inline comments should have two spaces before them.
+    OPTION="$OPTION,E261"
+    # Line break occurred before a binary operator (W503)
+    # Line breaks should occur after the binary operator to keep all variable
+    # names aligned.
+    OPTION="$OPTION,W503"
+    pycodestyle $OPTION $FILE_LIST
+    ) &
+    PID_LIST="$PID_LIST $!"
+    #
+    shPidListWait shLintPython "$PID_LIST"
+    printf "lint successful\n\n"
+)}
+
 shNpmPublishV0() {(set -e
 # this function will npm-publish name $1 with bare package.json
     DIR=/tmp/shNpmPublishV0
