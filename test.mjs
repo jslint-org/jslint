@@ -747,6 +747,14 @@ jstestDescribe((
             ],
             module: [
                 "export default Object.freeze();",
+
+// PR-439 - Add grammar for "export async function ...".
+
+                (
+                    "export default Object.freeze(async function () {\n"
+                    + "    return await 0;\n"
+                    + "});\n"
+                ),
                 "import {aa, bb} from \"aa\";\naa(bb);",
                 "import {} from \"aa\";",
                 "import(\"aa\").then(function () {\n    return;\n});",
