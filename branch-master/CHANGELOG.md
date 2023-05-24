@@ -5,9 +5,16 @@
 - coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning requiring paren around plus-separated concatenations.
-- jslint - require regexp to use open-form.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
-- jslint - unify analysis of variable-assignment/function-parameters into one function
+
+# v2023.5.23
+- jslint - Check exported properties are ordered.
+- jslint - Add grammar for "export async function ...".
+- python - Add shell-function shLintPython().
+- jslint - Add grammar for regexp-named-capture-group and regexp-named-backreference.
+- jslint - Add grammar for side-effect import-statement.
+- ci - Rename shell-function shRawLibFetch() to shRollupFetch().
+- doc - document devop procedures to maintain jslint-repo
 
 # v2023.4.29
 - vscode - Add manual lint-on-save command to vscode-jslint extension.

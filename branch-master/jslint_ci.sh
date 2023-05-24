@@ -295,7 +295,6 @@ shCiArtifactUpload() {(set -e
 # # this function will run custom-code to upload build-artifacts
 #     return
 # )}
-    local FILE
     if ! (shCiMatrixIsmainName \
         && [ -f package.json ] \
         && grep -q '^    "shCiArtifactUpload": 1,$' package.json)
@@ -789,7 +788,7 @@ shGitCmdWithGithubToken() {(set -e
         sed -i.bak "s|://.*@|://|g" .git/config
         rm -f .git/config.bak
     fi
-    local CMD="$1"
+    CMD="$1"
     case "$CMD" in
     clone)
         ;;
@@ -877,7 +876,6 @@ shGitGc() {(set -e
 
 shGitInitBase() {(set -e
 # this function will git init && create basic git-template from jslint-org/base
-    local BRANCH
     git init
     git config core.autocrlf input
     git remote remove base 2>/dev/null || true
@@ -1233,7 +1231,6 @@ shHttpFileServer() {(set -e
 # this function will run simple node http-file-server on port $PORT
     if [ ! "$npm_config_mode_auto_restart" ]
     then
-        local EXIT_CODE
         EXIT_CODE=0
         export npm_config_mode_auto_restart=1
         while true
@@ -1520,7 +1517,6 @@ shImageLogoCreate() {(set -e
         --window-size=512x512 \
         -screenshot=.artifact/asset_image_logo_512.png
     # create various smaller thumbnails
-    local SIZE
     for SIZE in 32 64 128 256
     do
         convert -resize "${SIZE}x${SIZE}" .artifact/asset_image_logo_512.png \
@@ -1630,9 +1626,74 @@ function objectDeepCopyWithKeysSorted(obj) {
 ' "$@" # '
 )}
 
+shLintPython() {(set -e
+# this function will lint python file
+    FILE_LIST="$@"
+    (
+    printf "\n\nlint ruff\n"
+    OPTION=""
+    # autofix
+    OPTION="$OPTION --fix"
+    # ANN flake8-annotations
+    OPTION="$OPTION --ignore=ANN"
+    # obsolete - one-blank-line-before-class (D203)
+    # * 1 blank line required before class docstring
+    OPTION="$OPTION --ignore=D203"
+    # multi-line-summary-first-line (D212)
+    # * Multi-line docstring summary should start at the first line
+    OPTION="$OPTION --ignore=D212"
+    # non-imperative-mood (D401)
+    # * First line of docstring should be in imperative mood: "{first_line}"
+    OPTION="$OPTION --ignore=D401"
+    # docstring-starts-with-this (D404)
+    # * First word of the docstring should not be "This"
+    OPTION="$OPTION --ignore=D404"
+    # commented-out-code (ERA001)
+    # Commented-out code is dead code, and is often included inadvertently.
+    OPTION="$OPTION --ignore=ERA001"
+    # too-many-statements (PLR0915)
+    # * Too many statements ({statements} > {max_statements})
+    OPTION="$OPTION --ignore=PLR0915"
+    # subprocess-without-shell-equals-true (S603)
+    # * `subprocess` call: check for execution of untrusted input
+    OPTION="$OPTION --ignore=S603"
+    # start-process-with-partial-path (S607)
+    # * Starting a process with a partial executable path
+    OPTION="$OPTION --ignore=S607"
+    # hardcoded-sql-expression (S608)
+    # SQL injection is a common attack vector for web applications.
+    OPTION="$OPTION --ignore=S608"
+    # print (T201)
+    # * `print` found
+    OPTION="$OPTION --ignore=T201"
+    OPTION="$OPTION --select=ALL"
+    ruff check $OPTION $FILE_LIST
+    ) &
+    PID_LIST="$PID_LIST $!"
+    #
+    (
+    printf "lint pycodestyle\n"
+    OPTION="--ignore="
+    # Unexpected indentation (comment) (E116)
+    # Comments should be indented relative to the code in the block they are in.
+    OPTION="$OPTION,E116"
+    # At least two spaces before inline comment (E261)
+    # Inline comments should have two spaces before them.
+    OPTION="$OPTION,E261"
+    # Line break occurred before a binary operator (W503)
+    # Line breaks should occur after the binary operator to keep all variable
+    # names aligned.
+    OPTION="$OPTION,W503"
+    pycodestyle $OPTION $FILE_LIST
+    ) &
+    PID_LIST="$PID_LIST $!"
+    #
+    shPidListWait shLintPython "$PID_LIST"
+    printf "lint successful\n\n"
+)}
+
 shNpmPublishV0() {(set -e
 # this function will npm-publish name $1 with bare package.json
-    local DIR
     DIR=/tmp/shNpmPublishV0
     rm -rf "$DIR" && mkdir -p "$DIR" && cd "$DIR"
     printf "{\"name\":\"$1\",\"version\":\"0.0.1\"}\n" > package.json
@@ -1642,9 +1703,9 @@ shNpmPublishV0() {(set -e
 
 shPidListWait() {
 # this will wait for all process-pid in $PID_LIST to exit
-    local EXIT_CODE=0
-    local PID_LIST="$2"
-    local TASK="$1"
+    EXIT_CODE=0
+    PID_LIST="$2"
+    TASK="$1"
     for PID in $PID_LIST
     do
         printf "$TASK - pid=$PID ...\n"
@@ -1655,7 +1716,16 @@ shPidListWait() {
     return "$EXIT_CODE"
 }
 
-shRawLibFetch() {(set -e
+shRmDsStore() {(set -e
+# this function will recursively rm .DS_Store from current-dir
+# http://stackoverflow.com/questions/2016844/bash-recursively-remove-files
+    for NAME in "._*" ".DS_Store" "desktop.ini" "npm-debug.log" "*~"
+    do
+        find . -iname "$NAME" -print0 | xargs -0 rm -f || true
+    done
+)}
+
+shRollupFetch() {(set -e
 # this function will fetch raw-lib from $1
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
@@ -1741,7 +1811,7 @@ function replaceListReplace(replaceList, data) {
         });
         if (data0 === data) {
             throw new Error(
-                "shRawLibFetch - cannot find-and-replace snippet "
+                "shRollupFetch - cannot find-and-replace snippet "
                 + JSON.stringify(aa)
             );
         }
@@ -1749,6 +1819,7 @@ function replaceListReplace(replaceList, data) {
     return data;
 }
 (async function () {
+    let fetchCount = 0;
     let fetchList;
     let matchObj;
     let repoDict;
@@ -1766,7 +1837,7 @@ function replaceListReplace(replaceList, data) {
     }
     // init matchObj
     matchObj = (
-        /^\/\*jslint-disable\*\/\n\/\*\nshRawLibFetch\n(\{\n[\S\s]*?\n\})([\S\s]*?)\n\*\/\n/m
+        /^\/\*jslint-disable\*\/\n\/\*\nshRollupFetch\n(\{\n[\S\s]*?\n\})([\S\s]*?)\n\*\/\n/m
     ).exec(await moduleFs.promises.readFile(process.argv[1], "utf8"));
     // JSON.parse match1 with comment
     matchObj[1] = Object.assign({
@@ -1776,7 +1847,7 @@ function replaceListReplace(replaceList, data) {
     fetchList = JSON.parse(JSON.stringify(matchObj[1].fetchList));
     // init repoDict, fetchList
     repoDict = {};
-    fetchList.forEach(function (elem) {
+    fetchList.forEach(async function (elem) {
         if (!elem.url) {
             return;
         }
@@ -1808,10 +1879,16 @@ function replaceListReplace(replaceList, data) {
             ).stdout, elem, "data");
             return;
         }
+        fetchCount += 1;
+        await new Promise(function (resolve) {
+            setTimeout(resolve, fetchCount * 50);
+        });
         moduleHttps.get(elem.url2 || elem.url.replace(
             "https://github.com/",
             "https://raw.githubusercontent.com/"
         ).replace("/blob/", "/"), function (res) {
+            fetchCount -= 1;
+            console.error(`shRollupFetch - ${fetchCount} remaining fetches`);
             // http-redirect
             if (res.statusCode === 302) {
                 moduleHttps.get(res.headers.location, function (res) {
@@ -1927,7 +2004,7 @@ function replaceListReplace(replaceList, data) {
         // init header
         header = (
             matchObj.input.slice(0, matchObj.index)
-            + "/*jslint-disable*/\n/*\nshRawLibFetch\n"
+            + "/*jslint-disable*/\n/*\nshRollupFetch\n"
             + JSON.stringify(
                 objectDeepCopyWithKeysSorted(matchObj[1]),
                 undefined,
@@ -1968,7 +2045,7 @@ function replaceListReplace(replaceList, data) {
             });
             if (result0 === result) {
                 throw new Error(
-                    "shRawLibFetch - cannot find-and-replace snippet "
+                    "shRollupFetch - cannot find-and-replace snippet "
                     + JSON.stringify(aa)
                 );
             }
@@ -1997,7 +2074,7 @@ function replaceListReplace(replaceList, data) {
             );
             if (result0 === result) {
                 throw new Error(
-                    "shRawLibFetch - cannot find-and-replace snippet "
+                    "shRollupFetch - cannot find-and-replace snippet "
                     + JSON.stringify(exports)
                 );
             }
@@ -2015,16 +2092,6 @@ function replaceListReplace(replaceList, data) {
 }());
 ' "$@" # '
     git diff
-)}
-
-shRmDsStore() {(set -e
-# this function will recursively rm .DS_Store from current-dir
-# http://stackoverflow.com/questions/2016844/bash-recursively-remove-files
-    local NAME
-    for NAME in "._*" ".DS_Store" "desktop.ini" "npm-debug.log" "*~"
-    do
-        find . -iname "$NAME" -print0 | xargs -0 rm -f || true
-    done
 )}
 
 shRunWithCoverage() {(set -e
@@ -3328,8 +3395,8 @@ v8CoverageReportCreate({
 shRunWithScreenshotTxt() {(set -e
 # this function will run cmd $@ and screenshot text-output
 # https://www.cnx-software.com/2011/09/22/how-to-convert-a-command-line-result-into-an-image-in-linux/
-    local EXIT_CODE=0
-    local SCREENSHOT_SVG="$1"
+    EXIT_CODE=0
+    SCREENSHOT_SVG="$1"
     shift
     printf "0\n" > "$SCREENSHOT_SVG.exit_code"
     printf "shRunWithScreenshotTxt - ($* 2>&1)\n" 1>&2

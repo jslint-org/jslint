@@ -25,6 +25,8 @@ jobs:
           - 16
           - 18
           - 19
+        python_version:
+          - "3.10"
         os:
           - macos-latest
           - ubuntu-latest
@@ -68,6 +70,10 @@ jobs:
         with:
           architecture: ${{ matrix.architecture }}
           node-version: ${{ matrix.node_version }}
+      # https://github.com/actions/setup-python
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python_version }}
       # https://github.com/actions/cache
       - uses: actions/cache@v3
         with:
