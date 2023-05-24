@@ -3,7 +3,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Status
-| Branch | [master<br>(v2023.4.29)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
+| Branch | [master<br>(v2023.5.23)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jslint-org/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/jslint-org/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/jslint-org/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-alpha/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-alpha/.artifact/coverage/index.html) |
@@ -969,6 +969,14 @@ git push origin :branch-v20yy.mm.dd -f
 - click `Rebase and merge`
 - verify ci-success for upstream-branch-beta
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+```shell
+git fetch upstream beta
+git diff upstream/beta
+git reset upstream/beta
+git push -f origin alpha alpha:beta
+shMyciUpdate
+git push -f upstream alpha
+```
 
 
 <br><br>
