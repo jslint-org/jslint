@@ -162,21 +162,21 @@ body {
 <pre><span class="lineno"><a href="#line_4" id="line_4">    4.</a></span><span class="count                ">      2</span><span>module.exports = exports = sqlite3;</span></pre>
 <pre><span class="lineno"><a href="#line_5" id="line_5">    5.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6" id="line_6">    6.</a></span><span class="count                ">     12</span><span>function normalizeMethod (fn) {</span></pre>
-<pre><span class="lineno"><a href="#line_7" id="line_7">    7.</a></span><span class="count                ">   3965</span><span>    return function (sql) {</span></pre>
-<pre><span class="lineno"><a href="#line_8" id="line_8">    8.</a></span><span class="count                ">   3965</span><span>        let errBack;</span></pre>
-<pre><span class="lineno"><a href="#line_9" id="line_9">    9.</a></span><span class="count                ">   3965</span><span>        const args = Array.prototype.slice.call(arguments, 1);</span></pre>
-<pre><span class="lineno"><a href="#line_10" id="line_10">   10.</a></span><span class="count                ">   3965</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_11" id="line_11">   11.</a></span><span class="count                ">   1120</span><span>        if (typeof args[args.length - 1] === 'function') {</span></pre>
-<pre><span class="lineno"><a href="#line_12" id="line_12">   12.</a></span><span class="count                ">   1120</span><span>            const callback = args[args.length - 1];</span></pre>
-<pre><span class="lineno"><a href="#line_13" id="line_13">   13.</a></span><span class="count                ">   1120</span><span>            errBack = function(err) {</span></pre>
-<pre><span class="lineno"><a href="#line_14" id="line_14">   14.</a></span><span class="count                ">   1120</span><span>                if (err) {</span></pre>
-<pre><span class="lineno"><a href="#line_15" id="line_15">   15.</a></span><span class="count                ">   1120</span><span>                    callback(err);</span></pre>
-<pre><span class="lineno"><a href="#line_16" id="line_16">   16.</a></span><span class="count                ">   1120</span><span>                }</span></pre>
-<pre><span class="lineno"><a href="#line_17" id="line_17">   17.</a></span><span class="count                ">   1120</span><span>            };</span></pre>
-<pre><span class="lineno"><a href="#line_18" id="line_18">   18.</a></span><span class="count                ">   1120</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_19" id="line_19">   19.</a></span><span class="count                ">   3965</span><span>        const statement = new Statement(this, sql, errBack);</span></pre>
-<pre><span class="lineno"><a href="#line_20" id="line_20">   20.</a></span><span class="count                ">   3965</span><span>        return fn.call(this, statement, args);</span></pre>
-<pre><span class="lineno"><a href="#line_21" id="line_21">   21.</a></span><span class="count                ">   3965</span><span>    };</span></pre>
+<pre><span class="lineno"><a href="#line_7" id="line_7">    7.</a></span><span class="count                ">   4182</span><span>    return function (sql) {</span></pre>
+<pre><span class="lineno"><a href="#line_8" id="line_8">    8.</a></span><span class="count                ">   4182</span><span>        let errBack;</span></pre>
+<pre><span class="lineno"><a href="#line_9" id="line_9">    9.</a></span><span class="count                ">   4182</span><span>        const args = Array.prototype.slice.call(arguments, 1);</span></pre>
+<pre><span class="lineno"><a href="#line_10" id="line_10">   10.</a></span><span class="count                ">   4182</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_11" id="line_11">   11.</a></span><span class="count                ">   1119</span><span>        if (typeof args[args.length - 1] === 'function') {</span></pre>
+<pre><span class="lineno"><a href="#line_12" id="line_12">   12.</a></span><span class="count                ">   1119</span><span>            const callback = args[args.length - 1];</span></pre>
+<pre><span class="lineno"><a href="#line_13" id="line_13">   13.</a></span><span class="count                ">   1119</span><span>            errBack = function(err) {</span></pre>
+<pre><span class="lineno"><a href="#line_14" id="line_14">   14.</a></span><span class="count                ">   1119</span><span>                if (err) {</span></pre>
+<pre><span class="lineno"><a href="#line_15" id="line_15">   15.</a></span><span class="count                ">   1119</span><span>                    callback(err);</span></pre>
+<pre><span class="lineno"><a href="#line_16" id="line_16">   16.</a></span><span class="count                ">   1119</span><span>                }</span></pre>
+<pre><span class="lineno"><a href="#line_17" id="line_17">   17.</a></span><span class="count                ">   1119</span><span>            };</span></pre>
+<pre><span class="lineno"><a href="#line_18" id="line_18">   18.</a></span><span class="count                ">   1119</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_19" id="line_19">   19.</a></span><span class="count                ">   4182</span><span>        const statement = new Statement(this, sql, errBack);</span></pre>
+<pre><span class="lineno"><a href="#line_20" id="line_20">   20.</a></span><span class="count                ">   4182</span><span>        return fn.call(this, statement, args);</span></pre>
+<pre><span class="lineno"><a href="#line_21" id="line_21">   21.</a></span><span class="count                ">   4182</span><span>    };</span></pre>
 <pre><span class="lineno"><a href="#line_22" id="line_22">   22.</a></span><span class="count                ">     12</span><span>}</span></pre>
 <pre><span class="lineno"><a href="#line_23" id="line_23">   23.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_24" id="line_24">   24.</a></span><span class="count                ">      6</span><span>function inherits(target, source) {</span></pre>
@@ -223,17 +223,17 @@ body {
 <pre><span class="lineno"><a href="#line_65" id="line_65">   65.</a></span><span class="count                ">      2</span><span>inherits(Backup, EventEmitter);</span></pre>
 <pre><span class="lineno"><a href="#line_66" id="line_66">   66.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_67" id="line_67">   67.</a></span><span class="count                ">      2</span><span>// Database#prepare(sql, [bind1, bind2, ...], [callback])</span></pre>
-<pre><span class="lineno"><a href="#line_68" id="line_68">   68.</a></span><span class="count                ">   1835</span><span>Database.prototype.prepare = normalizeMethod(function(statement, params) {</span></pre>
-<pre><span class="lineno"><a href="#line_69" id="line_69">   69.</a></span><span class="count                ">   1835</span><span>    return params.length</span></pre>
+<pre><span class="lineno"><a href="#line_68" id="line_68">   68.</a></span><span class="count                ">   2055</span><span>Database.prototype.prepare = normalizeMethod(function(statement, params) {</span></pre>
+<pre><span class="lineno"><a href="#line_69" id="line_69">   69.</a></span><span class="count                ">   2055</span><span>    return params.length</span></pre>
 <pre><span class="lineno"><a href="#line_70" id="line_70">   70.</a></span><span class="count                ">      7</span><span>        ? statement.bind.apply(statement, params)</span></pre>
-<pre><span class="lineno"><a href="#line_71" id="line_71">   71.</a></span><span class="count                ">   1828</span><span>        : statement;</span></pre>
-<pre><span class="lineno"><a href="#line_72" id="line_72">   72.</a></span><span class="count                ">   1835</span><span>});</span></pre>
+<pre><span class="lineno"><a href="#line_71" id="line_71">   71.</a></span><span class="count                ">   2048</span><span>        : statement;</span></pre>
+<pre><span class="lineno"><a href="#line_72" id="line_72">   72.</a></span><span class="count                ">   2055</span><span>});</span></pre>
 <pre><span class="lineno"><a href="#line_73" id="line_73">   73.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_74" id="line_74">   74.</a></span><span class="count                ">      2</span><span>// Database#run(sql, [bind1, bind2, ...], [callback])</span></pre>
-<pre><span class="lineno"><a href="#line_75" id="line_75">   75.</a></span><span class="count                ">   2077</span><span>Database.prototype.run = normalizeMethod(function(statement, params) {</span></pre>
-<pre><span class="lineno"><a href="#line_76" id="line_76">   76.</a></span><span class="count                ">   2077</span><span>    statement.run.apply(statement, params).finalize();</span></pre>
-<pre><span class="lineno"><a href="#line_77" id="line_77">   77.</a></span><span class="count                ">   2077</span><span>    return this;</span></pre>
-<pre><span class="lineno"><a href="#line_78" id="line_78">   78.</a></span><span class="count                ">   2077</span><span>});</span></pre>
+<pre><span class="lineno"><a href="#line_75" id="line_75">   75.</a></span><span class="count                ">   2074</span><span>Database.prototype.run = normalizeMethod(function(statement, params) {</span></pre>
+<pre><span class="lineno"><a href="#line_76" id="line_76">   76.</a></span><span class="count                ">   2074</span><span>    statement.run.apply(statement, params).finalize();</span></pre>
+<pre><span class="lineno"><a href="#line_77" id="line_77">   77.</a></span><span class="count                ">   2074</span><span>    return this;</span></pre>
+<pre><span class="lineno"><a href="#line_78" id="line_78">   78.</a></span><span class="count                ">   2074</span><span>});</span></pre>
 <pre><span class="lineno"><a href="#line_79" id="line_79">   79.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_80" id="line_80">   80.</a></span><span class="count                ">      2</span><span>// Database#get(sql, [bind1, bind2, ...], [callback])</span></pre>
 <pre><span class="lineno"><a href="#line_81" id="line_81">   81.</a></span><span class="count                ">     35</span><span>Database.prototype.get = normalizeMethod(function(statement, params) {</span></pre>
