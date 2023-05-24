@@ -7,7 +7,7 @@
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
-# v2023.5.1-beta
+# v2023.5.23
 - jslint - Check exported properties are ordered.
 - jslint - Add grammar for "export async function ...".
 - python - Add shell-function shLintPython().
