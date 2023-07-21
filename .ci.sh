@@ -321,7 +321,7 @@ import moduleFs from "fs";
                         "type": "extensionHost"
                     }
                 ],
-                "version": "0.2.0"
+                "version": "0.0.1"
             }, undefined, 4)
         }, {
             file: "README.md",
@@ -441,7 +441,7 @@ import moduleFs from "fs";
                     "type": "git",
                     "url": "https://github.com/jslint-org/jslint.git"
                 },
-                "version": "2023.5.23"
+                "version": "2023.6.21"
             }, undefined, 4)
         }
     ].map(async function ({

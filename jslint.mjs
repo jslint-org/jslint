@@ -165,7 +165,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2023.5.23";
+let jslint_edition = "v2023.6.21";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -3327,7 +3327,7 @@ function jslint_phase2_lex(state) {
         case "this":            // Allow 'this'.
         case "trace":           // Include jslint stack-trace in warnings.
         case "unordered":       // Allow unordered cases, params, properties,
-                                // ... and variables.
+                                // ... variables, and exports.
         case "variable":        // Allow unordered const and let declarations
                                 // ... that are not at top of function-scope.
         case "white":           // Allow messy whitespace.
