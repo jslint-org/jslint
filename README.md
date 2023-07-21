@@ -3,7 +3,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Status
-| Branch | [master<br>(v2023.5.23)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
+| Branch | [master<br>(v2023.6.21)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jslint-org/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/jslint-org/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/jslint-org/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-alpha/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-alpha/.artifact/coverage/index.html) |
@@ -813,7 +813,7 @@ Error
 
 ```js
 /*jslint unordered*/
-// Allow unordered cases, params, properties, and variables.
+// Allow unordered cases, params, properties, variables, and exports.
 
 let foo = {bb: 1, aa: 0};
 
@@ -823,6 +823,11 @@ function bar({
 }) {
     return aa + bb;
 }
+
+export {
+    foo,
+    bar
+};
 ```
 
 <br>
@@ -918,6 +923,7 @@ eval("1"); //jslint-ignore-line
 - click `New pull request`
 - click `base repository: jslint-org/jslint base:beta`
 - click `head repository: kaizhu256/jslint compare:branch-v20yy.mm.dd`
+- verify `commit into jslint-org:beta`
 - click `Create pull request`
 - verify ci-success for pull-request
     - https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
@@ -931,12 +937,21 @@ git diff alpha..upstream/beta
 git reset upstream/beta
 git push origin alpha -f
 git push origin alpha:beta
+shMyciUpdate
 git push upstream alpha -f
-git push origin :branch-v20yy.mm.dd -f
 ```
 - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - verify ci-success for upstream-branch-alpha
+    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+- click `Delete branch`
+```shell
+git push origin beta:master
+git push upstream beta:master
+```
+- verify ci-success for origin-branch-master
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- verify ci-success for upstream-branch-master
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 
 
@@ -954,6 +969,7 @@ git push origin :branch-v20yy.mm.dd -f
 - copy-paste release notes from CHANGELOG.md
 - click `Generate release notes`
 - click `Set as the latest release`
+- click `Preview` and review
 - click `Publish release`
 - verify ci-success for upstream-branch-publish
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
@@ -964,6 +980,7 @@ git push origin :branch-v20yy.mm.dd -f
 ### pull-request merge
 - find highest issue-number at https://github.com/jslint-org/jslint/issues/, and add +1 to it for PR-xxx
 - verify `commit into jslint-org:beta`
+- click `Create pull request`
 - verify ci-success for pull-request
     - https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
 - click `Rebase and merge`
@@ -971,12 +988,19 @@ git push origin :branch-v20yy.mm.dd -f
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 ```shell
 git fetch upstream beta
-git diff upstream/beta
+git diff alpha..upstream/beta
+# verify no diff between alpha..upstream/beta
 git reset upstream/beta
-git push -f origin alpha alpha:beta
+git push origin alpha -f
+git push origin alpha:beta
 shMyciUpdate
-git push -f upstream alpha
+git push upstream alpha -f
 ```
+- verify ci-success for origin-branch-alpha
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- verify ci-success for upstream-branch-alpha
+    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+- click `Delete branch`
 
 
 <br><br>
