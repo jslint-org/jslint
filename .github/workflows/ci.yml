@@ -24,7 +24,7 @@ jobs:
         node_version:
           - 16
           - 18
-          - 19
+          - 20
         python_version:
           - "3.10"
         os:
