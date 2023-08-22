@@ -71,13 +71,13 @@
     textLength="768"
     x="10"
     y="252"
->- ci - Update ci from nodejs-v19 to nodejs-v20.                                                  </tspan>
+>- ci - Remove ci for nodejs-v19, and add ci for nodejs-v20.                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="274"
->- license - Remove broken-links to unlicense.org.                                                </tspan>
+>- ci - Remove broken-links to unlicense.org, failing http-link-check.                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

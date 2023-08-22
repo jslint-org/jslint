@@ -8,8 +8,8 @@
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
 # v2023.8.20
-- ci - Update ci from nodejs-v19 to nodejs-v20.
-- license - Remove broken-links to unlicense.org.
+- ci - Remove ci for nodejs-v19, and add ci for nodejs-v20.
+- ci - Remove broken-links to unlicense.org, failing http-link-check.
 
 # v2023.6.21
 - doc - Update docs in README.md.
