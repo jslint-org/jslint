@@ -19,7 +19,7 @@ jobs:
         node_version:
           # - 16
           - 18
-          # - 19
+          # - 20
         os:
           # - macos-latest
           - ubuntu-latest

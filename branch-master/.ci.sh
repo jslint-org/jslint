@@ -441,7 +441,7 @@ import moduleFs from "fs";
                     "type": "git",
                     "url": "https://github.com/jslint-org/jslint.git"
                 },
-                "version": "2023.6.21"
+                "version": "2023.8.20"
             }, undefined, 4)
         }
     ].map(async function ({
