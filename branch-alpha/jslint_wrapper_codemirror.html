@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>CodeMirror: JSLint Demo</title>
+
+<!-- Assets from codemirror. -->
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.10/codemirror.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.10/addon/lint/lint.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.10/codemirror.js"></script>
+    <script defer src="https://codemirror.net/mode/javascript/javascript.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.10/addon/lint/lint.js"></script>
+
+<!-- Assets from jslint. -->
+
+    <script type="module" src="./jslint.mjs?window_jslint=1"></script>
+    <script defer src="./jslint_wrapper_codemirror.js"></script>
+<style>
+body {
+    background: #bbb;
+    color: #333;
+    font-family: sans-serif;
+    margin: 20px;
+}
+.JSLINT_.JSLINT_REPORT_ {
+    margin-top: 20px;
+}
+#editor1 {
+    height: 300px;
+    width: 100%;
+}
+</style>
+</head>
+
+
+<body>
+    <h1>CodeMirror: JSLint Demo</h1>
+    <h3>
+This demo will auto-lint the code below, and auto-generate a report as you type.
+    </h3>
+
+<!-- Container for codemirror-editor. -->
+
+    <textarea id="editor1">console.log('hello world');</textarea>
+
+<!-- Container for jslint-report. -->
+
+    <div class="JSLINT_ JSLINT_REPORT_"></div>
+
+
+<script type=module>
+window.addEventListener("load", function () {
+    let editor = window.CodeMirror.fromTextArea(document.getElementById(
+        "editor1"
+    ), {
+        gutters: [
+            "CodeMirror-lint-markers"
+        ],
+        indentUnit: 4,
+        lineNumbers: true,
+        lint: {
+            lintOnChange: true, // Enable auto-lint.
+            options: {
+                // browser: true,
+                // node: true
+                globals: [
+                    // "caches",
+                    // "indexedDb"
+                ]
+            }
+        },
+        mode: "javascript"
+    });
+
+// Initialize event-handling before linter is run.
+
+    editor.on("lintJslintBefore", function (/* options */) {
+        // options.browser = true;
+        // options.node = true;
+        // options.globals = [
+        //     "caches",
+        //     "indexedDb"
+        // ];
+        return;
+    });
+
+// Initialize event-handling after linter is run.
+
+    editor.on("lintJslintAfter", function (options) {
+
+// Generate jslint-report from options.result.
+
+        document.querySelector(
+            ".JSLINT_REPORT_"
+        ).innerHTML = window.jslint.jslint_report(options.result);
+    });
+
+// Manually trigger linter.
+
+    editor.performLint();
+});
+</script>
+</body>
+</html>
