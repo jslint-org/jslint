@@ -14,9 +14,9 @@ jobs:
           - x64
           # - x86
         node_version:
-          - 16
           - 18
           - 20
+          # - 22
         os:
           - macos-latest
           - ubuntu-latest
@@ -28,9 +28,9 @@ jobs:
         v${{ matrix.node_version }}
         ${{ matrix.architecture }}
         ${{ matrix.os }}
-      CI_MATRIX_NAME_MAIN: "node v18 x64 ubuntu-latest"
+      CI_MATRIX_NAME_MAIN: "node v20 x64 ubuntu-latest"
       CI_MATRIX_NODE_VERSION: v${{ matrix.node_version }}
-      CI_MATRIX_NODE_VERSION_MAIN: v18
+      CI_MATRIX_NODE_VERSION_MAIN: v20
       CI_WORKFLOW_NAME: >
         ${{ github.workflow }}
         - ${{ github.event_name }}

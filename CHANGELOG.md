@@ -7,6 +7,12 @@
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
+# v2023.10.24
+- jslint - bugfix - Update file jslint_wrapper_vim.vim to fix broken vim-link when linting shell-files.
+- ci - add custom-shell-ci hooks to script jslint_ci.sh:
+    shCiPublishNpmCustom()
+    shCiPublishPypiCustom()
+
 # v2023.8.20
 - ci - Remove ci for nodejs-v19, and add ci for nodejs-v20.
 - ci - Remove broken-links to unlicense.org, failing http-link-check.

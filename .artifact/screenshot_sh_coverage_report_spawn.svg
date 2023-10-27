@@ -1,5 +1,5 @@
-<svg height="1548" width="800" xmlns="http://www.w3.org/2000/svg">
-<rect height="1548" fill="#222" width="800"></rect>
+<svg height="1812" width="800" xmlns="http://www.w3.org/2000/svg">
+<rect height="1812" fill="#222" width="800"></rect>
 <text
     fill="#7f7"
     font-family="consolas, menlo, monospace"
@@ -221,204 +221,276 @@
     textLength="768"
     x="10"
     y="802"
->npm WARN deprecated @npmcli/move-file@1.1.2: This functionality has been moved to @npmcli/fs     </tspan>
+>(node:2537) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 close li\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="824"
->npm WARN deprecated debug@3.2.6: Debug versions &gt;=3.2.0 &lt;3.2.7 || &gt;=4 &lt;4.3.1 have a low-severity\</tspan>
+>  steners added to [TLSSocket]. Use emitter.setMaxListeners() to increase limit                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="846"
->   ReDos regression when used in a Node.js environment. It is recommended you upgrade to 3.2.7 o\</tspan>
+>(Use `node --trace-warnings ...` to show where the warning was created)                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="868"
->  r 4.3.1. (https://github.com/visionmedia/debug/issues/797)                                     </tspan>
+>(node:2537) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 close li\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="890"
->                                                                                                 </tspan>
+>  steners added to [TLSSocket]. Use emitter.setMaxListeners() to increase limit                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="912"
->&gt; sqlite3@5.0.11 install                                                                         </tspan>
+>(node:2537) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 close li\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="934"
->&gt; node-pre-gyp install --fallback-to-build                                                       </tspan>
+>  steners added to [TLSSocket]. Use emitter.setMaxListeners() to increase limit                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="956"
->                                                                                                 </tspan>
+>(node:2537) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 close li\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="978"
->node-pre-gyp info it worked if it ends with ok                                                   </tspan>
+>  steners added to [TLSSocket]. Use emitter.setMaxListeners() to increase limit                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1000"
->node-pre-gyp info using node-pre-gyp@1.0.11                                                      </tspan>
+>(node:2537) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 close li\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1022"
->node-pre-gyp info using node@18.17.1 | linux | x64                                               </tspan>
+>  steners added to [TLSSocket]. Use emitter.setMaxListeners() to increase limit                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1044"
->node-pre-gyp info check checked for "/home/runner/work/jslint/jslint/node-sqlite3-sh/lib/binding\</tspan>
+>(node:2537) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 close li\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1066"
->  /napi-v6-linux-glibc-x64/node_sqlite3.node" (not found)                                        </tspan>
+>  steners added to [TLSSocket]. Use emitter.setMaxListeners() to increase limit                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1088"
->node-pre-gyp http GET https://github.com/TryGhost/node-sqlite3/releases/download/v5.0.11/napi-v6\</tspan>
+>(node:2537) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 close li\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1110"
->  -linux-glibc-x64.tar.gz                                                                        </tspan>
+>  steners added to [TLSSocket]. Use emitter.setMaxListeners() to increase limit                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1132"
->node-pre-gyp info install unpacking napi-v6-linux-glibc-x64/node_sqlite3.node                    </tspan>
+>(node:2537) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 close li\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1154"
->node-pre-gyp info extracted file count: 1                                                        </tspan>
+>  steners added to [TLSSocket]. Use emitter.setMaxListeners() to increase limit                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1176"
->[sqlite3] Success: "/home/runner/work/jslint/jslint/node-sqlite3-sh/lib/binding/napi-v6-linux-gl\</tspan>
+>(node:2537) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 close li\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1198"
->  ibc-x64/node_sqlite3.node" is installed via remote                                             </tspan>
+>  steners added to [TLSSocket]. Use emitter.setMaxListeners() to increase limit                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1220"
->node-pre-gyp info ok                                                                             </tspan>
+>(node:2537) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 close li\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1242"
->                                                                                                 </tspan>
+>  steners added to [TLSSocket]. Use emitter.setMaxListeners() to increase limit                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1264"
->added 360 packages, and audited 361 packages in 11s                                              </tspan>
+>(node:2537) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 close li\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1286"
->                                                                                                 </tspan>
+>  steners added to [TLSSocket]. Use emitter.setMaxListeners() to increase limit                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1308"
->69 packages are looking for funding                                                              </tspan>
+>(node:2537) MaxListenersExceededWarning: Possible EventEmitter memory leak detected. 11 close li\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1330"
->  run `npm fund` for details                                                                     </tspan>
+>  steners added to [TLSSocket]. Use emitter.setMaxListeners() to increase limit                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1352"
->                                                                                                 </tspan>
+>npm WARN deprecated @npmcli/move-file@1.1.2: This functionality has been moved to @npmcli/fs     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1374"
->4 vulnerabilities (1 high, 3 critical)                                                           </tspan>
+>npm WARN deprecated debug@3.2.6: Debug versions &gt;=3.2.0 &lt;3.2.7 || &gt;=4 &lt;4.3.1 have a low-severity\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1396"
->                                                                                                 </tspan>
+>   ReDos regression when used in a Node.js environment. It is recommended you upgrade to 3.2.7 o\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1418"
->To address all issues (including breaking changes), run:                                         </tspan>
+>  r 4.3.1. (https://github.com/visionmedia/debug/issues/797)                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1440"
->  npm audit fix --force                                                                          </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1462"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
+    y="1462"
+>&gt; sqlite3@5.0.11 install                                                                         </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
     y="1484"
->Run `npm audit` for details.                                                                     </tspan>
+>&gt; node-pre-gyp install --fallback-to-build                                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1506"
->wrote file /home/runner/work/jslint/jslint/.artifact/coverage_sqlite3_sh//touch.txt              </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1528"
+>node-pre-gyp info it worked if it ends with ok                                                   </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1550"
+>node-pre-gyp info using node-pre-gyp@1.0.11                                                      </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1572"
+>node-pre-gyp info using node@20.9.0 | linux | x64                                                </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1594"
+>node-pre-gyp info check checked for "/home/runner/work/jslint/jslint/node-sqlite3-sh/lib/binding\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1616"
+>  /napi-v6-linux-glibc-x64/node_sqlite3.node" (not found)                                        </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1638"
+>node-pre-gyp http GET https://github.com/TryGhost/node-sqlite3/releases/download/v5.0.11/napi-v6\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1660"
+>  -linux-glibc-x64.tar.gz                                                                        </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1682"
+>node-pre-gyp info install unpacking napi-v6-linux-glibc-x64/node_sqlite3.node                    </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1704"
+>node-pre-gyp info extracted file count: 1                                                        </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1726"
+>[sqlite3] Success: "/home/runner/work/jslint/jslint/node-sqlite3-sh/lib/binding/napi-v6-linux-gl\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1748"
+>  ibc-x64/node_sqlite3.node" is installed via remote                                             </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1770"
+>node-pre-gyp info ok                                                                             </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1792"
 >                                                                                                 </tspan>
 
 </text>
