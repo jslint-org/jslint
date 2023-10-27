@@ -17,9 +17,9 @@ jobs:
           - x64
           # - x86
         node_version:
-          # - 16
-          - 18
-          # - 20
+          # - 18
+          - 20
+          # - 22
         os:
           # - macos-latest
           - ubuntu-latest
@@ -38,8 +38,8 @@ jobs:
 
       # Setup .npmrc file to publish to GitHub Packages
       - run: rm -f /home/runner/work/_temp/.npmrc
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node_version }}
           architecture: ${{ matrix.architecture }}
@@ -47,21 +47,21 @@ jobs:
           # Defaults to the user or organization that owns the workflow file
           # scope: '@octocat'
       # Publish to GitHub Packages
-      - run: sh jslint_ci.sh shCiNpmPublish
+      - run: sh jslint_ci.sh shCiPublishNpm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
           NPM_REGISTRY: github
 
       # Setup .npmrc file to publish to npm
       - run: rm -f /home/runner/work/_temp/.npmrc
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node_version }}
           architecture: ${{ matrix.architecture }}
           registry-url: 'https://registry.npmjs.org'
       # Publish to npm
-      - run: sh jslint_ci.sh shCiNpmPublish
+      - run: sh jslint_ci.sh shCiPublishNpm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_REGISTRY: npm

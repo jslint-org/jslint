@@ -280,7 +280,7 @@ import moduleFs from "fs";
     npm run test
 )}
 
-shCiNpmPublishCustom() {(set -e
+shCiPublishNpmCustom() {(set -e
 # this function will run custom-code to npm-publish package
     npm publish --access public
 )}
@@ -441,7 +441,7 @@ import moduleFs from "fs";
                     "type": "git",
                     "url": "https://github.com/jslint-org/jslint.git"
                 },
-                "version": "2023.8.20"
+                "version": "2023.10.24"
             }, undefined, 4)
         }
     ].map(async function ({

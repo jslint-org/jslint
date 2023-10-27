@@ -22,6 +22,7 @@ package-lock.json
 *.py[cod]
 dist/
 htmlcov/
+wheelhouse/
 
 # vscode
 *.vsix

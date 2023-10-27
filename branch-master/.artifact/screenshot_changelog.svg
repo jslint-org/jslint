@@ -65,37 +65,37 @@
     textLength="768"
     x="10"
     y="230"
-># v2023.8.20                                                                                     </tspan>
+># v2023.10.24                                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="252"
->- ci - Remove ci for nodejs-v19, and add ci for nodejs-v20.                                      </tspan>
+>- jslint - bugfix - Update file jslint_wrapper_vim.vim to fix broken vim-link when linting shell\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="274"
->- ci - Remove broken-links to unlicense.org, failing http-link-check.                            </tspan>
+>  -files.                                                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="296"
->                                                                                                 </tspan>
+>- ci - add custom-shell-ci hooks to script jslint_ci.sh:                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="318"
-># v2023.6.21                                                                                     </tspan>
+>    shCiPublishNpmCustom()                                                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="340"
->- doc - Update docs in README.md.                                                                </tspan>
+>    shCiPublishPypiCustom()                                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -107,211 +107,211 @@
     textLength="768"
     x="10"
     y="384"
-># v2023.5.23                                                                                     </tspan>
+># v2023.8.20                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="406"
->- jslint - Check exported properties are ordered.                                                </tspan>
+>- ci - Remove ci for nodejs-v19, and add ci for nodejs-v20.                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="428"
->- jslint - Add grammar for "export async function ...".                                          </tspan>
+>- ci - Remove broken-links to unlicense.org, failing http-link-check.                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="450"
->- python - Add shell-function shLintPython().                                                    </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="472"
->- jslint - Add grammar for regexp-named-capture-group and regexp-named-backreference.            </tspan>
+># v2023.6.21                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="494"
->- jslint - Add grammar for side-effect import-statement.                                         </tspan>
+>- doc - Update docs in README.md.                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="516"
->- ci - Rename shell-function shRawLibFetch() to shRollupFetch().                                 </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="538"
->- doc - document devop procedures to maintain jslint-repo                                        </tspan>
+># v2023.5.23                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="560"
->                                                                                                 </tspan>
+>- jslint - Check exported properties are ordered.                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="582"
-># v2023.4.29                                                                                     </tspan>
+>- jslint - Add grammar for "export async function ...".                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="604"
->- vscode - Add manual lint-on-save command to vscode-jslint extension.                           </tspan>
+>- python - Add shell-function shLintPython().                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="626"
->- ci - add custom-shell-ci hooks to script jslint_ci.sh:                                         </tspan>
+>- jslint - Add grammar for regexp-named-capture-group and regexp-named-backreference.            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="648"
->    shCiArtifactUploadCustom()                                                                   </tspan>
+>- jslint - Add grammar for side-effect import-statement.                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="670"
->    shCiBaseCustom()                                                                             </tspan>
+>- ci - Rename shell-function shRawLibFetch() to shRollupFetch().                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="692"
->    shCiBaseCustom2()                                                                            </tspan>
+>- doc - document devop procedures to maintain jslint-repo                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="714"
->    shCiLintCustom()                                                                             </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="736"
->    shCiLintCustom2()                                                                            </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="758"
->    shCiNpmPublishCustom()                                                                       </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="780"
->    shCiPreCustom()                                                                              </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="802"
->    shCiPreCustom2()                                                                             </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="824"
->- ci - housekeeping of ci-file jslint_ci.sh                                                      </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="846"
->- ci - update shell-function shGitCommitPushOrSquash() to be able to save to specified filename  </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="868"
->- ci - remove little-used shell-function shCiBranchPromote()                                     </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="890"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
+    y="736"
+># v2023.4.29                                                                                     </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="758"
+>- vscode - Add manual lint-on-save command to vscode-jslint extension.                           </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="780"
+>- ci - add custom-shell-ci hooks to script jslint_ci.sh:                                         </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="802"
+>    shCiArtifactUploadCustom()                                                                   </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="824"
+>    shCiBaseCustom()                                                                             </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="846"
+>    shCiBaseCustom2()                                                                            </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="868"
+>    shCiLintCustom()                                                                             </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="890"
+>    shCiLintCustom2()                                                                            </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
     y="912"
-># v2023.1.29                                                                                     </tspan>
+>    shCiNpmPublishCustom()                                                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="934"
->- ci - in windows-ci-env, alias node=node.exe instead of using winpty for pipes                  </tspan>
+>    shCiPreCustom()                                                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="956"
->- ci - bugfix - fix ci-shell-function shGithubFileUpload unable to upload new asset              </tspan>
+>    shCiPreCustom2()                                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="978"
->- ci - auto-create asset_image_logo_512.png from asset_image_logo_512.html                       </tspan>
+>- ci - housekeeping of ci-file jslint_ci.sh                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1000"
->- bugfix - fix shell-function shGithubCheckoutRemote not able to checkout trusted-files in non-a\</tspan>
+>- ci - update shell-function shGitCommitPushOrSquash() to be able to save to specified filename  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1022"
->  lpha branches                                                                                  </tspan>
+>- ci - remove little-used shell-function shCiBranchPromote()                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1044"
->- jslint-ci - revamp auto-updating and add shell-function shGithubCheckoutRemote                 </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1066"
->- test - print time-finished after test-run                                                      </tspan>
+># v2023.1.29                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1088"
->- jslint - hide warning about unordered case-statements behind beta-flag                         </tspan>
+>- ci - in windows-ci-env, alias node=node.exe instead of using winpty for pipes                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1110"
->- ci - bugfix - update shell-function shCiBase() to handle undefined fileMain                    </tspan>
+>- ci - bugfix - fix ci-shell-function shGithubFileUpload unable to upload new asset              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1132"
->- ci - auto-update version-number in main mjs-module                                             </tspan>
+>- ci - auto-create asset_image_logo_512.png from asset_image_logo_512.html                       </tspan>
 
 </text>
 </svg>

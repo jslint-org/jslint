@@ -163,7 +163,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2023.8.20";
+let jslint_edition = "v2023.10.24";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -279,7 +279,7 @@ async function assertErrorThrownAsync(asyncFunc, regexp) {
     }
     assertOrThrow(err, "No error thrown.");
     assertOrThrow(
-        regexp === undefined || new RegExp(regexp).test(err.message),
+        !regexp || new RegExp(regexp).test(err.message),
         err
     );
 }
