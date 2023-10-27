@@ -5,7 +5,7 @@
     "bugs": {
         "url": "https://github.com/jslint-org/jslint/issues"
     },
-    "counter": 7,
+    "counter": 0,
     "description": "JSLint, The JavaScript Code Quality and Coverage Tool",
     "exports": {
         "default": "./jslint_wrapper_cjs.cjs",

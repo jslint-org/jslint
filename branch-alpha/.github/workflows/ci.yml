@@ -59,7 +59,7 @@ jobs:
           echo "$(date -u +"%Y-%m-%d %TZ") - ${{ env.CI_WORKFLOW_NAME }}" # "
           git config --global core.autocrlf false
       # https://github.com/actions/checkout
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       # fetch jslint_ci.sh from trusted source
       - run: |
           git fetch origin alpha --depth=1
@@ -68,7 +68,7 @@ jobs:
       # pre-run .ci.sh
       - run: sh jslint_ci.sh shCiPre
       # https://github.com/actions/setup-node
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           architecture: ${{ matrix.architecture }}
           node-version: ${{ matrix.node_version }}
