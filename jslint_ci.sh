@@ -204,6 +204,7 @@ shBrowserScreenshot() {(set -e
 # window-size $2
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
+import moduleOs from "os";
 import modulePath from "path";
 import moduleUrl from "url";
 // init debugInline
@@ -257,7 +258,7 @@ import moduleUrl from "url";
             "--incognito",
             "--screenshot",
             "--timeout=30000",
-            "--user-data-dir=/dev/null",
+            "--user-data-dir=" + moduleOs.tmpdir(),
             "--window-size=800x600",
             "-screenshot=" + file,
             (
