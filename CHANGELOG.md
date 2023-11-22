@@ -7,6 +7,9 @@
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
+# v2023.11.1-beta
+- ci - bugfix - Fix google-chrome unable to create screenshot because user-data-dir is /dev/null.
+
 # v2023.10.24
 - jslint - bugfix - Update file jslint_wrapper_vim.vim to fix broken vim-link when linting shell-files.
 - ci - add custom-shell-ci hooks to script jslint_ci.sh:
