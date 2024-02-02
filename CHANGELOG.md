@@ -7,7 +7,9 @@
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
-# v2023.11.1-beta
+# v2024.2.1-beta
+- ci - Update github-ci for actions/cache, actions/setup-python from nodejs v16 to nodejs v20.
+- ci - Update shell-function shRollupFetch() to fix blank date-committed.
 - ci - bugfix - Fix google-chrome unable to create screenshot because user-data-dir is /dev/null.
 
 # v2023.10.24
