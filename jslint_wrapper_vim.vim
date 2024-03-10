@@ -42,7 +42,8 @@ function! SaveAndJslint(bang)
     let &l:errorformat =
         \ "%f.<node -e>.js:%n:%l:%c:%m," .
         \ "%f:%n:%l:%c:%m"
-    let &l:makeprg = "node \"" . $HOME . "/.vim/jslint.mjs\" jslint_wrapper_vim"
+    let &l:makeprg = "node \"" . expand("<sfile>:p:h") . "/jslint.mjs\""
+        \ . " jslint_wrapper_vim"
         \ . " \"" . fnamemodify(bufname("%"), ":p") . "\""
     silent make! | cwindow | redraw!
 endfunction
