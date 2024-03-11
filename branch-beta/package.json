@@ -35,5 +35,5 @@
     "shCiArtifactUpload": 1,
     "shCiPublishNpm": 1,
     "type": "module",
-    "version": "2023.10.24"
+    "version": "2024.3.1-beta"
 }

@@ -188,12 +188,12 @@ shBashrcWindowsInit() {
         ;;
     esac
     # alias curl.exe
-    # if (! alias curl &>/dev/null) && [ -f c:/windows/system32/curl.exe ]
+    # if (! alias curl 2>/dev/null) && [ -f c:/windows/system32/curl.exe ]
     # then
     #     alias curl=c:/windows/system32/curl.exe
     # fi
     # alias node.exe
-    if (! alias node &>/dev/null)
+    if (! alias node 2>/dev/null)
     then
         alias node=node.exe
     fi
@@ -204,6 +204,7 @@ shBrowserScreenshot() {(set -e
 # window-size $2
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
+import moduleOs from "os";
 import modulePath from "path";
 import moduleUrl from "url";
 // init debugInline
@@ -211,7 +212,7 @@ import moduleUrl from "url";
     let consoleError = console.error;
     globalThis.debugInline = globalThis.debugInline || function (...argList) {
 
-// this function will both print <argList> to stderr and return <argList>[0]
+// This function will print <argv> to stderr and then return <argv>[0].
 
         consoleError("\n\ndebugInline");
         consoleError(...argList);
@@ -257,7 +258,7 @@ import moduleUrl from "url";
             "--incognito",
             "--screenshot",
             "--timeout=30000",
-            "--user-data-dir=/dev/null",
+            "--user-data-dir=" + moduleOs.tmpdir(),
             "--window-size=800x600",
             "-screenshot=" + file,
             (
@@ -872,7 +873,7 @@ COMMIT_LIMIT=$COMMIT_LIMIT MODE_SQUASH=$MODE_SQUASH\n"
     fi
     # squash commits
     COMMIT_MESSAGE="[squashed $COMMIT_COUNT commits] $COMMIT_MESSAGE"
-    git branch -D __tmp1 &>/dev/null || true
+    git branch -D __tmp1 2>/dev/null || true
     git checkout --orphan __tmp1
     git commit --quiet -am "$COMMIT_MESSAGE" || true
     # reset branch to squashed-commit
@@ -1012,7 +1013,7 @@ shGithubCheckoutRemote() {(set -e
         # branch - */*/*
         git fetch origin alpha
         # assert latest ci
-        if (git rev-parse "$GITHUB_REF_NAME" &>/dev/null) \
+        if (git rev-parse "$GITHUB_REF_NAME" 2>/dev/null) \
             && [ "$(git rev-parse "$GITHUB_REF_NAME")" \
             != "$(git rev-parse origin/alpha)" ]
         then
@@ -1112,8 +1113,8 @@ import modulePath from "path";
     }
     console.error(
         mode === "download"
-        ? `shGithubFileDownload - ${process.argv[1]}`
-        : `shGithubFileUpload - ${process.argv[1]}`
+        ? `shGithubFileDownload - ${process.argv[2]}`
+        : `shGithubFileUpload - ${process.argv[2]}`
     );
     path = path.split("/");
     repo = path.slice(0, 2).join("/");
@@ -1283,7 +1284,7 @@ import moduleUrl from "url";
     let consoleError = console.error;
     globalThis.debugInline = globalThis.debugInline || function (...argList) {
 
-// this function will both print <argList> to stderr and return <argList>[0]
+// This function will print <argv> to stderr and then return <argv>[0].
 
         consoleError("\n\ndebugInline");
         consoleError(...argList);
@@ -1758,7 +1759,7 @@ import modulePath from "path";
     let consoleError = console.error;
     globalThis.debugInline = globalThis.debugInline || function (...argList) {
 
-// this function will both print <argList> to stderr and return <argList>[0]
+// This function will print <argv> to stderr and then return <argv>[0].
 
         consoleError("\n\ndebugInline");
         consoleError(...argList);
@@ -1843,6 +1844,7 @@ function replaceListReplace(replaceList, data) {
     let fetchCount = 0;
     let fetchList;
     let matchObj;
+    let promiseList = [];
     let repoDict;
     function pipeToBuffer(res, dict, key) {
 
@@ -1875,13 +1877,16 @@ function replaceListReplace(replaceList, data) {
         elem.prefix = elem.url.split("/").slice(0, 7).join("/");
         // fetch dateCommitted
         if (!repoDict.hasOwnProperty(elem.prefix)) {
-            repoDict[elem.prefix] = true;
-            moduleHttps.request(elem.prefix.replace(
-                "/blob/",
-                "/commits/"
-            ), function (res) {
-                pipeToBuffer(res, elem, "dateCommitted");
-            }).end();
+            promiseList.push(new Promise(function (resolve) {
+                repoDict[elem.prefix] = true;
+                moduleHttps.request(elem.prefix.replace(
+                    "/blob/",
+                    "/commits/"
+                ), function (res) {
+                    pipeToBuffer(res, elem, "dateCommitted");
+                    res.on("end", resolve);
+                }).end();
+            }));
         }
         // fetch file
         if (elem.node) {
@@ -1920,6 +1925,7 @@ function replaceListReplace(replaceList, data) {
             pipeToBuffer(res, elem, "data");
         });
     });
+    await Promise.all(promiseList);
     // parse fetched data
     process.on("exit", function () {
         let header;
@@ -1971,9 +1977,11 @@ function replaceListReplace(replaceList, data) {
                 result += (
                     "\n\n\n/*\n"
                     + "repo " + prefix.replace("/blob/", "/tree/") + "\n"
-                    + "committed " + (
-                        /\b\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ\b|$/
-                    ).exec(dateCommitted.toString())[0] + "\n"
+                    + "committed " + new Date(
+                        (
+                            /"(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d[^"]*?)"/
+                        ).exec(dateCommitted.toString())[1]
+                    ).toISOString().replace((/\.\d*?Z/), "Z") + "\n"
                     + "*/"
                 );
             }
