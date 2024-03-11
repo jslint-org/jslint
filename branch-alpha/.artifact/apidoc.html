@@ -1526,6 +1526,12 @@ fNZOtXKDe39jXdRlkmMnOWIOFBgeEK/b0mFsgffnP...
         process.on("exit", jstestOnExit);
     }
 
+// PR-xxx - Wait awhile for imports to initialize.
+
+    await new Promise(function (resolve) {
+        setTimeout(resolve);
+    });
+
 // Init jstestItList.
 
     jstestItList = [];
@@ -1603,9 +1609,7 @@ jstestIt((
         } catch (errCaught) {
             err = errCaught;
         }
-        resolve([
-            err, description, mode
-        ]);
+        resolve([err, description, mode]);
     }));
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
