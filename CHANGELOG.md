@@ -8,6 +8,7 @@
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
 # v2024.3.1-beta
+- ci - Fix tmpdir in shell-function shBrowserScreenshot().
 - vim - Allow installing vim-plugin to any directory, instead of hardcoded to ~/.vim/.
 - ci - Update github-ci for actions/cache, actions/setup-python from nodejs v16 to nodejs v20.
 - ci - Update shell-function shRollupFetch() to fix blank date-committed.
