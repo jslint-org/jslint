@@ -506,6 +506,9 @@ window.addEventListener("load", function () {
 # Quickstart JSLint in Vim
 1. Download and save [`jslint.mjs`](https://www.jslint.com/jslint.mjs), [`jslint_wrapper_vim.vim`](https://www.jslint.com/jslint_wrapper_vim.vim) to directory `~/.vim/`
 2. Add vim-command `:source ~/.vim/jslint_wrapper_vim.vim` to file `~/.vimrc`
+    - If above files were saved to custom-directory, then use that directory instead, e.g.:
+        - save [`jslint.mjs`](https://www.jslint.com/jslint.mjs), [`jslint_wrapper_vim.vim`](https://www.jslint.com/jslint_wrapper_vim.vim) to directory `~/vimfiles/`
+        - vim-command `:source ~/vimfiles/jslint_wrapper_vim.vim`
 3. Vim can now jslint files (via nodejs):
     - with vim-command `:SaveAndJslint`
     - with vim-key-combo `<Ctrl-S> <Ctrl-J>`
@@ -979,6 +982,26 @@ git push upstream beta:master
 <br><br>
 ### pull-request merge
 - find highest issue-number at https://github.com/jslint-org/jslint/issues/, and add +1 to it for PR-xxx
+```shell
+git push origin alpha:branch_xxx
+git push upstream alpha
+```
+- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:alpha
+- select branch to merge
+- click `Create pull request`
+- `Add a description` template:
+```
+Fixes #xxx.
+- <primary-commit-message>
+
+This PR will ...
+
+this PR will additionally:
+- <secondary-commit-messages>
+...
+
+<screenshot>
+```
 - verify `commit into jslint-org:beta`
 - click `Create pull request`
 - verify ci-success for pull-request
