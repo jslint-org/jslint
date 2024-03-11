@@ -204,6 +204,7 @@ shBrowserScreenshot() {(set -e
 # window-size $2
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
+import moduleFs from "fs";
 import moduleOs from "os";
 import modulePath from "path";
 import moduleUrl from "url";
@@ -225,6 +226,7 @@ import moduleUrl from "url";
     let exitCode;
     let file;
     let timeStart;
+    let tmpdir;
     let url;
     if (process.platform !== "linux") {
         return;
@@ -244,12 +246,15 @@ import moduleUrl from "url";
     file = ".artifact/screenshot_browser_" + encodeURIComponent(file).replace((
         /%/g
     ), "_").toLowerCase() + ".png";
+    tmpdir = await moduleFs.promises.mkdtemp(
+        moduleOs.tmpdir() + "/shBrowserScreenshot-"
+    );
     child = moduleChildProcess.spawn(
         (
             process.platform === "darwin"
             ? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
             : process.platform === "win32"
-            ? "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+            ? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
             : "/usr/bin/google-chrome-stable"
         ),
         [
@@ -258,7 +263,7 @@ import moduleUrl from "url";
             "--incognito",
             "--screenshot",
             "--timeout=30000",
-            "--user-data-dir=" + moduleOs.tmpdir(),
+            "--user-data-dir=" + tmpdir,
             "--window-size=800x600",
             "-screenshot=" + file,
             (
@@ -277,6 +282,7 @@ import moduleUrl from "url";
     exitCode = await new Promise(function (resolve) {
         child.on("exit", resolve);
     });
+    await moduleFs.promises.rm(tmpdir, {recursive: true});
     console.error(
         "shBrowserScreenshot"
         + "\n  - url - " + url

@@ -986,7 +986,7 @@ git push upstream beta:master
 git push origin alpha:branch_xxx
 git push upstream alpha
 ```
-- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch_xxx
+- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:alpha
 - select branch to merge
 - click `Create pull request`
 - `Add a description` template:
@@ -994,9 +994,9 @@ git push upstream alpha
 Fixes #xxx.
 - <primary-commit-message>
 
-This PR ...
+This PR will ...
 
-Additionally, this PR will:
+this PR will additionally:
 - <secondary-commit-messages>
 ...
 
