@@ -452,7 +452,7 @@ import moduleFs from "fs";
     }));
 }());
 ' "$@" # '
-    npx vsce package
+    npx @vscode/vsce package
     rm -rf node_modules
     )
 )}
