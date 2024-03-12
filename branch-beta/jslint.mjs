@@ -9952,6 +9952,12 @@ async function jstestDescribe(description, testFunction) {
         process.on("exit", jstestOnExit);
     }
 
+// PR-457 - Wait awhile for imports to initialize.
+
+    await new Promise(function (resolve) {
+        setTimeout(resolve);
+    });
+
 // Init jstestItList.
 
     jstestItList = [];
@@ -10005,9 +10011,7 @@ function jstestIt(description, testFunction, mode) {
         } catch (errCaught) {
             err = errCaught;
         }
-        resolve([
-            err, description, mode
-        ]);
+        resolve([err, description, mode]);
     }));
 }
 

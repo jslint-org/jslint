@@ -981,7 +981,7 @@ git push upstream beta:master
 
 <br><br>
 ### pull-request merge
-- find highest issue-number at https://github.com/jslint-org/jslint/issues/, and add +1 to it for PR-xxx
+- find highest issue-number at https://github.com/jslint-org/jslint/issues/, https://github.com/jslint-org/jslint/pulls/, and add +1 to it for PR-xxx
 ```shell
 git push origin alpha:branch_xxx
 git push upstream alpha
