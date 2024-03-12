@@ -9952,7 +9952,7 @@ async function jstestDescribe(description, testFunction) {
         process.on("exit", jstestOnExit);
     }
 
-// PR-xxx - Wait awhile for imports to initialize.
+// PR-457 - Wait awhile for imports to initialize.
 
     await new Promise(function (resolve) {
         setTimeout(resolve);
