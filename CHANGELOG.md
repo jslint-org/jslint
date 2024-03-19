@@ -8,6 +8,7 @@
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
 # v2024.3.1-beta
+- jslint - Allow destructuring-assignment after function-definition.
 - ci - Replace npm-package used to auto-build vscode-plugin, vsce to @vscode/vsce.
 - test - Update test-function jstestDescribe() to wait awhile for imports to initialize before running tests.
 - ci - Fix tmpdir in shell-function shBrowserScreenshot().
