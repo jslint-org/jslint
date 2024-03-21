@@ -74,9 +74,9 @@ Douglas Crockford <douglas@crockford.com>
 12. [License](#license)
 
 13. [Devops Instruction](#devops-instruction)
+    - [pull-request merge](#pull-request-merge)
     - [branch-master commit](#branch-master-commit)
     - [branch-master publish](#branch-master-publish)
-    - [pull-request merge](#pull-request-merge)
     - [vscode-jslint publish](#vscode-jslint-publish)
 
 
@@ -915,19 +915,86 @@ eval("1"); //jslint-ignore-line
 
 
 <br><br>
-### branch-master commit
-- update CHANGELOG.md `#v20xx.xx.xx` to today's date
-- $ `npm run test2`
-- $ `shGitSquashPop <commit-beta> '# v20yy.mm.dd\n<release notes from CHANGELOG.md>'`
-    - verify correct-year `20yy`
-- $ `git push origin alpha:branch-v20yy.mm.dd`
-- $ `git push upstream alpha -f`
+### pull-request merge
+- find highest issue-number at https://github.com/jslint-org/jslint/issues/, https://github.com/jslint-org/jslint/pulls/, and add +1 to it for PR-xxx
+```shell
+npm run test2
+shGitSquashPop beta '<commit-message>'
+git push origin alpha:branch_xxx
+git push origin alpha -f
+git push upstream alpha -f
+```
+- verify ci-success for origin-branch-alpha
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
-- goto https://github.com/kaizhu256/jslint/pulls
-- click `New pull request`
-- click `base repository: jslint-org/jslint base:beta`
+- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:alpha
+- click `head repository: kaizhu256/jslint compare:<branch-to-merge>`
+- click `Create pull request`
+- `Add a description` template:
+```
+Fixes #xxx.
+- <primary-commit-message>
+
+This PR will ...
+
+this PR will additionally:
+- <secondary-commit-message>
+...
+
+<screenshot>
+```
+- verify `commit into jslint-org:beta`
+- click `Create pull request`
+- verify ci-success for pull-request
+    - https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
+- click `Rebase and merge`
+- verify ci-success for upstream-branch-beta
+    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+```shell
+git fetch upstream beta
+git diff alpha..upstream/beta
+# verify no diff between alpha..upstream/beta
+git reset upstream/beta
+git push origin alpha -f
+git push origin alpha:beta
+shMyciUpdate
+git push upstream alpha -f
+```
+- verify ci-success for origin-branch-alpha
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- verify ci-success for upstream-branch-alpha
+    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+- click `Delete branch`
+
+
+<br><br>
+### branch-master commit
+- update CHANGELOG.md `#v20yy.mm.dd` to today's date
+```shell
+npm run test2
+shGitSquashPop beta '
+# v20yy.mm.dd
+- <primary-commit-message>
+- <secondary-commit-message>
+'
+git diff origin/branch-v20yy.mm.dd
+git push origin alpha:branch-v20yy.mm.dd
+git push origin alpha -f
+git push upstream alpha -f
+```
+- verify ci-success for origin-branch-alpha
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- verify ci-success for upstream-branch-alpha
+    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:alpha
 - click `head repository: kaizhu256/jslint compare:branch-v20yy.mm.dd`
+- click `Create pull request`
+- `Add a title` template: `#v20yy.mm.dd`
+- `Add a description` template:
+```
+<release notes from CHANGELOG.md>
+```
 - verify `commit into jslint-org:beta`
 - click `Create pull request`
 - verify ci-success for pull-request
@@ -966,12 +1033,17 @@ git push upstream beta:master
 - verify ci-success for upstream-branch-master
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 - goto https://github.com/jslint-org/jslint/releases/new
-- input tag `v20yy.mm.dd`
+- `Choose a tag` template: `v20yy.mm.dd`
 - click `Create new tag: v20yy.mm.dd on publish`
     - verify correct-year `20yy`
-- click `Target: master`
-- input `Release title: v20yy.mm.dd - <description>`
-- copy-paste release notes from CHANGELOG.md
+- select `Target: master`
+- select `Previous tag:auto`
+- `Release title` template: `v20yy.mm.dd - <primary-commit-message>`
+- `Describe this release` template:
+```
+- <primary-commit-message>
+- <secondary-commit-message>
+```
 - click `Generate release notes`
 - click `Set as the latest release`
 - click `Preview` and review
@@ -979,53 +1051,6 @@ git push upstream beta:master
 - verify ci-success for upstream-branch-publish
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 - verify email-notification `Successfully published @jslint-org/jslint@20yy.mm.dd`
-
-
-<br><br>
-### pull-request merge
-- find highest issue-number at https://github.com/jslint-org/jslint/issues/, https://github.com/jslint-org/jslint/pulls/, and add +1 to it for PR-xxx
-```shell
-git push origin alpha:branch_xxx
-git push upstream alpha
-```
-- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:alpha
-- select branch to merge
-- click `Create pull request`
-- `Add a description` template:
-```
-Fixes #xxx.
-- <primary-commit-message>
-
-This PR will ...
-
-this PR will additionally:
-- <secondary-commit-messages>
-...
-
-<screenshot>
-```
-- verify `commit into jslint-org:beta`
-- click `Create pull request`
-- verify ci-success for pull-request
-    - https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
-- click `Rebase and merge`
-- verify ci-success for upstream-branch-beta
-    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
-```shell
-git fetch upstream beta
-git diff alpha..upstream/beta
-# verify no diff between alpha..upstream/beta
-git reset upstream/beta
-git push origin alpha -f
-git push origin alpha:beta
-shMyciUpdate
-git push upstream alpha -f
-```
-- verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-- verify ci-success for upstream-branch-alpha
-    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
-- click `Delete branch`
 
 
 <br><br>
