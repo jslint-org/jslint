@@ -49,7 +49,7 @@ jobs:
       # Publish to GitHub Packages
       - run: sh jslint_ci.sh shCiPublishNpm
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_REGISTRY: github
 
       # Setup .npmrc file to publish to npm
