@@ -5487,13 +5487,15 @@ function jslint_phase3_parse(state) {
         if (
             token_nxt.id === "."
             || token_nxt.id === "?."
-            || token_nxt.id === "["
+
+// PR-459 - Allow destructuring-assignment after function-definition.
+
+            // || token_nxt.id === "["
         ) {
 
 // test_cause:
 // ["function aa(){}\n.aa", "prefix_function", "unexpected_a", ".", 1]
 // ["function aa(){}\n?.aa", "prefix_function", "unexpected_a", "?.", 1]
-// ["function aa(){}\n[]", "prefix_function", "unexpected_a", "[", 1]
 
             warn("unexpected_a");
         }
