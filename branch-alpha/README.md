@@ -3,7 +3,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Status
-| Branch | [master<br>(v2024.3.21)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
+| Branch | [master<br>(v2023.10.24)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jslint-org/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/jslint-org/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/jslint-org/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://jslint-org.github.io/jslint/branch-alpha/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-alpha/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-alpha/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-alpha/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-alpha/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-alpha/.artifact/coverage/index.html) |
@@ -917,24 +917,15 @@ eval("1"); //jslint-ignore-line
 <br><br>
 ### pull-request merge
 - find highest issue-number at https://github.com/jslint-org/jslint/issues/, https://github.com/jslint-org/jslint/pulls/, and add +1 to it for PR-xxx
-```shell
-(set -e
-npm run test2
-sh jslint_ci.sh shGitSquashPop beta '<commit-message>'
-git diff origin/branch-xxx || true
-git push origin alpha:branch-xxx -f
-git push origin alpha -f
-# git push upstream alpha -f
-)
-printf "EXIT_CODE=$?\n"
-```
-- verify ci-success for origin-branch-alpha
+- $ `shGitPullrequest beta beta`
+    - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-- verify ci-success for upstream-branch-alpha
+- $ `git push upstream alpha -f`
+    - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
-- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-xxx
+- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2024.3.21
 - click `Create pull request`
-- `Add a description` template:
+- input `Add your description here...` with:
 ```
 Fixes #xxx.
 - <primary-commit-message>
@@ -949,108 +940,73 @@ this PR will additionally:
 ```
 - verify `commit into jslint-org:beta`
 - click `Create pull request`
-- verify ci-success for pull-request
+    - verify ci-success for pull-request
     - https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
+- wait awhile before continuing ...
 - click `Rebase and merge`
-- verify ci-success for upstream-branch-beta
+    - verify ci-success for upstream-branch-beta
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
-```shell
-(set -e
-git fetch upstream beta
-git diff alpha..upstream/beta
-# verify no diff between alpha..upstream/beta
-git reset upstream/beta
-git push origin alpha -f
-git push origin alpha:beta
-sh jslint_ci.sh shMyciUpdate
-# git push upstream alpha -f
-)
-printf "EXIT_CODE=$?\n"
-```
-- verify ci-success for origin-branch-alpha
+- $ `shGitPullrequestCleanup`
+    - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-- verify ci-success for upstream-branch-alpha
+- $ `git push upstream alpha -f`
+    - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 - click `Delete branch`
 
 
 <br><br>
 ### branch-master commit
-- update CHANGELOG.md `#v20yy.mm.dd` to today's date
-```shell
-(set -e
-npm run test2
-sh jslint_ci.sh shGitSquashPop beta '
-# v20yy.mm.dd
+- $ `shGitPullrequest master beta`
+    - verify ci-success for origin-branch-alpha
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- $ `git push upstream alpha -f`
+    - verify ci-success for upstream-branch-alpha
+    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v2023.10.24
+- click `Create pull request`
+- input `Add a title` with: `# v20yy.mm.dd`
+- input `Add a description` with:
+```
 - <primary-commit-message>
 - <secondary-commit-message>
-'
-git diff origin/branch-v20yy.mm.dd || true
-git push origin alpha:branch-v20yy.mm.dd -f
-git push origin alpha -f
-# git push upstream alpha -f
-)
-printf "EXIT_CODE=$?\n"
-```
-- verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-- verify ci-success for upstream-branch-alpha
-    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
-- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v20yy.mm.dd
-- click `Create pull request`
-- `Add a title` template: `#v20yy.mm.dd`
-- `Add a description` template:
-```
-<release notes from CHANGELOG.md>
 ```
 - verify `commit into jslint-org:beta`
 - click `Create pull request`
-- verify ci-success for pull-request
+    - verify ci-success for pull-request
     - https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
+- wait awhile before continuing ...
 - click `Rebase and merge`
-- verify ci-success for upstream-branch-beta
+    - verify ci-success for upstream-branch-beta
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
-```shell
-(set -e
-git fetch upstream beta
-git diff alpha..upstream/beta
-# verify no diff between alpha..upstream/beta
-git reset upstream/beta
-git push origin alpha -f
-git push origin alpha:beta
-sh jslint_ci.sh shMyciUpdate
-# git push upstream alpha -f
-)
-printf "EXIT_CODE=$?\n"
-```
-- verify ci-success for origin-branch-alpha
+- $ `shGitPullrequestCleanup`
+    - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-- verify ci-success for upstream-branch-alpha
+- $ `git push upstream alpha -f`
+    - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 - click `Delete branch`
-```shell
-git push origin beta:master
-git push upstream beta:master
-```
-- verify ci-success for origin-branch-master
+- $ `git push origin beta:master`
+    - verify ci-success for origin-branch-master
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-- verify ci-success for upstream-branch-master
+- $ `git push upstream beta:master`
+    - verify ci-success for upstream-branch-master
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 
 
 <br><br>
 ### branch-master publish
 - $ `git push upstream beta:master`
-- verify ci-success for upstream-branch-master
+    - verify ci-success for upstream-branch-master
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 - goto https://github.com/jslint-org/jslint/releases/new
-- `Choose a tag` template: `v20yy.mm.dd`
+- input `Choose a tag` with: `v20yy.mm.dd`
 - click `Create new tag: v20yy.mm.dd on publish`
     - verify correct-year `20yy`
 - select `Target: master`
 - select `Previous tag:auto`
-- `Release title` template: `v20yy.mm.dd - <primary-commit-message>`
-- `Describe this release` template:
+- input `Release title` with: `v20yy.mm.dd - <primary-commit-message>`
+- input `Describe this release` with:
 ```
 - <primary-commit-message>
 - <secondary-commit-message>
@@ -1059,9 +1015,9 @@ git push upstream beta:master
 - click `Set as the latest release`
 - click `Preview` and review
 - click `Publish release`
-- verify ci-success for upstream-branch-publish
+    - verify ci-success for upstream-branch-publish
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
-- verify email-notification `Successfully published @jslint-org/jslint@20yy.mm.dd`
+    - verify email-notification `Successfully published @jslint-org/jslint@20yy.mm.dd`
 
 
 <br><br>
