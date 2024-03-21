@@ -920,7 +920,7 @@ eval("1"); //jslint-ignore-line
 ```shell
 npm run test2
 shGitSquashPop beta '<commit-message>'
-git push origin alpha:branch_xxx
+git push origin alpha:branch-xxx
 git push origin alpha -f
 git push upstream alpha -f
 ```
@@ -928,8 +928,7 @@ git push upstream alpha -f
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
-- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:alpha
-- click `head repository: kaizhu256/jslint compare:<branch-to-merge>`
+- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-xxx
 - click `Create pull request`
 - `Add a description` template:
 ```
@@ -987,8 +986,7 @@ git push upstream alpha -f
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
-- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:alpha
-- click `head repository: kaizhu256/jslint compare:branch-v20yy.mm.dd`
+- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v20yy.mm.dd
 - click `Create pull request`
 - `Add a title` template: `#v20yy.mm.dd`
 - `Add a description` template:
