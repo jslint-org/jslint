@@ -725,7 +725,9 @@ import moduleHttps from "https";
                 /[\u0022\u0027]/g
             ), "").replace((
                 /\/branch-[a-z]*?\//g
-            ), `/branch-${GITHUB_BRANCH0}/`).replace(new RegExp(
+            ), `/branch-${GITHUB_BRANCH0}/`).replace((
+                /:(?:branch-v20yy\.mm\.dd|branch-xxx)\b/g
+            ), ":alpha").replace(new RegExp(
                 `\\b${UPSTREAM_REPOSITORY}\\b`,
                 "g"
             ), GITHUB_REPOSITORY).replace(new RegExp(

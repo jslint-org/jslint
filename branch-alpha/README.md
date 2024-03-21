@@ -918,11 +918,15 @@ eval("1"); //jslint-ignore-line
 ### pull-request merge
 - find highest issue-number at https://github.com/jslint-org/jslint/issues/, https://github.com/jslint-org/jslint/pulls/, and add +1 to it for PR-xxx
 ```shell
+(set -e
 npm run test2
-shGitSquashPop beta '<commit-message>'
-git push origin alpha:branch-xxx
+sh jslint_ci.sh shGitSquashPop beta '<commit-message>'
+git diff origin/branch-xxx || true
+git push origin alpha:branch-xxx -f
 git push origin alpha -f
-git push upstream alpha -f
+# git push upstream alpha -f
+)
+printf "EXIT_CODE=$?\n"
 ```
 - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
@@ -951,14 +955,17 @@ this PR will additionally:
 - verify ci-success for upstream-branch-beta
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 ```shell
+(set -e
 git fetch upstream beta
 git diff alpha..upstream/beta
 # verify no diff between alpha..upstream/beta
 git reset upstream/beta
 git push origin alpha -f
 git push origin alpha:beta
-shMyciUpdate
-git push upstream alpha -f
+sh jslint_ci.sh shMyciUpdate
+# git push upstream alpha -f
+)
+printf "EXIT_CODE=$?\n"
 ```
 - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
@@ -971,16 +978,19 @@ git push upstream alpha -f
 ### branch-master commit
 - update CHANGELOG.md `#v20yy.mm.dd` to today's date
 ```shell
+(set -e
 npm run test2
-shGitSquashPop beta '
+sh jslint_ci.sh shGitSquashPop beta '
 # v20yy.mm.dd
 - <primary-commit-message>
 - <secondary-commit-message>
 '
-git diff origin/branch-v20yy.mm.dd
-git push origin alpha:branch-v20yy.mm.dd
+git diff origin/branch-v20yy.mm.dd || true
+git push origin alpha:branch-v20yy.mm.dd -f
 git push origin alpha -f
-git push upstream alpha -f
+# git push upstream alpha -f
+)
+printf "EXIT_CODE=$?\n"
 ```
 - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
@@ -1001,14 +1011,17 @@ git push upstream alpha -f
 - verify ci-success for upstream-branch-beta
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 ```shell
+(set -e
 git fetch upstream beta
 git diff alpha..upstream/beta
 # verify no diff between alpha..upstream/beta
 git reset upstream/beta
 git push origin alpha -f
 git push origin alpha:beta
-shMyciUpdate
-git push upstream alpha -f
+sh jslint_ci.sh shMyciUpdate
+# git push upstream alpha -f
+)
+printf "EXIT_CODE=$?\n"
 ```
 - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
