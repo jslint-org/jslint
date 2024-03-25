@@ -302,7 +302,7 @@ shCiArtifactUpload() {(set -e
     git pull --unshallow origin "$GITHUB_BRANCH0"
     # init $UPSTREAM_XXX
     export UPSTREAM_REPOSITORY="$(node -p '(
-    /^https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
+    /^(?:git\+)?https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
 ).exec(require("./package.json").repository.url)[1]
 ')" # '
     export UPSTREAM_GITHUB_IO="$(
@@ -666,7 +666,7 @@ shDirHttplinkValidate() {(set -e
     export GITHUB_BRANCH0="${GITHUB_BRANCH0:-alpha}"
     # init $UPSTREAM_XXX
     export UPSTREAM_REPOSITORY="$(node -p '(
-    /^https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
+    /^(?:git\+)?https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
 ).exec(require("./package.json").repository.url)[1]
 ')" # '
     export UPSTREAM_GITHUB_IO="$(
