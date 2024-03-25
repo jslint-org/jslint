@@ -347,7 +347,7 @@
     textLength="768"
     x="10"
     y="1264"
->added 374 packages, and audited 375 packages in 9s                                               </tspan>
+>added 374 packages, and audited 375 packages in 10s                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -377,7 +377,7 @@
     textLength="768"
     x="10"
     y="1374"
->5 vulnerabilities (1 moderate, 1 high, 3 critical)                                               </tspan>
+>5 vulnerabilities (1 low, 1 high, 3 critical)                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

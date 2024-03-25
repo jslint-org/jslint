@@ -208,19 +208,6 @@ import moduleFs from "fs";
 import moduleOs from "os";
 import modulePath from "path";
 import moduleUrl from "url";
-// init debugInline
-(function () {
-    let consoleError = console.error;
-    globalThis.debugInline = globalThis.debugInline || function (...argList) {
-
-// This function will print <argv> to stderr and then return <argv>[0].
-
-        consoleError("\n\ndebugInline");
-        consoleError(...argList);
-        consoleError("\n");
-        return argList[0];
-    };
-}());
 (async function () {
     let child;
     let exitCode;
@@ -483,8 +470,8 @@ import moduleFs from "fs";
         {
             file: "README.md",
             src: fileDict["README.md"].replace((
-                /\bv\d\d\d\d\.\d\d?\.\d\d?\b/m
-            ), `v${versionMaster}`)
+                /(\[(?:main|master)<br>\()v\d\d\d\d\.\d\d?\.\d\d?\b/g
+            ), `$1v${versionMaster}`)
         }, {
             file: "package.json",
             src: fileDict["package.json"].replace((
@@ -707,33 +694,40 @@ import moduleHttps from "https";
         await moduleFs.promises.readdir(".")
     ).forEach(async function (file) {
         let data;
-        if (file === "CHANGELOG.md" || !(
-            /.\.html$|.\.md$/m
-        ).test(file)) {
+        if (file === "CHANGELOG.md" || !(/.\.html$|.\.md$/m).test(file)) {
             return;
         }
         data = await moduleFs.promises.readFile(file, "utf8");
         // ignore link-rel-preconnect
         data = data.replace((
-            /<link\b.*?\brel="preconnect".*?>/g
+            /<link\b.+?\brel="preconnect".+?>/g
         ), "");
         data.replace((
-            /\bhttps?:\/\/.*?(?:[\s")\]]|\W?$)/gm
-        ), function (url) {
+            /\bhttps?:\/\/.+?([\s")\]]|\W?$)/gm
+        ), function (url, removeLast) {
             let req;
-            url = url.slice(0, -1).replace((
-                /[\u0022\u0027]/g
-            ), "").replace((
-                /\/branch-[a-z]*?\//g
-            ), `/branch-${GITHUB_BRANCH0}/`).replace(new RegExp(
-                `\\b${UPSTREAM_REPOSITORY}\\b`,
-                "g"
-            ), GITHUB_REPOSITORY).replace(new RegExp(
-                `\\b${UPSTREAM_GITHUB_IO}\\b`,
-                "g"
-            ), GITHUB_GITHUB_IO);
+            if (removeLast && removeLast !== "/") {
+                url = url.slice(0, -1);
+            }
+            url = url.replace((/["\u0027]/g), "");
+            url = url.replace(
+                (/\/branch-[a-z]+?\//g),
+                `/branch-${GITHUB_BRANCH0}/`
+            );
+            url = url.replace(
+                (/_2fbranch-[a-z]+?_2f/g),
+                `_2fbranch-${GITHUB_BRANCH0}_2f`
+            );
+            url = url.replace(
+                new RegExp(`\\b${UPSTREAM_REPOSITORY}\\b`, "g"),
+                GITHUB_REPOSITORY
+            );
+            url = url.replace(
+                new RegExp(`\\b${UPSTREAM_GITHUB_IO}\\b`, "g"),
+                GITHUB_GITHUB_IO
+            );
             if ((
-                /^http:\/\/(?:127\.0\.0\.1|localhost|www\.w3\.org\/2000\/svg)(?:[\/:]|$)/m
+                /^http:\/\/(?:127\.0\.0\.1|localhost|www\.w3\.org\/2000\/svg)(?:[\/:]|$)|^https:\/\/github\.com\/[\w.\-\/]+?\/compare\/[\w.\-\/]+?\.\.\.\w/m
             ).test(url)) {
                 return "";
             }
@@ -762,7 +756,7 @@ import moduleHttps from "https";
             return "";
         });
         data.replace((
-            /(\bhref=|\bsrc=|\burl\(|\[[^]*?\]\()("?.*?)(?:[")\]]|$)/gm
+            /(\bhref=|\bsrc=|\burl\(|\[[^]+?\]\()("?.+?)(?:[")\]]|$)/gm
         ), function (ignore, linkType, url) {
             if (!linkType.startsWith("[")) {
                 url = url.slice(1);
@@ -992,6 +986,121 @@ import moduleChildProcess from "child_process";
                 + "\n"
             );
         }).join(""));
+    });
+}());
+' "$@" # '
+)}
+
+shGitPullrequestCleanup() {(set -e
+# this function will cleanup pull-request after merge.
+    git fetch upstream beta
+    # verify no diff between alpha..upstream/beta
+    git diff alpha..upstream/beta
+    git push . HEAD:__pr_upstream_pre -f
+    git reset upstream/beta
+    git push origin alpha -f
+    git push origin alpha:beta
+    sh jslint_ci.sh shMyciUpdate
+    git push . HEAD:__pr_upstream -f
+)}
+
+shGitPullrequest() {(set -e
+# this function will create-and-push a github-pull-commit to origin/alpha
+    node --input-type=module --eval '
+import moduleAssert from "assert";
+import moduleChildProcess from "child_process";
+import moduleFs from "fs";
+// init debugInline
+(function () {
+    let consoleError = console.error;
+    globalThis.debugInline = globalThis.debugInline || function (...argList) {
+
+// This function will print <argv> to stderr and then return <argv>[0].
+
+        consoleError("\n\ndebugInline");
+        consoleError(...argList);
+        consoleError("\n");
+        return argList[0];
+    };
+}());
+(async function () {
+    let branchCheckpoint = process.argv[2] || "HEAD";
+    let branchMerge = process.argv[1] || "beta";
+    let branchPull;
+    let commitMessage;
+    let data;
+    let version = process.argv[3] || new Date().toISOString().slice(0, 10);
+    version = version.replace((/-0?/g), ".");
+    // security - sanitize branchXxx
+    [
+        branchCheckpoint, branchMerge, version
+    ] = [
+        branchCheckpoint, branchMerge, version
+    ].map(function (branch) {
+        return branch.trim().replace((/[^\w.\-]/g), "_");
+    });
+    data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
+    switch (branchMerge) {
+    case "master":
+        version = `v${version}`;
+        // update CHANGELOG.md
+        data = data.replace(
+            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
+            `\n\n# ${version}\n`
+        );
+        await moduleFs.promises.writeFile("CHANGELOG.md", data);
+        commitMessage = new RegExp(
+            `\n\n# ${version}\n[\\S\\s]+?\n\n`
+        ).exec(data)[0];
+        break;
+    default:
+        version = `p${version}`;
+        commitMessage = (
+            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)\n- /
+        ).exec(data)[1];
+    }
+    branchPull = `branch-${version}`;
+    // update README.md
+    data = await moduleFs.promises.readFile("README.md", "utf8");
+    data = data.replace(
+        new RegExp(
+            (
+                "(\\bhttps:\\/\\/github\\.com\\/[\\w.\\-\\/]+?"
+                + "\\/compare"
+                + "\\/[\\w.\\-\\/]+?\\.\\.\\.[\\w.:\\-\\/]+?)"
+                + `:branch-${version[0]}\\d\\d\\d\\d\\.\\d\\d?\\.\\d\\d?\\b`
+            ),
+            "g"
+        ),
+        `$1:${branchPull}`
+    );
+    await moduleFs.promises.writeFile("README.md", data);
+    // security - sanitize commitMessage
+    commitMessage = commitMessage.trim().replace((/[$\u0027`]/g), "?");
+    moduleChildProcess.spawn(
+        "sh",
+        [
+            "-c",
+            (`
+(set -e
+    . ./jslint_ci.sh
+    npm run test2
+    git push . HEAD:__pr_${branchMerge}_pre -f
+    shGitSquashPop ${branchCheckpoint} \u0027${commitMessage}\u0027
+    git diff origin/${branchPull} || true
+    git push origin alpha:${branchPull} -f
+    git push origin alpha -f
+    shDirHttplinkValidate
+    git push . HEAD:__pr_${branchMerge} -f
+)
+            `)
+        ],
+        {stdio: ["ignore", 1, 2]}
+    ).on("exit", function (exitCode) {
+        moduleAssert.ok(
+            exitCode === 0,
+            `shGitPullrequest - exitCode=${exitCode}`
+        );
     });
 }());
 ' "$@" # '
@@ -1285,19 +1394,6 @@ import moduleHttp from "http";
 import modulePath from "path";
 import moduleRepl from "repl";
 import moduleUrl from "url";
-// init debugInline
-(function () {
-    let consoleError = console.error;
-    globalThis.debugInline = globalThis.debugInline || function (...argList) {
-
-// This function will print <argv> to stderr and then return <argv>[0].
-
-        consoleError("\n\ndebugInline");
-        consoleError(...argList);
-        consoleError("\n");
-        return argList[0];
-    };
-}());
 (async function httpFileServer() {
 
 // this function will start http-file-server
@@ -1760,19 +1856,6 @@ import moduleChildProcess from "child_process";
 import moduleFs from "fs";
 import moduleHttps from "https";
 import modulePath from "path";
-// init debugInline
-(function () {
-    let consoleError = console.error;
-    globalThis.debugInline = globalThis.debugInline || function (...argList) {
-
-// This function will print <argv> to stderr and then return <argv>[0].
-
-        consoleError("\n\ndebugInline");
-        consoleError(...argList);
-        consoleError("\n");
-        return argList[0];
-    };
-}());
 function objectDeepCopyWithKeysSorted(obj) {
 
 // This function will recursively deep-copy <obj> with keys sorted.
