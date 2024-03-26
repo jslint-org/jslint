@@ -302,7 +302,7 @@ shCiArtifactUpload() {(set -e
     git pull --unshallow origin "$GITHUB_BRANCH0"
     # init $UPSTREAM_XXX
     export UPSTREAM_REPOSITORY="$(node -p '(
-    /^https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
+    /^(?:git\+)?https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
 ).exec(require("./package.json").repository.url)[1]
 ')" # '
     export UPSTREAM_GITHUB_IO="$(
@@ -666,7 +666,7 @@ shDirHttplinkValidate() {(set -e
     export GITHUB_BRANCH0="${GITHUB_BRANCH0:-alpha}"
     # init $UPSTREAM_XXX
     export UPSTREAM_REPOSITORY="$(node -p '(
-    /^https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
+    /^(?:git\+)?https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
 ).exec(require("./package.json").repository.url)[1]
 ')" # '
     export UPSTREAM_GITHUB_IO="$(
@@ -740,7 +740,11 @@ import moduleHttps from "https";
                 return "";
             }
             dict[url] = true;
-            req = moduleHttps.request(url, function (res) {
+            req = moduleHttps.request(url, {
+                headers: {
+                    "user-agent": "undefined"
+                }
+            }, function (res) {
                 console.error(
                     "shDirHttplinkValidate " + res.statusCode + " " + url
                 );
@@ -1007,9 +1011,6 @@ shGitPullrequestCleanup() {(set -e
 shGitPullrequest() {(set -e
 # this function will create-and-push a github-pull-commit to origin/alpha
     node --input-type=module --eval '
-import moduleAssert from "assert";
-import moduleChildProcess from "child_process";
-import moduleFs from "fs";
 // init debugInline
 (function () {
     let consoleError = console.error;
@@ -1023,6 +1024,9 @@ import moduleFs from "fs";
         return argList[0];
     };
 }());
+import moduleAssert from "assert";
+import moduleChildProcess from "child_process";
+import moduleFs from "fs";
 (async function () {
     let branchCheckpoint = process.argv[2] || "HEAD";
     let branchMerge = process.argv[1] || "beta";
