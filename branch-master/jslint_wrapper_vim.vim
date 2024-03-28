@@ -34,6 +34,8 @@
 ""    - with vim-command ":SaveAndJslint"
 ""    - with vim-key-combo "<Ctrl-S> <Ctrl-J>"
 
+let s:dir = expand("<sfile>:p:h")
+
 "" this function will save current file and jslint it (via nodejs)
 function! SaveAndJslint(bang)
     "" save file
@@ -42,7 +44,9 @@ function! SaveAndJslint(bang)
     let &l:errorformat =
         \ "%f.<node -e>.js:%n:%l:%c:%m," .
         \ "%f:%n:%l:%c:%m"
-    let &l:makeprg = "node \"" . $HOME . "/.vim/jslint.mjs\" jslint_wrapper_vim"
+    let &l:makeprg = "node"
+        \ . " \"" . s:dir . "/jslint.mjs\""
+        \ . " jslint_wrapper_vim"
         \ . " \"" . fnamemodify(bufname("%"), ":p") . "\""
     silent make! | cwindow | redraw!
 endfunction

@@ -441,7 +441,7 @@ import moduleFs from "fs";
                     "type": "git",
                     "url": "https://github.com/jslint-org/jslint.git"
                 },
-                "version": "2023.10.24"
+                "version": "2024.3.26"
             }, undefined, 4)
         }
     ].map(async function ({
@@ -452,7 +452,7 @@ import moduleFs from "fs";
     }));
 }());
 ' "$@" # '
-    npx vsce package
+    npx @vscode/vsce package
     rm -rf node_modules
     )
 )}

@@ -7,6 +7,17 @@
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
+# v2024.3.26
+- ci - Add shell-functions shGitPullrequestCleanup(), shGitPullrequest() to automatically cleanup or create-and-push github-pull-commit to origin/alpha.
+- jslint - Allow destructuring-assignment after function-definition.
+- ci - Replace npm-package used to auto-build vscode-plugin, vsce to @vscode/vsce.
+- test - Update test-function jstestDescribe() to wait awhile for imports to initialize before running tests.
+- ci - Fix tmpdir in shell-function shBrowserScreenshot().
+- vim - Allow installing vim-plugin to any directory, instead of hardcoded to ~/.vim/.
+- ci - Update github-ci for actions/cache, actions/setup-python from nodejs v16 to nodejs v20.
+- ci - Update shell-function shRollupFetch() to fix blank date-committed.
+- ci - bugfix - Fix google-chrome unable to create screenshot because user-data-dir is /dev/null.
+
 # v2023.10.24
 - jslint - bugfix - Update file jslint_wrapper_vim.vim to fix broken vim-link when linting shell-files.
 - ci - add custom-shell-ci hooks to script jslint_ci.sh:

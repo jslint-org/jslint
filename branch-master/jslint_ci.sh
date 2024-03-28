@@ -188,12 +188,12 @@ shBashrcWindowsInit() {
         ;;
     esac
     # alias curl.exe
-    # if (! alias curl &>/dev/null) && [ -f c:/windows/system32/curl.exe ]
+    # if (! alias curl 2>/dev/null) && [ -f c:/windows/system32/curl.exe ]
     # then
     #     alias curl=c:/windows/system32/curl.exe
     # fi
     # alias node.exe
-    if (! alias node &>/dev/null)
+    if (! alias node 2>/dev/null)
     then
         alias node=node.exe
     fi
@@ -204,26 +204,16 @@ shBrowserScreenshot() {(set -e
 # window-size $2
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
+import moduleFs from "fs";
+import moduleOs from "os";
 import modulePath from "path";
 import moduleUrl from "url";
-// init debugInline
-(function () {
-    let consoleError = console.error;
-    globalThis.debugInline = globalThis.debugInline || function (...argList) {
-
-// this function will both print <argList> to stderr and return <argList>[0]
-
-        consoleError("\n\ndebugInline");
-        consoleError(...argList);
-        consoleError("\n");
-        return argList[0];
-    };
-}());
 (async function () {
     let child;
     let exitCode;
     let file;
     let timeStart;
+    let tmpdir;
     let url;
     if (process.platform !== "linux") {
         return;
@@ -243,12 +233,15 @@ import moduleUrl from "url";
     file = ".artifact/screenshot_browser_" + encodeURIComponent(file).replace((
         /%/g
     ), "_").toLowerCase() + ".png";
+    tmpdir = await moduleFs.promises.mkdtemp(
+        moduleOs.tmpdir() + "/shBrowserScreenshot-"
+    );
     child = moduleChildProcess.spawn(
         (
             process.platform === "darwin"
             ? "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
             : process.platform === "win32"
-            ? "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+            ? "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
             : "/usr/bin/google-chrome-stable"
         ),
         [
@@ -257,7 +250,7 @@ import moduleUrl from "url";
             "--incognito",
             "--screenshot",
             "--timeout=30000",
-            "--user-data-dir=/dev/null",
+            "--user-data-dir=" + tmpdir,
             "--window-size=800x600",
             "-screenshot=" + file,
             (
@@ -276,6 +269,7 @@ import moduleUrl from "url";
     exitCode = await new Promise(function (resolve) {
         child.on("exit", resolve);
     });
+    await moduleFs.promises.rm(tmpdir, {recursive: true});
     console.error(
         "shBrowserScreenshot"
         + "\n  - url - " + url
@@ -308,7 +302,7 @@ shCiArtifactUpload() {(set -e
     git pull --unshallow origin "$GITHUB_BRANCH0"
     # init $UPSTREAM_XXX
     export UPSTREAM_REPOSITORY="$(node -p '(
-    /^https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
+    /^(?:git\+)?https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
 ).exec(require("./package.json").repository.url)[1]
 ')" # '
     export UPSTREAM_GITHUB_IO="$(
@@ -427,6 +421,8 @@ shCiBase() {(set -e
 # # this function will run custom-code to lint files
 # )}
     export GITHUB_BRANCH0="$(git rev-parse --abbrev-ref HEAD)"
+    # Auto-correct common errors in package.json.
+    npm pkg fix
     # validate package.json.fileCount
     node --input-type=module --eval '
 import moduleFs from "fs";
@@ -476,8 +472,8 @@ import moduleFs from "fs";
         {
             file: "README.md",
             src: fileDict["README.md"].replace((
-                /\bv\d\d\d\d\.\d\d?\.\d\d?\b/m
-            ), `v${versionMaster}`)
+                /(\[(?:main|master)<br>\()v\d\d\d\d\.\d\d?\.\d\d?\b/g
+            ), `$1v${versionMaster}`)
         }, {
             file: "package.json",
             src: fileDict["package.json"].replace((
@@ -672,7 +668,7 @@ shDirHttplinkValidate() {(set -e
     export GITHUB_BRANCH0="${GITHUB_BRANCH0:-alpha}"
     # init $UPSTREAM_XXX
     export UPSTREAM_REPOSITORY="$(node -p '(
-    /^https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
+    /^(?:git\+)?https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
 ).exec(require("./package.json").repository.url)[1]
 ')" # '
     export UPSTREAM_GITHUB_IO="$(
@@ -700,33 +696,40 @@ import moduleHttps from "https";
         await moduleFs.promises.readdir(".")
     ).forEach(async function (file) {
         let data;
-        if (file === "CHANGELOG.md" || !(
-            /.\.html$|.\.md$/m
-        ).test(file)) {
+        if (file === "CHANGELOG.md" || !(/.\.html$|.\.md$/m).test(file)) {
             return;
         }
         data = await moduleFs.promises.readFile(file, "utf8");
         // ignore link-rel-preconnect
         data = data.replace((
-            /<link\b.*?\brel="preconnect".*?>/g
+            /<link\b.+?\brel="preconnect".+?>/g
         ), "");
         data.replace((
-            /\bhttps?:\/\/.*?(?:[\s")\]]|\W?$)/gm
-        ), function (url) {
+            /\bhttps?:\/\/.+?([\s")\]]|\W?$)/gm
+        ), function (url, removeLast) {
             let req;
-            url = url.slice(0, -1).replace((
-                /[\u0022\u0027]/g
-            ), "").replace((
-                /\/branch-[a-z]*?\//g
-            ), `/branch-${GITHUB_BRANCH0}/`).replace(new RegExp(
-                `\\b${UPSTREAM_REPOSITORY}\\b`,
-                "g"
-            ), GITHUB_REPOSITORY).replace(new RegExp(
-                `\\b${UPSTREAM_GITHUB_IO}\\b`,
-                "g"
-            ), GITHUB_GITHUB_IO);
+            if (removeLast && removeLast !== "/") {
+                url = url.slice(0, -1);
+            }
+            url = url.replace((/["\u0027]/g), "");
+            url = url.replace(
+                (/\/branch-[a-z]+?\//g),
+                `/branch-${GITHUB_BRANCH0}/`
+            );
+            url = url.replace(
+                (/_2fbranch-[a-z]+?_2f/g),
+                `_2fbranch-${GITHUB_BRANCH0}_2f`
+            );
+            url = url.replace(
+                new RegExp(`\\b${UPSTREAM_REPOSITORY}\\b`, "g"),
+                GITHUB_REPOSITORY
+            );
+            url = url.replace(
+                new RegExp(`\\b${UPSTREAM_GITHUB_IO}\\b`, "g"),
+                GITHUB_GITHUB_IO
+            );
             if ((
-                /^http:\/\/(?:127\.0\.0\.1|localhost|www\.w3\.org\/2000\/svg)(?:[\/:]|$)/m
+                /^http:\/\/(?:127\.0\.0\.1|localhost|www\.w3\.org\/2000\/svg)(?:[\/:]|$)|^https:\/\/github\.com\/[\w.\-\/]+?\/compare\/[\w.\-\/]+?\.\.\.\w/m
             ).test(url)) {
                 return "";
             }
@@ -739,7 +742,11 @@ import moduleHttps from "https";
                 return "";
             }
             dict[url] = true;
-            req = moduleHttps.request(url, function (res) {
+            req = moduleHttps.request(url, {
+                headers: {
+                    "user-agent": "undefined"
+                }
+            }, function (res) {
                 console.error(
                     "shDirHttplinkValidate " + res.statusCode + " " + url
                 );
@@ -755,7 +762,7 @@ import moduleHttps from "https";
             return "";
         });
         data.replace((
-            /(\bhref=|\bsrc=|\burl\(|\[[^]*?\]\()("?.*?)(?:[")\]]|$)/gm
+            /(\bhref=|\bsrc=|\burl\(|\[[^]+?\]\()("?.+?)(?:[")\]]|$)/gm
         ), function (ignore, linkType, url) {
             if (!linkType.startsWith("[")) {
                 url = url.slice(1);
@@ -872,7 +879,7 @@ COMMIT_LIMIT=$COMMIT_LIMIT MODE_SQUASH=$MODE_SQUASH\n"
     fi
     # squash commits
     COMMIT_MESSAGE="[squashed $COMMIT_COUNT commits] $COMMIT_MESSAGE"
-    git branch -D __tmp1 &>/dev/null || true
+    git branch -D __tmp1 2>/dev/null || true
     git checkout --orphan __tmp1
     git commit --quiet -am "$COMMIT_MESSAGE" || true
     # reset branch to squashed-commit
@@ -990,6 +997,121 @@ import moduleChildProcess from "child_process";
 ' "$@" # '
 )}
 
+shGitPullrequestCleanup() {(set -e
+# this function will cleanup pull-request after merge.
+    git fetch upstream beta
+    # verify no diff between alpha..upstream/beta
+    git diff alpha..upstream/beta
+    git push . HEAD:__pr_upstream_pre -f
+    git reset upstream/beta
+    git push origin alpha -f
+    git push origin alpha:beta
+    sh jslint_ci.sh shMyciUpdate
+    git push . HEAD:__pr_upstream -f
+)}
+
+shGitPullrequest() {(set -e
+# this function will create-and-push a github-pull-commit to origin/alpha
+    node --input-type=module --eval '
+// init debugInline
+(function () {
+    let consoleError = console.error;
+    globalThis.debugInline = globalThis.debugInline || function (...argList) {
+
+// This function will print <argv> to stderr and then return <argv>[0].
+
+        consoleError("\n\ndebugInline");
+        consoleError(...argList);
+        consoleError("\n");
+        return argList[0];
+    };
+}());
+import moduleAssert from "assert";
+import moduleChildProcess from "child_process";
+import moduleFs from "fs";
+(async function () {
+    let branchCheckpoint = process.argv[2] || "HEAD";
+    let branchMerge = process.argv[1] || "beta";
+    let branchPull;
+    let commitMessage;
+    let data;
+    let version = process.argv[3] || new Date().toISOString().slice(0, 10);
+    version = version.replace((/-0?/g), ".");
+    // security - sanitize branchXxx
+    [
+        branchCheckpoint, branchMerge, version
+    ] = [
+        branchCheckpoint, branchMerge, version
+    ].map(function (branch) {
+        return branch.trim().replace((/[^\w.\-]/g), "_");
+    });
+    data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
+    switch (branchMerge) {
+    case "master":
+        version = `v${version}`;
+        // update CHANGELOG.md
+        data = data.replace(
+            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
+            `\n\n# ${version}\n`
+        );
+        await moduleFs.promises.writeFile("CHANGELOG.md", data);
+        commitMessage = new RegExp(
+            `\n\n# ${version}\n[\\S\\s]+?\n\n`
+        ).exec(data)[0];
+        break;
+    default:
+        version = `p${version}`;
+        commitMessage = (
+            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)\n- /
+        ).exec(data)[1];
+    }
+    branchPull = `branch-${version}`;
+    // update README.md
+    data = await moduleFs.promises.readFile("README.md", "utf8");
+    data = data.replace(
+        new RegExp(
+            (
+                "(\\bhttps:\\/\\/github\\.com\\/[\\w.\\-\\/]+?"
+                + "\\/compare"
+                + "\\/[\\w.\\-\\/]+?\\.\\.\\.[\\w.:\\-\\/]+?)"
+                + `:branch-${version[0]}\\d\\d\\d\\d\\.\\d\\d?\\.\\d\\d?\\b`
+            ),
+            "g"
+        ),
+        `$1:${branchPull}`
+    );
+    await moduleFs.promises.writeFile("README.md", data);
+    // security - sanitize commitMessage
+    commitMessage = commitMessage.trim().replace((/[$\u0027`]/g), "?");
+    moduleChildProcess.spawn(
+        "sh",
+        [
+            "-c",
+            (`
+(set -e
+    . ./jslint_ci.sh
+    npm run test2
+    git push . HEAD:__pr_${branchMerge}_pre -f
+    shGitSquashPop ${branchCheckpoint} \u0027${commitMessage}\u0027
+    git diff origin/${branchPull} || true
+    git push origin alpha:${branchPull} -f
+    git push origin alpha -f
+    shDirHttplinkValidate
+    git push . HEAD:__pr_${branchMerge} -f
+)
+            `)
+        ],
+        {stdio: ["ignore", 1, 2]}
+    ).on("exit", function (exitCode) {
+        moduleAssert.ok(
+            exitCode === 0,
+            `shGitPullrequest - exitCode=${exitCode}`
+        );
+    });
+}());
+' "$@" # '
+)}
+
 shGitSquashPop() {(set -e
 # this function will squash HEAD to given $COMMIT
 # http://stackoverflow.com/questions/5189560
@@ -1012,7 +1134,7 @@ shGithubCheckoutRemote() {(set -e
         # branch - */*/*
         git fetch origin alpha
         # assert latest ci
-        if (git rev-parse "$GITHUB_REF_NAME" &>/dev/null) \
+        if (git rev-parse "$GITHUB_REF_NAME" 2>/dev/null) \
             && [ "$(git rev-parse "$GITHUB_REF_NAME")" \
             != "$(git rev-parse origin/alpha)" ]
         then
@@ -1112,8 +1234,8 @@ import modulePath from "path";
     }
     console.error(
         mode === "download"
-        ? `shGithubFileDownload - ${process.argv[1]}`
-        : `shGithubFileUpload - ${process.argv[1]}`
+        ? `shGithubFileDownload - ${process.argv[2]}`
+        : `shGithubFileUpload - ${process.argv[2]}`
     );
     path = path.split("/");
     repo = path.slice(0, 2).join("/");
@@ -1278,19 +1400,6 @@ import moduleHttp from "http";
 import modulePath from "path";
 import moduleRepl from "repl";
 import moduleUrl from "url";
-// init debugInline
-(function () {
-    let consoleError = console.error;
-    globalThis.debugInline = globalThis.debugInline || function (...argList) {
-
-// this function will both print <argList> to stderr and return <argList>[0]
-
-        consoleError("\n\ndebugInline");
-        consoleError(...argList);
-        consoleError("\n");
-        return argList[0];
-    };
-}());
 (async function httpFileServer() {
 
 // this function will start http-file-server
@@ -1753,19 +1862,6 @@ import moduleChildProcess from "child_process";
 import moduleFs from "fs";
 import moduleHttps from "https";
 import modulePath from "path";
-// init debugInline
-(function () {
-    let consoleError = console.error;
-    globalThis.debugInline = globalThis.debugInline || function (...argList) {
-
-// this function will both print <argList> to stderr and return <argList>[0]
-
-        consoleError("\n\ndebugInline");
-        consoleError(...argList);
-        consoleError("\n");
-        return argList[0];
-    };
-}());
 function objectDeepCopyWithKeysSorted(obj) {
 
 // This function will recursively deep-copy <obj> with keys sorted.
@@ -1843,6 +1939,7 @@ function replaceListReplace(replaceList, data) {
     let fetchCount = 0;
     let fetchList;
     let matchObj;
+    let promiseList = [];
     let repoDict;
     function pipeToBuffer(res, dict, key) {
 
@@ -1875,13 +1972,16 @@ function replaceListReplace(replaceList, data) {
         elem.prefix = elem.url.split("/").slice(0, 7).join("/");
         // fetch dateCommitted
         if (!repoDict.hasOwnProperty(elem.prefix)) {
-            repoDict[elem.prefix] = true;
-            moduleHttps.request(elem.prefix.replace(
-                "/blob/",
-                "/commits/"
-            ), function (res) {
-                pipeToBuffer(res, elem, "dateCommitted");
-            }).end();
+            promiseList.push(new Promise(function (resolve) {
+                repoDict[elem.prefix] = true;
+                moduleHttps.request(elem.prefix.replace(
+                    "/blob/",
+                    "/commits/"
+                ), function (res) {
+                    pipeToBuffer(res, elem, "dateCommitted");
+                    res.on("end", resolve);
+                }).end();
+            }));
         }
         // fetch file
         if (elem.node) {
@@ -1920,6 +2020,7 @@ function replaceListReplace(replaceList, data) {
             pipeToBuffer(res, elem, "data");
         });
     });
+    await Promise.all(promiseList);
     // parse fetched data
     process.on("exit", function () {
         let header;
@@ -1971,9 +2072,11 @@ function replaceListReplace(replaceList, data) {
                 result += (
                     "\n\n\n/*\n"
                     + "repo " + prefix.replace("/blob/", "/tree/") + "\n"
-                    + "committed " + (
-                        /\b\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ\b|$/
-                    ).exec(dateCommitted.toString())[0] + "\n"
+                    + "committed " + new Date(
+                        (
+                            /"(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d[^"]*?)"/
+                        ).exec(dateCommitted.toString())[1]
+                    ).toISOString().replace((/\.\d*?Z/), "Z") + "\n"
                     + "*/"
                 );
             }

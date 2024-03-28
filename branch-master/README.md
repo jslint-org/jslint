@@ -3,7 +3,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Status
-| Branch | [master<br>(v2023.10.24)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
+| Branch | [master<br>(v2024.3.26)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jslint-org/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/jslint-org/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/jslint-org/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/index.html) |
@@ -74,9 +74,9 @@ Douglas Crockford <douglas@crockford.com>
 12. [License](#license)
 
 13. [Devops Instruction](#devops-instruction)
+    - [pull-request merge](#pull-request-merge)
     - [branch-master commit](#branch-master-commit)
     - [branch-master publish](#branch-master-publish)
-    - [pull-request merge](#pull-request-merge)
     - [vscode-jslint publish](#vscode-jslint-publish)
 
 
@@ -506,6 +506,9 @@ window.addEventListener("load", function () {
 # Quickstart JSLint in Vim
 1. Download and save [`jslint.mjs`](https://www.jslint.com/jslint.mjs), [`jslint_wrapper_vim.vim`](https://www.jslint.com/jslint_wrapper_vim.vim) to directory `~/.vim/`
 2. Add vim-command `:source ~/.vim/jslint_wrapper_vim.vim` to file `~/.vimrc`
+    - If above files were saved to custom-directory, then use that directory instead, e.g.:
+        - save [`jslint.mjs`](https://www.jslint.com/jslint.mjs), [`jslint_wrapper_vim.vim`](https://www.jslint.com/jslint_wrapper_vim.vim) to directory `~/vimfiles/`
+        - vim-command `:source ~/vimfiles/jslint_wrapper_vim.vim`
 3. Vim can now jslint files (via nodejs):
     - with vim-command `:SaveAndJslint`
     - with vim-key-combo `<Ctrl-S> <Ctrl-J>`
@@ -912,95 +915,109 @@ eval("1"); //jslint-ignore-line
 
 
 <br><br>
-### branch-master commit
-- $ `shGitSquashPop <commit-beta> '# v20yy.mm.dd\n<release notes from CHANGELOG.md>'`
-    - verify correct-year `20yy`
-- $ `git push origin alpha:branch-v20yy.mm.dd`
+### pull-request merge
+- find highest issue-number at https://github.com/jslint-org/jslint/issues/, https://github.com/jslint-org/jslint/pulls/, and add +1 to it for PR-xxx
+- $ `shGitPullrequest beta beta`
+    - verify ci-success for origin-branch-alpha
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
 - $ `git push upstream alpha -f`
-- verify ci-success for upstream-branch-alpha
+    - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
-- goto https://github.com/kaizhu256/jslint/pulls
-- click `New pull request`
-- click `base repository: jslint-org/jslint base:beta`
-- click `head repository: kaizhu256/jslint compare:branch-v20yy.mm.dd`
+- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2024.3.21
+- click `Create pull request`
+- input `Add your description here...` with:
+```
+Fixes #xxx.
+- <primary-commit-message>
+
+This PR will ...
+
+this PR will additionally:
+- <secondary-commit-message>
+...
+
+<screenshot>
+```
 - verify `commit into jslint-org:beta`
 - click `Create pull request`
-- verify ci-success for pull-request
+    - verify ci-success for pull-request
     - https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
+- wait awhile before continuing ...
 - click `Rebase and merge`
-- verify ci-success for upstream-branch-beta
+    - verify ci-success for upstream-branch-beta
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
-```shell
-git fetch upstream beta
-git diff alpha..upstream/beta
-# verify no diff between alpha..upstream/beta
-git reset upstream/beta
-git push origin alpha -f
-git push origin alpha:beta
-shMyciUpdate
-git push upstream alpha -f
-```
-- verify ci-success for origin-branch-alpha
+- $ `shGitPullrequestCleanup`
+    - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-- verify ci-success for upstream-branch-alpha
+- $ `git push upstream alpha -f`
+    - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 - click `Delete branch`
-```shell
-git push origin beta:master
-git push upstream beta:master
-```
-- verify ci-success for origin-branch-master
+
+
+<br><br>
+### branch-master commit
+- $ `shGitPullrequest master beta`
+    - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-- verify ci-success for upstream-branch-master
+- $ `git push upstream alpha -f`
+    - verify ci-success for upstream-branch-alpha
+    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v2024.3.26
+- click `Create pull request`
+- input `Add a title` with: `# v20yy.mm.dd`
+- input `Add a description` with:
+```
+- <primary-commit-message>
+- <secondary-commit-message>
+```
+- verify `commit into jslint-org:beta`
+- click `Create pull request`
+    - verify ci-success for pull-request
+    - https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
+- wait awhile before continuing ...
+- click `Rebase and merge`
+    - verify ci-success for upstream-branch-beta
+    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+- $ `shGitPullrequestCleanup`
+    - verify ci-success for origin-branch-alpha
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- $ `git push upstream alpha -f`
+    - verify ci-success for upstream-branch-alpha
+    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+- click `Delete branch`
+- $ `git push origin beta:master`
+    - verify ci-success for origin-branch-master
+    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
+- $ `git push upstream beta:master`
+    - verify ci-success for upstream-branch-master
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 
 
 <br><br>
 ### branch-master publish
 - $ `git push upstream beta:master`
-- verify ci-success for upstream-branch-master
+    - verify ci-success for upstream-branch-master
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 - goto https://github.com/jslint-org/jslint/releases/new
-- input tag `v20yy.mm.dd`
+- input `Choose a tag` with: `v20yy.mm.dd`
 - click `Create new tag: v20yy.mm.dd on publish`
     - verify correct-year `20yy`
-- click `Target: master`
-- input `Release title: v20yy.mm.dd - <description>`
-- copy-paste release notes from CHANGELOG.md
+- select `Target: master`
+- select `Previous tag:auto`
+- input `Release title` with: `v20yy.mm.dd - <primary-commit-message>`
+- input `Describe this release` with:
+```
+- <primary-commit-message>
+- <secondary-commit-message>
+```
 - click `Generate release notes`
 - click `Set as the latest release`
 - click `Preview` and review
 - click `Publish release`
-- verify ci-success for upstream-branch-publish
+    - verify ci-success for upstream-branch-publish
     - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
-- verify email-notification `Successfully published @jslint-org/jslint@20yy.mm.dd`
-
-
-<br><br>
-### pull-request merge
-- find highest issue-number at https://github.com/jslint-org/jslint/issues/, and add +1 to it for PR-xxx
-- verify `commit into jslint-org:beta`
-- click `Create pull request`
-- verify ci-success for pull-request
-    - https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
-- click `Rebase and merge`
-- verify ci-success for upstream-branch-beta
-    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
-```shell
-git fetch upstream beta
-git diff alpha..upstream/beta
-# verify no diff between alpha..upstream/beta
-git reset upstream/beta
-git push origin alpha -f
-git push origin alpha:beta
-shMyciUpdate
-git push upstream alpha -f
-```
-- verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions/workflows/ci.yml
-- verify ci-success for upstream-branch-alpha
-    - https://github.com/jslint-org/jslint/actions/workflows/ci.yml
-- click `Delete branch`
+    - verify email-notification `Successfully published @jslint-org/jslint@20yy.mm.dd`
 
 
 <br><br>

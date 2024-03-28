@@ -67,7 +67,7 @@ body {
 </head>
 <body>
 <div class="apidocDiv">
-<h1>API Doc for <a href="https://github.com/jslint-org/jslint">JSLint (v2023.10.24)</a></h1>
+<h1>API Doc for <a href="https://github.com/jslint-org/jslint">JSLint (v2024.3.26)</a></h1>
 <div class="apidocSectionDiv">
     <a href="#apidocTableOfContents1" id="apidocTableOfContents1">
         <h1>Table of Contents</h1>
@@ -1526,6 +1526,12 @@ fNZOtXKDe39jXdRlkmMnOWIOFBgeEK/b0mFsgffnP...
         process.on("exit", jstestOnExit);
     }
 
+// PR-457 - Wait awhile for imports to initialize.
+
+    await new Promise(function (resolve) {
+        setTimeout(resolve);
+    });
+
 // Init jstestItList.
 
     jstestItList = [];
@@ -1603,9 +1609,7 @@ jstestIt((
         } catch (errCaught) {
             err = errCaught;
         }
-        resolve([
-            err, description, mode
-        ]);
+        resolve([err, description, mode]);
     }));
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

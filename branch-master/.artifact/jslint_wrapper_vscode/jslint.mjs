@@ -163,7 +163,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2023.10.24";
+let jslint_edition = "v2024.3.26";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -5487,13 +5487,15 @@ function jslint_phase3_parse(state) {
         if (
             token_nxt.id === "."
             || token_nxt.id === "?."
-            || token_nxt.id === "["
+
+// PR-459 - Allow destructuring-assignment after function-definition.
+
+            // || token_nxt.id === "["
         ) {
 
 // test_cause:
 // ["function aa(){}\n.aa", "prefix_function", "unexpected_a", ".", 1]
 // ["function aa(){}\n?.aa", "prefix_function", "unexpected_a", "?.", 1]
-// ["function aa(){}\n[]", "prefix_function", "unexpected_a", "[", 1]
 
             warn("unexpected_a");
         }
@@ -9952,6 +9954,12 @@ async function jstestDescribe(description, testFunction) {
         process.on("exit", jstestOnExit);
     }
 
+// PR-457 - Wait awhile for imports to initialize.
+
+    await new Promise(function (resolve) {
+        setTimeout(resolve);
+    });
+
 // Init jstestItList.
 
     jstestItList = [];
@@ -10005,9 +10013,7 @@ function jstestIt(description, testFunction, mode) {
         } catch (errCaught) {
             err = errCaught;
         }
-        resolve([
-            err, description, mode
-        ]);
+        resolve([err, description, mode]);
     }));
 }
 
