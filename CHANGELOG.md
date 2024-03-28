@@ -7,7 +7,7 @@
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
-# v2024.3.1-beta
+# v2024.3.26
 - ci - Add shell-functions shGitPullrequestCleanup(), shGitPullrequest() to automatically cleanup or create-and-push github-pull-commit to origin/alpha.
 - jslint - Allow destructuring-assignment after function-definition.
 - ci - Replace npm-package used to auto-build vscode-plugin, vsce to @vscode/vsce.
