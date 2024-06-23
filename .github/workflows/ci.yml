@@ -22,15 +22,14 @@ jobs:
           - x64
           # - x86
         node_version:
-          - 18
           - 20
-          # - 22
-        python_version:
-          - "3.10"
+          - 22
         os:
           - macos-latest
           - ubuntu-latest
           - windows-latest
+        python_version:
+          - "3.10"
 # base - .github/workflows/ci.yml - beg
     env:
       CI_MATRIX_NAME: >
@@ -55,7 +54,7 @@ jobs:
     steps:
       # disable autocrlf in windows
       - run: |
-          sh -c uname
+          sh -c "uname -a"
           echo "$(date -u +"%Y-%m-%d %TZ") - ${{ env.CI_WORKFLOW_NAME }}" # "
           git config --global core.autocrlf false
       # https://github.com/actions/checkout
@@ -70,7 +69,6 @@ jobs:
       # https://github.com/actions/setup-node
       - uses: actions/setup-node@v4
         with:
-          architecture: ${{ matrix.architecture }}
           node-version: ${{ matrix.node_version }}
       # https://github.com/actions/setup-python
       - uses: actions/setup-python@v5

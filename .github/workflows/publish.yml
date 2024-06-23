@@ -17,7 +17,6 @@ jobs:
           - x64
           # - x86
         node_version:
-          # - 18
           - 20
           # - 22
         os:
