@@ -1062,7 +1062,7 @@ import moduleFs from "fs";
     default:
         version = `p${version}`;
         commitMessage = (
-            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)\n- /
+            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)(?:\n- |\n\n)/
         ).exec(data)[1];
     }
     branchPull = `branch-${version}`;

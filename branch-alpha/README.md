@@ -917,10 +917,10 @@ eval("1"); //jslint-ignore-line
 <br><br>
 ### pull-request merge
 - find highest issue-number at https://github.com/jslint-org/jslint/issues/, https://github.com/jslint-org/jslint/pulls/, and add +1 to it for PR-xxx
-- $ `shGitPullrequest beta beta`
+- `shGitPullrequest beta beta`
     - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions
-- $ `git push upstream alpha -f`
+- `git push upstream alpha -f`
     - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions
 - goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2024.6.23
@@ -946,10 +946,10 @@ this PR will additionally:
 - click `Rebase and merge`
     - verify ci-success for upstream-branch-beta
     - https://github.com/jslint-org/jslint/actions
-- $ `shGitPullrequestCleanup`
+- `shGitPullrequestCleanup`
     - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions
-- $ `git push upstream alpha -f`
+- `git push upstream alpha -f`
     - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions
 - click `Delete branch`
@@ -957,10 +957,10 @@ this PR will additionally:
 
 <br><br>
 ### branch-master commit
-- $ `shGitPullrequest master beta`
+- `shGitPullrequest master beta`
     - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions
-- $ `git push upstream alpha -f`
+- `git push upstream alpha -f`
     - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions
 - goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v2024.3.26
@@ -979,24 +979,24 @@ this PR will additionally:
 - click `Rebase and merge`
     - verify ci-success for upstream-branch-beta
     - https://github.com/jslint-org/jslint/actions
-- $ `shGitPullrequestCleanup`
+- `shGitPullrequestCleanup`
     - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions
-- $ `git push upstream alpha -f`
+- `git push upstream alpha -f`
     - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions
 - click `Delete branch`
-- $ `git push origin beta:master`
+- `git push origin beta:master`
     - verify ci-success for origin-branch-master
     - https://github.com/kaizhu256/jslint/actions
-- $ `git push upstream beta:master`
+- `git push upstream beta:master`
     - verify ci-success for upstream-branch-master
     - https://github.com/jslint-org/jslint/actions
 
 
 <br><br>
 ### branch-master publish
-- $ `git push upstream beta:master`
+- `git push upstream beta:master`
     - verify ci-success for upstream-branch-master
     - https://github.com/jslint-org/jslint/actions
 - goto https://github.com/jslint-org/jslint/releases/new
