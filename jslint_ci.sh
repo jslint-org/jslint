@@ -651,16 +651,6 @@ shCiPublishPypi() {(set -e
     fi
 )}
 
-shCurlExe() {(set -e
-# This function will print to stdout "curl.exe", if it exists, else "curl".
-    if [ -f c:/windows/system32/curl.exe ]
-    then
-        printf c:/windows/system32/curl.exe
-        return
-    fi
-    printf curl
-)}
-
 shDirHttplinkValidate() {(set -e
 # This function will validate http-links embedded in .html and .md files.
     # init $GITHUB_BRANCH0
@@ -1294,7 +1284,7 @@ shGithubWorkflowDispatch() {(set -e
     BRANCH="$1"
     shift
     EXIT_CODE=0
-    "$(shCurlExe)" \
+    curl \
 "https://api.github.com/repos/$REPO/actions/workflows/ci.yml/dispatches" \
         -H "accept: application/vnd.github.v3+json" \
         -H "authorization: Bearer $MY_GITHUB_TOKEN" \

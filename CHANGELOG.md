@@ -8,6 +8,7 @@
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
 # v2024.6.1-beta
+- jslint - Remove unnecessary shell-function shCurlExe().
 - coverage - Fix coverage-function v8CoverageReportCreate() throwing error EINVAL in latest nodejs-security-patch, when running win32-coverage with npm.cmd.
 
 # v2024.3.26
