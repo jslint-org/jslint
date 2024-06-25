@@ -11307,7 +11307,7 @@ function sentinel() {}
                         NODE_V8_COVERAGE: coverageDir
                     }),
 
-// PR-462
+// PR-465
 // https://nodejs.org/en/blog/vulnerability/april-2024-security-releases-2
 // Node.js will now error with EINVAL if a .bat or .cmd file is passed to
 // child_process.spawn and child_process.spawnSync without the shell option set.

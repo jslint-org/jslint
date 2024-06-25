@@ -57,7 +57,7 @@
 # `abcdefghijklmnopqrstuvwxyz{|}~\u007f
 
 shBashrcDebianInit() {
-# this function will init debian:stable /etc/skel/.bashrc
+# This function will init debian:stable /etc/skel/.bashrc.
 # https://sources.debian.org/src/bash/4.4-5/debian/skel.bashrc/
     # ~/.bashrc: executed by bash(1) for non-login shells.
     # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
@@ -175,7 +175,7 @@ shBashrcDebianInit() {
 }
 
 shBashrcWindowsInit() {
-# this function will init windows-environment
+# This function will init windows-environment.
     case "$(uname)" in
     CYGWIN*)
         ;;
@@ -200,8 +200,7 @@ shBashrcWindowsInit() {
 }
 
 shBrowserScreenshot() {(set -e
-# this function will run headless-chrome to screenshot url $1 with
-# window-size $2
+# This function will run headless-chrome to screenshot url $1.
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
@@ -282,9 +281,9 @@ import moduleUrl from "url";
 )}
 
 shCiArtifactUpload() {(set -e
-# this function will upload build-artifacts to branch-gh-pages
+# This function will upload build-artifacts to branch-gh-pages.
 # shCiArtifactUploadCustom() {(set -e
-# # this function will run custom-code to upload build-artifacts
+# # This function will run custom-code to upload build-artifacts.
 #     return
 # )}
     if ! (shCiMatrixIsmainName \
@@ -412,13 +411,13 @@ import moduleChildProcess from "child_process";
 )}
 
 shCiBase() {(set -e
-# this function will run base-ci
+# This function will run base-ci.
 # shCiBaseCustom() {(set -e
-# # this function will run custom-code for base-ci
+# # This function will run custom-code for base-ci.
 #     return
 # )}
 # shCiLintCustom() {(set -e
-# # this function will run custom-code to lint files
+# # This function will run custom-code to lint files.
 # )}
     export GITHUB_BRANCH0="$(git rev-parse --abbrev-ref HEAD)"
     # Auto-correct common errors in package.json.
@@ -577,21 +576,21 @@ import moduleFs from "fs";
 )}
 
 shCiMatrixIsmainName() {(set -e
-# this function will return 0 if current ci-job is main job
+# This function will return 0 if current ci-job is main job.
     CI_MATRIX_NAME="$(printf "$CI_MATRIX_NAME" | xargs)"
     [ "$CI_MATRIX_NAME" ] && [ "$CI_MATRIX_NAME" = "$CI_MATRIX_NAME_MAIN" ]
 )}
 
 shCiMatrixIsmainNodeversion() {(set -e
-# this function will return 0 if current ci-job is main job
+# This function will return 0 if current ci-job is main job.
     [ "$CI_MATRIX_NODE_VERSION" ] \
         && [ "$CI_MATRIX_NODE_VERSION" = "$CI_MATRIX_NODE_VERSION_MAIN" ]
 )}
 
 shCiPre() {(set -e
-# this function will run pre-ci
+# This function will run pre-ci.
 # shCiPreCustom() {(set -e
-# # this function will run custom-code for pre-ci
+# # This function will run custom-code for pre-ci.
 #     return
 # )}
     if [ -f ./myci2.sh ]
@@ -610,9 +609,9 @@ shCiPre() {(set -e
 )}
 
 shCiPublishNpm() {(set -e
-# this function will publish npm-package
+# This function will publish npm-package.
 # shCiPublishNpmCustom() {(set -e
-# # this function will run custom-code to npm-publish package
+# # This function will run custom-code to publish npm-package.
 #     # npm publish --access public
 # )}
     if ! ([ -f package.json ] \
@@ -636,9 +635,9 @@ shCiPublishNpm() {(set -e
 )}
 
 shCiPublishPypi() {(set -e
-# this function will publish pypi-package
+# This function will publish pypi-package.
 # shCiPublishPypiCustom() {(set -e
-# # this function will run custom-code to npm-publish package
+# # This function will run custom-code to publish pypi-package.
 #     # npm publish --access public
 # )}
     if ! ([ -f pyproject.toml ] \
@@ -652,18 +651,8 @@ shCiPublishPypi() {(set -e
     fi
 )}
 
-shCurlExe() {(set -e
-# this function will print to stdout "curl.exe", if it exists, else "curl"
-    if [ -f c:/windows/system32/curl.exe ]
-    then
-        printf c:/windows/system32/curl.exe
-        return
-    fi
-    printf curl
-)}
-
 shDirHttplinkValidate() {(set -e
-# this function will validate http-links embedded in .html and .md files
+# This function will validate http-links embedded in .html and .md files.
     # init $GITHUB_BRANCH0
     export GITHUB_BRANCH0="${GITHUB_BRANCH0:-alpha}"
     # init $UPSTREAM_XXX
@@ -801,12 +790,12 @@ import moduleHttps from "https";
 )}
 
 shDuList() {(set -e
-# this function will du $1 and sort its subdir by size
+# This function will du $1 and sort its subdir by size.
     du -md1 "$1" | sort -nr
 )}
 
 shGitCmdWithGithubToken() {(set -e
-# this function will run git $CMD with $MY_GITHUB_TOKEN
+# This function will run git $CMD with $MY_GITHUB_TOKEN.
     printf "shGitCmdWithGithubToken $*\n"
     if [ -f .git/config ]
     then
@@ -850,9 +839,9 @@ shGitCmdWithGithubToken() {(set -e
 )}
 
 shGitCommitPushOrSquash() {(set -e
-# this function will, if $COMMIT_COUNT > $COMMIT_LIMIT,
+# This function will, if $COMMIT_COUNT > $COMMIT_LIMIT,
 # then backup, squash, force-push,
-# else normal-push
+# else normal-push.
     BRANCH="$(git branch --show-current)"
     COMMIT_MESSAGE="${1:-$(git diff HEAD --stat)}"
     COMMIT_LIMIT="$2"
@@ -890,7 +879,7 @@ COMMIT_LIMIT=$COMMIT_LIMIT MODE_SQUASH=$MODE_SQUASH\n"
 )}
 
 shGitGc() {(set -e
-# this function will gc unreachable .git objects
+# This function will gc unreachable .git objects.
 # http://stackoverflow.com/questions/3797907/how-to-remove-unused-objects-from-a-git-repository
     git remote prune origin
     git \
@@ -903,7 +892,7 @@ shGitGc() {(set -e
 )}
 
 shGitInitBase() {(set -e
-# this function will git init && create basic git-template from jslint-org/base
+# This function will git init && create basic git-template from jslint-org/base.
     git init
     git config core.autocrlf input
     git remote remove base 2>/dev/null || true
@@ -921,7 +910,7 @@ shGitInitBase() {(set -e
 )}
 
 shGitLsTree() {(set -e
-# this function will "git ls-tree" all files committed in HEAD
+# This function will "git ls-tree" all files committed in HEAD.
 # example usage:
 # shGitLsTree | sort -rk3 # sort by date
 # shGitLsTree | sort -rk4 # sort by size
@@ -998,7 +987,7 @@ import moduleChildProcess from "child_process";
 )}
 
 shGitPullrequestCleanup() {(set -e
-# this function will cleanup pull-request after merge.
+# This function will cleanup pull-request after merge.
     git fetch upstream beta
     # verify no diff between alpha..upstream/beta
     git diff alpha..upstream/beta
@@ -1011,7 +1000,7 @@ shGitPullrequestCleanup() {(set -e
 )}
 
 shGitPullrequest() {(set -e
-# this function will create-and-push a github-pull-commit to origin/alpha
+# This function will create-and-push a github-pull-commit to origin/alpha.
     node --input-type=module --eval '
 // init debugInline
 (function () {
@@ -1113,7 +1102,7 @@ import moduleFs from "fs";
 )}
 
 shGitSquashPop() {(set -e
-# this function will squash HEAD to given $COMMIT
+# This function will squash HEAD to given $COMMIT.
 # http://stackoverflow.com/questions/5189560
 # /how-can-i-squash-my-last-x-commits-together-using-git
     COMMIT="$1"
@@ -1126,7 +1115,7 @@ shGitSquashPop() {(set -e
 )}
 
 shGithubCheckoutRemote() {(set -e
-# this function will run like actions/checkout, except checkout remote-branch
+# This function will run like actions/checkout, except checkout remote-branch.
     # GITHUB_REF_NAME="owner/repo/branch"
     GITHUB_REF_NAME="$1"
     if (printf "$GITHUB_REF_NAME" | grep -q ".*/.*/.*")
@@ -1169,7 +1158,7 @@ shGithubCheckoutRemote() {(set -e
 )}
 
 shGithubFileDownload() {(set -e
-# this function will download file $1 from github repo/branch
+# This function will download file $1 from github repo/branch.
 # https://docs.github.com/en/rest/reference/repos#create-or-update-file-contents
 # example usage:
 # shGithubFileDownload octocat/hello-world/master/hello.txt
@@ -1177,7 +1166,7 @@ shGithubFileDownload() {(set -e
 )}
 
 shGithubFileDownloadUpload() {(set -e
-# this function will upload file $2 to github repo/branch $1
+# This function will upload file $2 to github repo/branch $1.
 # https://docs.github.com/en/rest/reference/repos#create-or-update-file-contents
 # example usage:
 # shGithubFileUpload octocat/hello-world/master/hello.txt hello.txt
@@ -1270,7 +1259,7 @@ import modulePath from "path";
 )}
 
 shGithubFileUpload() {(set -e
-# this function will upload file $2 to github repo/branch $1
+# This function will upload file $2 to github repo/branch $1.
 # https://docs.github.com/en/rest/reference/repos#create-or-update-file-contents
 # example usage:
 # shGithubFileUpload octocat/hello-world/master/hello.txt hello.txt
@@ -1278,7 +1267,7 @@ shGithubFileUpload() {(set -e
 )}
 
 shGithubTokenExport() {
-# this function will export $MY_GITHUB_TOKEN from file
+# This function will export $MY_GITHUB_TOKEN from file.
     if [ ! "$MY_GITHUB_TOKEN" ]
     then
         export MY_GITHUB_TOKEN="$(cat ~/.mysecret2/.my_github_token)"
@@ -1286,7 +1275,7 @@ shGithubTokenExport() {
 }
 
 shGithubWorkflowDispatch() {(set -e
-# this function will trigger github-workflow on given $REPO and $BRANCH
+# This function will trigger github-workflow on given $REPO and $BRANCH.
 # example usage:
 # shGithubWorkflowDispatch octocat/hello-world master
     shGithubTokenExport
@@ -1295,7 +1284,7 @@ shGithubWorkflowDispatch() {(set -e
     BRANCH="$1"
     shift
     EXIT_CODE=0
-    "$(shCurlExe)" \
+    curl \
 "https://api.github.com/repos/$REPO/actions/workflows/ci.yml/dispatches" \
         -H "accept: application/vnd.github.v3+json" \
         -H "authorization: Bearer $MY_GITHUB_TOKEN" \
@@ -1308,7 +1297,7 @@ shGithubWorkflowDispatch() {(set -e
 )}
 
 shGrep() {(set -e
-# this function will recursively grep . for $REGEXP
+# This function will recursively grep . for $REGEXP.
     REGEXP="$1"
     shift
     FILE_FILTER="\
@@ -1338,7 +1327,7 @@ vendor)s{0,1}(\\b|_)\
 )}
 
 shGrepReplace() {(set -e
-# this function will inline grep-and-replace /tmp/shGrep.txt
+# This function will inline grep-and-replace /tmp/shGrep.txt.
     node --input-type=module --eval '
 import moduleFs from "fs";
 import moduleOs from "os";
@@ -1370,7 +1359,7 @@ import modulePath from "path";
 )}
 
 shHttpFileServer() {(set -e
-# this function will run simple node http-file-server on port $PORT
+# This function will run simple node http-file-server on port $PORT.
     if [ ! "$npm_config_mode_auto_restart" ]
     then
         EXIT_CODE=0
@@ -1636,7 +1625,7 @@ import moduleUrl from "url";
 )}
 
 shImageLogoCreate() {(set -e
-# this function will create .png logo
+# This function will create .png logo.
     if [ ! -f asset_image_logo_512.html ]
     then
         return
@@ -1658,7 +1647,7 @@ shImageLogoCreate() {(set -e
 )}
 
 shImageToDataUri() {(set -e
-# this function will convert image $1 to data-uri string
+# This function will convert image $1 to data-uri string.
     node --input-type=module --eval '
 import moduleFs from "fs";
 import moduleHttps from "https";
@@ -1696,7 +1685,7 @@ import moduleHttps from "https";
 )}
 
 shJsonNormalize() {(set -e
-# this function will
+# This function will:
 # 1. read json-data from file $1
 # 2. normalize json-data
 # 3. write normalized json-data back to file $1
@@ -1757,7 +1746,7 @@ function objectDeepCopyWithKeysSorted(obj) {
 )}
 
 shLintPython() {(set -e
-# this function will lint python file
+# This function will lint python file.
     FILE_LIST="$@"
     (
     printf "\n\nlint ruff\n"
@@ -1823,7 +1812,7 @@ shLintPython() {(set -e
 )}
 
 shNpmPublishV0() {(set -e
-# this function will npm-publish name $1 with bare package.json
+# This function will npm-publish name $1 with bare package.json.
     DIR=/tmp/shNpmPublishV0
     rm -rf "$DIR" && mkdir -p "$DIR" && cd "$DIR"
     printf "{\"name\":\"$1\",\"version\":\"0.0.1\"}\n" > package.json
@@ -1832,7 +1821,7 @@ shNpmPublishV0() {(set -e
 )}
 
 shPidListWait() {
-# this will wait for all process-pid in $PID_LIST to exit
+# This function will wait for all process-pid in $PID_LIST to exit.
     EXIT_CODE=0
     PID_LIST="$2"
     TASK="$1"
@@ -1847,7 +1836,7 @@ shPidListWait() {
 }
 
 shRmDsStore() {(set -e
-# this function will recursively rm .DS_Store from current-dir
+# This function will recursively rm .DS_Store from current-dir.
 # http://stackoverflow.com/questions/2016844/bash-recursively-remove-files
     for NAME in "._*" ".DS_Store" "desktop.ini" "npm-debug.log" "*~"
     do
@@ -1856,7 +1845,7 @@ shRmDsStore() {(set -e
 )}
 
 shRollupFetch() {(set -e
-# this function will fetch raw-lib from $1
+# This function will fetch raw-lib from $1.
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
@@ -2219,8 +2208,8 @@ function replaceListReplace(replaceList, data) {
 )}
 
 shRunWithCoverage() {(set -e
-# this function will run nodejs command $@ with v8-coverage
-# and create coverage-report .artifact/coverage/index.html
+# This function will run nodejs command $@ with v8-coverage
+# and create coverage-report .artifact/coverage/index.html.
     node --input-type=module --eval '
 /*jslint indent2*/
 let moduleChildProcess;
@@ -3524,7 +3513,7 @@ v8CoverageReportCreate({
 )}
 
 shRunWithScreenshotTxt() {(set -e
-# this function will run cmd $@ and screenshot text-output
+# This function will run cmd $@ and screenshot text-output.
 # https://www.cnx-software.com/2011/09/22/how-to-convert-a-command-line-result-into-an-image-in-linux/
     EXIT_CODE=0
     SCREENSHOT_SVG="$1"
