@@ -7,6 +7,10 @@
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
+# v2024.6.28
+- coverage - Fix coverage-function v8CoverageReportCreate() throwing error EINVAL in latest nodejs-security-patch, when running win32-coverage with npm.cmd.
+- jslint - Remove unnecessary shell-function shCurlExe().
+
 # v2024.3.26
 - ci - Add shell-functions shGitPullrequestCleanup(), shGitPullrequest() to automatically cleanup or create-and-push github-pull-commit to origin/alpha.
 - jslint - Allow destructuring-assignment after function-definition.
