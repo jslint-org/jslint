@@ -263,13 +263,13 @@
     textLength="768"
     x="10"
     y="956"
->npm warn deprecated npmlog@5.0.1: This package is no longer supported.                           </tspan>
+>npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="978"
->npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported            </tspan>
+>npm warn deprecated npmlog@5.0.1: This package is no longer supported.                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -287,13 +287,13 @@
     textLength="768"
     x="10"
     y="1044"
->npm warn deprecated are-we-there-yet@3.0.1: This package is no longer supported.                 </tspan>
+>npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1066"
->npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported                </tspan>
+>npm warn deprecated are-we-there-yet@3.0.1: This package is no longer supported.                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -365,7 +365,7 @@
     textLength="768"
     x="10"
     y="1330"
->node-pre-gyp info using node@20.14.0 | linux | x64                                               </tspan>
+>node-pre-gyp info using node@20.15.0 | linux | x64                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -431,7 +431,7 @@
     textLength="768"
     x="10"
     y="1572"
->added 374 packages, and audited 375 packages in 13s                                              </tspan>
+>added 374 packages, and audited 375 packages in 11s                                              </tspan>
 
 </text>
 </svg>
