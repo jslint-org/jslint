@@ -7,6 +7,9 @@
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
+# v2024.10.1
+- ci - Update shell-function shHttpFileServer() to auto-serve /index.html, when url-path is root /.
+
 # v2024.6.28
 - coverage - Fix coverage-function v8CoverageReportCreate() throwing error EINVAL in latest nodejs-security-patch, when running win32-coverage with npm.cmd.
 - jslint - Remove unnecessary shell-function shCurlExe().
