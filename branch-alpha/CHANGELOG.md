@@ -8,7 +8,7 @@
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
 # v2024.11.1-beta
-- bugfix - Fix optional dynamic-property/function not recognized.
+- bugfix - Fix optional dynamic-property/function-call not recognized.
 - ci - Update shell-function shHttpFileServer() to auto-serve /index.html, when url-path is root /.
 
 # v2024.6.28

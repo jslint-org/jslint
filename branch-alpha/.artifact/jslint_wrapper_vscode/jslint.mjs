@@ -4733,14 +4733,14 @@ function jslint_phase3_parse(state) {
             check_left(left, the_token);
         }
 
-// PR-xxx - Fix issue #468 - optional dynamic-property/function not recognized.
+// Issue #468 - Fix optional dynamic-property/function-call not recognized.
 
         if (name.id === "[" || name.id === "(") {
-            test_cause("dyn_prop_or_func");
+            test_cause("dyn_prop_or_call");
 
 // test_cause:
-// ["aa?.(aa)", "infix_option_chain", "dyn_prop_or_func", "", 0]
-// ["aa?.[aa]", "infix_option_chain", "dyn_prop_or_func", "", 0]
+// ["aa?.(bb)", "infix_option_chain", "dyn_prop_or_call", "", 0]
+// ["aa?.[bb]", "infix_option_chain", "dyn_prop_or_call", "", 0]
 
             return left;
         }

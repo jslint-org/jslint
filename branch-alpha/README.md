@@ -932,7 +932,7 @@ Fixes #xxx.
 
 This PR will ...
 
-this PR will additionally:
+This PR will additionally:
 - <secondary-commit-message>
 ...
 
