@@ -923,7 +923,7 @@ eval("1"); //jslint-ignore-line
 - `git push upstream alpha -f`
     - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions
-- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2024.6.23
+- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2024.11.9
 - click `Create pull request`
 - input `Add your description here...` with:
 ```
@@ -932,7 +932,7 @@ Fixes #xxx.
 
 This PR will ...
 
-this PR will additionally:
+This PR will additionally:
 - <secondary-commit-message>
 ...
 

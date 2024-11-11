@@ -1,5 +1,5 @@
-<svg height="1592" width="800" xmlns="http://www.w3.org/2000/svg">
-<rect height="1592" fill="#222" width="800"></rect>
+<svg height="1614" width="800" xmlns="http://www.w3.org/2000/svg">
+<rect height="1614" fill="#222" width="800"></rect>
 <text
     fill="#7f7"
     font-family="consolas, menlo, monospace"
@@ -233,25 +233,25 @@
     textLength="768"
     x="10"
     y="846"
->npm warn deprecated gauge@3.0.2: This package is no longer supported.                            </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="868"
 >npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use i\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="890"
+    y="868"
 >  t. Check out lru-cache if you want a good and tested way to coalesce async requests by a key v\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="912"
+    y="890"
 >  alue, which is much more comprehensive and powerful.                                           </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="912"
+>npm warn deprecated gauge@3.0.2: This package is no longer supported.                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -287,19 +287,19 @@
     textLength="768"
     x="10"
     y="1044"
->npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported                </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1066"
 >npm warn deprecated are-we-there-yet@3.0.1: This package is no longer supported.                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1088"
+    y="1066"
 >npm warn deprecated npmlog@6.0.2: This package is no longer supported.                           </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1088"
+>npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -329,109 +329,115 @@
     textLength="768"
     x="10"
     y="1198"
->                                                                                                 </tspan>
+>npm warn deprecated eslint@6.8.0: This version is no longer supported. Please see https://eslint\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1220"
->&gt; sqlite3@5.0.11 install                                                                         </tspan>
+>  .org/version-support for other options.                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1242"
->&gt; node-pre-gyp install --fallback-to-build                                                       </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1264"
->                                                                                                 </tspan>
+>&gt; sqlite3@5.0.11 install                                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1286"
->node-pre-gyp info it worked if it ends with ok                                                   </tspan>
+>&gt; node-pre-gyp install --fallback-to-build                                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1308"
->node-pre-gyp info using node-pre-gyp@1.0.11                                                      </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1330"
->node-pre-gyp info using node@20.15.0 | linux | x64                                               </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1352"
->node-pre-gyp info check checked for "/home/runner/work/jslint/jslint/node-sqlite3-sh/lib/binding\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1374"
->  /napi-v6-linux-glibc-x64/node_sqlite3.node" (not found)                                        </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1396"
->node-pre-gyp http GET https://github.com/TryGhost/node-sqlite3/releases/download/v5.0.11/napi-v6\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1418"
->  -linux-glibc-x64.tar.gz                                                                        </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1440"
->node-pre-gyp info install unpacking napi-v6-linux-glibc-x64/node_sqlite3.node                    </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1462"
->node-pre-gyp info extracted file count: 1                                                        </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1484"
->[sqlite3] Success: "/home/runner/work/jslint/jslint/node-sqlite3-sh/lib/binding/napi-v6-linux-gl\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1506"
->  ibc-x64/node_sqlite3.node" is installed via remote                                             </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1528"
->node-pre-gyp info ok                                                                             </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1550"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
+    y="1330"
+>node-pre-gyp info it worked if it ends with ok                                                   </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1352"
+>node-pre-gyp info using node-pre-gyp@1.0.11                                                      </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1374"
+>node-pre-gyp info using node@20.18.0 | linux | x64                                               </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1396"
+>node-pre-gyp info check checked for "/home/runner/work/jslint/jslint/node-sqlite3-sh/lib/binding\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1418"
+>  /napi-v6-linux-glibc-x64/node_sqlite3.node" (not found)                                        </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1440"
+>node-pre-gyp http GET https://github.com/TryGhost/node-sqlite3/releases/download/v5.0.11/napi-v6\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1462"
+>  -linux-glibc-x64.tar.gz                                                                        </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1484"
+>node-pre-gyp info install unpacking napi-v6-linux-glibc-x64/node_sqlite3.node                    </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1506"
+>node-pre-gyp info extracted file count: 1                                                        </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1528"
+>[sqlite3] Success: "/home/runner/work/jslint/jslint/node-sqlite3-sh/lib/binding/napi-v6-linux-gl\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1550"
+>  ibc-x64/node_sqlite3.node" is installed via remote                                             </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
     y="1572"
->added 374 packages, and audited 375 packages in 11s                                              </tspan>
+>node-pre-gyp info ok                                                                             </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1594"
+>                                                                                                 </tspan>
 
 </text>
 </svg>

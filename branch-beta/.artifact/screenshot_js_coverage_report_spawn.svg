@@ -1,5 +1,5 @@
-<svg height="1526" width="800" xmlns="http://www.w3.org/2000/svg">
-<rect height="1526" fill="#222" width="800"></rect>
+<svg height="1548" width="800" xmlns="http://www.w3.org/2000/svg">
+<rect height="1548" fill="#222" width="800"></rect>
 <text
     fill="#7f7"
     font-family="consolas, menlo, monospace"
@@ -299,37 +299,37 @@
     textLength="768"
     x="10"
     y="1088"
->npm warn deprecated @npmcli/move-file@1.1.2: This functionality has been moved to @npmcli/fs     </tspan>
+>npm warn deprecated gauge@3.0.2: This package is no longer supported.                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1110"
->npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use i\</tspan>
+>npm warn deprecated @npmcli/move-file@1.1.2: This functionality has been moved to @npmcli/fs     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1132"
->  t. Check out lru-cache if you want a good and tested way to coalesce async requests by a key v\</tspan>
+>npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use i\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1154"
->  alue, which is much more comprehensive and powerful.                                           </tspan>
+>  t. Check out lru-cache if you want a good and tested way to coalesce async requests by a key v\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1176"
->npm warn deprecated glob@7.1.3: Glob versions prior to v9 are no longer supported                </tspan>
+>  alue, which is much more comprehensive and powerful.                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1198"
->npm warn deprecated gauge@3.0.2: This package is no longer supported.                            </tspan>
+>npm warn deprecated glob@7.1.3: Glob versions prior to v9 are no longer supported                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -359,19 +359,19 @@
     textLength="768"
     x="10"
     y="1308"
->npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported                </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1330"
 >npm warn deprecated are-we-there-yet@3.0.1: This package is no longer supported.                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1352"
+    y="1330"
 >npm warn deprecated npmlog@6.0.2: This package is no longer supported.                           </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1352"
+>npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -401,19 +401,25 @@
     textLength="768"
     x="10"
     y="1462"
->                                                                                                 </tspan>
+>npm warn deprecated eslint@6.8.0: This version is no longer supported. Please see https://eslint\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1484"
->&gt; sqlite3@5.0.11 install                                                                         </tspan>
+>  .org/version-support for other options.                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1506"
->&gt; node-pre-gyp install --fallback-to-build                                                       </tspan>
+>                                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1528"
+>&gt; sqlite3@5.0.11 install                                                                         </tspan>
 
 </text>
 </svg>
