@@ -402,7 +402,7 @@ import jslint from "../jslint.mjs";
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.10/codemirror.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.10/addon/lint/lint.css">
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.10/codemirror.js"></script>
-    <script defer src="https://codemirror.net/mode/javascript/javascript.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.10/mode/javascript/javascript.js"></script>
     <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.10/addon/lint/lint.js"></script>
 
 <!-- Assets from jslint. -->
@@ -923,7 +923,7 @@ eval("1"); //jslint-ignore-line
 - `git push upstream alpha -f`
     - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions
-- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2024.11.9
+- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2024.11.24
 - click `Create pull request`
 - input `Add your description here...` with:
 ```
