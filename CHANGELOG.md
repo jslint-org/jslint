@@ -7,9 +7,9 @@
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
-# v2024.11.1-beta
-- quickstart - bugfix - Fix broken quickstart-jslint-in-codemirror demo.
+# v2024.11.24
 - jslint - bugfix - Fix optional dynamic-property/function-call not recognized.
+- quickstart - bugfix - Fix broken quickstart-jslint-in-codemirror demo.
 - ci - Update shell-function shHttpFileServer() to auto-serve /index.html, when url-path is root /.
 
 # v2024.6.28
