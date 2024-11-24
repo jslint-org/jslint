@@ -233,25 +233,25 @@
     textLength="768"
     x="10"
     y="846"
->npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use i\</tspan>
+>npm warn deprecated gauge@3.0.2: This package is no longer supported.                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="868"
->  t. Check out lru-cache if you want a good and tested way to coalesce async requests by a key v\</tspan>
+>npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use i\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="890"
->  alue, which is much more comprehensive and powerful.                                           </tspan>
+>  t. Check out lru-cache if you want a good and tested way to coalesce async requests by a key v\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="912"
->npm warn deprecated gauge@3.0.2: This package is no longer supported.                            </tspan>
+>  alue, which is much more comprehensive and powerful.                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -287,13 +287,13 @@
     textLength="768"
     x="10"
     y="1044"
->npm warn deprecated are-we-there-yet@3.0.1: This package is no longer supported.                 </tspan>
+>npm warn deprecated npmlog@6.0.2: This package is no longer supported.                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1066"
->npm warn deprecated npmlog@6.0.2: This package is no longer supported.                           </tspan>
+>npm warn deprecated are-we-there-yet@3.0.1: This package is no longer supported.                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
