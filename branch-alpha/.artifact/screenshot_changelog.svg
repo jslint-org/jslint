@@ -65,19 +65,19 @@
     textLength="768"
     x="10"
     y="230"
-># v2024.11.1-beta                                                                                </tspan>
+># v2024.11.24                                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="252"
->- quickstart - bugfix - Fix broken quickstart-jslint-in-codemirror demo.                         </tspan>
+>- jslint - bugfix - Fix optional dynamic-property/function-call not recognized.                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="274"
->- jslint - bugfix - Fix optional dynamic-property/function-call not recognized.                  </tspan>
+>- quickstart - bugfix - Fix broken quickstart-jslint-in-codemirror demo.                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
