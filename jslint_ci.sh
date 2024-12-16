@@ -214,9 +214,6 @@ import moduleUrl from "url";
     let timeStart;
     let tmpdir;
     let url;
-    if (process.platform !== "linux") {
-        return;
-    }
     timeStart = Date.now();
     url = process.argv[1];
     if (!(
@@ -245,18 +242,19 @@ import moduleUrl from "url";
         ),
         [
             "--headless",
+            "--hide-scrollbars",
             "--ignore-certificate-errors",
             "--incognito",
             "--screenshot",
             "--timeout=30000",
             "--user-data-dir=" + tmpdir,
-            "--window-size=800x600",
-            "-screenshot=" + file,
-            (
-                (process.getuid && process.getuid() === 0)
-                ? "--no-sandbox"
-                : ""
-            ),
+            "--window-size=800,800",
+            //
+            "--disable-audio-input",
+            "--disable-audio-output",
+            "--disable-gpu",
+            //
+            "-screenshot=" + modulePath.resolve(file),
             url
         ].concat(process.argv.filter(function (elem) {
             return elem.startsWith("-");
@@ -291,6 +289,11 @@ shCiArtifactUpload() {(set -e
         && grep -q '^    "shCiArtifactUpload": 1,$' package.json)
     then
         return
+    fi
+    # install graphicsmagick
+    if [ "$GITHUB_ACTION" ] && [ ! -f /usr/bin/gm ]
+    then
+        sudo apt-get install -y graphicsmagick
     fi
     mkdir -p .artifact
     # init .git/config
@@ -356,10 +359,9 @@ import moduleChildProcess from "child_process";
         shCiArtifactUploadCustom
     fi
     # 1px-border around browser-screenshot
-    if (ls .artifact/screenshot_browser_*.png 2>/dev/null \
-            && mogrify -version 2>&1 | grep -i imagemagick)
+    if (ls .artifact/screenshot_browser_*.png 2>/dev/null)
     then
-        mogrify -shave 1x1 -bordercolor black -border 1 \
+        gm mogrify -crop 798x598 -bordercolor black -border 1 \
             .artifact/screenshot_browser_*.png
     fi
     # add dir .artifact
@@ -1626,23 +1628,17 @@ import moduleUrl from "url";
 
 shImageLogoCreate() {(set -e
 # This function will create .png logo.
-    if [ ! -f asset_image_logo_512.html ]
+    if [ ! -f asset_image_logo_256.html ]
     then
         return
     fi
-    # screenshot asset_image_logo_512.png
+    # screenshot asset_image_logo_256.png
     mkdir -p .artifact
-    shBrowserScreenshot asset_image_logo_512.html \
-        --window-size=512x512 \
-        -screenshot=.artifact/asset_image_logo_512.png
-    # create various smaller thumbnails
-    for SIZE in 32 64 128 256
-    do
-        convert -resize "${SIZE}x${SIZE}" .artifact/asset_image_logo_512.png \
-            ".artifact/asset_image_logo_$SIZE.png"
-        printf \
-"shImageLogoCreate - wrote - .artifact/asset_image_logo_$SIZE.png\n" 1>&2
-    done
+    FILE="$(node --print 'path.resolve(".artifact/asset_image_logo_256.png")')"
+    shBrowserScreenshot asset_image_logo_256.html "-screenshot=$FILE"
+    gm mogrify -crop 256x256 .artifact/asset_image_logo_256.png
+    printf \
+"shImageLogoCreate - wrote - .artifact/asset_image_logo_256.png\n" 1>&2
     # convert to svg @ https://convertio.co/png-svg/
 )}
 
