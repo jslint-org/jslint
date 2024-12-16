@@ -1957,8 +1957,8 @@ function replaceListReplace(replaceList, data) {
         elem.prefix = elem.url.split("/").slice(0, 7).join("/");
         // fetch dateCommitted
         if (!repoDict.hasOwnProperty(elem.prefix)) {
+            repoDict[elem.prefix] = true;
             promiseList.push(new Promise(function (resolve) {
-                repoDict[elem.prefix] = true;
                 moduleHttps.request(elem.prefix.replace(
                     "/blob/",
                     "/commits/"
@@ -2060,7 +2060,8 @@ function replaceListReplace(replaceList, data) {
                     + "committed " + new Date(
                         (
                             /"(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d[^"]*?)"/
-                        ).exec(dateCommitted.toString())[1]
+                        ).exec(dateCommitted.toString())?.[1]
+                        || "1970-01-01T00:00:00Z"
                     ).toISOString().replace((/\.\d*?Z/), "Z") + "\n"
                     + "*/"
                 );
