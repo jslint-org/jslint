@@ -673,9 +673,10 @@ import moduleHttps from "https";
             /<link\b.+?\brel="preconnect".+?>/g
         ), "");
         data.replace((
-            /\bhttps?:\/\/.+?([\s")\]]|\W?$)/gm
-        ), function (url, removeLast) {
+            /\bhttps?:\/\/.+?([\s")\]]|\W?$)(<!--no-validate-->)?/gm
+        ), function (url, removeLast, noValidate) {
             let req;
+            let timeStart = Date.now();
             if (removeLast && removeLast !== "/") {
                 url = url.slice(0, -1);
             }
@@ -698,12 +699,12 @@ import moduleHttps from "https";
             );
             if ((
                 /^http:\/\/(?:127\.0\.0\.1|localhost|www\.w3\.org\/2000\/svg)(?:[\/:]|$)|^https:\/\/github\.com\/[\w.\-\/]+?\/compare\/[\w.\-\/]+?\.\.\.\w/m
-            ).test(url)) {
+            ).test(url) || noValidate) {
                 return "";
             }
             moduleAssert.ok(
                 !url.startsWith("http://"),
-                `shDirHttplinkValidate - ${file} - insecure link - ${url}`
+                `shDirHttplinkValidate - ${file} - insecure-link - ${url}`
             );
             // ignore duplicate-link
             if (dict.hasOwnProperty(url)) {
@@ -716,16 +717,21 @@ import moduleHttps from "https";
                 }
             }, function (res) {
                 console.error(
-                    "shDirHttplinkValidate " + res.statusCode + " " + url
+                    `shDirHttplinkValidate ${res.statusCode} ${url}`
+                    + ` - ${Date.now() - timeStart}ms`
                 );
-                moduleAssert.ok(
-                    res.statusCode < 400,
-                    `shDirHttplinkValidate - ${file} - unreachable url ${url}`
-                );
-                req.abort();
+                moduleAssert.ok(res.statusCode < 400);
+                req.destroy();
                 res.destroy();
             });
-            req.setTimeout(30000);
+            req.on("error", function (err) {
+                console.error(
+                    `shDirHttplinkValidate - ${file} - error - ${url}`
+                    + ` - ${Date.now() - timeStart}ms`
+                );
+                throw err;
+            });
+            req.setTimeout(60000);
             req.end();
             return "";
         });
@@ -750,15 +756,9 @@ import moduleHttps from "https";
             ).test(url)) {
                 moduleFs.stat(url.split("?")[0], function (ignore, exists) {
                     console.error(
-                        "shDirHttplinkValidate " + Boolean(exists) + " " + url
+                        `shDirHttplinkValidate ${Boolean(exists)} ${url}`
                     );
-                    moduleAssert.ok(
-                        exists,
-                        (
-                            `shDirHttplinkValidate - ${file}`
-                            + `- unreachable file ${url}`
-                        )
-                    );
+                    moduleAssert.ok(exists);
                 });
             }
             return "";
