@@ -1856,6 +1856,8 @@ function replaceListReplace(replaceList, data) {
                 : ""
             );
         });
+        elem.flags = elem.flags || "";
+        elem.substr = elem.substr || "";
     });
     // replaceList - sort
     replaceList.sort(function (aa, bb) {
@@ -1984,25 +1986,26 @@ function replaceListReplace(replaceList, data) {
     await Promise.all(promiseList);
     // parse fetched data
     process.on("exit", function () {
-        let header;
-        let result;
-        let result0;
-        result = "";
-        fetchList.forEach(function ({
-            comment,
-            data,
-            dataUriType,
-            dateCommitted,
-            footer = "",
-            header = "",
-            prefix,
-            replaceList = [],
-            url
-        }, ii, list) {
+        let rollupBody;
+        let rollupBody0;
+        let rollupHeader;
+        rollupBody = "";
+        fetchList.forEach(function (elem) {
+            let {
+                comment,
+                data,
+                dataUriType,
+                dateCommitted,
+                footer = "",
+                header = "",
+                prefix,
+                replaceList = [],
+                url
+            } = elem;
             if (!url) {
                 return;
             }
-            list[ii].exports = (
+            elem.exports = (
                 (
                     "exports_" + modulePath.dirname(url).replace(
                         "https://github.com/",
@@ -2026,11 +2029,12 @@ function replaceListReplace(replaceList, data) {
                     ), "_")
                 )
             );
+            elem.replaceList = replaceList;
             if (dataUriType) {
                 return;
             }
             if (dateCommitted && dateCommitted.toString()) {
-                result += (
+                rollupBody += (
                     "\n\n\n/*\n"
                     + "repo " + prefix.replace("/blob/", "/tree/") + "\n"
                     + "committed " + new Date(
@@ -2053,42 +2057,42 @@ function replaceListReplace(replaceList, data) {
             }
             data = replaceListReplace(replaceList, data);
             // init header and footer
-            result += (
+            rollupBody += (
                 "\n\n\n/*\nfile " + url + "\n*/\n"
                 + header
                 + data.trim()
                 + footer
             );
         });
-        result = (
-            "\n" + result.trim()
+        rollupBody = (
+            "\n" + rollupBody.trim()
             + "\n\n\n/*\nfile none\n*/\n/*jslint-enable*/\n"
         );
         // comment #!
-        result = result.replace((
+        rollupBody = rollupBody.replace((
             /^#!/gm
         ), "// $&");
         // normalize newline
-        result = result.replace((
+        rollupBody = rollupBody.replace((
             /\r\n|\r/g
         ), "\n");
         // remove trailing-whitespace
-        result = result.replace((
+        rollupBody = rollupBody.replace((
             /[\t ]+$/gm
         ), "");
         // remove leading-newline before ket
-        result = result.replace((
+        rollupBody = rollupBody.replace((
             /\n+?(\n *?\})/g
         ), "$1");
         // eslint - no-multiple-empty-lines
         // https://github.com/eslint/eslint/blob/v7.2.0/docs/rules/no-multiple-empty-lines.md //jslint-ignore-line
-        result = result.replace((
+        rollupBody = rollupBody.replace((
             /\n{4,}/g
         ), "\n\n\n");
         // replace from replaceList
-        result = replaceListReplace(matchObj[1].replaceList, result);
-        // init header
-        header = (
+        rollupBody = replaceListReplace(matchObj[1].replaceList, rollupBody);
+        // init rollupHeader
+        rollupHeader = (
             matchObj.input.slice(0, matchObj.index)
             + "/*jslint-disable*/\n/*\nshRollupFetch\n"
             + JSON.stringify(
@@ -2106,8 +2110,8 @@ function replaceListReplace(replaceList, data) {
                 ), "/\\\\*") + "\n";
             }).sort().join("\n") + "*/\n\n"
         );
-        // replace from header-diff
-        header.replace((
+        // replace from rollupHeader-diff
+        rollupHeader.replace((
             /((?:^-.*?\n)+?)((?:^\+.*?\n)+)/gm
         ), function (ignore, aa, bb) {
             aa = "\n" + aa.replace((
@@ -2124,12 +2128,12 @@ function replaceListReplace(replaceList, data) {
             ), "*/").replace((
                 /\/\\\\\*/g
             ), "/*");
-            result0 = result;
+            rollupBody0 = rollupBody;
             // disable $-escape in replacement-string
-            result = result.replace(aa, function () {
+            rollupBody = rollupBody.replace(aa, function () {
                 return bb;
             });
-            if (result0 === result) {
+            if (rollupBody0 === rollupBody) {
                 throw new Error(
                     "shRollupFetch - cannot find-and-replace snippet "
                     + JSON.stringify(aa)
@@ -2150,15 +2154,15 @@ function replaceListReplace(replaceList, data) {
                 "data:" + dataUriType + ";base64,"
                 + data.toString("base64")
             );
-            result0 = result;
-            result = result.replace(
+            rollupBody0 = rollupBody;
+            rollupBody = rollupBody.replace(
                 new RegExp("^" + exports + "$", "gm"),
                 // disable $-escape in replacement-string
                 function () {
                     return data;
                 }
             );
-            if (result0 === result) {
+            if (rollupBody0 === rollupBody) {
                 throw new Error(
                     "shRollupFetch - cannot find-and-replace snippet "
                     + JSON.stringify(exports)
@@ -2166,14 +2170,17 @@ function replaceListReplace(replaceList, data) {
             }
         });
         // init footer
-        result = header + result;
+        rollupBody = rollupHeader + rollupBody;
         matchObj.input.replace((
             /\n\/\*\nfile none\n\*\/\n\/\*jslint-enable\*\/\n([\S\s]+)/
         ), function (ignore, match1) {
-            result += "\n\n" + match1.trim() + "\n";
+            rollupBody += "\n\n" + match1.trim() + "\n";
         });
         // write to file
-        moduleFs.writeFileSync(process.argv[1], result); //jslint-ignore-line
+        moduleFs.writeFileSync( //jslint-ignore-line
+            process.argv[1],
+            rollupBody
+        );
     });
 }());
 ' "$@" # '
