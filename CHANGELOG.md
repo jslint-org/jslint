@@ -7,7 +7,8 @@
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
-# v2024.12.1-beta
+# v2025.3.1-beta
+- ubuntu-ci - bugfix - Fix out-of-date apt-list when installing graphicsmagick.
 - jslint - Cleanup ci-shell-function shRollupFetch().
 - jslint - Update ci-shell-function shDirHttplinkValidate() with pragma <\!!--novalidate--\>.
 - ci - Upgrade nodejs used in ci to v22.
