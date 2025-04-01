@@ -705,7 +705,7 @@ import moduleHttps from "https";
             }
             moduleAssert.ok(
                 !url.startsWith("http://"),
-                `shDirHttplinkValidate - ${file} - insecure-link - ${url}`
+                `shDirHttplinkValidate - insecure-link - ${file} - ${url}`
             );
             // ignore duplicate-link
             if (dict.hasOwnProperty(url)) {
@@ -718,8 +718,8 @@ import moduleHttps from "https";
                 }
             }, function (res) {
                 console.error(
-                    `shDirHttplinkValidate ${res.statusCode} ${url}`
-                    + ` - ${Date.now() - timeStart}ms`
+                    `shDirHttplinkValidate - ${res.statusCode}`
+                    + ` - ${file} - ${url} - ${Date.now() - timeStart}ms`
                 );
                 moduleAssert.ok(res.statusCode < 400);
                 req.destroy();
@@ -727,8 +727,8 @@ import moduleHttps from "https";
             });
             req.on("error", function (err) {
                 console.error(
-                    `shDirHttplinkValidate - ${file} - error - ${url}`
-                    + ` - ${Date.now() - timeStart}ms`
+                    `shDirHttplinkValidate - error`
+                    + ` - ${file} - ${url} - ${Date.now() - timeStart}ms`
                 );
                 throw err;
             });
@@ -757,7 +757,8 @@ import moduleHttps from "https";
             ).test(url)) {
                 moduleFs.stat(url.split("?")[0], function (ignore, exists) {
                     console.error(
-                        `shDirHttplinkValidate ${Boolean(exists)} ${url}`
+                        `shDirHttplinkValidate - ${Boolean(exists)}`
+                        + ` - ${file} - ${url}`
                     );
                     moduleAssert.ok(exists);
                 });
