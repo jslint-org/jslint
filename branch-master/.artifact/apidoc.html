@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="JSLint API Doc">
+<title>JSLint apidoc</title>
+<style>
+/* jslint utility2:true */
+/*csslint*/
+body {
+    margin: 0;
+    padding: 20px;
+}
+.apidocCodeCommentSpan,
+.apidocCodeKeywordSpan {
+    background: royalblue;
+    color: white;
+}
+.apidocCodeCommentSpan {
+    display: block;
+}
+.apidocCodePre {
+    background: #eef;
+    border: 1px solid;
+    font-size: 14px;
+    overflow-wrap: break-word;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+.apidocDiv {
+    color: #555;
+    font-family: sans-serif;
+}
+.apidocDiv a[href] {
+    color: royalblue;
+    text-decoration: none;
+}
+.apidocDiv a[href]:hover {
+    text-decoration: underline;
+}
+.apidocDiv li a {
+    display: inline-block;
+    padding: 8px 0;
+}
+.apidocDiv ul {
+    list-style: none;
+    padding-left: 20px;
+}
+.apidocFooterDiv {
+    margin-top: 20px;
+    text-align: center;
+}
+.apidocModuleA {
+    font-size: 24px;
+    font-weight: bold;
+}
+.apidocSectionDiv {
+    border-top: 1px solid;
+    margin-top: 20px;
+}
+.apidocSignatureSpan {
+    color: #666;
+    white-space: pre-wrap;
+}
+</style>
+</head>
+<body>
+<div class="apidocDiv">
+<h1>API Doc for <a href="https://github.com/jslint-org/jslint">JSLint (v2024.11.24)</a></h1>
+<div class="apidocSectionDiv">
+    <a href="#apidocTableOfContents1" id="apidocTableOfContents1">
+        <h1>Table of Contents</h1>
+    </a>
+    <ul>
+
+        <li>
+            <a class="apidocModuleA" href="#apidoc.module.%22.%2Fjslint.mjs%22">Module "./jslint.mjs"</a>
+            <ul>
+            <li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.assertErrorThrownAsync">1.
+function assertErrorThrownAsync<span class="apidocSignatureSpan">(asyncFunc, regexp)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.assertJsonEqual">2.
+function assertJsonEqual<span class="apidocSignatureSpan">(aa, bb, message)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.assertOrThrow">3.
+function assertOrThrow<span class="apidocSignatureSpan">(condition, message)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.debugInline">4.
+function debugInline<span class="apidocSignatureSpan">(...argv)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.fsWriteFileWithParents">5.
+function fsWriteFileWithParents<span class="apidocSignatureSpan">(pathname, data)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.globExclude">6.
+function globExclude<span class="apidocSignatureSpan">({
+    excludeList = [],
+    includeList = [],
+    pathnameList = []
+})</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.htmlEscape">7.
+function htmlEscape<span class="apidocSignatureSpan">(str)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint">8.
+function jslint<span class="apidocSignatureSpan">(
+    source = "",
+    option_dict = empty(),
+    global_list = []
+)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_apidoc">9.
+function jslint_apidoc<span class="apidocSignatureSpan">({
+    example_list,
+    github_repo,
+    module_list,
+    package_name,
+    pathname,
+    version
+})</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_assert">10.
+function jslint_assert<span class="apidocSignatureSpan">(condition, message)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_cli">11.
+function jslint_cli<span class="apidocSignatureSpan">({
+    console_error,
+    console_log,
+    file,
+    import_meta_url,
+    mode_cli,
+    mode_noop,
+    option,
+    process_argv,
+    process_env,
+    process_exit,
+    source
+})</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase1_split">12.
+function jslint_phase1_split<span class="apidocSignatureSpan">()</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase2_lex">13.
+function jslint_phase2_lex<span class="apidocSignatureSpan">(state)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase3_parse">14.
+function jslint_phase3_parse<span class="apidocSignatureSpan">(state)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase4_walk">15.
+function jslint_phase4_walk<span class="apidocSignatureSpan">(state)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase5_whitage">16.
+function jslint_phase5_whitage<span class="apidocSignatureSpan">(state)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_report">17.
+function jslint_report<span class="apidocSignatureSpan">({
+    exports,
+    froms,
+    functions,
+    global,
+    json,
+    module,
+    property,
+    stop,
+    warnings
+})</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestDescribe">18.
+function jstestDescribe<span class="apidocSignatureSpan">(description, testFunction)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestIt">19.
+function jstestIt<span class="apidocSignatureSpan">(description, testFunction, mode)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestOnExit">20.
+function jstestOnExit<span class="apidocSignatureSpan">(exitCode, mode)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.moduleFsInit">21.
+function moduleFsInit<span class="apidocSignatureSpan">()</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.noop">22.
+function noop<span class="apidocSignatureSpan">(val)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.objectDeepCopyWithKeysSorted">23.
+function objectDeepCopyWithKeysSorted<span class="apidocSignatureSpan">(obj)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.v8CoverageListMerge">24.
+function v8CoverageListMerge<span class="apidocSignatureSpan">(processCovs)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.v8CoverageReportCreate">25.
+function v8CoverageReportCreate<span class="apidocSignatureSpan">({
+    consoleError,
+    coverageDir,
+    processArgv = []
+})</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_charset_ascii">26.
+string jslint_charset_ascii
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_edition">27.
+string jslint_edition
+</a>
+
+</li>
+
+            </ul>
+        </li>
+
+    </ul>
+</div>
+
+<div class="apidocSectionDiv">
+    <h1><a href="#apidoc.module.%22.%2Fjslint.mjs%22" id="apidoc.module.%22.%2Fjslint.mjs%22">Module "./jslint.mjs"</a></h1>
+    <ul>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.assertErrorThrownAsync" id="apidoc.elem.%22.%2Fjslint.mjs%22.assertErrorThrownAsync">1.
+    function assertErrorThrownAsync<span class="apidocSignatureSpan">(asyncFunc, regexp)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">async function assertErrorThrownAsync(asyncFunc, regexp) {
+<span class="apidocCodeCommentSpan">
+// This function will assert calling &lt;asyncFunc&gt; throws an error.
+
+</span>    let err;
+    try {
+        await asyncFunc();
+    } catch (errCaught) {
+        err = errCaught;
+    }
+    assertOrThrow(err, "No error thrown.");
+    assertOrThrow(
+        !regexp || new RegExp(regexp).test(err.message),
+        err
+    );
+}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+
+jstestDescribe((
+"test v8CoverageReportCreate handling-behavior"
+), function testBehaviorV8CoverageReportCreate() {
+jstestIt((
+    "test null-case handling-behavior"
+), async function () {
+    await <span class="apidocCodeKeywordSpan">assertErrorThrownAsync</span>(function () {
+        return v8CoverageReportCreate({});
+    }, "invalid coverageDir");
+});
+jstestIt((
+    "test coverage-report jslint.mjs handling-behavior"
+), async function () {
+    // test remove-old-coverage handling-behavior
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.assertJsonEqual" id="apidoc.elem.%22.%2Fjslint.mjs%22.assertJsonEqual">2.
+    function assertJsonEqual<span class="apidocSignatureSpan">(aa, bb, message)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function assertJsonEqual(aa, bb, message) {
+<span class="apidocCodeCommentSpan">
+// This function will assert JSON.stringify(&lt;aa&gt;) === JSON.stringify(&lt;bb&gt;).
+
+</span>    aa = JSON.stringify(objectDeepCopyWithKeysSorted(aa), undefined, 1);
+    bb = JSON.stringify(objectDeepCopyWithKeysSorted(bb), undefined, 1);
+    if (aa !== bb) {
+        throw new Error(
+            "\n" + aa + "\n!==\n" + bb
+            + (
+                typeof message === "string"
+                ? " - " + message
+                : message
+                ? " - " + JSON.stringify(message)
+                : ""
+            )
+        );
+    }
+}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+
+// Debug data1.
+// await moduleFs.promises.writeFile(
+//     ".test_v8_coverage_node_sqlite_merged.json",
+//     JSON.stringify(objectDeepCopyWithKeysSorted(data1), undefined, 4) + "\n"
+// );
+
+    <span class="apidocCodeKeywordSpan">assertJsonEqual</span>(data1, data2);
+});
+});
+
+jstestDescribe((
+"test v8CoverageReportCreate handling-behavior"
+), function testBehaviorV8CoverageReportCreate() {
+jstestIt((
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.assertOrThrow" id="apidoc.elem.%22.%2Fjslint.mjs%22.assertOrThrow">3.
+    function assertOrThrow<span class="apidocSignatureSpan">(condition, message)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function assertOrThrow(condition, message) {
+<span class="apidocCodeCommentSpan">
+// This function will throw &lt;message&gt; if &lt;condition&gt; is falsy.
+
+</span>    if (!condition) {
+        throw (
+            (!message || typeof message === "string")
+            ? new Error(String(message).slice(0, 2048))
+            : message
+        );
+    }
+}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+            assertJsonEqual(1, 2, "undefined");
+        });
+        await assertErrorThrownAsync(function () {
+            assertJsonEqual(1, 2, {});
+        });
+        // test assertOrThrow error handling-behavior
+        await assertErrorThrownAsync(function () {
+            <span class="apidocCodeKeywordSpan">assertOrThrow</span>(undefined, "undefined");
+        });
+        await assertErrorThrownAsync(function () {
+            assertOrThrow(undefined, new Error());
+        });
+    });
+});
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.debugInline" id="apidoc.elem.%22.%2Fjslint.mjs%22.debugInline">4.
+    function debugInline<span class="apidocSignatureSpan">(...argv)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function debug(...argv) {
+<span class="apidocCodeCommentSpan">
+// This function will print &lt;argv&gt; to stderr and then return &lt;argv&gt;[0].
+
+</span>    __consoleError("\n\ndebugInline");
+    __consoleError(...argv);
+    __consoleError("\n");
+    return argv[0];
+}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">N/A</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.fsWriteFileWithParents" id="apidoc.elem.%22.%2Fjslint.mjs%22.fsWriteFileWithParents">5.
+    function fsWriteFileWithParents<span class="apidocSignatureSpan">(pathname, data)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">async function fsWriteFileWithParents(pathname, data) {
+<span class="apidocCodeCommentSpan">
+// This function will write &lt;data&gt; to &lt;pathname&gt; and lazy-mkdirp if necessary.
+
+</span>    await moduleFsInit();
+
+// Try writing to pathname.
+
+    try {
+        await moduleFs.promises.writeFile(pathname, data);
+    } catch (ignore) {
+
+// Lazy mkdirp.
+
+        await moduleFs.promises.mkdir(modulePath.dirname(pathname), {
+            recursive: true
+        });
+
+// Retry writing to pathname.
+
+        await moduleFs.promises.writeFile(pathname, data);
+    }
+    console.error("wrote file " + pathname);
+}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+                }
+            ]
+        }, undefined, 4)
+    ]
+].map(async function ([
+    file, data
+]) {
+    await <span class="apidocCodeKeywordSpan">fsWriteFileWithParents</span>(file, data);
+}));
+await jslint.jslint_cli({
+    console_error: noop, // comment to debug
+    mode_cli: true,
+    process_argv: [
+        "node", "jslint.mjs",
+        "v8_coverage_report=.tmp/coverage_misc"
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.globExclude" id="apidoc.elem.%22.%2Fjslint.mjs%22.globExclude">6.
+    function globExclude<span class="apidocSignatureSpan">({
+    excludeList = [],
+    includeList = [],
+    pathnameList = []
+})</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function globExclude({
+    excludeList = [],
+    includeList = [],
+    pathnameList = []
+}) {
+<span class="apidocCodeCommentSpan">
+// This function will
+// 1. Exclude pathnames in &lt;pathnameList&gt; that don't match glob-patterns in
+//    &lt;includeList&gt;.
+// 2. Exclude pathnames in &lt;pathnameList&gt; that match glob-patterns in
+//    &lt;excludeList&gt;.
+
+</span>    function globAssertNotWeird(list, name) {
+
+// This function will check if &lt;list&gt; of strings contain weird characters.
+
+        [
+            [
+                "\n", (
+                    /^.*?([\u0000-\u0007\r]).*/gm
+                )
+            ],
+            [
+                "\r", (
+                    /^.*?([\n]).*/gm
+                )
+            ]
+        ].forEach(function ([
+            separator, rgx
+        ]) {
+            list.join(separator).replace(rgx, function (match0, char) {
+                throw new Error(
+                    "Weird character "
+                    + JSON.stringify(char)
+                    + " found in " + name + " "
+                    + JSON.stringify(match0)
+                );
+            });
+        });
+    }
+
+    function globToRegexp(pattern) {
+
+// This function will translate glob &lt;pattern&gt; to javascript-regexp,
+// which javascript can then use to "glob" pathnames.
+
+        let ii = 0;
+        let isClass = false;
+        let strClass = "";
+        let strRegex = "";
+        pattern = pattern.replace((
+            /\/\/+/g
+        ), "/");
+        pattern = pattern.replace((
+            /\*\*\*+/g
+        ), "**");
+        pattern.replace((
+            /\\\\|\\\[|\\\]|\[|\]|./g
+        ), function (match0) {
+            switch (match0) {
+            case "[":
+                if (isClass) {
+                    strClass += "[";
+                    return;
+                }
+                strClass += "\u0000";
+                strRegex += "\u0000";
+                isClass = true;
+                return;
+            case "]":
+                if (isClass) {
+                    isClass = false;...
+}
+</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+    "test/support/helper.js": (
+        /^test\/support\/helper\.js$/gm
+    )
+}).forEach(function ([
+    pattern, rgx
+]) {
+    assertJsonEqual(
+        <span class="apidocCodeKeywordSpan">globExclude</span>({
+            excludeList: [
+                pattern
+            ]
+        }).excludeList[0].source,
+        rgx.source
+    );
+    assertJsonEqual(
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.htmlEscape" id="apidoc.elem.%22.%2Fjslint.mjs%22.htmlEscape">7.
+    function htmlEscape<span class="apidocSignatureSpan">(str)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function htmlEscape(str) {
+<span class="apidocCodeCommentSpan">
+// This function will make &lt;str&gt; html-safe by escaping &amp; &lt; &gt;.
+
+</span>    return String(str).replace((
+        /&amp;/g
+    ), "&amp;amp;").replace((
+        /&lt;/g
+    ), "&amp;lt;").replace((
+        /&gt;/g
+    ), "&amp;gt;");
+}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+                            inHole = isHole;
+                        }
+                        chunk += char;
+                    });
+                    lineHtml += htmlEscape(chunk);
+                    break;
+                default:
+                    lineHtml += <span class="apidocCodeKeywordSpan">htmlEscape</span>(line);
+                }
+                html += String(`
+&lt;pre&gt;
+&lt;span class="lineno"&gt;
+&lt;a href="#${lineId}" id="${lineId}"&gt;${String(ii + 1).padStart(5, " ")}.&lt;/a&gt;
+&lt;/span&gt;
+&lt;span class="count
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint">8.
+    function jslint<span class="apidocSignatureSpan">(
+    source = "",
+    option_dict = empty(),
+    global_list = []
+)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function jslint(
+    source = "",                // A text to analyze.
+    option_dict = empty(),      // An object whose keys correspond to option
+                                // ... names.
+    global_list = []            // An array of strings containing global
+                                // ... variables that the file is allowed
+                                // ... readonly access.
+) {
+<span class="apidocCodeCommentSpan">
+// The jslint function itself.
+
+</span>    let catch_list = [];        // The array containing all catch-blocks.
+    let catch_stack = [         // The stack of catch-blocks.
+        {
+            context: empty()
+        }
+    ];
+    let cause_dict = empty();   // The object of test-causes.
+    let directive_list = [];    // The directive comments.
+    let export_dict = empty();  // The exported names and values.
+    let function_list = [];     // The array containing all functions.
+    let function_stack = [];    // The stack of functions.
+    let global_dict = empty();  // The object containing the global
+                                // ... declarations.
+    let import_list = [];       // The array collecting all import-from strings.
+    let line_list = String(     // The array containing source lines.
+        "\n" + source
+    ).split(jslint_rgx_crlf).map(function (line_source) {
+        return {
+            line_source
+        };
+    });
+    let mode_stop = false;      // true if JSLint cannot finish.
+    let property_dict = empty();        // The object containing the tallied
+                                        // ... property names.
+    let state = empty();        // jslint state-object to be passed between
+                                // jslint functions.
+    let syntax_dict = empty();  // The object containing the parser.
+    let tenure = empty();       // The predefined property registry.
+    let token_global = {        // The global object; the outermost context.
+        async: 0,
+        body: true,
+        context: empty(),
+        finally: 0,
+        from: 0,
+...
+}
+</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+import fs from "fs";
+(async function () {
+    let result;
+    let source = "function foo() {console.log(\u0027hello world\u0027);}\n";
+
+// Create JSLint report from &lt;source&gt; in javascript.
+
+    result = jslint.<span class="apidocCodeKeywordSpan">jslint</span>(source);
+    result = jslint.jslint_report(result);
+    result = `&lt;body class="JSLINT_ JSLINT_REPORT_"&gt;\n${result}&lt;/body&gt;\n`;
+
+    await fs.promises.mkdir(".artifact/", {recursive: true});
+    await fs.promises.writeFile(".artifact/jslint_report_hello.html", result);
+    console.error("wrote file .artifact/jslint_report_hello.html");
+}());
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_apidoc" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_apidoc">9.
+    function jslint_apidoc<span class="apidocSignatureSpan">({
+    example_list,
+    github_repo,
+    module_list,
+    package_name,
+    pathname,
+    version
+})</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">async function jslint_apidoc({
+    example_list,
+    github_repo,
+    module_list,
+    package_name,
+    pathname,
+    version
+}) {
+<span class="apidocCodeCommentSpan">
+// This function will create API Doc from &lt;module_list&gt;.
+
+</span>    let elem_ii = 0;
+    let html;
+
+    function elem_create(moduleObj, key, moduleName) {
+
+// This function will create a sub API Doc from elem &lt;moduleObj&gt;[&lt;key&gt;].
+
+        let example = "N/A";
+        let id = encodeURIComponent("apidoc.elem." + moduleName + "." + key);
+        let name;
+        let signature;
+        let source;
+        name = htmlEscape((typeof moduleObj[key]) + " " + key);
+        if (typeof moduleObj[key] !== "function") {
+            return {
+                name,
+                signature: (`
+&lt;a class="apidocElementLiA" href="#${id}"&gt;
+${name}
+&lt;/a&gt;
+                `),
+                source: (`
+&lt;li&gt;
+    &lt;h2&gt;
+    &lt;a href="#${id}" id="${id}"&gt;
+    ${name}
+    &lt;/a&gt;
+    &lt;/h2&gt;
+&lt;/li&gt;
+                `)
+            };
+        }
+        // init source
+        source = htmlEscape(trim_start(moduleObj[key].toString()));
+        // init signature
+        source = source.replace((
+            /(\([\S\s]*?\)) \{/
+        ), function (match0, match1) {
+            signature = htmlEscape(
+                match1.replace((
+                    / *?\/\*[\S\s]*?\*\/ */g
+                ), "").replace((
+                    / *?\/\/.*/g
+                ), "").replace((
+                    /\n{2,}/g
+                ), "\n")
+            );
+            return match0;
+        });
+        // init comment
+        source = source.replace((
+            /\n(?:\/\/.*?\n)+\n/
+        ), "&lt;span class=\"apidocCodeCommentSpan\"&gt;$&amp;&lt;/span&gt;");
+        // init example
+        example_list.some(function (example2) {
+            example2.replace(
+                new RegExp((
+                    "((?:\\n.*?){8}(function )?)\\b"
+                    + key
+                    + "(\\((?:.*?\\n){8})"
+                ), "g"),
+  ...
+}
+</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+command[1] = command.slice(1).join("=");
+
+switch (command[0]) {
+
+// PR-362 - Add API Doc.
+
+case "jslint_apidoc":
+    await <span class="apidocCodeKeywordSpan">jslint_apidoc</span>(Object.assign(JSON.parse(process_argv[3]), {
+        pathname: command[1]
+    }));
+    return;
+
+// PR-363 - Add command jslint_report.
+
+case "jslint_report":
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_assert" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_assert">10.
+    function jslint_assert<span class="apidocSignatureSpan">(condition, message)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function jslint_assert(condition, message) {
+<span class="apidocCodeCommentSpan">
+// This function will throw &lt;message&gt; if &lt;condition&gt; is falsy.
+
+</span>    if (condition) {
+        return condition;
+    }
+    throw new Error(
+        `This was caused by a bug in JSLint.
+Please open an issue with this stack-trace (and possible example-code) at
+https://github.com/jslint-org/jslint/issues.
+edition = "${jslint_edition}";
+${String(message).slice(0, 2000)}`
+    );
+}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+// ["let aa={};", "whitage", "opener", "", 0]
+
+test_cause("opener");
+
+// Probably deadcode.
+// case "${}":
+
+<span class="apidocCodeKeywordSpan">jslint_assert</span>(
+    !(left.id + right.id === "${}"),
+    "Expected !(left.id + right.id === \"${}\")."
+);
+switch (left.id + right.id) {
+case "()":
+case "[]":
+case "{}":
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_cli" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_cli">11.
+    function jslint_cli<span class="apidocSignatureSpan">({
+    console_error,
+    console_log,
+    file,
+    import_meta_url,
+    mode_cli,
+    mode_noop,
+    option,
+    process_argv,
+    process_env,
+    process_exit,
+    source
+})</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">async function jslint_cli({
+    console_error,
+    console_log,
+    file,
+    import_meta_url,
+    mode_cli,
+    mode_noop,
+    option,
+    process_argv,
+    process_env,
+    process_exit,
+    source
+}) {
+<span class="apidocCodeCommentSpan">
+// This function will run jslint from nodejs-cli.
+
+</span>    let command;
+    let data;
+    let exit_code = 0;
+    let mode_report;
+    let mode_wrapper_vim;
+    let result;
+
+    function jslint_from_file({
+        code,
+        file,
+        line_offset = 0,
+        mode_conditional,
+        option = empty()
+    }) {
+        let result_from_file;
+        if (
+            mode_conditional
+            &amp;&amp; !(
+                /^\/\*jslint\b/m
+            ).test(code.slice(0, 65536))
+        ) {
+            return;
+        }
+        option = Object.assign(empty(), option, {
+            file
+        });
+        switch ((
+            /\.\w+?$|$/m
+        ).exec(file)[0]) {
+        case ".html":
+
+// Recursively jslint embedded "&lt;script&gt;\n...\n&lt;/script&gt;".
+
+            code.replace((
+                /^&lt;script\b[^&gt;]*?&gt;\n([\S\s]*?\n)&lt;\/script&gt;$/gm
+            ), function (ignore, match1, ii) {
+                jslint_from_file({
+                    code: match1,
+                    file: file + ".&lt;script&gt;.js",
+                    line_offset: string_line_count(code.slice(0, ii)) + 1,
+                    option: Object.assign(empty(), {
+                        browser: true
+                    }, option)
+                });
+                return "";
+            });
+            return;
+        case ".md":
+
+// Recursively jslint embedded "node --eval '\n...\n'".
+
+            jslint_node_eval({
+                code,
+                file,
+                mode_conditional: true,
+                option
+            });
+            return;
+        case ".sh":
+
+// Recursively jslint embedded "node --eval '\n...\n'".
+
+            jslint_node_eval({
+                code,
+                file,
+                option
+            });
+            return;
+       ...
+}
+</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+        }, undefined, 4)
+    ]
+].map(async function ([
+    file, data
+]) {
+    await fsWriteFileWithParents(file, data);
+}));
+await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
+    console_error: noop, // comment to debug
+    mode_cli: true,
+    process_argv: [
+        "node", "jslint.mjs",
+        "v8_coverage_report=.tmp/coverage_misc"
+        // "node", ".tmp/coverage_misc/aa.js"
+    ]
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase1_split" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase1_split">12.
+    function jslint_phase1_split<span class="apidocSignatureSpan">()</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function jslint_phase1_split() {
+<span class="apidocCodeCommentSpan">
+// PHASE 1. Split &lt;source&gt; by newlines into &lt;line_list&gt;.
+
+</span>    return;
+}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+            warn,
+            warn_at,
+            warning_list
+        });
+
+// PHASE 1. Split &lt;source&gt; by newlines into &lt;line_list&gt;.
+
+        <span class="apidocCodeKeywordSpan">jslint_phase1_split</span>(state);
+        jslint_assert(catch_stack.length === 1, `catch_stack.length === 1.`);
+        jslint_assert(
+            function_stack.length === 0,
+            `function_stack.length === 0.`
+        );
+
+// PHASE 2. Lex &lt;line_list&gt; into &lt;token_list&gt;.
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase2_lex" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase2_lex">13.
+    function jslint_phase2_lex<span class="apidocSignatureSpan">(state)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function jslint_phase2_lex(state) {
+<span class="apidocCodeCommentSpan">
+// PHASE 2. Lex &lt;line_list&gt; into &lt;token_list&gt;.
+
+</span>    let {
+        artifact,
+        directive_list,
+        global_dict,
+        global_list,
+        line_list,
+        option_dict,
+        stop,
+        stop_at,
+        tenure,
+        test_cause,
+        token_global,
+        token_list,
+        warn,
+        warn_at
+    } = state;
+    let char;                   // The current character being lexed.
+    let column = 0;             // The column number of the next character.
+    let from;                   // The starting column number of the token.
+    let from_mega;              // The starting column of megastring.
+    let line = 0;               // The line number of the next character.
+    let line_disable;           // The starting line of "/*jslint-disable*/".
+    let line_mega;              // The starting line of megastring.
+    let line_source = "";       // The remaining line source string.
+    let line_whole = "";        // The whole line source string.
+    let mode_digits_empty_string = 1;
+    let mode_digits_numeric_separator = 2;
+    let mode_directive = true;  // true if directives are still allowed.
+    let mode_mega = false;      // true if currently parsing a megastring
+                                // ... literal.
+    let mode_regexp;            // true if regular expression literal seen on
+                                // ... this line.
+    let paren_backtrack_list = [];      // List of most recent "(" tokens at any
+                                        // ... paren-depth.
+    let paren_depth = 0;        // Keeps track of current paren-depth.
+    let snippet = "";           // A piece of string.
+    let token_1;                // The first token.
+    let token_prv = token_global;       // The previous token including
+                                        // ... comments.
+    let token_prv_expr = token_global;  // The previous token excluding
+                                        // ... comm...
+}
+</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+        jslint_assert(
+            function_stack.length === 0,
+            `function_stack.length === 0.`
+        );
+
+// PHASE 2. Lex &lt;line_list&gt; into &lt;token_list&gt;.
+
+        <span class="apidocCodeKeywordSpan">jslint_phase2_lex</span>(state);
+        jslint_assert(catch_stack.length === 1, `catch_stack.length === 1.`);
+        jslint_assert(
+            function_stack.length === 0,
+            `function_stack.length === 0.`
+        );
+
+// PHASE 3. Parse &lt;token_list&gt; into &lt;token_tree&gt; using the Pratt-parser.
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase3_parse" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase3_parse">14.
+    function jslint_phase3_parse<span class="apidocSignatureSpan">(state)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function jslint_phase3_parse(state) {
+<span class="apidocCodeCommentSpan">
+// PHASE 3. Parse &lt;token_list&gt; into &lt;token_tree&gt; using the Pratt-parser.
+
+</span>// Parsing:
+
+// Parsing weaves the tokens into an abstract syntax tree. During that process,
+// a token may be given any of these properties:
+
+//      arity       string
+//      label       identifier
+//      name        identifier
+//      expression  expressions
+//      block       statements
+//      else        statements (else, default, catch)
+
+// Specialized tokens may have additional properties.
+
+    let anon = "anonymous";     // The guessed name for anonymous functions.
+    let {
+        artifact,
+        catch_list,
+        catch_stack,
+        export_dict,
+        function_list,
+        function_stack,
+        global_dict,
+        import_list,
+        is_equal,
+        option_dict,
+        property_dict,
+        stop,
+        syntax_dict,
+        tenure,
+        test_cause,
+        token_global,
+        token_list,
+        warn,
+        warn_at
+    } = state;
+    let catchage = catch_stack[0];      // The current catch-block.
+    let functionage = token_global;     // The current function.
+    let mode_var;               // "var" if using var; "let" if using let.
+    let token_ii = 0;           // The number of the next token.
+    let token_now = token_global;       // The current token being examined in
+                                        // ... the parse.
+    let token_nxt = token_global;       // The next token to be examined in
+                                        // ... &lt;token_list&gt;.
+
+    function advance(id, match) {
+
+// Produce the next token.
+
+// Attempt to give helpful names to anonymous functions.
+
+        if (
+            token_now.identifier
+            &amp;&amp; token_now.id !== "function"
+            &amp;&amp; token_now.id !== "async"
+        ) {
+            anon = token_now.id;
+        } else if (
+            token_now.id === "(string)"
+            &amp;&amp; jslint_rgx_identifier.test(token_now.value)
+       ...
+}
+</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+        jslint_assert(
+            function_stack.length === 0,
+            `function_stack.length === 0.`
+        );
+
+// PHASE 3. Parse &lt;token_list&gt; into &lt;token_tree&gt; using the Pratt-parser.
+
+        <span class="apidocCodeKeywordSpan">jslint_phase3_parse</span>(state);
+        jslint_assert(catch_stack.length === 1, `catch_stack.length === 1.`);
+        jslint_assert(
+            function_stack.length === 0,
+            `function_stack.length === 0.`
+        );
+
+// PHASE 4. Walk &lt;token_tree&gt;, traversing all nodes of the tree. It is a
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase4_walk" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase4_walk">15.
+    function jslint_phase4_walk<span class="apidocSignatureSpan">(state)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function jslint_phase4_walk(state) {
+<span class="apidocCodeCommentSpan">
+// PHASE 4. Walk &lt;token_tree&gt;, traversing all nodes of the tree. It is a
+//          recursive traversal. Each node may be processed on the way down
+//          (preaction) and on the way up (postaction).
+
+</span>    let {
+        artifact,
+        catch_stack,
+        function_stack,
+        global_dict,
+        is_equal,
+        is_weird,
+        option_dict,
+        syntax_dict,
+        test_cause,
+        token_global,
+        warn
+    } = state;
+    let block_stack = [];               // The stack of blocks.
+    let blockage = token_global;        // The current block.
+    let catchage = catch_stack[0];      // The current catch-block.
+    let functionage = token_global;     // The current function.
+    let postaction;
+    let postamble;
+    let posts = empty();
+    let preaction;
+    let preamble;
+    let pres = empty();
+
+// The relational operators.
+
+    let relationop = object_assign_from_list(empty(), [
+        "!=", "!==", "&lt;", "&lt;=", "==", "===", "&gt;", "&gt;="
+    ], true);
+
+// Ambulation of the parse tree.
+
+    function action(when) {
+
+// Produce a function that will register task functions that will be called as
+// the tree is traversed.
+
+        return function (arity, id, task) {
+            let a_set = when[arity];
+            let i_set;
+
+// The id parameter is optional. If excluded, the task will be applied to all
+// ids.
+
+            if (typeof id !== "string") {
+                task = id;
+                id = "(all)";
+            }
+
+// If this arity has no registrations yet, then create a set object to hold
+// them.
+
+            if (a_set === undefined) {
+                a_set = empty();
+                when[arity] = a_set;
+            }
+
+// If this id has no registrations yet, then create a set array to hold them.
+
+            i_set = a_set[id];
+            if (i_set === undefined) {
+                i_set = [];
+                a_set[id] = i_set;
+            }
+
+// Register the task with the arity and the id.
+...
+}
+</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+);
+
+// PHASE 4. Walk &lt;token_tree&gt;, traversing all nodes of the tree. It is a
+//          recursive traversal. Each node may be processed on the way down
+//          (preaction) and on the way up (postaction).
+
+if (!state.mode_json) {
+    <span class="apidocCodeKeywordSpan">jslint_phase4_walk</span>(state);
+}
+jslint_assert(catch_stack.length === 1, `catch_stack.length === 1.`);
+jslint_assert(
+    function_stack.length === 0,
+    `function_stack.length === 0.`
+);
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase5_whitage" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase5_whitage">16.
+    function jslint_phase5_whitage<span class="apidocSignatureSpan">(state)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function jslint_phase5_whitage(state) {
+<span class="apidocCodeCommentSpan">
+// PHASE 5. Check whitespace between tokens in &lt;token_list&gt;.
+
+</span>    let {
+        artifact,
+        catch_list,
+        function_list,
+        function_stack,
+        option_dict,
+        test_cause,
+        token_global,
+        token_list,
+        warn
+    } = state;
+    let closer = "(end)";
+    let free = false;
+
+// free = false
+
+// cause:
+// "()=&gt;0"
+// "aa()"
+// "aa(0,0)"
+// "function(){}"
+
+// free = true
+
+// cause:
+// "(0)"
+// "(aa)"
+// "aa(0)"
+// "do{}while()"
+// "for(){}"
+// "if(){}"
+// "switch(){}"
+// "while(){}"
+
+    let left = token_global;
+    let margin = 0;
+    let mode_indent = (
+
+// PR-330 - Allow 2-space indent.
+
+        option_dict.indent2
+        ? 2
+        : 4
+    );
+    let nr_comments_skipped = 0;
+    let open = true;
+    let opening = true;
+    let right;
+
+// This is the set of infix operators that require a space on each side.
+
+    let spaceop = object_assign_from_list(empty(), [
+        "!=", "!==", "%", "%=", "&amp;", "&amp;&amp;", "&amp;=", "*", "*=", "+=", "-=", "/",
+        "/=", "&lt;", "&lt;&lt;", "&lt;&lt;=", "&lt;=", "=", "==", "===", "=&gt;", "&gt;", "&gt;=", "&gt;&gt;",
+        "&gt;&gt;=", "&gt;&gt;&gt;", "&gt;&gt;&gt;=", "^", "^=", "|", "|=", "||"
+    ], true);
+
+    function at_margin(fit) {
+        const at = margin + fit;
+        if (right.from !== at) {
+            return expected_at(at);
+        }
+    }
+
+    function delve(the_function) {
+        Object.keys(the_function.context).forEach(function (id) {
+            const name = the_function.context[id];
+            if (id !== "ignore" &amp;&amp; name.parent === the_function) {
+
+// test_cause:
+// ["function aa(aa) {return aa;}", "delve", "id", "", 0]
+
+                test_cause("id");
+                if (
+                    name.used === 0
+
+// Probably deadcode.
+// &amp;&amp; (
+//     name.role !== "function"
+//     || name.parent.arity !== "unary"
+// )
+
+                    &amp;&amp; jslint_assert(
+                        name.role...
+}
+</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+    function_stack.length === 0,
+    `function_stack.length === 0.`
+);
+
+// PHASE 5. Check whitespace between tokens in &lt;token_list&gt;.
+
+if (!state.mode_json &amp;&amp; warning_list.length === 0) {
+    <span class="apidocCodeKeywordSpan">jslint_phase5_whitage</span>(state);
+}
+jslint_assert(catch_stack.length === 1, `catch_stack.length === 1.`);
+jslint_assert(
+    function_stack.length === 0,
+    `function_stack.length === 0.`
+);
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_report" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_report">17.
+    function jslint_report<span class="apidocSignatureSpan">({
+    exports,
+    froms,
+    functions,
+    global,
+    json,
+    module,
+    property,
+    stop,
+    warnings
+})</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function jslint_report({
+    exports,
+    froms,
+    functions,
+    global,
+    json,
+    module,
+    property,
+    stop,
+    warnings
+}) {
+<span class="apidocCodeCommentSpan">
+// This function will create human-readable, html-report
+// for warnings, properties, and functions from jslint-result-object.
+//
+// Example usage:
+//  let result = jslint("console.log('hello world')");
+//  let html = jslint_report(result);
+
+</span>    let html = "";
+    let length_80 = 1111;
+
+    function address(line = 1, column = 1) {
+
+// This function will create HTML address element from &lt;line&gt; and &lt;column&gt;
+
+        return `&lt;address&gt;${Number(line)}: ${Number(column)}&lt;/address&gt;`;
+
+    }
+
+    function detail(title, list) {
+        return (
+            (Array.isArray(list) &amp;&amp; list.length &gt; 0)
+            ? (
+
+// Google Lighthouse Accessibility - &lt;dl&gt;'s do not contain only properly-ordered
+// &lt;dt&gt; and &lt;dd&gt; groups, &lt;script&gt;, &lt;template&gt; or &lt;div&gt; elements.
+
+                "&lt;dl&gt;"
+                + "&lt;dt&gt;" + htmlEscape(title) + "&lt;/dt&gt;"
+                + "&lt;dd&gt;" + list.join(", ") + "&lt;/dd&gt;"
+                + "&lt;/dl&gt;"
+            )
+            : ""
+        );
+    }
+
+    html += String(`
+&lt;style class="JSLINT_REPORT_STYLE"&gt;
+/* jslint utility2:true */
+/*csslint box-model: false, ids:false */
+/*csslint ignore:start*/
+@font-face {
+    font-display: swap;
+    font-family: "Daley";
+    src: url(
+"data:font/woff2;base64,d09GMgABAAAAABy4AA4AAAAAThwAABxiAAEAAAAAAAAAAAAA\
+AAAAAAAAAAAAAAAABmAAgiQINAmcDBEICuc41DEBNgIkA4R2C4I+AAQgBYkuByAMgScfYUIF\
+7NgjsHGAbcDVFkXZ5Jwd+P96IGPc9rl9ETBEaCzCJkvY2UpziRZ7zftZWk8052U9+NqX6vXL\
+KDflSQnlJ0bP+QnPQAy744n9mup6H9PaCDFwM5zjf8exB89bZ1cdrYOP0NgnuRDRWlk9u/fE\
+llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOtz\
+7sIKEGgLdDNl/IrfqWVZG/wr42ekomEm91VA1p4LhHBuFzHF8//u7vvbREHMQqGtNLmiOOD/\
+X7WWiwqyCE98qt0jk5JJmgR5WJJElBmzRb1F7a66MmSLTNWZ2XSHfKBSKHoVteSEJ6EOdvVw\
+fNZOtXKDe39jXdRlkmMnOWIOFBgeEK/b0mFsgffnP...
+}
+</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+
+    editor.on("lintJslintAfter", function (options) {
+
+// Generate jslint-report from options.result.
+
+        document.querySelector(
+            ".JSLINT_REPORT_"
+        ).innerHTML = window.jslint.<span class="apidocCodeKeywordSpan">jslint_report</span>(options.result);
+    });
+
+// Manually trigger linter.
+
+    editor.performLint();
+});
+&lt;/script&gt;
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestDescribe" id="apidoc.elem.%22.%2Fjslint.mjs%22.jstestDescribe">18.
+    function jstestDescribe<span class="apidocSignatureSpan">(description, testFunction)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">async function jstestDescribe(description, testFunction) {
+<span class="apidocCodeCommentSpan">
+// This function will create-and-run test-group &lt;testFunction&gt;
+// with given &lt;description&gt;.
+
+</span>    let message;
+    let result;
+    let timerTimeout;
+
+// Init jstestTimeStart.
+
+    if (jstestTimeStart === undefined) {
+        jstestTimeStart = jstestTimeStart || Date.now();
+        process.on("exit", jstestOnExit);
+    }
+
+// PR-457 - Wait awhile for imports to initialize.
+
+    await new Promise(function (resolve) {
+        setTimeout(resolve);
+    });
+
+// Init jstestItList.
+
+    jstestItList = [];
+    testFunction();
+
+// Wait for jstestItList to resolve.
+
+    timerTimeout = setTimeout(noop, 0x7fffffff);
+    result = await Promise.all(jstestItList);
+    clearTimeout(timerTimeout);
+
+// Print test results.
+
+    message = (
+        "\n  " + (Date.now() - jstestTimeStart) + "ms"
+        + " - test describe - " + description + "\n"
+        + result.map(function ([
+            err, description, mode
+        ]) {
+            jstestItCount += 1;
+            if (err) {
+                jstestCountFailed += 1;
+                err = (
+                    "    \u001b[31m\u2718 " + jstestItCount + ". test it - "
+                    + description + "\n" + err.stack + "\u001b[39m"
+                );
+                if (mode === "pass") {
+                    jstestCountFailed -= 1;
+                    err = "";
+                }
+            }
+            return err || (
+                "    \u001b[32m\u2714 " + jstestItCount + ". test it - "
+                + description + "\u001b[39m"
+            );
+        }).join("\n")
+    );
+    console.error(message);
+}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+//     JSON.stringify(objectDeepCopyWithKeysSorted(data1), undefined, 4) + "\n"
+// );
+
+    assertJsonEqual(data1, data2);
+});
+});
+
+<span class="apidocCodeKeywordSpan">jstestDescribe</span>((
+"test v8CoverageReportCreate handling-behavior"
+), function testBehaviorV8CoverageReportCreate() {
+jstestIt((
+    "test null-case handling-behavior"
+), async function () {
+    await assertErrorThrownAsync(function () {
+        return v8CoverageReportCreate({});
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestIt" id="apidoc.elem.%22.%2Fjslint.mjs%22.jstestIt">19.
+    function jstestIt<span class="apidocSignatureSpan">(description, testFunction, mode)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function jstestIt(description, testFunction, mode) {
+<span class="apidocCodeCommentSpan">
+// This function will create-and-run test-case &lt;testFunction&gt;
+// inside current test-group with given &lt;description&gt;.
+
+</span>    jstestCountTotal += 1;
+    jstestItList.push(new Promise(async function (resolve) {
+        let err;
+        try {
+            await testFunction();
+        } catch (errCaught) {
+            err = errCaught;
+        }
+        resolve([err, description, mode]);
+    }));
+}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+                "v8_coverage_report=" + dir,
+                "node",
+                file
+            ]
+        });
+    });
+});
+<span class="apidocCodeKeywordSpan">jstestIt</span>((
+    "test npm handling-behavior"
+), async function () {
+    await jslint.jslint_cli({
+        console_error: noop, // comment to debug
+        mode_cli: true,
+        process_argv: [
+            "node", "jslint.mjs",
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestOnExit" id="apidoc.elem.%22.%2Fjslint.mjs%22.jstestOnExit">20.
+    function jstestOnExit<span class="apidocSignatureSpan">(exitCode, mode)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function jstestOnExit(exitCode, mode) {
+<span class="apidocCodeCommentSpan">
+// This function will on process-exit, print test-report
+// and exit with non-zero exit-code if any test failed.
+
+</span>    let message = (
+        (
+            (jstestCountFailed || mode === "testsFailed")
+            ? "\n\u001b[31m"
+            : "\n\u001b[32m"
+        )
+        + "  tests total  - " + jstestCountTotal + "\n"
+        + "  tests failed - " + jstestCountFailed + "\n"
+        + "\n"
+        + "  time finished - "
+        + Number(Date.now() - jstestTimeStart).toLocaleString()
+        + " ms\n"
+        + "\u001b[39m"
+    );
+    if (mode !== "testsFailed") {
+        console.error(message);
+    }
+    process.exitCode = exitCode || jstestCountFailed;
+    return message;
+}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+    "test jstestDescribe error handling-behavior"
+), function () {
+    throw new Error();
+}, "pass");
+jstestIt((
+    "test jstestOnExit tests-failed handling-behavior"
+), function () {
+    <span class="apidocCodeKeywordSpan">jstestOnExit</span>(undefined, "testsFailed");
+});
+});
+
+jstestDescribe((
+"test misc handling-behavior"
+), function testBehaviorMisc() {
+jstestIt((
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.moduleFsInit" id="apidoc.elem.%22.%2Fjslint.mjs%22.moduleFsInit">21.
+    function moduleFsInit<span class="apidocSignatureSpan">()</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">async function moduleFsInit() {
+<span class="apidocCodeCommentSpan">
+// This function will import nodejs builtin-modules if they have not yet been
+// imported.
+
+</span>// State 3 - Modules already imported.
+
+    if (moduleFs !== undefined) {
+        return;
+    }
+
+// State 2 - Wait while modules are importing.
+
+    if (moduleFsInitResolveList !== undefined) {
+        return new Promise(function (resolve) {
+            moduleFsInitResolveList.push(resolve);
+        });
+    }
+
+// State 1 - Start importing modules.
+
+    moduleFsInitResolveList = [];
+    [
+        moduleChildProcess,
+        moduleFs,
+        modulePath,
+        moduleUrl
+    ] = await Promise.all([
+        import("child_process"),
+        import("fs"),
+        import("path"),
+        import("url")
+    ]);
+    while (moduleFsInitResolveList.length &gt; 0) {
+        moduleFsInitResolveList.shift()();
+    }
+}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+let sourceJslintMjs;
+let testCoverageMergeData;
+
+await (async function init() {
+
+// Coverage-hack - Ugly-hack to get test-coverage for all initialization-states.
+
+<span class="apidocCodeKeywordSpan">moduleFsInit</span>();
+moduleFsInit();
+
+// Cleanup directory .tmp
+
+await moduleFs.promises.rm(".tmp", {
+    recursive: true
+}).catch(noop);
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.noop" id="apidoc.elem.%22.%2Fjslint.mjs%22.noop">22.
+    function noop<span class="apidocSignatureSpan">(val)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function noop(val) {
+<span class="apidocCodeCommentSpan">
+// This function will do nothing except return &lt;val&gt;.
+
+</span>    return val;
+}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+jstestDescribe((
+"test misc handling-behavior"
+), function testBehaviorMisc() {
+jstestIt((
+    "test misc handling-behavior"
+), async function () {
+    // test debugInline handling-behavior
+    <span class="apidocCodeKeywordSpan">noop</span>(debugInline);
+    // test assertErrorThrownAsync error handling-behavior
+    await assertErrorThrownAsync(function () {
+        return assertErrorThrownAsync(noop);
+    });
+    // test assertJsonEqual error handling-behavior
+    await assertErrorThrownAsync(function () {
+        assertJsonEqual(1, 2);
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.objectDeepCopyWithKeysSorted" id="apidoc.elem.%22.%2Fjslint.mjs%22.objectDeepCopyWithKeysSorted">23.
+    function objectDeepCopyWithKeysSorted<span class="apidocSignatureSpan">(obj)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function objectDeepCopyWithKeysSorted(obj) {
+<span class="apidocCodeCommentSpan">
+// This function will recursively deep-copy &lt;obj&gt; with keys sorted.
+
+</span>    let sorted;
+    if (typeof obj !== "object" || !obj) {
+        return obj;
+    }
+
+// Recursively deep-copy list with child-keys sorted.
+
+    if (Array.isArray(obj)) {
+        return obj.map(objectDeepCopyWithKeysSorted);
+    }
+
+// Recursively deep-copy obj with keys sorted.
+
+    sorted = Object.create(null);
+    Object.keys(obj).sort().forEach(function (key) {
+        sorted[key] = objectDeepCopyWithKeysSorted(obj[key]);
+    });
+    return sorted;
+}</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+        ];
+        data1 = v8CoverageListMerge(data1);
+        data1 = v8CoverageListMerge([data1]);
+
+// Debug data1.
+// await moduleFs.promises.writeFile(
+//     ".test_v8_coverage_node_sqlite_merged.json",
+//     JSON.stringify(<span class="apidocCodeKeywordSpan">objectDeepCopyWithKeysSorted</span>(data1), undefined, 4) + "\n"
+// );
+
+        assertJsonEqual(data1, data2);
+    });
+});
+
+jstestDescribe((
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.v8CoverageListMerge" id="apidoc.elem.%22.%2Fjslint.mjs%22.v8CoverageListMerge">24.
+    function v8CoverageListMerge<span class="apidocSignatureSpan">(processCovs)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function v8CoverageListMerge(processCovs) {
+<span class="apidocCodeCommentSpan">
+// This function is derived from MIT Licensed v8-coverage at
+// https://github.com/demurgos/v8-coverage/tree/master/ts
+// https://github.com/demurgos/v8-coverage/blob/master/ts/LICENSE.md
+//
+// Merges a list of v8 process coverages.
+// The result is normalized.
+// The input values may be mutated, it is not safe to use them after passing
+// them to this function.
+// The computation is synchronous.
+// @param processCovs Process coverages to merge.
+// @return Merged process coverage.
+
+</span>    let resultMerged = [];      // List of merged scripts from processCovs.
+    let urlToScriptDict = new Map();    // Map scriptCov.url to scriptCovs.
+
+    function compareRangeList(aa, bb) {
+
+// Compares two range coverages.
+// The ranges are first ordered by ascending `startOffset` and then by
+// descending `endOffset`.
+// This corresponds to a pre-order tree traversal.
+
+        if (aa.startOffset !== bb.startOffset) {
+            return aa.startOffset - bb.startOffset;
+        }
+        return bb.endOffset - aa.endOffset;
+    }
+
+    function dictKeyValueAppend(dict, key, val) {
+
+// This function will append &lt;val&gt; to list &lt;dict&gt;[&lt;key&gt;].
+
+        let list = dict.get(key);
+        if (list === undefined) {
+            list = [];
+            dict.set(key, list);
+        }
+        list.push(val);
+    }
+
+    function mergeTreeList(parentTrees) {
+
+// This function will return RangeTree object with &lt;parentTrees&gt; merged into
+// property-children.
+// @precondition Same `start` and `end` for all the parentTrees
+
+        if (parentTrees.length &lt;= 1) {
+            return parentTrees[0];
+        }
+
+// new RangeTree().
+
+        return {
+
+// Merge parentTrees into property-children.
+
+            children: mergeTreeListToChildren(parentTrees),
+            delta: parentTrees.reduce(function (aa, bb) {
+                return aa + bb.delta;
+            }, 0),
+            end: parentTrees[0].end,
+            start: parentTrees[0].start
+   ...
+}
+</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+            "test_v8_coverage_node_sqlite_13216_1633662333140_0.json"
+        ].map(function (file) {
+            return testCoverageMergeData[file];
+        });
+        let data2 = testCoverageMergeData[
+            "test_v8_coverage_node_sqlite_merged.json"
+        ];
+        data1 = <span class="apidocCodeKeywordSpan">v8CoverageListMerge</span>(data1);
+        data1 = v8CoverageListMerge([data1]);
+
+// Debug data1.
+// await moduleFs.promises.writeFile(
+//     ".test_v8_coverage_node_sqlite_merged.json",
+//     JSON.stringify(objectDeepCopyWithKeysSorted(data1), undefined, 4) + "\n"
+// );
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.v8CoverageReportCreate" id="apidoc.elem.%22.%2Fjslint.mjs%22.v8CoverageReportCreate">25.
+    function v8CoverageReportCreate<span class="apidocSignatureSpan">({
+    consoleError,
+    coverageDir,
+    processArgv = []
+})</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">async function v8CoverageReportCreate({
+    consoleError,
+    coverageDir,
+    processArgv = []
+}) {
+<span class="apidocCodeCommentSpan">
+// This function will create html-coverage-reports directly from
+// v8-coverage-files in &lt;coverageDir&gt;.
+// 1. Spawn node.js program &lt;processArgv&gt; with NODE_V8_COVERAGE.
+// 2. Merge JSON v8-coverage-files in &lt;coverageDir&gt;.
+// 3. Create html-coverage-reports in &lt;coverageDir&gt;.
+
+</span>    let cwd;
+    let excludeList = [];
+    let exitCode = 0;
+    let fileDict;
+    let includeList = [];
+    let modeIncludeNodeModules;
+    let processArgElem;
+    let promiseList = [];
+    let v8CoverageObj;
+
+    function htmlRender({
+        fileList,
+        lineList,
+        modeIndex,
+        pathname
+    }) {
+        let html;
+        let padLines;
+        let padPathname;
+        let txt;
+        let txtBorder;
+        html = "";
+        html += String(`
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+&lt;title&gt;V8 Coverage Report&lt;/title&gt;
+&lt;style&gt;
+/* jslint utility2:true */
+/*csslint ignore:start*/
+.coverage,
+.coverage a,
+.coverage div,
+.coverage pre,
+.coverage span,
+.coverage table,
+.coverage tbody,
+.coverage td,
+.coverage th,
+.coverage thead,
+.coverage tr {
+    box-sizing: border-box;
+    font-family: monospace;
+}
+/*csslint ignore:end*/
+
+/* css - coverage_report - general */
+body {
+    margin: 0;
+}
+.coverage pre {
+    margin: 5px 0;
+}
+.coverage table {
+    border-collapse: collapse;
+}
+.coverage td,
+.coverage th {
+    border: 1px solid #777;
+    line-height: 20px;
+    margin: 0;
+    padding: 5px 10px;
+}
+.coverage td span {
+    display: inline-block;
+    width: 100%;
+}
+.coverage .content {
+    padding: 0 5px;
+}
+.coverage .content a {
+    text-decoration: none;
+}
+.coverage .count {
+    margin: 0 5px;
+    padding: 0 5px;
+}
+.coverage .footer,
+.coverage .header {
+    padding: 20px;
+}
+.coverage .footer {
+    text-align: center;
+}
+.coverage .percentbar {
+    height: 12px;
+    margin: 2px 0;
+    min-width: 200px;
+    position: relative;
+    width: 100%;...
+}
+</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+
+/*jslint node*/
+import jslint from "../jslint.mjs";
+(async function () {
+
+// Create V8 coverage report from program `npm run test` in javascript.
+
+await jslint.<span class="apidocCodeKeywordSpan">v8CoverageReportCreate</span>({
+    coverageDir: "../.artifact/coverage_sqlite3_js/",
+    processArgv: [
+        "--exclude=tes?/",
+        "--exclude=tes[!0-9A-Z_a-z-]/",
+        "--exclude=tes[0-9A-Z_a-z-]/",
+        "--exclude=tes[^0-9A-Z_a-z-]/",
+        "--exclude=test/**/*.js",
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_charset_ascii" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_charset_ascii">26.
+    string jslint_charset_ascii
+    </a>
+    </h2>
+</li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_edition" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_edition">27.
+    string jslint_edition
+    </a>
+    </h2>
+</li>
+
+    </ul>
+</div>
+
+<div class="apidocFooterDiv">
+    [
+    This document was created with
+    <a href="https://github.com/jslint-org/jslint">JSLint</a>
+    ]
+</div>
+</div>
+</body>
+</html>

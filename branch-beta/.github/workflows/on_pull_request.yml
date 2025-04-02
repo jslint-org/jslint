@@ -1,0 +1,63 @@
+# this workflow will run nodejs coverages and tests
+name: on-pull-request
+on:
+  - pull_request
+  - workflow_dispatch
+jobs:
+
+
+  job1:
+    strategy:
+      matrix:
+        architecture:
+          # - arm64
+          - x64
+          # - x86
+        node_version:
+          - 20
+          - 22
+        os:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
+# base - .github/workflows/ci.yml - beg
+    env:
+      CI_MATRIX_NAME: >
+        node
+        v${{ matrix.node_version }}
+        ${{ matrix.architecture }}
+        ${{ matrix.os }}
+      CI_MATRIX_NAME_MAIN: "node v20 x64 ubuntu-latest"
+      CI_MATRIX_NODE_VERSION: v${{ matrix.node_version }}
+      CI_MATRIX_NODE_VERSION_MAIN: v20
+      CI_WORKFLOW_NAME: >
+        ${{ github.workflow }}
+        - ${{ github.event_name }}
+        - ${{ github.event.inputs.workflow_dispatch_name }}
+        - ${{ github.ref_name }}
+    name: >
+      node
+      v${{ matrix.node_version }}
+      ${{ matrix.architecture }}
+      ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      # disable autocrlf in windows
+      - run: |
+          sh -c "uname -a"
+          echo "$(date -u +"%Y-%m-%d %TZ") - ${{ env.CI_WORKFLOW_NAME }}" # "
+          git config --global core.autocrlf false
+      # https://github.com/actions/checkout
+      - uses: actions/checkout@v4
+      # fetch jslint_ci.sh from trusted source
+      - run: |
+          git fetch origin alpha --depth=1
+          sh -c 'for FILE in .ci.sh .ci2.sh jslint_ci.sh myci2.sh; do
+          if [ -f "$FILE" ]; then git checkout origin/alpha "$FILE"; fi; done'
+      # https://github.com/actions/setup-node
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node_version }}
+      # run nodejs coverages and tests
+      - run: sh jslint_ci.sh shCiBase
+# base - .github/workflows/ci.yml - end

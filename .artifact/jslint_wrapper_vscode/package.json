@@ -1,0 +1,113 @@
+{
+    "activationEvents": [
+        "onCommand:jslint.clear",
+        "onCommand:jslint.disableRegion",
+        "onCommand:jslint.ignoreLine",
+        "onCommand:jslint.lint",
+        "onCommand:jslint.lintAndSave"
+    ],
+    "bugs": {
+        "url": "https://github.com/jslint-org/jslint/issues"
+    },
+    "categories": [
+        "Linters"
+    ],
+    "contributes": {
+        "commands": [
+            {
+                "category": "jslint",
+                "command": "jslint.clear",
+                "title": "JSLint - Clear Warnings"
+            },
+            {
+                "category": "jslint",
+                "command": "jslint.disableRegion",
+                "title": "JSLint - Do Not Lint Selected Region"
+            },
+            {
+                "category": "jslint",
+                "command": "jslint.ignoreLine",
+                "title": "JSLint - Ignore Current Line"
+            },
+            {
+                "category": "jslint",
+                "command": "jslint.lint",
+                "title": "JSLint - Lint File"
+            },
+            {
+                "category": "jslint",
+                "command": "jslint.lintAndSave",
+                "title": "JSLint - Lint File and Save"
+            }
+        ],
+        "keybindings": [
+            {
+                "command": "jslint.clear",
+                "key": "ctrl+shift+j c",
+                "mac": "cmd+shift+j c",
+                "when": "editorTextFocus"
+            },
+            {
+                "command": "jslint.lint",
+                "key": "ctrl+shift+j l",
+                "mac": "cmd+shift+j l",
+                "when": "editorTextFocus"
+            },
+            {
+                "command": "jslint.lintAndSave",
+                "key": "ctrl+shift+j s",
+                "mac": "cmd+shift+j s",
+                "when": "editorTextFocus"
+            }
+        ],
+        "menus": {
+            "editor/context": [
+                {
+                    "command": "jslint.lint",
+                    "group": "7_modification@1",
+                    "when": "resourceLangId == javascript"
+                },
+                {
+                    "command": "jslint.lintAndSave",
+                    "group": "7_modification@2",
+                    "when": "resourceLangId == javascript"
+                },
+                {
+                    "command": "jslint.clear",
+                    "group": "7_modification@3",
+                    "when": "resourceLangId == javascript"
+                },
+                {
+                    "command": "jslint.disableRegion",
+                    "group": "7_modification@4",
+                    "when": "resourceLangId == javascript"
+                },
+                {
+                    "command": "jslint.ignoreLine",
+                    "group": "7_modification@5",
+                    "when": "resourceLangId == javascript"
+                }
+            ]
+        }
+    },
+    "description": "Integrates JSLint into VS Code.",
+    "displayName": "vscode-jslint",
+    "engines": {
+        "vscode": "^1.66.0"
+    },
+    "icon": "asset_image_logo_256.png",
+    "keywords": [
+        "javascript",
+        "jslint",
+        "linter"
+    ],
+    "license": "UNLICENSE",
+    "main": "./jslint_wrapper_vscode.js",
+    "name": "vscode-jslint",
+    "publisher": "jslint",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jslint-org/jslint.git"
+    },
+    "version": "2025.3.31"
+}

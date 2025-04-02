@@ -1,0 +1,90 @@
+# this workflow will run nodejs coverages and tests
+# and upload build-artifacts to branch-gh-pages
+name: ci
+on:
+  push:
+    branches:
+      - alpha
+      - beta
+      - master
+  workflow_dispatch:
+env:
+  MY_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  zzzz1234: 1
+jobs:
+
+
+  job1:
+    strategy:
+      matrix:
+        architecture:
+          # - arm64
+          - x64
+          # - x86
+        node_version:
+          - 20
+          - 22
+        os:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
+        python_version:
+          - "3.12"
+# base - .github/workflows/ci.yml - beg
+    env:
+      CI_MATRIX_NAME: >
+        node
+        v${{ matrix.node_version }}
+        ${{ matrix.architecture }}
+        ${{ matrix.os }}
+      CI_MATRIX_NAME_MAIN: "node v22 x64 ubuntu-latest"
+      CI_MATRIX_NODE_VERSION: v${{ matrix.node_version }}
+      CI_MATRIX_NODE_VERSION_MAIN: v22
+      CI_WORKFLOW_NAME: >
+        ${{ github.workflow }}
+        - ${{ github.event_name }}
+        - ${{ github.event.inputs.workflow_dispatch_name }}
+        - ${{ github.ref_name }}
+    name: >
+      node
+      v${{ matrix.node_version }}
+      ${{ matrix.architecture }}
+      ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      # disable autocrlf in windows
+      - run: |
+          sh -c "uname -a"
+          echo "$(date -u +"%Y-%m-%d %TZ") - ${{ env.CI_WORKFLOW_NAME }}" # "
+          git config --global core.autocrlf false
+      # https://github.com/actions/checkout
+      - uses: actions/checkout@v4
+      # fetch jslint_ci.sh from trusted source
+      - run: |
+          git fetch origin alpha --depth=1
+          sh -c 'for FILE in .ci.sh .ci2.sh jslint_ci.sh myci2.sh; do
+          if [ -f "$FILE" ]; then git checkout origin/alpha "$FILE"; fi; done'
+      # pre-run .ci.sh
+      - run: sh jslint_ci.sh shCiPre
+      # https://github.com/actions/setup-node
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node_version }}
+      # https://github.com/actions/setup-python
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python_version }}
+      # https://github.com/actions/cache
+      - uses: actions/cache@v4
+        with:
+          key: >
+            ${{ hashFiles('./package.json') }}
+            ${{ matrix.architecture }}
+            ${{ matrix.node_version }}
+            ${{ matrix.os }}
+          path: .github_cache
+      # run nodejs coverages and tests
+      - run: sh jslint_ci.sh shCiBase
+      # upload build-artifacts to branch-gh-pages
+      - run: sh jslint_ci.sh shCiArtifactUpload
+# base - .github/workflows/ci.yml - end

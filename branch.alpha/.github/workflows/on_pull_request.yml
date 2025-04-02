@@ -1,0 +1,36 @@
+# this workflow will run nodejs coverages and tests
+name: on_pull_request
+on:
+  - pull_request
+# shCiBase - start
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        architecture:
+          # - arm64
+          - x64
+          # - x86
+        node_version:
+          - 12
+          - 14
+          - 16
+        os:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
+    name: node . v${{ matrix.node_version }} . ${{ matrix.architecture }} . ${{ matrix.os }}
+    steps:
+      # https://github.com/actions/checkout
+      - uses: actions/checkout@v2
+      # https://github.com/actions/setup-node
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node_version }}
+          architecture: ${{ matrix.architecture }}
+      # fetch ci.sh from trusted source
+      - run: git fetch origin alpha && git checkout origin/alpha ci.sh
+      # run nodejs coverages and tests
+      - run: sh ci.sh shCiBase
+# shCiBase - end
