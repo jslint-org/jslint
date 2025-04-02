@@ -17,8 +17,8 @@ jobs:
           - x64
           # - x86
         node_version:
-          - 20
-          # - 22
+          - 22
+          # - 24
         os:
           # - macos-latest
           - ubuntu-latest

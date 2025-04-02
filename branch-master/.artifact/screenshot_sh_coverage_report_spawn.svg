@@ -1,5 +1,5 @@
-<svg height="1482" width="800" xmlns="http://www.w3.org/2000/svg">
-<rect height="1482" fill="#222" width="800"></rect>
+<svg height="1460" width="800" xmlns="http://www.w3.org/2000/svg">
+<rect height="1460" fill="#222" width="800"></rect>
 <text
     fill="#7f7"
     font-family="consolas, menlo, monospace"
@@ -257,7 +257,7 @@
     textLength="768"
     x="10"
     y="934"
->node-pre-gyp info using node@20.18.0 | linux | x64                                               </tspan>
+>node-pre-gyp info using node@22.14.0 | linux | x64                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -293,7 +293,7 @@
     textLength="768"
     x="10"
     y="1066"
->up to date, audited 384 packages in 1s                                                           </tspan>
+>up to date, audited 395 packages in 2s                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -305,7 +305,7 @@
     textLength="768"
     x="10"
     y="1110"
->86 packages are looking for funding                                                              </tspan>
+>92 packages are looking for funding                                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -323,7 +323,7 @@
     textLength="768"
     x="10"
     y="1176"
->5 vulnerabilities (1 low, 1 high, 3 critical)                                                    </tspan>
+>12 vulnerabilities (1 low, 7 moderate, 1 high, 3 critical)                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -335,13 +335,13 @@
     textLength="768"
     x="10"
     y="1220"
->To address all issues (including breaking changes), run:                                         </tspan>
+>To address issues that do not require attention, run:                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1242"
->  npm audit fix --force                                                                          </tspan>
+>  npm audit fix                                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -353,13 +353,13 @@
     textLength="768"
     x="10"
     y="1286"
->Run `npm audit` for details.                                                                     </tspan>
+>To address all issues (including breaking changes), run:                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1308"
->wrote file /home/runner/work/jslint/jslint/.artifact/coverage_sqlite3_sh//touch.txt              </tspan>
+>  npm audit fix --force                                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -371,13 +371,13 @@
     textLength="768"
     x="10"
     y="1352"
->&gt; sqlite3@5.0.11 pretest                                                                         </tspan>
+>Run `npm audit` for details.                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1374"
->&gt; node test/support/createdb.js                                                                  </tspan>
+>wrote file /home/runner/work/jslint/jslint/.artifact/coverage_sqlite3_sh//touch.txt              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -389,19 +389,13 @@
     textLength="768"
     x="10"
     y="1418"
->okay: database already created (/home/runner/work/jslint/jslint/node-sqlite3-sh/test/support/big\</tspan>
+>&gt; sqlite3@5.0.11 pretest                                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1440"
->  .db)                                                                                           </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1462"
->                                                                                                 </tspan>
+>&gt; node test/support/createdb.js                                                                  </tspan>
 
 </text>
 </svg>

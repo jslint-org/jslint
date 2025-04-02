@@ -95,7 +95,7 @@
     "engines": {
         "vscode": "^1.66.0"
     },
-    "icon": "asset_image_logo_512.png",
+    "icon": "asset_image_logo_256.png",
     "keywords": [
         "javascript",
         "jslint",
@@ -109,5 +109,5 @@
         "type": "git",
         "url": "https://github.com/jslint-org/jslint.git"
     },
-    "version": "2024.11.24"
+    "version": "2025.3.31"
 }
