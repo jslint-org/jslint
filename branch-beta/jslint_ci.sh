@@ -214,9 +214,6 @@ import moduleUrl from "url";
     let timeStart;
     let tmpdir;
     let url;
-    if (process.platform !== "linux") {
-        return;
-    }
     timeStart = Date.now();
     url = process.argv[1];
     if (!(
@@ -245,18 +242,19 @@ import moduleUrl from "url";
         ),
         [
             "--headless",
+            "--hide-scrollbars",
             "--ignore-certificate-errors",
             "--incognito",
             "--screenshot",
             "--timeout=30000",
             "--user-data-dir=" + tmpdir,
-            "--window-size=800x600",
-            "-screenshot=" + file,
-            (
-                (process.getuid && process.getuid() === 0)
-                ? "--no-sandbox"
-                : ""
-            ),
+            "--window-size=800,800",
+            //
+            "--disable-audio-input",
+            "--disable-audio-output",
+            "--disable-gpu",
+            //
+            "-screenshot=" + modulePath.resolve(file),
             url
         ].concat(process.argv.filter(function (elem) {
             return elem.startsWith("-");
@@ -292,7 +290,14 @@ shCiArtifactUpload() {(set -e
     then
         return
     fi
-    mkdir -p .artifact
+    # install graphicsmagick
+    if (! command -v gm >/dev/null)
+    then
+        sudo apt-get update
+        sudo apt-get install -y graphicsmagick
+    fi
+    # mkdir .artifact/
+    mkdir -p .artifact/
     # init .git/config
     git config --local user.email "github-actions@users.noreply.github.com"
     git config --local user.name "github-actions"
@@ -313,53 +318,28 @@ shCiArtifactUpload() {(set -e
         printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
     # screenshot changelog and files
-    node --input-type=module --eval '
-import moduleChildProcess from "child_process";
-(function () {
-    [
-        // parallel-task - screenshot changelog
-        [
-            "jslint_ci.sh",
-            "shRunWithScreenshotTxt",
-            ".artifact/screenshot_changelog.svg",
-            "head",
-            "-n50",
-            "CHANGELOG.md"
-        ],
-        // parallel-task - screenshot files
-        [
-            "jslint_ci.sh",
-            "shRunWithScreenshotTxt",
-            ".artifact/screenshot_package_listing.svg",
-            "shGitLsTree"
-        ],
-        // parallel-task - screenshot logo
-        [
-            "jslint_ci.sh",
-            "shImageLogoCreate"
-        ]
-    ].forEach(function (argList) {
-        moduleChildProcess.spawn(
-            "sh",
-            argList,
-            {stdio: ["ignore", 1, 2]}
-        ).on("exit", function (exitCode) {
-            if (exitCode) {
-                process.exit(exitCode);
-            }
-        });
-    });
-}());
-' "$@" # '
+    PID_LIST=""
+    # parallel-task - screenshot changelog
+    shRunWithScreenshotTxt .artifact/screenshot_changelog.svg \
+        head -n50 CHANGELOG.md &
+    PID_LIST="$PID_LIST $!"
+    # parallel-task - screenshot files
+    shRunWithScreenshotTxt .artifact/screenshot_package_listing.svg \
+        shGitLsTree &
+    PID_LIST="$PID_LIST $!"
+    # parallel-task - screenshot logo
+    shImageLogoCreate &
+    PID_LIST="$PID_LIST $!"
+    shPidListWait screenshot "$PID_LIST"
+    # shCiArtifactUploadCustom
     if (command -v shCiArtifactUploadCustom >/dev/null)
     then
         shCiArtifactUploadCustom
     fi
     # 1px-border around browser-screenshot
-    if (ls .artifact/screenshot_browser_*.png 2>/dev/null \
-            && mogrify -version 2>&1 | grep -i imagemagick)
+    if (ls .artifact/screenshot_browser_*.png >/dev/null 2>&1)
     then
-        mogrify -shave 1x1 -bordercolor black -border 1 \
+        gm mogrify -crop 798x598 -bordercolor black -border 1 \
             .artifact/screenshot_browser_*.png
     fi
     # add dir .artifact
@@ -694,9 +674,10 @@ import moduleHttps from "https";
             /<link\b.+?\brel="preconnect".+?>/g
         ), "");
         data.replace((
-            /\bhttps?:\/\/.+?([\s")\]]|\W?$)/gm
-        ), function (url, removeLast) {
+            /\bhttps?:\/\/.+?([\s")\]]|\W?$)(<!--no-validate-->)?/gm
+        ), function (url, removeLast, noValidate) {
             let req;
+            let timeStart = Date.now();
             if (removeLast && removeLast !== "/") {
                 url = url.slice(0, -1);
             }
@@ -719,12 +700,12 @@ import moduleHttps from "https";
             );
             if ((
                 /^http:\/\/(?:127\.0\.0\.1|localhost|www\.w3\.org\/2000\/svg)(?:[\/:]|$)|^https:\/\/github\.com\/[\w.\-\/]+?\/compare\/[\w.\-\/]+?\.\.\.\w/m
-            ).test(url)) {
+            ).test(url) || noValidate) {
                 return "";
             }
             moduleAssert.ok(
                 !url.startsWith("http://"),
-                `shDirHttplinkValidate - ${file} - insecure link - ${url}`
+                `shDirHttplinkValidate - insecure-link - ${file} - ${url}`
             );
             // ignore duplicate-link
             if (dict.hasOwnProperty(url)) {
@@ -737,16 +718,21 @@ import moduleHttps from "https";
                 }
             }, function (res) {
                 console.error(
-                    "shDirHttplinkValidate " + res.statusCode + " " + url
+                    `shDirHttplinkValidate - ${res.statusCode}`
+                    + ` - ${file} - ${url} - ${Date.now() - timeStart}ms`
                 );
-                moduleAssert.ok(
-                    res.statusCode < 400,
-                    `shDirHttplinkValidate - ${file} - unreachable url ${url}`
-                );
-                req.abort();
+                moduleAssert.ok(res.statusCode < 400);
+                req.destroy();
                 res.destroy();
             });
-            req.setTimeout(30000);
+            req.on("error", function (err) {
+                console.error(
+                    `shDirHttplinkValidate - error`
+                    + ` - ${file} - ${url} - ${Date.now() - timeStart}ms`
+                );
+                throw err;
+            });
+            req.setTimeout(60000);
             req.end();
             return "";
         });
@@ -771,15 +757,10 @@ import moduleHttps from "https";
             ).test(url)) {
                 moduleFs.stat(url.split("?")[0], function (ignore, exists) {
                     console.error(
-                        "shDirHttplinkValidate " + Boolean(exists) + " " + url
+                        `shDirHttplinkValidate - ${Boolean(exists)}`
+                        + ` - ${file} - ${url}`
                     );
-                    moduleAssert.ok(
-                        exists,
-                        (
-                            `shDirHttplinkValidate - ${file}`
-                            + `- unreachable file ${url}`
-                        )
-                    );
+                    moduleAssert.ok(exists);
                 });
             }
             return "";
@@ -1626,23 +1607,16 @@ import moduleUrl from "url";
 
 shImageLogoCreate() {(set -e
 # This function will create .png logo.
-    if [ ! -f asset_image_logo_512.html ]
+    if [ ! -f asset_image_logo_256.html ]
     then
         return
     fi
-    # screenshot asset_image_logo_512.png
-    mkdir -p .artifact
-    shBrowserScreenshot asset_image_logo_512.html \
-        --window-size=512x512 \
-        -screenshot=.artifact/asset_image_logo_512.png
-    # create various smaller thumbnails
-    for SIZE in 32 64 128 256
-    do
-        convert -resize "${SIZE}x${SIZE}" .artifact/asset_image_logo_512.png \
-            ".artifact/asset_image_logo_$SIZE.png"
-        printf \
-"shImageLogoCreate - wrote - .artifact/asset_image_logo_$SIZE.png\n" 1>&2
-    done
+    FILE=".artifact/asset_image_logo_256.png"
+    shBrowserScreenshot asset_image_logo_256.html \
+        "-screenshot=$(node --print "path.resolve(process.argv[1])" "$FILE")"
+    gm mogrify -crop 256x256 "$FILE"
+    printf \
+"shImageLogoCreate - wrote - $FILE\n" 1>&2
     # convert to svg @ https://convertio.co/png-svg/
 )}
 
@@ -1884,6 +1858,8 @@ function replaceListReplace(replaceList, data) {
                 : ""
             );
         });
+        elem.flags = elem.flags || "";
+        elem.substr = elem.substr || "";
     });
     // replaceList - sort
     replaceList.sort(function (aa, bb) {
@@ -1961,8 +1937,8 @@ function replaceListReplace(replaceList, data) {
         elem.prefix = elem.url.split("/").slice(0, 7).join("/");
         // fetch dateCommitted
         if (!repoDict.hasOwnProperty(elem.prefix)) {
+            repoDict[elem.prefix] = true;
             promiseList.push(new Promise(function (resolve) {
-                repoDict[elem.prefix] = true;
                 moduleHttps.request(elem.prefix.replace(
                     "/blob/",
                     "/commits/"
@@ -2012,25 +1988,26 @@ function replaceListReplace(replaceList, data) {
     await Promise.all(promiseList);
     // parse fetched data
     process.on("exit", function () {
-        let header;
-        let result;
-        let result0;
-        result = "";
-        fetchList.forEach(function ({
-            comment,
-            data,
-            dataUriType,
-            dateCommitted,
-            footer = "",
-            header = "",
-            prefix,
-            replaceList = [],
-            url
-        }, ii, list) {
+        let rollupBody;
+        let rollupBody0;
+        let rollupHeader;
+        rollupBody = "";
+        fetchList.forEach(function (elem) {
+            let {
+                comment,
+                data,
+                dataUriType,
+                dateCommitted,
+                footer = "",
+                header = "",
+                prefix,
+                replaceList = [],
+                url
+            } = elem;
             if (!url) {
                 return;
             }
-            list[ii].exports = (
+            elem.exports = (
                 (
                     "exports_" + modulePath.dirname(url).replace(
                         "https://github.com/",
@@ -2054,17 +2031,19 @@ function replaceListReplace(replaceList, data) {
                     ), "_")
                 )
             );
+            elem.replaceList = replaceList;
             if (dataUriType) {
                 return;
             }
             if (dateCommitted && dateCommitted.toString()) {
-                result += (
+                rollupBody += (
                     "\n\n\n/*\n"
                     + "repo " + prefix.replace("/blob/", "/tree/") + "\n"
                     + "committed " + new Date(
                         (
                             /"(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d[^"]*?)"/
-                        ).exec(dateCommitted.toString())[1]
+                        ).exec(dateCommitted.toString())?.[1]
+                        || "1970-01-01T00:00:00Z"
                     ).toISOString().replace((/\.\d*?Z/), "Z") + "\n"
                     + "*/"
                 );
@@ -2080,42 +2059,42 @@ function replaceListReplace(replaceList, data) {
             }
             data = replaceListReplace(replaceList, data);
             // init header and footer
-            result += (
+            rollupBody += (
                 "\n\n\n/*\nfile " + url + "\n*/\n"
                 + header
                 + data.trim()
                 + footer
             );
         });
-        result = (
-            "\n" + result.trim()
+        rollupBody = (
+            "\n" + rollupBody.trim()
             + "\n\n\n/*\nfile none\n*/\n/*jslint-enable*/\n"
         );
         // comment #!
-        result = result.replace((
+        rollupBody = rollupBody.replace((
             /^#!/gm
         ), "// $&");
         // normalize newline
-        result = result.replace((
+        rollupBody = rollupBody.replace((
             /\r\n|\r/g
         ), "\n");
         // remove trailing-whitespace
-        result = result.replace((
+        rollupBody = rollupBody.replace((
             /[\t ]+$/gm
         ), "");
         // remove leading-newline before ket
-        result = result.replace((
+        rollupBody = rollupBody.replace((
             /\n+?(\n *?\})/g
         ), "$1");
         // eslint - no-multiple-empty-lines
         // https://github.com/eslint/eslint/blob/v7.2.0/docs/rules/no-multiple-empty-lines.md //jslint-ignore-line
-        result = result.replace((
+        rollupBody = rollupBody.replace((
             /\n{4,}/g
         ), "\n\n\n");
         // replace from replaceList
-        result = replaceListReplace(matchObj[1].replaceList, result);
-        // init header
-        header = (
+        rollupBody = replaceListReplace(matchObj[1].replaceList, rollupBody);
+        // init rollupHeader
+        rollupHeader = (
             matchObj.input.slice(0, matchObj.index)
             + "/*jslint-disable*/\n/*\nshRollupFetch\n"
             + JSON.stringify(
@@ -2133,8 +2112,8 @@ function replaceListReplace(replaceList, data) {
                 ), "/\\\\*") + "\n";
             }).sort().join("\n") + "*/\n\n"
         );
-        // replace from header-diff
-        header.replace((
+        // replace from rollupHeader-diff
+        rollupHeader.replace((
             /((?:^-.*?\n)+?)((?:^\+.*?\n)+)/gm
         ), function (ignore, aa, bb) {
             aa = "\n" + aa.replace((
@@ -2151,12 +2130,12 @@ function replaceListReplace(replaceList, data) {
             ), "*/").replace((
                 /\/\\\\\*/g
             ), "/*");
-            result0 = result;
+            rollupBody0 = rollupBody;
             // disable $-escape in replacement-string
-            result = result.replace(aa, function () {
+            rollupBody = rollupBody.replace(aa, function () {
                 return bb;
             });
-            if (result0 === result) {
+            if (rollupBody0 === rollupBody) {
                 throw new Error(
                     "shRollupFetch - cannot find-and-replace snippet "
                     + JSON.stringify(aa)
@@ -2177,15 +2156,15 @@ function replaceListReplace(replaceList, data) {
                 "data:" + dataUriType + ";base64,"
                 + data.toString("base64")
             );
-            result0 = result;
-            result = result.replace(
+            rollupBody0 = rollupBody;
+            rollupBody = rollupBody.replace(
                 new RegExp("^" + exports + "$", "gm"),
                 // disable $-escape in replacement-string
                 function () {
                     return data;
                 }
             );
-            if (result0 === result) {
+            if (rollupBody0 === rollupBody) {
                 throw new Error(
                     "shRollupFetch - cannot find-and-replace snippet "
                     + JSON.stringify(exports)
@@ -2193,14 +2172,17 @@ function replaceListReplace(replaceList, data) {
             }
         });
         // init footer
-        result = header + result;
+        rollupBody = rollupHeader + rollupBody;
         matchObj.input.replace((
             /\n\/\*\nfile none\n\*\/\n\/\*jslint-enable\*\/\n([\S\s]+)/
         ), function (ignore, match1) {
-            result += "\n\n" + match1.trim() + "\n";
+            rollupBody += "\n\n" + match1.trim() + "\n";
         });
         // write to file
-        moduleFs.writeFileSync(process.argv[1], result); //jslint-ignore-line
+        moduleFs.writeFileSync( //jslint-ignore-line
+            process.argv[1],
+            rollupBody
+        );
     });
 }());
 ' "$@" # '

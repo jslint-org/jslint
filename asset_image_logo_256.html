@@ -3,13 +3,17 @@
 <head>
 <title>logo</title>
 <style>
-/* sh jslint_ci.sh shBrowserScreenshot asset_image_logo_512.html --window-size=512x512 */
+/* sh jslint_ci.sh shBrowserScreenshot asset_image_logo_256.html --window-size=256x256 */
 /* csslint box-model:false */
 /* csslint ignore:start */
 *,
 *:after,
 *:before {
+    background: rgba(0, 0, 0, 0);
+    border: 0;
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 @font-face {
     font-family: Daley;
@@ -155,45 +159,35 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     ") format("woff2");
 }
 /* csslint ignore:end */
-body,
-div {
-    margin: 0;
-}
 .container1 {
     background: antiquewhite;
-    border: 24px solid darkslategray;
-    border-radius: 96px;
+    border: 16px solid darkslategray;
+    border-radius: 48px;
     color: darkslategray;
     font-family: Daley;
-    height: 512px;
-    margin: 0;
+    height: 256px;
     position: relative;
-    width: 512px;
+    width: 256px;
     zoom: 100%;
-/*
-    background: transparent;
-    border: 24px solid black;
-    color: black;
-*/
 }
 .text1 {
-    font-size: 256px;
-    left: 44px;
+    font-size: 112px;
+    left: 36px;
     position: absolute;
-    top: 32px;
+    top: 12px;
 }
 .text2 {
     bottom: 8px;
-    font-size: 192px;
-    left: 44px;
+    font-size: 96px;
+    left: 18px;
     position: absolute;
 }
 </style>
 </head>
 <body>
 <div class="container1">
-<div class="text1">JS</div>
-<div class="text2">Lint</div>
+    <div class="text1">JS</div>
+    <div class="text2">Lint</div>
 </div>
 </body>
 </html>

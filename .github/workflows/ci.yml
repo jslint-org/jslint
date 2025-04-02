@@ -29,7 +29,7 @@ jobs:
           - ubuntu-latest
           - windows-latest
         python_version:
-          - "3.10"
+          - "3.12"
 # base - .github/workflows/ci.yml - beg
     env:
       CI_MATRIX_NAME: >
@@ -37,9 +37,9 @@ jobs:
         v${{ matrix.node_version }}
         ${{ matrix.architecture }}
         ${{ matrix.os }}
-      CI_MATRIX_NAME_MAIN: "node v20 x64 ubuntu-latest"
+      CI_MATRIX_NAME_MAIN: "node v22 x64 ubuntu-latest"
       CI_MATRIX_NODE_VERSION: v${{ matrix.node_version }}
-      CI_MATRIX_NODE_VERSION_MAIN: v20
+      CI_MATRIX_NODE_VERSION_MAIN: v22
       CI_WORKFLOW_NAME: >
         ${{ github.workflow }}
         - ${{ github.event_name }}
