@@ -2192,664 +2192,664 @@ shRunWithCoverage() {(set -e
 # This function will run nodejs command $@ with v8-coverage
 # and create coverage-report .artifact/coverage/index.html.
     node --input-type=module --eval '
-/*jslint indent2*/
+/*jslint white*/
 let moduleChildProcess;
 let moduleFs;
 let moduleFsInitResolveList;
 let modulePath;
 let moduleUrl;
 function assertOrThrow(condition, message) {
-  if (!condition) {
-    throw (
-      (!message || typeof message === "string")
-      ? new Error(String(message).slice(0, 2048))
-      : message
-    );
-  }
+ if (!condition) {
+  throw (
+   (!message || typeof message === "string")
+   ? new Error(String(message).slice(0, 2048))
+   : message
+  );
+ }
 }
 async function fsWriteFileWithParents(pathname, data) {
-  await moduleFsInit();
-  try {
-    await moduleFs.promises.writeFile(pathname, data);
-  } catch (ignore) {
-    await moduleFs.promises.mkdir(modulePath.dirname(pathname), {
-      recursive: true
-    });
-    await moduleFs.promises.writeFile(pathname, data);
-  }
-  console.error("wrote file " + pathname);
+ await moduleFsInit();
+ try {
+  await moduleFs.promises.writeFile(pathname, data);
+ } catch (ignore) {
+  await moduleFs.promises.mkdir(modulePath.dirname(pathname), {
+   recursive: true
+  });
+  await moduleFs.promises.writeFile(pathname, data);
+ }
+ console.error("wrote file " + pathname);
 }
 function globExclude({
-  excludeList = [],
-  includeList = [],
-  pathnameList = []
+ excludeList = [],
+ includeList = [],
+ pathnameList = []
 }) {
-  function globAssertNotWeird(list, name) {
-    [
-      [
-        "\n", (
-          /^.*?([\u0000-\u0007\r]).*/gm
-        )
-      ],
-      [
-        "\r", (
-          /^.*?([\n]).*/gm
-        )
-      ]
-    ].forEach(function ([
-      separator, rgx
-    ]) {
-      list.join(separator).replace(rgx, function (match0, char) {
-        throw new Error(
-          "Weird character "
-          + JSON.stringify(char)
-          + " found in " + name + " "
-          + JSON.stringify(match0)
-        );
-      });
-    });
-  }
+ function globAssertNotWeird(list, name) {
+  [
+   [
+    "\n", (
+     /^.*?([\u0000-\u0007\r]).*/gm
+    )
+   ],
+   [
+    "\r", (
+     /^.*?([\n]).*/gm
+    )
+   ]
+  ].forEach(function ([
+   separator, rgx
+  ]) {
+   list.join(separator).replace(rgx, function (match0, char) {
+    throw new Error(
+     "Weird character "
+     + JSON.stringify(char)
+     + " found in " + name + " "
+     + JSON.stringify(match0)
+    );
+   });
+  });
+ }
 
-  function globToRegexp(pattern) {
-    let ii = 0;
-    let isClass = false;
-    let strClass = "";
-    let strRegex = "";
-    pattern = pattern.replace((
-      /\/\/+/g
-    ), "/");
-    pattern = pattern.replace((
-      /\*\*\*+/g
-    ), "**");
-    pattern.replace((
-      /\\\\|\\\[|\\\]|\[|\]|./g
-    ), function (match0) {
-      switch (match0) {
-      case "[":
-        if (isClass) {
-          strClass += "[";
-          return;
-        }
-        strClass += "\u0000";
-        strRegex += "\u0000";
-        isClass = true;
-        return;
-      case "]":
-        if (isClass) {
-          isClass = false;
-          return;
-        }
-        strRegex += "]";
-        return;
-      default:
-        if (isClass) {
-          strClass += match0;
-          return;
-        }
-        strRegex += match0;
-      }
-      return "";
-    });
+ function globToRegexp(pattern) {
+  let ii = 0;
+  let isClass = false;
+  let strClass = "";
+  let strRegex = "";
+  pattern = pattern.replace((
+   /\/\/+/g
+  ), "/");
+  pattern = pattern.replace((
+   /\*\*\*+/g
+  ), "**");
+  pattern.replace((
+   /\\\\|\\\[|\\\]|\[|\]|./g
+  ), function (match0) {
+   switch (match0) {
+   case "[":
+    if (isClass) {
+     strClass += "[";
+     return;
+    }
     strClass += "\u0000";
-    strClass = strClass.replace((
-      /\u0000!/g
-    ), "\u0000^");
-    strClass = strClass.replace((
-      /\u0000-/g
-    ), "\u0000\\-");
-    strClass = strClass.replace((
-      /-\u0000/g
-    ), "\\-\u0000");
-    strClass = strClass.replace((
-      /[\[\]]/g
-    ), "\\$&");
-    strRegex = strRegex.replace((
-      /[$()*+.?\[\\\]\^{|}]/g
-    ), "\\$&");
-    strRegex = strRegex.replace((
-      /\\\*\\\*\/(?:\\\*)+/g
-    ), ".*?");
-    strRegex = strRegex.replace((
-      /(^|\/)\\\*\\\*(\/|$)/gm
-    ), "$1.*?$2");
-    strRegex = strRegex.replace((
-      /(?:\\\*)+/g
-    ), "[^\\/]*?");
-    strRegex = strRegex.replace((
-      /\\\?/g
-    ), "[^\\/]");
-    strRegex = strRegex.replace((
-      /\/$/gm
-    ), "\\/.*?");
-    ii = 0;
-    strClass = strClass.split("\u0000");
-    strRegex = strRegex.replace((
-      /\u0000/g
-    ), function () {
-      ii += 1;
-      if (strClass[ii] === "") {
-        return "";
-      }
-      return "[" + strClass[ii] + "]";
-    });
-    strRegex = new RegExp("^" + strRegex + "$", "gm");
-    return strRegex;
-  }
-  globAssertNotWeird(excludeList, "pattern");
-  globAssertNotWeird(includeList, "pattern");
-  globAssertNotWeird(pathnameList, "pathname");
-  pathnameList = pathnameList.join("\n");
-  if (includeList.length > 0) {
-    includeList = includeList.map(globToRegexp);
-    includeList.forEach(function (pattern) {
-      pathnameList = pathnameList.replace(pattern, "\u0000$&");
-    });
-    pathnameList = pathnameList.replace((
-      /^[^\u0000].*/gm
-    ), "");
-    pathnameList = pathnameList.replace((
-      /^\u0000+/gm
-    ), "");
-  }
-  excludeList = excludeList.map(globToRegexp);
-  excludeList.forEach(function (pattern) {
-    pathnameList = pathnameList.replace(pattern, "");
+    strRegex += "\u0000";
+    isClass = true;
+    return;
+   case "]":
+    if (isClass) {
+     isClass = false;
+     return;
+    }
+    strRegex += "]";
+    return;
+   default:
+    if (isClass) {
+     strClass += match0;
+     return;
+    }
+    strRegex += match0;
+   }
+   return "";
   });
-  pathnameList = pathnameList.split("\n").filter(function (elem) {
-    return elem;
+  strClass += "\u0000";
+  strClass = strClass.replace((
+   /\u0000!/g
+  ), "\u0000^");
+  strClass = strClass.replace((
+   /\u0000-/g
+  ), "\u0000\\-");
+  strClass = strClass.replace((
+   /-\u0000/g
+  ), "\\-\u0000");
+  strClass = strClass.replace((
+   /[\[\]]/g
+  ), "\\$&");
+  strRegex = strRegex.replace((
+   /[$()*+.?\[\\\]\^{|}]/g
+  ), "\\$&");
+  strRegex = strRegex.replace((
+   /\\\*\\\*\/(?:\\\*)+/g
+  ), ".*?");
+  strRegex = strRegex.replace((
+   /(^|\/)\\\*\\\*(\/|$)/gm
+  ), "$1.*?$2");
+  strRegex = strRegex.replace((
+   /(?:\\\*)+/g
+  ), "[^\\/]*?");
+  strRegex = strRegex.replace((
+   /\\\?/g
+  ), "[^\\/]");
+  strRegex = strRegex.replace((
+   /\/$/gm
+  ), "\\/.*?");
+  ii = 0;
+  strClass = strClass.split("\u0000");
+  strRegex = strRegex.replace((
+   /\u0000/g
+  ), function () {
+   ii += 1;
+   if (strClass[ii] === "") {
+    return "";
+   }
+   return "[" + strClass[ii] + "]";
   });
-  return {
-    excludeList,
-    includeList,
-    pathnameList
-  };
+  strRegex = new RegExp("^" + strRegex + "$", "gm");
+  return strRegex;
+ }
+ globAssertNotWeird(excludeList, "pattern");
+ globAssertNotWeird(includeList, "pattern");
+ globAssertNotWeird(pathnameList, "pathname");
+ pathnameList = pathnameList.join("\n");
+ if (includeList.length > 0) {
+  includeList = includeList.map(globToRegexp);
+  includeList.forEach(function (pattern) {
+   pathnameList = pathnameList.replace(pattern, "\u0000$&");
+  });
+  pathnameList = pathnameList.replace((
+   /^[^\u0000].*/gm
+  ), "");
+  pathnameList = pathnameList.replace((
+   /^\u0000+/gm
+  ), "");
+ }
+ excludeList = excludeList.map(globToRegexp);
+ excludeList.forEach(function (pattern) {
+  pathnameList = pathnameList.replace(pattern, "");
+ });
+ pathnameList = pathnameList.split("\n").filter(function (elem) {
+  return elem;
+ });
+ return {
+  excludeList,
+  includeList,
+  pathnameList
+ };
 }
 function htmlEscape(str) {
-  return String(str).replace((
-    /&/g
-  ), "&amp;").replace((
-    /</g
-  ), "&lt;").replace((
-    />/g
-  ), "&gt;");
+ return String(str).replace((
+  /&/g
+ ), "&amp;").replace((
+  /</g
+ ), "&lt;").replace((
+  />/g
+ ), "&gt;");
 }
 async function moduleFsInit() {
 
-  if (moduleFs !== undefined) {
-    return;
-  }
-  if (moduleFsInitResolveList !== undefined) {
-    return new Promise(function (resolve) {
-      moduleFsInitResolveList.push(resolve);
-    });
-  }
-  moduleFsInitResolveList = [];
-  [
-    moduleChildProcess,
-    moduleFs,
-    modulePath,
-    moduleUrl
-  ] = await Promise.all([
-    import("child_process"),
-    import("fs"),
-    import("path"),
-    import("url")
-  ]);
-  while (moduleFsInitResolveList.length > 0) {
-    moduleFsInitResolveList.shift()();
-  }
+ if (moduleFs !== undefined) {
+  return;
+ }
+ if (moduleFsInitResolveList !== undefined) {
+  return new Promise(function (resolve) {
+   moduleFsInitResolveList.push(resolve);
+  });
+ }
+ moduleFsInitResolveList = [];
+ [
+  moduleChildProcess,
+  moduleFs,
+  modulePath,
+  moduleUrl
+ ] = await Promise.all([
+  import("child_process"),
+  import("fs"),
+  import("path"),
+  import("url")
+ ]);
+ while (moduleFsInitResolveList.length > 0) {
+  moduleFsInitResolveList.shift()();
+ }
 }
 function v8CoverageListMerge(processCovs) {
-  let resultMerged = [];    // List of merged scripts from processCovs.
-  let urlToScriptDict = new Map();  // Map scriptCov.url to scriptCovs.
+ let resultMerged = [];   // List of merged scripts from processCovs.
+ let urlToScriptDict = new Map(); // Map scriptCov.url to scriptCovs.
 
-  function compareRangeList(aa, bb) {
-    if (aa.startOffset !== bb.startOffset) {
-      return aa.startOffset - bb.startOffset;
-    }
-    return bb.endOffset - aa.endOffset;
+ function compareRangeList(aa, bb) {
+  if (aa.startOffset !== bb.startOffset) {
+   return aa.startOffset - bb.startOffset;
   }
+  return bb.endOffset - aa.endOffset;
+ }
 
-  function dictKeyValueAppend(dict, key, val) {
-    let list = dict.get(key);
-    if (list === undefined) {
-      list = [];
-      dict.set(key, list);
-    }
-    list.push(val);
+ function dictKeyValueAppend(dict, key, val) {
+  let list = dict.get(key);
+  if (list === undefined) {
+   list = [];
+   dict.set(key, list);
   }
+  list.push(val);
+ }
 
-  function mergeTreeList(parentTrees) {
-    if (parentTrees.length <= 1) {
-      return parentTrees[0];
-    }
-    return {
-      children: mergeTreeListToChildren(parentTrees),
-      delta: parentTrees.reduce(function (aa, bb) {
-        return aa + bb.delta;
-      }, 0),
-      end: parentTrees[0].end,
-      start: parentTrees[0].start
-    };
+ function mergeTreeList(parentTrees) {
+  if (parentTrees.length <= 1) {
+   return parentTrees[0];
   }
-
-  function mergeTreeListToChildren(parentTrees) {
-    let openRange;
-    let parentToChildDict = new Map();    // Map parent to child.
-    let queueList;
-    let queueListIi = 0;
-    let queueOffset;
-    let queueTrees;
-    let resultChildren = [];
-    let startToTreeDict = new Map();    // Map tree.start to tree.
-    function nextXxx() {
-      let [
-        nextOffset, nextTrees
-      ] = queueList[queueListIi] || [];
-      let openRangeEnd;
-      if (queueTrees === undefined) {
-        queueListIi += 1;
-      } else if (nextOffset === undefined || nextOffset > queueOffset) {
-        nextOffset = queueOffset;
-        nextTrees = queueTrees;
-        queueTrees = undefined;
-      } else {
-        if (nextOffset === queueOffset) {
-          queueTrees.forEach(function (tree) {
-            nextTrees.push(tree);
-          });
-          queueTrees = undefined;
-        }
-        queueListIi += 1;
-      }
-      if (nextOffset === undefined) {
-        if (openRange !== undefined) {
-          resultAppendNextChild();
-        }
-        return true;
-      }
-      if (openRange !== undefined && openRange.end <= nextOffset) {
-        resultAppendNextChild();
-        openRange = undefined;
-      }
-      if (openRange === undefined) {
-        openRangeEnd = nextOffset + 1;
-        nextTrees.forEach(function ({
-          parentIi,
-          tree
-        }) {
-          openRangeEnd = Math.max(openRangeEnd, tree.end);
-          dictKeyValueAppend(parentToChildDict, parentIi, tree);
-        });
-        queueOffset = openRangeEnd;
-        openRange = {
-          end: openRangeEnd,
-          start: nextOffset
-        };
-      } else {
-        nextTrees.forEach(function ({
-          parentIi,
-          tree
-        }) {
-          let right;
-          if (tree.end > openRange.end) {
-            right = treeSplit(tree, openRange.end);
-            if (queueTrees === undefined) {
-              queueTrees = [];
-            }
-            queueTrees.push({
-              parentIi,
-              tree: right
-            });
-          }
-          dictKeyValueAppend(parentToChildDict, parentIi, tree);
-        });
-      }
-    }
-    function resultAppendNextChild() {
-      let treesMatching = [];
-      parentToChildDict.forEach(function (nested) {
-        if (
-          nested.length === 1
-          && nested[0].start === openRange.start
-          && nested[0].end === openRange.end
-        ) {
-          treesMatching.push(nested[0]);
-        } else {
-          treesMatching.push({
-            children: nested,
-            delta: 0,
-            end: openRange.end,
-            start: openRange.start
-          });
-        }
-      });
-      parentToChildDict.clear();
-      resultChildren.push(mergeTreeList(treesMatching));
-    }
-    function treeSplit(tree, offset) {
-      let child;
-      let ii = 0;
-      let leftChildLen = tree.children.length;
-      let mid;
-      let resultTree;
-      let rightChildren;
-      while (ii < tree.children.length) {
-        child = tree.children[ii];
-        if (child.start < offset && offset < child.end) {
-          mid = treeSplit(child, offset);
-          leftChildLen = ii + 1;
-          break;
-        }
-        if (child.start >= offset) {
-          leftChildLen = ii;
-          break;
-        }
-        ii += 1;
-      }
-      rightChildren = tree.children.splice(
-        leftChildLen,
-        tree.children.length - leftChildLen
-      );
-      if (mid !== undefined) {
-        rightChildren.unshift(mid);
-      }
-      resultTree = {
-        children: rightChildren,
-        delta: tree.delta,
-        end: tree.end,
-        start: offset
-      };
-      tree.end = offset;
-      return resultTree;
-    }
-    parentTrees.forEach(function (parentTree, parentIi) {
-      parentTree.children.forEach(function (child) {
-        dictKeyValueAppend(startToTreeDict, child.start, {
-          parentIi,
-          tree: child
-        });
-      });
-    });
-    queueList = Array.from(startToTreeDict).map(function ([
-      startOffset, trees
-    ]) {
-      return [
-        startOffset, trees
-      ];
-    }).sort(function (aa, bb) {
-      return aa[0] - bb[0];
-    });
-    while (true) {
-      if (nextXxx()) {
-        break;
-      }
-    }
-    return resultChildren;
-  }
-
-  function sortFunc(funcCov) {
-    funcCov.ranges = treeToRanges(treeFromSortedRanges(
-      funcCov.ranges.sort(compareRangeList)
-    ));
-    return funcCov;
-  }
-
-  function sortScript(scriptCov) {
-
-    scriptCov.functions.forEach(function (funcCov) {
-      sortFunc(funcCov);
-    });
-    scriptCov.functions.sort(function (aa, bb) {
-      return compareRangeList(aa.ranges[0], bb.ranges[0]);
-    });
-    return scriptCov;
-  }
-
-  function treeFromSortedRanges(ranges) {
-    let root;
-    let stack = [];   // Stack of parent trees and parent counts.
-    ranges.forEach(function (range) {
-      let node = {
-        children: [],
-        delta: range.count,
-        end: range.endOffset,
-        start: range.startOffset
-      };
-      let parent;
-      let parentCount;
-      if (root === undefined) {
-        root = node;
-        stack.push([
-          node, range.count
-        ]);
-        return;
-      }
-      while (true) {
-        [
-          parent, parentCount
-        ] = stack[stack.length - 1];
-        if (range.startOffset < parent.end) {
-          break;
-        }
-        stack.pop();
-      }
-      node.delta -= parentCount;
-      parent.children.push(node);
-      stack.push([
-        node, range.count
-      ]);
-    });
-    return root;
-  }
-
-  function treeToRanges(tree) {
-    let count;
-    let cur;
-    let ii;
-    let parentCount;
-    let ranges = [];
-    let stack = [       // Stack of parent trees and counts.
-      [
-        tree, 0
-      ]
-    ];
-    function normalizeRange(tree) {
-      let children = [];
-      let curEnd;
-      let head;
-      let tail = [];
-      function endChain() {
-        if (tail.length !== 0) {
-          head.end = tail[tail.length - 1].end;
-          tail.forEach(function (tailTree) {
-            tailTree.children.forEach(function (subChild) {
-              subChild.delta += tailTree.delta - head.delta;
-              head.children.push(subChild);
-            });
-          });
-          tail.length = 0;
-        }
-        normalizeRange(head);
-        children.push(head);
-      }
-      tree.children.forEach(function (child) {
-        if (head === undefined) {
-          head = child;
-        } else if (
-          child.delta === head.delta && child.start === curEnd
-        ) {
-          tail.push(child);
-        } else {
-          endChain();
-          head = child;
-        }
-        curEnd = child.end;
-      });
-      if (head !== undefined) {
-        endChain();
-      }
-      if (children.length === 1) {
-        if (
-          children[0].start === tree.start
-          && children[0].end === tree.end
-        ) {
-          tree.delta += children[0].delta;
-          tree.children = children[0].children;
-          return;
-        }
-      }
-      tree.children = children;
-    }
-    normalizeRange(tree);
-    while (stack.length > 0) {
-      [
-        cur, parentCount
-      ] = stack.pop();
-      count = parentCount + cur.delta;
-      ranges.push({
-        count,
-        endOffset: cur.end,
-        startOffset: cur.start
-      });
-      ii = cur.children.length - 1;
-      while (ii >= 0) {
-        stack.push([
-          cur.children[ii], count
-        ]);
-        ii -= 1;
-      }
-    }
-    return ranges;
-  }
-
-  if (processCovs.length === 0) {
-    return {
-      result: []
-    };
-  }
-  processCovs.forEach(function ({
-    result
-  }) {
-    result.forEach(function (scriptCov) {
-      dictKeyValueAppend(urlToScriptDict, scriptCov.url, scriptCov);
-    });
-  });
-  urlToScriptDict.forEach(function (scriptCovs) {
-
-    let functions = [];
-    let rangeToFuncDict = new Map();
-    if (scriptCovs.length === 1) {
-      resultMerged.push(sortScript(scriptCovs[0]));
-      return;
-    }
-    scriptCovs.forEach(function ({
-      functions
-    }) {
-      functions.forEach(function (funcCov) {
-        dictKeyValueAppend(
-          rangeToFuncDict,
-          (
-            funcCov.ranges[0].startOffset
-            + ";" + funcCov.ranges[0].endOffset
-          ),
-          funcCov
-        );
-      });
-    });
-    rangeToFuncDict.forEach(function (funcCovs) {
-
-      let count = 0;
-      let isBlockCoverage;
-      let merged;
-      let ranges;
-      let trees = [];
-      if (funcCovs.length === 1) {
-        functions.push(sortFunc(funcCovs[0]));
-        return;
-      }
-      funcCovs.forEach(function (funcCov) {
-        count += (
-          funcCov.count !== undefined
-          ? funcCov.count
-          : funcCov.ranges[0].count
-        );
-        if (funcCov.isBlockCoverage) {
-          trees.push(treeFromSortedRanges(funcCov.ranges));
-        }
-      });
-      if (trees.length > 0) {
-        isBlockCoverage = true;
-        ranges = treeToRanges(mergeTreeList(trees));
-      } else {
-        isBlockCoverage = false;
-        ranges = [
-          {
-            count,
-            endOffset: funcCovs[0].ranges[0].endOffset,
-            startOffset: funcCovs[0].ranges[0].startOffset
-          }
-        ];
-      }
-      merged = {
-        functionName: funcCovs[0].functionName,
-        isBlockCoverage,
-        ranges
-      };
-      if (count !== ranges[0].count) {
-        merged.count = count;
-      }
-      functions.push(merged);
-    });
-    resultMerged.push(sortScript({
-      functions,
-      scriptId: scriptCovs[0].scriptId,
-      url: scriptCovs[0].url
-    }));
-  });
-  Object.entries(resultMerged.sort(function (aa, bb) {
-    return (
-      aa.url > bb.url
-      ? 1
-      : -1
-    );
-  })).forEach(function ([
-    scriptId, scriptCov
-  ]) {
-    scriptCov.scriptId = scriptId.toString(10);
-  });
   return {
-    result: resultMerged
+   children: mergeTreeListToChildren(parentTrees),
+   delta: parentTrees.reduce(function (aa, bb) {
+    return aa + bb.delta;
+   }, 0),
+   end: parentTrees[0].end,
+   start: parentTrees[0].start
   };
+ }
+
+ function mergeTreeListToChildren(parentTrees) {
+  let openRange;
+  let parentToChildDict = new Map();   // Map parent to child.
+  let queueList;
+  let queueListIi = 0;
+  let queueOffset;
+  let queueTrees;
+  let resultChildren = [];
+  let startToTreeDict = new Map();  // Map tree.start to tree.
+  function nextXxx() {
+   let [
+    nextOffset, nextTrees
+   ] = queueList[queueListIi] || [];
+   let openRangeEnd;
+   if (queueTrees === undefined) {
+    queueListIi += 1;
+   } else if (nextOffset === undefined || nextOffset > queueOffset) {
+    nextOffset = queueOffset;
+    nextTrees = queueTrees;
+    queueTrees = undefined;
+   } else {
+    if (nextOffset === queueOffset) {
+     queueTrees.forEach(function (tree) {
+      nextTrees.push(tree);
+     });
+     queueTrees = undefined;
+    }
+    queueListIi += 1;
+   }
+   if (nextOffset === undefined) {
+    if (openRange !== undefined) {
+     resultAppendNextChild();
+    }
+    return true;
+   }
+   if (openRange !== undefined && openRange.end <= nextOffset) {
+    resultAppendNextChild();
+    openRange = undefined;
+   }
+   if (openRange === undefined) {
+    openRangeEnd = nextOffset + 1;
+    nextTrees.forEach(function ({
+     parentIi,
+     tree
+    }) {
+     openRangeEnd = Math.max(openRangeEnd, tree.end);
+     dictKeyValueAppend(parentToChildDict, parentIi, tree);
+    });
+    queueOffset = openRangeEnd;
+    openRange = {
+     end: openRangeEnd,
+     start: nextOffset
+    };
+   } else {
+    nextTrees.forEach(function ({
+     parentIi,
+     tree
+    }) {
+     let right;
+     if (tree.end > openRange.end) {
+      right = treeSplit(tree, openRange.end);
+      if (queueTrees === undefined) {
+       queueTrees = [];
+      }
+      queueTrees.push({
+       parentIi,
+       tree: right
+      });
+     }
+     dictKeyValueAppend(parentToChildDict, parentIi, tree);
+    });
+   }
+  }
+  function resultAppendNextChild() {
+   let treesMatching = [];
+   parentToChildDict.forEach(function (nested) {
+    if (
+     nested.length === 1
+     && nested[0].start === openRange.start
+     && nested[0].end === openRange.end
+    ) {
+     treesMatching.push(nested[0]);
+    } else {
+     treesMatching.push({
+      children: nested,
+      delta: 0,
+      end: openRange.end,
+      start: openRange.start
+     });
+    }
+   });
+   parentToChildDict.clear();
+   resultChildren.push(mergeTreeList(treesMatching));
+  }
+  function treeSplit(tree, offset) {
+   let child;
+   let ii = 0;
+   let leftChildLen = tree.children.length;
+   let mid;
+   let resultTree;
+   let rightChildren;
+   while (ii < tree.children.length) {
+    child = tree.children[ii];
+    if (child.start < offset && offset < child.end) {
+     mid = treeSplit(child, offset);
+     leftChildLen = ii + 1;
+     break;
+    }
+    if (child.start >= offset) {
+     leftChildLen = ii;
+     break;
+    }
+    ii += 1;
+   }
+   rightChildren = tree.children.splice(
+    leftChildLen,
+    tree.children.length - leftChildLen
+   );
+   if (mid !== undefined) {
+    rightChildren.unshift(mid);
+   }
+   resultTree = {
+    children: rightChildren,
+    delta: tree.delta,
+    end: tree.end,
+    start: offset
+   };
+   tree.end = offset;
+   return resultTree;
+  }
+  parentTrees.forEach(function (parentTree, parentIi) {
+   parentTree.children.forEach(function (child) {
+    dictKeyValueAppend(startToTreeDict, child.start, {
+     parentIi,
+     tree: child
+    });
+   });
+  });
+  queueList = Array.from(startToTreeDict).map(function ([
+   startOffset, trees
+  ]) {
+   return [
+    startOffset, trees
+   ];
+  }).sort(function (aa, bb) {
+   return aa[0] - bb[0];
+  });
+  while (true) {
+   if (nextXxx()) {
+    break;
+   }
+  }
+  return resultChildren;
+ }
+
+ function sortFunc(funcCov) {
+  funcCov.ranges = treeToRanges(treeFromSortedRanges(
+   funcCov.ranges.sort(compareRangeList)
+  ));
+  return funcCov;
+ }
+
+ function sortScript(scriptCov) {
+
+  scriptCov.functions.forEach(function (funcCov) {
+   sortFunc(funcCov);
+  });
+  scriptCov.functions.sort(function (aa, bb) {
+   return compareRangeList(aa.ranges[0], bb.ranges[0]);
+  });
+  return scriptCov;
+ }
+
+ function treeFromSortedRanges(ranges) {
+  let root;
+  let stack = [];   // Stack of parent trees and parent counts.
+  ranges.forEach(function (range) {
+   let node = {
+    children: [],
+    delta: range.count,
+    end: range.endOffset,
+    start: range.startOffset
+   };
+   let parent;
+   let parentCount;
+   if (root === undefined) {
+    root = node;
+    stack.push([
+     node, range.count
+    ]);
+    return;
+   }
+   while (true) {
+    [
+     parent, parentCount
+    ] = stack[stack.length - 1];
+    if (range.startOffset < parent.end) {
+     break;
+    }
+    stack.pop();
+   }
+   node.delta -= parentCount;
+   parent.children.push(node);
+   stack.push([
+    node, range.count
+   ]);
+  });
+  return root;
+ }
+
+ function treeToRanges(tree) {
+  let count;
+  let cur;
+  let ii;
+  let parentCount;
+  let ranges = [];
+  let stack = [     // Stack of parent trees and counts.
+   [
+    tree, 0
+   ]
+  ];
+  function normalizeRange(tree) {
+   let children = [];
+   let curEnd;
+   let head;
+   let tail = [];
+   function endChain() {
+    if (tail.length !== 0) {
+     head.end = tail[tail.length - 1].end;
+     tail.forEach(function (tailTree) {
+      tailTree.children.forEach(function (subChild) {
+       subChild.delta += tailTree.delta - head.delta;
+       head.children.push(subChild);
+      });
+     });
+     tail.length = 0;
+    }
+    normalizeRange(head);
+    children.push(head);
+   }
+   tree.children.forEach(function (child) {
+    if (head === undefined) {
+     head = child;
+    } else if (
+     child.delta === head.delta && child.start === curEnd
+    ) {
+     tail.push(child);
+    } else {
+     endChain();
+     head = child;
+    }
+    curEnd = child.end;
+   });
+   if (head !== undefined) {
+    endChain();
+   }
+   if (children.length === 1) {
+    if (
+     children[0].start === tree.start
+     && children[0].end === tree.end
+    ) {
+     tree.delta += children[0].delta;
+     tree.children = children[0].children;
+     return;
+    }
+   }
+   tree.children = children;
+  }
+  normalizeRange(tree);
+  while (stack.length > 0) {
+   [
+    cur, parentCount
+   ] = stack.pop();
+   count = parentCount + cur.delta;
+   ranges.push({
+    count,
+    endOffset: cur.end,
+    startOffset: cur.start
+   });
+   ii = cur.children.length - 1;
+   while (ii >= 0) {
+    stack.push([
+     cur.children[ii], count
+    ]);
+    ii -= 1;
+   }
+  }
+  return ranges;
+ }
+
+ if (processCovs.length === 0) {
+  return {
+   result: []
+  };
+ }
+ processCovs.forEach(function ({
+  result
+ }) {
+  result.forEach(function (scriptCov) {
+   dictKeyValueAppend(urlToScriptDict, scriptCov.url, scriptCov);
+  });
+ });
+ urlToScriptDict.forEach(function (scriptCovs) {
+
+  let functions = [];
+  let rangeToFuncDict = new Map();
+  if (scriptCovs.length === 1) {
+   resultMerged.push(sortScript(scriptCovs[0]));
+   return;
+  }
+  scriptCovs.forEach(function ({
+   functions
+  }) {
+   functions.forEach(function (funcCov) {
+    dictKeyValueAppend(
+     rangeToFuncDict,
+     (
+      funcCov.ranges[0].startOffset
+      + ";" + funcCov.ranges[0].endOffset
+     ),
+     funcCov
+    );
+   });
+  });
+  rangeToFuncDict.forEach(function (funcCovs) {
+
+   let count = 0;
+   let isBlockCoverage;
+   let merged;
+   let ranges;
+   let trees = [];
+   if (funcCovs.length === 1) {
+    functions.push(sortFunc(funcCovs[0]));
+    return;
+   }
+   funcCovs.forEach(function (funcCov) {
+    count += (
+     funcCov.count !== undefined
+     ? funcCov.count
+     : funcCov.ranges[0].count
+    );
+    if (funcCov.isBlockCoverage) {
+     trees.push(treeFromSortedRanges(funcCov.ranges));
+    }
+   });
+   if (trees.length > 0) {
+    isBlockCoverage = true;
+    ranges = treeToRanges(mergeTreeList(trees));
+   } else {
+    isBlockCoverage = false;
+    ranges = [
+     {
+      count,
+      endOffset: funcCovs[0].ranges[0].endOffset,
+      startOffset: funcCovs[0].ranges[0].startOffset
+     }
+    ];
+   }
+   merged = {
+    functionName: funcCovs[0].functionName,
+    isBlockCoverage,
+    ranges
+   };
+   if (count !== ranges[0].count) {
+    merged.count = count;
+   }
+   functions.push(merged);
+  });
+  resultMerged.push(sortScript({
+   functions,
+   scriptId: scriptCovs[0].scriptId,
+   url: scriptCovs[0].url
+  }));
+ });
+ Object.entries(resultMerged.sort(function (aa, bb) {
+  return (
+   aa.url > bb.url
+   ? 1
+   : -1
+  );
+ })).forEach(function ([
+  scriptId, scriptCov
+ ]) {
+  scriptCov.scriptId = scriptId.toString(10);
+ });
+ return {
+  result: resultMerged
+ };
 }
 async function v8CoverageReportCreate({
-  consoleError,
-  coverageDir,
-  processArgv = []
+ consoleError,
+ coverageDir,
+ processArgv = []
 }) {
-  let cwd;
-  let excludeList = [];
-  let exitCode = 0;
-  let fileDict;
-  let includeList = [];
-  let modeIncludeNodeModules;
-  let processArgElem;
-  let promiseList = [];
-  let v8CoverageObj;
+ let cwd;
+ let excludeList = [];
+ let exitCode = 0;
+ let fileDict;
+ let includeList = [];
+ let modeIncludeNodeModules;
+ let processArgElem;
+ let promiseList = [];
+ let v8CoverageObj;
 
-  function htmlRender({
-    fileList,
-    lineList,
-    modeIndex,
-    pathname
-  }) {
-    let html;
-    let padLines;
-    let padPathname;
-    let txt;
-    let txtBorder;
-    html = "";
-    html += String(`
+ function htmlRender({
+  fileList,
+  lineList,
+  modeIndex,
+  pathname
+ }) {
+  let html;
+  let padLines;
+  let padPathname;
+  let txt;
+  let txtBorder;
+  html = "";
+  html += String(`
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2868,115 +2868,115 @@ async function v8CoverageReportCreate({
 .coverage th,
 .coverage thead,
 .coverage tr {
-  box-sizing: border-box;
-  font-family: monospace;
+ box-sizing: border-box;
+ font-family: monospace;
 }
 /*csslint ignore:end*/
 
 /* css - coverage_report - general */
 body {
-  margin: 0;
+ margin: 0;
 }
 .coverage pre {
-  margin: 5px 0;
+ margin: 5px 0;
 }
 .coverage table {
-  border-collapse: collapse;
+ border-collapse: collapse;
 }
 .coverage td,
 .coverage th {
-  border: 1px solid #777;
-  line-height: 20px;
-  margin: 0;
-  padding: 5px 10px;
+ border: 1px solid #777;
+ line-height: 20px;
+ margin: 0;
+ padding: 5px 10px;
 }
 .coverage td span {
-  display: inline-block;
-  width: 100%;
+ display: inline-block;
+ width: 100%;
 }
 .coverage .content {
-  padding: 0 5px;
+ padding: 0 5px;
 }
 .coverage .content a {
-  text-decoration: none;
+ text-decoration: none;
 }
 .coverage .count {
-  margin: 0 5px;
-  padding: 0 5px;
+ margin: 0 5px;
+ padding: 0 5px;
 }
 .coverage .footer,
 .coverage .header {
-  padding: 20px;
+ padding: 20px;
 }
 .coverage .footer {
-  text-align: center;
+ text-align: center;
 }
 .coverage .percentbar {
-  height: 12px;
-  margin: 2px 0;
-  min-width: 200px;
-  position: relative;
-  width: 100%;
+ height: 12px;
+ margin: 2px 0;
+ min-width: 200px;
+ position: relative;
+ width: 100%;
 }
 .coverage .percentbar div {
-  height: 100%;
-  position: absolute;
+ height: 100%;
+ position: absolute;
 }
 .coverage .title {
-  font-size: large;
-  font-weight: bold;
-  margin-bottom: 10px;
+ font-size: large;
+ font-weight: bold;
+ margin-bottom: 10px;
 }
 
 /* css - coverage_report - color */
 .coverage td,
 .coverage th {
-  background: #fff;
+ background: #fff;
 }
 .coverage .count,
 .coverage .coverageHigh {
-  background: #9d9;
+ background: #9d9;
 }
 .coverage .count {
-  color: #333;
+ color: #333;
 }
 .coverage .coverageIgnore {
-  background: #ccc;
+ background: #ccc;
 }
 .coverage .coverageLow,
 .coverage .ignore {
-  background: #ccc;
+ background: #ccc;
 }
 .coverage .uncovered {
-  background: #ebb;
+ background: #ebb;
 }
 .coverage .coverageMedium {
-  background: #fd7;
+ background: #fd7;
 }
 .coverage .footer,
 .coverage .header,
 .coverage .lineno {
-  background: #ddd;
+ background: #ddd;
 }
 .coverage .percentbar {
-  background: #999;
+ background: #999;
 }
 .coverage .percentbar div {
-  background: #666;
+ background: #666;
 }
 
 /* css - coverage_report - important */
 .coverage pre:hover span,
 .coverage tr:hover td {
-  background: #7d7;
+ background: #7d7;
 }
 .coverage pre:hover span.ignore,
 .coverage tr:hover td.coverageIgnore {
-  background: #ccc;
+ background: #ccc;
 }
 .coverage pre:hover span.uncovered,
 .coverage tr:hover td.coverageLow {
-  background: #f99;
+ background: #f99;
 }
 </style>
 </head>
@@ -2986,535 +2986,535 @@ body {
 <div class="title">V8 Coverage Report</div>
 <table>
 <thead>
-  <tr>
-  <th>Files covered</th>
-  <th>Lines</th>
-  <th>Remaining</th>
-  </tr>
+ <tr>
+ <th>Files covered</th>
+ <th>Lines</th>
+ <th>Remaining</th>
+ </tr>
 </thead>
 <tbody>
-    `).trim() + "\n";
-    if (modeIndex) {
-      padLines = String("(ignore) 100.00 %").length;
-      padPathname = 32;
-      fileList.unshift({
-        linesCovered: 0,
-        linesTotal: 0,
-        modeCoverageIgnoreFile: "",
-        pathname: "./"
-      });
-      fileList.slice(1).forEach(function ({
-        linesCovered,
-        linesTotal,
-        modeCoverageIgnoreFile,
-        pathname
-      }) {
-        if (!modeCoverageIgnoreFile) {
-          fileList[0].linesCovered += linesCovered;
-          fileList[0].linesTotal += linesTotal;
-        }
-        padPathname = Math.max(padPathname, pathname.length + 2);
-        padLines = Math.max(
-          padLines,
-          String(linesCovered + " / " + linesTotal).length
-        );
-      });
+  `).trim() + "\n";
+  if (modeIndex) {
+   padLines = String("(ignore) 100.00 %").length;
+   padPathname = 32;
+   fileList.unshift({
+    linesCovered: 0,
+    linesTotal: 0,
+    modeCoverageIgnoreFile: "",
+    pathname: "./"
+   });
+   fileList.slice(1).forEach(function ({
+    linesCovered,
+    linesTotal,
+    modeCoverageIgnoreFile,
+    pathname
+   }) {
+    if (!modeCoverageIgnoreFile) {
+     fileList[0].linesCovered += linesCovered;
+     fileList[0].linesTotal += linesTotal;
     }
-    txtBorder = (
-      "+" + "-".repeat(padPathname + 2) + "+"
-      + "-".repeat(padLines + 2) + "+"
-      + "-".repeat(padLines + 2) + "+\n"
+    padPathname = Math.max(padPathname, pathname.length + 2);
+    padLines = Math.max(
+     padLines,
+     String(linesCovered + " / " + linesTotal).length
     );
-    txt = "";
-    txt += "V8 Coverage Report\n";
-    txt += txtBorder;
-    txt += (
-      "| " + String("Files covered").padEnd(padPathname, " ") + " | "
-      + String("Lines").padStart(padLines, " ") + " | "
-      + String("Remaining").padStart(padLines, " ") + " |\n"
+   });
+  }
+  txtBorder = (
+   "+" + "-".repeat(padPathname + 2) + "+"
+   + "-".repeat(padLines + 2) + "+"
+   + "-".repeat(padLines + 2) + "+\n"
+  );
+  txt = "";
+  txt += "V8 Coverage Report\n";
+  txt += txtBorder;
+  txt += (
+   "| " + String("Files covered").padEnd(padPathname, " ") + " | "
+   + String("Lines").padStart(padLines, " ") + " | "
+   + String("Remaining").padStart(padLines, " ") + " |\n"
+  );
+  txt += txtBorder;
+  fileList.forEach(function ({
+   linesCovered,
+   linesTotal,
+   modeCoverageIgnoreFile,
+   pathname
+  }, ii) {
+   let coverageLevel;
+   let coveragePct;
+   let fill;
+   let str1;
+   let str2;
+   let xx1;
+   let xx2;
+   coveragePct = Math.floor(10000 * linesCovered / linesTotal || 0);
+   coverageLevel = (
+    modeCoverageIgnoreFile
+    ? "coverageIgnore"
+    : coveragePct >= 8000
+    ? "coverageHigh"
+    : coveragePct >= 5000
+    ? "coverageMedium"
+    : "coverageLow"
+   );
+   coveragePct = String(coveragePct).replace((
+    /..$/m
+   ), ".$&");
+   if (modeIndex && ii === 0) {
+    fill = (
+     "#" + Math.round(
+      (100 - Number(coveragePct)) * 2.21
+     ).toString(16).padStart(2, "0")
+     + Math.round(
+      Number(coveragePct) * 2.21
+     ).toString(16).padStart(2, "0")
+     + "00"
     );
-    txt += txtBorder;
-    fileList.forEach(function ({
-      linesCovered,
-      linesTotal,
-      modeCoverageIgnoreFile,
-      pathname
-    }, ii) {
-      let coverageLevel;
-      let coveragePct;
-      let fill;
-      let str1;
-      let str2;
-      let xx1;
-      let xx2;
-      coveragePct = Math.floor(10000 * linesCovered / linesTotal || 0);
-      coverageLevel = (
-        modeCoverageIgnoreFile
-        ? "coverageIgnore"
-        : coveragePct >= 8000
-        ? "coverageHigh"
-        : coveragePct >= 5000
-        ? "coverageMedium"
-        : "coverageLow"
-      );
-      coveragePct = String(coveragePct).replace((
-        /..$/m
-      ), ".$&");
-      if (modeIndex && ii === 0) {
-        fill = (
-          "#" + Math.round(
-            (100 - Number(coveragePct)) * 2.21
-          ).toString(16).padStart(2, "0")
-          + Math.round(
-            Number(coveragePct) * 2.21
-          ).toString(16).padStart(2, "0")
-          + "00"
-        );
-        str1 = "coverage";
-        str2 = coveragePct + " %";
-        xx1 = 6 * str1.length + 20;
-        xx2 = 6 * str2.length + 20;
-        promiseList.push(fsWriteFileWithParents((
-          coverageDir + "coverage_badge.svg"
-        ), String(`
+    str1 = "coverage";
+    str2 = coveragePct + " %";
+    xx1 = 6 * str1.length + 20;
+    xx2 = 6 * str2.length + 20;
+    promiseList.push(fsWriteFileWithParents((
+     coverageDir + "coverage_badge.svg"
+    ), String(`
 <svg height="20" width="${xx1 + xx2}" xmlns="http://www.w3.org/2000/svg">
 <rect fill="#555" height="20" width="${xx1 + xx2}"/>
 <rect fill="${fill}" height="20" width="${xx2}" x="${xx1}"/>
 <g
-  fill="#fff"
-  font-family="verdana, geneva, dejavu sans, sans-serif"
-  font-size="11"
-  font-weight="bold"
-  text-anchor="middle"
+ fill="#fff"
+ font-family="verdana, geneva, dejavu sans, sans-serif"
+ font-size="11"
+ font-weight="bold"
+ text-anchor="middle"
 >
 <text x="${0.5 * xx1}" y="14">${str1}</text>
 <text x="${xx1 + 0.5 * xx2}" y="14">${str2}</text>
 </g>
 </svg>
-        `).trim() + "\n"));
-        pathname = "";
-      }
-      txt += (
-        "| "
-        + String("./" + pathname).padEnd(padPathname, " ") + " | "
-        + String(
-          modeCoverageIgnoreFile + " " + coveragePct + " %"
-        ).padStart(padLines, " ") + " | "
-        + " ".repeat(padLines) + " |\n"
-      );
-      txt += (
-        "| " + "*".repeat(
-          Math.round(0.01 * coveragePct * padPathname)
-        ).padEnd(padPathname, "_") + " | "
-        + String(
-          linesCovered + " / " + linesTotal
-        ).padStart(padLines, " ") + " | "
-        + String(
-          (linesTotal - linesCovered) + " / " + linesTotal
-        ).padStart(padLines, " ") + " |\n"
-      );
-      txt += txtBorder;
-      pathname = htmlEscape(pathname);
-      html += String(`
-  <tr>
-  <td class="${coverageLevel}">
-      ${(
-        modeIndex
-        ? (
-          "<a href=\"" + (pathname || "index") + ".html\">. / "
-          + pathname + "</a><br>"
-        )
-        : (
-          "<a href=\""
-          + "../".repeat(pathname.split("/").length - 1)
-          + "index.html\">. / </a>"
-          + pathname + "<br>"
-        )
-      )}
-    <div class="percentbar">
-      <div style="width: ${coveragePct}%;"></div>
-    </div>
-  </td>
-  <td style="text-align: right;">
-    ${modeCoverageIgnoreFile} ${coveragePct} %<br>
-    ${linesCovered} / ${linesTotal}
-  </td>
-  <td style="text-align: right;">
-    <br>
-    ${linesTotal - linesCovered} / ${linesTotal}
-  </td>
-  </tr>
-    `).trim() + "\n";
-    });
-    html += String(`
+    `).trim() + "\n"));
+    pathname = "";
+   }
+   txt += (
+    "| "
+    + String("./" + pathname).padEnd(padPathname, " ") + " | "
+    + String(
+     modeCoverageIgnoreFile + " " + coveragePct + " %"
+    ).padStart(padLines, " ") + " | "
+    + " ".repeat(padLines) + " |\n"
+   );
+   txt += (
+    "| " + "*".repeat(
+     Math.round(0.01 * coveragePct * padPathname)
+    ).padEnd(padPathname, "_") + " | "
+    + String(
+     linesCovered + " / " + linesTotal
+    ).padStart(padLines, " ") + " | "
+    + String(
+     (linesTotal - linesCovered) + " / " + linesTotal
+    ).padStart(padLines, " ") + " |\n"
+   );
+   txt += txtBorder;
+   pathname = htmlEscape(pathname);
+   html += String(`
+ <tr>
+ <td class="${coverageLevel}">
+   ${(
+    modeIndex
+    ? (
+     "<a href=\"" + (pathname || "index") + ".html\">. / "
+     + pathname + "</a><br>"
+    )
+    : (
+     "<a href=\""
+     + "../".repeat(pathname.split("/").length - 1)
+     + "index.html\">. / </a>"
+     + pathname + "<br>"
+    )
+   )}
+  <div class="percentbar">
+   <div style="width: ${coveragePct}%;"></div>
+  </div>
+ </td>
+ <td style="text-align: right;">
+  ${modeCoverageIgnoreFile} ${coveragePct} %<br>
+  ${linesCovered} / ${linesTotal}
+ </td>
+ <td style="text-align: right;">
+  <br>
+  ${linesTotal - linesCovered} / ${linesTotal}
+ </td>
+ </tr>
+  `).trim() + "\n";
+  });
+  html += String(`
 </tbody>
 </table>
 </div>
 <!-- header end -->
-    `).trim() + "\n";
-    if (!modeIndex) {
-      html += String(`
+  `).trim() + "\n";
+  if (!modeIndex) {
+   html += String(`
 <!-- content start -->
 <div class="content">
-      `).trim() + "\n";
-      lineList.forEach(function ({
-        count,
-        holeList,
-        ignoreLine,
-        line,
-        startOffset
-      }, ii) {
-        let chunk;
-        let inHole;
-        let lineHtml;
-        let lineId;
-        lineHtml = "";
-        lineId = "line_" + (ii + 1);
-        switch (count) {
-        case -1:
-        case 0:
-          if (holeList.length === 0) {
-            lineHtml += "</span>";
-            lineHtml += "<span class=\"uncovered\">";
-            lineHtml += htmlEscape(line);
-            break;
-          }
-          line = line.split("").map(function (char) {
-            return {
-              char,
-              isHole: undefined
-            };
-          });
-          holeList.forEach(function ([
-            aa, bb
-          ]) {
-            aa = Math.max(aa - startOffset, 0);
-            bb = Math.min(bb - startOffset, line.length);
-            while (aa < bb) {
-              line[aa].isHole = true;
-              aa += 1;
-            }
-          });
-          chunk = "";
-          line.forEach(function ({
-            char,
-            isHole
-          }) {
-            if (inHole !== isHole) {
-              lineHtml += htmlEscape(chunk);
-              lineHtml += "</span><span";
-              if (isHole) {
-                lineHtml += (
-                  ignoreLine
-                  ? " class=\"ignore\""
-                  : " class=\"uncovered\""
-                );
-              }
-              lineHtml += ">";
-              chunk = "";
-              inHole = isHole;
-            }
-            chunk += char;
-          });
-          lineHtml += htmlEscape(chunk);
-          break;
-        default:
-          lineHtml += htmlEscape(line);
-        }
-        html += String(`
+   `).trim() + "\n";
+   lineList.forEach(function ({
+    count,
+    holeList,
+    ignoreLine,
+    line,
+    startOffset
+   }, ii) {
+    let chunk;
+    let inHole;
+    let lineHtml;
+    let lineId;
+    lineHtml = "";
+    lineId = "line_" + (ii + 1);
+    switch (count) {
+    case -1:
+    case 0:
+     if (holeList.length === 0) {
+      lineHtml += "</span>";
+      lineHtml += "<span class=\"uncovered\">";
+      lineHtml += htmlEscape(line);
+      break;
+     }
+     line = line.split("").map(function (char) {
+      return {
+       char,
+       isHole: undefined
+      };
+     });
+     holeList.forEach(function ([
+      aa, bb
+     ]) {
+      aa = Math.max(aa - startOffset, 0);
+      bb = Math.min(bb - startOffset, line.length);
+      while (aa < bb) {
+       line[aa].isHole = true;
+       aa += 1;
+      }
+     });
+     chunk = "";
+     line.forEach(function ({
+      char,
+      isHole
+     }) {
+      if (inHole !== isHole) {
+       lineHtml += htmlEscape(chunk);
+       lineHtml += "</span><span";
+       if (isHole) {
+        lineHtml += (
+         ignoreLine
+         ? " class=\"ignore\""
+         : " class=\"uncovered\""
+        );
+       }
+       lineHtml += ">";
+       chunk = "";
+       inHole = isHole;
+      }
+      chunk += char;
+     });
+     lineHtml += htmlEscape(chunk);
+     break;
+    default:
+     lineHtml += htmlEscape(line);
+    }
+    html += String(`
 <pre>
 <span class="lineno">
 <a href="#${lineId}" id="${lineId}">${String(ii + 1).padStart(5, " ")}.</a>
 </span>
 <span class="count
-        ${(
-          (count <= 0 && ignoreLine)
-          ? "ignore"
-          : count <= 0
-          ? "uncovered"
-          : ""
-        )}"
+    ${(
+     (count <= 0 && ignoreLine)
+     ? "ignore"
+     : count <= 0
+     ? "uncovered"
+     : ""
+    )}"
 >
 ${String(count || "-0").padStart(7, " ")}
 </span>
 <span>${lineHtml}</span>
 </pre>
-        `).replace((
-          /\n/g
-        ), "").trim() + "\n";
-      });
-      html += String(`
+    `).replace((
+     /\n/g
+    ), "").trim() + "\n";
+   });
+   html += String(`
 </div>
 <!-- content end -->
-      `).trim() + "\n";
-    }
-    html += String(`
+   `).trim() + "\n";
+  }
+  html += String(`
 <div class="footer">
-  [
-  This document was created with
-  <a href="https://github.com/jslint-org/jslint">JSLint</a>
-  ]
+ [
+ This document was created with
+ <a href="https://github.com/jslint-org/jslint">JSLint</a>
+ ]
 </div>
 </body>
 </html>
-    `).trim() + "\n";
-    promiseList.push(fsWriteFileWithParents(pathname + ".html", html));
-    if (!modeIndex) {
-      return;
-    }
-    consoleError("\n" + txt);
-    promiseList.push(fsWriteFileWithParents((
-      coverageDir + "coverage_report.txt"
-    ), txt));
+  `).trim() + "\n";
+  promiseList.push(fsWriteFileWithParents(pathname + ".html", html));
+  if (!modeIndex) {
+   return;
   }
+  consoleError("\n" + txt);
+  promiseList.push(fsWriteFileWithParents((
+   coverageDir + "coverage_report.txt"
+  ), txt));
+ }
 
 /*
 function sentinel() {}
 */
 
-  await moduleFsInit();
-  consoleError = consoleError || console.error;
-  cwd = process.cwd().replace((
-    /\\/g
-  ), "/") + "/";
-  assertOrThrow(coverageDir, "invalid coverageDir " + coverageDir);
-  coverageDir = modulePath.resolve(coverageDir).replace((
-    /\\/g
-  ), "/") + "/";
+ await moduleFsInit();
+ consoleError = consoleError || console.error;
+ cwd = process.cwd().replace((
+  /\\/g
+ ), "/") + "/";
+ assertOrThrow(coverageDir, "invalid coverageDir " + coverageDir);
+ coverageDir = modulePath.resolve(coverageDir).replace((
+  /\\/g
+ ), "/") + "/";
 
-  processArgv = processArgv.slice();
-  while (processArgv[0] && processArgv[0][0] === "-") {
-    processArgElem = processArgv.shift().split("=");
-    processArgElem[1] = processArgElem.slice(1).join("=");
-    switch (processArgElem[0]) {
-    case "--exclude":
-      excludeList.push(processArgElem[1]);
-      break;
-    case "--include":
-      includeList.push(processArgElem[1]);
-      break;
-    case "--include-node-modules":
-      modeIncludeNodeModules = !(
-        /0|false|null|undefined/
-      ).test(processArgElem[1]);
-      break;
-    }
+ processArgv = processArgv.slice();
+ while (processArgv[0] && processArgv[0][0] === "-") {
+  processArgElem = processArgv.shift().split("=");
+  processArgElem[1] = processArgElem.slice(1).join("=");
+  switch (processArgElem[0]) {
+  case "--exclude":
+   excludeList.push(processArgElem[1]);
+   break;
+  case "--include":
+   includeList.push(processArgElem[1]);
+   break;
+  case "--include-node-modules":
+   modeIncludeNodeModules = !(
+    /0|false|null|undefined/
+   ).test(processArgElem[1]);
+   break;
   }
-  if (processArgv.length > 0) {
-    await fsWriteFileWithParents(coverageDir + "/touch.txt", "");
-    await Promise.all(Array.from(
-      await moduleFs.promises.readdir(coverageDir)
-    ).map(async function (file) {
-      if ((
-        /^coverage-\d+?-\d+?-\d+?\.json$/
-      ).test(file)) {
-        consoleError("rm file " + coverageDir + file);
-        await moduleFs.promises.unlink(coverageDir + file);
-      }
-    }));
-    exitCode = await new Promise(function (resolve) {
-      let processArgv0 = processArgv[0];
-      if (processArgv0 === "npm") {
-        processArgv0 = process.platform.replace(
-          "win32",
-          "npm.cmd"
-        ).replace(
-          process.platform,
-          "npm"
-        );
-      }
-      moduleChildProcess.spawn(
-        processArgv0,
-        processArgv.slice(1),
-        {
-          env: Object.assign({}, process.env, {
-            NODE_V8_COVERAGE: coverageDir
-          }),
-          shell: (
-            processArgv0.endsWith(".bat")
-            || processArgv0.endsWith(".cmd")
-          ),
-          stdio: ["ignore", 1, 2]
-        }
-      ).on("exit", resolve);
-    });
-    consoleError(
-      `v8CoverageReportCreate - program exited with exitCode=${exitCode}`
+ }
+ if (processArgv.length > 0) {
+  await fsWriteFileWithParents(coverageDir + "/touch.txt", "");
+  await Promise.all(Array.from(
+   await moduleFs.promises.readdir(coverageDir)
+  ).map(async function (file) {
+   if ((
+    /^coverage-\d+?-\d+?-\d+?\.json$/
+   ).test(file)) {
+    consoleError("rm file " + coverageDir + file);
+    await moduleFs.promises.unlink(coverageDir + file);
+   }
+  }));
+  exitCode = await new Promise(function (resolve) {
+   let processArgv0 = processArgv[0];
+   if (processArgv0 === "npm") {
+    processArgv0 = process.platform.replace(
+     "win32",
+     "npm.cmd"
+    ).replace(
+     process.platform,
+     "npm"
     );
-  }
-  consoleError("v8CoverageReportCreate - merging coverage files...");
-  v8CoverageObj = await moduleFs.promises.readdir(coverageDir);
-  v8CoverageObj = v8CoverageObj.filter(function (file) {
-    return (
-      /^coverage-\d+?-\d+?-\d+?\.json$/
-    ).test(file);
-  });
-  v8CoverageObj = await Promise.all(v8CoverageObj.map(async function (file) {
-    let data;
-    let pathnameDict = Object.create(null);
-    data = await moduleFs.promises.readFile(coverageDir + file, "utf8");
-    data = JSON.parse(data);
-    data.result.forEach(function (scriptCov) {
-      let pathname = scriptCov.url;
-      if (!pathname.startsWith("file:///")) {
-        return;
-      }
-      pathname = moduleUrl.fileURLToPath(pathname);
-      pathname = modulePath.resolve(pathname).replace((
-        /\\/g
-      ), "/");
-      if (pathname.indexOf("[") >= 0 || !pathname.startsWith(cwd)) {
-        return;
-      }
-      pathname = pathname.slice(cwd.length);
-      scriptCov.url = pathname;
-      pathnameDict[pathname] = scriptCov;
-    });
-    if (!modeIncludeNodeModules) {
-      excludeList.push("node_modules/");
+   }
+   moduleChildProcess.spawn(
+    processArgv0,
+    processArgv.slice(1),
+    {
+     env: Object.assign({}, process.env, {
+      NODE_V8_COVERAGE: coverageDir
+     }),
+     shell: (
+      processArgv0.endsWith(".bat")
+      || processArgv0.endsWith(".cmd")
+     ),
+     stdio: ["ignore", 1, 2]
     }
-    data.result = globExclude({
-      excludeList,
-      includeList,
-      pathnameList: Object.keys(pathnameDict)
-    }).pathnameList.map(function (pathname) {
-      return pathnameDict[pathname];
-    });
-    return data;
-  }));
-  v8CoverageObj = v8CoverageListMerge(v8CoverageObj);
-  await fsWriteFileWithParents(
-    coverageDir + "v8_coverage_merged.json",
-    JSON.stringify(v8CoverageObj, undefined, 1)
-  );
-  consoleError("v8CoverageReportCreate - creating html-coverage-report...");
-  fileDict = Object.create(null);
-  await Promise.all(v8CoverageObj.result.map(async function ({
-    functions,
-    url: pathname
-  }) {
-    let ignoreBlock = false;
-    let lineList;
-    let linesCovered;
-    let linesTotal;
-    let source;
-    source = await moduleFs.promises.readFile(pathname, "utf8");
-    lineList = [{}];
-    source.replace((
-      /^.*$/gm
-    ), function (line, startOffset) {
-      if (line === "/*coverage-disable*/") {
-        ignoreBlock = true;
-      }
-      lineList[lineList.length - 1].endOffset = startOffset - 1;
-      lineList.push({
-        count: -1,
-        endOffset: 0,
-        holeList: [],
-        ignoreLine: (
-          ignoreBlock || line.endsWith("//coverage-ignore-line")
-        ),
-        line,
-        startOffset
-      });
-      if (line === "/*coverage-enable*/") {
-        ignoreBlock = false;
-      }
-      return "";
-    });
-    lineList.shift();
-    lineList[lineList.length - 1].endOffset = source.length;
-    functions.reverse().forEach(function ({
-      ranges
-    }) {
-      ranges.reverse().forEach(function ({
-        count,
-        endOffset,
-        startOffset
-      }, ii, list) {
-        lineList.forEach(function (elem) {
-          if (!(
-            (
-              elem.startOffset <= startOffset
-              && startOffset <= elem.endOffset
-            ) || (
-              elem.startOffset <= endOffset
-              && endOffset <= elem.endOffset
-            ) || (
-              startOffset <= elem.startOffset
-              && elem.endOffset <= endOffset
-            )
-          )) {
-            return;
-          }
-          if (ii + 1 === list.length) {
-            if (elem.count === -1) {
-              elem.count = count;
-            }
-            return;
-          }
-          if (elem.count !== 0) {
-            elem.count = Math.max(count, elem.count);
-          }
-          if (count === 0) {
-            elem.count = 0;
-            elem.holeList.push([
-              startOffset, endOffset
-            ]);
-          }
-        });
-      });
-    });
-    linesTotal = lineList.length;
-    linesCovered = 0;
-    lineList.forEach(function ({
-      count,
-      ignoreLine
-    }) {
-      linesCovered += count > 0 || ignoreLine;
-    });
-    await moduleFs.promises.mkdir((
-      modulePath.dirname(coverageDir + pathname)
-    ), {
-      recursive: true
-    });
-    fileDict[pathname] = {
-      lineList,
-      linesCovered,
-      linesTotal,
-      modeCoverageIgnoreFile: (
-        (
-          /^\/\*coverage-ignore-file\*\/$/m
-        ).test(source.slice(0, 65536))
-        ? "(ignore)"
-        : ""
-      ),
-      pathname
-    };
-    htmlRender({
-      fileList: [
-        fileDict[pathname]
-      ],
-      lineList,
-      pathname: coverageDir + pathname
-    });
-  }));
-  htmlRender({
-    fileList: Object.keys(fileDict).sort().map(function (pathname) {
-      return fileDict[pathname];
-    }),
-    modeIndex: true,
-    pathname: coverageDir + "index"
+   ).on("exit", resolve);
   });
-  await Promise.all(promiseList);
-  assertOrThrow(
-    exitCode === 0,
-    "v8CoverageReportCreate - nonzero exitCode " + exitCode
+  consoleError(
+   `v8CoverageReportCreate - program exited with exitCode=${exitCode}`
   );
+ }
+ consoleError("v8CoverageReportCreate - merging coverage files...");
+ v8CoverageObj = await moduleFs.promises.readdir(coverageDir);
+ v8CoverageObj = v8CoverageObj.filter(function (file) {
+  return (
+   /^coverage-\d+?-\d+?-\d+?\.json$/
+  ).test(file);
+ });
+ v8CoverageObj = await Promise.all(v8CoverageObj.map(async function (file) {
+  let data;
+  let pathnameDict = Object.create(null);
+  data = await moduleFs.promises.readFile(coverageDir + file, "utf8");
+  data = JSON.parse(data);
+  data.result.forEach(function (scriptCov) {
+   let pathname = scriptCov.url;
+   if (!pathname.startsWith("file:///")) {
+    return;
+   }
+   pathname = moduleUrl.fileURLToPath(pathname);
+   pathname = modulePath.resolve(pathname).replace((
+    /\\/g
+   ), "/");
+   if (pathname.indexOf("[") >= 0 || !pathname.startsWith(cwd)) {
+    return;
+   }
+   pathname = pathname.slice(cwd.length);
+   scriptCov.url = pathname;
+   pathnameDict[pathname] = scriptCov;
+  });
+  if (!modeIncludeNodeModules) {
+   excludeList.push("node_modules/");
+  }
+  data.result = globExclude({
+   excludeList,
+   includeList,
+   pathnameList: Object.keys(pathnameDict)
+  }).pathnameList.map(function (pathname) {
+   return pathnameDict[pathname];
+  });
+  return data;
+ }));
+ v8CoverageObj = v8CoverageListMerge(v8CoverageObj);
+ await fsWriteFileWithParents(
+  coverageDir + "v8_coverage_merged.json",
+  JSON.stringify(v8CoverageObj, undefined, 1)
+ );
+ consoleError("v8CoverageReportCreate - creating html-coverage-report...");
+ fileDict = Object.create(null);
+ await Promise.all(v8CoverageObj.result.map(async function ({
+  functions,
+  url: pathname
+ }) {
+  let ignoreBlock = false;
+  let lineList;
+  let linesCovered;
+  let linesTotal;
+  let source;
+  source = await moduleFs.promises.readFile(pathname, "utf8");
+  lineList = [{}];
+  source.replace((
+   /^.*$/gm
+  ), function (line, startOffset) {
+   if (line === "/*coverage-disable*/") {
+    ignoreBlock = true;
+   }
+   lineList[lineList.length - 1].endOffset = startOffset - 1;
+   lineList.push({
+    count: -1,
+    endOffset: 0,
+    holeList: [],
+    ignoreLine: (
+     ignoreBlock || line.endsWith("//coverage-ignore-line")
+    ),
+    line,
+    startOffset
+   });
+   if (line === "/*coverage-enable*/") {
+    ignoreBlock = false;
+   }
+   return "";
+  });
+  lineList.shift();
+  lineList[lineList.length - 1].endOffset = source.length;
+  functions.reverse().forEach(function ({
+   ranges
+  }) {
+   ranges.reverse().forEach(function ({
+    count,
+    endOffset,
+    startOffset
+   }, ii, list) {
+    lineList.forEach(function (elem) {
+     if (!(
+      (
+       elem.startOffset <= startOffset
+       && startOffset <= elem.endOffset
+      ) || (
+       elem.startOffset <= endOffset
+       && endOffset <= elem.endOffset
+      ) || (
+       startOffset <= elem.startOffset
+       && elem.endOffset <= endOffset
+      )
+     )) {
+      return;
+     }
+     if (ii + 1 === list.length) {
+      if (elem.count === -1) {
+       elem.count = count;
+      }
+      return;
+     }
+     if (elem.count !== 0) {
+      elem.count = Math.max(count, elem.count);
+     }
+     if (count === 0) {
+      elem.count = 0;
+      elem.holeList.push([
+       startOffset, endOffset
+      ]);
+     }
+    });
+   });
+  });
+  linesTotal = lineList.length;
+  linesCovered = 0;
+  lineList.forEach(function ({
+   count,
+   ignoreLine
+  }) {
+   linesCovered += count > 0 || ignoreLine;
+  });
+  await moduleFs.promises.mkdir((
+   modulePath.dirname(coverageDir + pathname)
+  ), {
+   recursive: true
+  });
+  fileDict[pathname] = {
+   lineList,
+   linesCovered,
+   linesTotal,
+   modeCoverageIgnoreFile: (
+    (
+     /^\/\*coverage-ignore-file\*\/$/m
+    ).test(source.slice(0, 65536))
+    ? "(ignore)"
+    : ""
+   ),
+   pathname
+  };
+  htmlRender({
+   fileList: [
+    fileDict[pathname]
+   ],
+   lineList,
+   pathname: coverageDir + pathname
+  });
+ }));
+ htmlRender({
+  fileList: Object.keys(fileDict).sort().map(function (pathname) {
+   return fileDict[pathname];
+  }),
+  modeIndex: true,
+  pathname: coverageDir + "index"
+ });
+ await Promise.all(promiseList);
+ assertOrThrow(
+  exitCode === 0,
+  "v8CoverageReportCreate - nonzero exitCode " + exitCode
+ );
 }
 v8CoverageReportCreate({
-  coverageDir: ".artifact/coverage",
-  processArgv: process.argv.slice(2)
+ coverageDir: ".artifact/coverage",
+ processArgv: process.argv.slice(2)
 });
 ' 0 "$@" # '
 )}
