@@ -1615,8 +1615,7 @@ shImageLogoCreate() {(set -e
     shBrowserScreenshot asset_image_logo_256.html \
         "-screenshot=$(node --print "path.resolve(process.argv[1])" "$FILE")"
     gm mogrify -crop 256x256 "$FILE"
-    printf \
-"shImageLogoCreate - wrote - $FILE\n" 1>&2
+    printf "shImageLogoCreate - wrote - $FILE\n" 1>&2
     # convert to svg @ https://convertio.co/png-svg/
 )}
 
@@ -2939,12 +2938,15 @@ body {
   background: #9d9;
 }
 .coverage .count {
-  color: #666;
+  color: #333;
 }
 .coverage .coverageIgnore {
   background: #ccc;
 }
 .coverage .coverageLow,
+.coverage .ignore {
+  background: #ccc;
+}
 .coverage .uncovered {
   background: #ebb;
 }
@@ -2967,6 +2969,10 @@ body {
 .coverage pre:hover span,
 .coverage tr:hover td {
   background: #7d7;
+}
+.coverage pre:hover span.ignore,
+.coverage tr:hover td.coverageIgnore {
+  background: #ccc;
 }
 .coverage pre:hover span.uncovered,
 .coverage tr:hover td.coverageLow {
@@ -3154,6 +3160,7 @@ body {
       lineList.forEach(function ({
         count,
         holeList,
+        ignoreLine,
         line,
         startOffset
       }, ii) {
@@ -3197,7 +3204,11 @@ body {
               lineHtml += htmlEscape(chunk);
               lineHtml += "</span><span";
               if (isHole) {
-                lineHtml += " class=\"uncovered\"";
+                lineHtml += (
+                  ignoreLine
+                  ? " class=\"ignore\""
+                  : " class=\"uncovered\""
+                );
               }
               lineHtml += ">";
               chunk = "";
@@ -3217,7 +3228,9 @@ body {
 </span>
 <span class="count
         ${(
-          count <= 0
+          (count <= 0 && ignoreLine)
+          ? "ignore"
+          : count <= 0
           ? "uncovered"
           : ""
         )}"
@@ -3380,6 +3393,7 @@ function sentinel() {}
     functions,
     url: pathname
   }) {
+    let ignoreBlock = false;
     let lineList;
     let linesCovered;
     let linesTotal;
@@ -3389,14 +3403,23 @@ function sentinel() {}
     source.replace((
       /^.*$/gm
     ), function (line, startOffset) {
+      if (line === "/*coverage-disable*/") {
+        ignoreBlock = true;
+      }
       lineList[lineList.length - 1].endOffset = startOffset - 1;
       lineList.push({
         count: -1,
         endOffset: 0,
         holeList: [],
+        ignoreLine: (
+          ignoreBlock || line.endsWith("//coverage-ignore-line")
+        ),
         line,
         startOffset
       });
+      if (line === "/*coverage-enable*/") {
+        ignoreBlock = false;
+      }
       return "";
     });
     lineList.shift();
@@ -3443,11 +3466,13 @@ function sentinel() {}
       });
     });
     linesTotal = lineList.length;
-    linesCovered = lineList.filter(function ({
-      count
+    linesCovered = 0;
+    lineList.forEach(function ({
+      count,
+      ignoreLine
     }) {
-      return count > 0;
-    }).length;
+      linesCovered += count > 0 || ignoreLine;
+    });
     await moduleFs.promises.mkdir((
       modulePath.dirname(coverageDir + pathname)
     ), {

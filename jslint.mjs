@@ -106,9 +106,9 @@
     formatted_message, free, freeze, from, froms, fsWriteFileWithParents,
     fud_stmt, functionName, function_list, function_stack, functions, get,
     getset, github_repo, globExclude, global, global_dict, global_list,
-    holeList, htmlEscape, id, identifier, import, import_list, import_meta_url,
-    inc, includeList, indent2, index, indexOf, init, initial, isArray,
-    isBlockCoverage, isHole, isNaN, is_equal, is_weird, join, jslint,
+    holeList, htmlEscape, id, identifier, ignoreLine, import, import_list,
+    import_meta_url, inc, includeList, indent2, index, indexOf, init, initial,
+    isArray, isBlockCoverage, isHole, isNaN, is_equal, is_weird, join, jslint,
     jslint_apidoc, jslint_assert, jslint_charset_ascii, jslint_cli,
     jslint_edition, jslint_phase1_split, jslint_phase2_lex, jslint_phase3_parse,
     jslint_phase4_walk, jslint_phase5_whitage, jslint_report, json,
@@ -163,7 +163,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2025.3.31";
+let jslint_edition = "v2025.9.1-beta";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -10882,12 +10882,15 @@ body {
     background: #9d9;
 }
 .coverage .count {
-    color: #666;
+    color: #333;
 }
 .coverage .coverageIgnore {
     background: #ccc;
 }
 .coverage .coverageLow,
+.coverage .ignore {
+    background: #ccc;
+}
 .coverage .uncovered {
     background: #ebb;
 }
@@ -10910,6 +10913,10 @@ body {
 .coverage pre:hover span,
 .coverage tr:hover td {
     background: #7d7;
+}
+.coverage pre:hover span.ignore,
+.coverage tr:hover td.coverageIgnore {
+    background: #ccc;
 }
 .coverage pre:hover span.uncovered,
 .coverage tr:hover td.coverageLow {
@@ -11112,6 +11119,7 @@ body {
             lineList.forEach(function ({
                 count,
                 holeList,
+                ignoreLine,
                 line,
                 startOffset
             }, ii) {
@@ -11159,7 +11167,11 @@ body {
 // true.
 
                             if (isHole) {
-                                lineHtml += " class=\"uncovered\"";
+                                lineHtml += (
+                                    ignoreLine
+                                    ? " class=\"ignore\""
+                                    : " class=\"uncovered\""
+                                );
                             }
                             lineHtml += ">";
                             chunk = "";
@@ -11179,7 +11191,9 @@ body {
 </span>
 <span class="count
                 ${(
-                    count <= 0
+                    (count <= 0 && ignoreLine)
+                    ? "ignore"
+                    : count <= 0
                     ? "uncovered"
                     : ""
                 )}"
@@ -11416,6 +11430,7 @@ function sentinel() {}
         functions,
         url: pathname
     }) {
+        let ignoreBlock = false;
         let lineList;
         let linesCovered;
         let linesTotal;
@@ -11425,14 +11440,23 @@ function sentinel() {}
         source.replace((
             /^.*$/gm
         ), function (line, startOffset) {
+            if (line === "/*coverage-disable*/") {
+                ignoreBlock = true;
+            }
             lineList[lineList.length - 1].endOffset = startOffset - 1;
             lineList.push({
                 count: -1,
                 endOffset: 0,
                 holeList: [],
+                ignoreLine: (
+                    ignoreBlock || line.endsWith("//coverage-ignore-line")
+                ),
                 line,
                 startOffset
             });
+            if (line === "/*coverage-enable*/") {
+                ignoreBlock = false;
+            }
             return "";
         });
         lineList.shift();
@@ -11485,11 +11509,13 @@ function sentinel() {}
             });
         });
         linesTotal = lineList.length;
-        linesCovered = lineList.filter(function ({
-            count
+        linesCovered = 0;
+        lineList.forEach(function ({
+            count,
+            ignoreLine
         }) {
-            return count > 0;
-        }).length;
+            linesCovered += count > 0 || ignoreLine;
+        });
         await moduleFs.promises.mkdir((
             modulePath.dirname(coverageDir + pathname)
         ), {
