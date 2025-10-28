@@ -953,7 +953,7 @@ if (false) {
 - `git push upstream alpha -f`
     - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions
-- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2024.11.24
+- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2025.10.28
 - click `Create pull request`
 - input `Add your description here...` with:
 ```
