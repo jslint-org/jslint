@@ -6,7 +6,7 @@
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
-# v2025.9.1-beta
+# v2025.10.1-beta
 - coverage - Add coverage-directives '/*coverage-disable*/', '/*coverage-enable*/'. '//coverage-ignore-line'.
 
 # v2025.3.31

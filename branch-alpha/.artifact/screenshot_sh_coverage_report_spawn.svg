@@ -227,13 +227,13 @@
     textLength="768"
     x="10"
     y="824"
->npm warn deprecated @npmcli/move-file@1.1.2: This functionality has been moved to @npmcli/fs     </tspan>
+>npm warn deprecated gauge@3.0.2: This package is no longer supported.                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="846"
->npm warn deprecated gauge@3.0.2: This package is no longer supported.                            </tspan>
+>npm warn deprecated @npmcli/move-file@1.1.2: This functionality has been moved to @npmcli/fs     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -287,43 +287,43 @@
     textLength="768"
     x="10"
     y="1044"
->npm warn deprecated are-we-there-yet@3.0.1: This package is no longer supported.                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1066"
 >npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1088"
+    y="1066"
 >npm warn deprecated npmlog@6.0.2: This package is no longer supported.                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
+    y="1088"
+>npm warn deprecated are-we-there-yet@3.0.1: This package is no longer supported.                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
     y="1110"
->npm warn deprecated debug@3.2.6: Debug versions &gt;=3.2.0 &lt;3.2.7 || &gt;=4 &lt;4.3.1 have a low-severity\</tspan>
+>npm warn deprecated gauge@4.0.4: This package is no longer supported.                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1132"
->   ReDos regression when used in a Node.js environment. It is recommended you upgrade to 3.2.7 o\</tspan>
+>npm warn deprecated debug@3.2.6: Debug versions &gt;=3.2.0 &lt;3.2.7 || &gt;=4 &lt;4.3.1 have a low-severity\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1154"
->  r 4.3.1. (https://github.com/visionmedia/debug/issues/797)                                     </tspan>
+>   ReDos regression when used in a Node.js environment. It is recommended you upgrade to 3.2.7 o\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1176"
->npm warn deprecated gauge@4.0.4: This package is no longer supported.                            </tspan>
+>  r 4.3.1. (https://github.com/visionmedia/debug/issues/797)                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -377,7 +377,7 @@
     textLength="768"
     x="10"
     y="1374"
->node-pre-gyp info using node@22.19.0 | linux | x64                                               </tspan>
+>node-pre-gyp info using node@22.20.0 | linux | x64                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
