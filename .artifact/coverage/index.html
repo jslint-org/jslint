@@ -86,12 +86,15 @@ body {
     background: #9d9;
 }
 .coverage .count {
-    color: #666;
+    color: #333;
 }
 .coverage .coverageIgnore {
     background: #ccc;
 }
 .coverage .coverageLow,
+.coverage .ignore {
+    background: #ccc;
+}
 .coverage .uncovered {
     background: #ebb;
 }
@@ -114,6 +117,10 @@ body {
 .coverage pre:hover span,
 .coverage tr:hover td {
     background: #7d7;
+}
+.coverage pre:hover span.ignore,
+.coverage tr:hover td.coverageIgnore {
+    background: #ccc;
 }
 .coverage pre:hover span.uncovered,
 .coverage tr:hover td.coverageLow {
@@ -143,11 +150,11 @@ body {
     </td>
     <td style="text-align: right;">
          100.00 %<br>
-        13199 / 13199
+        13243 / 13243
     </td>
     <td style="text-align: right;">
         <br>
-        0 / 13199
+        0 / 13243
     </td>
     </tr>
 <tr>
@@ -159,11 +166,11 @@ body {
     </td>
     <td style="text-align: right;">
          100.00 %<br>
-        11574 / 11574
+        11600 / 11600
     </td>
     <td style="text-align: right;">
         <br>
-        0 / 11574
+        0 / 11600
     </td>
     </tr>
 <tr>
@@ -191,11 +198,11 @@ body {
     </td>
     <td style="text-align: right;">
          100.00 %<br>
-        1576 / 1576
+        1594 / 1594
     </td>
     <td style="text-align: right;">
         <br>
-        0 / 1576
+        0 / 1594
     </td>
     </tr>
 </tbody>

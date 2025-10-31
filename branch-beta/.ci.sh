@@ -236,25 +236,30 @@ import moduleFs from "fs";
             ), function (ignore, match1) {
                 return (
                     match1
-                    + [
-                        jslint.assertOrThrow,
-                        jslint.fsWriteFileWithParents,
-                        jslint.globExclude,
-                        jslint.htmlEscape,
-                        jslint.moduleFsInit,
-                        jslint.v8CoverageListMerge,
-                        jslint.v8CoverageReportCreate
+                    + (
+                        [
+                            jslint.assertOrThrow,
+                            jslint.fsWriteFileWithParents,
+                            jslint.globExclude,
+                            jslint.htmlEscape,
+                            jslint.moduleFsInit,
+                            jslint.v8CoverageListMerge,
+                            jslint.v8CoverageReportCreate
+                        ].join("\n")
                     // reduce size of string/argument passed to nodejs
                     // by removing comments
-                    ].join("\n").replace((
-                        /\n\/\/.*/g
-                    ), "").replace((
-                        /\n\n\n/g
+                    ).replace(
+                        (/\n\/\/.*/g),
+                        ""
+                    ).replace(
+                        (/\n\n\n/g),
+                        "\n"
                     // CL-61b11012 reduce size of string/argument passed
-                    // to nodejs by using 2-space-indent
-                    ), "\n").replace((
-                        /    /g
-                    ), "  ")
+                    // to nodejs by using 1-space-indent
+                    ).replace(
+                        (/    /g),
+                        " "
+                    )
                     + "\nv8CoverageReportCreate("
                 );
             })
@@ -441,7 +446,7 @@ import moduleFs from "fs";
                     "type": "git",
                     "url": "https://github.com/jslint-org/jslint.git"
                 },
-                "version": "2025.3.31"
+                "version": "2025.10.1"
             }, undefined, 4)
         }
     ].map(async function ({

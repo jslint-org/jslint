@@ -305,25 +305,25 @@
     textLength="768"
     x="10"
     y="1110"
->npm warn deprecated gauge@3.0.2: This package is no longer supported.                            </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1132"
 >npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use i\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1154"
+    y="1132"
 >  t. Check out lru-cache if you want a good and tested way to coalesce async requests by a key v\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1176"
+    y="1154"
 >  alue, which is much more comprehensive and powerful.                                           </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1176"
+>npm warn deprecated gauge@3.0.2: This package is no longer supported.                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -359,19 +359,19 @@
     textLength="768"
     x="10"
     y="1308"
->npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported                </tspan>
+>npm warn deprecated are-we-there-yet@3.0.1: This package is no longer supported.                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1330"
->npm warn deprecated npmlog@6.0.2: This package is no longer supported.                           </tspan>
+>npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1352"
->npm warn deprecated are-we-there-yet@3.0.1: This package is no longer supported.                 </tspan>
+>npm warn deprecated npmlog@6.0.2: This package is no longer supported.                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

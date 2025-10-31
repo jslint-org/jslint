@@ -2,10 +2,12 @@
 
 # Todo
 - doc - document supported/unsupported es6+ features
-- coverage - add macros `/*coverage-disable*/` and `/*coverage-enable*/`.
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
+
+# v2025.10.1-beta
+- coverage - Add coverage-directives '/*coverage-disable*/', '/*coverage-enable*/'. '//coverage-ignore-line'.
 
 # v2025.3.31
 - ci - Upgrade nodejs used in ci to v22.

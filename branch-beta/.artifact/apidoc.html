@@ -67,7 +67,7 @@ body {
 </head>
 <body>
 <div class="apidocDiv">
-<h1>API Doc for <a href="https://github.com/jslint-org/jslint">JSLint (v2025.3.31)</a></h1>
+<h1>API Doc for <a href="https://github.com/jslint-org/jslint">JSLint (v2025.10.1-beta)</a></h1>
 <div class="apidocSectionDiv">
     <a href="#apidocTableOfContents1" id="apidocTableOfContents1">
         <h1>Table of Contents</h1>
@@ -629,21 +629,21 @@ await jslint.jslint_cli({
     ), "&amp;gt;");
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
+                            }
+                            lineHtml += "&gt;";
+                            chunk = "";
                             inHole = isHole;
                         }
                         chunk += char;
                     });
-                    lineHtml += htmlEscape(chunk);
+                    lineHtml += <span class="apidocCodeKeywordSpan">htmlEscape</span>(chunk);
                     break;
                 default:
-                    lineHtml += <span class="apidocCodeKeywordSpan">htmlEscape</span>(line);
+                    lineHtml += htmlEscape(line);
                 }
                 html += String(`
 &lt;pre&gt;
 &lt;span class="lineno"&gt;
-&lt;a href="#${lineId}" id="${lineId}"&gt;${String(ii + 1).padStart(5, " ")}.&lt;/a&gt;
-&lt;/span&gt;
-&lt;span class="count
 ...</pre></li>
 
 <li>
@@ -1613,21 +1613,21 @@ jstestIt((
     }));
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-                "v8_coverage_report=" + dir,
-                "node",
-                file
-            ]
-        });
+        process_argv: [
+            "node", "jslint.mjs",
+            "v8_coverage_report=.tmp/coverage_npm",
+            "npm", "--version"
+        ]
     });
 });
 <span class="apidocCodeKeywordSpan">jstestIt</span>((
-    "test npm handling-behavior"
+    "test misc handling-behavior"
 ), async function () {
-    await jslint.jslint_cli({
-        console_error: noop, // comment to debug
-        mode_cli: true,
-        process_argv: [
-            "node", "jslint.mjs",
+    await Promise.all([
+        [
+            ".tmp/coverage_misc/aa.js", "\n".repeat(0x100)
+        ], [
+            ".tmp/coverage_misc/coverage-0-0-0.json", JSON.stringify({
 ...</pre></li>
 
 <li>
@@ -1756,21 +1756,21 @@ await moduleFs.promises.rm(".tmp", {
 </span>    return val;
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-jstestDescribe((
-"test misc handling-behavior"
-), function testBehaviorMisc() {
-jstestIt((
-    "test misc handling-behavior"
-), async function () {
-    // test debugInline handling-behavior
-    <span class="apidocCodeKeywordSpan">noop</span>(debugInline);
-    // test assertErrorThrownAsync error handling-behavior
-    await assertErrorThrownAsync(function () {
-        return assertErrorThrownAsync(noop);
+        ]
     });
-    // test assertJsonEqual error handling-behavior
-    await assertErrorThrownAsync(function () {
-        assertJsonEqual(1, 2);
+});
+    });
+    jstestIt((
+"test coverage-ignore handling-behavior"
+    ), function () {
+switch (<span class="apidocCodeKeywordSpan">noop</span>() &amp;&amp; noop()) { //coverage-ignore-line
+case 1: //coverage-ignore-line
+    break; //coverage-ignore-line
+/*coverage-disable*/
+case 2:
+    break;
+/*coverage-enable*/
+case undefined:
 ...</pre></li>
 
 <li>
