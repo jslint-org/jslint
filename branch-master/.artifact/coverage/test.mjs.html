@@ -86,12 +86,15 @@ body {
     background: #9d9;
 }
 .coverage .count {
-    color: #666;
+    color: #333;
 }
 .coverage .coverageIgnore {
     background: #ccc;
 }
 .coverage .coverageLow,
+.coverage .ignore {
+    background: #ccc;
+}
 .coverage .uncovered {
     background: #ebb;
 }
@@ -114,6 +117,10 @@ body {
 .coverage pre:hover span,
 .coverage tr:hover td {
     background: #7d7;
+}
+.coverage pre:hover span.ignore,
+.coverage tr:hover td.coverageIgnore {
+    background: #ccc;
 }
 .coverage pre:hover span.uncovered,
 .coverage tr:hover td.coverageLow {
@@ -143,11 +150,11 @@ body {
     </td>
     <td style="text-align: right;">
          100.00 %<br>
-        1576 / 1576
+        1594 / 1594
     </td>
     <td style="text-align: right;">
         <br>
-        0 / 1576
+        0 / 1594
     </td>
     </tr>
 </tbody>
@@ -1612,126 +1619,144 @@ body {
 <pre><span class="lineno"><a href="#line_1454" id="line_1454"> 1454.</a></span><span class="count                ">      1</span><span>                "/*coverage-ignore-file*/\n"</span></pre>
 <pre><span class="lineno"><a href="#line_1455" id="line_1455"> 1455.</a></span><span class="count                ">      1</span><span>                + "switch(0){\n"</span></pre>
 <pre><span class="lineno"><a href="#line_1456" id="line_1456"> 1456.</a></span><span class="count                ">      1</span><span>                + "case 0:break;\n"</span></pre>
-<pre><span class="lineno"><a href="#line_1457" id="line_1457"> 1457.</a></span><span class="count                ">      1</span><span>                + "}\n"</span></pre>
-<pre><span class="lineno"><a href="#line_1458" id="line_1458"> 1458.</a></span><span class="count                ">      1</span><span>            )</span></pre>
-<pre><span class="lineno"><a href="#line_1459" id="line_1459"> 1459.</a></span><span class="count                ">      1</span><span>        ], [</span></pre>
-<pre><span class="lineno"><a href="#line_1460" id="line_1460"> 1460.</a></span><span class="count                ">      1</span><span>            "v8CoverageReportCreate_low.js", (</span></pre>
-<pre><span class="lineno"><a href="#line_1461" id="line_1461"> 1461.</a></span><span class="count                ">      1</span><span>                "switch(0){\n"</span></pre>
-<pre><span class="lineno"><a href="#line_1462" id="line_1462"> 1462.</a></span><span class="count                ">      1</span><span>                + "case 1:break;\n"</span></pre>
-<pre><span class="lineno"><a href="#line_1463" id="line_1463"> 1463.</a></span><span class="count                ">      1</span><span>                + "case 2:break;\n"</span></pre>
-<pre><span class="lineno"><a href="#line_1464" id="line_1464"> 1464.</a></span><span class="count                ">      1</span><span>                + "case 3:break;\n"</span></pre>
-<pre><span class="lineno"><a href="#line_1465" id="line_1465"> 1465.</a></span><span class="count                ">      1</span><span>                + "case 4:break;\n"</span></pre>
-<pre><span class="lineno"><a href="#line_1466" id="line_1466"> 1466.</a></span><span class="count                ">      1</span><span>                + "}\n"</span></pre>
-<pre><span class="lineno"><a href="#line_1467" id="line_1467"> 1467.</a></span><span class="count                ">      1</span><span>            )</span></pre>
-<pre><span class="lineno"><a href="#line_1468" id="line_1468"> 1468.</a></span><span class="count                ">      1</span><span>        ], [</span></pre>
-<pre><span class="lineno"><a href="#line_1469" id="line_1469"> 1469.</a></span><span class="count                ">      1</span><span>            "v8CoverageReportCreate_medium.js", (</span></pre>
-<pre><span class="lineno"><a href="#line_1470" id="line_1470"> 1470.</a></span><span class="count                ">      1</span><span>                "switch(0){\n"</span></pre>
-<pre><span class="lineno"><a href="#line_1471" id="line_1471"> 1471.</a></span><span class="count                ">      1</span><span>                + "case 0:break;\n"</span></pre>
-<pre><span class="lineno"><a href="#line_1472" id="line_1472"> 1472.</a></span><span class="count                ">      1</span><span>                + "case 1:break;\n"</span></pre>
-<pre><span class="lineno"><a href="#line_1473" id="line_1473"> 1473.</a></span><span class="count                ">      1</span><span>                + "case 2:break;\n"</span></pre>
-<pre><span class="lineno"><a href="#line_1474" id="line_1474"> 1474.</a></span><span class="count                ">      1</span><span>                + "}\n"</span></pre>
-<pre><span class="lineno"><a href="#line_1475" id="line_1475"> 1475.</a></span><span class="count                ">      1</span><span>            )</span></pre>
-<pre><span class="lineno"><a href="#line_1476" id="line_1476"> 1476.</a></span><span class="count                ">      1</span><span>        ]</span></pre>
-<pre><span class="lineno"><a href="#line_1477" id="line_1477"> 1477.</a></span><span class="count                ">      4</span><span>    ].forEach(function ([</span></pre>
-<pre><span class="lineno"><a href="#line_1478" id="line_1478"> 1478.</a></span><span class="count                ">      4</span><span>        file, data</span></pre>
-<pre><span class="lineno"><a href="#line_1479" id="line_1479"> 1479.</a></span><span class="count                ">      4</span><span>    ], ii) {</span></pre>
-<pre><span class="lineno"><a href="#line_1480" id="line_1480"> 1480.</a></span><span class="count                ">      4</span><span>        jstestIt(file, async function () {</span></pre>
-<pre><span class="lineno"><a href="#line_1481" id="line_1481"> 1481.</a></span><span class="count                ">      4</span><span>            let dir = ".tmp/coverage_" + ii + "/";</span></pre>
-<pre><span class="lineno"><a href="#line_1482" id="line_1482"> 1482.</a></span><span class="count                ">      4</span><span>            file = dir + file;</span></pre>
-<pre><span class="lineno"><a href="#line_1483" id="line_1483"> 1483.</a></span><span class="count                ">      4</span><span>            await fsWriteFileWithParents(file, data);</span></pre>
-<pre><span class="lineno"><a href="#line_1484" id="line_1484"> 1484.</a></span><span class="count                ">      4</span><span>            await jslint.jslint_cli({</span></pre>
-<pre><span class="lineno"><a href="#line_1485" id="line_1485"> 1485.</a></span><span class="count                ">      4</span><span>                console_error: noop, // comment to debug</span></pre>
-<pre><span class="lineno"><a href="#line_1486" id="line_1486"> 1486.</a></span><span class="count                ">      4</span><span>                mode_cli: true,</span></pre>
-<pre><span class="lineno"><a href="#line_1487" id="line_1487"> 1487.</a></span><span class="count                ">      4</span><span>                process_argv: [</span></pre>
-<pre><span class="lineno"><a href="#line_1488" id="line_1488"> 1488.</a></span><span class="count                ">      4</span><span>                    "node", "jslint.mjs",</span></pre>
-<pre><span class="lineno"><a href="#line_1489" id="line_1489"> 1489.</a></span><span class="count                ">      4</span><span>                    "v8_coverage_report=" + dir,</span></pre>
-<pre><span class="lineno"><a href="#line_1490" id="line_1490"> 1490.</a></span><span class="count                ">      4</span><span>                    "node",</span></pre>
-<pre><span class="lineno"><a href="#line_1491" id="line_1491"> 1491.</a></span><span class="count                ">      4</span><span>                    file</span></pre>
-<pre><span class="lineno"><a href="#line_1492" id="line_1492"> 1492.</a></span><span class="count                ">      4</span><span>                ]</span></pre>
-<pre><span class="lineno"><a href="#line_1493" id="line_1493"> 1493.</a></span><span class="count                ">      4</span><span>            });</span></pre>
-<pre><span class="lineno"><a href="#line_1494" id="line_1494"> 1494.</a></span><span class="count                ">      4</span><span>        });</span></pre>
-<pre><span class="lineno"><a href="#line_1495" id="line_1495"> 1495.</a></span><span class="count                ">      4</span><span>    });</span></pre>
-<pre><span class="lineno"><a href="#line_1496" id="line_1496"> 1496.</a></span><span class="count                ">      1</span><span>    jstestIt((</span></pre>
-<pre><span class="lineno"><a href="#line_1497" id="line_1497"> 1497.</a></span><span class="count                ">      1</span><span>        "test npm handling-behavior"</span></pre>
-<pre><span class="lineno"><a href="#line_1498" id="line_1498"> 1498.</a></span><span class="count                ">      1</span><span>    ), async function () {</span></pre>
-<pre><span class="lineno"><a href="#line_1499" id="line_1499"> 1499.</a></span><span class="count                ">      1</span><span>        await jslint.jslint_cli({</span></pre>
-<pre><span class="lineno"><a href="#line_1500" id="line_1500"> 1500.</a></span><span class="count                ">      1</span><span>            console_error: noop, // comment to debug</span></pre>
-<pre><span class="lineno"><a href="#line_1501" id="line_1501"> 1501.</a></span><span class="count                ">      1</span><span>            mode_cli: true,</span></pre>
-<pre><span class="lineno"><a href="#line_1502" id="line_1502"> 1502.</a></span><span class="count                ">      1</span><span>            process_argv: [</span></pre>
-<pre><span class="lineno"><a href="#line_1503" id="line_1503"> 1503.</a></span><span class="count                ">      1</span><span>                "node", "jslint.mjs",</span></pre>
-<pre><span class="lineno"><a href="#line_1504" id="line_1504"> 1504.</a></span><span class="count                ">      1</span><span>                "v8_coverage_report=.tmp/coverage_npm",</span></pre>
-<pre><span class="lineno"><a href="#line_1505" id="line_1505"> 1505.</a></span><span class="count                ">      1</span><span>                "npm", "--version"</span></pre>
-<pre><span class="lineno"><a href="#line_1506" id="line_1506"> 1506.</a></span><span class="count                ">      1</span><span>            ]</span></pre>
-<pre><span class="lineno"><a href="#line_1507" id="line_1507"> 1507.</a></span><span class="count                ">      1</span><span>        });</span></pre>
-<pre><span class="lineno"><a href="#line_1508" id="line_1508"> 1508.</a></span><span class="count                ">      1</span><span>    });</span></pre>
-<pre><span class="lineno"><a href="#line_1509" id="line_1509"> 1509.</a></span><span class="count                ">      1</span><span>    jstestIt((</span></pre>
-<pre><span class="lineno"><a href="#line_1510" id="line_1510"> 1510.</a></span><span class="count                ">      1</span><span>        "test misc handling-behavior"</span></pre>
-<pre><span class="lineno"><a href="#line_1511" id="line_1511"> 1511.</a></span><span class="count                ">      1</span><span>    ), async function () {</span></pre>
-<pre><span class="lineno"><a href="#line_1512" id="line_1512"> 1512.</a></span><span class="count                ">      1</span><span>        await Promise.all([</span></pre>
-<pre><span class="lineno"><a href="#line_1513" id="line_1513"> 1513.</a></span><span class="count                ">      1</span><span>            [</span></pre>
-<pre><span class="lineno"><a href="#line_1514" id="line_1514"> 1514.</a></span><span class="count                ">      1</span><span>                ".tmp/coverage_misc/aa.js", "\n".repeat(0x100)</span></pre>
-<pre><span class="lineno"><a href="#line_1515" id="line_1515"> 1515.</a></span><span class="count                ">      1</span><span>            ], [</span></pre>
-<pre><span class="lineno"><a href="#line_1516" id="line_1516"> 1516.</a></span><span class="count                ">      1</span><span>                ".tmp/coverage_misc/coverage-0-0-0.json", JSON.stringify({</span></pre>
-<pre><span class="lineno"><a href="#line_1517" id="line_1517"> 1517.</a></span><span class="count                ">      1</span><span>                    "result": [</span></pre>
-<pre><span class="lineno"><a href="#line_1518" id="line_1518"> 1518.</a></span><span class="count                ">      1</span><span>                        {</span></pre>
-<pre><span class="lineno"><a href="#line_1519" id="line_1519"> 1519.</a></span><span class="count                ">      1</span><span>                            "functions": [</span></pre>
-<pre><span class="lineno"><a href="#line_1520" id="line_1520"> 1520.</a></span><span class="count                ">      1</span><span>                                {</span></pre>
-<pre><span class="lineno"><a href="#line_1521" id="line_1521"> 1521.</a></span><span class="count                ">      1</span><span>                                    "functionName": "",</span></pre>
-<pre><span class="lineno"><a href="#line_1522" id="line_1522"> 1522.</a></span><span class="count                ">      1</span><span>                                    "isBlockCoverage": true,</span></pre>
-<pre><span class="lineno"><a href="#line_1523" id="line_1523"> 1523.</a></span><span class="count                ">      1</span><span>                                    "ranges": [</span></pre>
-<pre><span class="lineno"><a href="#line_1524" id="line_1524"> 1524.</a></span><span class="count                ">      1</span><span>                                        {</span></pre>
-<pre><span class="lineno"><a href="#line_1525" id="line_1525"> 1525.</a></span><span class="count                ">      1</span><span>                                            "count": 1,</span></pre>
-<pre><span class="lineno"><a href="#line_1526" id="line_1526"> 1526.</a></span><span class="count                ">      1</span><span>                                            "endOffset": 0xf0,</span></pre>
-<pre><span class="lineno"><a href="#line_1527" id="line_1527"> 1527.</a></span><span class="count                ">      1</span><span>                                            "startOffset": 0x10</span></pre>
-<pre><span class="lineno"><a href="#line_1528" id="line_1528"> 1528.</a></span><span class="count                ">      1</span><span>                                        },</span></pre>
-<pre><span class="lineno"><a href="#line_1529" id="line_1529"> 1529.</a></span><span class="count                ">      1</span><span>                                        {</span></pre>
-<pre><span class="lineno"><a href="#line_1530" id="line_1530"> 1530.</a></span><span class="count                ">      1</span><span>                                            "count": 1,</span></pre>
-<pre><span class="lineno"><a href="#line_1531" id="line_1531"> 1531.</a></span><span class="count                ">      1</span><span>                                            "endOffset": 0x40,</span></pre>
-<pre><span class="lineno"><a href="#line_1532" id="line_1532"> 1532.</a></span><span class="count                ">      1</span><span>                                            "startOffset": 0x20</span></pre>
-<pre><span class="lineno"><a href="#line_1533" id="line_1533"> 1533.</a></span><span class="count                ">      1</span><span>                                        },</span></pre>
-<pre><span class="lineno"><a href="#line_1534" id="line_1534"> 1534.</a></span><span class="count                ">      1</span><span>                                        {</span></pre>
-<pre><span class="lineno"><a href="#line_1535" id="line_1535"> 1535.</a></span><span class="count                ">      1</span><span>                                            "count": 1,</span></pre>
-<pre><span class="lineno"><a href="#line_1536" id="line_1536"> 1536.</a></span><span class="count                ">      1</span><span>                                            "endOffset": 0x80,</span></pre>
-<pre><span class="lineno"><a href="#line_1537" id="line_1537"> 1537.</a></span><span class="count                ">      1</span><span>                                            "startOffset": 0x60</span></pre>
-<pre><span class="lineno"><a href="#line_1538" id="line_1538"> 1538.</a></span><span class="count                ">      1</span><span>                                        },</span></pre>
-<pre><span class="lineno"><a href="#line_1539" id="line_1539"> 1539.</a></span><span class="count                ">      1</span><span>                                        {</span></pre>
-<pre><span class="lineno"><a href="#line_1540" id="line_1540"> 1540.</a></span><span class="count                ">      1</span><span>                                            "count": 0,</span></pre>
-<pre><span class="lineno"><a href="#line_1541" id="line_1541"> 1541.</a></span><span class="count                ">      1</span><span>                                            "endOffset": 0x45,</span></pre>
-<pre><span class="lineno"><a href="#line_1542" id="line_1542"> 1542.</a></span><span class="count                ">      1</span><span>                                            "startOffset": 0x25</span></pre>
-<pre><span class="lineno"><a href="#line_1543" id="line_1543"> 1543.</a></span><span class="count                ">      1</span><span>                                        },</span></pre>
-<pre><span class="lineno"><a href="#line_1544" id="line_1544"> 1544.</a></span><span class="count                ">      1</span><span>                                        {</span></pre>
-<pre><span class="lineno"><a href="#line_1545" id="line_1545"> 1545.</a></span><span class="count                ">      1</span><span>                                            "count": 0,</span></pre>
-<pre><span class="lineno"><a href="#line_1546" id="line_1546"> 1546.</a></span><span class="count                ">      1</span><span>                                            "endOffset": 0x85,</span></pre>
-<pre><span class="lineno"><a href="#line_1547" id="line_1547"> 1547.</a></span><span class="count                ">      1</span><span>                                            "startOffset": 0x65</span></pre>
-<pre><span class="lineno"><a href="#line_1548" id="line_1548"> 1548.</a></span><span class="count                ">      1</span><span>                                        }</span></pre>
-<pre><span class="lineno"><a href="#line_1549" id="line_1549"> 1549.</a></span><span class="count                ">      1</span><span>                                    ]</span></pre>
-<pre><span class="lineno"><a href="#line_1550" id="line_1550"> 1550.</a></span><span class="count                ">      1</span><span>                                }</span></pre>
-<pre><span class="lineno"><a href="#line_1551" id="line_1551"> 1551.</a></span><span class="count                ">      1</span><span>                            ],</span></pre>
-<pre><span class="lineno"><a href="#line_1552" id="line_1552"> 1552.</a></span><span class="count                ">      1</span><span>                            "scriptId": "0",</span></pre>
-<pre><span class="lineno"><a href="#line_1553" id="line_1553"> 1553.</a></span><span class="count                ">      1</span><span>                            "url": "file:///" + modulePath.resolve(</span></pre>
-<pre><span class="lineno"><a href="#line_1554" id="line_1554"> 1554.</a></span><span class="count                ">      1</span><span>                                ".tmp/coverage_misc/aa.js"</span></pre>
-<pre><span class="lineno"><a href="#line_1555" id="line_1555"> 1555.</a></span><span class="count                ">      1</span><span>                            )</span></pre>
-<pre><span class="lineno"><a href="#line_1556" id="line_1556"> 1556.</a></span><span class="count                ">      1</span><span>                        }</span></pre>
-<pre><span class="lineno"><a href="#line_1557" id="line_1557"> 1557.</a></span><span class="count                ">      1</span><span>                    ]</span></pre>
-<pre><span class="lineno"><a href="#line_1558" id="line_1558"> 1558.</a></span><span class="count                ">      1</span><span>                }, undefined, 4)</span></pre>
-<pre><span class="lineno"><a href="#line_1559" id="line_1559"> 1559.</a></span><span class="count                ">      1</span><span>            ]</span></pre>
-<pre><span class="lineno"><a href="#line_1560" id="line_1560"> 1560.</a></span><span class="count                ">      2</span><span>        ].map(async function ([</span></pre>
-<pre><span class="lineno"><a href="#line_1561" id="line_1561"> 1561.</a></span><span class="count                ">      2</span><span>            file, data</span></pre>
-<pre><span class="lineno"><a href="#line_1562" id="line_1562"> 1562.</a></span><span class="count                ">      2</span><span>        ]) {</span></pre>
-<pre><span class="lineno"><a href="#line_1563" id="line_1563"> 1563.</a></span><span class="count                ">      2</span><span>            await fsWriteFileWithParents(file, data);</span></pre>
-<pre><span class="lineno"><a href="#line_1564" id="line_1564"> 1564.</a></span><span class="count                ">      2</span><span>        }));</span></pre>
-<pre><span class="lineno"><a href="#line_1565" id="line_1565"> 1565.</a></span><span class="count                ">      1</span><span>        await jslint.jslint_cli({</span></pre>
-<pre><span class="lineno"><a href="#line_1566" id="line_1566"> 1566.</a></span><span class="count                ">      1</span><span>            console_error: noop, // comment to debug</span></pre>
-<pre><span class="lineno"><a href="#line_1567" id="line_1567"> 1567.</a></span><span class="count                ">      1</span><span>            mode_cli: true,</span></pre>
-<pre><span class="lineno"><a href="#line_1568" id="line_1568"> 1568.</a></span><span class="count                ">      1</span><span>            process_argv: [</span></pre>
-<pre><span class="lineno"><a href="#line_1569" id="line_1569"> 1569.</a></span><span class="count                ">      1</span><span>                "node", "jslint.mjs",</span></pre>
-<pre><span class="lineno"><a href="#line_1570" id="line_1570"> 1570.</a></span><span class="count                ">      1</span><span>                "v8_coverage_report=.tmp/coverage_misc"</span></pre>
-<pre><span class="lineno"><a href="#line_1571" id="line_1571"> 1571.</a></span><span class="count                ">      1</span><span>                // "node", ".tmp/coverage_misc/aa.js"</span></pre>
-<pre><span class="lineno"><a href="#line_1572" id="line_1572"> 1572.</a></span><span class="count                ">      1</span><span>            ]</span></pre>
-<pre><span class="lineno"><a href="#line_1573" id="line_1573"> 1573.</a></span><span class="count                ">      1</span><span>        });</span></pre>
-<pre><span class="lineno"><a href="#line_1574" id="line_1574"> 1574.</a></span><span class="count                ">      1</span><span>    });</span></pre>
-<pre><span class="lineno"><a href="#line_1575" id="line_1575"> 1575.</a></span><span class="count                ">      1</span><span>});</span></pre>
-<pre><span class="lineno"><a href="#line_1576" id="line_1576"> 1576.</a></span><span class="count                ">      1</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_1457" id="line_1457"> 1457.</a></span><span class="count                ">      1</span><span>                + "case 1:break;//coverage-ignore-line\n"</span></pre>
+<pre><span class="lineno"><a href="#line_1458" id="line_1458"> 1458.</a></span><span class="count                ">      1</span><span>                + "/*coverage-disable*/\n"</span></pre>
+<pre><span class="lineno"><a href="#line_1459" id="line_1459"> 1459.</a></span><span class="count                ">      1</span><span>                + "case 2:break;\n"</span></pre>
+<pre><span class="lineno"><a href="#line_1460" id="line_1460"> 1460.</a></span><span class="count                ">      1</span><span>                + "/*coverage-enable*/\n"</span></pre>
+<pre><span class="lineno"><a href="#line_1461" id="line_1461"> 1461.</a></span><span class="count                ">      1</span><span>                + "}\n"</span></pre>
+<pre><span class="lineno"><a href="#line_1462" id="line_1462"> 1462.</a></span><span class="count                ">      1</span><span>            )</span></pre>
+<pre><span class="lineno"><a href="#line_1463" id="line_1463"> 1463.</a></span><span class="count                ">      1</span><span>        ], [</span></pre>
+<pre><span class="lineno"><a href="#line_1464" id="line_1464"> 1464.</a></span><span class="count                ">      1</span><span>            "v8CoverageReportCreate_low.js", (</span></pre>
+<pre><span class="lineno"><a href="#line_1465" id="line_1465"> 1465.</a></span><span class="count                ">      1</span><span>                "switch(0){\n"</span></pre>
+<pre><span class="lineno"><a href="#line_1466" id="line_1466"> 1466.</a></span><span class="count                ">      1</span><span>                + "case 1:break;\n"</span></pre>
+<pre><span class="lineno"><a href="#line_1467" id="line_1467"> 1467.</a></span><span class="count                ">      1</span><span>                + "case 2:break;\n"</span></pre>
+<pre><span class="lineno"><a href="#line_1468" id="line_1468"> 1468.</a></span><span class="count                ">      1</span><span>                + "case 3:break;\n"</span></pre>
+<pre><span class="lineno"><a href="#line_1469" id="line_1469"> 1469.</a></span><span class="count                ">      1</span><span>                + "case 4:break;\n"</span></pre>
+<pre><span class="lineno"><a href="#line_1470" id="line_1470"> 1470.</a></span><span class="count                ">      1</span><span>                + "}\n"</span></pre>
+<pre><span class="lineno"><a href="#line_1471" id="line_1471"> 1471.</a></span><span class="count                ">      1</span><span>            )</span></pre>
+<pre><span class="lineno"><a href="#line_1472" id="line_1472"> 1472.</a></span><span class="count                ">      1</span><span>        ], [</span></pre>
+<pre><span class="lineno"><a href="#line_1473" id="line_1473"> 1473.</a></span><span class="count                ">      1</span><span>            "v8CoverageReportCreate_medium.js", (</span></pre>
+<pre><span class="lineno"><a href="#line_1474" id="line_1474"> 1474.</a></span><span class="count                ">      1</span><span>                "switch(0){\n"</span></pre>
+<pre><span class="lineno"><a href="#line_1475" id="line_1475"> 1475.</a></span><span class="count                ">      1</span><span>                + "case 0:break;\n"</span></pre>
+<pre><span class="lineno"><a href="#line_1476" id="line_1476"> 1476.</a></span><span class="count                ">      1</span><span>                + "case 1:break;\n"</span></pre>
+<pre><span class="lineno"><a href="#line_1477" id="line_1477"> 1477.</a></span><span class="count                ">      1</span><span>                + "case 2:break;\n"</span></pre>
+<pre><span class="lineno"><a href="#line_1478" id="line_1478"> 1478.</a></span><span class="count                ">      1</span><span>                + "}\n"</span></pre>
+<pre><span class="lineno"><a href="#line_1479" id="line_1479"> 1479.</a></span><span class="count                ">      1</span><span>            )</span></pre>
+<pre><span class="lineno"><a href="#line_1480" id="line_1480"> 1480.</a></span><span class="count                ">      1</span><span>        ]</span></pre>
+<pre><span class="lineno"><a href="#line_1481" id="line_1481"> 1481.</a></span><span class="count                ">      4</span><span>    ].forEach(function ([</span></pre>
+<pre><span class="lineno"><a href="#line_1482" id="line_1482"> 1482.</a></span><span class="count                ">      4</span><span>        file, data</span></pre>
+<pre><span class="lineno"><a href="#line_1483" id="line_1483"> 1483.</a></span><span class="count                ">      4</span><span>    ], ii) {</span></pre>
+<pre><span class="lineno"><a href="#line_1484" id="line_1484"> 1484.</a></span><span class="count                ">      4</span><span>        jstestIt(file, async function () {</span></pre>
+<pre><span class="lineno"><a href="#line_1485" id="line_1485"> 1485.</a></span><span class="count                ">      4</span><span>            let dir = ".tmp/coverage_" + ii + "/";</span></pre>
+<pre><span class="lineno"><a href="#line_1486" id="line_1486"> 1486.</a></span><span class="count                ">      4</span><span>            file = dir + file;</span></pre>
+<pre><span class="lineno"><a href="#line_1487" id="line_1487"> 1487.</a></span><span class="count                ">      4</span><span>            await fsWriteFileWithParents(file, data);</span></pre>
+<pre><span class="lineno"><a href="#line_1488" id="line_1488"> 1488.</a></span><span class="count                ">      4</span><span>            await jslint.jslint_cli({</span></pre>
+<pre><span class="lineno"><a href="#line_1489" id="line_1489"> 1489.</a></span><span class="count                ">      4</span><span>                console_error: noop, // comment to debug</span></pre>
+<pre><span class="lineno"><a href="#line_1490" id="line_1490"> 1490.</a></span><span class="count                ">      4</span><span>                mode_cli: true,</span></pre>
+<pre><span class="lineno"><a href="#line_1491" id="line_1491"> 1491.</a></span><span class="count                ">      4</span><span>                process_argv: [</span></pre>
+<pre><span class="lineno"><a href="#line_1492" id="line_1492"> 1492.</a></span><span class="count                ">      4</span><span>                    "node", "jslint.mjs",</span></pre>
+<pre><span class="lineno"><a href="#line_1493" id="line_1493"> 1493.</a></span><span class="count                ">      4</span><span>                    "v8_coverage_report=" + dir,</span></pre>
+<pre><span class="lineno"><a href="#line_1494" id="line_1494"> 1494.</a></span><span class="count                ">      4</span><span>                    "node",</span></pre>
+<pre><span class="lineno"><a href="#line_1495" id="line_1495"> 1495.</a></span><span class="count                ">      4</span><span>                    file</span></pre>
+<pre><span class="lineno"><a href="#line_1496" id="line_1496"> 1496.</a></span><span class="count                ">      4</span><span>                ]</span></pre>
+<pre><span class="lineno"><a href="#line_1497" id="line_1497"> 1497.</a></span><span class="count                ">      4</span><span>            });</span></pre>
+<pre><span class="lineno"><a href="#line_1498" id="line_1498"> 1498.</a></span><span class="count                ">      4</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_1499" id="line_1499"> 1499.</a></span><span class="count                ">      4</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_1500" id="line_1500"> 1500.</a></span><span class="count                ">      1</span><span>    jstestIt((</span></pre>
+<pre><span class="lineno"><a href="#line_1501" id="line_1501"> 1501.</a></span><span class="count                ">      1</span><span>        "test coverage-ignore handling-behavior"</span></pre>
+<pre><span class="lineno"><a href="#line_1502" id="line_1502"> 1502.</a></span><span class="count                ">      1</span><span>    ), function () {</span></pre>
+<pre><span class="lineno"><a href="#line_1503" id="line_1503"> 1503.</a></span><span class="count                ignore">     -0</span><span>        switch (noop() </span><span class="ignore">&amp;&amp; noop()</span><span>) { //coverage-ignore-line</span></pre>
+<pre><span class="lineno"><a href="#line_1504" id="line_1504"> 1504.</a></span><span class="count                ignore">     -0</span><span>        </span><span class="ignore">case 1: //coverage-ignore-line</span></pre>
+<pre><span class="lineno"><a href="#line_1505" id="line_1505"> 1505.</a></span><span class="count                ignore">     -0</span><span></span><span class="ignore">            break;</span><span> //coverage-ignore-line</span></pre>
+<pre><span class="lineno"><a href="#line_1506" id="line_1506"> 1506.</a></span><span class="count                ">      1</span><span>/*coverage-disable*/</span></pre>
+<pre><span class="lineno"><a href="#line_1507" id="line_1507"> 1507.</a></span><span class="count                ignore">     -0</span><span>        </span><span class="ignore">case 2:</span></pre>
+<pre><span class="lineno"><a href="#line_1508" id="line_1508"> 1508.</a></span><span class="count                ignore">     -0</span><span></span><span class="ignore">            break;</span></pre>
+<pre><span class="lineno"><a href="#line_1509" id="line_1509"> 1509.</a></span><span class="count                ">      1</span><span>/*coverage-enable*/</span></pre>
+<pre><span class="lineno"><a href="#line_1510" id="line_1510"> 1510.</a></span><span class="count                ">      1</span><span>        case undefined:</span></pre>
+<pre><span class="lineno"><a href="#line_1511" id="line_1511"> 1511.</a></span><span class="count                ">      1</span><span>            break;</span></pre>
+<pre><span class="lineno"><a href="#line_1512" id="line_1512"> 1512.</a></span><span class="count                ">      1</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_1513" id="line_1513"> 1513.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_1514" id="line_1514"> 1514.</a></span><span class="count                ">      1</span><span>    jstestIt((</span></pre>
+<pre><span class="lineno"><a href="#line_1515" id="line_1515"> 1515.</a></span><span class="count                ">      1</span><span>        "test npm handling-behavior"</span></pre>
+<pre><span class="lineno"><a href="#line_1516" id="line_1516"> 1516.</a></span><span class="count                ">      1</span><span>    ), async function () {</span></pre>
+<pre><span class="lineno"><a href="#line_1517" id="line_1517"> 1517.</a></span><span class="count                ">      1</span><span>        await jslint.jslint_cli({</span></pre>
+<pre><span class="lineno"><a href="#line_1518" id="line_1518"> 1518.</a></span><span class="count                ">      1</span><span>            console_error: noop, // comment to debug</span></pre>
+<pre><span class="lineno"><a href="#line_1519" id="line_1519"> 1519.</a></span><span class="count                ">      1</span><span>            mode_cli: true,</span></pre>
+<pre><span class="lineno"><a href="#line_1520" id="line_1520"> 1520.</a></span><span class="count                ">      1</span><span>            process_argv: [</span></pre>
+<pre><span class="lineno"><a href="#line_1521" id="line_1521"> 1521.</a></span><span class="count                ">      1</span><span>                "node", "jslint.mjs",</span></pre>
+<pre><span class="lineno"><a href="#line_1522" id="line_1522"> 1522.</a></span><span class="count                ">      1</span><span>                "v8_coverage_report=.tmp/coverage_npm",</span></pre>
+<pre><span class="lineno"><a href="#line_1523" id="line_1523"> 1523.</a></span><span class="count                ">      1</span><span>                "npm", "--version"</span></pre>
+<pre><span class="lineno"><a href="#line_1524" id="line_1524"> 1524.</a></span><span class="count                ">      1</span><span>            ]</span></pre>
+<pre><span class="lineno"><a href="#line_1525" id="line_1525"> 1525.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_1526" id="line_1526"> 1526.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_1527" id="line_1527"> 1527.</a></span><span class="count                ">      1</span><span>    jstestIt((</span></pre>
+<pre><span class="lineno"><a href="#line_1528" id="line_1528"> 1528.</a></span><span class="count                ">      1</span><span>        "test misc handling-behavior"</span></pre>
+<pre><span class="lineno"><a href="#line_1529" id="line_1529"> 1529.</a></span><span class="count                ">      1</span><span>    ), async function () {</span></pre>
+<pre><span class="lineno"><a href="#line_1530" id="line_1530"> 1530.</a></span><span class="count                ">      1</span><span>        await Promise.all([</span></pre>
+<pre><span class="lineno"><a href="#line_1531" id="line_1531"> 1531.</a></span><span class="count                ">      1</span><span>            [</span></pre>
+<pre><span class="lineno"><a href="#line_1532" id="line_1532"> 1532.</a></span><span class="count                ">      1</span><span>                ".tmp/coverage_misc/aa.js", "\n".repeat(0x100)</span></pre>
+<pre><span class="lineno"><a href="#line_1533" id="line_1533"> 1533.</a></span><span class="count                ">      1</span><span>            ], [</span></pre>
+<pre><span class="lineno"><a href="#line_1534" id="line_1534"> 1534.</a></span><span class="count                ">      1</span><span>                ".tmp/coverage_misc/coverage-0-0-0.json", JSON.stringify({</span></pre>
+<pre><span class="lineno"><a href="#line_1535" id="line_1535"> 1535.</a></span><span class="count                ">      1</span><span>                    "result": [</span></pre>
+<pre><span class="lineno"><a href="#line_1536" id="line_1536"> 1536.</a></span><span class="count                ">      1</span><span>                        {</span></pre>
+<pre><span class="lineno"><a href="#line_1537" id="line_1537"> 1537.</a></span><span class="count                ">      1</span><span>                            "functions": [</span></pre>
+<pre><span class="lineno"><a href="#line_1538" id="line_1538"> 1538.</a></span><span class="count                ">      1</span><span>                                {</span></pre>
+<pre><span class="lineno"><a href="#line_1539" id="line_1539"> 1539.</a></span><span class="count                ">      1</span><span>                                    "functionName": "",</span></pre>
+<pre><span class="lineno"><a href="#line_1540" id="line_1540"> 1540.</a></span><span class="count                ">      1</span><span>                                    "isBlockCoverage": true,</span></pre>
+<pre><span class="lineno"><a href="#line_1541" id="line_1541"> 1541.</a></span><span class="count                ">      1</span><span>                                    "ranges": [</span></pre>
+<pre><span class="lineno"><a href="#line_1542" id="line_1542"> 1542.</a></span><span class="count                ">      1</span><span>                                        {</span></pre>
+<pre><span class="lineno"><a href="#line_1543" id="line_1543"> 1543.</a></span><span class="count                ">      1</span><span>                                            "count": 1,</span></pre>
+<pre><span class="lineno"><a href="#line_1544" id="line_1544"> 1544.</a></span><span class="count                ">      1</span><span>                                            "endOffset": 0xf0,</span></pre>
+<pre><span class="lineno"><a href="#line_1545" id="line_1545"> 1545.</a></span><span class="count                ">      1</span><span>                                            "startOffset": 0x10</span></pre>
+<pre><span class="lineno"><a href="#line_1546" id="line_1546"> 1546.</a></span><span class="count                ">      1</span><span>                                        },</span></pre>
+<pre><span class="lineno"><a href="#line_1547" id="line_1547"> 1547.</a></span><span class="count                ">      1</span><span>                                        {</span></pre>
+<pre><span class="lineno"><a href="#line_1548" id="line_1548"> 1548.</a></span><span class="count                ">      1</span><span>                                            "count": 1,</span></pre>
+<pre><span class="lineno"><a href="#line_1549" id="line_1549"> 1549.</a></span><span class="count                ">      1</span><span>                                            "endOffset": 0x40,</span></pre>
+<pre><span class="lineno"><a href="#line_1550" id="line_1550"> 1550.</a></span><span class="count                ">      1</span><span>                                            "startOffset": 0x20</span></pre>
+<pre><span class="lineno"><a href="#line_1551" id="line_1551"> 1551.</a></span><span class="count                ">      1</span><span>                                        },</span></pre>
+<pre><span class="lineno"><a href="#line_1552" id="line_1552"> 1552.</a></span><span class="count                ">      1</span><span>                                        {</span></pre>
+<pre><span class="lineno"><a href="#line_1553" id="line_1553"> 1553.</a></span><span class="count                ">      1</span><span>                                            "count": 1,</span></pre>
+<pre><span class="lineno"><a href="#line_1554" id="line_1554"> 1554.</a></span><span class="count                ">      1</span><span>                                            "endOffset": 0x80,</span></pre>
+<pre><span class="lineno"><a href="#line_1555" id="line_1555"> 1555.</a></span><span class="count                ">      1</span><span>                                            "startOffset": 0x60</span></pre>
+<pre><span class="lineno"><a href="#line_1556" id="line_1556"> 1556.</a></span><span class="count                ">      1</span><span>                                        },</span></pre>
+<pre><span class="lineno"><a href="#line_1557" id="line_1557"> 1557.</a></span><span class="count                ">      1</span><span>                                        {</span></pre>
+<pre><span class="lineno"><a href="#line_1558" id="line_1558"> 1558.</a></span><span class="count                ">      1</span><span>                                            "count": 0,</span></pre>
+<pre><span class="lineno"><a href="#line_1559" id="line_1559"> 1559.</a></span><span class="count                ">      1</span><span>                                            "endOffset": 0x45,</span></pre>
+<pre><span class="lineno"><a href="#line_1560" id="line_1560"> 1560.</a></span><span class="count                ">      1</span><span>                                            "startOffset": 0x25</span></pre>
+<pre><span class="lineno"><a href="#line_1561" id="line_1561"> 1561.</a></span><span class="count                ">      1</span><span>                                        },</span></pre>
+<pre><span class="lineno"><a href="#line_1562" id="line_1562"> 1562.</a></span><span class="count                ">      1</span><span>                                        {</span></pre>
+<pre><span class="lineno"><a href="#line_1563" id="line_1563"> 1563.</a></span><span class="count                ">      1</span><span>                                            "count": 0,</span></pre>
+<pre><span class="lineno"><a href="#line_1564" id="line_1564"> 1564.</a></span><span class="count                ">      1</span><span>                                            "endOffset": 0x85,</span></pre>
+<pre><span class="lineno"><a href="#line_1565" id="line_1565"> 1565.</a></span><span class="count                ">      1</span><span>                                            "startOffset": 0x65</span></pre>
+<pre><span class="lineno"><a href="#line_1566" id="line_1566"> 1566.</a></span><span class="count                ">      1</span><span>                                        }</span></pre>
+<pre><span class="lineno"><a href="#line_1567" id="line_1567"> 1567.</a></span><span class="count                ">      1</span><span>                                    ]</span></pre>
+<pre><span class="lineno"><a href="#line_1568" id="line_1568"> 1568.</a></span><span class="count                ">      1</span><span>                                }</span></pre>
+<pre><span class="lineno"><a href="#line_1569" id="line_1569"> 1569.</a></span><span class="count                ">      1</span><span>                            ],</span></pre>
+<pre><span class="lineno"><a href="#line_1570" id="line_1570"> 1570.</a></span><span class="count                ">      1</span><span>                            "scriptId": "0",</span></pre>
+<pre><span class="lineno"><a href="#line_1571" id="line_1571"> 1571.</a></span><span class="count                ">      1</span><span>                            "url": "file:///" + modulePath.resolve(</span></pre>
+<pre><span class="lineno"><a href="#line_1572" id="line_1572"> 1572.</a></span><span class="count                ">      1</span><span>                                ".tmp/coverage_misc/aa.js"</span></pre>
+<pre><span class="lineno"><a href="#line_1573" id="line_1573"> 1573.</a></span><span class="count                ">      1</span><span>                            )</span></pre>
+<pre><span class="lineno"><a href="#line_1574" id="line_1574"> 1574.</a></span><span class="count                ">      1</span><span>                        }</span></pre>
+<pre><span class="lineno"><a href="#line_1575" id="line_1575"> 1575.</a></span><span class="count                ">      1</span><span>                    ]</span></pre>
+<pre><span class="lineno"><a href="#line_1576" id="line_1576"> 1576.</a></span><span class="count                ">      1</span><span>                }, undefined, 4)</span></pre>
+<pre><span class="lineno"><a href="#line_1577" id="line_1577"> 1577.</a></span><span class="count                ">      1</span><span>            ]</span></pre>
+<pre><span class="lineno"><a href="#line_1578" id="line_1578"> 1578.</a></span><span class="count                ">      2</span><span>        ].map(async function ([</span></pre>
+<pre><span class="lineno"><a href="#line_1579" id="line_1579"> 1579.</a></span><span class="count                ">      2</span><span>            file, data</span></pre>
+<pre><span class="lineno"><a href="#line_1580" id="line_1580"> 1580.</a></span><span class="count                ">      2</span><span>        ]) {</span></pre>
+<pre><span class="lineno"><a href="#line_1581" id="line_1581"> 1581.</a></span><span class="count                ">      2</span><span>            await fsWriteFileWithParents(file, data);</span></pre>
+<pre><span class="lineno"><a href="#line_1582" id="line_1582"> 1582.</a></span><span class="count                ">      2</span><span>        }));</span></pre>
+<pre><span class="lineno"><a href="#line_1583" id="line_1583"> 1583.</a></span><span class="count                ">      1</span><span>        await jslint.jslint_cli({</span></pre>
+<pre><span class="lineno"><a href="#line_1584" id="line_1584"> 1584.</a></span><span class="count                ">      1</span><span>            console_error: noop, // comment to debug</span></pre>
+<pre><span class="lineno"><a href="#line_1585" id="line_1585"> 1585.</a></span><span class="count                ">      1</span><span>            mode_cli: true,</span></pre>
+<pre><span class="lineno"><a href="#line_1586" id="line_1586"> 1586.</a></span><span class="count                ">      1</span><span>            process_argv: [</span></pre>
+<pre><span class="lineno"><a href="#line_1587" id="line_1587"> 1587.</a></span><span class="count                ">      1</span><span>                "node", "jslint.mjs",</span></pre>
+<pre><span class="lineno"><a href="#line_1588" id="line_1588"> 1588.</a></span><span class="count                ">      1</span><span>                "v8_coverage_report=.tmp/coverage_misc"</span></pre>
+<pre><span class="lineno"><a href="#line_1589" id="line_1589"> 1589.</a></span><span class="count                ">      1</span><span>                // "node", ".tmp/coverage_misc/aa.js"</span></pre>
+<pre><span class="lineno"><a href="#line_1590" id="line_1590"> 1590.</a></span><span class="count                ">      1</span><span>            ]</span></pre>
+<pre><span class="lineno"><a href="#line_1591" id="line_1591"> 1591.</a></span><span class="count                ">      1</span><span>        });</span></pre>
+<pre><span class="lineno"><a href="#line_1592" id="line_1592"> 1592.</a></span><span class="count                ">      1</span><span>    });</span></pre>
+<pre><span class="lineno"><a href="#line_1593" id="line_1593"> 1593.</a></span><span class="count                ">      1</span><span>});</span></pre>
+<pre><span class="lineno"><a href="#line_1594" id="line_1594"> 1594.</a></span><span class="count                ">      1</span><span></span></pre>
 </div>
 <!-- content end -->
 <div class="footer">

@@ -3,7 +3,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Status
-| Branch | [master<br>(v2025.3.31)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
+| Branch | [master<br>(v2025.10.31)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jslint-org/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/jslint-org/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/jslint-org/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/index.html) |
@@ -66,6 +66,8 @@ Douglas Crockford <douglas@crockford.com>
     - [Directive `/*property*/`](#directive-property)
     - [Directive `/*jslint-disable*/.../*jslint-enable*/`](#directive-jslint-disablejslint-enable)
     - [Directive `//jslint-ignore-line`](#directive-jslint-ignore-line)
+    - [Directive `/*coverage-disable*/.../*coverage-enable*/`](#directive-coverage-disablecoverage-enable)
+    - [Directive `//coverage-ignore-line`](#directive-coverage-ignore-line)
 
 10. [Package Listing](#package-listing)
 
@@ -892,6 +894,34 @@ eval("1"); //jslint-ignore-line
 
 
 <br><br>
+### Directive `/*coverage-disable*/.../*coverage-enable*/`
+
+```js
+/*coverage-disable*/
+
+// JSLint will ignore code-coverage in this region.
+
+if (false) {
+    console.log("hello world");
+}
+
+/*coverage-enable*/
+```
+
+
+<br><br>
+### Directive `//coverage-ignore-line`
+
+```js
+// JSLint will ignore code-coverage at given line.
+
+if (false) {
+    console.log("hello world"); //coverage-ignore-line
+}
+```
+
+
+<br><br>
 # Package Listing
 ![screenshot_package_listing.svg](https://jslint-org.github.io/jslint/branch-master/.artifact/screenshot_package_listing.svg)
 
@@ -923,7 +953,7 @@ eval("1"); //jslint-ignore-line
 - `git push upstream alpha -f`
     - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions
-- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2024.11.24
+- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2025.10.28
 - click `Create pull request`
 - input `Add your description here...` with:
 ```
@@ -963,7 +993,7 @@ This PR will additionally:
 - `git push upstream alpha -f`
     - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions
-- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v2025.3.31
+- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v2025.10.31
 - click `Create pull request`
 - input `Add a title` with: `# v20yy.mm.dd`
 - input `Add a description` with:
