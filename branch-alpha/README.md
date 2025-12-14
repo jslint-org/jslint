@@ -953,7 +953,7 @@ if (false) {
 - `git push upstream alpha -f`
     - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions
-- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2025.10.28
+- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2025.12.14
 - click `Create pull request`
 - input `Add your description here...` with:
 ```
@@ -987,6 +987,7 @@ This PR will additionally:
 
 <br><br>
 ### branch-master commit
+- update ci.yml to latest nodejs-lts
 - `shGitPullrequest master beta`
     - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions
