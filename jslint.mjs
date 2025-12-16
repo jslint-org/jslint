@@ -4676,6 +4676,9 @@ function jslint_phase3_parse(state) {
             the_paren.free = true;
             if (
                 the_argument.wrapped === true
+
+// PR-483 - Allow parenthesis after ellipsis inside a function call.
+
                 && the_argument.ellipsis !== true
             ) {
 
