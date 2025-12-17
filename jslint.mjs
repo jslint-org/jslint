@@ -4674,7 +4674,13 @@ function jslint_phase3_parse(state) {
 
             test_cause("free");
             the_paren.free = true;
-            if (the_argument.wrapped === true) {
+            if (
+                the_argument.wrapped === true
+
+// PR-483 - Allow parenthesis after ellipsis inside a function call.
+
+                && the_argument.ellipsis !== true
+            ) {
 
 // test_cause:
 // ["aa((0))", "infix_lparen", "unexpected_a", "(", 3]
