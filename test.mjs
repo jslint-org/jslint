@@ -693,6 +693,19 @@ jstestDescribe((
                 "#!\n/*jslint browser:false, node*/\n\"use strict\";",
                 "/*property aa bb*/"
             ],
+            ellipsis: [
+
+// PR-483 - Allow parenthesis after ellipsis inside a function call.
+
+                (
+                    "let aa = 0;\n"
+                    + "aa(...(\n"
+                    + "    aa()\n"
+                    + "    ? [0]\n"
+                    + "    : [1]\n"
+                    + "));"
+                )
+            ],
             for: [
                 (
                     "/*jslint for*/\n"
