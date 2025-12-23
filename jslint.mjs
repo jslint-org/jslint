@@ -5214,9 +5214,12 @@ function jslint_phase3_parse(state) {
             }
             semicolon();
         }
-        if (the_label !== undefined) {
-            the_label.dead = true;
-        }
+
+// Issue #458 - Regression - Warn about variable usage before initialization.
+
+//        if (the_label !== undefined) {
+//            the_label.dead = true;
+//        }
         return the_statement;
     }
 
