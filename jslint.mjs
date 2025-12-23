@@ -5164,6 +5164,9 @@ function jslint_phase3_parse(state) {
                 the_label.dead = false;
                 the_label.init = true;
                 the_statement = parse_statement();
+
+// Issue #458 - Regression - Warn about variable usage before initialization.
+
                 the_label.dead = true;
                 functionage.statement_prv = the_statement;
                 the_statement.label = the_label;
@@ -6994,6 +6997,10 @@ function jslint_phase3_parse(state) {
                         the_variable.names.push(name);
                         enroll(name, "variable", mode_const);
                     }
+
+// Issue #458 - Regression - Warn about variable usage before initialization.
+
+//                    name.dead = false;
                     name.init = true;
 
 // test_cause:
@@ -7049,6 +7056,10 @@ function jslint_phase3_parse(state) {
                     advance();
                     the_variable.names.push(name);
                     enroll(name, "variable", mode_const);
+
+// Issue #458 - Regression - Warn about variable usage before initialization.
+
+//                    name.dead = false;
                     name.init = true;
 
 // test_cause:
@@ -7086,6 +7097,10 @@ function jslint_phase3_parse(state) {
                 enroll(name, "variable", mode_const);
                 if (token_nxt.id === "=" || mode_const) {
                     advance("=");
+
+// Issue #458 - Regression - Warn about variable usage before initialization.
+
+//                    name.dead = false;
                     name.init = true;
 
 // test_cause:
