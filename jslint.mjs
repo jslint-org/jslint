@@ -5220,6 +5220,7 @@ function jslint_phase3_parse(state) {
 //        if (the_label !== undefined) {
 //            the_label.dead = true;
 //        }
+
         return the_statement;
     }
 
@@ -7004,6 +7005,7 @@ function jslint_phase3_parse(state) {
 // Issue #458 - Regression - Warn about variable usage before initialization.
 
 //                    name.dead = false;
+
                     name.init = true;
 
 // test_cause:
@@ -7063,6 +7065,7 @@ function jslint_phase3_parse(state) {
 // Issue #458 - Regression - Warn about variable usage before initialization.
 
 //                    name.dead = false;
+
                     name.init = true;
 
 // test_cause:
@@ -7104,6 +7107,7 @@ function jslint_phase3_parse(state) {
 // Issue #458 - Regression - Warn about variable usage before initialization.
 
 //                    name.dead = false;
+
                     name.init = true;
 
 // test_cause:
