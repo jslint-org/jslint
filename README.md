@@ -1007,7 +1007,7 @@ This PR will additionally:
     - verify ci-success for pull-request
     - https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
 - wait awhile before continuing ...
-- click `Rebase and merge`
+- click `Squash and merge`
     - verify ci-success for upstream-branch-beta
     - https://github.com/jslint-org/jslint/actions
 - `shGitPullrequestCleanup`
