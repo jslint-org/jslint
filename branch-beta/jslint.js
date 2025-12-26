@@ -5164,6 +5164,10 @@ function jslint_phase3_parse(state) {
                 the_label.dead = false;
                 the_label.init = true;
                 the_statement = parse_statement();
+
+// Issue #458 - Regression - Warn about variable usage before initialization.
+
+                the_label.dead = true;
                 functionage.statement_prv = the_statement;
                 the_statement.label = the_label;
                 the_statement.statement = true;
@@ -5210,9 +5214,13 @@ function jslint_phase3_parse(state) {
             }
             semicolon();
         }
-        if (the_label !== undefined) {
-            the_label.dead = true;
-        }
+
+// Issue #458 - Regression - Warn about variable usage before initialization.
+
+//        if (the_label !== undefined) {
+//            the_label.dead = true;
+//        }
+
         return the_statement;
     }
 
@@ -6993,8 +7001,16 @@ function jslint_phase3_parse(state) {
                         the_variable.names.push(name);
                         enroll(name, "variable", mode_const);
                     }
-                    name.dead = false;
+
+// Issue #458 - Regression - Warn about variable usage before initialization.
+
+//                    name.dead = false;
+
                     name.init = true;
+
+// test_cause:
+// ["const {aa}=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 12]
+
                     if (token_nxt.id === "=") {
 
 // test_cause:
@@ -7045,8 +7061,16 @@ function jslint_phase3_parse(state) {
                     advance();
                     the_variable.names.push(name);
                     enroll(name, "variable", mode_const);
-                    name.dead = false;
+
+// Issue #458 - Regression - Warn about variable usage before initialization.
+
+//                    name.dead = false;
+
                     name.init = true;
+
+// test_cause:
+// ["const [aa]=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 12]
+
                     if (ellipsis) {
                         name.ellipsis = true;
                         break;
@@ -7079,8 +7103,16 @@ function jslint_phase3_parse(state) {
                 enroll(name, "variable", mode_const);
                 if (token_nxt.id === "=" || mode_const) {
                     advance("=");
-                    name.dead = false;
+
+// Issue #458 - Regression - Warn about variable usage before initialization.
+
+//                    name.dead = false;
+
                     name.init = true;
+
+// test_cause:
+// ["const aa=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 10]
+
                     name.expression = parse_expression(0);
                 }
                 the_variable.names.push(name);
