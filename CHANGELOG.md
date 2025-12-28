@@ -6,7 +6,7 @@
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
-# v2025.12.1-beta
+# v2025.12.28
 - jslint - regression-fix - Warn about variable usage before initialization.
 - jslint - Allow parenthesis after ellipsis inside a function call.
 - ci - Upgrade nodejs used in ci to v24.
