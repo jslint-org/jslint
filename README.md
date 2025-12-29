@@ -990,7 +990,7 @@ This PR will additionally:
 ### branch-master commit
 - update ci.yml to latest nodejs-lts
 - checkpoint local-branch-beta
-- `shGitPullrequest master beta # run until version propagates`
+- `shGitPullrequest master beta # re-run until version propagates`
     - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions
 - `git push upstream alpha -f`
@@ -1029,6 +1029,12 @@ This PR will additionally:
 
 <br><br>
 ### branch-master publish
+- goto https://www.npmjs.com/package/@jslint-org/jslint/access <!--no-validate-->
+- click `Github Actions`
+- input `Organization or user*` with: `jslint-org`
+- input `Repository*` with: `jslint`
+- input `Workflow filename*` with: `publish.yml`
+- click `Set up connection` or `Update Package Settings`
 - `git push upstream beta:master`
     - verify ci-success for upstream-branch-master
     - https://github.com/jslint-org/jslint/actions

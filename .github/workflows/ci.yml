@@ -9,7 +9,7 @@ on:
       - master
   workflow_dispatch:
 env:
-  MY_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
   zzzz1234: 1
 jobs:
 
@@ -22,7 +22,7 @@ jobs:
           - x64
           # - x86
         node_version:
-          - 24
+          - "24"
         os:
           - macos-latest
           - ubuntu-latest

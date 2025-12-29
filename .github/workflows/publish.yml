@@ -1,6 +1,7 @@
 # base - .github/workflows/publish.yml - beg
 # Publishing packages to npm and GitHub Packages
 # https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages#publishing-packages-to-npm-and-github-packages
+# https://docs.npmjs.com/trusted-publishers#step-2-configure-your-cicd-workflow
 name: publish
 on:
   release:
@@ -9,58 +10,40 @@ on:
 jobs:
 
 
-  job1:
-    strategy:
-      matrix:
-        architecture:
-          # - arm64
-          - x64
-          # - x86
-        node_version:
-          - 24
-        os:
-          # - macos-latest
-          - ubuntu-latest
-          # - windows-latest
-    name: >
-      job1
-      node
-      v${{ matrix.node_version }}
-      ${{ matrix.architecture }}
-      ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+  publish_github:
+    name: Publish Package to GitHub
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
     steps:
-
-      # Setup .npmrc file to publish to GitHub Packages
-      - run: rm -f /home/runner/work/_temp/.npmrc
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node_version }}
-          architecture: ${{ matrix.architecture }}
-          registry-url: 'https://npm.pkg.github.com'
+          node-version: "24"
+          registry-url: "https://npm.pkg.github.com"
           # Defaults to the user or organization that owns the workflow file
-          # scope: '@octocat'
+          # scope: "@octocat"
       # Publish to GitHub Packages
       - run: sh jslint_ci.sh shCiPublishNpm
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_REGISTRY: github
 
-      # Setup .npmrc file to publish to npm
-      - run: rm -f /home/runner/work/_temp/.npmrc
+
+  publish_npmjs:
+    name: Publish Package to npmjs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write  # Required for OIDC
+      packages: write
+    steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node_version }}
-          architecture: ${{ matrix.architecture }}
-          registry-url: 'https://registry.npmjs.org'
-      # Publish to npm
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+      # Publish to npmjs Packages
       - run: sh jslint_ci.sh shCiPublishNpm
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_REGISTRY: npm
 # base - .github/workflows/publish.yml - end
