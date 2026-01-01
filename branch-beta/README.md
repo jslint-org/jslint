@@ -3,7 +3,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Status
-| Branch | [master<br>(v2025.10.31)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
+| Branch | [master<br>(v2025.12.28)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jslint-org/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/jslint-org/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/jslint-org/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/index.html) |
@@ -947,6 +947,7 @@ if (false) {
 <br><br>
 ### pull-request merge
 - find highest issue-number at https://github.com/jslint-org/jslint/issues/, https://github.com/jslint-org/jslint/pulls/, and add +1 to it for PR-xxx
+- checkpoint local-branch-beta
 - `shGitPullrequest beta beta`
     - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions
@@ -973,7 +974,7 @@ This PR will additionally:
     - verify ci-success for pull-request
     - https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
 - wait awhile before continuing ...
-- click `Rebase and merge`
+- click `Squash and merge`
     - verify ci-success for upstream-branch-beta
     - https://github.com/jslint-org/jslint/actions
 - `shGitPullrequestCleanup`
@@ -988,13 +989,14 @@ This PR will additionally:
 <br><br>
 ### branch-master commit
 - update ci.yml to latest nodejs-lts
-- `shGitPullrequest master beta`
+- checkpoint local-branch-beta
+- `shGitPullrequest master beta # re-run until version propagates`
     - verify ci-success for origin-branch-alpha
     - https://github.com/kaizhu256/jslint/actions
 - `git push upstream alpha -f`
     - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions
-- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v2025.10.31
+- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v2025.12.28
 - click `Create pull request`
 - input `Add a title` with: `# v20yy.mm.dd`
 - input `Add a description` with:
@@ -1027,6 +1029,12 @@ This PR will additionally:
 
 <br><br>
 ### branch-master publish
+- goto https://www.npmjs.com/package/@jslint-org/jslint/access <!--no-validate-->
+- click `Github Actions`
+- input `Organization or user*` with: `jslint-org`
+- input `Repository*` with: `jslint`
+- input `Workflow filename*` with: `publish.yml`
+- click `Set up connection` or `Update Package Settings`
 - `git push upstream beta:master`
     - verify ci-success for upstream-branch-master
     - https://github.com/jslint-org/jslint/actions

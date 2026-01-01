@@ -967,19 +967,6 @@ import moduleChildProcess from "child_process";
 ' "$@" # '
 )}
 
-shGitPullrequestCleanup() {(set -e
-# This function will cleanup pull-request after merge.
-    git fetch upstream beta
-    # verify no diff between alpha..upstream/beta
-    git diff alpha..upstream/beta
-    git push . HEAD:__pr_upstream_pre -f
-    git reset upstream/beta
-    git push origin alpha -f
-    git push origin alpha:beta
-    sh jslint_ci.sh shMyciUpdate
-    git push . HEAD:__pr_upstream -f
-)}
-
 shGitPullrequest() {(set -e
 # This function will create-and-push a github-pull-commit to origin/alpha.
     node --input-type=module --eval '
@@ -1080,6 +1067,19 @@ import moduleFs from "fs";
     });
 }());
 ' "$@" # '
+)}
+
+shGitPullrequestCleanup() {(set -e
+# This function will cleanup pull-request after merge.
+    git fetch upstream beta
+    # verify no diff between alpha..upstream/beta
+    git diff alpha..upstream/beta
+    git push . HEAD:__pr_upstream_pre -f
+    git reset upstream/beta
+    git push origin alpha -f
+    git push origin alpha:beta
+    sh jslint_ci.sh shMyciUpdate
+    git push . HEAD:__pr_upstream -f
 )}
 
 shGitSquashPop() {(set -e
