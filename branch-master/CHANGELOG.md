@@ -6,6 +6,12 @@
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
+# v2025.12.28
+- ci - Update file publish.yml to use trusted-publishing for npm packages.
+- jslint - regression-fix - Warn about variable usage before initialization.
+- jslint - Allow parenthesis after ellipsis inside a function call.
+- ci - Upgrade nodejs used in ci to v24.
+
 # v2025.10.31
 - coverage - Add coverage-directives '/*coverage-disable*/', '/*coverage-enable*/'. '//coverage-ignore-line'.
 
