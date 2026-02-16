@@ -6,6 +6,9 @@
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
+# v2026.2.1-beta
+- jslint - Update warning to suggest Boolean(...) instead of !! for ternary-expression.
+
 # v2025.12.28
 - ci - Update file publish.yml to use trusted-publishing for npm packages.
 - jslint - regression-fix - Warn about variable usage before initialization.
