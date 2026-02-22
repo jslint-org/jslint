@@ -329,7 +329,7 @@
     textLength="768"
     x="10"
     y="1198"
->node-pre-gyp info using node@24.12.0 | linux | x64                                               </tspan>
+>node-pre-gyp info using node@24.13.0 | linux | x64                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -395,7 +395,7 @@
     textLength="768"
     x="10"
     y="1440"
->17 vulnerabilities (5 low, 8 moderate, 1 high, 3 critical)                                       </tspan>
+>26 vulnerabilities (5 low, 8 moderate, 13 high)                                                  </tspan>
 
 </text>
 </svg>
