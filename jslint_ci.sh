@@ -302,7 +302,7 @@ shCiArtifactUpload() {(set -e
     git config --local user.email "github-actions@users.noreply.github.com"
     git config --local user.name "github-actions"
     # init $GITHUB_BRANCH0
-    export GITHUB_BRANCH0="$(git rev-parse --abbrev-ref HEAD)"
+    export GITHUB_BRANCH0="$(git branch --show-current)"
     git pull --unshallow origin "$GITHUB_BRANCH0"
     # init $UPSTREAM_XXX
     export UPSTREAM_REPOSITORY="$(node -p '(
@@ -399,9 +399,13 @@ shCiBase() {(set -e
 # shCiLintCustom() {(set -e
 # # This function will run custom-code to lint files.
 # )}
-    export GITHUB_BRANCH0="$(git rev-parse --abbrev-ref HEAD)"
+    export GITHUB_BRANCH0="$(git branch --show-current)"
     # Auto-correct common errors in package.json.
-    npm pkg fix
+    # Check npm-version >= 10.0.0, before running npm-pkg-fix
+    if [ "$(npm --version | cut -d"." -f1)" -ge 10 ]
+    then
+        npm pkg fix
+    fi
     # validate package.json.fileCount
     node --input-type=module --eval '
 import moduleFs from "fs";
@@ -451,8 +455,8 @@ import moduleFs from "fs";
         {
             file: "README.md",
             src: fileDict["README.md"].replace((
-                /(\[(?:main|master)<br>\()v\d\d\d\d\.\d\d?\.\d\d?\b/g
-            ), `$1v${versionMaster}`)
+                /(\[(?:main|master)<br>\()v\d\d\d\d\.\d\d?\.\d\d?\b[^)]*?(\))/g
+            ), `$1v${versionMaster}$2`)
         }, {
             file: "package.json",
             src: fileDict["package.json"].replace((
