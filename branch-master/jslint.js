@@ -163,7 +163,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2025.12.28";
+let jslint_edition = "v2026.2.28";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -8195,7 +8195,7 @@ function jslint_phase4_walk(state) {
 // test_cause:
 // ["aa?true:false", "post_t", "expected_a_b", "?", 3]
 
-            warn("expected_a_b", thing, "!!", "?");
+            warn("expected_a_b", thing, "Boolean(...)", "?");
         } else if (
             thing.expression[1].id === "false"
             && thing.expression[2].id === "true"
