@@ -1724,45 +1724,69 @@ function objectDeepCopyWithKeysSorted(obj) {
 
 shLintPython() {(set -e
 # This function will lint python file.
+# https://docs.astral.sh/ruff/rules/
     FILE_LIST="$@"
     (
     printf "\n\nlint ruff\n"
     OPTION=""
     # autofix
     OPTION="$OPTION --fix"
-    # ANN flake8-annotations
-    OPTION="$OPTION --ignore=ANN"
-    # obsolete - one-blank-line-before-class (D203)
-    # * 1 blank line required before class docstring
-    OPTION="$OPTION --ignore=D203"
-    # multi-line-summary-first-line (D212)
-    # * Multi-line docstring summary should start at the first line
-    OPTION="$OPTION --ignore=D212"
-    # non-imperative-mood (D401)
-    # * First line of docstring should be in imperative mood: "{first_line}"
-    OPTION="$OPTION --ignore=D401"
-    # docstring-starts-with-this (D404)
-    # * First word of the docstring should not be "This"
-    OPTION="$OPTION --ignore=D404"
-    # commented-out-code (ERA001)
-    # Commented-out code is dead code, and is often included inadvertently.
-    OPTION="$OPTION --ignore=ERA001"
-    # too-many-statements (PLR0915)
-    # * Too many statements ({statements} > {max_statements})
-    OPTION="$OPTION --ignore=PLR0915"
-    # subprocess-without-shell-equals-true (S603)
-    # * `subprocess` call: check for execution of untrusted input
-    OPTION="$OPTION --ignore=S603"
-    # start-process-with-partial-path (S607)
-    # * Starting a process with a partial executable path
-    OPTION="$OPTION --ignore=S607"
-    # hardcoded-sql-expression (S608)
-    # SQL injection is a common attack vector for web applications.
-    OPTION="$OPTION --ignore=S608"
-    # print (T201)
-    # * `print` found
-    OPTION="$OPTION --ignore=T201"
     OPTION="$OPTION --select=ALL"
+    #
+    # ANNXXX flake8-annotations
+    OPTION="$OPTION --ignore=ANN"
+    #
+    # C901 - complex-structure
+    # {name} is too complex ({complexity} > {max_complexity})
+    OPTION="$OPTION --ignore=C901"
+    #
+    # D203 - incorrect-blank-line-before-class
+    # 1 blank line required before class docstring
+    OPTION="$OPTION --ignore=D203"
+    #
+    # D212 - multi-line-summary-first-line
+    # Multi-line docstring summary should start at the first line
+    OPTION="$OPTION --ignore=D212"
+    #
+    # D401 - non-imperative-mood
+    # First line of docstring should be in imperative mood: "{first_line}"
+    OPTION="$OPTION --ignore=D401"
+    #
+    # D404 - docstring-starts-with-this
+    # First word of the docstring should not be "This"
+    OPTION="$OPTION --ignore=D404"
+    #
+    # ERA001 - commented-out-code
+    # Found commented-out code
+    OPTION="$OPTION --ignore=ERA001"
+    #
+    # PLR0912 - too-many-branches
+    # Too many branches ({branches} > {max_branches})
+    OPTION="$OPTION --ignore=PLR0912"
+    #
+    # PLR0913 - too-many-arguments
+    # Too many arguments in function definition ({c_args} > {max_args})
+    OPTION="$OPTION --ignore=PLR0913"
+    #
+    # PLR0915 - too-many-statements
+    # Too many statements ({statements} > {max_statements})
+    OPTION="$OPTION --ignore=PLR0915"
+    #
+    # S603 - subprocess-without-shell-equals-true
+    # subprocess call: check for execution of untrusted input
+    OPTION="$OPTION --ignore=S603"
+    #
+    # S607 - start-process-with-partial-path
+    # Starting a process with a partial executable path
+    OPTION="$OPTION --ignore=S607"
+    #
+    # S608 - hardcoded-sql-expression
+    # Possible SQL injection vector through string-based query construction
+    OPTION="$OPTION --ignore=S608"
+    #
+    # T201 - print
+    # print found
+    OPTION="$OPTION --ignore=T201"
     ruff check $OPTION $FILE_LIST
     ) &
     PID_LIST="$PID_LIST $!"
@@ -1770,12 +1794,15 @@ shLintPython() {(set -e
     (
     printf "lint pycodestyle\n"
     OPTION="--ignore="
-    # Unexpected indentation (comment) (E116)
-    # Comments should be indented relative to the code in the block they are in.
+    #
+    # E116 - unexpected-indentation-comment
+    # Unexpected indentation (comment)
     OPTION="$OPTION,E116"
-    # At least two spaces before inline comment (E261)
-    # Inline comments should have two spaces before them.
+    #
+    # E261 - too-few-spaces-before-inline-comment
+    # Insert at least two spaces before an inline comment
     OPTION="$OPTION,E261"
+    #
     # Line break occurred before a binary operator (W503)
     # Line breaks should occur after the binary operator to keep all variable
     # names aligned.

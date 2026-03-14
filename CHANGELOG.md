@@ -6,6 +6,9 @@
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
+# v2026.3.1-beta
+- jslint-ci - Update shell-function shLintPython().
+
 # v2026.2.28
 - jslint - Update warning to suggest Boolean(...) instead of !! for ternary-expression.
 - ci - Update shell-function shCiBase() to check npm-version-support, before running npm-pkg-fix.
