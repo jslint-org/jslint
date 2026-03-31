@@ -1075,15 +1075,16 @@ import moduleFs from "fs";
 
 shGitPullrequestCleanup() {(set -e
 # This function will cleanup pull-request after merge.
+    git checkout alpha
+    git push . alpha:__pr_upstream_pre -f
     git fetch upstream beta
     # verify no diff between alpha..upstream/beta
     git diff alpha..upstream/beta
-    git push . HEAD:__pr_upstream_pre -f
     git reset upstream/beta
-    git push origin alpha -f
-    git push origin alpha:beta
+    git push . alpha:beta -f
+    git push origin alpha beta -f
     sh jslint_ci.sh shMyciUpdate
-    git push . HEAD:__pr_upstream -f
+    git push . alpha:__pr_upstream -f
 )}
 
 shGitSquashPop() {(set -e
