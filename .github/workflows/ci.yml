@@ -2,6 +2,11 @@
 # and upload build-artifacts to branch-gh-pages
 name: ci
 on:
+  pull_request:
+    branches:
+      - alpha
+      - beta
+      - master
   push:
     branches:
       - alpha
@@ -37,8 +42,8 @@ jobs:
         ${{ matrix.architecture }}
         ${{ matrix.os }}
       CI_MATRIX_NAME_MAIN: "node v24 x64 ubuntu-latest"
-      CI_MATRIX_NODE_VERSION: v${{ matrix.node_version }}
-      CI_MATRIX_NODE_VERSION_MAIN: v24
+      CI_MATRIX_NODE_VERSION: ${{ matrix.node_version }}
+      CI_MATRIX_NODE_VERSION_MAIN: "24"
       CI_WORKFLOW_NAME: >
         ${{ github.workflow }}
         - ${{ github.event_name }}
@@ -57,7 +62,16 @@ jobs:
           echo "$(date -u +"%Y-%m-%d %TZ") - ${{ env.CI_WORKFLOW_NAME }}" # "
           git config --global core.autocrlf false
       # https://github.com/actions/checkout
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+      # https://github.com/actions/cache
+      - uses: actions/cache@v5
+        with:
+          key: >
+            ${{ hashFiles('./package.json') }}
+            ${{ matrix.architecture }}
+            ${{ matrix.node_version }}
+            ${{ matrix.os }}
+          path: .github_cache/
       # fetch jslint_ci.sh from trusted source
       - run: |
           git fetch origin alpha --depth=1
@@ -65,25 +79,24 @@ jobs:
           if [ -f "$FILE" ]; then git checkout origin/alpha "$FILE"; fi; done'
       # pre-run .ci.sh
       - run: sh jslint_ci.sh shCiPre
+        if: >
+          github.event_name == 'push' ||
+          github.event_name == 'schedule' ||
+          github.event_name == 'workflow_dispatch'
       # https://github.com/actions/setup-node
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ matrix.node_version }}
       # https://github.com/actions/setup-python
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python_version }}
-      # https://github.com/actions/cache
-      - uses: actions/cache@v4
-        with:
-          key: >
-            ${{ hashFiles('./package.json') }}
-            ${{ matrix.architecture }}
-            ${{ matrix.node_version }}
-            ${{ matrix.os }}
-          path: .github_cache
       # run nodejs coverages and tests
       - run: sh jslint_ci.sh shCiBase
       # upload build-artifacts to branch-gh-pages
       - run: sh jslint_ci.sh shCiArtifactUpload
+        if: >
+          github.event_name == 'push' ||
+          github.event_name == 'schedule' ||
+          github.event_name == 'workflow_dispatch'
 # base - .github/workflows/ci.yml - end

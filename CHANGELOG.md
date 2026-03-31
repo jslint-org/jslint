@@ -7,6 +7,7 @@
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.3.1-beta
+- ci - Update file .github/workflows/ci.yml with hook to run on pull-request.
 - jslint-ci - Update shell-function shLintPython().
 
 # v2026.2.28
