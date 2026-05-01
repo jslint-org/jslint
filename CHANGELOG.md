@@ -7,7 +7,7 @@
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
-# v2026.3.1-beta
+# v2026.4.30
 - github-ci - Pin various github-runner-os to stable/lts version.
 - jslint-ci - Update file jslint_ci.sh, replacing deprecated url.parse(...).pathname with new URL(...).pathname.
 - jslint-ci - Update shell-function shGitPullrequestCleanup() to allow squash-and-merge pull-request.
