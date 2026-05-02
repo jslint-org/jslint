@@ -1,10 +1,18 @@
 # Changelog
 
 # Todo
+- jslint - bugfix - Fix false-positive Unused-variable when variable is used in function argument-default.
 - doc - document supported/unsupported es6+ features
 - jslint - add html and css linting back into jslint.
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
+
+# v2026.4.30
+- github-ci - Pin various github-runner-os to stable/lts version.
+- jslint-ci - Update file jslint_ci.sh, replacing deprecated url.parse(...).pathname with new URL(...).pathname.
+- jslint-ci - Update shell-function shGitPullrequestCleanup() to allow squash-and-merge pull-request.
+- ci - Update file .github/workflows/ci.yml with hook to run on pull-request.
+- jslint-ci - Update shell-function shLintPython().
 
 # v2026.2.28
 - jslint - Update warning to suggest Boolean(...) instead of !! for ternary-expression.
