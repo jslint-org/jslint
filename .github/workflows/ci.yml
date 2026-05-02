@@ -84,7 +84,7 @@ jobs:
           github.event_name == 'schedule' ||
           github.event_name == 'workflow_dispatch'
       # https://github.com/actions/setup-node
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node_version }}
       # https://github.com/actions/setup-python
