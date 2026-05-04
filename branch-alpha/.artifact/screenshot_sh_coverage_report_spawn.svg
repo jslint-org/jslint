@@ -263,7 +263,7 @@
     textLength="768"
     x="10"
     y="956"
->(node:3843) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone t\</tspan>
+>(node:3938) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone t\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
