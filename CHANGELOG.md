@@ -7,6 +7,9 @@
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
+# v2026.5.1-beta
+- jslint - Allow more methods to be called on literal strings and arrays; make allowed methods for . and ?. consistent.
+
 # v2026.4.30
 - github-ci - Pin various github-runner-os to stable/lts version.
 - jslint-ci - Update file jslint_ci.sh, replacing deprecated url.parse(...).pathname with new URL(...).pathname.
