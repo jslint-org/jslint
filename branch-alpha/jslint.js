@@ -163,7 +163,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2026.4.30";
+let jslint_edition = "v2026.5.1-beta";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -4542,17 +4542,35 @@ function jslint_phase3_parse(state) {
         if (
             (
                 left.id !== "(string)"
-                || (name.id !== "indexOf" && name.id !== "repeat")
+                || (
+                    name.id !== "charCodeAt"
+                    && name.id !== "includes"
+                    && name.id !== "indexOf"
+                    && name.id !== "match"
+                    && name.id !== "repeat"
+                    && name.id !== "replace"
+                    && name.id !== "toLowerCase"
+                    && name.id !== "toUpperCase"
+                )
             )
             && (
                 left.id !== "["
                 || (
                     name.id !== "concat"
+                    && name.id !== "every"
+                    && name.id !== "filter"
+                    && name.id !== "find"
+                    && name.id !== "findIndex"
                     && name.id !== "flat"
                     && name.id !== "flatMap"
                     && name.id !== "forEach"
+                    && name.id !== "includes"
                     && name.id !== "join"
                     && name.id !== "map"
+                    && name.id !== "reduce"
+                    && name.id !== "some"
+                    && name.id !== "toReversed"
+                    && name.id !== "toSorted"
                 )
             )
             && (left.id !== "+" || name.id !== "slice")
@@ -4708,15 +4726,35 @@ function jslint_phase3_parse(state) {
         if (
             (
                 left.id !== "(string)"
-                || (name.id !== "indexOf" && name.id !== "repeat")
+                || (
+                    name.id !== "charCodeAt"
+                    && name.id !== "includes"
+                    && name.id !== "indexOf"
+                    && name.id !== "match"
+                    && name.id !== "repeat"
+                    && name.id !== "replace"
+                    && name.id !== "toLowerCase"
+                    && name.id !== "toUpperCase"
+                )
             )
             && (
                 left.id !== "["
                 || (
                     name.id !== "concat"
+                    && name.id !== "every"
+                    && name.id !== "filter"
+                    && name.id !== "find"
+                    && name.id !== "findIndex"
+                    && name.id !== "flat"
+                    && name.id !== "flatMap"
                     && name.id !== "forEach"
+                    && name.id !== "includes"
                     && name.id !== "join"
                     && name.id !== "map"
+                    && name.id !== "reduce"
+                    && name.id !== "some"
+                    && name.id !== "toReversed"
+                    && name.id !== "toSorted"
                 )
             )
 
