@@ -716,6 +716,9 @@ jstestDescribe((
                     + "}\n"
                 )
             ],
+            import: [
+                `import aa from "aa" with {"type": "json"};\naa();`
+            ],
             jslint_disable: [
                 "/*jslint-disable*/\n0\n/*jslint-enable*/"
             ],
