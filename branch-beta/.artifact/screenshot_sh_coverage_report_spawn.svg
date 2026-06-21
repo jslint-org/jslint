@@ -227,13 +227,13 @@
     textLength="768"
     x="10"
     y="824"
->npm warn deprecated gauge@3.0.2: This package is no longer supported.                            </tspan>
+>npm warn deprecated @npmcli/move-file@1.1.2: This functionality has been moved to @npmcli/fs     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="846"
->npm warn deprecated @npmcli/move-file@1.1.2: This functionality has been moved to @npmcli/fs     </tspan>
+>npm warn deprecated gauge@3.0.2: This package is no longer supported.                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -311,25 +311,25 @@
     textLength="768"
     x="10"
     y="1132"
->npm warn deprecated npmlog@6.0.2: This package is no longer supported.                           </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1154"
 >npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publi\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1176"
+    y="1154"
 >  cized security vulnerabilities, which have been fixed in the current version. Please update. S\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1198"
+    y="1176"
 >  upport for old versions may be purchased (at exorbitant rates) by contacting i@izs.me          </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1198"
+>npm warn deprecated npmlog@6.0.2: This package is no longer supported.                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

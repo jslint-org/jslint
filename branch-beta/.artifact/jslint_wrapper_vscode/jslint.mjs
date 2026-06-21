@@ -163,7 +163,7 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2026.5.1-beta";
+let jslint_edition = "v2026.6.1-beta";
 let jslint_export;                      // The jslint object to be exported.
 let jslint_fudge = 1;                   // Fudge starting line and starting
                                         // ... column to 1.
@@ -6604,6 +6604,14 @@ function jslint_phase3_parse(state) {
             warn("bad_module_name_a", token_now);
         }
         import_list.push(token_now.value);
+
+// Issue-495 - Add ES16-syntax "import ... with {...}".
+
+        if (token_nxt.id === "with") {
+            advance("with");
+            advance("{");
+            prefix_lbrace();
+        }
         semicolon();
         return the_import;
     }

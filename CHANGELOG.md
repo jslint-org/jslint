@@ -7,7 +7,8 @@
 - jslint - add new warning requiring paren around plus-separated concatenations.
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
-# v2026.5.1-beta
+# v2026.6.1-beta
+- jslint - Add ES16-syntax "import ... with {...}".
 - jslint - Allow more methods to be called on literal strings and arrays; make allowed methods for . and ?. consistent.
 
 # v2026.4.30
