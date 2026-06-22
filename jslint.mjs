@@ -5831,134 +5831,137 @@ function jslint_phase3_parse(state) {
         let name;
         let the_colon;
         let value;
+        function property_parse() {
+            name = token_nxt;
+            advance();
+
+// Issue #401 - Add ES2018-syntax for object-literal-spread-operator.
+
+            if (name.id === "...") {
+                value = parse_expression(0);
+                value.ellipsis = true;
+            } else if (
+                (name.id === "get" || name.id === "set")
+                && token_nxt.identifier
+            ) {
+                if (!option_dict.getset) {
+
+// test_cause:
+// ["aa={get aa(){}}", "property_parse", "unexpected_a", "get", 5]
+
+                    warn("unexpected_a", name);
+                }
+                extra = name.id;
+                full = extra + " " + token_nxt.id;
+                name = token_nxt;
+                advance();
+                id = survey(name);
+                if (seen[full] === true || seen[id] === true) {
+
+// test_cause:
+// ["aa={get aa(){},get aa(){}}", "property_parse", "duplicate_a", "aa", 20]
+
+                    warn("duplicate_a", name);
+                }
+                seen[id] = false;
+                seen[full] = true;
+            } else if (name.id === "`") {
+
+// test_cause:
+// ["aa={`aa`:0}", "property_parse", "unexpected_a", "`", 5]
+
+                stop("unexpected_a", name);
+
+            } else {
+                id = survey(name);
+                if (typeof seen[id] === "boolean") {
+
+// test_cause:
+// ["aa={aa,aa}", "property_parse", "duplicate_a", "aa", 8]
+
+                    warn("duplicate_a", name);
+                }
+                seen[id] = true;
+            }
+            if (value && value.ellipsis) {
+                the_brace.expression.push(value);
+            } else if (name.identifier) {
+                if (token_nxt.id === "}" || token_nxt.id === ",") {
+                    if (typeof extra === "string") {
+
+// test_cause:
+// ["aa={get aa}", "property_parse", "closer", "", 0]
+
+                        test_cause("closer");
+                        advance("(");
+                    }
+                    value = parse_expression(Infinity, true);
+                } else if (token_nxt.id === "(") {
+
+// test_cause:
+// ["aa={aa()}", "property_parse", "paren", "", 0]
+// ["aa={get aa(){}}", "property_parse", "paren", "", 0]
+
+                    test_cause("paren");
+                    value = prefix_function({
+                        arity: "unary",
+                        from: name.from,
+                        id: "function",
+                        line: name.line,
+                        name: (
+                            typeof extra === "string"
+                            ? extra
+                            : id
+                        ),
+                        thru: name.from
+                    });
+                } else {
+                    if (typeof extra === "string") {
+
+// test_cause:
+// ["aa={get aa.aa}", "property_parse", "paren", "", 0]
+
+                        test_cause("paren");
+                        advance("(");
+                    }
+                    the_colon = token_nxt;
+                    advance(":");
+                    value = parse_expression(0);
+                    if (
+                        value.id === name.id
+                        && value.id !== "function"
+                    ) {
+
+// test_cause:
+// ["aa={aa:aa}", "property_parse", "unexpected_a", ": aa", 7]
+
+                        warn("unexpected_a", the_colon, ": " + name.id);
+                    }
+                }
+                value.label = name;
+                if (typeof extra === "string") {
+                    value.extra = extra;
+                }
+                the_brace.expression.push(value);
+            } else {
+
+// test_cause:
+// ["aa={\"aa\":0}", "property_parse", "colon", "", 0]
+
+                test_cause("colon");
+                advance(":");
+                value = parse_expression(0);
+                value.label = name;
+                the_brace.expression.push(value);
+            }
+        }
         the_brace.expression = [];
         if (token_nxt.id !== "}") {
 
 // Parse/loop through each property in {...}.
 
             while (true) {
-                name = token_nxt;
-                advance();
-
-// Issue #401 - Add ES2018-syntax for object-literal-spread-operator.
-
-                if (name.id === "...") {
-                    value = parse_expression(0);
-                    value.ellipsis = true;
-                } else if (
-                    (name.id === "get" || name.id === "set")
-                    && token_nxt.identifier
-                ) {
-                    if (!option_dict.getset) {
-
-// test_cause:
-// ["aa={get aa(){}}", "prefix_lbrace", "unexpected_a", "get", 5]
-
-                        warn("unexpected_a", name);
-                    }
-                    extra = name.id;
-                    full = extra + " " + token_nxt.id;
-                    name = token_nxt;
-                    advance();
-                    id = survey(name);
-                    if (seen[full] === true || seen[id] === true) {
-
-// test_cause:
-// ["aa={get aa(){},get aa(){}}", "prefix_lbrace", "duplicate_a", "aa", 20]
-
-                        warn("duplicate_a", name);
-                    }
-                    seen[id] = false;
-                    seen[full] = true;
-                } else if (name.id === "`") {
-
-// test_cause:
-// ["aa={`aa`:0}", "prefix_lbrace", "unexpected_a", "`", 5]
-
-                    stop("unexpected_a", name);
-
-                } else {
-                    id = survey(name);
-                    if (typeof seen[id] === "boolean") {
-
-// test_cause:
-// ["aa={aa,aa}", "prefix_lbrace", "duplicate_a", "aa", 8]
-
-                        warn("duplicate_a", name);
-                    }
-                    seen[id] = true;
-                }
-                if (value && value.ellipsis) {
-                    the_brace.expression.push(value);
-                } else if (name.identifier) {
-                    if (token_nxt.id === "}" || token_nxt.id === ",") {
-                        if (typeof extra === "string") {
-
-// test_cause:
-// ["aa={get aa}", "prefix_lbrace", "closer", "", 0]
-
-                            test_cause("closer");
-                            advance("(");
-                        }
-                        value = parse_expression(Infinity, true);
-                    } else if (token_nxt.id === "(") {
-
-// test_cause:
-// ["aa={aa()}", "prefix_lbrace", "paren", "", 0]
-// ["aa={get aa(){}}", "prefix_lbrace", "paren", "", 0]
-
-                        test_cause("paren");
-                        value = prefix_function({
-                            arity: "unary",
-                            from: name.from,
-                            id: "function",
-                            line: name.line,
-                            name: (
-                                typeof extra === "string"
-                                ? extra
-                                : id
-                            ),
-                            thru: name.from
-                        });
-                    } else {
-                        if (typeof extra === "string") {
-
-// test_cause:
-// ["aa={get aa.aa}", "prefix_lbrace", "paren", "", 0]
-
-                            test_cause("paren");
-                            advance("(");
-                        }
-                        the_colon = token_nxt;
-                        advance(":");
-                        value = parse_expression(0);
-                        if (
-                            value.id === name.id
-                            && value.id !== "function"
-                        ) {
-
-// test_cause:
-// ["aa={aa:aa}", "prefix_lbrace", "unexpected_a", ": aa", 7]
-
-                            warn("unexpected_a", the_colon, ": " + name.id);
-                        }
-                    }
-                    value.label = name;
-                    if (typeof extra === "string") {
-                        value.extra = extra;
-                    }
-                    the_brace.expression.push(value);
-                } else {
-
-// test_cause:
-// ["aa={\"aa\":0}", "prefix_lbrace", "colon", "", 0]
-
-                    test_cause("colon");
-                    advance(":");
-                    value = parse_expression(0);
-                    value.label = name;
-                    the_brace.expression.push(value);
-                }
+                property_parse();
                 if (token_nxt.id !== ",") {
                     break;
                 }
