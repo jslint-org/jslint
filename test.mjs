@@ -697,9 +697,9 @@ jstestDescribe((
 
 // Issue #401 - Add ES2018-syntax for object-literal-spread-operator.
 
-                "let aa = 0;\naa = {...aa()};",
-                "let aa = 0;\naa = {...aa.aa};",
-                "let aa = 0;\naa = {...aa};",
+                "let aa = 0;\naa = {aa: 1, ...aa(), bb: 2};",
+                "let aa = 0;\naa = {aa: 1, ...aa, bb: 2};",
+                "let aa = 0;\naa = {aa: 1, ...aa.aa, bb: 2};",
 
 // PR-483 - Allow parenthesis after ellipsis inside a function call.
 

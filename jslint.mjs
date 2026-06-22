@@ -5871,6 +5871,7 @@ function jslint_phase3_parse(state) {
 
                 test_cause("aa={...aa}");
                 value = prefix_ellipsis();
+                value.ellipsis = true;
                 return value;
             }
             advance();
@@ -6011,7 +6012,11 @@ function jslint_phase3_parse(state) {
 
         check_ordered(
             "property",
-            the_brace.expression.map(function ({
+            the_brace.expression.filter(function ({
+                ellipsis
+            }) {
+                return !ellipsis;
+            }).map(function ({
                 label
             }) {
                 return label;
