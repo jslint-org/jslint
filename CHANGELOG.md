@@ -1,6 +1,7 @@
 # Changelog
 
 # Todo
+- jslint - replace all non-return "stop(...);" with "return stop(...)".
 - jslint - bugfix - Fix false-positive Unused-variable when variable is used in function argument-default.
 - doc - document supported/unsupported es6+ features
 - jslint - add html and css linting back into jslint.

@@ -5832,15 +5832,17 @@ function jslint_phase3_parse(state) {
         let the_colon;
         let value;
         function property_parse() {
-            name = token_nxt;
-            advance();
 
 // Issue #401 - Add ES2018-syntax for object-literal-spread-operator.
 
-            if (name.id === "...") {
+            name = token_nxt;
+            if (token_nxt.id === "...") {
+                advance("...");
                 value = parse_expression(0);
-                value.ellipsis = true;
-            } else if (
+                return;
+            }
+            advance();
+            if (
                 (name.id === "get" || name.id === "set")
                 && token_nxt.identifier
             ) {
@@ -5883,67 +5885,7 @@ function jslint_phase3_parse(state) {
                 }
                 seen[id] = true;
             }
-            if (value && value.ellipsis) {
-                the_brace.expression.push(value);
-            } else if (name.identifier) {
-                if (token_nxt.id === "}" || token_nxt.id === ",") {
-                    if (typeof extra === "string") {
-
-// test_cause:
-// ["aa={get aa}", "property_parse", "closer", "", 0]
-
-                        test_cause("closer");
-                        advance("(");
-                    }
-                    value = parse_expression(Infinity, true);
-                } else if (token_nxt.id === "(") {
-
-// test_cause:
-// ["aa={aa()}", "property_parse", "paren", "", 0]
-// ["aa={get aa(){}}", "property_parse", "paren", "", 0]
-
-                    test_cause("paren");
-                    value = prefix_function({
-                        arity: "unary",
-                        from: name.from,
-                        id: "function",
-                        line: name.line,
-                        name: (
-                            typeof extra === "string"
-                            ? extra
-                            : id
-                        ),
-                        thru: name.from
-                    });
-                } else {
-                    if (typeof extra === "string") {
-
-// test_cause:
-// ["aa={get aa.aa}", "property_parse", "paren", "", 0]
-
-                        test_cause("paren");
-                        advance("(");
-                    }
-                    the_colon = token_nxt;
-                    advance(":");
-                    value = parse_expression(0);
-                    if (
-                        value.id === name.id
-                        && value.id !== "function"
-                    ) {
-
-// test_cause:
-// ["aa={aa:aa}", "property_parse", "unexpected_a", ": aa", 7]
-
-                        warn("unexpected_a", the_colon, ": " + name.id);
-                    }
-                }
-                value.label = name;
-                if (typeof extra === "string") {
-                    value.extra = extra;
-                }
-                the_brace.expression.push(value);
-            } else {
+            if (!name.identifier) {
 
 // test_cause:
 // ["aa={\"aa\":0}", "property_parse", "colon", "", 0]
@@ -5952,7 +5894,63 @@ function jslint_phase3_parse(state) {
                 advance(":");
                 value = parse_expression(0);
                 value.label = name;
-                the_brace.expression.push(value);
+                return;
+            }
+            if (token_nxt.id === "}" || token_nxt.id === ",") {
+                if (typeof extra === "string") {
+
+// test_cause:
+// ["aa={get aa}", "property_parse", "closer", "", 0]
+
+                    test_cause("closer");
+                    advance("(");
+                }
+                value = parse_expression(Infinity, true);
+            } else if (token_nxt.id === "(") {
+
+// test_cause:
+// ["aa={aa()}", "property_parse", "paren", "", 0]
+// ["aa={get aa(){}}", "property_parse", "paren", "", 0]
+
+                test_cause("paren");
+                value = prefix_function({
+                    arity: "unary",
+                    from: name.from,
+                    id: "function",
+                    line: name.line,
+                    name: (
+                        typeof extra === "string"
+                        ? extra
+                        : id
+                    ),
+                    thru: name.from
+                });
+            } else {
+                if (typeof extra === "string") {
+
+// test_cause:
+// ["aa={get aa.aa}", "property_parse", "paren", "", 0]
+
+                    test_cause("paren");
+                    advance("(");
+                }
+                the_colon = token_nxt;
+                advance(":");
+                value = parse_expression(0);
+                if (
+                    value.id === name.id
+                    && value.id !== "function"
+                ) {
+
+// test_cause:
+// ["aa={aa:aa}", "property_parse", "unexpected_a", ": aa", 7]
+
+                    warn("unexpected_a", the_colon, ": " + name.id);
+                }
+            }
+            value.label = name;
+            if (typeof extra === "string") {
+                value.extra = extra;
             }
         }
         the_brace.expression = [];
@@ -5962,6 +5960,7 @@ function jslint_phase3_parse(state) {
 
             while (true) {
                 property_parse();
+                the_brace.expression.push(value);
                 if (token_nxt.id !== ",") {
                     break;
                 }
