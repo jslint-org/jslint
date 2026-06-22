@@ -187,7 +187,7 @@ let jslint_rgx_digits_octals = (
     /^[0-7_]*/
 );
 let jslint_rgx_directive = (
-    /^(jslint|property|global)\s+(.*)$/
+    /^(jslint|property|global)\s+?(\S.*?)$/
 );
 let jslint_rgx_directive_part = (
     /([a-zA-Z$_][a-zA-Z0-9$_]*)(?::\s*(true|false))?,?\s*|$/g
@@ -9511,10 +9511,10 @@ function jslint_report({
 // Google Lighthouse Accessibility - <dl>'s do not contain only properly-ordered
 // <dt> and <dd> groups, <script>, <template> or <div> elements.
 
-                "<dl>"
-                + "<dt>" + htmlEscape(title) + "</dt>"
-                + "<dd>" + list.join(", ") + "</dd>"
-                + "</dl>"
+                "<dl>" +
+                "<dt>" + htmlEscape(title) + "</dt>" +
+                "<dd>" + list.map(htmlEscape).join(", ") + "</dd>" +
+                "</dl>"
             )
             : ""
         );

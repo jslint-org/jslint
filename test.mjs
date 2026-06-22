@@ -93,9 +93,9 @@ jstestDescribe((
                     ]
                 });
             }, (
-                "Weird character "
-                + JSON.stringify(char).replace("\\", "\\\\")
-                + " found in "
+                "Weird character " +
+                JSON.stringify(char).replace((/\\/g), "\\\\") +
+                " found in "
             ));
         }));
     });
