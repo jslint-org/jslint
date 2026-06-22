@@ -5825,21 +5825,27 @@ function jslint_phase3_parse(state) {
     function prefix_lbrace() {
         const seen = empty();
         const the_brace = token_now;
-        let extra;
-        let full;
-        let id;
-        let name;
-        let the_colon;
-        let value;
         function property_parse() {
+            let extra;
+            let full;
+            let id;
+            let name = token_nxt;
+            let the_colon;
+            let value;
+            if (!name.identifier && name.id === "`") {
+
+// test_cause:
+// ["aa={`aa`:0}", "property_parse", "unexpected_a", "`", 5]
+
+                return stop("unexpected_a", name);
+            }
 
 // Issue #401 - Add ES2018-syntax for object-literal-spread-operator.
 
-            name = token_nxt;
-            if (token_nxt.id === "...") {
+            if (!name.identifier && token_nxt.id === "...") {
                 advance("...");
                 value = parse_expression(0);
-                return;
+                return value;
             }
             advance();
             if (
@@ -5867,13 +5873,6 @@ function jslint_phase3_parse(state) {
                 }
                 seen[id] = false;
                 seen[full] = true;
-            } else if (name.id === "`") {
-
-// test_cause:
-// ["aa={`aa`:0}", "property_parse", "unexpected_a", "`", 5]
-
-                stop("unexpected_a", name);
-
             } else {
                 id = survey(name);
                 if (typeof seen[id] === "boolean") {
@@ -5894,7 +5893,7 @@ function jslint_phase3_parse(state) {
                 advance(":");
                 value = parse_expression(0);
                 value.label = name;
-                return;
+                return value;
             }
             if (token_nxt.id === "}" || token_nxt.id === ",") {
                 if (typeof extra === "string") {
@@ -5952,6 +5951,7 @@ function jslint_phase3_parse(state) {
             if (typeof extra === "string") {
                 value.extra = extra;
             }
+            return value;
         }
         the_brace.expression = [];
         if (token_nxt.id !== "}") {
@@ -5959,8 +5959,7 @@ function jslint_phase3_parse(state) {
 // Parse/loop through each property in {...}.
 
             while (true) {
-                property_parse();
-                the_brace.expression.push(value);
+                the_brace.expression.push(property_parse());
                 if (token_nxt.id !== ",") {
                     break;
                 }
