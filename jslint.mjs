@@ -4838,7 +4838,10 @@ function jslint_phase3_parse(state) {
 // .led_infix   Left denotation. The infix/postfix handler.
 //  lbp         Left binding power of infix operator. It tells us how strongly
 //              the operator binds to the argument at its left.
-//  rbp         Right binding power.
+//  rbp         Right binding power. Parser will continue consuming tokens while
+//              next token's lbp > rbp.
+//  initial     Whether first token has already been advanced. If falsy,
+//              immediately calls advance().
 
 // It processes a nud_prefix (variable, constant, prefix operator). It will then
 // process leds (infix operators) until the bind powers cause it to stop (it
@@ -5838,7 +5841,13 @@ function jslint_phase3_parse(state) {
             while (true) {
                 name = token_nxt;
                 advance();
-                if (
+
+// Issue #401 - Add ES2018-syntax for object-literal-spread-operator.
+
+                if (name.id === "...") {
+                    value = parse_expression(0);
+                    value.ellipsis = true;
+                } else if (
                     (name.id === "get" || name.id === "set")
                     && token_nxt.identifier
                 ) {
@@ -5881,7 +5890,9 @@ function jslint_phase3_parse(state) {
                     }
                     seen[id] = true;
                 }
-                if (name.identifier) {
+                if (value && value.ellipsis) {
+                    the_brace.expression.push(value);
+                } else if (name.identifier) {
                     if (token_nxt.id === "}" || token_nxt.id === ",") {
                         if (typeof extra === "string") {
 
@@ -6605,7 +6616,7 @@ function jslint_phase3_parse(state) {
         }
         import_list.push(token_now.value);
 
-// Issue-495 - Add ES16-syntax "import ... with {...}".
+// Issue #495 - Add ES2025-syntax "import ... with {...}".
 
         if (token_nxt.id === "with") {
             advance("with");
