@@ -9,6 +9,7 @@
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.6.1-beta
+- jslint - Unify ES2018-syntax-spread-operator with function prefix_ellipsis().
 - jslint - Add ES2018-syntax for object-literal-spread-operator.
 - jslint - Add ES2025-syntax "import ... with {...}".
 - jslint - Allow more methods to be called on literal strings and arrays; make allowed methods for . and ?. consistent.

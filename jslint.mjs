@@ -4650,7 +4650,6 @@ function jslint_phase3_parse(state) {
 
     function infix_lparen(left) {
         const the_paren = token_now;
-        let ellipsis;
         let the_argument;
         if (left.id !== "function") {
 
@@ -4670,12 +4669,15 @@ function jslint_phase3_parse(state) {
 
             while (true) {
                 if (token_nxt.id === "...") {
-                    ellipsis = true;
-                    advance("...");
-                }
-                the_argument = parse_expression(10);
-                if (ellipsis) {
+
+// test_cause:
+// ["aa(...aa)", "infix_lparen", "aa(...aa)", "", 0]
+
+                    test_cause("aa(...aa)");
+                    the_argument = prefix_ellipsis();
                     the_argument.ellipsis = true;
+                } else {
+                    the_argument = parse_expression(10);
                 }
                 the_paren.expression.push(the_argument);
                 if (token_nxt.id !== ",") {
@@ -5430,6 +5432,13 @@ function jslint_phase3_parse(state) {
         return the_await;
     }
 
+    function prefix_ellipsis() {
+        let after_ellipsis;
+        advance("...");
+        after_ellipsis = parse_expression(0);
+        return after_ellipsis;
+    }
+
     function prefix_fart() {
 
 // test_cause:
@@ -5843,8 +5852,12 @@ function jslint_phase3_parse(state) {
 // Issue #401 - Add ES2018-syntax for object-literal-spread-operator.
 
             if (!name.identifier && token_nxt.id === "...") {
-                advance("...");
-                value = parse_expression(0);
+
+// test_cause:
+// ["aa={...aa}", "property_parse", "aa={...aa}", "", 0]
+
+                test_cause("aa={...aa}");
+                value = prefix_ellipsis();
                 return value;
             }
             advance();
@@ -5998,21 +6011,21 @@ function jslint_phase3_parse(state) {
     function prefix_lbracket() {
         const the_token = token_now;
         let element;
-        let ellipsis;
         the_token.expression = [];
         if (token_nxt.id !== "]") {
 
 // Parse/loop through each element in [...].
 
             while (true) {
-                ellipsis = false;
                 if (token_nxt.id === "...") {
-                    ellipsis = true;
-                    advance("...");
-                }
-                element = parse_expression(10);
-                if (ellipsis) {
-                    element.ellipsis = true;
+
+// test_cause:
+// ["aa=[...aa]", "prefix_lbracket", "aa=[...aa]", "", 0]
+
+                    test_cause("aa=[...aa]");
+                    element = prefix_ellipsis();
+                } else {
+                    element = parse_expression(10);
                 }
                 the_token.expression.push(element);
                 if (token_nxt.id !== ",") {
@@ -7103,6 +7116,11 @@ function jslint_phase3_parse(state) {
                 while (true) {
                     ellipsis = false;
                     if (token_nxt.id === "...") {
+
+// test_cause:
+// ["let [...aa]=aa", "stmt_var", "let [...aa]=aa", "", 0]
+
+                        test_cause("let [...aa]=aa");
                         ellipsis = true;
                         advance("...");
                     }
@@ -7128,7 +7146,6 @@ function jslint_phase3_parse(state) {
 // ["const [aa]=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 12]
 
                     if (ellipsis) {
-                        name.ellipsis = true;
                         break;
                     }
                     if (token_nxt.id === "=") {
