@@ -2279,7 +2279,13 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["\"\\u{12345\"", "char_after_escape", "expected_a_before_b", "\"", 10]
 
-                    stop_at("expected_a_before_b", line, column, "}", char);
+                    return stop_at(
+                        "expected_a_before_b",
+                        line,
+                        column,
+                        "}",
+                        char
+                    );
                 }
                 return char_after();
             }
@@ -3729,7 +3735,7 @@ import moduleHttps from "https";
 // test_cause:
 // ["/*jslint-enable*/", "read_line", "unopened_enable", "", 1]
 
-                stop_at("unopened_enable", line);
+                return stop_at("unopened_enable", line);
             }
             line_disable = undefined;
         } else if (
@@ -4590,7 +4596,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["aa.0", "infix_dot", "expected_identifier_a", "0", 4]
 
-            stop("expected_identifier_a");
+            return stop("expected_identifier_a");
         }
         advance();
         survey(name);
@@ -4795,7 +4801,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["aa?.0", "infix_option_chain", "expected_identifier_a", "0", 5]
 
-            stop("expected_identifier_a");
+            return stop("expected_identifier_a");
         }
         advance();
         survey(name);
@@ -4994,21 +5000,28 @@ function jslint_phase3_parse(state) {
                 warn("use_function_not_fart", the_fart);
             }
             the_fart.block = block("body");
-        } else if (
-            syntax_dict[token_nxt.id] !== undefined
-            && syntax_dict[token_nxt.id].fud_stmt !== undefined
-        ) {
-
-// PR-384 - Bugfix - Fixes issue #379 - warn against naked-statement in fart.
-
-// test_cause:
-// ["()=>delete aa", "parse_fart", "unexpected_a_after_b", "=>", 5]
-
-            stop("unexpected_a_after_b", token_nxt, token_nxt.id, "=>");
 
 // The function's body is an expression.
 
         } else {
+
+// PR-384 - Bugfix - Fixes issue #379 - warn against naked-statement in fart.
+
+            if (
+                syntax_dict[token_nxt.id] !== undefined
+                && syntax_dict[token_nxt.id].fud_stmt !== undefined
+            ) {
+
+// test_cause:
+// ["()=>delete aa", "parse_fart", "unexpected_a_after_b", "=>", 5]
+
+                return stop(
+                    "unexpected_a_after_b",
+                    token_nxt,
+                    token_nxt.id,
+                    "=>"
+                );
+            }
             the_fart.expression = parse_expression(0);
         }
 
@@ -5165,7 +5178,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["[undefined]", "parse_json", "unexpected_a", "undefined", 2]
 
-            stop("unexpected_a");
+            return stop("unexpected_a");
         }
     }
 
@@ -5360,7 +5373,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["/=", "prefix_assign_divide", "expected_a_b", "/=", 1]
 
-        stop("expected_a_b", token_now, "/\\=", "/=");
+        return stop("expected_a_b", token_now, "/\\=", "/=");
     }
 
     function prefix_async() {
@@ -6247,7 +6260,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["delete 0", "stmt_delete", "expected_a_b", "0", 8]
 
-            stop("expected_a_b", the_value, ".", artifact(the_value));
+            return stop("expected_a_b", the_value, ".", artifact(the_value));
         }
         the_token.expression = the_value;
         semicolon();
@@ -6372,7 +6385,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["export {}", "stmt_export", "expected_identifier_a", "}", 9]
 
-                        stop("expected_identifier_a");
+                        return stop("expected_identifier_a");
                     }
                     the_id = token_nxt.id;
                     export_list.push(token_nxt);
@@ -6416,7 +6429,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["export", "stmt_export", "unexpected_a", "(end)", 1]
 
-                stop("unexpected_a");
+                return stop("unexpected_a");
             }
         }
         state.mode_module = true;
@@ -6594,7 +6607,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["import {", "stmt_import", "expected_identifier_a", "(end)", 1]
 
-                        stop("expected_identifier_a");
+                        return stop("expected_identifier_a");
                     }
                     name = token_nxt;
                     advance();
@@ -7261,7 +7274,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["with", "stmt_with", "unexpected_a", "with", 1]
 
-        stop("unexpected_a", token_now);
+        return stop("unexpected_a", token_now);
     }
 
     function survey(name) {

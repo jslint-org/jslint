@@ -1,7 +1,6 @@
 # Changelog
 
 # Todo
-- jslint - replace all non-return "stop(...);" with "return stop(...)".
 - jslint - bugfix - Fix false-positive Unused-variable when variable is used in function argument-default.
 - doc - document supported/unsupported es6+ features
 - jslint - add html and css linting back into jslint.
@@ -9,6 +8,7 @@
 - jslint - try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.6.1-beta
+- jslint - replace all non-return "stop(...);" with "return stop(...)".
 - jslint - Unify ES2018-syntax-spread-operator with function prefix_ellipsis().
 - jslint - Add ES2018-syntax for object-literal-spread-operator.
 - jslint - Add ES2025-syntax "import ... with {...}".
