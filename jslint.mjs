@@ -9162,8 +9162,9 @@ function jslint_phase5_whitage(state) {
                 } else {
                     at_margin(0);
                 }
-            } else {
-                if (right.statement || right.role === "label") {
+                break;
+            }
+            if (right.statement || right.role === "label") {
 
 // test_cause:
 // ["
@@ -9174,13 +9175,13 @@ function jslint_phase5_whitage(state) {
 // }
 // ", "whitage_case", "expected_line_break_a_b", "bb", 16]
 
-                    warn(
-                        "expected_line_break_a_b",
-                        right,
-                        artifact(left),
-                        artifact(right)
-                    );
-                }
+                warn(
+                    "expected_line_break_a_b",
+                    right,
+                    artifact(left),
+                    artifact(right)
+                );
+            }
 
 // test_cause:
 // ["let aa=(0);", "whitage_case", "not_free", "", 0]
@@ -9188,15 +9189,14 @@ function jslint_phase5_whitage(state) {
 // ["let aa=`${0}`;", "whitage_case", "not_free", "", 0]
 // ["let aa={aa:0};", "whitage_case", "not_free", "", 0]
 
-                test_cause("not_free");
-                free = false;
-                open = false;
+            test_cause("not_free");
+            free = false;
+            open = false;
 
 // test_cause:
 // ["let aa = ( 0 );", "no_space_only", "unexpected_space_a_b", "0", 12]
 
-                no_space_only();
-            }
+            no_space_only();
         }
     }
 
@@ -9223,17 +9223,20 @@ function jslint_phase5_whitage(state) {
                 at_margin(0);
                 open = false;
             }
+            return;
+        }
 
 // If right is a closer, then pop the previous state.
 
-        } else if (right.id === closer) {
+        if (right.id === closer) {
             pop();
             if (opening && right.id !== ";") {
                 at_margin(0);
             } else {
                 no_space_only();
             }
-        } else {
+            return;
+        }
 
 // Left is not an opener, and right is not a closer.
 // The nature of left and right will determine the space between them.
@@ -9241,10 +9244,12 @@ function jslint_phase5_whitage(state) {
 // If left is ',' or ';' or right is a statement then if open,
 // right must go at the margin, or if closed, a space between.
 
-            if (right.switch) {
-                at_margin(-mode_indent);
-            } else if (right.role === "label") {
-                if (right.from !== 0) {
+        if (right.switch) {
+            at_margin(-mode_indent);
+            return;
+        }
+        if (right.role === "label") {
+            if (right.from !== 0) {
 
 // test_cause:
 // ["
@@ -9258,19 +9263,21 @@ function jslint_phase5_whitage(state) {
 // }
 // ", "expected_at", "expected_a_at_b_c", "1", 10]
 
-                    expected_at(0);
-                }
-            } else if (left.id === ",") {
-                if (!open || (
-                    (free || closer === "]")
-                    && left.line === right.line
-                )) {
+                expected_at(0);
+            }
+            return;
+        }
+        if (left.id === ",") {
+            if (!open || (
+                (free || closer === "]")
+                && left.line === right.line
+            )) {
 
 // test_cause:
 // ["let {aa,bb} = 0;", "one_space", "expected_space_a_b", "bb", 9]
 
-                    one_space();
-                } else {
+                one_space();
+            } else {
 
 // test_cause:
 // ["
@@ -9281,13 +9288,15 @@ function jslint_phase5_whitage(state) {
 // }
 // ", "expected_at", "expected_a_at_b_c", "9", 11]
 
-                    at_margin(0);
-                }
+                at_margin(0);
+            }
+            return;
+        }
 
 // If right is a ternary operator, line it up on the margin.
 
-            } else if (right.arity === "ternary") {
-                if (open) {
+        if (right.arity === "ternary") {
+            if (open) {
 
 // test_cause:
 // ["
@@ -9298,48 +9307,54 @@ function jslint_phase5_whitage(state) {
 // );
 // ", "expected_at", "expected_a_at_b_c", "5", 1]
 
-                    at_margin(0);
-                } else {
+                at_margin(0);
+            } else {
 
 // test_cause:
 // ["let aa = (aa ? 0 : 1);", "whitage_default", "use_open", "?", 14]
 
-                    warn("use_open", right);
-                }
-            } else if (
-                right.arity === "binary"
-                && right.id === "("
-                && free
-            ) {
+                warn("use_open", right);
+            }
+            return;
+        }
+        if (
+            right.arity === "binary"
+            && right.id === "("
+            && free
+        ) {
 
 // test_cause:
 // ["let aa = aa(\naa ()\n);", "no_space", "unexpected_space_a_b", "(", 4]
 
-                no_space();
-            } else if (
-                left.id === "."
-                || left.id === "?."
-                || left.id === "..."
-                || right.id === ","
-                || right.id === ";"
-                || right.id === ":"
-                || (
-                    right.arity === "binary"
-                    && (right.id === "(" || right.id === "[")
-                )
-                || (
-                    right.arity === "function"
-                    && left.id !== "function"
-                )
-                || (right.id === "." || right.id === "?.")
-            ) {
+            no_space();
+            return;
+        }
+        if (
+            left.id === "."
+            || left.id === "?."
+            || left.id === "..."
+            || right.id === ","
+            || right.id === ";"
+            || right.id === ":"
+            || (
+                right.arity === "binary"
+                && (right.id === "(" || right.id === "[")
+            )
+            || (
+                right.arity === "function"
+                && left.id !== "function"
+            )
+            || (right.id === "." || right.id === "?.")
+        ) {
 
 // test_cause:
 // ["let aa = 0 ;", "no_space_only", "unexpected_space_a_b", ";", 12]
 // ["let aa = aa ?.aa;", "no_space_only", "unexpected_space_a_b", "?.", 13]
 
-                no_space_only();
-            } else if (left.id === ";") {
+            no_space_only();
+            return;
+        }
+        if (left.id === ";") {
 
 // test_cause:
 // ["
@@ -9355,23 +9370,25 @@ function jslint_phase5_whitage(state) {
 // }
 // ", "expected_at", "expected_a_at_b_c", "9", 1]
 
-                if (open) {
-                    at_margin(0);
-                }
-            } else if (
-                left.arity === "ternary"
-                || left.id === "case"
-                || left.id === "catch"
-                || left.id === "else"
-                || left.id === "finally"
-                || left.id === "while"
-                || left.id === "await"
-                || right.id === "catch"
-                || right.id === "else"
-                || right.id === "finally"
-                || (right.id === "while" && !right.statement)
-                || (left.id === ")" && right.id === "{")
-            ) {
+            if (open) {
+                at_margin(0);
+            }
+            return;
+        }
+        if (
+            left.arity === "ternary"
+            || left.id === "case"
+            || left.id === "catch"
+            || left.id === "else"
+            || left.id === "finally"
+            || left.id === "while"
+            || left.id === "await"
+            || right.id === "catch"
+            || right.id === "else"
+            || right.id === "finally"
+            || (right.id === "while" && !right.statement)
+            || (left.id === ")" && right.id === "{")
+        ) {
 
 // test_cause:
 // ["
@@ -9382,47 +9399,51 @@ function jslint_phase5_whitage(state) {
 // }
 // ", "one_space_only", "expected_space_a_b", "(", 12]
 
-                one_space_only();
-            } else if (
+            one_space_only();
+            return;
+        }
+        if (
 
 // There is a space between left and right.
 
-                spaceop[left.id] === true
-                || spaceop[right.id] === true
-                || (
-                    left.arity === "binary"
-                    && (left.id === "+" || left.id === "-")
+            spaceop[left.id] === true
+            || spaceop[right.id] === true
+            || (
+                left.arity === "binary"
+                && (left.id === "+" || left.id === "-")
+            )
+            || (
+                right.arity === "binary"
+                && (right.id === "+" || right.id === "-")
+            )
+            || left.id === "function"
+            || left.id === ":"
+            || left.id === "async"
+            || (
+                (
+                    left.identifier
+                    || left.id === "(string)"
+                    || left.id === "(number)"
                 )
-                || (
-                    right.arity === "binary"
-                    && (right.id === "+" || right.id === "-")
+                && (
+                    right.identifier
+                    || right.id === "(string)"
+                    || right.id === "(number)"
                 )
-                || left.id === "function"
-                || left.id === ":"
-                || left.id === "async"
-                || (
-                    (
-                        left.identifier
-                        || left.id === "(string)"
-                        || left.id === "(number)"
-                    )
-                    && (
-                        right.identifier
-                        || right.id === "(string)"
-                        || right.id === "(number)"
-                    )
-                )
-                || (left.arity === "statement" && right.id !== ";")
-            ) {
+            )
+            || (left.arity === "statement" && right.id !== ";")
+        ) {
 
 // test_cause:
 // ["let aa=0;", "one_space", "expected_space_a_b", "0", 8]
 // ["let aa={\naa:\n0\n};", "expected_at", "expected_a_at_b_c", "5", 1]
 
-                one_space();
-            } else if (left.arity === "unary" && left.id !== "`") {
-                no_space_only();
-            }
+            one_space();
+            return;
+        }
+        if (left.arity === "unary" && left.id !== "`") {
+            no_space_only();
+            return;
         }
     }
 
