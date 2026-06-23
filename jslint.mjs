@@ -92,48 +92,309 @@
 
 /*jslint beta, node*/
 /*property
-    JSLINT_BETA, NODE_V8_COVERAGE, a, all, argv, arity, artifact,
-    assertErrorThrownAsync, assertJsonEqual, assertOrThrow, assign, async, b,
-    beta, bitwise, block, body, browser, c, calls, catch, catch_list,
-    catch_stack, causes, char, children, clear, closer, closure, code, column,
-    concat, consoleError, console_error, console_log, constant, context,
-    convert, count, coverageDir, create, cwd, d, dead, debugInline, default,
-    delta, devel, directive, directive_ignore_line, directive_list, directives,
-    dirname, disrupt, dot, edition, elem_list, ellipsis, else, end, endOffset,
-    endsWith, entries, env, error, eval, every, example_list, excludeList, exec,
-    execArgv, exit, exitCode, export_dict, exports, expression, extra, fart,
-    file, fileList, fileURLToPath, filter, finally, flag, floor, for, forEach,
-    formatted_message, free, freeze, from, froms, fsWriteFileWithParents,
-    fud_stmt, functionName, function_list, function_stack, functions, get,
-    getset, github_repo, globExclude, global, global_dict, global_list,
-    holeList, htmlEscape, id, identifier, ignoreLine, import, import_list,
-    import_meta_url, inc, includeList, indent2, index, indexOf, init, initial,
-    isArray, isBlockCoverage, isHole, isNaN, is_equal, is_weird, join, jslint,
-    jslint_apidoc, jslint_assert, jslint_charset_ascii, jslint_cli,
-    jslint_edition, jslint_phase1_split, jslint_phase2_lex, jslint_phase3_parse,
-    jslint_phase4_walk, jslint_phase5_whitage, jslint_report, json,
-    jstestDescribe, jstestIt, jstestOnExit, keys, label, lbp, led_infix, length,
-    level, line, lineList, line_list, line_offset, line_source, lines,
-    linesCovered, linesTotal, live, log, long, loop, m, map, margin, match, max,
-    message, meta, min, mkdir, modeCoverageIgnoreFile, modeIndex, mode_cli,
-    mode_conditional, mode_json, mode_module, mode_noop, mode_property,
-    mode_shebang, mode_stop, module, moduleFsInit, moduleName, module_list,
-    name, names, node, nomen, noop, now, nr, nud_prefix,
-    objectDeepCopyWithKeysSorted, ok, on, open, opening, option, option_dict,
-    order, package_name, padEnd, padStart, parameters, parent, parentIi, parse,
-    pathname, pathnameList, platform, pop, processArgv, process_argv,
-    process_env, process_exit, promises, property, property_dict, push, quote,
-    ranges, readFile, readdir, readonly, recursive, reduce, repeat, replace,
-    resolve, result, reverse, role, round, scriptId, search, set, shebang,
-    shell, shift, signature, single, slice, some, sort, source, spawn, splice,
-    split, stack, stack_trace, start, startOffset, startsWith, statement,
-    statement_prv, stdio, stop, stop_at, stringify, subscript, switch,
-    syntax_dict, tenure, test, test_cause, test_internal_error, this, thru,
-    toLocaleString, toString, token, token_global, token_list, token_nxt,
-    token_tree, tokens, trace, tree, trim, trimEnd, trimRight, try, type,
-    unlink, unordered, unshift, url, used, v8CoverageListMerge,
-    v8CoverageReportCreate, value, variable, version, versions, warn, warn_at,
-    warning, warning_list, warnings, white, wrapped, writeFile
+    JSLINT_BETA,
+    NODE_V8_COVERAGE,
+    a,
+    all,
+    argv,
+    arity,
+    artifact,
+    assertErrorThrownAsync,
+    assertJsonEqual,
+    assertOrThrow,
+    assign,
+    async,
+    b,
+    beta,
+    bitwise,
+    block,
+    body,
+    browser,
+    c,
+    calls,
+    catch,
+    catch_list,
+    catch_stack,
+    causes,
+    char,
+    children,
+    clear,
+    closer,
+    closure,
+    code,
+    column,
+    concat,
+    consoleError,
+    console_error,
+    console_log,
+    constant,
+    context,
+    convert,
+    count,
+    coverageDir,
+    create,
+    cwd,
+    d,
+    dead,
+    debugInline,
+    default,
+    delta,
+    devel,
+    directive,
+    directive_ignore_line,
+    directive_list,
+    directives,
+    dirname,
+    disrupt,
+    dot,
+    edition,
+    elem_list,
+    ellipsis,
+    else,
+    end,
+    endOffset,
+    endsWith,
+    entries,
+    env,
+    error,
+    eval,
+    every,
+    example_list,
+    excludeList,
+    exec,
+    execArgv,
+    exit,
+    exitCode,
+    export_dict,
+    exports,
+    expression,
+    extra,
+    fart,
+    file,
+    fileList,
+    fileURLToPath,
+    filter,
+    finally,
+    flag,
+    floor,
+    for,
+    forEach,
+    formatted_message,
+    free,
+    freeze,
+    from,
+    froms,
+    fsWriteFileWithParents,
+    fud_stmt,
+    functionName,
+    function_list,
+    function_stack,
+    functions,
+    get,
+    getset,
+    github_repo,
+    globExclude,
+    global,
+    global_dict,
+    global_list,
+    holeList,
+    htmlEscape,
+    id,
+    identifier,
+    ignoreLine,
+    import,
+    import_list,
+    import_meta_url,
+    inc,
+    includeList,
+    indent2,
+    indent_method,
+    index,
+    indexOf,
+    init,
+    initial,
+    isArray,
+    isBlockCoverage,
+    isHole,
+    isNaN,
+    is_equal,
+    is_weird,
+    join,
+    jslint,
+    jslint_apidoc,
+    jslint_assert,
+    jslint_charset_ascii,
+    jslint_cli,
+    jslint_edition,
+    jslint_phase1_split,
+    jslint_phase2_lex,
+    jslint_phase3_parse,
+    jslint_phase4_walk,
+    jslint_phase5_whitage,
+    jslint_report,
+    json,
+    jstestDescribe,
+    jstestIt,
+    jstestOnExit,
+    keys,
+    label,
+    lbp,
+    led_infix,
+    length,
+    level,
+    line,
+    lineList,
+    line_list,
+    line_offset,
+    line_source,
+    lines,
+    linesCovered,
+    linesTotal,
+    live,
+    log,
+    long,
+    loop,
+    m,
+    map,
+    margin,
+    match,
+    max,
+    message,
+    meta,
+    min,
+    mkdir,
+    modeCoverageIgnoreFile,
+    modeIndex,
+    mode_cli,
+    mode_conditional,
+    mode_json,
+    mode_module,
+    mode_noop,
+    mode_property,
+    mode_shebang,
+    mode_stop,
+    module,
+    moduleFsInit,
+    moduleName,
+    module_list,
+    name,
+    names,
+    node,
+    nomen,
+    noop,
+    now,
+    nr,
+    nud_prefix,
+    objectDeepCopyWithKeysSorted,
+    ok,
+    on,
+    open,
+    opening,
+    option,
+    option_dict,
+    order,
+    package_name,
+    padEnd,
+    padStart,
+    parameters,
+    parent,
+    parentIi,
+    parse,
+    pathname,
+    pathnameList,
+    platform,
+    pop,
+    processArgv,
+    process_argv,
+    process_env,
+    process_exit,
+    promises,
+    property,
+    property_dict,
+    push,
+    quote,
+    ranges,
+    readFile,
+    readdir,
+    readonly,
+    recursive,
+    reduce,
+    repeat,
+    replace,
+    resolve,
+    result,
+    reverse,
+    role,
+    round,
+    scriptId,
+    search,
+    set,
+    shebang,
+    shell,
+    shift,
+    signature,
+    single,
+    slice,
+    some,
+    sort,
+    source,
+    spawn,
+    splice,
+    split,
+    stack,
+    stack_trace,
+    start,
+    startOffset,
+    startsWith,
+    statement,
+    statement_prv,
+    stdio,
+    stop,
+    stop_at,
+    stringify,
+    subscript,
+    switch,
+    syntax_dict,
+    tenure,
+    test,
+    test_cause,
+    test_internal_error,
+    this,
+    thru,
+    toLocaleString,
+    toString,
+    token,
+    token_global,
+    token_list,
+    token_nxt,
+    token_tree,
+    tokens,
+    trace,
+    tree,
+    trim,
+    trimEnd,
+    trimRight,
+    try,
+    type,
+    unlink,
+    unordered,
+    unshift,
+    url,
+    used,
+    v8CoverageListMerge,
+    v8CoverageReportCreate,
+    value,
+    variable,
+    version,
+    versions,
+    warn,
+    warn_at,
+    warning,
+    warning_list,
+    warnings,
+    white,
+    wrapped,
+    writeFile
 */
 
 // init debugInline
@@ -8843,6 +9104,8 @@ function jslint_phase5_whitage(state) {
 // "switch(){}"
 // "while(){}"
 
+    let indent_method_dict = {};
+    let indentage;
     let left = token_global;
     let margin = 0;
     let mode_indent = (
@@ -9037,25 +9300,6 @@ function jslint_phase5_whitage(state) {
         }
     }
 
-    function pop() {
-        const previous = function_stack.pop();
-        closer = previous.closer;
-        free = previous.free;
-        margin = previous.margin;
-        open = previous.open;
-        opening = previous.opening;
-    }
-
-    function push() {
-        function_stack.push({
-            closer,
-            free,
-            margin,
-            open,
-            opening
-        });
-    }
-
     function whitage_case() {
 
 // test_cause:
@@ -9112,7 +9356,14 @@ function jslint_phase5_whitage(state) {
 
             test_cause("opener_operand");
             opening = left.open || (left.line !== right.line);
-            push();
+            indentage = {
+                closer,
+                free,
+                margin,
+                open,
+                opening
+            };
+            function_stack.push(indentage);
             switch (left.id) {
             case "${":
                 closer = "}";
@@ -9140,6 +9391,13 @@ function jslint_phase5_whitage(state) {
                 free = closer === ")" && left.free;
                 open = true;
                 margin += mode_indent;
+                if (indent_method_dict[left.line]) {
+
+// PR-xxx - Relax warning on multiline-method-chaining.
+
+                    margin += mode_indent;
+                    indentage.indent_method = true;
+                }
                 if (right.role === "label") {
                     if (right.from !== 0) {
 
@@ -9229,9 +9487,21 @@ function jslint_phase5_whitage(state) {
 // If right is a closer, then pop the previous state.
 
         if (right.id === closer) {
-            pop();
+            indentage = function_stack.pop();
+            closer = indentage.closer;
+            free = indentage.free;
+            margin = indentage.margin;
+            open = indentage.open;
+            opening = indentage.opening;
             if (opening && right.id !== ";") {
-                at_margin(0);
+                at_margin(
+                    indentage.indent_method
+
+// PR-xxx - Relax warning on multiline-method-chaining.
+
+                    ? mode_indent
+                    : 0
+                );
             } else {
                 no_space_only();
             }
@@ -9344,14 +9614,28 @@ function jslint_phase5_whitage(state) {
                 right.arity === "function"
                 && left.id !== "function"
             )
-            || (right.id === "." || right.id === "?.")
         ) {
 
 // test_cause:
 // ["let aa = 0 ;", "no_space_only", "unexpected_space_a_b", ";", 12]
-// ["let aa = aa ?.aa;", "no_space_only", "unexpected_space_a_b", "?.", 13]
 
             no_space_only();
+            return;
+        }
+        if (right.id === "." || right.id === "?.") {
+            if (left.line === right.line) {
+
+// test_cause:
+// ["let aa = aa ?.aa;", "no_space_only", "unexpected_space_a_b", "?.", 13]
+
+                no_space_only();
+            } else {
+
+// PR-xxx - Relax warning on multiline-method-chaining.
+
+                indent_method_dict[right.line] = true;
+                at_margin(mode_indent);
+            }
             return;
         }
         if (left.id === ";") {

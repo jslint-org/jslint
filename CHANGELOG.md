@@ -9,7 +9,7 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.6.1-beta
-- jslint - Relax warning on multi-line-method-chaining.
+- jslint - Relax warning on multiline-method-chaining.
 - jslint - Replace all non-return "stop(...);" with "return stop(...)".
 - jslint - Unify ES2018-syntax-spread-operator with function prefix_ellipsis().
 - jslint - Add ES2018-syntax for object-literal-spread-operator.
