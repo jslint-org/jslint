@@ -13,9 +13,8 @@ on:
       - beta
       - master
   workflow_dispatch:
-env:
-  MY_GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-  zzzz1234: 1
+permissions:
+  contents: write
 jobs:
 
 
