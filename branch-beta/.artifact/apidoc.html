@@ -1457,10 +1457,10 @@ jslint_assert(
 // Google Lighthouse Accessibility - &lt;dl&gt;'s do not contain only properly-ordered
 // &lt;dt&gt; and &lt;dd&gt; groups, &lt;script&gt;, &lt;template&gt; or &lt;div&gt; elements.
 
-                "&lt;dl&gt;"
-                + "&lt;dt&gt;" + htmlEscape(title) + "&lt;/dt&gt;"
-                + "&lt;dd&gt;" + list.join(", ") + "&lt;/dd&gt;"
-                + "&lt;/dl&gt;"
+                "&lt;dl&gt;" +
+                "&lt;dt&gt;" + htmlEscape(title) + "&lt;/dt&gt;" +
+                "&lt;dd&gt;" + list.map(htmlEscape).join(", ") + "&lt;/dd&gt;" +
+                "&lt;/dl&gt;"
             )
             : ""
         );
@@ -1482,7 +1482,7 @@ KDflSQnlJ0bP+QnPQAy744n9mup6H9PaCDFwM5zjf8exB89bZ1cdrYOP0NgnuRDRWlk9u/fE\
 llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOtz\
 7sIKEGgLdDNl/IrfqWVZG/wr42ekomEm91VA1p4LhHBuFzHF8//u7vvbREHMQqGtNLmiOOD/\
 X7WWiwqyCE98qt0jk5JJmgR5WJJElBmzRb1F7a66MmSLTNWZ2XSHfKBSKHoVteSEJ6EOdvVw\
-fNZOtXKDe39jXdRlkmMnOWIOFBgeEK/b0mFsgffnP...
+fNZOtXKDe39jXdRlkmMnOWIOF...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
