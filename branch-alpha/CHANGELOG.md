@@ -1,14 +1,15 @@
 # Changelog
 
 # Todo
+- jslint - Relax warning on multi-line method-chaining.
 - jslint - bugfix - Fix false-positive Unused-variable when variable is used in function argument-default.
-- doc - document supported/unsupported es6+ features
-- jslint - add html and css linting back into jslint.
-- jslint - add new warning requiring paren around plus-separated concatenations.
-- jslint - try to improve parser to be able to parse jquery.js without stopping.
+- doc - Document supported/unsupported es6+ features
+- jslint - Add html and css linting back into jslint.
+- jslint - Add new warning requiring paren around plus-separated concatenations.
+- jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.6.1-beta
-- jslint - replace all non-return "stop(...);" with "return stop(...)".
+- jslint - Replace all non-return "stop(...);" with "return stop(...)".
 - jslint - Unify ES2018-syntax-spread-operator with function prefix_ellipsis().
 - jslint - Add ES2018-syntax for object-literal-spread-operator.
 - jslint - Add ES2025-syntax "import ... with {...}".

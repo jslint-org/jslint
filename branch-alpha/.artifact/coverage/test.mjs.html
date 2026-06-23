@@ -258,9 +258,9 @@ body {
 <pre><span class="lineno"><a href="#line_93" id="line_93">   93.</a></span><span class="count                ">      3</span><span>                    ]</span></pre>
 <pre><span class="lineno"><a href="#line_94" id="line_94">   94.</a></span><span class="count                ">      3</span><span>                });</span></pre>
 <pre><span class="lineno"><a href="#line_95" id="line_95">   95.</a></span><span class="count                ">      3</span><span>            }, (</span></pre>
-<pre><span class="lineno"><a href="#line_96" id="line_96">   96.</a></span><span class="count                ">      3</span><span>                "Weird character "</span></pre>
-<pre><span class="lineno"><a href="#line_97" id="line_97">   97.</a></span><span class="count                ">      3</span><span>                + JSON.stringify(char).replace("\\", "\\\\")</span></pre>
-<pre><span class="lineno"><a href="#line_98" id="line_98">   98.</a></span><span class="count                ">      3</span><span>                + " found in "</span></pre>
+<pre><span class="lineno"><a href="#line_96" id="line_96">   96.</a></span><span class="count                ">      3</span><span>                "Weird character " +</span></pre>
+<pre><span class="lineno"><a href="#line_97" id="line_97">   97.</a></span><span class="count                ">      3</span><span>                JSON.stringify(char).replace((/\\/g), "\\\\") +</span></pre>
+<pre><span class="lineno"><a href="#line_98" id="line_98">   98.</a></span><span class="count                ">      3</span><span>                " found in "</span></pre>
 <pre><span class="lineno"><a href="#line_99" id="line_99">   99.</a></span><span class="count                ">      3</span><span>            ));</span></pre>
 <pre><span class="lineno"><a href="#line_100" id="line_100">  100.</a></span><span class="count                ">      3</span><span>        }));</span></pre>
 <pre><span class="lineno"><a href="#line_101" id="line_101">  101.</a></span><span class="count                ">      1</span><span>    });</span></pre>
@@ -862,9 +862,9 @@ body {
 <pre><span class="lineno"><a href="#line_697" id="line_697">  697.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_698" id="line_698">  698.</a></span><span class="count                ">      1</span><span>// Issue #401 - Add ES2018-syntax for object-literal-spread-operator.</span></pre>
 <pre><span class="lineno"><a href="#line_699" id="line_699">  699.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_700" id="line_700">  700.</a></span><span class="count                ">      1</span><span>                "let aa = 0;\naa = {...aa()};",</span></pre>
-<pre><span class="lineno"><a href="#line_701" id="line_701">  701.</a></span><span class="count                ">      1</span><span>                "let aa = 0;\naa = {...aa.aa};",</span></pre>
-<pre><span class="lineno"><a href="#line_702" id="line_702">  702.</a></span><span class="count                ">      1</span><span>                "let aa = 0;\naa = {...aa};",</span></pre>
+<pre><span class="lineno"><a href="#line_700" id="line_700">  700.</a></span><span class="count                ">      1</span><span>                "let aa = 0;\naa = {aa: 1, ...aa(), bb: 2};",</span></pre>
+<pre><span class="lineno"><a href="#line_701" id="line_701">  701.</a></span><span class="count                ">      1</span><span>                "let aa = 0;\naa = {aa: 1, ...aa, bb: 2};",</span></pre>
+<pre><span class="lineno"><a href="#line_702" id="line_702">  702.</a></span><span class="count                ">      1</span><span>                "let aa = 0;\naa = {aa: 1, ...aa.aa, bb: 2};",</span></pre>
 <pre><span class="lineno"><a href="#line_703" id="line_703">  703.</a></span><span class="count                ">      1</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_704" id="line_704">  704.</a></span><span class="count                ">      1</span><span>// PR-483 - Allow parenthesis after ellipsis inside a function call.</span></pre>
 <pre><span class="lineno"><a href="#line_705" id="line_705">  705.</a></span><span class="count                ">      1</span><span></span></pre>

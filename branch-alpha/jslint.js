@@ -187,7 +187,7 @@ let jslint_rgx_digits_octals = (
     /^[0-7_]*/
 );
 let jslint_rgx_directive = (
-    /^(jslint|property|global)\s+(.*)$/
+    /^(jslint|property|global)\s+?(\S.*?)$/
 );
 let jslint_rgx_directive_part = (
     /([a-zA-Z$_][a-zA-Z0-9$_]*)(?::\s*(true|false))?,?\s*|$/g
@@ -5871,6 +5871,7 @@ function jslint_phase3_parse(state) {
 
                 test_cause("aa={...aa}");
                 value = prefix_ellipsis();
+                value.ellipsis = true;
                 return value;
             }
             advance();
@@ -6011,7 +6012,11 @@ function jslint_phase3_parse(state) {
 
         check_ordered(
             "property",
-            the_brace.expression.map(function ({
+            the_brace.expression.filter(function ({
+                ellipsis
+            }) {
+                return !ellipsis;
+            }).map(function ({
                 label
             }) {
                 return label;
@@ -9506,10 +9511,10 @@ function jslint_report({
 // Google Lighthouse Accessibility - <dl>'s do not contain only properly-ordered
 // <dt> and <dd> groups, <script>, <template> or <div> elements.
 
-                "<dl>"
-                + "<dt>" + htmlEscape(title) + "</dt>"
-                + "<dd>" + list.join(", ") + "</dd>"
-                + "</dl>"
+                "<dl>" +
+                "<dt>" + htmlEscape(title) + "</dt>" +
+                "<dd>" + list.map(htmlEscape).join(", ") + "</dd>" +
+                "</dl>"
             )
             : ""
         );
