@@ -1,7 +1,7 @@
 # Changelog
 
 # Todo
-- jslint - Relax warning on multi-line method-chaining.
+- jslint - Add ability to auto-fix whitespace.
 - jslint - bugfix - Fix false-positive Unused-variable when variable is used in function argument-default.
 - doc - Document supported/unsupported es6+ features
 - jslint - Add html and css linting back into jslint.
@@ -9,6 +9,7 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.6.1-beta
+- jslint - Relax warning on multi-line-method-chaining.
 - jslint - Replace all non-return "stop(...);" with "return stop(...)".
 - jslint - Unify ES2018-syntax-spread-operator with function prefix_ellipsis().
 - jslint - Add ES2018-syntax for object-literal-spread-operator.
