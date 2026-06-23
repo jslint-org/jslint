@@ -836,13 +836,10 @@ function htmlEscape(str) {
 
 // This function will make <str> html-safe by escaping & < >.
 
-    return String(str).replace((
-        /&/g
-    ), "&amp;").replace((
-        /</g
-    ), "&lt;").replace((
-        />/g
-    ), "&gt;");
+    return String(str)
+        .replace((/&/g), "&amp;")
+        .replace((/</g), "&lt;")
+        .replace((/>/g), "&gt;");
 }
 
 function jslint(
@@ -1083,22 +1080,24 @@ function jslint(
 // This function will instrument <cause> to <cause_dict> for test-purposes.
 
         if (option_dict.test_cause) {
-            cause_dict[JSON.stringify([
-                String(new Error().stack).replace((
-                    /^    at (?:file|stop|stop_at|test_cause|warn|warn_at)\b.*?\n/gm
-                ), "").match(
-                    /\n    at ((?:Object\.\w+?_)?\w+?) /
-                )[1].replace((
-                    /^Object\./
-                ), ""),
-                code,
-                String(
-                    (aa === undefined || aa === token_global)
-                    ? ""
-                    : aa
-                ),
-                column || 0
-            ])] = true;
+            cause_dict[
+                JSON.stringify([
+                    String(new Error().stack)
+                        .replace(
+                            (/^    at (?:file|stop|stop_at|test_cause|warn|warn_at)\b.*?\n/gm),
+                            ""
+                        )
+                        .match(/\n    at ((?:Object\.\w+?_)?\w+?) /)[1]
+                        .replace((/^Object\./), ""),
+                    code,
+                    String(
+                        (aa === undefined || aa === token_global)
+                        ? ""
+                        : aa
+                    ),
+                    column || 0
+                ])
+            ] = true;
         }
     }
 
@@ -1740,13 +1739,10 @@ ${name}
             /(\([\S\s]*?\)) \{/
         ), function (match0, match1) {
             signature = htmlEscape(
-                match1.replace((
-                    / *?\/\*[\S\s]*?\*\/ */g
-                ), "").replace((
-                    / *?\/\/.*/g
-                ), "").replace((
-                    /\n{2,}/g
-                ), "\n")
+                match1
+                    .replace((/ *?\/\*[\S\s]*?\*\/ */g), "")
+                    .replace((/ *?\/\/.*/g), "")
+                    .replace((/\n{2,}/g), "\n")
             );
             return match0;
         });
@@ -11758,13 +11754,9 @@ function sentinel() {}
 // Coverage-hack - Ugly-hack to get test-coverage under both win32 and linux.
 
             if (processArgv0 === "npm") {
-                processArgv0 = process.platform.replace(
-                    "win32",
-                    "npm.cmd"
-                ).replace(
-                    process.platform,
-                    "npm"
-                );
+                processArgv0 = process.platform
+                    .replace("win32", "npm.cmd")
+                    .replace(process.platform, "npm");
             }
             moduleChildProcess.spawn(
                 processArgv0,
