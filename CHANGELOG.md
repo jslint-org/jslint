@@ -8,9 +8,14 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.6.1-beta
-- doc - Update README.md, documenting supported/unsupported es6+ features.
-- jslint - Add ES2021-feature WeakRef.
-- jslint - Update ES2021-feature arrow, to continue parsing unwrapped-form with warning, instead of stopping.
+- jslint-ecma - Update README.md documenting supported ES2015+ features.
+- jslint-ecma - Add ES2023-feature ShadowRealm to global-scope.
+- jslint-ecma - Add ES2024-feature .isWellFormed(), .toWellFormed() for literal string.
+- jslint-ecma - Add ES2022-feature .at() for literal string/array.
+- jslint-ecma - Add ES2025-feature Float16Array to global-scope.
+- jslint-ecma - Relax warning for ES2025-feature RegExp.escape().
+- jslint-ecma - Add ES2021-feature WeakRef to global-scope.
+- jslint-ecma - Update ES2015-feature arrow, to continue parsing unwrapped-form with warning, instead of stopping.
 - jslint - Relax warning on multiline-method-chaining.
 - jslint - Replace all non-return "stop(...);" with "return stop(...)".
 - jslint - Unify ES2018-syntax-spread-operator with function prefix_ellipsis().

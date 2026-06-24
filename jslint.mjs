@@ -3776,6 +3776,7 @@ import https from "https";
                 "Date",
                 "Error",
                 "EvalError",
+                "Float16Array",
                 "Float32Array",
                 "Float64Array",
                 "Function",
@@ -3797,6 +3798,7 @@ import https from "https";
                 "Reflect",
                 "RegExp",
                 "Set",
+                "ShadowRealm",
                 "SharedArrayBuffer",
                 "String",
                 "Symbol",
@@ -4809,20 +4811,24 @@ function jslint_phase3_parse(state) {
             (
                 left.id !== "(string)"
                 || (
-                    name.id !== "charCodeAt"
+                    name.id !== "at"
+                    && name.id !== "charCodeAt"
                     && name.id !== "includes"
                     && name.id !== "indexOf"
+                    && name.id !== "isWellFormed"
                     && name.id !== "match"
                     && name.id !== "repeat"
                     && name.id !== "replace"
                     && name.id !== "toLowerCase"
                     && name.id !== "toUpperCase"
+                    && name.id !== "toWellFormed"
                 )
             )
             && (
                 left.id !== "["
                 || (
-                    name.id !== "concat"
+                    name.id !== "at"
+                    && name.id !== "concat"
                     && name.id !== "every"
                     && name.id !== "filter"
                     && name.id !== "find"
@@ -4847,14 +4853,34 @@ function jslint_phase3_parse(state) {
         ) {
 
 // test_cause:
+// ["(/./)?.0", "check_left", "unexpected_a", "?.", 6]
 // ["\"\".aa", "check_left", "unexpected_a", ".", 3]
+// ["\"aa\"?.0", "check_left", "unexpected_a", "?.", 5]
+// ["aa=[]?.aa", "check_left", "unexpected_a", "?.", 6]
 
             check_left(left, the_token);
+        }
+
+// Issue #468 - Fix optional dynamic-property/function-call not recognized.
+
+        if (
+            the_token.id === "?."
+            && (name.id === "[" || name.id === "(")
+        ) {
+
+// test_cause:
+// ["aa?.(bb)", "infix_dot", "dyn_prop_or_call", "", 0]
+// ["aa?.[bb]", "infix_dot", "dyn_prop_or_call", "", 0]
+
+            test_cause("dyn_prop_or_call");
+            return left;
         }
         if (!name.identifier) {
 
 // test_cause:
+// ["(0+0)?.0", "infix_dot", "expected_identifier_a", "0", 8]
 // ["aa.0", "infix_dot", "expected_identifier_a", "0", 4]
+// ["aa?.0", "infix_dot", "expected_identifier_a", "0", 5]
 
             return stop("expected_identifier_a");
         }
@@ -4982,91 +5008,6 @@ function jslint_phase3_parse(state) {
             the_paren.free = false;
         }
         return the_paren;
-    }
-
-    function infix_option_chain(left) {
-        const the_token = token_now;
-        let name = token_nxt;
-        if (
-            (
-                left.id !== "(string)"
-                || (
-                    name.id !== "charCodeAt"
-                    && name.id !== "includes"
-                    && name.id !== "indexOf"
-                    && name.id !== "match"
-                    && name.id !== "repeat"
-                    && name.id !== "replace"
-                    && name.id !== "toLowerCase"
-                    && name.id !== "toUpperCase"
-                )
-            )
-            && (
-                left.id !== "["
-                || (
-                    name.id !== "concat"
-                    && name.id !== "every"
-                    && name.id !== "filter"
-                    && name.id !== "find"
-                    && name.id !== "findIndex"
-                    && name.id !== "flat"
-                    && name.id !== "flatMap"
-                    && name.id !== "forEach"
-                    && name.id !== "includes"
-                    && name.id !== "join"
-                    && name.id !== "map"
-                    && name.id !== "reduce"
-                    && name.id !== "some"
-                    && name.id !== "toReversed"
-                    && name.id !== "toSorted"
-                )
-            )
-
-// test_cause:
-// ["(0+0)?.0", "infix_option_chain", "check_left", "", 0]
-
-            && (left.id !== "+" || name.id !== "slice")
-            && (
-                left.id !== "(regexp)"
-                || (name.id !== "exec" && name.id !== "test")
-            )
-        ) {
-            test_cause("check_left");
-
-// test_cause:
-// ["(/./)?.0", "check_left", "unexpected_a", "?.", 6]
-// ["\"aa\"?.0", "check_left", "unexpected_a", "?.", 5]
-// ["aa=[]?.aa", "check_left", "unexpected_a", "?.", 6]
-
-            check_left(left, the_token);
-        }
-
-// Issue #468 - Fix optional dynamic-property/function-call not recognized.
-
-        if (name.id === "[" || name.id === "(") {
-            test_cause("dyn_prop_or_call");
-
-// test_cause:
-// ["aa?.(bb)", "infix_option_chain", "dyn_prop_or_call", "", 0]
-// ["aa?.[bb]", "infix_option_chain", "dyn_prop_or_call", "", 0]
-
-            return left;
-        }
-        if (!name.identifier) {
-
-// test_cause:
-// ["aa?.0", "infix_option_chain", "expected_identifier_a", "0", 5]
-
-            return stop("expected_identifier_a");
-        }
-        advance();
-        survey(name);
-
-// The property name is not an expression.
-
-        the_token.name = name;
-        the_token.expression = left;
-        return the_token;
     }
 
     function infixr(bp, id) {
@@ -7714,7 +7655,7 @@ function jslint_phase3_parse(state) {
     infix(160, "`", infix_grave);
     infix(170, ".", infix_dot);
     infix(170, "=>", infix_fart_unwrapped);
-    infix(170, "?.", infix_option_chain);
+    infix(170, "?.", infix_dot);
     infix(170, "[", infix_lbracket);
     infix(35, "??");
     infix(40, "||");
@@ -8192,10 +8133,15 @@ function jslint_phase4_walk(state) {
         } else if (thing.id === "." || thing.id === "?.") {
             if (thing.expression.id === "RegExp") {
 
+// PR-xxx - Relax warning for ES2025-feature RegExp.escape().
+
+                if (!thing.name || thing.name.id !== "escape") {
+
 // test_cause:
 // ["aa=RegExp.aa", "post_b", "weird_expression_a", ".", 10]
 
-                warn("weird_expression_a", thing);
+                    warn("weird_expression_a", thing);
+                }
             }
         } else if (thing.id !== "=>" && thing.id !== "(") {
             right = thing.expression[1];

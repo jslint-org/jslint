@@ -749,6 +749,10 @@ jstestDescribe((
                     + "}\n"
                 )
             ],
+            literal: [
+                "String(\"\".at());",
+                "String([].at());"
+            ],
             loop: [
                 (
                     "function aa() {\n"
@@ -820,6 +824,7 @@ jstestDescribe((
                 "let aa = aa[`!`];"
             ],
             regexp: [
+                "RegExp.escape(\"\");",
                 "function aa() {\n    return /./;\n}",
                 "let aa = /(?!.)(?:.)(?=.)/;",
                 "let aa = /./gimuy;",

@@ -927,107 +927,107 @@ if (false) {
 - https://github.com/tc39/proposals/blob/main/finished-proposals.md
 - https://github.com/lukehoban/es6features
 
-| JSLint Support | ES Version | ES Feature |
-|:--|:--|:--|
-| &#x274c; | ES2027 | [`Explicit Resource Management`](https://github.com/tc39/proposal-explicit-resource-management) |
-| &#x2705; | ES2027 | [`Atomics.pause`](https://github.com/tc39/proposal-atomics-microwait) |
-| &#x274c; | ES2027 | [`Joint Iteration`](https://github.com/tc39/proposal-joint-iteration) |
-| &#x274c; | ES2027 | [`Temporal`](https://github.com/tc39/proposal-temporal) |
-| &#x274c; | ES2026 | [`Upsert`](https://github.com/tc39/proposal-upsert) |
-| &#x2705; | ES2026 | [`JSON.parse source text access`](https://github.com/tc39/proposal-json-parse-with-source) |
-| &#x274c; | ES2026 | [`Iterator Sequencing`](https://github.com/tc39/proposal-iterator-sequencing) |
-| &#x2705; | ES2026 | [`Uint8Array to/from Base64`](https://github.com/tc39/proposal-arraybuffer-base64) |
-| &#x2705; | ES2026 | [`Math.sumPrecise`](https://github.com/tc39/proposal-math-sum) |
-| &#x2705; | ES2026 | [`Error.isError`](https://github.com/tc39/proposal-is-error) |
-| &#x2705; | ES2026 | [`Array.fromAsync`](https://github.com/tc39/proposal-array-from-async) |
-| &#x26a0; | ES2025 | [`RegExp.escape`](https://github.com/tc39/proposal-regex-escaping) |
-| &#x2705; | ES2025 | [`Redeclarable global eval-introduced vars`](https://github.com/tc39/proposal-redeclarable-global-eval-vars) |
-| &#x26a0; | ES2025 | [`Float16 on TypedArrays, DataView, Math.f16round`](https://github.com/tc39/proposal-float16array) |
-| &#x2705; | ES2025 | [`Promise.try`](https://github.com/tc39/proposal-promise-try) |
-| &#x274c; | ES2025 | [`Sync Iterator helpers`](https://github.com/tc39/proposal-iterator-helpers) |
-| &#x2705; | ES2025 | [`JSON Modules`](https://github.com/tc39/proposal-json-modules) |
-| &#x2705; | ES2025 | [`Import Attributes`](https://github.com/tc39/proposal-import-attributes) |
-| &#x274c; | ES2025 | [`RegExp Modifiers`](https://github.com/tc39/proposal-regexp-modifiers) |
-| &#x2705; | ES2025 | [`New Set methods`](https://github.com/tc39/proposal-set-methods) |
-| &#x274c; | ES2025 | [`Duplicate named capture groups`](https://github.com/tc39/proposal-duplicate-named-capturing-groups) |
-| &#x2705; | ES2024 | [`ArrayBuffer transfer`](https://github.com/tc39/proposal-arraybuffer-transfer) |
-| &#x2705; | ES2024 | [`Promise.withResolvers`](https://github.com/tc39/proposal-promise-with-resolvers) |
-| &#x2705; | ES2024 | [`Array Grouping`](https://github.com/tc39/proposal-array-grouping) |
-| &#x2705; | ES2024 | [`Resizable and growable ArrayBuffers`](https://github.com/tc39/proposal-resizablearraybuffer) |
-| &#x26a0; | ES2024 | [`RegExp v flag with set notation + properties of strings`](https://github.com/tc39/proposal-regexp-v-flag) |
-| &#x2705; | ES2024 | [`Atomics.waitAsync`](https://github.com/tc39/proposal-atomics-wait-async) |
-| &#x26a0; | ES2024 | [`Well-Formed Unicode Strings`](https://github.com/tc39/proposal-is-usv-string) |
-| &#x26a0; | ES2023 | [`Change Array by Copy`](https://github.com/tc39/proposal-change-array-by-copy) |
-| &#x2705; | ES2023 | [`Symbols as WeakMap keys`](https://github.com/tc39/proposal-symbols-as-weakmap-keys) |
-| &#x2705; | ES2023 | [`Hashbang Grammar`](https://github.com/tc39/proposal-hashbang) |
-| &#x2705; | ES2023 | [`Array find from last`](https://github.com/tc39/proposal-array-find-from-last) |
-| &#x2705; | ES2022 | [`Error Cause`](https://github.com/tc39/proposal-error-cause) |
-| &#x274c; | ES2022 | [`Class Static Block`](https://github.com/tc39/proposal-class-static-block) |
-| &#x274c; | ES2022 | [`Accessible Object.prototype.hasOwnProperty`](https://github.com/tc39/proposal-accessible-object-hasownproperty) |
-| &#x26a0; | ES2022 | [`.at()`](https://github.com/tc39/proposal-relative-indexing-method) |
-| &#x274c; | ES2022 | [`Ergonomic brand checks for Private Fields`](https://github.com/tc39/proposal-private-fields-in-in) |
-| &#x2705; | ES2022 | [`Top-level await`](https://github.com/tc39/proposal-top-level-await) |
-| &#x26a0; | ES2022 | [`RegExp Match Indices`](https://github.com/tc39/proposal-regexp-match-indices) |
-| &#x274c; | ES2022 | [`Class Public Instance Fields & Private Instance Fields`](https://github.com/tc39/proposal-class-fields) |
-| &#x2705; | ES2021 | [`Numeric separators`](https://github.com/tc39/proposal-numeric-separator) |
-| &#x26a0; | ES2021 | [`Logical Assignment Operators`](https://github.com/tc39/proposal-logical-assignment) |
-| &#x2705; | ES2021 | [`WeakRefs`](https://github.com/tc39/proposal-weakrefs) |
-| &#x2705; | ES2021 | [`Promise.any`](https://github.com/tc39/proposal-promise-any) |
-| &#x2705; | ES2021 | [`String.prototype.replaceAll`](https://github.com/tc39/proposal-string-replaceall) |
-| &#x2705; | ES2020 | [`import.meta`](https://github.com/tc39/proposal-import-meta) |
-| &#x2705; | ES2020 | [`Nullish coalescing Operator`](https://github.com/tc39/proposal-nullish-coalescing) |
-| &#x2705; | ES2020 | [`Optional Chaining`](https://github.com/tc39/proposal-optional-chaining) |
-| &#x274c; | ES2020 | [`for-in mechanics`](https://github.com/tc39/proposal-for-in-order) |
-| &#x2705; | ES2020 | [`globalThis`](https://github.com/tc39/proposal-global) |
-| &#x2705; | ES2020 | [`Promise.allSettled`](https://github.com/tc39/proposal-promise-allSettled) |
-| &#x2705; | ES2020 | [`BigInt`](https://github.com/tc39/proposal-bigint) |
-| &#x2705; | ES2020 | [`import()`](https://github.com/tc39/proposal-dynamic-import) |
-| &#x2705; | ES2020 | [`String.prototype.matchAll`](https://github.com/tc39/proposal-string-matchall) |
-| &#x2705; | ES2019 | [`Array.prototype.{flat,flatMap}`](https://github.com/tc39/proposal-flatMap) |
-| &#x2705; | ES2019 | [`String.prototype.{trimStart,trimEnd}`](https://github.com/tc39/proposal-string-left-right-trim) |
-| &#x2705; | ES2019 | [`Well-formed JSON.stringify`](https://github.com/tc39/proposal-well-formed-stringify) |
-| &#x2705; | ES2019 | [`Object.fromEntries`](https://github.com/tc39/proposal-object-from-entries) |
-| &#x2705; | ES2019 | [`Function.prototype.toString revision`](https://github.com/tc39/Function-prototype-toString-revision) |
-| &#x2705; | ES2019 | [`Symbol.prototype.description`](https://github.com/tc39/proposal-Symbol-description) |
-| &#x2705; | ES2019 | [`JSON superset`](https://github.com/tc39/proposal-json-superset) |
-| &#x2705; | ES2019 | [`Optional catch binding`](https://github.com/tc39/proposal-optional-catch-binding) |
-| &#x26a0; | ES2018 | [`Asynchronous Iteration`](https://github.com/tc39/proposal-async-iteration) |
-| &#x2705; | ES2018 | [`Promise.prototype.finally`](https://github.com/tc39/proposal-promise-finally) |
-| &#x2705; | ES2018 | [`RegExp Unicode Property Escapes`](https://github.com/tc39/proposal-regexp-unicode-property-escapes) |
-| &#x26a0; | ES2018 | [`RegExp Lookbehind Assertions`](https://github.com/tc39/proposal-regexp-lookbehind) |
-| &#x26a0; | ES2018 | [`Rest/Spread Properties`](https://github.com/tc39/proposal-object-rest-spread) |
-| &#x2705; | ES2018 | [`RegExp named capture groups`](https://github.com/tc39/proposal-regexp-named-groups) |
-| &#x26a0; | ES2018 | [`s (dotAll) flag for regular expressions`](https://github.com/tc39/proposal-regexp-dotall-flag) |
-| &#x2705; | ES2018 | [`Lifting template literal restriction`](https://github.com/tc39/proposal-template-literal-revision) |
-| &#x2705; | ES2017 | [`Shared memory and atomics`](https://github.com/tc39/proposal-ecmascript-sharedmem) |
-| &#x2705; | ES2017 | [`Async functions`](https://github.com/tc39/proposal-async-await) |
-| &#x26a0; | ES2017 | [`Trailing commas in function parameter lists and calls`](https://github.com/tc39/proposal-trailing-function-commas) |
-| &#x2705; | ES2017 | [`Object.getOwnPropertyDescriptors`](https://github.com/tc39/proposal-object-getownpropertydescriptors) |
-| &#x2705; | ES2017 | [`String padding`](https://github.com/tc39/proposal-string-pad-start-end) |
-| &#x2705; | ES2017 | [`Object.values/Object.entries`](https://github.com/tc39/proposal-object-values-entries) |
-| &#x2705; | ES2016 | [`Exponentiation operator`](https://github.com/tc39/proposal-exponentiation-operator) |
-| &#x2705; | ES2016 | [`Array.prototype.includes`](https://github.com/tc39/proposal-Array.prototype.includes) |
-| &#x2705; | ES2015 | [`arrows`](https://github.com/lukehoban/es6features#arrows) |
-| &#x274c; | ES2015 | [`classes`](https://github.com/lukehoban/es6features#classes) |
-| &#x274c; | ES2015 | [`enhanced object literals`](https://github.com/lukehoban/es6features#enhanced-object-literals) |
-| &#x2705; | ES2015 | [`template strings`](https://github.com/lukehoban/es6features#template-strings) |
-| &#x26a0; | ES2015 | [`destructuring`](https://github.com/lukehoban/es6features#destructuring) |
-| &#x2705; | ES2015 | [`default + rest + spread`](https://github.com/lukehoban/es6features#default--rest--spread) |
-| &#x2705; | ES2015 | [`let + const`](https://github.com/lukehoban/es6features#let--const) |
-| &#x274c; | ES2015 | [`iterators + for..of`](https://github.com/lukehoban/es6features#iterators--forof) |
-| &#x274c; | ES2015 | [`generators`](https://github.com/lukehoban/es6features#generators) |
-| &#x274c; | ES2015 | [`unicode`](https://github.com/lukehoban/es6features#unicode) |
-| &#x26a0; | ES2015 | [`modules`](https://github.com/lukehoban/es6features#modules) |
-| &#x2705; | ES2015 | [`module loaders`](https://github.com/lukehoban/es6features#module-loaders) |
-| &#x2705; | ES2015 | [`map + set + weakmap + weakset`](https://github.com/lukehoban/es6features#map--set--weakmap--weakset) |
-| &#x2705; | ES2015 | [`proxies`](https://github.com/lukehoban/es6features#proxies) |
-| &#x2705; | ES2015 | [`symbols`](https://github.com/lukehoban/es6features#symbols) |
-| &#x274c; | ES2015 | [`subclassable built-ins`](https://github.com/lukehoban/es6features#subclassable-built-ins) |
-| &#x2705; | ES2015 | [`promises`](https://github.com/lukehoban/es6features#promises) |
-| &#x2705; | ES2015 | [`math + number + string + array + object APIs`](https://github.com/lukehoban/es6features#math--number--string--array--object-apis) |
-| &#x2705; | ES2015 | [`binary and octal literals`](https://github.com/lukehoban/es6features#binary-and-octal-literals) |
-| &#x2705; | ES2015 | [`reflect api`](https://github.com/lukehoban/es6features#reflect-api) |
-| &#x2705; | ES2015 | [`tail calls`](https://github.com/lukehoban/es6features#tail-calls) |
+| #. | JSLint Support | ES Version | ES Feature |
+|--:|:--|:--|:--|
+|  99. | &#x274c; | ES2027 | [`Explicit Resource Management`](https://github.com/tc39/proposal-explicit-resource-management) |
+|  98. | &#x2705; | ES2027 | [`Atomics.pause`](https://github.com/tc39/proposal-atomics-microwait) |
+|  97. | &#x274c; | ES2027 | [`Joint Iteration`](https://github.com/tc39/proposal-joint-iteration) |
+|  96. | &#x26a0; | ES2027 | [`Temporal`](https://github.com/tc39/proposal-temporal) |
+|  95. | &#x2705; | ES2026 | [`Upsert`](https://github.com/tc39/proposal-upsert) |
+|  94. | &#x2705; | ES2026 | [`JSON.parse source text access`](https://github.com/tc39/proposal-json-parse-with-source) |
+|  93. | &#x274c; | ES2026 | [`Iterator Sequencing`](https://github.com/tc39/proposal-iterator-sequencing) |
+|  92. | &#x2705; | ES2026 | [`Uint8Array to/from Base64`](https://github.com/tc39/proposal-arraybuffer-base64) |
+|  91. | &#x2705; | ES2026 | [`Math.sumPrecise`](https://github.com/tc39/proposal-math-sum) |
+|  90. | &#x2705; | ES2026 | [`Error.isError`](https://github.com/tc39/proposal-is-error) |
+|  89. | &#x2705; | ES2026 | [`Array.fromAsync`](https://github.com/tc39/proposal-array-from-async) |
+|  88. | &#x2705; | ES2025 | [`RegExp.escape`](https://github.com/tc39/proposal-regex-escaping) |
+|  87. | &#x2705; | ES2025 | [`Redeclarable global eval-introduced vars`](https://github.com/tc39/proposal-redeclarable-global-eval-vars) |
+|  86. | &#x2705; | ES2025 | [`Float16 on TypedArrays, DataView, Math.f16round`](https://github.com/tc39/proposal-float16array) |
+|  85. | &#x2705; | ES2025 | [`Promise.try`](https://github.com/tc39/proposal-promise-try) |
+|  84. | &#x274c; | ES2025 | [`Sync Iterator helpers`](https://github.com/tc39/proposal-iterator-helpers) |
+|  83. | &#x2705; | ES2025 | [`JSON Modules`](https://github.com/tc39/proposal-json-modules) |
+|  82. | &#x2705; | ES2025 | [`Import Attributes`](https://github.com/tc39/proposal-import-attributes) |
+|  81. | &#x26a0; | ES2025 | [`RegExp Modifiers`](https://github.com/tc39/proposal-regexp-modifiers) |
+|  80. | &#x2705; | ES2025 | [`New Set methods`](https://github.com/tc39/proposal-set-methods) |
+|  79. | &#x274c; | ES2025 | [`Duplicate named capture groups`](https://github.com/tc39/proposal-duplicate-named-capturing-groups) |
+|  78. | &#x2705; | ES2024 | [`ArrayBuffer transfer`](https://github.com/tc39/proposal-arraybuffer-transfer) |
+|  77. | &#x2705; | ES2024 | [`Promise.withResolvers`](https://github.com/tc39/proposal-promise-with-resolvers) |
+|  76. | &#x2705; | ES2024 | [`Array Grouping`](https://github.com/tc39/proposal-array-grouping) |
+|  75. | &#x2705; | ES2024 | [`Resizable and growable ArrayBuffers`](https://github.com/tc39/proposal-resizablearraybuffer) |
+|  74. | &#x26a0; | ES2024 | [`RegExp v flag with set notation + properties of strings`](https://github.com/tc39/proposal-regexp-v-flag) |
+|  73. | &#x2705; | ES2024 | [`Atomics.waitAsync`](https://github.com/tc39/proposal-atomics-wait-async) |
+|  72. | &#x2705; | ES2024 | [`Well-Formed Unicode Strings`](https://github.com/tc39/proposal-is-usv-string) |
+|  71. | &#x2705; | ES2023 | [`Change Array by Copy`](https://github.com/tc39/proposal-change-array-by-copy) |
+|  70. | &#x2705; | ES2023 | [`Symbols as WeakMap keys`](https://github.com/tc39/proposal-symbols-as-weakmap-keys) |
+|  69. | &#x2705; | ES2023 | [`Hashbang Grammar`](https://github.com/tc39/proposal-hashbang) |
+|  68. | &#x2705; | ES2023 | [`Array find from last`](https://github.com/tc39/proposal-array-find-from-last) |
+|  67. | &#x2705; | ES2022 | [`Error Cause`](https://github.com/tc39/proposal-error-cause) |
+|  66. | &#x274c; | ES2022 | [`Class Static Block`](https://github.com/tc39/proposal-class-static-block) |
+|  65. | &#x26a0; | ES2022 | [`Accessible Object.prototype.hasOwnProperty`](https://github.com/tc39/proposal-accessible-object-hasownproperty) |
+|  64. | &#x2705; | ES2022 | [`.at()`](https://github.com/tc39/proposal-relative-indexing-method) |
+|  63. | &#x274c; | ES2022 | [`Ergonomic brand checks for Private Fields`](https://github.com/tc39/proposal-private-fields-in-in) |
+|  62. | &#x2705; | ES2022 | [`Top-level await`](https://github.com/tc39/proposal-top-level-await) |
+|  61. | &#x26a0; | ES2022 | [`RegExp Match Indices`](https://github.com/tc39/proposal-regexp-match-indices) |
+|  60. | &#x274c; | ES2022 | [`Class Public Instance Fields & Private Instance Fields`](https://github.com/tc39/proposal-class-fields) |
+|  59. | &#x2705; | ES2021 | [`Numeric separators`](https://github.com/tc39/proposal-numeric-separator) |
+|  58. | &#x26a0; | ES2021 | [`Logical Assignment Operators`](https://github.com/tc39/proposal-logical-assignment) |
+|  57. | &#x2705; | ES2021 | [`WeakRefs`](https://github.com/tc39/proposal-weakrefs) |
+|  56. | &#x2705; | ES2021 | [`Promise.any`](https://github.com/tc39/proposal-promise-any) |
+|  55. | &#x2705; | ES2021 | [`String.prototype.replaceAll`](https://github.com/tc39/proposal-string-replaceall) |
+|  54. | &#x2705; | ES2020 | [`import.meta`](https://github.com/tc39/proposal-import-meta) |
+|  53. | &#x2705; | ES2020 | [`Nullish coalescing Operator`](https://github.com/tc39/proposal-nullish-coalescing) |
+|  52. | &#x2705; | ES2020 | [`Optional Chaining`](https://github.com/tc39/proposal-optional-chaining) |
+|  51. | &#x274c; | ES2020 | [`for-in mechanics`](https://github.com/tc39/proposal-for-in-order) |
+|  50. | &#x2705; | ES2020 | [`globalThis`](https://github.com/tc39/proposal-global) |
+|  49. | &#x2705; | ES2020 | [`Promise.allSettled`](https://github.com/tc39/proposal-promise-allSettled) |
+|  48. | &#x2705; | ES2020 | [`BigInt`](https://github.com/tc39/proposal-bigint) |
+|  47. | &#x2705; | ES2020 | [`import()`](https://github.com/tc39/proposal-dynamic-import) |
+|  46. | &#x2705; | ES2020 | [`String.prototype.matchAll`](https://github.com/tc39/proposal-string-matchall) |
+|  45. | &#x2705; | ES2019 | [`Array.prototype.{flat,flatMap}`](https://github.com/tc39/proposal-flatMap) |
+|  44. | &#x2705; | ES2019 | [`String.prototype.{trimStart,trimEnd}`](https://github.com/tc39/proposal-string-left-right-trim) |
+|  43. | &#x2705; | ES2019 | [`Well-formed JSON.stringify`](https://github.com/tc39/proposal-well-formed-stringify) |
+|  42. | &#x2705; | ES2019 | [`Object.fromEntries`](https://github.com/tc39/proposal-object-from-entries) |
+|  41. | &#x2705; | ES2019 | [`Function.prototype.toString revision`](https://github.com/tc39/Function-prototype-toString-revision) |
+|  40. | &#x2705; | ES2019 | [`Symbol.prototype.description`](https://github.com/tc39/proposal-Symbol-description) |
+|  39. | &#x2705; | ES2019 | [`JSON superset`](https://github.com/tc39/proposal-json-superset) |
+|  38. | &#x2705; | ES2019 | [`Optional catch binding`](https://github.com/tc39/proposal-optional-catch-binding) |
+|  37. | &#x274c; | ES2018 | [`Asynchronous Iteration`](https://github.com/tc39/proposal-async-iteration) |
+|  36. | &#x2705; | ES2018 | [`Promise.prototype.finally`](https://github.com/tc39/proposal-promise-finally) |
+|  35. | &#x2705; | ES2018 | [`RegExp Unicode Property Escapes`](https://github.com/tc39/proposal-regexp-unicode-property-escapes) |
+|  34. | &#x26a0; | ES2018 | [`RegExp Lookbehind Assertions`](https://github.com/tc39/proposal-regexp-lookbehind) |
+|  33. | &#x26a0; | ES2018 | [`Rest/Spread Properties`](https://github.com/tc39/proposal-object-rest-spread) |
+|  32. | &#x2705; | ES2018 | [`RegExp named capture groups`](https://github.com/tc39/proposal-regexp-named-groups) |
+|  31. | &#x26a0; | ES2018 | [`s (dotAll) flag for regular expressions`](https://github.com/tc39/proposal-regexp-dotall-flag) |
+|  30. | &#x2705; | ES2018 | [`Lifting template literal restriction`](https://github.com/tc39/proposal-template-literal-revision) |
+|  29. | &#x2705; | ES2017 | [`Shared memory and atomics`](https://github.com/tc39/proposal-ecmascript-sharedmem) |
+|  28. | &#x2705; | ES2017 | [`Async functions`](https://github.com/tc39/proposal-async-await) |
+|  27. | &#x26a0; | ES2017 | [`Trailing commas in function parameter lists and calls`](https://github.com/tc39/proposal-trailing-function-commas) |
+|  26. | &#x2705; | ES2017 | [`Object.getOwnPropertyDescriptors`](https://github.com/tc39/proposal-object-getownpropertydescriptors) |
+|  25. | &#x2705; | ES2017 | [`String padding`](https://github.com/tc39/proposal-string-pad-start-end) |
+|  24. | &#x2705; | ES2017 | [`Object.values/Object.entries`](https://github.com/tc39/proposal-object-values-entries) |
+|  23. | &#x2705; | ES2016 | [`Exponentiation operator`](https://github.com/tc39/proposal-exponentiation-operator) |
+|  22. | &#x2705; | ES2016 | [`Array.prototype.includes`](https://github.com/tc39/proposal-Array.prototype.includes) |
+|  21. | &#x2705; | ES2015 | [`arrows`](https://github.com/lukehoban/es6features#arrows) |
+|  20. | &#x274c; | ES2015 | [`classes`](https://github.com/lukehoban/es6features#classes) |
+|  19. | &#x274c; | ES2015 | [`enhanced object literals`](https://github.com/lukehoban/es6features#enhanced-object-literals) |
+|  18. | &#x2705; | ES2015 | [`template strings`](https://github.com/lukehoban/es6features#template-strings) |
+|  17. | &#x26a0; | ES2015 | [`destructuring`](https://github.com/lukehoban/es6features#destructuring) |
+|  16. | &#x2705; | ES2015 | [`default + rest + spread`](https://github.com/lukehoban/es6features#default--rest--spread) |
+|  15. | &#x2705; | ES2015 | [`let + const`](https://github.com/lukehoban/es6features#let--const) |
+|  14. | &#x274c; | ES2015 | [`iterators + for..of`](https://github.com/lukehoban/es6features#iterators--forof) |
+|  13. | &#x274c; | ES2015 | [`generators`](https://github.com/lukehoban/es6features#generators) |
+|  12. | &#x2705; | ES2015 | [`unicode`](https://github.com/lukehoban/es6features#unicode) |
+|  11. | &#x26a0; | ES2015 | [`modules`](https://github.com/lukehoban/es6features#modules) |
+|  10. | &#x2705; | ES2015 | [`module loaders`](https://github.com/lukehoban/es6features#module-loaders) |
+|   9. | &#x2705; | ES2015 | [`map + set + weakmap + weakset`](https://github.com/lukehoban/es6features#map--set--weakmap--weakset) |
+|   8. | &#x2705; | ES2015 | [`proxies`](https://github.com/lukehoban/es6features#proxies) |
+|   7. | &#x2705; | ES2015 | [`symbols`](https://github.com/lukehoban/es6features#symbols) |
+|   6. | &#x274c; | ES2015 | [`subclassable built-ins`](https://github.com/lukehoban/es6features#subclassable-built-ins) |
+|   5. | &#x2705; | ES2015 | [`promises`](https://github.com/lukehoban/es6features#promises) |
+|   4. | &#x2705; | ES2015 | [`math + number + string + array + object APIs`](https://github.com/lukehoban/es6features#math--number--string--array--object-apis) |
+|   3. | &#x2705; | ES2015 | [`binary and octal literals`](https://github.com/lukehoban/es6features#binary-and-octal-literals) |
+|   2. | &#x2705; | ES2015 | [`reflect api`](https://github.com/lukehoban/es6features#reflect-api) |
+|   1. | &#x2705; | ES2015 | [`tail calls`](https://github.com/lukehoban/es6features#tail-calls) |
 
 
 <br><br>
