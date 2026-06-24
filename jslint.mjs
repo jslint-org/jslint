@@ -6084,9 +6084,9 @@ function jslint_phase3_parse(state) {
             if (!name.identifier && token_nxt.id === "...") {
 
 // test_cause:
-// ["aa={...aa}", "property_parse", "aa={...aa}", "", 0]
+// ["aa={...aa}", "property_parse", "ellipsis", "", 0]
 
-                test_cause("aa={...aa}");
+                test_cause("ellipsis");
                 value = prefix_ellipsis();
                 value.ellipsis = true;
                 return value;
@@ -6252,16 +6252,25 @@ function jslint_phase3_parse(state) {
 // Parse/loop through each element in [...].
 
             while (true) {
-                if (token_nxt.id === "...") {
+                if (!state.mode_json && token_nxt.id === ",") {
 
 // test_cause:
-// ["aa=[...aa]", "prefix_lbracket", "aa=[...aa]", "", 0]
+// [";[,aa]=0", "prefix_lbracket", "ignore", "", 0]
 
-                    test_cause("aa=[...aa]");
-                    element = prefix_ellipsis();
-                } else {
-                    element = parse_expression(10);
+                    test_cause("ignore");
+                    advance(",");
                 }
+                if (!state.mode_json && token_nxt.id === "...") {
+
+// test_cause:
+// ["aa=[...aa]", "prefix_lbracket", "ellipsis", "", 0]
+
+                    test_cause("ellipsis");
+                    element = prefix_ellipsis();
+                    the_token.expression.push(element);
+                    break;
+                }
+                element = parse_expression(10);
                 the_token.expression.push(element);
                 if (token_nxt.id !== ",") {
                     break;
@@ -7201,12 +7210,128 @@ function jslint_phase3_parse(state) {
 
     function stmt_var() {
         let ellipsis;
-        let is_brace;
         let mode_const;
         let name;
-        let the_brace_or_bracket;
+        let the_destructure;
         let the_variable = token_now;
         let variable_prv;
+        function destructure_parse() {
+            const is_brace = token_nxt.id === "{";
+            the_destructure = token_nxt;
+            advance();
+            while (true) {
+                if (!is_brace && token_nxt.id === ",") {
+
+// test_cause:
+// ["let[,aa]=0", "destructure_parse", "ignore", "", 0]
+
+                    test_cause("ignore");
+                    advance(",");
+                }
+                ellipsis = token_nxt.id === "...";
+                if (ellipsis) {
+
+// test_cause:
+// ["let[...aa]=0", "destructure_parse", "ellipsis", "", 0]
+// ["let{...aa}=0", "destructure_parse", "ellipsis", "", 0]
+
+                    test_cause("ellipsis");
+                    advance("...");
+                }
+                name = token_nxt;
+                if (!name.identifier) {
+
+// test_cause:
+// ["let[0]", "destructure_parse", "expected_identifier_a", "0", 5]
+// ["let{0}", "destructure_parse", "expected_identifier_a", "0", 5]
+
+                    return stop("expected_identifier_a");
+                }
+                if (is_brace) {
+                    survey(name);
+                }
+                advance();
+                if (is_brace && token_nxt.id === ":") {
+                    advance(":");
+
+// Recurse destructure_parse().
+
+                    if (token_nxt.id === "{" || token_nxt.id === "[") {
+
+// test_cause:
+// ["let{aa:{aa}}", "destructure_parse", "recurse", "", 0]
+
+                        test_cause("recurse");
+                        destructure_parse();
+                    } else {
+                        if (!token_nxt.identifier) {
+
+// test_cause:
+// ["let{aa:0}", "destructure_parse", "expected_identifier_a", "0", 8]
+
+                            return stop("expected_identifier_a");
+                        }
+
+// PR-363 - Bugfix
+// Add test against false-warning <uninitialized 'bb'> in code
+// '/*jslint node*/\nlet {aa:bb} = {}; bb();'.
+//
+//                         token_nxt.label = name;
+//                         the_variable.names.push(token_nxt);
+//                         enroll(token_nxt, "variable", mode_const);
+
+                        name = token_nxt;
+                        the_variable.names.push(name);
+                        survey(name);
+                        enroll(name, "variable", mode_const);
+                        advance();
+                        the_destructure.open = true;
+                    }
+                } else {
+                    the_variable.names.push(name);
+                    enroll(name, "variable", mode_const);
+                }
+
+// Issue #458 - Regression - Warn about variable usage before initialization.
+
+//                    name.dead = false;
+
+                name.init = true;
+                if (ellipsis) {
+                    break;
+                }
+
+// test_cause:
+// ["const[aa]=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 11]
+// ["const{aa}=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 11]
+
+                if (token_nxt.id === "=") {
+
+// test_cause:
+// ["let[aa=0]", "destructure_parse", "assign", "", 0]
+// ["let{aa=0}", "destructure_parse", "assign", "", 0]
+
+                    test_cause("assign");
+                    advance("=");
+                    name.expression = parse_expression();
+                    the_destructure.open = true;
+                }
+                if (token_nxt.id !== ",") {
+                    break;
+                }
+                advance(",");
+            }
+            if (is_brace) {
+
+// test_cause:
+// ["let{bb,aa}", "check_ordered", "expected_a_b_before_c_d", "aa", 8]
+
+                check_ordered(the_variable.id, the_variable.names);
+                advance("}");
+            } else {
+                advance("]");
+            }
+        }
         mode_const = the_variable.id === "const";
         the_variable.names = [];
 
@@ -7274,7 +7399,6 @@ function jslint_phase3_parse(state) {
             }
         }
         while (true) {
-            is_brace = token_nxt.id === "{";
             if (token_nxt.id === "{" || token_nxt.id === "[") {
                 if (the_variable.id === "var") {
 
@@ -7284,102 +7408,7 @@ function jslint_phase3_parse(state) {
 
                     warn("unexpected_a", the_variable);
                 }
-                the_brace_or_bracket = token_nxt;
-                advance();
-                while (true) {
-                    ellipsis = false;
-                    if (token_nxt.id === "...") {
-
-// test_cause:
-// ["let [...aa]=0", "stmt_var", "ellipsis", "", 0]
-// ["let {...aa}=0", "stmt_var", "ellipsis", "", 0]
-
-                        test_cause("ellipsis");
-                        ellipsis = true;
-                        advance("...");
-                    }
-                    name = token_nxt;
-                    if (!name.identifier) {
-
-// test_cause:
-// ["let [0]", "stmt_var", "expected_identifier_a", "0", 6]
-// ["let {0}", "stmt_var", "expected_identifier_a", "0", 6]
-
-                        return stop("expected_identifier_a");
-                    }
-                    if (is_brace) {
-                        survey(name);
-                    }
-                    advance();
-                    if (is_brace && token_nxt.id === ":") {
-                        advance(":");
-                        if (!token_nxt.identifier) {
-
-// test_cause:
-// ["let {aa:0}", "stmt_var", "expected_identifier_a", "0", 9]
-// ["let {aa:{aa}}", "stmt_var", "expected_identifier_a", "{", 9]
-
-                            return stop("expected_identifier_a");
-                        }
-
-// PR-363 - Bugfix
-// Add test against false-warning <uninitialized 'bb'> in code
-// '/*jslint node*/\nlet {aa:bb} = {}; bb();'.
-//
-//                         token_nxt.label = name;
-//                         the_variable.names.push(token_nxt);
-//                         enroll(token_nxt, "variable", mode_const);
-
-                        name = token_nxt;
-                        the_variable.names.push(name);
-                        survey(name);
-                        enroll(name, "variable", mode_const);
-                        advance();
-                        the_brace_or_bracket.open = true;
-                    } else {
-                        the_variable.names.push(name);
-                        enroll(name, "variable", mode_const);
-                    }
-
-// Issue #458 - Regression - Warn about variable usage before initialization.
-
-//                    name.dead = false;
-
-                    name.init = true;
-                    if (ellipsis) {
-                        break;
-                    }
-
-// test_cause:
-// ["const [aa]=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 12]
-// ["const {aa}=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 12]
-
-                    if (token_nxt.id === "=") {
-
-// test_cause:
-// ["let [aa=0]", "stmt_var", "assign", "", 0]
-// ["let {aa=0}", "stmt_var", "assign", "", 0]
-
-                        test_cause("assign");
-                        advance("=");
-                        name.expression = parse_expression();
-                        the_brace_or_bracket.open = true;
-                    }
-                    if (token_nxt.id !== ",") {
-                        break;
-                    }
-                    advance(",");
-                }
-                if (is_brace) {
-
-// test_cause:
-// ["let{bb,aa}", "check_ordered", "expected_a_b_before_c_d", "aa", 8]
-
-                    check_ordered(the_variable.id, the_variable.names);
-                    advance("}");
-                } else {
-                    advance("]");
-                }
+                destructure_parse();
                 advance("=");
                 the_variable.expression = parse_expression(0);
             } else if (token_nxt.identifier) {
@@ -7414,7 +7443,6 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["let 0", "stmt_var", "expected_identifier_a", "0", 5]
-// ["var{aa:{aa}}", "stmt_var", "expected_identifier_a", "{", 8]
 
                 return stop("expected_identifier_a");
             }
@@ -9482,7 +9510,7 @@ function jslint_phase5_whitage(state) {
             )) {
 
 // test_cause:
-// ["let {aa,bb} = 0;", "one_space", "expected_space_a_b", "bb", 9]
+// ["let{aa,bb} = 0;", "one_space", "expected_space_a_b", "bb", 8]
 
                 one_space();
             } else {

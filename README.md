@@ -966,7 +966,7 @@ if (false) {
 |  20. | &#x274c; | ES2015 | [`classes`](https://github.com/lukehoban/es6features#classes) |
 |  19. | &#x274c; | ES2015 | [`enhanced object literals`](https://github.com/lukehoban/es6features#enhanced-object-literals) |
 |  18. | &#x2705; | ES2015 | [`template strings`](https://github.com/lukehoban/es6features#template-strings) |
-|  17. | &#x26a0; | ES2015 | [`destructuring`](https://github.com/lukehoban/es6features#destructuring) |
+|  17. | &#x2705; | ES2015 | [`destructuring`](https://github.com/lukehoban/es6features#destructuring) |
 |  16. | &#x2705; | ES2015 | [`default + rest + spread`](https://github.com/lukehoban/es6features#default--rest--spread) |
 |  15. | &#x2705; | ES2015 | [`let + const`](https://github.com/lukehoban/es6features#let--const) |
 |  14. | &#x274c; | ES2015 | [`iterators + for..of`](https://github.com/lukehoban/es6features#iterators--forof) |

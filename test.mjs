@@ -689,6 +689,28 @@ jstestDescribe((
                 "let aa = aa().getTime();",
                 "let aa = aa.aa().getTime();"
             ],
+            destructure: [
+                "let [\n    , aa, bb = 0, ...cc\n] = 0;\naa(bb, cc);",
+
+// PR-459 - Allow destructuring-assignment after function-definition.
+
+                (
+                    "let aa;\n"
+                    + "let bb;\n"
+                    + "function cc() {\n"
+                    + "    return;\n"
+                    + "}\n"
+                    + "[aa, bb] = cc();\n"
+                ),
+                (
+                    "let {\n"
+                    + "    aa,\n"
+                    + "    bb = 0,\n"
+                    + "    cc: dd,\n"
+                    + "    ...ee\n"
+                    + "} = 0;\n"
+                )
+            ],
             directive: [
                 "#!\n/*jslint browser:false, node*/\n\"use strict\";",
                 "/*property aa bb*/"
@@ -910,28 +932,7 @@ jstestDescribe((
             ].map(function (directive) {
                 return [
                     "const aa = 0;\naa();\n",
-                    "let [\n    aa, bb = 0, ...cc\n] = 0;\naa(bb, cc);",
                     "let aa = 0;\naa();\n",
-
-// PR-459 - Allow destructuring-assignment after function-definition.
-
-                    (
-                        "let aa;\n"
-                        + "let bb;\n"
-                        + "function cc() {\n"
-                        + "    return;\n"
-                        + "}\n"
-                        + "[aa, bb] = cc();\n"
-                    ),
-                    (
-                        "let {\n"
-                        + "    aa,\n"
-                        + "    bb = 0,\n"
-                        + "    cc: dd,\n"
-                        + "    ...ee\n"
-                        + "} = 0;\n"
-                        + "aa(bb, dd, ee);\n"
-                    ),
                     "var aa = 0;\naa();\n"
                 ].map(function (code) {
                     return directive + code;
