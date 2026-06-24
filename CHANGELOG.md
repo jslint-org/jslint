@@ -3,12 +3,14 @@
 # Todo
 - jslint - Add ability to auto-fix whitespace.
 - jslint - bugfix - Fix false-positive Unused-variable when variable is used in function argument-default.
-- doc - Document supported/unsupported es6+ features
 - jslint - Add html and css linting back into jslint.
 - jslint - Add new warning requiring paren around plus-separated concatenations.
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.6.1-beta
+- doc - Update README.md, documenting supported/unsupported es6+ features.
+- jslint - Add ES2021-feature WeakRef.
+- jslint - Update ES2021-feature arrow, to continue parsing unwrapped-form with warning, instead of stopping.
 - jslint - Relax warning on multiline-method-chaining.
 - jslint - Replace all non-return "stop(...);" with "return stop(...)".
 - jslint - Unify ES2018-syntax-spread-operator with function prefix_ellipsis().

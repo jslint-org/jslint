@@ -3808,6 +3808,7 @@ import https from "https";
                 "Uint8Array",
                 "Uint8ClampedArray",
                 "WeakMap",
+                "WeakRef",
                 "WeakSet",
                 "WebAssembly",
                 "decodeURI",
@@ -4201,6 +4202,7 @@ function jslint_phase3_parse(state) {
                                         // ... the parse.
     let token_nxt = token_global;       // The next token to be examined in
                                         // ... <token_list>.
+    let token_prv = token_global;       // The previous token examined.
 
     function advance(id, match) {
 
@@ -4248,6 +4250,7 @@ function jslint_phase3_parse(state) {
 
 // Promote the tokens, skipping comments.
 
+        token_prv = token_now;
         token_now = token_nxt;
         while (true) {
             token_nxt = token_list[token_ii];
@@ -4866,11 +4869,7 @@ function jslint_phase3_parse(state) {
     }
 
     function infix_fart_unwrapped() {
-
-// test_cause:
-// ["aa=>0", "infix_fart_unwrapped", "wrap_fart_parameter", "=>", 3]
-
-        return stop("wrap_fart_parameter", token_now);
+        return parse_fart(token_now, true);
     }
 
     function infix_grave(left) {
@@ -5209,7 +5208,7 @@ function jslint_phase3_parse(state) {
         return left;
     }
 
-    function parse_fart(the_fart) {
+    function parse_fart(the_fart, mode_infix) {
 
 // Give the function properties storing its names and for observing the depth
 // of loops and switches.
@@ -5240,11 +5239,29 @@ function jslint_phase3_parse(state) {
         function_list.push(the_fart);
         function_stack.push(functionage);
         functionage = the_fart;
+        if (mode_infix) {
+            if (!token_prv.identifier) {
+
+// test_cause:
+// ["0=>0", "parse_fart", "wrap_fart_parameter", "=>", 2]
+
+                return stop("wrap_fart_parameter", token_now);
+            }
+
+// test_cause:
+// ["aa=>0", "parse_fart", "wrap_fart_parameter", "=>", 3]
+
+            warn("wrap_fart_parameter", token_now);
+            the_fart.parameters = [token_prv];
+            the_fart.signature = token_prv.id;
+            enroll(token_prv, "parameter", false);
+        } else {
 
 // Parse the parameter list.
 
-        prefix_function_parameter(the_fart);
-        advance("=>");
+            prefix_function_parameter(the_fart);
+            advance("=>");
+        }
 
 // The function's body is a block.
 
