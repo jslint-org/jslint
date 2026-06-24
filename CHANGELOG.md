@@ -1,6 +1,8 @@
 # Changelog
 
 # Todo
+- jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
+- jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
 - jslint - Add ability to auto-fix whitespace.
 - jslint - bugfix - Fix false-positive Unused-variable when variable is used in function argument-default.
 - jslint - Add html and css linting back into jslint.
@@ -8,7 +10,8 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.6.1-beta
-- jslint-ecma - Update README.md documenting supported ES2015+ features.
+- jslint-ecma - Update README.md, documenting supported ES2015+ features.
+- jslint-ecma - Expand ES2015-feature-support for es-module-import-statement.
 - jslint-ecma - Add ES2023-feature ShadowRealm to global-scope.
 - jslint-ecma - Add ES2024-feature .isWellFormed(), .toWellFormed() for literal string.
 - jslint-ecma - Add ES2022-feature .at() for literal string/array.

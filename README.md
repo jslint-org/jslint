@@ -41,7 +41,7 @@ Douglas Crockford <douglas@crockford.com>
 
 9. [Documentation](#documentation)
     - [API Doc](#api-doc)
-    - [Directive `/*jslint*/`](#directive-jslint)
+    - [Directive](#directive)
         - [`/*jslint beta*/`](#jslint-beta)
         - [`/*jslint bitwise*/`](#jslint-bitwise)
         - [`/*jslint browser*/`](#jslint-browser)
@@ -62,12 +62,12 @@ Douglas Crockford <douglas@crockford.com>
         - [`/*jslint trace*/`](#jslint-trace)
         - [`/*jslint unordered*/`](#jslint-unordered)
         - [`/*jslint white*/`](#jslint-white)
-    - [Directive `/*global*/`](#directive-global)
-    - [Directive `/*property*/`](#directive-property)
-    - [Directive `/*jslint-disable*/.../*jslint-enable*/`](#directive-jslint-disablejslint-enable)
-    - [Directive `//jslint-ignore-line`](#directive-jslint-ignore-line)
-    - [Directive `/*coverage-disable*/.../*coverage-enable*/`](#directive-coverage-disablecoverage-enable)
-    - [Directive `//coverage-ignore-line`](#directive-coverage-ignore-line)
+        - [`/*global*/`](#global)
+        - [`/*property*/`](#property)
+        - [`/*jslint-disable*/.../*jslint-enable*/`](#jslint-disablejslint-enable)
+        - [`//jslint-ignore-line`](#jslint-ignore-line)
+        - [`/*coverage-disable*/.../*coverage-enable*/`](#coverage-disablecoverage-enable)
+        - [`//coverage-ignore-line`](#coverage-ignore-line)
     - [ECMAScript Feature Support](#ecmascript-feature-support)
 
 10. [Package Listing](#package-listing)
@@ -534,27 +534,8 @@ window.addEventListener("load", function () {
 
 <br><br>
 # Documentation
-
-
 - [jslint.mjs](jslint.mjs) contains the jslint function. It parses and analyzes a source file, returning an object with information about the file. It can also take an object that sets options.
-
 - [index.html](index.html) runs the jslint.mjs function in a web page.
-
-JSLint can be run anywhere that JavaScript (or Java) can run.
-
-The place to express yourself in programming is in the quality of your ideas and
-the efficiency of their execution. The role of style in programming is the same
-as in literature: It makes for better reading. A great writer doesn't express
-herself by putting the spaces before her commas instead of after, or by putting
-extra spaces inside her parentheses. A great writer will slavishly conform to
-some rules of style, and that in no way constrains her power to express herself
-creatively. See for example William Strunk's The Elements of Style
-[https://www.crockford.com/style.html].
-
-This applies to programming as well. Conforming to a consistent style improves
-readability, and frees you to express yourself in ways that matter. JSLint here
-plays the part of a stern but benevolent editor, helping you to get the style
-right so that you can focus your creative energy where it is most needed.
 
 
 <br><br>
@@ -565,12 +546,11 @@ right so that you can focus your creative energy where it is most needed.
 
 
 <br><br>
-### Directive `/*jslint*/`
+### Directive
 
 <br>
 
 ##### `/*jslint beta*/`
-
 ```js
 /*jslint beta*/
 // Enable experimental warnings.
@@ -585,7 +565,6 @@ right so that you can focus your creative energy where it is most needed.
 <br>
 
 ##### `/*jslint bitwise*/`
-
 ```js
 /*jslint bitwise*/
 // Allow bitwise operator.
@@ -596,7 +575,6 @@ let foo = 0 | 1;
 <br>
 
 ##### `/*jslint browser*/`
-
 ```js
 /*jslint browser*/
 // Assume browser environment.
@@ -607,7 +585,6 @@ localStorage.getItem("foo");
 <br>
 
 ##### `/*jslint convert*/`
-
 ```js
 /*jslint convert*/
 // Allow conversion operator.
@@ -619,7 +596,6 @@ let bar = !!0;
 <br>
 
 ##### `/*jslint couch*/`
-
 ```js
 /*jslint couch*/
 // Assume CouchDb environment.
@@ -630,7 +606,6 @@ registerType("text-json", "text/json");
 <br>
 
 ##### `/*jslint devel*/`
-
 ```js
 /*jslint devel*/
 // Allow console.log() and friends.
@@ -641,7 +616,6 @@ console.log("hello");
 <br>
 
 ##### `/*jslint eval*/`
-
 ```js
 /*jslint eval*/
 // Allow eval().
@@ -652,7 +626,6 @@ eval("1");
 <br>
 
 ##### `/*jslint fart*/`
-
 ```js
 /*jslint fart*/
 // Allow complex fat-arrow.
@@ -665,7 +638,6 @@ let foo = async ({bar, baz}) => {
 <br>
 
 ##### `/*jslint for*/`
-
 ```js
 /*jslint for*/
 // Allow for-loop.
@@ -681,7 +653,6 @@ function foo() {
 <br>
 
 ##### `/*jslint getset*/`
-
 ```js
 /*jslint getset, this, devel*/
 // Allow get() and set().
@@ -703,7 +674,6 @@ console.log(foo.getBar); // 1
 <br>
 
 ##### `/*jslint indent2*/`
-
 ```js
 /*jslint indent2*/
 // Use 2-space indent.
@@ -716,7 +686,6 @@ function foo() {
 <br>
 
 ##### `/*jslint long*/`
-
 ```js
 /*jslint long*/
 // Allow long lines.
@@ -727,7 +696,6 @@ let foo = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 <br>
 
 ##### `/*jslint node*/`
-
 ```js
 /*jslint node*/
 // Assume Node.js environment.
@@ -738,7 +706,6 @@ require("fs");
 <br>
 
 ##### `/*jslint nomen*/`
-
 ```js
 /*jslint nomen*/
 // Allow weird property name.
@@ -750,7 +717,6 @@ foo._bar = 1;
 <br>
 
 ##### `/*jslint single*/`
-
 ```js
 /*jslint single*/
 // Allow single-quote strings.
@@ -761,7 +727,6 @@ let foo = '';
 <br>
 
 ##### `/*jslint subscript*/`
-
 ```js
 /*jslint subscript*/
 // Allow identifiers in subscript-notation.
@@ -773,7 +738,6 @@ foo["bar"] = 1;
 <br>
 
 ##### `/*jslint this*/`
-
 ```js
 /*jslint this*/
 // Allow 'this'.
@@ -786,7 +750,6 @@ function foo() {
 <br>
 
 ##### `/*jslint trace*/`
-
 ```js
 /*jslint trace*/
 // Include jslint stack-trace in warnings.
@@ -816,7 +779,6 @@ Error
 <br>
 
 ##### `/*jslint unordered*/`
-
 ```js
 /*jslint unordered*/
 // Allow unordered cases, params, properties, variables, and exports.
@@ -839,7 +801,6 @@ export {
 <br>
 
 ##### `/*jslint white*/`
-
 ```js
 /*jslint white*/
 // Allow messy whitespace.
@@ -847,10 +808,9 @@ export {
 let foo = 1; let bar = 2;
 ```
 
+<br>
 
-<br><br>
-### Directive `/*global*/`
-
+##### `/*global*/`
 ```js
 /*global foo, bar*/
 // Declare global variables foo, bar.
@@ -859,10 +819,9 @@ foo();
 bar();
 ```
 
+<br>
 
-<br><br>
-### Directive `/*property*/`
-
+##### `/*property*/`
 ```js
 /*property foo, bar*/
 // Restrict property-access to only .foo, .bar.
@@ -870,10 +829,9 @@ bar();
 let aa = {bar: 1, foo: 2};
 ```
 
+<br>
 
-<br><br>
-### Directive `/*jslint-disable*/.../*jslint-enable*/`
-
+##### `/*jslint-disable*/.../*jslint-enable*/`
 ```js
 /*jslint-disable*/
 
@@ -883,20 +841,18 @@ Syntax error.
 /*jslint-enable*/
 ```
 
+<br>
 
-<br><br>
-### Directive `//jslint-ignore-line`
-
+##### `//jslint-ignore-line`
 ```js
 // JSLint will ignore non-fatal warnings at given line.
 
 eval("1"); //jslint-ignore-line
 ```
 
+<br>
 
-<br><br>
-### Directive `/*coverage-disable*/.../*coverage-enable*/`
-
+##### `/*coverage-disable*/.../*coverage-enable*/`
 ```js
 /*coverage-disable*/
 
@@ -909,10 +865,9 @@ if (false) {
 /*coverage-enable*/
 ```
 
+<br>
 
-<br><br>
-### Directive `//coverage-ignore-line`
-
+##### `//coverage-ignore-line`
 ```js
 // JSLint will ignore code-coverage at given line.
 

@@ -723,7 +723,14 @@ jstestDescribe((
                 )
             ],
             import: [
-                `import aa from "aa" with {"type": "json"};\naa();`
+                `const aa = await import("aa");\naa();`,
+                `const aa = await import("aa", {with: {type: "json"}});\naa();`,
+                `const {aa} = await import("aa");\naa();`,
+                "import(\"aa\").then(function () {\n    return;\n});",
+                (
+                    "let aa = 0;\n"
+                    + "import(aa).then(aa).then(aa).catch(aa).finally(aa);\n"
+                )
             ],
             indent_method: [
                 "let aa = 0;\naa\n    .bb\n    .cc(\n        0\n    );"
@@ -784,14 +791,17 @@ jstestDescribe((
                     + "    return await 0;\n"
                     + "});\n"
                 ),
-                "import {aa, bb} from \"aa\";\naa(bb);",
-                "import {} from \"aa\";",
-                "import(\"aa\").then(function () {\n    return;\n});",
-                (
-                    "let aa = 0;\n"
-                    + "import(aa).then(aa).then(aa)"
-                    + ".catch(aa).finally(aa);\n"
-                )
+                // `import "aa";`,
+                `import * as aa from "aa";\naa();`,
+                `import aa from "aa" with {type: "json"};\naa();`,
+                `import aa from "aa";\naa();`,
+                `import aa, * as bb from "aa";\naa(bb);`,
+                `import aa, {aa as bb} from "aa";\naa(bb);`,
+                `import aa, {bb, cc} from "aa";\naa(bb, cc);`,
+                `import {aa as aa, bb as bb} from "aa";\naa(bb);`,
+                `import {aa as aa} from "aa";\naa();`,
+                `import {aa, bb} from "aa";\naa(bb);`,
+                `import {} from "aa";`
             ],
             number: [
                 "let aa = 0.0e0;",

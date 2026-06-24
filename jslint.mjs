@@ -6771,7 +6771,81 @@ function jslint_phase3_parse(state) {
     function stmt_import() {
         const the_import = token_now;
         let name;
-        let names;
+        the_import.name = [];
+        state.mode_module = true;
+        while (true) {
+
+// PR-436 - Add grammar for side-effect import-statement.
+
+            if (token_nxt.id === "(string)") {
+
+// test_cause:
+// ["import \"aa\"", "stmt_import", "import_side_effect", "", 0]
+
+                test_cause("import_side_effect");
+                warn("expected_a_b", token_nxt, "{", artifact());
+                advance();
+                semicolon();
+                return the_import;
+            }
+            if (token_nxt.id === "*") {
+                advance("*");
+                advance("as");
+                if (!token_nxt.identifier) {
+
+// test_cause:
+// ["import * as", "stmt_import", "expected_identifier_a", "(end)", 1]
+
+                    return stop("expected_identifier_a");
+                }
+            }
+            if (token_nxt.identifier) {
+                name = token_nxt;
+                advance();
+                if (name.id === "ignore") {
+
+// test_cause:
+// ["import ignore from \"aa\"", "stmt_import", "unexpected_a", "ignore", 8]
+
+                    warn("unexpected_a", name);
+                }
+                enroll(name, "variable", true);
+                the_import.name.push(name);
+            } else {
+                advance("{");
+                if (token_nxt.id !== "}") {
+                    while (true) {
+                        if (!token_nxt.identifier) {
+
+// test_cause:
+// ["import {", "stmt_import", "expected_identifier_a", "(end)", 1]
+
+                            return stop("expected_identifier_a");
+                        }
+                        name = token_nxt;
+                        advance();
+                        if (token_nxt.id === "as") {
+                            advance("as");
+                            name = token_nxt;
+                            advance();
+                        }
+                        if (name.id === "ignore") {
+
+// test_cause:
+// ["import {ignore} from \"aa\"", "stmt_import", "unexpected_a", "ignore", 9]
+
+                            warn("unexpected_a", name);
+                        }
+                        enroll(name, "variable", true);
+                        the_import.name.push(name);
+                        if (token_nxt.id !== ",") {
+                            break;
+                        }
+                        advance(",");
+                    }
+                }
+                advance("}");
+            }
 
 // PR-347 - Disable warning "unexpected_directive_a".
 //
@@ -6790,64 +6864,10 @@ function jslint_phase3_parse(state) {
 //             );
 //         }
 
-        state.mode_module = true;
-
-// PR-436 - Add grammar for side-effect import-statement.
-
-        if (token_nxt.id === "(string)") {
-
-// test_cause:
-// ["import \"./aa.mjs\";", "stmt_import", "import_side_effect", "", 0]
-
-            test_cause("import_side_effect");
-            warn("expected_a_b", token_nxt, "{", artifact());
-            advance();
-            semicolon();
-            return the_import;
-        }
-        if (token_nxt.identifier) {
-            name = token_nxt;
-            advance();
-            if (name.id === "ignore") {
-
-// test_cause:
-// ["import ignore from \"aa\"", "stmt_import", "unexpected_a", "ignore", 8]
-
-                warn("unexpected_a", name);
+            if (token_nxt.id !== ",") {
+                break;
             }
-            enroll(name, "variable", true);
-            the_import.name = name;
-        } else {
-            names = [];
-            advance("{");
-            if (token_nxt.id !== "}") {
-                while (true) {
-                    if (!token_nxt.identifier) {
-
-// test_cause:
-// ["import {", "stmt_import", "expected_identifier_a", "(end)", 1]
-
-                        return stop("expected_identifier_a");
-                    }
-                    name = token_nxt;
-                    advance();
-                    if (name.id === "ignore") {
-
-// test_cause:
-// ["import {ignore} from \"aa\"", "stmt_import", "unexpected_a", "ignore", 9]
-
-                        warn("unexpected_a", name);
-                    }
-                    enroll(name, "variable", true);
-                    names.push(name);
-                    if (token_nxt.id !== ",") {
-                        break;
-                    }
-                    advance(",");
-                }
-            }
-            advance("}");
-            the_import.name = names;
+            advance(",");
         }
         advance("from");
         advance("(string)");
@@ -8407,21 +8427,12 @@ function jslint_phase4_walk(state) {
     }
 
     function post_s_import(the_thing) {
-        const name = the_thing.name;
-        if (name) {
-            if (Array.isArray(name)) {
-                name.forEach(function (name) {
-                    name.dead = false;
-                    name.init = true;
-                    blockage.live.push(name);
-                });
-            } else {
-                name.dead = false;
-                name.init = true;
-                blockage.live.push(name);
-            }
-            return post_s_export(the_thing);
-        }
+        the_thing.name.forEach(function (name) {
+            name.dead = false;
+            name.init = true;
+            blockage.live.push(name);
+        });
+        return post_s_export(the_thing);
     }
 
     function post_s_lbrace() {
