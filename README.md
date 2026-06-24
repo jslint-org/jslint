@@ -950,9 +950,9 @@ if (false) {
 |  36. | &#x2705; | ES2018 | [`Promise.prototype.finally`](https://github.com/tc39/proposal-promise-finally) |
 |  35. | &#x2705; | ES2018 | [`RegExp Unicode Property Escapes`](https://github.com/tc39/proposal-regexp-unicode-property-escapes) |
 |  34. | &#x26a0; | ES2018 | [`RegExp Lookbehind Assertions`](https://github.com/tc39/proposal-regexp-lookbehind) |
-|  33. | &#x26a0; | ES2018 | [`Rest/Spread Properties`](https://github.com/tc39/proposal-object-rest-spread) |
+|  33. | &#x2705; | ES2018 | [`Rest/Spread Properties`](https://github.com/tc39/proposal-object-rest-spread) |
 |  32. | &#x2705; | ES2018 | [`RegExp named capture groups`](https://github.com/tc39/proposal-regexp-named-groups) |
-|  31. | &#x26a0; | ES2018 | [`s (dotAll) flag for regular expressions`](https://github.com/tc39/proposal-regexp-dotall-flag) |
+|  31. | &#x2705; | ES2018 | [`s (dotAll) flag for regular expressions`](https://github.com/tc39/proposal-regexp-dotall-flag) |
 |  30. | &#x2705; | ES2018 | [`Lifting template literal restriction`](https://github.com/tc39/proposal-template-literal-revision) |
 |  29. | &#x2705; | ES2017 | [`Shared memory and atomics`](https://github.com/tc39/proposal-ecmascript-sharedmem) |
 |  28. | &#x2705; | ES2017 | [`Async functions`](https://github.com/tc39/proposal-async-await) |

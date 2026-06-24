@@ -11,6 +11,8 @@
 
 # v2026.6.1-beta
 - jslint-ecma - Update README.md, documenting supported ES2015+ features.
+- jslint-ecma - Add ES2018-feature Rest/Spread Properties.
+- jslint-ecma - Add ES2018-feature s (dotall) flag for regular expressions.
 - jslint-ecma - Expand ES2015-feature-support for es-module-import-statement.
 - jslint-ecma - Add ES2023-feature ShadowRealm to global-scope.
 - jslint-ecma - Add ES2024-feature .isWellFormed(), .toWellFormed() for literal string.
