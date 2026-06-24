@@ -9389,7 +9389,7 @@ function jslint_phase5_whitage(state) {
                 margin += mode_indent;
                 if (indent_method_dict[left.line]) {
 
-// PR-xxx - Relax warning on multiline-method-chaining.
+// PR-498 - Relax warning on multiline-method-chaining.
 
                     margin += mode_indent;
                     indentage.indent_method = true;
@@ -9493,7 +9493,7 @@ function jslint_phase5_whitage(state) {
                 at_margin(
                     indentage.indent_method
 
-// PR-xxx - Relax warning on multiline-method-chaining.
+// PR-498 - Relax warning on multiline-method-chaining.
 
                     ? mode_indent
                     : 0
@@ -9627,7 +9627,7 @@ function jslint_phase5_whitage(state) {
                 no_space_only();
             } else {
 
-// PR-xxx - Relax warning on multiline-method-chaining.
+// PR-498 - Relax warning on multiline-method-chaining.
 
                 indent_method_dict[right.line] = true;
                 at_margin(mode_indent);
