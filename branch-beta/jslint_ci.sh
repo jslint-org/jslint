@@ -2395,13 +2395,10 @@ function globExclude({
  };
 }
 function htmlEscape(str) {
- return String(str).replace((
-  /&/g
- ), "&amp;").replace((
-  /</g
- ), "&lt;").replace((
-  />/g
- ), "&gt;");
+ return String(str)
+  .replace((/&/g), "&amp;")
+  .replace((/</g), "&lt;")
+  .replace((/>/g), "&gt;");
 }
 async function moduleFsInit() {
 
@@ -3345,13 +3342,9 @@ function sentinel() {}
   exitCode = await new Promise(function (resolve) {
    let processArgv0 = processArgv[0];
    if (processArgv0 === "npm") {
-    processArgv0 = process.platform.replace(
-     "win32",
-     "npm.cmd"
-    ).replace(
-     process.platform,
-     "npm"
-    );
+    processArgv0 = process.platform
+     .replace("win32", "npm.cmd")
+     .replace(process.platform, "npm");
    }
    moduleChildProcess.spawn(
     processArgv0,

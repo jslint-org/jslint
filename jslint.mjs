@@ -92,48 +92,309 @@
 
 /*jslint beta, node*/
 /*property
-    JSLINT_BETA, NODE_V8_COVERAGE, a, all, argv, arity, artifact,
-    assertErrorThrownAsync, assertJsonEqual, assertOrThrow, assign, async, b,
-    beta, bitwise, block, body, browser, c, calls, catch, catch_list,
-    catch_stack, causes, char, children, clear, closer, closure, code, column,
-    concat, consoleError, console_error, console_log, constant, context,
-    convert, count, coverageDir, create, cwd, d, dead, debugInline, default,
-    delta, devel, directive, directive_ignore_line, directive_list, directives,
-    dirname, disrupt, dot, edition, elem_list, ellipsis, else, end, endOffset,
-    endsWith, entries, env, error, eval, every, example_list, excludeList, exec,
-    execArgv, exit, exitCode, export_dict, exports, expression, extra, fart,
-    file, fileList, fileURLToPath, filter, finally, flag, floor, for, forEach,
-    formatted_message, free, freeze, from, froms, fsWriteFileWithParents,
-    fud_stmt, functionName, function_list, function_stack, functions, get,
-    getset, github_repo, globExclude, global, global_dict, global_list,
-    holeList, htmlEscape, id, identifier, ignoreLine, import, import_list,
-    import_meta_url, inc, includeList, indent2, index, indexOf, init, initial,
-    isArray, isBlockCoverage, isHole, isNaN, is_equal, is_weird, join, jslint,
-    jslint_apidoc, jslint_assert, jslint_charset_ascii, jslint_cli,
-    jslint_edition, jslint_phase1_split, jslint_phase2_lex, jslint_phase3_parse,
-    jslint_phase4_walk, jslint_phase5_whitage, jslint_report, json,
-    jstestDescribe, jstestIt, jstestOnExit, keys, label, lbp, led_infix, length,
-    level, line, lineList, line_list, line_offset, line_source, lines,
-    linesCovered, linesTotal, live, log, long, loop, m, map, margin, match, max,
-    message, meta, min, mkdir, modeCoverageIgnoreFile, modeIndex, mode_cli,
-    mode_conditional, mode_json, mode_module, mode_noop, mode_property,
-    mode_shebang, mode_stop, module, moduleFsInit, moduleName, module_list,
-    name, names, node, nomen, noop, now, nr, nud_prefix,
-    objectDeepCopyWithKeysSorted, ok, on, open, opening, option, option_dict,
-    order, package_name, padEnd, padStart, parameters, parent, parentIi, parse,
-    pathname, pathnameList, platform, pop, processArgv, process_argv,
-    process_env, process_exit, promises, property, property_dict, push, quote,
-    ranges, readFile, readdir, readonly, recursive, reduce, repeat, replace,
-    resolve, result, reverse, role, round, scriptId, search, set, shebang,
-    shell, shift, signature, single, slice, some, sort, source, spawn, splice,
-    split, stack, stack_trace, start, startOffset, startsWith, statement,
-    statement_prv, stdio, stop, stop_at, stringify, subscript, switch,
-    syntax_dict, tenure, test, test_cause, test_internal_error, this, thru,
-    toLocaleString, toString, token, token_global, token_list, token_nxt,
-    token_tree, tokens, trace, tree, trim, trimEnd, trimRight, try, type,
-    unlink, unordered, unshift, url, used, v8CoverageListMerge,
-    v8CoverageReportCreate, value, variable, version, versions, warn, warn_at,
-    warning, warning_list, warnings, white, wrapped, writeFile
+    JSLINT_BETA,
+    NODE_V8_COVERAGE,
+    a,
+    all,
+    argv,
+    arity,
+    artifact,
+    assertErrorThrownAsync,
+    assertJsonEqual,
+    assertOrThrow,
+    assign,
+    async,
+    b,
+    beta,
+    bitwise,
+    block,
+    body,
+    browser,
+    c,
+    calls,
+    catch,
+    catch_list,
+    catch_stack,
+    causes,
+    char,
+    children,
+    clear,
+    closer,
+    closure,
+    code,
+    column,
+    concat,
+    consoleError,
+    console_error,
+    console_log,
+    constant,
+    context,
+    convert,
+    count,
+    coverageDir,
+    create,
+    cwd,
+    d,
+    dead,
+    debugInline,
+    default,
+    delta,
+    devel,
+    directive,
+    directive_ignore_line,
+    directive_list,
+    directives,
+    dirname,
+    disrupt,
+    dot,
+    edition,
+    elem_list,
+    ellipsis,
+    else,
+    end,
+    endOffset,
+    endsWith,
+    entries,
+    env,
+    error,
+    eval,
+    every,
+    example_list,
+    excludeList,
+    exec,
+    execArgv,
+    exit,
+    exitCode,
+    export_dict,
+    exports,
+    expression,
+    extra,
+    fart,
+    file,
+    fileList,
+    fileURLToPath,
+    filter,
+    finally,
+    flag,
+    floor,
+    for,
+    forEach,
+    formatted_message,
+    free,
+    freeze,
+    from,
+    froms,
+    fsWriteFileWithParents,
+    fud_stmt,
+    functionName,
+    function_list,
+    function_stack,
+    functions,
+    get,
+    getset,
+    github_repo,
+    globExclude,
+    global,
+    global_dict,
+    global_list,
+    holeList,
+    htmlEscape,
+    id,
+    identifier,
+    ignoreLine,
+    import,
+    import_list,
+    import_meta_url,
+    inc,
+    includeList,
+    indent2,
+    indent_method,
+    index,
+    indexOf,
+    init,
+    initial,
+    isArray,
+    isBlockCoverage,
+    isHole,
+    isNaN,
+    is_equal,
+    is_weird,
+    join,
+    jslint,
+    jslint_apidoc,
+    jslint_assert,
+    jslint_charset_ascii,
+    jslint_cli,
+    jslint_edition,
+    jslint_phase1_split,
+    jslint_phase2_lex,
+    jslint_phase3_parse,
+    jslint_phase4_walk,
+    jslint_phase5_whitage,
+    jslint_report,
+    json,
+    jstestDescribe,
+    jstestIt,
+    jstestOnExit,
+    keys,
+    label,
+    lbp,
+    led_infix,
+    length,
+    level,
+    line,
+    lineList,
+    line_list,
+    line_offset,
+    line_source,
+    lines,
+    linesCovered,
+    linesTotal,
+    live,
+    log,
+    long,
+    loop,
+    m,
+    map,
+    margin,
+    match,
+    max,
+    message,
+    meta,
+    min,
+    mkdir,
+    modeCoverageIgnoreFile,
+    modeIndex,
+    mode_cli,
+    mode_conditional,
+    mode_json,
+    mode_module,
+    mode_noop,
+    mode_property,
+    mode_shebang,
+    mode_stop,
+    module,
+    moduleFsInit,
+    moduleName,
+    module_list,
+    name,
+    names,
+    node,
+    nomen,
+    noop,
+    now,
+    nr,
+    nud_prefix,
+    objectDeepCopyWithKeysSorted,
+    ok,
+    on,
+    open,
+    opening,
+    option,
+    option_dict,
+    order,
+    package_name,
+    padEnd,
+    padStart,
+    parameters,
+    parent,
+    parentIi,
+    parse,
+    pathname,
+    pathnameList,
+    platform,
+    pop,
+    processArgv,
+    process_argv,
+    process_env,
+    process_exit,
+    promises,
+    property,
+    property_dict,
+    push,
+    quote,
+    ranges,
+    readFile,
+    readdir,
+    readonly,
+    recursive,
+    reduce,
+    repeat,
+    replace,
+    resolve,
+    result,
+    reverse,
+    role,
+    round,
+    scriptId,
+    search,
+    set,
+    shebang,
+    shell,
+    shift,
+    signature,
+    single,
+    slice,
+    some,
+    sort,
+    source,
+    spawn,
+    splice,
+    split,
+    stack,
+    stack_trace,
+    start,
+    startOffset,
+    startsWith,
+    statement,
+    statement_prv,
+    stdio,
+    stop,
+    stop_at,
+    stringify,
+    subscript,
+    switch,
+    syntax_dict,
+    tenure,
+    test,
+    test_cause,
+    test_internal_error,
+    this,
+    thru,
+    toLocaleString,
+    toString,
+    token,
+    token_global,
+    token_list,
+    token_nxt,
+    token_tree,
+    tokens,
+    trace,
+    tree,
+    trim,
+    trimEnd,
+    trimRight,
+    try,
+    type,
+    unlink,
+    unordered,
+    unshift,
+    url,
+    used,
+    v8CoverageListMerge,
+    v8CoverageReportCreate,
+    value,
+    variable,
+    version,
+    versions,
+    warn,
+    warn_at,
+    warning,
+    warning_list,
+    warnings,
+    white,
+    wrapped,
+    writeFile
 */
 
 // init debugInline
@@ -575,13 +836,10 @@ function htmlEscape(str) {
 
 // This function will make <str> html-safe by escaping & < >.
 
-    return String(str).replace((
-        /&/g
-    ), "&amp;").replace((
-        /</g
-    ), "&lt;").replace((
-        />/g
-    ), "&gt;");
+    return String(str)
+        .replace((/&/g), "&amp;")
+        .replace((/</g), "&lt;")
+        .replace((/>/g), "&gt;");
 }
 
 function jslint(
@@ -822,22 +1080,24 @@ function jslint(
 // This function will instrument <cause> to <cause_dict> for test-purposes.
 
         if (option_dict.test_cause) {
-            cause_dict[JSON.stringify([
-                String(new Error().stack).replace((
-                    /^    at (?:file|stop|stop_at|test_cause|warn|warn_at)\b.*?\n/gm
-                ), "").match(
-                    /\n    at ((?:Object\.\w+?_)?\w+?) /
-                )[1].replace((
-                    /^Object\./
-                ), ""),
-                code,
-                String(
-                    (aa === undefined || aa === token_global)
-                    ? ""
-                    : aa
-                ),
-                column || 0
-            ])] = true;
+            cause_dict[
+                JSON.stringify([
+                    String(new Error().stack)
+                        .replace(
+                            (/^    at (?:file|stop|stop_at|test_cause|warn|warn_at)\b.*?\n/gm),
+                            ""
+                        )
+                        .match(/\n    at ((?:Object\.\w+?_)?\w+?) /)[1]
+                        .replace((/^Object\./), ""),
+                    code,
+                    String(
+                        (aa === undefined || aa === token_global)
+                        ? ""
+                        : aa
+                    ),
+                    column || 0
+                ])
+            ] = true;
         }
     }
 
@@ -1479,13 +1739,10 @@ ${name}
             /(\([\S\s]*?\)) \{/
         ), function (match0, match1) {
             signature = htmlEscape(
-                match1.replace((
-                    / *?\/\*[\S\s]*?\*\/ */g
-                ), "").replace((
-                    / *?\/\/.*/g
-                ), "").replace((
-                    /\n{2,}/g
-                ), "\n")
+                match1
+                    .replace((/ *?\/\*[\S\s]*?\*\/ */g), "")
+                    .replace((/ *?\/\/.*/g), "")
+                    .replace((/\n{2,}/g), "\n")
             );
             return match0;
         });
@@ -8843,6 +9100,8 @@ function jslint_phase5_whitage(state) {
 // "switch(){}"
 // "while(){}"
 
+    let indent_method_dict = {};
+    let indentage;
     let left = token_global;
     let margin = 0;
     let mode_indent = (
@@ -9037,23 +9296,435 @@ function jslint_phase5_whitage(state) {
         }
     }
 
-    function pop() {
-        const previous = function_stack.pop();
-        closer = previous.closer;
-        free = previous.free;
-        margin = previous.margin;
-        open = previous.open;
-        opening = previous.opening;
+    function whitage_case() {
+
+// test_cause:
+// ["let aa=[];", "whitage_case", "opener", "", 0]
+// ["let aa=`${0}`;", "whitage_case", "opener", "", 0]
+// ["let aa=aa();", "whitage_case", "opener", "", 0]
+// ["let aa={};", "whitage_case", "opener", "", 0]
+
+        test_cause("opener");
+
+// Probably deadcode.
+// case "${}":
+
+        jslint_assert(
+            !(left.id + right.id === "${}"),
+            "Expected !(left.id + right.id === \"${}\")."
+        );
+        switch (left.id + right.id) {
+        case "()":
+        case "[]":
+        case "{}":
+
+// If left and right are opener and closer, then the placement of right depends
+// on the openness. Illegal pairs (like '{]') have already been detected.
+
+// test_cause:
+// ["let aa=[];", "whitage_case", "opener_closer", "", 0]
+// ["let aa=aa();", "whitage_case", "opener_closer", "", 0]
+// ["let aa={};", "whitage_case", "opener_closer", "", 0]
+
+            test_cause("opener_closer");
+            if (left.line === right.line) {
+
+// test_cause:
+// ["let aa = aa( );", "no_space", "unexpected_space_a_b", ")", 14]
+
+                no_space();
+            } else {
+
+// test_cause:
+// ["let aa = aa(\n );", "expected_at", "expected_a_at_b_c", "1", 2]
+
+                at_margin(0);
+            }
+            break;
+        default:
+
+// test_cause:
+// ["let aa=(0);", "whitage_case", "opener_operand", "", 0]
+// ["let aa=[0];", "whitage_case", "opener_operand", "", 0]
+// ["let aa=`${0}`;", "whitage_case", "opener_operand", "", 0]
+// ["let aa=aa(0);", "whitage_case", "opener_operand", "", 0]
+// ["let aa={aa:0};", "whitage_case", "opener_operand", "", 0]
+
+            test_cause("opener_operand");
+            opening = left.open || (left.line !== right.line);
+            indentage = {
+                closer,
+                free,
+                margin,
+                open,
+                opening
+            };
+            function_stack.push(indentage);
+            switch (left.id) {
+            case "${":
+                closer = "}";
+                break;
+            case "(":
+                closer = ")";
+                break;
+            case "[":
+                closer = "]";
+                break;
+            case "{":
+                closer = "}";
+                break;
+            }
+            if (opening) {
+
+// test_cause:
+// ["function aa(){\nreturn;\n}", "whitage_case", "opening", "", 0]
+// ["let aa=(\n0\n);", "whitage_case", "opening", "", 0]
+// ["let aa=[\n0\n];", "whitage_case", "opening", "", 0]
+// ["let aa=`${\n0\n}`;", "whitage_case", "opening", "", 0]
+// ["let aa={\naa:0\n};", "whitage_case", "opening", "", 0]
+
+                test_cause("opening");
+                free = closer === ")" && left.free;
+                open = true;
+                margin += mode_indent;
+                if (indent_method_dict[left.line]) {
+
+// PR-xxx - Relax warning on multiline-method-chaining.
+
+                    margin += mode_indent;
+                    indentage.indent_method = true;
+                }
+                if (right.role === "label") {
+                    if (right.from !== 0) {
+
+// test_cause:
+// ["
+// function aa() {
+//  bb:
+//     while (aa) {
+//         if (aa) {
+//             break bb;
+//         }
+//     }
+// }
+// ", "expected_at", "expected_a_at_b_c", "1", 2]
+
+                        expected_at(0);
+                    }
+                } else if (right.switch) {
+                    at_margin(-mode_indent);
+                } else {
+                    at_margin(0);
+                }
+                break;
+            }
+            if (right.statement || right.role === "label") {
+
+// test_cause:
+// ["
+// function aa() {bb:
+//     while (aa) {
+//         aa();
+//     }
+// }
+// ", "whitage_case", "expected_line_break_a_b", "bb", 16]
+
+                warn(
+                    "expected_line_break_a_b",
+                    right,
+                    artifact(left),
+                    artifact(right)
+                );
+            }
+
+// test_cause:
+// ["let aa=(0);", "whitage_case", "not_free", "", 0]
+// ["let aa=[0];", "whitage_case", "not_free", "", 0]
+// ["let aa=`${0}`;", "whitage_case", "not_free", "", 0]
+// ["let aa={aa:0};", "whitage_case", "not_free", "", 0]
+
+            test_cause("not_free");
+            free = false;
+            open = false;
+
+// test_cause:
+// ["let aa = ( 0 );", "no_space_only", "unexpected_space_a_b", "0", 12]
+
+            no_space_only();
+        }
     }
 
-    function push() {
-        function_stack.push({
-            closer,
-            free,
-            margin,
-            open,
-            opening
-        });
+    function whitage_default() {
+        if (right.statement === true) {
+            if (left.id === "else") {
+
+// test_cause:
+// ["
+// let aa = 0;
+// if (aa) {
+//     aa();
+// } else  if (aa) {
+//     aa();
+// }
+// ", "one_space_only", "expected_space_a_b", "if", 9]
+
+                one_space_only();
+            } else {
+
+// test_cause:
+// [" let aa = 0;", "expected_at", "expected_a_at_b_c", "1", 2]
+
+                at_margin(0);
+                open = false;
+            }
+            return;
+        }
+
+// If right is a closer, then pop the previous state.
+
+        if (right.id === closer) {
+            indentage = function_stack.pop();
+            closer = indentage.closer;
+            free = indentage.free;
+            margin = indentage.margin;
+            open = indentage.open;
+            opening = indentage.opening;
+            if (opening && right.id !== ";") {
+                at_margin(
+                    indentage.indent_method
+
+// PR-xxx - Relax warning on multiline-method-chaining.
+
+                    ? mode_indent
+                    : 0
+                );
+            } else {
+                no_space_only();
+            }
+            return;
+        }
+
+// Left is not an opener, and right is not a closer.
+// The nature of left and right will determine the space between them.
+
+// If left is ',' or ';' or right is a statement then if open,
+// right must go at the margin, or if closed, a space between.
+
+        if (right.switch) {
+            at_margin(-mode_indent);
+            return;
+        }
+        if (right.role === "label") {
+            if (right.from !== 0) {
+
+// test_cause:
+// ["
+// function aa() {
+//     aa();cc:
+//     while (aa) {
+//         if (aa) {
+//             break cc;
+//         }
+//     }
+// }
+// ", "expected_at", "expected_a_at_b_c", "1", 10]
+
+                expected_at(0);
+            }
+            return;
+        }
+        if (left.id === ",") {
+            if (!open || (
+                (free || closer === "]")
+                && left.line === right.line
+            )) {
+
+// test_cause:
+// ["let {aa,bb} = 0;", "one_space", "expected_space_a_b", "bb", 9]
+
+                one_space();
+            } else {
+
+// test_cause:
+// ["
+// function aa() {
+//     aa(
+//         0,0
+//     );
+// }
+// ", "expected_at", "expected_a_at_b_c", "9", 11]
+
+                at_margin(0);
+            }
+            return;
+        }
+
+// If right is a ternary operator, line it up on the margin.
+
+        if (right.arity === "ternary") {
+            if (open) {
+
+// test_cause:
+// ["
+// let aa = (
+//     aa
+//     ? 0
+// : 1
+// );
+// ", "expected_at", "expected_a_at_b_c", "5", 1]
+
+                at_margin(0);
+            } else {
+
+// test_cause:
+// ["let aa = (aa ? 0 : 1);", "whitage_default", "use_open", "?", 14]
+
+                warn("use_open", right);
+            }
+            return;
+        }
+        if (
+            right.arity === "binary"
+            && right.id === "("
+            && free
+        ) {
+
+// test_cause:
+// ["let aa = aa(\naa ()\n);", "no_space", "unexpected_space_a_b", "(", 4]
+
+            no_space();
+            return;
+        }
+        if (
+            left.id === "."
+            || left.id === "?."
+            || left.id === "..."
+            || right.id === ","
+            || right.id === ";"
+            || right.id === ":"
+            || (
+                right.arity === "binary"
+                && (right.id === "(" || right.id === "[")
+            )
+            || (
+                right.arity === "function"
+                && left.id !== "function"
+            )
+        ) {
+
+// test_cause:
+// ["let aa = 0 ;", "no_space_only", "unexpected_space_a_b", ";", 12]
+
+            no_space_only();
+            return;
+        }
+        if (right.id === "." || right.id === "?.") {
+            if (left.line === right.line) {
+
+// test_cause:
+// ["let aa = aa ?.aa;", "no_space_only", "unexpected_space_a_b", "?.", 13]
+
+                no_space_only();
+            } else {
+
+// PR-xxx - Relax warning on multiline-method-chaining.
+
+                indent_method_dict[right.line] = true;
+                at_margin(mode_indent);
+            }
+            return;
+        }
+        if (left.id === ";") {
+
+// test_cause:
+// ["
+// /*jslint for*/
+// function aa() {
+//     for (
+//         aa();
+// aa;
+//         aa()
+//     ) {
+//         aa();
+//     }
+// }
+// ", "expected_at", "expected_a_at_b_c", "9", 1]
+
+            if (open) {
+                at_margin(0);
+            }
+            return;
+        }
+        if (
+            left.arity === "ternary"
+            || left.id === "case"
+            || left.id === "catch"
+            || left.id === "else"
+            || left.id === "finally"
+            || left.id === "while"
+            || left.id === "await"
+            || right.id === "catch"
+            || right.id === "else"
+            || right.id === "finally"
+            || (right.id === "while" && !right.statement)
+            || (left.id === ")" && right.id === "{")
+        ) {
+
+// test_cause:
+// ["
+// function aa() {
+//     do {
+//         aa();
+//     } while(aa());
+// }
+// ", "one_space_only", "expected_space_a_b", "(", 12]
+
+            one_space_only();
+            return;
+        }
+        if (
+
+// There is a space between left and right.
+
+            spaceop[left.id] === true
+            || spaceop[right.id] === true
+            || (
+                left.arity === "binary"
+                && (left.id === "+" || left.id === "-")
+            )
+            || (
+                right.arity === "binary"
+                && (right.id === "+" || right.id === "-")
+            )
+            || left.id === "function"
+            || left.id === ":"
+            || left.id === "async"
+            || (
+                (
+                    left.identifier
+                    || left.id === "(string)"
+                    || left.id === "(number)"
+                )
+                && (
+                    right.identifier
+                    || right.id === "(string)"
+                    || right.id === "(number)"
+                )
+            )
+            || (left.arity === "statement" && right.id !== ";")
+        ) {
+
+// test_cause:
+// ["let aa=0;", "one_space", "expected_space_a_b", "0", 8]
+// ["let aa={\naa:\n0\n};", "expected_at", "expected_a_at_b_c", "5", 1]
+
+            one_space();
+            return;
+        }
+        if (left.arity === "unary" && left.id !== "`") {
+            no_space_only();
+            return;
+        }
     }
 
 // uninitialized_and_unused();
@@ -9074,11 +9745,12 @@ function jslint_phase5_whitage(state) {
 // whitage();
 // Go through the token list, looking at usage of whitespace.
 
-    token_list.forEach(function whitage(the_token) {
+    token_list.forEach(function (the_token) {
         right = the_token;
         if (right.id === "(comment)" || right.id === "(end)") {
             nr_comments_skipped += 1;
-        } else {
+            return;
+        }
 
 // If left is an opener and right is not the closer, then push the previous
 // state. If the token following the opener is on the next line, then this is
@@ -9089,387 +9761,24 @@ function jslint_phase5_whitage(state) {
 
 // The open and close pairs.
 
-            switch (left.id) {
-            case "${":
-            case "(":
-            case "[":
-            case "{":
-
-// test_cause:
-// ["let aa=[];", "whitage", "opener", "", 0]
-// ["let aa=`${0}`;", "whitage", "opener", "", 0]
-// ["let aa=aa();", "whitage", "opener", "", 0]
-// ["let aa={};", "whitage", "opener", "", 0]
-
-                test_cause("opener");
-
-// Probably deadcode.
-// case "${}":
-
-                jslint_assert(
-                    !(left.id + right.id === "${}"),
-                    "Expected !(left.id + right.id === \"${}\")."
-                );
-                switch (left.id + right.id) {
-                case "()":
-                case "[]":
-                case "{}":
-
-// If left and right are opener and closer, then the placement of right depends
-// on the openness. Illegal pairs (like '{]') have already been detected.
-
-// test_cause:
-// ["let aa=[];", "whitage", "opener_closer", "", 0]
-// ["let aa=aa();", "whitage", "opener_closer", "", 0]
-// ["let aa={};", "whitage", "opener_closer", "", 0]
-
-                    test_cause("opener_closer");
-                    if (left.line === right.line) {
-
-// test_cause:
-// ["let aa = aa( );", "no_space", "unexpected_space_a_b", ")", 14]
-
-                        no_space();
-                    } else {
-
-// test_cause:
-// ["let aa = aa(\n );", "expected_at", "expected_a_at_b_c", "1", 2]
-
-                        at_margin(0);
-                    }
-                    break;
-                default:
-
-// test_cause:
-// ["let aa=(0);", "whitage", "opener_operand", "", 0]
-// ["let aa=[0];", "whitage", "opener_operand", "", 0]
-// ["let aa=`${0}`;", "whitage", "opener_operand", "", 0]
-// ["let aa=aa(0);", "whitage", "opener_operand", "", 0]
-// ["let aa={aa:0};", "whitage", "opener_operand", "", 0]
-
-                    test_cause("opener_operand");
-                    opening = left.open || (left.line !== right.line);
-                    push();
-                    switch (left.id) {
-                    case "${":
-                        closer = "}";
-                        break;
-                    case "(":
-                        closer = ")";
-                        break;
-                    case "[":
-                        closer = "]";
-                        break;
-                    case "{":
-                        closer = "}";
-                        break;
-                    }
-                    if (opening) {
-
-// test_cause:
-// ["function aa(){\nreturn;\n}", "whitage", "opening", "", 0]
-// ["let aa=(\n0\n);", "whitage", "opening", "", 0]
-// ["let aa=[\n0\n];", "whitage", "opening", "", 0]
-// ["let aa=`${\n0\n}`;", "whitage", "opening", "", 0]
-// ["let aa={\naa:0\n};", "whitage", "opening", "", 0]
-
-                        test_cause("opening");
-                        free = closer === ")" && left.free;
-                        open = true;
-                        margin += mode_indent;
-                        if (right.role === "label") {
-                            if (right.from !== 0) {
-
-// test_cause:
-// ["
-// function aa() {
-//  bb:
-//     while (aa) {
-//         if (aa) {
-//             break bb;
-//         }
-//     }
-// }
-// ", "expected_at", "expected_a_at_b_c", "1", 2]
-
-                                expected_at(0);
-                            }
-                        } else if (right.switch) {
-                            at_margin(-mode_indent);
-                        } else {
-                            at_margin(0);
-                        }
-                    } else {
-                        if (right.statement || right.role === "label") {
-
-// test_cause:
-// ["
-// function aa() {bb:
-//     while (aa) {
-//         aa();
-//     }
-// }
-// ", "whitage", "expected_line_break_a_b", "bb", 16]
-
-                            warn(
-                                "expected_line_break_a_b",
-                                right,
-                                artifact(left),
-                                artifact(right)
-                            );
-                        }
-
-// test_cause:
-// ["let aa=(0);", "whitage", "not_free", "", 0]
-// ["let aa=[0];", "whitage", "not_free", "", 0]
-// ["let aa=`${0}`;", "whitage", "not_free", "", 0]
-// ["let aa={aa:0};", "whitage", "not_free", "", 0]
-
-                        test_cause("not_free");
-                        free = false;
-                        open = false;
-
-// test_cause:
-// ["let aa = ( 0 );", "no_space_only", "unexpected_space_a_b", "0", 12]
-
-                        no_space_only();
-                    }
-                }
-                break;
-            default:
-                if (right.statement === true) {
-                    if (left.id === "else") {
-
-// test_cause:
-// ["
-// let aa = 0;
-// if (aa) {
-//     aa();
-// } else  if (aa) {
-//     aa();
-// }
-// ", "one_space_only", "expected_space_a_b", "if", 9]
-
-                        one_space_only();
-                    } else {
-
-// test_cause:
-// [" let aa = 0;", "expected_at", "expected_a_at_b_c", "1", 2]
-
-                        at_margin(0);
-                        open = false;
-                    }
-
-// If right is a closer, then pop the previous state.
-
-                } else if (right.id === closer) {
-                    pop();
-                    if (opening && right.id !== ";") {
-                        at_margin(0);
-                    } else {
-                        no_space_only();
-                    }
-                } else {
-
-// Left is not an opener, and right is not a closer.
-// The nature of left and right will determine the space between them.
-
-// If left is ',' or ';' or right is a statement then if open,
-// right must go at the margin, or if closed, a space between.
-
-                    if (right.switch) {
-                        at_margin(-mode_indent);
-                    } else if (right.role === "label") {
-                        if (right.from !== 0) {
-
-// test_cause:
-// ["
-// function aa() {
-//     aa();cc:
-//     while (aa) {
-//         if (aa) {
-//             break cc;
-//         }
-//     }
-// }
-// ", "expected_at", "expected_a_at_b_c", "1", 10]
-
-                            expected_at(0);
-                        }
-                    } else if (left.id === ",") {
-                        if (!open || (
-                            (free || closer === "]")
-                            && left.line === right.line
-                        )) {
-
-// test_cause:
-// ["let {aa,bb} = 0;", "one_space", "expected_space_a_b", "bb", 9]
-
-                            one_space();
-                        } else {
-
-// test_cause:
-// ["
-// function aa() {
-//     aa(
-//         0,0
-//     );
-// }
-// ", "expected_at", "expected_a_at_b_c", "9", 11]
-
-                            at_margin(0);
-                        }
-
-// If right is a ternary operator, line it up on the margin.
-
-                    } else if (right.arity === "ternary") {
-                        if (open) {
-
-// test_cause:
-// ["
-// let aa = (
-//     aa
-//     ? 0
-// : 1
-// );
-// ", "expected_at", "expected_a_at_b_c", "5", 1]
-
-                            at_margin(0);
-                        } else {
-
-// test_cause:
-// ["let aa = (aa ? 0 : 1);", "whitage", "use_open", "?", 14]
-
-                            warn("use_open", right);
-                        }
-                    } else if (
-                        right.arity === "binary"
-                        && right.id === "("
-                        && free
-                    ) {
-
-// test_cause:
-// ["let aa = aa(\naa ()\n);", "no_space", "unexpected_space_a_b", "(", 4]
-
-                        no_space();
-                    } else if (
-                        left.id === "."
-                        || left.id === "?."
-                        || left.id === "..."
-                        || right.id === ","
-                        || right.id === ";"
-                        || right.id === ":"
-                        || (
-                            right.arity === "binary"
-                            && (right.id === "(" || right.id === "[")
-                        )
-                        || (
-                            right.arity === "function"
-                            && left.id !== "function"
-                        )
-                        || (right.id === "." || right.id === "?.")
-                    ) {
-
-// test_cause:
-// ["let aa = 0 ;", "no_space_only", "unexpected_space_a_b", ";", 12]
-// ["let aa = aa ?.aa;", "no_space_only", "unexpected_space_a_b", "?.", 13]
-
-                        no_space_only();
-                    } else if (left.id === ";") {
-
-// test_cause:
-// ["
-// /*jslint for*/
-// function aa() {
-//     for (
-//         aa();
-// aa;
-//         aa()
-//     ) {
-//         aa();
-//     }
-// }
-// ", "expected_at", "expected_a_at_b_c", "9", 1]
-
-                        if (open) {
-                            at_margin(0);
-                        }
-                    } else if (
-                        left.arity === "ternary"
-                        || left.id === "case"
-                        || left.id === "catch"
-                        || left.id === "else"
-                        || left.id === "finally"
-                        || left.id === "while"
-                        || left.id === "await"
-                        || right.id === "catch"
-                        || right.id === "else"
-                        || right.id === "finally"
-                        || (right.id === "while" && !right.statement)
-                        || (left.id === ")" && right.id === "{")
-                    ) {
-
-// test_cause:
-// ["
-// function aa() {
-//     do {
-//         aa();
-//     } while(aa());
-// }
-// ", "one_space_only", "expected_space_a_b", "(", 12]
-
-                        one_space_only();
-                    } else if (
-
-// There is a space between left and right.
-
-                        spaceop[left.id] === true
-                        || spaceop[right.id] === true
-                        || (
-                            left.arity === "binary"
-                            && (left.id === "+" || left.id === "-")
-                        )
-                        || (
-                            right.arity === "binary"
-                            && (right.id === "+" || right.id === "-")
-                        )
-                        || left.id === "function"
-                        || left.id === ":"
-                        || left.id === "async"
-                        || (
-                            (
-                                left.identifier
-                                || left.id === "(string)"
-                                || left.id === "(number)"
-                            )
-                            && (
-                                right.identifier
-                                || right.id === "(string)"
-                                || right.id === "(number)"
-                            )
-                        )
-                        || (left.arity === "statement" && right.id !== ";")
-                    ) {
-
-// test_cause:
-// ["let aa=0;", "one_space", "expected_space_a_b", "0", 8]
-// ["let aa={\naa:\n0\n};", "expected_at", "expected_a_at_b_c", "5", 1]
-
-                        one_space();
-                    } else if (left.arity === "unary" && left.id !== "`") {
-                        no_space_only();
-                    }
-                }
-            }
-            nr_comments_skipped = 0;
-            delete left.calls;
-            delete left.dead;
-            delete left.free;
-            delete left.init;
-            delete left.open;
-            delete left.used;
-            left = right;
+        switch (left.id) {
+        case "${":
+        case "(":
+        case "[":
+        case "{":
+            whitage_case();
+            break;
+        default:
+            whitage_default();
         }
+        nr_comments_skipped = 0;
+        delete left.calls;
+        delete left.dead;
+        delete left.free;
+        delete left.init;
+        delete left.open;
+        delete left.used;
+        left = right;
     });
 }
 
@@ -11445,13 +11754,9 @@ function sentinel() {}
 // Coverage-hack - Ugly-hack to get test-coverage under both win32 and linux.
 
             if (processArgv0 === "npm") {
-                processArgv0 = process.platform.replace(
-                    "win32",
-                    "npm.cmd"
-                ).replace(
-                    process.platform,
-                    "npm"
-                );
+                processArgv0 = process.platform
+                    .replace("win32", "npm.cmd")
+                    .replace(process.platform, "npm");
             }
             moduleChildProcess.spawn(
                 processArgv0,

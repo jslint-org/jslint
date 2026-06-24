@@ -725,6 +725,9 @@ jstestDescribe((
             import: [
                 `import aa from "aa" with {"type": "json"};\naa();`
             ],
+            indent_method: [
+                "let aa = 0;\naa\n    .bb\n    .cc(\n        0\n    );"
+            ],
             jslint_disable: [
                 "/*jslint-disable*/\n0\n/*jslint-enable*/"
             ],

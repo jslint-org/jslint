@@ -620,13 +620,10 @@ await jslint.jslint_cli({
 <span class="apidocCodeCommentSpan">
 // This function will make &lt;str&gt; html-safe by escaping &amp; &lt; &gt;.
 
-</span>    return String(str).replace((
-        /&amp;/g
-    ), "&amp;amp;").replace((
-        /&lt;/g
-    ), "&amp;lt;").replace((
-        /&gt;/g
-    ), "&amp;gt;");
+</span>    return String(str)
+        .replace((/&amp;/g), "&amp;amp;")
+        .replace((/&lt;/g), "&amp;lt;")
+        .replace((/&gt;/g), "&amp;gt;");
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
                             }
@@ -787,13 +784,10 @@ ${name}
             /(\([\S\s]*?\)) \{/
         ), function (match0, match1) {
             signature = htmlEscape(
-                match1.replace((
-                    / *?\/\*[\S\s]*?\*\/ */g
-                ), "").replace((
-                    / *?\/\/.*/g
-                ), "").replace((
-                    /\n{2,}/g
-                ), "\n")
+                match1
+                    .replace((/ *?\/\*[\S\s]*?\*\/ */g), "")
+                    .replace((/ *?\/\/.*/g), "")
+                    .replace((/\n{2,}/g), "\n")
             );
             return match0;
         });
@@ -809,7 +803,7 @@ ${name}
                     + key
                     + "(\\((?:.*?\\n){8})"
                 ), "g"),
-  ...
+                function (ignore, header, isDeclarati...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -853,7 +847,7 @@ ${String(message).slice(0, 2000)}`
     );
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-// ["let aa={};", "whitage", "opener", "", 0]
+// ["let aa={};", "whitage_case", "opener", "", 0]
 
 test_cause("opener");
 
@@ -1333,6 +1327,8 @@ jslint_assert(
 // "switch(){}"
 // "while(){}"
 
+    let indent_method_dict = {};
+    let indentage;
     let left = token_global;
     let margin = 0;
     let mode_indent = (
@@ -1381,8 +1377,7 @@ jslint_assert(
 //     || name.parent.arity !== "unary"
 // )
 
-                    &amp;&amp; jslint_assert(
-                        name.role...
+                    &amp;&a...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
