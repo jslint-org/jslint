@@ -5248,6 +5248,9 @@ function jslint_phase3_parse(state) {
                 return stop("wrap_fart_parameter", token_now);
             }
 
+// PR-xxx - Update ES2015-feature arrow, to continue parsing unwrapped-form
+// with warning, instead of stopping.
+
 // test_cause:
 // ["aa=>0", "parse_fart", "wrap_fart_parameter", "=>", 3]
 
