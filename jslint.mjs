@@ -6036,11 +6036,11 @@ function jslint_phase3_parse(state) {
         }
         function param_parse() {
             const is_brace = token_nxt.id === "{";
-            let param;
-            switch (token_nxt.id) {
+            let param = token_nxt;
+            switch (param.id) {
             case "...":
-                signature.push("...");
                 advance("...");
+                signature.push("...");
                 if (optional !== undefined) {
 
 // test_cause:
@@ -6061,104 +6061,11 @@ function jslint_phase3_parse(state) {
                     return stop("expected_identifier_a");
                 }
                 param = token_nxt;
-                parameters.push(param);
                 advance();
+                parameters.push(param);
                 signature.push(param.id);
                 break;
             case "[":
-                if (optional !== undefined) {
-
-// test_cause:
-// ["function aa(aa=0,[]){}", "param_parse", "required_a_optional_b", "aa", 18]
-// ["function aa(aa=0,{}){}", "param_parse", "required_a_optional_b", "aa", 18]
-
-                    warn(
-                        "required_a_optional_b",
-                        token_nxt,
-                        token_nxt.id,
-                        optional.id
-                    );
-                }
-                param = token_nxt;
-                param.names = [];
-                advance();
-                if (is_brace) {
-                    signature.push("{");
-                } else {
-                    signature.push("[]");
-                }
-                while (true) {
-                    subparam = token_nxt;
-                    if (!subparam.identifier) {
-
-// test_cause:
-// ["function aa(aa=0,[]){}", "param_parse", "expected_identifier_a", "]", 19]
-// ["function aa(aa=0,{}){}", "param_parse", "expected_identifier_a", "}", 19]
-// ["function aa({0}){}", "param_parse", "expected_identifier_a", "0", 14]
-
-                        return stop("expected_identifier_a");
-                    }
-                    if (is_brace) {
-                        survey(subparam);
-                        advance();
-                        signature.push(subparam.id);
-                        if (token_nxt.id === ":") {
-                            advance(":");
-                            advance();
-                            token_now.label = subparam;
-                            subparam = token_now;
-                            if (!subparam.identifier) {
-
-// test_cause:
-// ["function aa({aa:0}){}", "param_parse", "expected_identifier_a", "}", 18]
-
-                                return stop(
-                                    "expected_identifier_a",
-                                    token_nxt
-                                );
-                            }
-                        }
-                    } else {
-                        advance();
-                        param.names.push(subparam);
-                    }
-
-// test_cause:
-// ["function aa([aa=aa],aa){}", "param_parse", "equal", "", 0]
-// ["function aa({aa=aa},aa){}", "param_parse", "equal", "", 0]
-
-                    test_cause("equal");
-                    if (token_nxt.id === "=") {
-                        advance("=");
-                        subparam.expression = parse_expression();
-                        param.open = true;
-                    }
-                    if (is_brace) {
-                        param.names.push(subparam);
-                    }
-                    if (token_nxt.id !== ",") {
-                        break;
-                    }
-                    advance(",");
-                    if (is_brace) {
-                        signature.push(", ");
-                    }
-                }
-                parameters.push(param);
-                if (is_brace) {
-
-// test_cause:
-// ["
-// function aa({bb,aa}){}
-// ", "check_ordered", "expected_a_b_before_c_d", "aa", 17]
-
-                    check_ordered("parameter", param.names);
-                    advance("}");
-                    signature.push("}");
-                } else {
-                    advance("]");
-                }
-                break;
             case "{":
                 if (optional !== undefined) {
 
@@ -6173,14 +6080,9 @@ function jslint_phase3_parse(state) {
                         optional.id
                     );
                 }
-                param = token_nxt;
-                param.names = [];
                 advance();
-                if (is_brace) {
-                    signature.push("{");
-                } else {
-                    signature.push("[]");
-                }
+                param.names = [];
+                signature.push(param.id);
                 while (true) {
                     subparam = token_nxt;
                     if (!subparam.identifier) {
@@ -6192,9 +6094,9 @@ function jslint_phase3_parse(state) {
 
                         return stop("expected_identifier_a");
                     }
+                    advance();
                     if (is_brace) {
                         survey(subparam);
-                        advance();
                         signature.push(subparam.id);
                         if (token_nxt.id === ":") {
                             advance(":");
@@ -6213,7 +6115,6 @@ function jslint_phase3_parse(state) {
                             }
                         }
                     } else {
-                        advance();
                         param.names.push(subparam);
                     }
 
@@ -6240,6 +6141,8 @@ function jslint_phase3_parse(state) {
                 }
                 parameters.push(param);
                 if (is_brace) {
+                    advance("}");
+                    signature.push("}");
 
 // test_cause:
 // ["
@@ -6247,8 +6150,6 @@ function jslint_phase3_parse(state) {
 // ", "check_ordered", "expected_a_b_before_c_d", "aa", 17]
 
                     check_ordered("parameter", param.names);
-                    advance("}");
-                    signature.push("}");
                 } else {
                     advance("]");
                 }
@@ -6262,12 +6163,12 @@ function jslint_phase3_parse(state) {
                     return stop("expected_identifier_a");
                 }
                 param = token_nxt;
-                parameters.push(param);
                 advance();
+                parameters.push(param);
                 signature.push(param.id);
                 if (token_nxt.id === "=") {
-                    optional = param;
                     advance("=");
+                    optional = param;
                     param.expression = parse_expression(0);
                 } else {
                     if (optional !== undefined) {
