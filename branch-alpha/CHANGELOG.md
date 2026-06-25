@@ -1,14 +1,33 @@
 # Changelog
 
 # Todo
+- jslint-ecma - Unify ES2015-destructure-logic into function prefix_destructure.
+- jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
+- jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
 - jslint - Add ability to auto-fix whitespace.
 - jslint - bugfix - Fix false-positive Unused-variable when variable is used in function argument-default.
-- doc - Document supported/unsupported es6+ features
 - jslint - Add html and css linting back into jslint.
 - jslint - Add new warning requiring paren around plus-separated concatenations.
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.6.1-beta
+- jslint-ecma - Update README.md, documenting supported ES2015+ features.
+- jslint - Update warning infix_in to recommend Object.hasOwn() over hasOwnProperty().
+- jslint-ecma - Add ES2025-feature RegExp Modifiers.
+- jslint-ecma - Add ES2022-feature RegExp Match Indices.
+- jslint-ecma - Add ES2021-feature Logical Assignment Operators.
+- jslint-ecma - Add ES2027-feature Temporal.
+- jslint-ecma - Expand ES2015-feature-support for destructuring.
+- jslint-ecma - Add ES2018-feature Rest/Spread Properties.
+- jslint-ecma - Add ES2018-feature s (dotall) flag for regular expressions.
+- jslint-ecma - Expand ES2015-feature-support for es-module-import-statement.
+- jslint-ecma - Add ES2023-feature ShadowRealm to global-scope.
+- jslint-ecma - Add ES2024-feature .isWellFormed(), .toWellFormed() for literal string.
+- jslint-ecma - Add ES2022-feature .at() for literal string/array.
+- jslint-ecma - Add ES2025-feature Float16Array to global-scope.
+- jslint-ecma - Relax warning for ES2025-feature RegExp.escape().
+- jslint-ecma - Add ES2021-feature WeakRef to global-scope.
+- jslint-ecma - Update ES2015-feature arrow, to continue parsing unwrapped-form with warning, instead of stopping.
 - jslint - Relax warning on multiline-method-chaining.
 - jslint - Replace all non-return "stop(...);" with "return stop(...)".
 - jslint - Unify ES2018-syntax-spread-operator with function prefix_ellipsis().
