@@ -778,6 +778,11 @@ jstestDescribe((
                 "String(\"\".at());",
                 "String([].at());"
             ],
+            logical_assignment: [
+                "let aa = 0;\naa &&= 0;",
+                "let aa = 0;\naa ??= 0;",
+                "let aa = 0;\naa ||= 0;"
+            ],
             loop: [
                 (
                     "function aa() {\n"
@@ -847,11 +852,12 @@ jstestDescribe((
                 "let aa = aa[`!`];"
             ],
             regexp: [
-                "RegExp.escape(\"\");",
-                "function aa() {\n    return /./;\n}",
-                "let aa = /(?!.)(?:.)(?=.)/;",
-                "let aa = /./gimsuy;",
-                "let aa = /[\\--\\-]/;"
+                `RegExp.escape("");`,
+                `function aa() {\n    return /./;\n}`,
+                `let aa = /(?!.)(?:.)(?=.)/;`,
+                `let aa = /(?ims-ims:.)/;`,
+                `let aa = /./dgimsuvy;`,
+                `let aa = /[\\--\\-]/;`
             ],
             ternary: [
                 (

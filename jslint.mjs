@@ -489,6 +489,7 @@ let jslint_rgx_token = new RegExp(
     + "(\\s+)"
     + "|([a-zA-Z_$][a-zA-Z0-9_$]*)"
     + "|[(){}\\[\\],:;'\"~\\`]"
+    + "|\\?\\?="
     + "|\\?[?.]?"
     + "|=(?:==?|>)?"
     + "|\\.+"
@@ -497,9 +498,10 @@ let jslint_rgx_token = new RegExp(
     + "|\\+[=+]?"
     + "|-[=\\-]?"
     + "|[\\^%]=?"
+    + "|&&="
     + "|&[&=]?"
-    + "|\\"
-    + "|[|=]?"
+    + "|\\|\\|="
+    + "|\\|[|=]?"
     + "|>{1,3}=?"
     + "|<<?=?"
     + "|!(?:!|==?)?"
@@ -1266,7 +1268,7 @@ function jslint(
         case "infix_in":
             mm = (
                 `Unexpected 'in'. Compare with undefined,`
-                + ` or use the hasOwnProperty method instead.`
+                + ` or use Object.hasOwn() instead.`
             );
             break;
         case "label_a":
@@ -3088,13 +3090,54 @@ function jslint_phase2_lex(state) {
                     case "?":
                         char_after("?");
                         switch (char) {
+
+// ES1999-feature Negative lookahead assertion.
+
                         case "!":
 
 // PR-437 - Add grammar for regexp-named-capture-group.
 
                         case "<":
+
+// ES1999-feature Positive lookahead assertion.
+
                         case "=":
                             char_after();
+                            break;
+
+// PR-xxx - Add ES2025-feature RegExp Modifiers.
+
+                        case "-":
+                        case "i":
+                        case "m":
+                        case "s":
+                            char_after();
+                            while (true) {
+                                if (char === ":" && snippet.slice(-1) !== "-") {
+                                    char_after();
+                                    break;
+                                }
+                                switch (char) {
+                                case "-":
+                                case "i":
+                                case "m":
+                                case "s":
+                                    char_after();
+                                    break;
+                                default:
+
+// test_cause:
+// ["aa=/(?-.", "lex_regexp_group", "unexpected_a_after_b", "(?-", 8]
+
+                                    return stop_at(
+                                        "unexpected_a_after_b",
+                                        line,
+                                        column,
+                                        snippet.slice(-1),
+                                        snippet.slice(0, -1)
+                                    );
+                                }
+                            }
                             break;
                         default:
                             char_after(":");
@@ -3256,15 +3299,28 @@ function jslint_phase2_lex(state) {
 // Process dangling flag letters.
 
             switch (!flag[char] && char) {
+
+// PR-xxx - Add ES2022-feature RegExp Match Indices.
+
+            case "d":
+                break;
             case "g":
                 break;
             case "i":
                 break;
             case "m":
                 break;
+
+// PR-xxx - Add ES2018-feature s (dotall) flag for regular expressions.
+
             case "s":
                 break;
             case "u":
+                break;
+
+// PR-xxx - Add ES2024-feature RegExp v flag with set-notation + str-properties.
+
+            case "v":
                 break;
             case "y":
 
@@ -3752,9 +3808,9 @@ import https from "https";
         });
     });
     result.replace((
-        /\n- \{\{JSxRef\("(?:Global_Objects\/)?([^"\/]+?)"/g
+        /\n- \{\{jsxref\("(?:global_objects\/)?([^"]+?)"/ig
     ), function (ignore, key) {
-        if (globalThis.hasOwnProperty(key)) {
+        if (Object.hasOwn(globalThis, key)) {
             dict[key] = true;
         }
         return "";
@@ -3805,6 +3861,7 @@ import https from "https";
                 "String",
                 "Symbol",
                 "SyntaxError",
+                "Temporal",
                 "TypeError",
                 "URIError",
                 "Uint16Array",
@@ -5190,6 +5247,9 @@ function jslint_phase3_parse(state) {
 
                 return stop("wrap_fart_parameter", token_now);
             }
+
+// PR-xxx - Update ES2015-feature arrow, to continue parsing unwrapped-form
+// with warning, instead of stopping.
 
 // test_cause:
 // ["aa=>0", "parse_fart", "wrap_fart_parameter", "=>", 3]
@@ -7622,6 +7682,7 @@ function jslint_phase3_parse(state) {
 // Begin defining the language.
 
     assignment("%=");
+    assignment("&&=");
     assignment("&=");
     assignment("*=");
     assignment("+=");
@@ -7631,8 +7692,10 @@ function jslint_phase3_parse(state) {
     assignment("=");
     assignment(">>=");
     assignment(">>>=");
+    assignment("??=");
     assignment("^=");
     assignment("|=");
+    assignment("||=");
     constant("(number)", "number");
     constant("(regexp)", "regexp");
     constant("(string)", "string");
@@ -9090,9 +9153,19 @@ function jslint_phase5_whitage(state) {
 // This is the set of infix operators that require a space on each side.
 
     let spaceop = object_assign_from_list(empty(), [
-        "!=", "!==", "%", "%=", "&", "&&", "&=", "*", "*=", "+=", "-=", "/",
-        "/=", "<", "<<", "<<=", "<=", "=", "==", "===", "=>", ">", ">=", ">>",
-        ">>=", ">>>", ">>>=", "^", "^=", "|", "|=", "||"
+        "!=", "!==",
+        "%", "%=",
+        "&", "&&", "&&=", "&=",
+        "*", "*=",
+        "+=",
+        "-=",
+        "/", "/=",
+        "<", "<<", "<<=", "<=",
+        "=", "==", "===", "=>",
+        ">", ">=", ">>", ">>=", ">>>", ">>>=",
+        "??", "??=",
+        "^", "^=",
+        "|", "|=", "||", "||="
     ], true);
 
     function at_margin(fit) {

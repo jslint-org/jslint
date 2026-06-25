@@ -887,7 +887,7 @@ if (false) {
 |  99. | &#x274c; | ES2027 | [`Explicit Resource Management`](https://github.com/tc39/proposal-explicit-resource-management) |
 |  98. | &#x2705; | ES2027 | [`Atomics.pause`](https://github.com/tc39/proposal-atomics-microwait) |
 |  97. | &#x274c; | ES2027 | [`Joint Iteration`](https://github.com/tc39/proposal-joint-iteration) |
-|  96. | &#x26a0; | ES2027 | [`Temporal`](https://github.com/tc39/proposal-temporal) |
+|  96. | &#x2705; | ES2027 | [`Temporal`](https://github.com/tc39/proposal-temporal) |
 |  95. | &#x2705; | ES2026 | [`Upsert`](https://github.com/tc39/proposal-upsert) |
 |  94. | &#x2705; | ES2026 | [`JSON.parse source text access`](https://github.com/tc39/proposal-json-parse-with-source) |
 |  93. | &#x274c; | ES2026 | [`Iterator Sequencing`](https://github.com/tc39/proposal-iterator-sequencing) |
@@ -902,9 +902,9 @@ if (false) {
 |  84. | &#x274c; | ES2025 | [`Sync Iterator helpers`](https://github.com/tc39/proposal-iterator-helpers) |
 |  83. | &#x2705; | ES2025 | [`JSON Modules`](https://github.com/tc39/proposal-json-modules) |
 |  82. | &#x2705; | ES2025 | [`Import Attributes`](https://github.com/tc39/proposal-import-attributes) |
-|  81. | &#x26a0; | ES2025 | [`RegExp Modifiers`](https://github.com/tc39/proposal-regexp-modifiers) |
+|  81. | &#x2705; | ES2025 | [`RegExp Modifiers`](https://github.com/tc39/proposal-regexp-modifiers) |
 |  80. | &#x2705; | ES2025 | [`New Set methods`](https://github.com/tc39/proposal-set-methods) |
-|  79. | &#x274c; | ES2025 | [`Duplicate named capture groups`](https://github.com/tc39/proposal-duplicate-named-capturing-groups) |
+|  79. | &#x2705; | ES2025 | [`Duplicate named capture groups`](https://github.com/tc39/proposal-duplicate-named-capturing-groups) |
 |  78. | &#x2705; | ES2024 | [`ArrayBuffer transfer`](https://github.com/tc39/proposal-arraybuffer-transfer) |
 |  77. | &#x2705; | ES2024 | [`Promise.withResolvers`](https://github.com/tc39/proposal-promise-with-resolvers) |
 |  76. | &#x2705; | ES2024 | [`Array Grouping`](https://github.com/tc39/proposal-array-grouping) |
@@ -918,21 +918,21 @@ if (false) {
 |  68. | &#x2705; | ES2023 | [`Array find from last`](https://github.com/tc39/proposal-array-find-from-last) |
 |  67. | &#x2705; | ES2022 | [`Error Cause`](https://github.com/tc39/proposal-error-cause) |
 |  66. | &#x274c; | ES2022 | [`Class Static Block`](https://github.com/tc39/proposal-class-static-block) |
-|  65. | &#x26a0; | ES2022 | [`Accessible Object.prototype.hasOwnProperty`](https://github.com/tc39/proposal-accessible-object-hasownproperty) |
+|  65. | &#x2705; | ES2022 | [`Accessible Object.prototype.hasOwnProperty`](https://github.com/tc39/proposal-accessible-object-hasownproperty) |
 |  64. | &#x2705; | ES2022 | [`.at()`](https://github.com/tc39/proposal-relative-indexing-method) |
 |  63. | &#x274c; | ES2022 | [`Ergonomic brand checks for Private Fields`](https://github.com/tc39/proposal-private-fields-in-in) |
 |  62. | &#x2705; | ES2022 | [`Top-level await`](https://github.com/tc39/proposal-top-level-await) |
-|  61. | &#x26a0; | ES2022 | [`RegExp Match Indices`](https://github.com/tc39/proposal-regexp-match-indices) |
+|  61. | &#x2705; | ES2022 | [`RegExp Match Indices`](https://github.com/tc39/proposal-regexp-match-indices) |
 |  60. | &#x274c; | ES2022 | [`Class Public Instance Fields & Private Instance Fields`](https://github.com/tc39/proposal-class-fields) |
 |  59. | &#x2705; | ES2021 | [`Numeric separators`](https://github.com/tc39/proposal-numeric-separator) |
-|  58. | &#x26a0; | ES2021 | [`Logical Assignment Operators`](https://github.com/tc39/proposal-logical-assignment) |
+|  58. | &#x2705; | ES2021 | [`Logical Assignment Operators`](https://github.com/tc39/proposal-logical-assignment) |
 |  57. | &#x2705; | ES2021 | [`WeakRefs`](https://github.com/tc39/proposal-weakrefs) |
 |  56. | &#x2705; | ES2021 | [`Promise.any`](https://github.com/tc39/proposal-promise-any) |
 |  55. | &#x2705; | ES2021 | [`String.prototype.replaceAll`](https://github.com/tc39/proposal-string-replaceall) |
 |  54. | &#x2705; | ES2020 | [`import.meta`](https://github.com/tc39/proposal-import-meta) |
 |  53. | &#x2705; | ES2020 | [`Nullish coalescing Operator`](https://github.com/tc39/proposal-nullish-coalescing) |
 |  52. | &#x2705; | ES2020 | [`Optional Chaining`](https://github.com/tc39/proposal-optional-chaining) |
-|  51. | &#x274c; | ES2020 | [`for-in mechanics`](https://github.com/tc39/proposal-for-in-order) |
+|  51. | &#x2705; | ES2020 | [`for-in mechanics`](https://github.com/tc39/proposal-for-in-order) |
 |  50. | &#x2705; | ES2020 | [`globalThis`](https://github.com/tc39/proposal-global) |
 |  49. | &#x2705; | ES2020 | [`Promise.allSettled`](https://github.com/tc39/proposal-promise-allSettled) |
 |  48. | &#x2705; | ES2020 | [`BigInt`](https://github.com/tc39/proposal-bigint) |
@@ -949,7 +949,7 @@ if (false) {
 |  37. | &#x274c; | ES2018 | [`Asynchronous Iteration`](https://github.com/tc39/proposal-async-iteration) |
 |  36. | &#x2705; | ES2018 | [`Promise.prototype.finally`](https://github.com/tc39/proposal-promise-finally) |
 |  35. | &#x2705; | ES2018 | [`RegExp Unicode Property Escapes`](https://github.com/tc39/proposal-regexp-unicode-property-escapes) |
-|  34. | &#x26a0; | ES2018 | [`RegExp Lookbehind Assertions`](https://github.com/tc39/proposal-regexp-lookbehind) |
+|  34. | &#x2705; | ES2018 | [`RegExp Lookbehind Assertions`](https://github.com/tc39/proposal-regexp-lookbehind) |
 |  33. | &#x2705; | ES2018 | [`Rest/Spread Properties`](https://github.com/tc39/proposal-object-rest-spread) |
 |  32. | &#x2705; | ES2018 | [`RegExp named capture groups`](https://github.com/tc39/proposal-regexp-named-groups) |
 |  31. | &#x2705; | ES2018 | [`s (dotAll) flag for regular expressions`](https://github.com/tc39/proposal-regexp-dotall-flag) |

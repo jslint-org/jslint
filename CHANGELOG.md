@@ -1,7 +1,7 @@
 # Changelog
 
 # Todo
-- jslint-ecma - Unify ES2015-destructure-logic into function prefix_destructure.
+- jslint-ecma - Unify ES2015-destructure-logic into function prefix_destructure().
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
 - jslint - Add ability to auto-fix whitespace.
@@ -12,6 +12,11 @@
 
 # v2026.6.1-beta
 - jslint-ecma - Update README.md, documenting supported ES2015+ features.
+- jslint - Update warning infix_in to recommend Object.hasOwn() over hasOwnProperty().
+- jslint-ecma - Add ES2025-feature RegExp Modifiers.
+- jslint-ecma - Add ES2022-feature RegExp Match Indices.
+- jslint-ecma - Add ES2021-feature Logical Assignment Operators.
+- jslint-ecma - Add ES2027-feature Temporal.
 - jslint-ecma - Expand ES2015-feature-support for destructuring.
 - jslint-ecma - Add ES2018-feature Rest/Spread Properties.
 - jslint-ecma - Add ES2018-feature s (dotall) flag for regular expressions.
