@@ -6098,9 +6098,30 @@ function jslint_phase3_parse(state) {
 
                         return stop("expected_identifier_a");
                     }
-                    //
-                    advance();
-                    param.names.push(subparam);
+                    if (is_brace) {
+                        survey(subparam);
+                        advance();
+                        signature.push(subparam.id);
+                        if (token_nxt.id === ":") {
+                            advance(":");
+                            advance();
+                            token_now.label = subparam;
+                            subparam = token_now;
+                            if (!subparam.identifier) {
+
+// test_cause:
+// ["function aa({aa:0}){}", "param_parse", "expected_identifier_a", "}", 18]
+
+                                return stop(
+                                    "expected_identifier_a",
+                                    token_nxt
+                                );
+                            }
+                        }
+                    } else {
+                        advance();
+                        param.names.push(subparam);
+                    }
 
 // test_cause:
 // ["function aa([aa=aa],aa){}", "param_parse", "equal", "", 0]
@@ -6171,25 +6192,29 @@ function jslint_phase3_parse(state) {
 
                         return stop("expected_identifier_a");
                     }
-                    //
-                    survey(subparam);
-                    advance();
-                    signature.push(subparam.id);
-                    if (token_nxt.id === ":") {
-                        advance(":");
+                    if (is_brace) {
+                        survey(subparam);
                         advance();
-                        token_now.label = subparam;
-                        subparam = token_now;
-                        if (!subparam.identifier) {
+                        signature.push(subparam.id);
+                        if (token_nxt.id === ":") {
+                            advance(":");
+                            advance();
+                            token_now.label = subparam;
+                            subparam = token_now;
+                            if (!subparam.identifier) {
 
 // test_cause:
 // ["function aa({aa:0}){}", "param_parse", "expected_identifier_a", "}", 18]
 
-                            return stop(
-                                "expected_identifier_a",
-                                token_nxt
-                            );
+                                return stop(
+                                    "expected_identifier_a",
+                                    token_nxt
+                                );
+                            }
                         }
+                    } else {
+                        advance();
+                        param.names.push(subparam);
                     }
 
 // test_cause:
