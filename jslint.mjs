@@ -3105,7 +3105,7 @@ function jslint_phase2_lex(state) {
                             char_after();
                             break;
 
-// PR-xxx - Add ES2025-feature RegExp Modifiers.
+// PR-499 - Add ES2025-feature RegExp Modifiers.
 
                         case "-":
                         case "i":
@@ -3300,7 +3300,7 @@ function jslint_phase2_lex(state) {
 
             switch (!flag[char] && char) {
 
-// PR-xxx - Add ES2022-feature RegExp Match Indices.
+// PR-499 - Add ES2022-feature RegExp Match Indices.
 
             case "d":
                 break;
@@ -3311,14 +3311,14 @@ function jslint_phase2_lex(state) {
             case "m":
                 break;
 
-// PR-xxx - Add ES2018-feature s (dotall) flag for regular expressions.
+// PR-499 - Add ES2018-feature s (dotall) flag for regular expressions.
 
             case "s":
                 break;
             case "u":
                 break;
 
-// PR-xxx - Add ES2024-feature RegExp v flag with set-notation + str-properties.
+// PR-499 - Add ES2024-feature RegExp v flag with set-notation + str-properties.
 
             case "v":
                 break;
@@ -5248,7 +5248,7 @@ function jslint_phase3_parse(state) {
                 return stop("wrap_fart_parameter", token_now);
             }
 
-// PR-xxx - Update ES2015-feature arrow, to continue parsing unwrapped-form
+// PR-499 - Update ES2015-feature arrow, to continue parsing unwrapped-form
 // with warning, instead of stopping.
 
 // test_cause:
@@ -8162,7 +8162,7 @@ function jslint_phase4_walk(state) {
         } else if (thing.id === "." || thing.id === "?.") {
             if (thing.expression.id === "RegExp") {
 
-// PR-xxx - Relax warning for ES2025-feature RegExp.escape().
+// PR-499 - Relax warning for ES2025-feature RegExp.escape().
 
                 if (!thing.name || thing.name.id !== "escape") {
 
