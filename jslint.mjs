@@ -5723,9 +5723,8 @@ function jslint_phase3_parse(state) {
         return the_await;
     }
 
-    function prefix_destructure(the_variable) {
+    function prefix_destructure(role, readonly, name_list) {
         const is_brace = token_nxt.id === "{";
-        const mode_const = the_variable.id === "const";
         const the_destructure = token_nxt;
         let ellipsis;
         let name;
@@ -5773,7 +5772,7 @@ function jslint_phase3_parse(state) {
 // ["let{aa:{aa}}", "prefix_destructure", "recurse", "", 0]
 
                     test_cause("recurse");
-                    prefix_destructure();
+                    prefix_destructure(role, readonly, []);
                 } else {
                     if (!token_nxt.identifier) {
 
@@ -5788,19 +5787,19 @@ function jslint_phase3_parse(state) {
 // '/*jslint node*/\nlet {aa:bb} = {}; bb();'.
 //
 //                         token_nxt.label = name;
-//                         the_variable.names.push(token_nxt);
-//                         enroll(token_nxt, "variable", mode_const);
+//                         name_list.push(token_nxt);
+//                         enroll(token_nxt, role, readonly);
 
                     name = token_nxt;
-                    the_variable.names.push(name);
+                    name_list.push(name);
                     survey(name);
-                    enroll(name, "variable", mode_const);
+                    enroll(name, role, readonly);
                     advance();
                     the_destructure.open = true;
                 }
             } else {
-                the_variable.names.push(name);
-                enroll(name, "variable", mode_const);
+                name_list.push(name);
+                enroll(name, role, readonly);
             }
 
 // Issue #458 - Regression - Warn about variable usage before initialization.
@@ -5837,7 +5836,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["let{bb,aa}", "check_ordered", "expected_a_b_before_c_d", "aa", 8]
 
-            check_ordered(the_variable.id, the_variable.names);
+            check_ordered(role, name_list);
             advance("}");
         } else {
             advance("]");
@@ -7326,16 +7325,15 @@ function jslint_phase3_parse(state) {
     }
 
     function stmt_var() {
-        let mode_const;
+        const readonly = token_now.id === "const";
         let name;
         let the_variable = token_now;
         let variable_prv;
-        mode_const = the_variable.id === "const";
         the_variable.names = [];
 
 // A program may use var or let, but not both.
 
-        if (!mode_const) {
+        if (!readonly) {
             if (mode_var === undefined) {
                 mode_var = the_variable.id;
             } else if (the_variable.id !== mode_var) {
@@ -7406,7 +7404,11 @@ function jslint_phase3_parse(state) {
 
                     warn("unexpected_a", the_variable);
                 }
-                prefix_destructure(the_variable);
+                prefix_destructure(
+                    "variable",
+                    the_variable.id === "const",
+                    the_variable.names
+                );
                 advance("=");
                 the_variable.expression = parse_expression(0);
             } else if (token_nxt.identifier) {
@@ -7421,8 +7423,8 @@ function jslint_phase3_parse(state) {
 
                     warn("unexpected_a", name);
                 }
-                enroll(name, "variable", mode_const);
-                if (token_nxt.id === "=" || mode_const) {
+                enroll(name, "variable", readonly);
+                if (token_nxt.id === "=" || readonly) {
                     advance("=");
 
 // Issue #458 - Regression - Warn about variable usage before initialization.
