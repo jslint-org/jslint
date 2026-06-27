@@ -690,15 +690,11 @@ jstestDescribe((
                 "let aa = aa.aa().getTime();"
             ],
             destructure: [
-
-// PR-363 - Bugfix
-// Add test against false-warning <uninitialized 'bb'> in source
-// '/*jslint node*/\nlet {aa:bb} = {}; bb();'.
-
-// PR-xxx - Fix false-warning "uninitialized_a" in statement ";[aa]=0;".
-
                 [
-                    //!! "\nlet aa;\nlet bb;\nlet cc;\nlet dd;\nlet zz;\n(",
+
+// PR-xxx - Unify ES2015-destructure-logic.
+
+                    "\nlet aa;\nlet bb;\nlet cc;\nlet dd;\nlet zz;\n",
                     "const ",
                     "let "
                 ].map(function (prefix) {

@@ -103,6 +103,7 @@
     assertJsonEqual,
     assertOrThrow,
     assign,
+    assignment,
     async,
     b,
     beta,
@@ -2442,9 +2443,8 @@ function jslint_phase2_lex(state) {
                                 // ... literal.
     let mode_regexp;            // true if regular expression literal seen on
                                 // ... this line.
-    let paren_backtrack_list = [];      // List of most recent "(" tokens at any
-                                        // ... paren-depth.
-    let paren_depth = 0;        // Keeps track of current paren-depth.
+    let opener_popped = empty();        // Last popped token from opener_stack.
+    let opener_stack = [];      // Stack of opener tokens: (, [.
     let snippet = "";           // A piece of string.
     let token_1;                // The first token.
     let token_prv = token_global;       // The previous token including
@@ -2695,9 +2695,14 @@ function jslint_phase2_lex(state) {
 
 // Lex directives in comment.
 
-        [
-            the_comment.directive, body
-        ] = Array.from(snippet.match(jslint_rgx_directive) || []).slice(1);
+        snippet.replace(jslint_rgx_directive, function (
+            ignore,
+            match1,
+            match2
+        ) {
+            the_comment.directive = match1;
+            body = match2;
+        });
         if (the_comment.directive === undefined) {
             return the_comment;
         }
@@ -4158,19 +4163,32 @@ import moduleHttps from "https";
 
         switch (id) {
         case "(":
-            paren_backtrack_list[paren_depth] = the_token;
-            paren_depth += 1;
+        case "[":
+            opener_stack.push(the_token);
             break;
         case ")":
-            paren_depth -= 1;
-            break;
-        case "=>":
-            if (
-                token_prv_expr.id === ")"
-                && paren_backtrack_list[paren_depth]
-            ) {
-                paren_backtrack_list[paren_depth].fart = the_token;
+        case "]":
+            opener_popped = opener_stack.pop();
+            if (noop(
+                id === ")"
+                ? opener_popped.id !== "("
+                : opener_popped.id !== "["
+            )) {
+
+// test_cause:
+// [";(]", "token_create", "unexpected_a", "]", 3]
+// [";[)", "token_create", "unexpected_a", ")", 3]
+
+                return stop("unexpected_a", the_token);
             }
+            break;
+        }
+        switch (token_prv_expr.id + " " + id) {
+        case ") =>":
+            opener_popped.fart = the_token;
+            break;
+        case "] =":
+            opener_popped.assignment = the_token;
             break;
         }
 
@@ -5363,11 +5381,6 @@ function jslint_phase3_parse(state) {
 
                     container.expression.push(parse_json());
                     if (token_nxt.id !== ",") {
-
-// test_cause:
-// ["[0,0]", "parse_json", "comma", "", 0]
-
-                        test_cause("comma");
                         break;
                     }
                     advance(",");
@@ -5822,24 +5835,16 @@ function jslint_phase3_parse(state) {
                 enroll(name, role, readonly);
                 name.init = true;
             }
-            if (role === "variable") {
 
 // PR-xxx - Fix false-warning "uninitialized_a" in statement ";[aa]=0;".
 
-                name.arity = "variable";
-            }
+            name.arity = role;
         }
-        //!! if (token_now.id !== "[" && token_now.id !== "{") {
-
-//!! // test_cause:
-//!! // ["(aa)=0", "prefix_destructure", "unexpected_a", "aa", 2]
-
-            //!! return stop("unexpected_a", token_now);
-        //!! }
         while (true) {
             if (!is_brace && token_nxt.id === ",") {
 
 // test_cause:
+// [";[,aa]=0", "prefix_destructure", "ignore", "", 0]
 // ["let[,aa]=0", "prefix_destructure", "ignore", "", 0]
 
                 test_cause("ignore");
@@ -6350,11 +6355,6 @@ function jslint_phase3_parse(state) {
                 if (token_nxt.id !== ",") {
                     break;
                 }
-
-// test_cause:
-// ["aa={\"aa\":0,\"bb\":0}", "prefix_lbrace", "comma", "", 0]
-
-                test_cause("comma");
                 advance(",");
                 if (token_nxt.id === "}") {
 
@@ -6389,20 +6389,32 @@ function jslint_phase3_parse(state) {
     function prefix_lbracket() {
         const the_token = token_now;
         let element;
+        let the_assignment;
         the_token.expression = [];
+        if (the_token.assignment) {
+            the_assignment = Object.assign(token_now.assignment, {
+                arity: "assignment",
+                expression: [],
+                names: []
+            });
+
+// PR-xxx - Unify ES2015-destructure-logic.
+
+            element = prefix_destructure(
+                undefined,
+                "variable",
+                false,
+                the_assignment.names
+            );
+            advance("=");
+            symbol("=").led_infix(element);
+            return the_assignment;
+        }
         if (token_nxt.id !== "]") {
 
 // Parse/loop through each element in [...].
 
             while (true) {
-                if (!state.mode_json && token_nxt.id === ",") {
-
-// test_cause:
-// [";[,aa]=0", "prefix_lbracket", "ignore", "", 0]
-
-                    test_cause("ignore");
-                    advance(",");
-                }
                 if (!state.mode_json && token_nxt.id === "...") {
 
 // test_cause:
@@ -7431,6 +7443,9 @@ function jslint_phase3_parse(state) {
                     warn("unexpected_a", the_variable);
                 }
                 advance();
+
+// PR-xxx - Unify ES2015-destructure-logic.
+
                 prefix_destructure(
                     enroll,
                     "variable",
@@ -8051,8 +8066,8 @@ function jslint_phase4_walk(state) {
 
 // PR-xxx - Fix false-warning "uninitialized_a" in statement ";[aa]=0;".
 
-//!! // test_cause:
-//!! // ["[aa]=0", "post_a", "[aa]=0", "", 0]
+// test_cause:
+// [";[aa]=0", "post_a", "[aa]=0", "", 0]
 
                     test_cause("[aa]=0");
                     thing.names.forEach(init_variable);
