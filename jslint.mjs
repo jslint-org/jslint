@@ -5736,22 +5736,42 @@ function jslint_phase3_parse(state) {
         return the_await;
     }
 
-    function prefix_destructure(enroll, role, readonly, names) {
+    function prefix_destructure(enroll, role, readonly, names, signature) {
         const is_brace = token_now.id === "{";
         const name_list = [];
         const the_destructure = token_now;
+        function advance_and_signature_push(id) {
+            advance(id);
+            signature.push(id);
+            switch (id) {
+            case ",":
+            case ":":
+                signature.push(" ");
+                break;
+            }
+        }
+        function name_list_push(name) {
+            name_list.push(name);
+            if (typeof enroll === "function") {
+                enroll(name, role, readonly);
+                name.init = true;
+            }
+
+// PR-xxx - Fix false-warning "uninitialized_a" in statement ";[aa]=0;".
+
+            name.arity = role;
+        }
         function name_parse() {
             let name = token_nxt;
             switch (name.id) {
             case "...":
-                advance("...");
-                name = token_nxt;
-                if (!name.identifier) {
+                advance_and_signature_push("...");
+                if (token_nxt.id === "...") {
 
 // test_cause:
-// ["let[...0]=0", "name_parse", "recurse_ellipsis", "", 0]
+// ["let[... ...]=0", "name_parse", "unexpected_a_after_b", "...", 5]
 
-                    warn("expected_identifier_a", name);
+                    return stop("unexpected_a_after_b", name, name.id, "...");
                 }
 
 // test_cause:
@@ -5769,13 +5789,18 @@ function jslint_phase3_parse(state) {
 // ["let[{aa}]=0", "name_parse", "recurse_element", "", 0]
 
                 test_cause("recurse_element");
-                advance();
-                prefix_destructure(enroll, role, readonly, names);
+                advance_and_signature_push(token_nxt.id);
+                prefix_destructure(enroll, role, readonly, names, signature);
                 return;
             }
             if (!name.identifier) {
 
 // test_cause:
+// ["function aa(aa=0,[]){}", "name_parse", "expected_identifier_a", "]", 19]
+// ["function aa(aa=0,{}){}", "name_parse", "expected_identifier_a", "}", 19]
+// ["function aa({0}){}", "name_parse", "expected_identifier_a", "0", 14]
+// ["function aa({aa:0}){}", "name_parse", "expected_identifier_a", "0", 17]
+// ["let[...0]=0", "name_parse", "expected_identifier_a", "0", 8]
 // ["let[0]=0", "name_parse", "expected_identifier_a", "0", 5]
 // ["let{0}=0", "name_parse", "expected_identifier_a", "0", 5]
 
@@ -5784,9 +5809,9 @@ function jslint_phase3_parse(state) {
             if (is_brace) {
                 survey(name);
             }
-            advance();
+            advance_and_signature_push(token_nxt.id);
             if (is_brace && token_nxt.id === ":") {
-                advance(":");
+                advance_and_signature_push(":");
                 the_destructure.open = true;
                 if (token_nxt.id === "...") {
 
@@ -5807,38 +5832,29 @@ function jslint_phase3_parse(state) {
                 }
                 token_nxt.label = name;
                 name = token_nxt;
-                name_push(name);
-                advance();
+                name_list_push(name);
+                advance_and_signature_push(token_nxt.id);
                 return;
             }
-            name_push(name);
+            name_list_push(name);
 
 // test_cause:
 // ["const[aa]=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 11]
 // ["const{aa}=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 11]
 
             if (token_nxt.id === "=") {
-                advance("=");
+                advance_and_signature_push("=");
                 the_destructure.open = true;
                 name.expression = parse_expression(0);
 
 // test_cause:
+// ["function aa([aa=aa],aa){}", "name_parse", "default", "", 0]
+// ["function aa({aa=aa},aa){}", "name_parse", "default", "", 0]
 // ["let[aa=0]=0", "name_parse", "default", "", 0]
 // ["let{aa=0}=0", "name_parse", "default", "", 0]
 
                 test_cause("default");
             }
-        }
-        function name_push(name) {
-            name_list.push(name);
-            if (typeof enroll === "function") {
-                enroll(name, role, readonly);
-                name.init = true;
-            }
-
-// PR-xxx - Fix false-warning "uninitialized_a" in statement ";[aa]=0;".
-
-            name.arity = role;
         }
         while (true) {
             if (!is_brace && token_nxt.id === ",") {
@@ -5848,7 +5864,7 @@ function jslint_phase3_parse(state) {
 // ["let[,aa]=0", "prefix_destructure", "ignore", "", 0]
 
                 test_cause("ignore");
-                advance(",");
+                advance_and_signature_push(",");
             }
 
 // Break from ellipsis.
@@ -5859,17 +5875,20 @@ function jslint_phase3_parse(state) {
             if (token_nxt.id !== ",") {
                 break;
             }
-            advance(",");
+            advance_and_signature_push(",");
         }
         if (is_brace) {
 
 // test_cause:
+// ["
+// function aa({bb,aa}){}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 17]
 // ["let{bb,aa}=0", "check_ordered", "expected_a_b_before_c_d", "aa", 8]
 
             check_ordered(role, name_list);
-            advance("}");
+            advance_and_signature_push("}");
         } else {
-            advance("]");
+            advance_and_signature_push("]");
         }
         names.push(...name_list);
         return the_destructure;
@@ -6046,24 +6065,22 @@ function jslint_phase3_parse(state) {
 
         const parameters = [];
         let optional;
-        let signature = "(";
-        function advance_and_signature_append(id) {
+        let signature = ["("];
+        function advance_and_signature_push(id) {
             advance(id);
-            signature += id;
+            signature.push(id);
             switch (id) {
             case ",":
             case ":":
-                signature += " ";
+                signature.push(" ");
                 break;
             }
         }
         function param_parse() {
-            const is_brace = token_nxt.id === "{";
             let param = token_nxt;
-            let subparam;
             switch (param.id) {
             case "...":
-                advance_and_signature_append("...");
+                advance_and_signature_push("...");
                 param = token_nxt;
                 if (optional !== undefined) {
 
@@ -6081,7 +6098,7 @@ function jslint_phase3_parse(state) {
                 }
                 enroll(param, "parameter", false);
                 parameters.push(param);
-                advance_and_signature_append(param.id);
+                advance_and_signature_push(param.id);
                 break;
             case "[":
             case "{":
@@ -6102,66 +6119,18 @@ function jslint_phase3_parse(state) {
                     warn("required_a_optional_b", param, param.id, optional.id);
                 }
                 param.names = [];
-                advance_and_signature_append(param.id);
-                while (true) {
-                    subparam = token_nxt;
-                    if (!subparam.identifier) {
 
-// test_cause:
-// ["function aa(aa=0,[]){}", "param_parse", "expected_identifier_a", "]", 19]
-// ["function aa(aa=0,{}){}", "param_parse", "expected_identifier_a", "}", 19]
-// ["function aa({0}){}", "param_parse", "expected_identifier_a", "0", 14]
+// PR-xxx - Unify ES2015-destructure-logic. - function([aa]) {...}
 
-                        return stop("expected_identifier_a", subparam);
-                    }
-                    advance_and_signature_append(subparam.id);
-                    if (is_brace) {
-                        survey(subparam);
-                        if (token_nxt.id === ":") {
-                            advance_and_signature_append(":");
-                            advance_and_signature_append(token_nxt.id);
-                            token_now.label = subparam;
-                            subparam = token_now;
-                            if (!subparam.identifier) {
-
-// test_cause:
-// ["function aa({aa:0}){}", "param_parse", "expected_identifier_a", "0", 17]
-
-                                return stop("expected_identifier_a", subparam);
-                            }
-                        }
-                    }
-                    enroll(subparam, "parameter", false);
-                    param.names.push(subparam);
-
-// test_cause:
-// ["function aa([aa=aa],aa){}", "param_parse", "equal", "", 0]
-// ["function aa({aa=aa},aa){}", "param_parse", "equal", "", 0]
-
-                    test_cause("equal");
-                    if (token_nxt.id === "=") {
-                        advance("=");
-                        subparam.expression = parse_expression(0);
-                        param.open = true;
-                    }
-                    if (token_nxt.id !== ",") {
-                        break;
-                    }
-                    advance_and_signature_append(",");
-                }
+                advance_and_signature_push(param.id);
+                prefix_destructure(
+                    enroll,
+                    "parameter",
+                    false,
+                    param.names,
+                    signature
+                );
                 parameters.push(param);
-                if (is_brace) {
-                    advance_and_signature_append("}");
-
-// test_cause:
-// ["
-// function aa({bb,aa}){}
-// ", "check_ordered", "expected_a_b_before_c_d", "aa", 17]
-
-                    check_ordered("parameter", param.names);
-                } else {
-                    advance_and_signature_append("]");
-                }
                 break;
             default:
                 if (!param.identifier) {
@@ -6173,7 +6142,7 @@ function jslint_phase3_parse(state) {
                 }
                 enroll(param, "parameter", false);
                 parameters.push(param);
-                advance_and_signature_append(param.id);
+                advance_and_signature_push(param.id);
                 if (token_nxt.id === "=") {
                     advance("=");
                     optional = param;
@@ -6201,12 +6170,12 @@ function jslint_phase3_parse(state) {
                 if (token_nxt.id !== ",") {
                     break;
                 }
-                advance_and_signature_append(",");
+                advance_and_signature_push(",");
             }
         }
-        advance_and_signature_append(")");
+        advance_and_signature_push(")");
         the_function.parameters = parameters;
-        the_function.signature = signature;
+        the_function.signature = signature.join("");
     }
 
     function prefix_lbrace() {
@@ -6387,28 +6356,25 @@ function jslint_phase3_parse(state) {
     }
 
     function prefix_lbracket() {
-        const the_token = token_now;
         let element;
-        let the_assignment;
+        let the_token = token_now;
         the_token.expression = [];
         if (the_token.assignment) {
-            the_assignment = Object.assign(token_now.assignment, {
-                arity: "assignment",
-                expression: [],
-                names: []
-            });
+            the_token = token_now.assignment;
+            the_token.names = [];
 
-// PR-xxx - Unify ES2015-destructure-logic.
+// PR-xxx - Unify ES2015-destructure-logic. - [aa] = ...;
 
             element = prefix_destructure(
                 undefined,
                 "variable",
                 false,
-                the_assignment.names
+                the_token.names,
+                []
             );
             advance("=");
             symbol("=").led_infix(element);
-            return the_assignment;
+            return the_token;
         }
         if (token_nxt.id !== "]") {
 
@@ -7444,13 +7410,14 @@ function jslint_phase3_parse(state) {
                 }
                 advance();
 
-// PR-xxx - Unify ES2015-destructure-logic.
+// PR-xxx - Unify ES2015-destructure-logic. - let [aa] = ...;
 
                 prefix_destructure(
                     enroll,
                     "variable",
                     readonly,
-                    the_variable.names
+                    the_variable.names,
+                    []
                 );
                 advance("=");
                 the_variable.expression = parse_expression(0);
