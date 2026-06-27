@@ -5723,37 +5723,47 @@ function jslint_phase3_parse(state) {
         return the_await;
     }
 
-    function prefix_destructure(role, readonly, name_list) {
-        const is_brace = token_nxt.id === "{";
-        const the_destructure = token_nxt;
-        let ellipsis;
-        let name;
-        advance();
-        while (true) {
-            if (!is_brace && token_nxt.id === ",") {
-
-// test_cause:
-// ["let[,aa]=0", "prefix_destructure", "ignore", "", 0]
-
-                test_cause("ignore");
-                advance(",");
-            }
-            ellipsis = token_nxt.id === "...";
-            if (ellipsis) {
-
-// test_cause:
-// ["let[...aa]=0", "prefix_destructure", "ellipsis", "", 0]
-// ["let{...aa}=0", "prefix_destructure", "ellipsis", "", 0]
-
-                test_cause("ellipsis");
+    function prefix_destructure(role, readonly, name_list, mode_enroll) {
+        const is_brace = token_now.id === "{";
+        const the_destructure = token_now;
+        function name_parse() {
+            let name = token_nxt;
+            switch (name.id) {
+            case "...":
                 advance("...");
+                name = token_nxt;
+                if (!name.identifier) {
+
+// test_cause:
+// ["let[...0]=0", "name_parse", "recurse_ellipsis", "", 0]
+
+                    warn("expected_identifier_a", name);
+                }
+
+// test_cause:
+// ["let[...aa]=0", "name_parse", "recurse_ellipsis", "", 0]
+// ["let{...aa}=0", "name_parse", "recurse_ellipsis", "", 0]
+
+                test_cause("recurse_ellipsis");
+                name_parse();
+                return true;
+            case "[":
+            case "{":
+
+// test_cause:
+// ["let[[aa]]=0", "name_parse", "recurse_element", "", 0]
+// ["let[{aa}]=0", "name_parse", "recurse_element", "", 0]
+
+                test_cause("recurse_element");
+                advance();
+                prefix_destructure(role, readonly, [], mode_enroll);
+                return;
             }
-            name = token_nxt;
             if (!name.identifier) {
 
 // test_cause:
-// ["let[0]", "prefix_destructure", "expected_identifier_a", "0", 5]
-// ["let{0}", "prefix_destructure", "expected_identifier_a", "0", 5]
+// ["let[0]=0", "name_parse", "expected_identifier_a", "0", 5]
+// ["let{0}=0", "name_parse", "expected_identifier_a", "0", 5]
 
                 return stop("expected_identifier_a", name);
             }
@@ -5763,52 +5773,31 @@ function jslint_phase3_parse(state) {
             advance();
             if (is_brace && token_nxt.id === ":") {
                 advance(":");
-
-// Recurse prefix_destructure().
-
-                if (token_nxt.id === "{" || token_nxt.id === "[") {
-
-// test_cause:
-// ["let{aa:{aa}}", "prefix_destructure", "recurse", "", 0]
-
-                    test_cause("recurse");
-                    prefix_destructure(role, readonly, []);
-                } else {
-                    if (!token_nxt.identifier) {
+                the_destructure.open = true;
+                switch (token_nxt.id) {
+                case "...":
 
 // test_cause:
-// ["let{aa:0}", "prefix_destructure", "expected_identifier_a", "0", 8]
+// ["let{aa:...aa}=0", "name_parse", "unexpected_a", "...", 8]
 
-                        return stop("expected_identifier_a", token_nxt);
-                    }
-
-// PR-363 - Bugfix
-// Add test against false-warning <uninitialized 'bb'> in code
-// '/*jslint node*/\nlet {aa:bb} = {}; bb();'.
-//
-//                         token_nxt.label = name;
-//                         name_list.push(token_nxt);
-//                         enroll(token_nxt, role, readonly);
-
+                    return stop("unexpected_a", token_nxt);
+                }
+                if (token_nxt.identifier) {
+                    token_nxt.label = name;
                     name = token_nxt;
-                    name_list.push(name);
-                    survey(name);
-                    enroll(name, role, readonly);
+                    name_push(name);
                     advance();
-                    the_destructure.open = true;
+                } else {
+
+// test_cause:
+// ["let{aa:[aa]}=0", "name_parse", "recurse_property", "", 0]
+// ["let{aa:{aa}}=0", "name_parse", "recurse_property", "", 0]
+
+                    test_cause("recurse_property");
+                    name_parse();
                 }
             } else {
-                name_list.push(name);
-                enroll(name, role, readonly);
-            }
-
-// Issue #458 - Regression - Warn about variable usage before initialization.
-
-//                    name.dead = false;
-
-            name.init = true;
-            if (ellipsis) {
-                break;
+                name_push(name);
             }
 
 // test_cause:
@@ -5816,15 +5805,38 @@ function jslint_phase3_parse(state) {
 // ["const{aa}=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 11]
 
             if (token_nxt.id === "=") {
+                advance("=");
+                the_destructure.open = true;
+                name.expression = parse_expression();
 
 // test_cause:
-// ["let[aa=0]", "prefix_destructure", "assign", "", 0]
-// ["let{aa=0}", "prefix_destructure", "assign", "", 0]
+// ["let[aa=0]=0", "name_parse", "default", "", 0]
+// ["let{aa=0}=0", "name_parse", "default", "", 0]
 
-                test_cause("assign");
-                advance("=");
-                name.expression = parse_expression();
-                the_destructure.open = true;
+                test_cause("default");
+            }
+        }
+        function name_push(name) {
+            name_list.push(name);
+            if (mode_enroll) {
+                enroll(name, role, readonly);
+            }
+            name.init = true;
+        }
+        while (true) {
+            if (!is_brace && token_nxt.id === ",") {
+
+// test_cause:
+// ["let[,aa]=0", "prefix_destructure", "ignore", "", 0]
+
+                test_cause("ignore");
+                advance(",");
+            }
+
+// Break from ellipsis.
+
+            if (name_parse()) {
+                break;
             }
             if (token_nxt.id !== ",") {
                 break;
@@ -5834,13 +5846,14 @@ function jslint_phase3_parse(state) {
         if (is_brace) {
 
 // test_cause:
-// ["let{bb,aa}", "check_ordered", "expected_a_b_before_c_d", "aa", 8]
+// ["let{bb,aa}=0", "check_ordered", "expected_a_b_before_c_d", "aa", 8]
 
             check_ordered(role, name_list);
             advance("}");
         } else {
             advance("]");
         }
+        return the_destructure;
     }
 
     function prefix_ellipsis() {
@@ -6013,17 +6026,16 @@ function jslint_phase3_parse(state) {
 // This function will parse input <parameters> at beginning of <the_function>
 
         const parameters = [];
-        const signature = ["("];
         let optional;
-        function advance_and_signature_push(id) {
+        let signature = "(";
+        function advance_and_signature_append(id) {
             advance(id);
+            signature += id;
             switch (id) {
             case ",":
             case ":":
-                signature.push(id + " ");
+                signature += " ";
                 break;
-            default:
-                signature.push(id);
             }
         }
         function param_parse() {
@@ -6032,7 +6044,7 @@ function jslint_phase3_parse(state) {
             let subparam;
             switch (param.id) {
             case "...":
-                advance_and_signature_push("...");
+                advance_and_signature_append("...");
                 param = token_nxt;
                 if (optional !== undefined) {
 
@@ -6050,7 +6062,7 @@ function jslint_phase3_parse(state) {
                 }
                 enroll(param, "parameter", false);
                 parameters.push(param);
-                advance_and_signature_push(param.id);
+                advance_and_signature_append(param.id);
                 break;
             case "[":
             case "{":
@@ -6063,7 +6075,7 @@ function jslint_phase3_parse(state) {
                     warn("required_a_optional_b", param, param.id, optional.id);
                 }
                 param.names = [];
-                advance_and_signature_push(param.id);
+                advance_and_signature_append(param.id);
                 while (true) {
                     subparam = token_nxt;
                     if (!subparam.identifier) {
@@ -6075,12 +6087,12 @@ function jslint_phase3_parse(state) {
 
                         return stop("expected_identifier_a", subparam);
                     }
-                    advance_and_signature_push(subparam.id);
+                    advance_and_signature_append(subparam.id);
                     if (is_brace) {
                         survey(subparam);
                         if (token_nxt.id === ":") {
-                            advance_and_signature_push(":");
-                            advance_and_signature_push(token_nxt.id);
+                            advance_and_signature_append(":");
+                            advance_and_signature_append(token_nxt.id);
                             token_now.label = subparam;
                             subparam = token_now;
                             if (!subparam.identifier) {
@@ -6108,11 +6120,11 @@ function jslint_phase3_parse(state) {
                     if (token_nxt.id !== ",") {
                         break;
                     }
-                    advance_and_signature_push(",");
+                    advance_and_signature_append(",");
                 }
                 parameters.push(param);
                 if (is_brace) {
-                    advance_and_signature_push("}");
+                    advance_and_signature_append("}");
 
 // test_cause:
 // ["
@@ -6121,7 +6133,7 @@ function jslint_phase3_parse(state) {
 
                     check_ordered("parameter", param.names);
                 } else {
-                    advance_and_signature_push("]");
+                    advance_and_signature_append("]");
                 }
                 break;
             default:
@@ -6134,7 +6146,7 @@ function jslint_phase3_parse(state) {
                 }
                 enroll(param, "parameter", false);
                 parameters.push(param);
-                advance_and_signature_push(param.id);
+                advance_and_signature_append(param.id);
                 if (token_nxt.id === "=") {
                     advance("=");
                     optional = param;
@@ -6170,12 +6182,12 @@ function jslint_phase3_parse(state) {
                 if (token_nxt.id !== ",") {
                     break;
                 }
-                advance_and_signature_push(",");
+                advance_and_signature_append(",");
             }
         }
-        advance_and_signature_push(")");
+        advance_and_signature_append(")");
         the_function.parameters = parameters;
-        the_function.signature = signature.join("");
+        the_function.signature = signature;
     }
 
     function prefix_lbrace() {
@@ -7404,10 +7416,12 @@ function jslint_phase3_parse(state) {
 
                     warn("unexpected_a", the_variable);
                 }
+                advance();
                 prefix_destructure(
                     "variable",
                     the_variable.id === "const",
-                    the_variable.names
+                    the_variable.names,
+                    true
                 );
                 advance("=");
                 the_variable.expression = parse_expression(0);
