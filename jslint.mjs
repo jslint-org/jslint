@@ -4854,7 +4854,7 @@ function jslint_phase3_parse(state) {
         the_symbol.led_infix = function (left) {
             const the_token = token_now;
             the_token.arity = "binary";
-            if (f !== undefined) {
+            if (typeof f === "function") {
                 return f(left);
             }
             the_token.expression = [left, parse_expression(bp)];
@@ -5723,8 +5723,9 @@ function jslint_phase3_parse(state) {
         return the_await;
     }
 
-    function prefix_destructure(role, readonly, name_list, mode_enroll) {
+    function prefix_destructure(enroll, role, readonly, names) {
         const is_brace = token_now.id === "{";
+        const name_list = [];
         const the_destructure = token_now;
         function name_parse() {
             let name = token_nxt;
@@ -5756,7 +5757,7 @@ function jslint_phase3_parse(state) {
 
                 test_cause("recurse_element");
                 advance();
-                prefix_destructure(role, readonly, [], mode_enroll);
+                prefix_destructure(enroll, role, readonly, names);
                 return;
             }
             if (!name.identifier) {
@@ -5774,20 +5775,14 @@ function jslint_phase3_parse(state) {
             if (is_brace && token_nxt.id === ":") {
                 advance(":");
                 the_destructure.open = true;
-                switch (token_nxt.id) {
-                case "...":
+                if (token_nxt.id === "...") {
 
 // test_cause:
 // ["let{aa:...aa}=0", "name_parse", "unexpected_a", "...", 8]
 
                     return stop("unexpected_a", token_nxt);
                 }
-                if (token_nxt.identifier) {
-                    token_nxt.label = name;
-                    name = token_nxt;
-                    name_push(name);
-                    advance();
-                } else {
+                if (!token_nxt.identifier) {
 
 // test_cause:
 // ["let{aa:[aa]}=0", "name_parse", "recurse_property", "", 0]
@@ -5795,10 +5790,15 @@ function jslint_phase3_parse(state) {
 
                     test_cause("recurse_property");
                     name_parse();
+                    return;
                 }
-            } else {
+                token_nxt.label = name;
+                name = token_nxt;
                 name_push(name);
+                advance();
+                return;
             }
+            name_push(name);
 
 // test_cause:
 // ["const[aa]=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 11]
@@ -5807,7 +5807,7 @@ function jslint_phase3_parse(state) {
             if (token_nxt.id === "=") {
                 advance("=");
                 the_destructure.open = true;
-                name.expression = parse_expression();
+                name.expression = parse_expression(0);
 
 // test_cause:
 // ["let[aa=0]=0", "name_parse", "default", "", 0]
@@ -5818,11 +5818,24 @@ function jslint_phase3_parse(state) {
         }
         function name_push(name) {
             name_list.push(name);
-            if (mode_enroll) {
+            if (typeof enroll === "function") {
                 enroll(name, role, readonly);
+                name.init = true;
             }
-            name.init = true;
+            if (role === "variable") {
+
+// PR-xxx - Fix false-warning "uninitialized_a" in statement ";[aa]=0;".
+
+                name.arity = "variable";
+            }
         }
+        //!! if (token_now.id !== "[" && token_now.id !== "{") {
+
+//!! // test_cause:
+//!! // ["(aa)=0", "prefix_destructure", "unexpected_a", "aa", 2]
+
+            //!! return stop("unexpected_a", token_now);
+        //!! }
         while (true) {
             if (!is_brace && token_nxt.id === ",") {
 
@@ -5853,6 +5866,7 @@ function jslint_phase3_parse(state) {
         } else {
             advance("]");
         }
+        names.push(...name_list);
         return the_destructure;
     }
 
@@ -6066,6 +6080,14 @@ function jslint_phase3_parse(state) {
                 break;
             case "[":
             case "{":
+
+// test_cause:
+// ["([aa])=>0", "param_parse", "use_function_not_fart", "=>", 7]
+// ["({aa})=>0", "param_parse", "use_function_not_fart", "=>", 7]
+
+                if (the_function.id === "=>" && !option_dict.fart) {
+                    warn("use_function_not_fart", the_function);
+                }
                 if (optional !== undefined) {
 
 // test_cause:
@@ -6114,7 +6136,7 @@ function jslint_phase3_parse(state) {
                     test_cause("equal");
                     if (token_nxt.id === "=") {
                         advance("=");
-                        subparam.expression = parse_expression();
+                        subparam.expression = parse_expression(0);
                         param.open = true;
                     }
                     if (token_nxt.id !== ",") {
@@ -6166,14 +6188,6 @@ function jslint_phase3_parse(state) {
                     }
                 }
             }
-        }
-
-// test_cause:
-// ["([aa])=>0", "prefix_function_parameter", "use_function_not_fart", "=>", 7]
-// ["({aa})=>0", "prefix_function_parameter", "use_function_not_fart", "=>", 7]
-
-        if (the_function.id === "=>" && !option_dict.fart) {
-            warn("use_function_not_fart", the_function);
         }
         token_now.free = false;
         if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
@@ -7418,10 +7432,10 @@ function jslint_phase3_parse(state) {
                 }
                 advance();
                 prefix_destructure(
+                    enroll,
                     "variable",
-                    the_variable.id === "const",
-                    the_variable.names,
-                    true
+                    readonly,
+                    the_variable.names
                 );
                 advance("=");
                 the_variable.expression = parse_expression(0);
@@ -8033,24 +8047,23 @@ function jslint_phase4_walk(state) {
         let right;
         if (thing.id === "=") {
             if (thing.names !== undefined) {
+                if (Array.isArray(thing.names)) {
+
+// PR-xxx - Fix false-warning "uninitialized_a" in statement ";[aa]=0;".
+
+//!! // test_cause:
+//!! // ["[aa]=0", "post_a", "[aa]=0", "", 0]
+
+                    test_cause("[aa]=0");
+                    thing.names.forEach(init_variable);
+                } else {
 
 // test_cause:
-// ["if(0){aa=0}", "post_a", "=", "", 0]
+// ["aa=0", "post_a", "aa=0", "", 0]
 
-                test_cause("=");
-
-// Probably deadcode.
-// if (Array.isArray(thing.names)) {
-//     thing.names.forEach(init_variable);
-// } else {
-//     init_variable(thing.names);
-// }
-
-                jslint_assert(
-                    !Array.isArray(thing.names),
-                    `Expected !Array.isArray(thing.names).`
-                );
-                init_variable(thing.names);
+                    test_cause("aa=0");
+                    init_variable(thing.names);
+                }
             } else {
                 if (lvalue.id === "[" || lvalue.id === "{") {
                     lvalue.expression.forEach(function (thing) {
