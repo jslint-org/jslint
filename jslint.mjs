@@ -5243,9 +5243,9 @@ function jslint_phase3_parse(state) {
             if (!token_prv.identifier) {
 
 // test_cause:
-// ["0=>0", "parse_fart", "wrap_fart_parameter", "=>", 2]
+// ["0=>0", "parse_fart", "expected_identifier_a", "0", 1]
 
-                return stop("wrap_fart_parameter", token_now);
+                return stop("expected_identifier_a", token_prv);
             }
 
 // PR-499 - Update ES2015-feature arrow, to continue parsing unwrapped-form
@@ -5255,6 +5255,7 @@ function jslint_phase3_parse(state) {
 // ["aa=>0", "parse_fart", "wrap_fart_parameter", "=>", 3]
 
             warn("wrap_fart_parameter", token_now);
+            the_fart.name = "anonymous";
             the_fart.parameters = [token_prv];
             the_fart.signature = token_prv.id;
             enroll(token_prv, "parameter", false);
@@ -6012,9 +6013,9 @@ function jslint_phase3_parse(state) {
 
 // This function will parse input <parameters> at beginning of <the_function>
 
+        const parameters = [];
+        const signature = ["("];
         let optional;
-        let parameters = [];
-        let signature = ["("];
         function advance_and_signature_push(id) {
             advance(id);
             switch (id) {
@@ -6025,16 +6026,6 @@ function jslint_phase3_parse(state) {
             default:
                 signature.push(id);
             }
-        }
-        function param_enroll(name) {
-            if (name.identifier) {
-                enroll(name, "parameter", false);
-                return;
-            }
-
-// Recurse param_enroll().
-
-            name.names.forEach(param_enroll);
         }
         function param_parse() {
             const is_brace = token_nxt.id === "{";
@@ -6058,6 +6049,7 @@ function jslint_phase3_parse(state) {
 
                     return stop("expected_identifier_a", param);
                 }
+                enroll(param, "parameter", false);
                 parameters.push(param);
                 advance_and_signature_push(param.id);
                 break;
@@ -6101,6 +6093,7 @@ function jslint_phase3_parse(state) {
                             }
                         }
                     }
+                    enroll(subparam, "parameter", false);
                     param.names.push(subparam);
 
 // test_cause:
@@ -6140,6 +6133,7 @@ function jslint_phase3_parse(state) {
 
                     return stop("expected_identifier_a", param);
                 }
+                enroll(param, "parameter", false);
                 parameters.push(param);
                 advance_and_signature_push(param.id);
                 if (token_nxt.id === "=") {
@@ -6181,7 +6175,6 @@ function jslint_phase3_parse(state) {
             }
         }
         advance_and_signature_push(")");
-        parameters.forEach(param_enroll);
         the_function.parameters = parameters;
         the_function.signature = signature.join("");
     }
