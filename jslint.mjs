@@ -297,7 +297,7 @@
     package_name,
     padEnd,
     padStart,
-    parameters,
+    parameter_count,
     parent,
     parentIi,
     parse,
@@ -2443,7 +2443,7 @@ function jslint_phase2_lex(state) {
                                 // ... literal.
     let mode_regexp;            // true if regular expression literal seen on
                                 // ... this line.
-    let opener_popped = empty();        // Last popped token from opener_stack.
+    let opener_popped = empty();        // Last token popped from opener_stack.
     let opener_stack = [];      // Stack of opener tokens: (, [.
     let snippet = "";           // A piece of string.
     let token_1;                // The first token.
@@ -4872,7 +4872,7 @@ function jslint_phase3_parse(state) {
         the_symbol.led_infix = function (left) {
             const the_token = token_now;
             the_token.arity = "binary";
-            if (typeof f === "function") {
+            if (f) {
                 return f(left);
             }
             the_token.expression = [left, parse_expression(bp)];
@@ -5275,7 +5275,7 @@ function jslint_phase3_parse(state) {
             warn("wrap_fart_parameter", token_now);
             the_fart.name = "anonymous";
             the_fart.names = [token_prv];
-            the_fart.parameters = [token_prv];
+            the_fart.parameter_count = 1;
             the_fart.signature = token_prv.id;
             enroll(token_prv, "parameter", false);
         } else {
@@ -5651,7 +5651,7 @@ function jslint_phase3_parse(state) {
         the_symbol.nud_prefix = function () {
             const the_token = token_now;
             the_token.arity = "unary";
-            if (typeof f === "function") {
+            if (f) {
                 return f();
             }
             the_token.expression = parse_expression(150);
@@ -5762,14 +5762,14 @@ function jslint_phase3_parse(state) {
         }
         function name_list_push(name) {
             name_list.push(name);
-            if (typeof enroll === "function") {
-                enroll(name, role, readonly);
-                name.init = true;
-            }
 
 // PR-xxx - Fix false-warning "uninitialized_a" in statement ";[aa]=0;".
 
             name.arity = role;
+            if (enroll) {
+                enroll(name, role, readonly);
+                name.init = true;
+            }
         }
         function name_parse() {
             let name = token_nxt;
@@ -5824,20 +5824,6 @@ function jslint_phase3_parse(state) {
 
                 test_cause("recurse_element");
                 advance_and_signature_push(token_nxt.id);
-                if (the_function_toplevel) {
-                    the_function.parameters.push(name);
-                    name.names = [];
-                    prefix_destructure(
-                        enroll,         // enroll
-                        role,           // role
-                        readonly,       // readonly
-                        name.names,     // name_list
-                        the_function,   // the_function
-                        false           // the_function_toplevel
-                    );
-                    name_list.push(...name.names);
-                    return;
-                }
                 prefix_destructure(
                     enroll,             // enroll
                     role,               // role
@@ -5888,15 +5874,9 @@ function jslint_phase3_parse(state) {
                 }
                 token_nxt.label = name;
                 name = token_nxt;
-                if (the_function_toplevel) {
-                    the_function.parameters.push(name);
-                }
                 name_list_push(name);
                 advance_and_signature_push(token_nxt.id);
                 return;
-            }
-            if (the_function_toplevel) {
-                the_function.parameters.push(name);
             }
             name_list_push(name);
 
@@ -5928,14 +5908,19 @@ function jslint_phase3_parse(state) {
             }
         }
         while (true) {
-            if (!is_brace && token_nxt.id === ",") {
+            if (!is_brace && !the_function_toplevel && token_nxt.id === ",") {
 
 // test_cause:
+// ["(,aa)=>0", "name_parse", "expected_identifier_a", ",", 2]
+// ["([,aa])=>0", "prefix_destructure", "ignore", "", 0]
 // [";[,aa]=0", "prefix_destructure", "ignore", "", 0]
 // ["let[,aa]=0", "prefix_destructure", "ignore", "", 0]
 
                 test_cause("ignore");
                 advance_and_signature_push(",");
+            }
+            if (the_function_toplevel) {
+                the_function.parameter_count += 1;
             }
             if (name_parse()) {
 
@@ -6136,7 +6121,7 @@ function jslint_phase3_parse(state) {
 // This function will parse input <parameters> at beginning of <the_function>
 
         the_function.names = [];
-        the_function.parameters = [];
+        the_function.parameter_count = 0;
         the_function.signature = ["("];
         token_now.free = false;
         if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
@@ -8016,9 +8001,9 @@ function jslint_phase4_walk(state) {
 // PR-xxx - Fix false-warning "uninitialized_a" in statement ";[aa]=0;".
 
 // test_cause:
-// [";[aa]=0", "post_a", "[aa]=0", "", 0]
+// [";[aa]=0", "post_a", ";[aa]=0", "", 0]
 
-                    test_cause("[aa]=0");
+                    test_cause(";[aa]=0");
                     thing.names.forEach(init_variable);
                 } else {
 
@@ -8460,21 +8445,20 @@ function jslint_phase4_walk(state) {
     function post_s_var(thing) {
         thing.names.forEach(function (name) {
             name.dead = false;
-            if (name.expression !== undefined) {
+            if (name.expression) {
+
+// test_cause:
+// ["let aa=0", "post_s_var", "let aa=0", "", 0]
+
+                test_cause("let aa=0");
                 walk_expression(name.expression);
-
-// Probably deadcode.
-// if (name.id === "{" || name.id === "[") {
-//     name.names.forEach(subactivate);
-// } else {
-//     name.init = true;
-// }
-
-                jslint_assert(
-                    !(name.id === "{" || name.id === "["),
-                    `Expected !(name.id === "{" || name.id === "[").`
-                );
                 name.init = true;
+            } else {
+
+// test_cause:
+// ["let aa", "post_s_var", "let aa", "", 0]
+
+                test_cause("let aa");
             }
             blockage.live.push(name);
         });
@@ -8816,7 +8800,7 @@ function jslint_phase4_walk(state) {
             thing.name.init = true;
         }
         if (thing.extra === "get") {
-            if (thing.parameters.length !== 0) {
+            if (thing.parameter_count !== 0) {
 
 // test_cause:
 // ["
@@ -8827,7 +8811,7 @@ function jslint_phase4_walk(state) {
                 warn("bad_get", thing);
             }
         } else if (thing.extra === "set") {
-            if (thing.parameters.length !== 1) {
+            if (thing.parameter_count !== 1) {
 
 // test_cause:
 // ["
@@ -8838,14 +8822,27 @@ function jslint_phase4_walk(state) {
                 warn("bad_set", thing);
             }
         }
-        thing.parameters.forEach(function (name) {
-            walk_expression(name.expression);
-            if (name.id === "{" || name.id === "[") {
-                name.names.forEach(subactivate);
+
+// PR-xxx - Unify property the_function.parameters into the_function.names.
+
+        thing.names.forEach(function (name) {
+            if (name.expression) {
+
+// test_cause:
+// ["(aa=0)=>0", "pre_s_function", "(aa=0)=>0", "", 0]
+
+                test_cause("(aa=0)=>0");
             } else {
-                name.dead = false;
-                name.init = true;
+
+// test_cause:
+// ["(aa)=>0", "pre_s_function", "(aa)=>0", "", 0]
+// ["aa=>0", "pre_s_function", "(aa)=>0", "", 0]
+
+                test_cause("(aa)=>0");
             }
+            walk_expression(name.expression);
+            name.dead = false;
+            name.init = true;
         });
     }
 
@@ -8871,12 +8868,6 @@ function jslint_phase4_walk(state) {
             thing.variable = the_variable;
             the_variable.used += 1;
         }
-    }
-
-    function subactivate(name) {
-        name.init = true;
-        name.dead = false;
-        blockage.live.push(name);
     }
 
     function walk_expression(thing) {
