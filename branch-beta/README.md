@@ -41,7 +41,7 @@ Douglas Crockford <douglas@crockford.com>
 
 9. [Documentation](#documentation)
     - [API Doc](#api-doc)
-    - [Directive `/*jslint*/`](#directive-jslint)
+    - [Directive](#directive)
         - [`/*jslint beta*/`](#jslint-beta)
         - [`/*jslint bitwise*/`](#jslint-bitwise)
         - [`/*jslint browser*/`](#jslint-browser)
@@ -62,12 +62,13 @@ Douglas Crockford <douglas@crockford.com>
         - [`/*jslint trace*/`](#jslint-trace)
         - [`/*jslint unordered*/`](#jslint-unordered)
         - [`/*jslint white*/`](#jslint-white)
-    - [Directive `/*global*/`](#directive-global)
-    - [Directive `/*property*/`](#directive-property)
-    - [Directive `/*jslint-disable*/.../*jslint-enable*/`](#directive-jslint-disablejslint-enable)
-    - [Directive `//jslint-ignore-line`](#directive-jslint-ignore-line)
-    - [Directive `/*coverage-disable*/.../*coverage-enable*/`](#directive-coverage-disablecoverage-enable)
-    - [Directive `//coverage-ignore-line`](#directive-coverage-ignore-line)
+        - [`/*global*/`](#global)
+        - [`/*property*/`](#property)
+        - [`/*jslint-disable*/.../*jslint-enable*/`](#jslint-disablejslint-enable)
+        - [`//jslint-ignore-line`](#jslint-ignore-line)
+        - [`/*coverage-disable*/.../*coverage-enable*/`](#coverage-disablecoverage-enable)
+        - [`//coverage-ignore-line`](#coverage-ignore-line)
+    - [ECMAScript Feature Support](#ecmascript-feature-support)
 
 10. [Package Listing](#package-listing)
 
@@ -533,27 +534,8 @@ window.addEventListener("load", function () {
 
 <br><br>
 # Documentation
-
-
 - [jslint.mjs](jslint.mjs) contains the jslint function. It parses and analyzes a source file, returning an object with information about the file. It can also take an object that sets options.
-
 - [index.html](index.html) runs the jslint.mjs function in a web page.
-
-JSLint can be run anywhere that JavaScript (or Java) can run.
-
-The place to express yourself in programming is in the quality of your ideas and
-the efficiency of their execution. The role of style in programming is the same
-as in literature: It makes for better reading. A great writer doesn't express
-herself by putting the spaces before her commas instead of after, or by putting
-extra spaces inside her parentheses. A great writer will slavishly conform to
-some rules of style, and that in no way constrains her power to express herself
-creatively. See for example William Strunk's The Elements of Style
-[https://www.crockford.com/style.html].
-
-This applies to programming as well. Conforming to a consistent style improves
-readability, and frees you to express yourself in ways that matter. JSLint here
-plays the part of a stern but benevolent editor, helping you to get the style
-right so that you can focus your creative energy where it is most needed.
 
 
 <br><br>
@@ -564,12 +546,11 @@ right so that you can focus your creative energy where it is most needed.
 
 
 <br><br>
-### Directive `/*jslint*/`
+### Directive
 
 <br>
 
 ##### `/*jslint beta*/`
-
 ```js
 /*jslint beta*/
 // Enable experimental warnings.
@@ -584,7 +565,6 @@ right so that you can focus your creative energy where it is most needed.
 <br>
 
 ##### `/*jslint bitwise*/`
-
 ```js
 /*jslint bitwise*/
 // Allow bitwise operator.
@@ -595,7 +575,6 @@ let foo = 0 | 1;
 <br>
 
 ##### `/*jslint browser*/`
-
 ```js
 /*jslint browser*/
 // Assume browser environment.
@@ -606,7 +585,6 @@ localStorage.getItem("foo");
 <br>
 
 ##### `/*jslint convert*/`
-
 ```js
 /*jslint convert*/
 // Allow conversion operator.
@@ -618,7 +596,6 @@ let bar = !!0;
 <br>
 
 ##### `/*jslint couch*/`
-
 ```js
 /*jslint couch*/
 // Assume CouchDb environment.
@@ -629,7 +606,6 @@ registerType("text-json", "text/json");
 <br>
 
 ##### `/*jslint devel*/`
-
 ```js
 /*jslint devel*/
 // Allow console.log() and friends.
@@ -640,7 +616,6 @@ console.log("hello");
 <br>
 
 ##### `/*jslint eval*/`
-
 ```js
 /*jslint eval*/
 // Allow eval().
@@ -651,7 +626,6 @@ eval("1");
 <br>
 
 ##### `/*jslint fart*/`
-
 ```js
 /*jslint fart*/
 // Allow complex fat-arrow.
@@ -664,7 +638,6 @@ let foo = async ({bar, baz}) => {
 <br>
 
 ##### `/*jslint for*/`
-
 ```js
 /*jslint for*/
 // Allow for-loop.
@@ -680,7 +653,6 @@ function foo() {
 <br>
 
 ##### `/*jslint getset*/`
-
 ```js
 /*jslint getset, this, devel*/
 // Allow get() and set().
@@ -702,7 +674,6 @@ console.log(foo.getBar); // 1
 <br>
 
 ##### `/*jslint indent2*/`
-
 ```js
 /*jslint indent2*/
 // Use 2-space indent.
@@ -715,7 +686,6 @@ function foo() {
 <br>
 
 ##### `/*jslint long*/`
-
 ```js
 /*jslint long*/
 // Allow long lines.
@@ -726,7 +696,6 @@ let foo = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 <br>
 
 ##### `/*jslint node*/`
-
 ```js
 /*jslint node*/
 // Assume Node.js environment.
@@ -737,7 +706,6 @@ require("fs");
 <br>
 
 ##### `/*jslint nomen*/`
-
 ```js
 /*jslint nomen*/
 // Allow weird property name.
@@ -749,7 +717,6 @@ foo._bar = 1;
 <br>
 
 ##### `/*jslint single*/`
-
 ```js
 /*jslint single*/
 // Allow single-quote strings.
@@ -760,7 +727,6 @@ let foo = '';
 <br>
 
 ##### `/*jslint subscript*/`
-
 ```js
 /*jslint subscript*/
 // Allow identifiers in subscript-notation.
@@ -772,7 +738,6 @@ foo["bar"] = 1;
 <br>
 
 ##### `/*jslint this*/`
-
 ```js
 /*jslint this*/
 // Allow 'this'.
@@ -785,7 +750,6 @@ function foo() {
 <br>
 
 ##### `/*jslint trace*/`
-
 ```js
 /*jslint trace*/
 // Include jslint stack-trace in warnings.
@@ -815,7 +779,6 @@ Error
 <br>
 
 ##### `/*jslint unordered*/`
-
 ```js
 /*jslint unordered*/
 // Allow unordered cases, params, properties, variables, and exports.
@@ -838,7 +801,6 @@ export {
 <br>
 
 ##### `/*jslint white*/`
-
 ```js
 /*jslint white*/
 // Allow messy whitespace.
@@ -846,10 +808,9 @@ export {
 let foo = 1; let bar = 2;
 ```
 
+<br>
 
-<br><br>
-### Directive `/*global*/`
-
+##### `/*global*/`
 ```js
 /*global foo, bar*/
 // Declare global variables foo, bar.
@@ -858,10 +819,9 @@ foo();
 bar();
 ```
 
+<br>
 
-<br><br>
-### Directive `/*property*/`
-
+##### `/*property*/`
 ```js
 /*property foo, bar*/
 // Restrict property-access to only .foo, .bar.
@@ -869,10 +829,9 @@ bar();
 let aa = {bar: 1, foo: 2};
 ```
 
+<br>
 
-<br><br>
-### Directive `/*jslint-disable*/.../*jslint-enable*/`
-
+##### `/*jslint-disable*/.../*jslint-enable*/`
 ```js
 /*jslint-disable*/
 
@@ -882,20 +841,18 @@ Syntax error.
 /*jslint-enable*/
 ```
 
+<br>
 
-<br><br>
-### Directive `//jslint-ignore-line`
-
+##### `//jslint-ignore-line`
 ```js
 // JSLint will ignore non-fatal warnings at given line.
 
 eval("1"); //jslint-ignore-line
 ```
 
+<br>
 
-<br><br>
-### Directive `/*coverage-disable*/.../*coverage-enable*/`
-
+##### `/*coverage-disable*/.../*coverage-enable*/`
 ```js
 /*coverage-disable*/
 
@@ -908,10 +865,9 @@ if (false) {
 /*coverage-enable*/
 ```
 
+<br>
 
-<br><br>
-### Directive `//coverage-ignore-line`
-
+##### `//coverage-ignore-line`
 ```js
 // JSLint will ignore code-coverage at given line.
 
@@ -919,6 +875,114 @@ if (false) {
     console.log("hello world"); //coverage-ignore-line
 }
 ```
+
+
+<br><br>
+### ECMAScript Feature Support
+- https://github.com/tc39/proposals/blob/main/finished-proposals.md
+- https://github.com/lukehoban/es6features
+
+| #. | JSLint Support | ES Version | ES Feature |
+|--:|:--|:--|:--|
+|  99. | &#x274c; | ES2027 | [`Explicit Resource Management`](https://github.com/tc39/proposal-explicit-resource-management) |
+|  98. | &#x2705; | ES2027 | [`Atomics.pause`](https://github.com/tc39/proposal-atomics-microwait) |
+|  97. | &#x274c; | ES2027 | [`Joint Iteration`](https://github.com/tc39/proposal-joint-iteration) |
+|  96. | &#x2705; | ES2027 | [`Temporal`](https://github.com/tc39/proposal-temporal) |
+|  95. | &#x2705; | ES2026 | [`Upsert`](https://github.com/tc39/proposal-upsert) |
+|  94. | &#x2705; | ES2026 | [`JSON.parse source text access`](https://github.com/tc39/proposal-json-parse-with-source) |
+|  93. | &#x274c; | ES2026 | [`Iterator Sequencing`](https://github.com/tc39/proposal-iterator-sequencing) |
+|  92. | &#x2705; | ES2026 | [`Uint8Array to/from Base64`](https://github.com/tc39/proposal-arraybuffer-base64) |
+|  91. | &#x2705; | ES2026 | [`Math.sumPrecise`](https://github.com/tc39/proposal-math-sum) |
+|  90. | &#x2705; | ES2026 | [`Error.isError`](https://github.com/tc39/proposal-is-error) |
+|  89. | &#x2705; | ES2026 | [`Array.fromAsync`](https://github.com/tc39/proposal-array-from-async) |
+|  88. | &#x2705; | ES2025 | [`RegExp.escape`](https://github.com/tc39/proposal-regex-escaping) |
+|  87. | &#x2705; | ES2025 | [`Redeclarable global eval-introduced vars`](https://github.com/tc39/proposal-redeclarable-global-eval-vars) |
+|  86. | &#x2705; | ES2025 | [`Float16 on TypedArrays, DataView, Math.f16round`](https://github.com/tc39/proposal-float16array) |
+|  85. | &#x2705; | ES2025 | [`Promise.try`](https://github.com/tc39/proposal-promise-try) |
+|  84. | &#x274c; | ES2025 | [`Sync Iterator helpers`](https://github.com/tc39/proposal-iterator-helpers) |
+|  83. | &#x2705; | ES2025 | [`JSON Modules`](https://github.com/tc39/proposal-json-modules) |
+|  82. | &#x2705; | ES2025 | [`Import Attributes`](https://github.com/tc39/proposal-import-attributes) |
+|  81. | &#x2705; | ES2025 | [`RegExp Modifiers`](https://github.com/tc39/proposal-regexp-modifiers) |
+|  80. | &#x2705; | ES2025 | [`New Set methods`](https://github.com/tc39/proposal-set-methods) |
+|  79. | &#x2705; | ES2025 | [`Duplicate named capture groups`](https://github.com/tc39/proposal-duplicate-named-capturing-groups) |
+|  78. | &#x2705; | ES2024 | [`ArrayBuffer transfer`](https://github.com/tc39/proposal-arraybuffer-transfer) |
+|  77. | &#x2705; | ES2024 | [`Promise.withResolvers`](https://github.com/tc39/proposal-promise-with-resolvers) |
+|  76. | &#x2705; | ES2024 | [`Array Grouping`](https://github.com/tc39/proposal-array-grouping) |
+|  75. | &#x2705; | ES2024 | [`Resizable and growable ArrayBuffers`](https://github.com/tc39/proposal-resizablearraybuffer) |
+|  74. | &#x26a0; | ES2024 | [`RegExp v flag with set notation + properties of strings`](https://github.com/tc39/proposal-regexp-v-flag) |
+|  73. | &#x2705; | ES2024 | [`Atomics.waitAsync`](https://github.com/tc39/proposal-atomics-wait-async) |
+|  72. | &#x2705; | ES2024 | [`Well-Formed Unicode Strings`](https://github.com/tc39/proposal-is-usv-string) |
+|  71. | &#x2705; | ES2023 | [`Change Array by Copy`](https://github.com/tc39/proposal-change-array-by-copy) |
+|  70. | &#x2705; | ES2023 | [`Symbols as WeakMap keys`](https://github.com/tc39/proposal-symbols-as-weakmap-keys) |
+|  69. | &#x2705; | ES2023 | [`Hashbang Grammar`](https://github.com/tc39/proposal-hashbang) |
+|  68. | &#x2705; | ES2023 | [`Array find from last`](https://github.com/tc39/proposal-array-find-from-last) |
+|  67. | &#x2705; | ES2022 | [`Error Cause`](https://github.com/tc39/proposal-error-cause) |
+|  66. | &#x274c; | ES2022 | [`Class Static Block`](https://github.com/tc39/proposal-class-static-block) |
+|  65. | &#x2705; | ES2022 | [`Accessible Object.prototype.hasOwnProperty`](https://github.com/tc39/proposal-accessible-object-hasownproperty) |
+|  64. | &#x2705; | ES2022 | [`.at()`](https://github.com/tc39/proposal-relative-indexing-method) |
+|  63. | &#x274c; | ES2022 | [`Ergonomic brand checks for Private Fields`](https://github.com/tc39/proposal-private-fields-in-in) |
+|  62. | &#x2705; | ES2022 | [`Top-level await`](https://github.com/tc39/proposal-top-level-await) |
+|  61. | &#x2705; | ES2022 | [`RegExp Match Indices`](https://github.com/tc39/proposal-regexp-match-indices) |
+|  60. | &#x274c; | ES2022 | [`Class Public Instance Fields & Private Instance Fields`](https://github.com/tc39/proposal-class-fields) |
+|  59. | &#x2705; | ES2021 | [`Numeric separators`](https://github.com/tc39/proposal-numeric-separator) |
+|  58. | &#x2705; | ES2021 | [`Logical Assignment Operators`](https://github.com/tc39/proposal-logical-assignment) |
+|  57. | &#x2705; | ES2021 | [`WeakRefs`](https://github.com/tc39/proposal-weakrefs) |
+|  56. | &#x2705; | ES2021 | [`Promise.any`](https://github.com/tc39/proposal-promise-any) |
+|  55. | &#x2705; | ES2021 | [`String.prototype.replaceAll`](https://github.com/tc39/proposal-string-replaceall) |
+|  54. | &#x2705; | ES2020 | [`import.meta`](https://github.com/tc39/proposal-import-meta) |
+|  53. | &#x2705; | ES2020 | [`Nullish coalescing Operator`](https://github.com/tc39/proposal-nullish-coalescing) |
+|  52. | &#x2705; | ES2020 | [`Optional Chaining`](https://github.com/tc39/proposal-optional-chaining) |
+|  51. | &#x2705; | ES2020 | [`for-in mechanics`](https://github.com/tc39/proposal-for-in-order) |
+|  50. | &#x2705; | ES2020 | [`globalThis`](https://github.com/tc39/proposal-global) |
+|  49. | &#x2705; | ES2020 | [`Promise.allSettled`](https://github.com/tc39/proposal-promise-allSettled) |
+|  48. | &#x2705; | ES2020 | [`BigInt`](https://github.com/tc39/proposal-bigint) |
+|  47. | &#x2705; | ES2020 | [`import()`](https://github.com/tc39/proposal-dynamic-import) |
+|  46. | &#x2705; | ES2020 | [`String.prototype.matchAll`](https://github.com/tc39/proposal-string-matchall) |
+|  45. | &#x2705; | ES2019 | [`Array.prototype.{flat,flatMap}`](https://github.com/tc39/proposal-flatMap) |
+|  44. | &#x2705; | ES2019 | [`String.prototype.{trimStart,trimEnd}`](https://github.com/tc39/proposal-string-left-right-trim) |
+|  43. | &#x2705; | ES2019 | [`Well-formed JSON.stringify`](https://github.com/tc39/proposal-well-formed-stringify) |
+|  42. | &#x2705; | ES2019 | [`Object.fromEntries`](https://github.com/tc39/proposal-object-from-entries) |
+|  41. | &#x2705; | ES2019 | [`Function.prototype.toString revision`](https://github.com/tc39/Function-prototype-toString-revision) |
+|  40. | &#x2705; | ES2019 | [`Symbol.prototype.description`](https://github.com/tc39/proposal-Symbol-description) |
+|  39. | &#x2705; | ES2019 | [`JSON superset`](https://github.com/tc39/proposal-json-superset) |
+|  38. | &#x2705; | ES2019 | [`Optional catch binding`](https://github.com/tc39/proposal-optional-catch-binding) |
+|  37. | &#x274c; | ES2018 | [`Asynchronous Iteration`](https://github.com/tc39/proposal-async-iteration) |
+|  36. | &#x2705; | ES2018 | [`Promise.prototype.finally`](https://github.com/tc39/proposal-promise-finally) |
+|  35. | &#x2705; | ES2018 | [`RegExp Unicode Property Escapes`](https://github.com/tc39/proposal-regexp-unicode-property-escapes) |
+|  34. | &#x2705; | ES2018 | [`RegExp Lookbehind Assertions`](https://github.com/tc39/proposal-regexp-lookbehind) |
+|  33. | &#x2705; | ES2018 | [`Rest/Spread Properties`](https://github.com/tc39/proposal-object-rest-spread) |
+|  32. | &#x2705; | ES2018 | [`RegExp named capture groups`](https://github.com/tc39/proposal-regexp-named-groups) |
+|  31. | &#x2705; | ES2018 | [`s (dotAll) flag for regular expressions`](https://github.com/tc39/proposal-regexp-dotall-flag) |
+|  30. | &#x2705; | ES2018 | [`Lifting template literal restriction`](https://github.com/tc39/proposal-template-literal-revision) |
+|  29. | &#x2705; | ES2017 | [`Shared memory and atomics`](https://github.com/tc39/proposal-ecmascript-sharedmem) |
+|  28. | &#x2705; | ES2017 | [`Async functions`](https://github.com/tc39/proposal-async-await) |
+|  27. | &#x26a0; | ES2017 | [`Trailing commas in function parameter lists and calls`](https://github.com/tc39/proposal-trailing-function-commas) |
+|  26. | &#x2705; | ES2017 | [`Object.getOwnPropertyDescriptors`](https://github.com/tc39/proposal-object-getownpropertydescriptors) |
+|  25. | &#x2705; | ES2017 | [`String padding`](https://github.com/tc39/proposal-string-pad-start-end) |
+|  24. | &#x2705; | ES2017 | [`Object.values/Object.entries`](https://github.com/tc39/proposal-object-values-entries) |
+|  23. | &#x2705; | ES2016 | [`Exponentiation operator`](https://github.com/tc39/proposal-exponentiation-operator) |
+|  22. | &#x2705; | ES2016 | [`Array.prototype.includes`](https://github.com/tc39/proposal-Array.prototype.includes) |
+|  21. | &#x2705; | ES2015 | [`arrows`](https://github.com/lukehoban/es6features#arrows) |
+|  20. | &#x274c; | ES2015 | [`classes`](https://github.com/lukehoban/es6features#classes) |
+|  19. | &#x274c; | ES2015 | [`enhanced object literals`](https://github.com/lukehoban/es6features#enhanced-object-literals) |
+|  18. | &#x2705; | ES2015 | [`template strings`](https://github.com/lukehoban/es6features#template-strings) |
+|  17. | &#x2705; | ES2015 | [`destructuring`](https://github.com/lukehoban/es6features#destructuring) |
+|  16. | &#x2705; | ES2015 | [`default + rest + spread`](https://github.com/lukehoban/es6features#default--rest--spread) |
+|  15. | &#x2705; | ES2015 | [`let + const`](https://github.com/lukehoban/es6features#let--const) |
+|  14. | &#x274c; | ES2015 | [`iterators + for..of`](https://github.com/lukehoban/es6features#iterators--forof) |
+|  13. | &#x274c; | ES2015 | [`generators`](https://github.com/lukehoban/es6features#generators) |
+|  12. | &#x2705; | ES2015 | [`unicode`](https://github.com/lukehoban/es6features#unicode) |
+|  11. | &#x26a0; | ES2015 | [`modules`](https://github.com/lukehoban/es6features#modules) |
+|  10. | &#x2705; | ES2015 | [`module loaders`](https://github.com/lukehoban/es6features#module-loaders) |
+|   9. | &#x2705; | ES2015 | [`map + set + weakmap + weakset`](https://github.com/lukehoban/es6features#map--set--weakmap--weakset) |
+|   8. | &#x2705; | ES2015 | [`proxies`](https://github.com/lukehoban/es6features#proxies) |
+|   7. | &#x2705; | ES2015 | [`symbols`](https://github.com/lukehoban/es6features#symbols) |
+|   6. | &#x274c; | ES2015 | [`subclassable built-ins`](https://github.com/lukehoban/es6features#subclassable-built-ins) |
+|   5. | &#x2705; | ES2015 | [`promises`](https://github.com/lukehoban/es6features#promises) |
+|   4. | &#x2705; | ES2015 | [`math + number + string + array + object APIs`](https://github.com/lukehoban/es6features#math--number--string--array--object-apis) |
+|   3. | &#x2705; | ES2015 | [`binary and octal literals`](https://github.com/lukehoban/es6features#binary-and-octal-literals) |
+|   2. | &#x2705; | ES2015 | [`reflect api`](https://github.com/lukehoban/es6features#reflect-api) |
+|   1. | &#x2705; | ES2015 | [`tail calls`](https://github.com/lukehoban/es6features#tail-calls) |
 
 
 <br><br>
@@ -954,7 +1018,7 @@ if (false) {
 - `git push upstream alpha -f`
     - verify ci-success for upstream-branch-alpha
     - https://github.com/jslint-org/jslint/actions
-- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2026.6.23
+- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2026.6.24
 - click `Create pull request`
 - input `Add your description here...` with:
 ```

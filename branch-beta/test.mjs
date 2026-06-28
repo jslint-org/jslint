@@ -689,6 +689,28 @@ jstestDescribe((
                 "let aa = aa().getTime();",
                 "let aa = aa.aa().getTime();"
             ],
+            destructure: [
+                "let [\n    , aa, bb = 0, ...cc\n] = 0;\naa(bb, cc);",
+
+// PR-459 - Allow destructuring-assignment after function-definition.
+
+                (
+                    "let aa;\n"
+                    + "let bb;\n"
+                    + "function cc() {\n"
+                    + "    return;\n"
+                    + "}\n"
+                    + "[aa, bb] = cc();\n"
+                ),
+                (
+                    "let {\n"
+                    + "    aa,\n"
+                    + "    bb = 0,\n"
+                    + "    cc: dd,\n"
+                    + "    ...ee\n"
+                    + "} = 0;\n"
+                )
+            ],
             directive: [
                 "#!\n/*jslint browser:false, node*/\n\"use strict\";",
                 "/*property aa bb*/"
@@ -723,7 +745,10 @@ jstestDescribe((
                 )
             ],
             import: [
-                `import aa from "aa" with {"type": "json"};\naa();`
+                `let aa = 0;\nimport(aa).then(aa).catch(aa).finally(aa);`,
+                `let aa = await import("aa");`,
+                `let aa = await import("aa", {with: {type: "json"}});`,
+                `let {aa, bb} = await import("aa");`
             ],
             indent_method: [
                 "let aa = 0;\naa\n    .bb\n    .cc(\n        0\n    );"
@@ -748,6 +773,15 @@ jstestDescribe((
                     + "    }\n"
                     + "}\n"
                 )
+            ],
+            literal: [
+                "String(\"\".at());",
+                "String([].at());"
+            ],
+            logical_assignment: [
+                "let aa = 0;\naa &&= 0;",
+                "let aa = 0;\naa ??= 0;",
+                "let aa = 0;\naa ||= 0;"
             ],
             loop: [
                 (
@@ -780,14 +814,12 @@ jstestDescribe((
                     + "    return await 0;\n"
                     + "});\n"
                 ),
-                "import {aa, bb} from \"aa\";\naa(bb);",
-                "import {} from \"aa\";",
-                "import(\"aa\").then(function () {\n    return;\n});",
-                (
-                    "let aa = 0;\n"
-                    + "import(aa).then(aa).then(aa)"
-                    + ".catch(aa).finally(aa);\n"
-                )
+                // `import "aa";`,
+                `import * as aa from "aa";\naa();`,
+                `import aa from "aa" with {type: "json"};\naa();`,
+                `import aa from "aa";\naa();`,
+                `import aa, {aa as bb, cc} from "aa";\naa(bb, cc);`,
+                `import {} from "aa";`
             ],
             number: [
                 "let aa = 0.0e0;",
@@ -820,10 +852,12 @@ jstestDescribe((
                 "let aa = aa[`!`];"
             ],
             regexp: [
-                "function aa() {\n    return /./;\n}",
-                "let aa = /(?!.)(?:.)(?=.)/;",
-                "let aa = /./gimuy;",
-                "let aa = /[\\--\\-]/;"
+                `RegExp.escape("");`,
+                `function aa() {\n    return /./;\n}`,
+                `let aa = /(?!.)(?:.)(?=.)/;`,
+                `let aa = /(?ims-ims:.)/;`,
+                `let aa = /./dgimsuvy;`,
+                `let aa = /[\\--\\-]/;`
             ],
             ternary: [
                 (
@@ -903,24 +937,9 @@ jstestDescribe((
                 ""
             ].map(function (directive) {
                 return [
-                    "let [\n    aa, bb = 0\n] = 0;\naa();\nbb();",
-                    "let aa = 0;\nlet [...bb] = [...aa];\nbb();",
-
-// PR-459 - Allow destructuring-assignment after function-definition.
-
-                    (
-                        "let aa;\n"
-                        + "let bb;\n"
-                        + "function cc() {\n"
-                        + "    return;\n"
-                        + "}\n"
-                        + "[aa, bb] = cc();\n"
-                    ),
-                    "let constructor = 0;\nconstructor();",
-                    "let {\n    aa: bb\n} = 0;\nbb();",
-                    "let {\n    aa: bb,\n    bb: cc\n} = 0;\nbb();\ncc();",
-                    "let {aa, bb} = 0;\naa();\nbb();",
-                    "let {constructor} = 0;\nconstructor();"
+                    "const aa = 0;\naa();\n",
+                    "let aa = 0;\naa();\n",
+                    "var aa = 0;\naa();\n"
                 ].map(function (code) {
                     return directive + code;
                 });

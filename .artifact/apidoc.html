@@ -1146,6 +1146,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
                                         // ... the parse.
     let token_nxt = token_global;       // The next token to be examined in
                                         // ... &lt;token_list&gt;.
+    let token_prv = token_global;       // The previous token examined.
 
     function advance(id, match) {
 
@@ -1161,8 +1162,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
             anon = token_now.id;
         } else if (
             token_now.id === "(string)"
-            &amp;&amp; jslint_rgx_identifier.test(token_now.value)
-       ...
+  ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1347,9 +1347,19 @@ jslint_assert(
 // This is the set of infix operators that require a space on each side.
 
     let spaceop = object_assign_from_list(empty(), [
-        "!=", "!==", "%", "%=", "&amp;", "&amp;&amp;", "&amp;=", "*", "*=", "+=", "-=", "/",
-        "/=", "&lt;", "&lt;&lt;", "&lt;&lt;=", "&lt;=", "=", "==", "===", "=&gt;", "&gt;", "&gt;=", "&gt;&gt;",
-        "&gt;&gt;=", "&gt;&gt;&gt;", "&gt;&gt;&gt;=", "^", "^=", "|", "|=", "||"
+        "!=", "!==",
+        "%", "%=",
+        "&amp;", "&amp;&amp;", "&amp;&amp;=", "&amp;=",
+        "*", "*=",
+        "+=",
+        "-=",
+        "/", "/=",
+        "&lt;", "&lt;&lt;", "&lt;&lt;=", "&lt;=",
+        "=", "==", "===", "=&gt;",
+        "&gt;", "&gt;=", "&gt;&gt;", "&gt;&gt;=", "&gt;&gt;&gt;", "&gt;&gt;&gt;=",
+        "??", "??=",
+        "^", "^=",
+        "|", "|=", "||", "||="
     ], true);
 
     function at_margin(fit) {
@@ -1372,12 +1382,7 @@ jslint_assert(
                     name.used === 0
 
 // Probably deadcode.
-// &amp;&amp; (
-//     name.role !== "function"
-//     || name.parent.arity !== "unary"
-// )
-
-                    &amp;&a...
+// &am...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
