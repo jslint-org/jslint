@@ -690,27 +690,34 @@ jstestDescribe((
                 "let aa = aa.aa().getTime();"
             ],
             destructure: [
-                [
 
 // PR-xxx - Unify ES2015-destructure-logic.
 
-                    "\nlet aa;\nlet bb;\nlet cc;\nlet dd;\nlet zz;\n",
-                    "const ",
-                    "let "
-                ].map(function (prefix) {
-                    return (
-                        `/\*jslint node*\/\n`
-                        + `${prefix}[{\n`
+                [
+                    `(function ({expr}) {\n    aa(bb, cc, dd, zz);\n}());`,
+                    `const {expr}`,
+                    `let [aa, bb, cc, dd, zz] = 0;\n{expr}`,
+                    `let {expr}`
+                ].map(function (source) {
+                    source = source.replace("{expr}", (
+                        `[{\n`
                         + `    aa,\n`
                         + `    bb = 0,\n`
                         + `    bb: cc,\n`
                         + `    dd: [{dd}],\n`
                         + `    ...zz\n`
-                        + `}] = (function () {\n`
-                        + `    return;\n`
-                        + `}());\n`
-                        + `aa(bb, cc, dd, zz);\n`
-                    );
+                        + `}]`
+                    ));
+                    if (!(/function/).test(source)) {
+                        source = (
+                            `${source} = (function () {\n`
+                            + `    return;\n`
+                            + `}());\n`
+                            + `aa(bb, cc, dd, zz);\n`
+                        );
+                    }
+                    source = `/*jslint node*/\n${source}`;
+                    return source;
                 }),
 
 // PR-459 - Allow destructuring-assignment after function-definition.
