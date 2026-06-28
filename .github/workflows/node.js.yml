@@ -1,0 +1,50 @@
+# derived from
+# https://github.com/actions/starter-workflows/blob/main/ci/node.js.yml
+# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+name: Node.js CI
+on:
+  push:
+    branches:
+    - alpha
+    - beta
+    - master
+    - sandbox
+    # - none
+  # - pull_request:
+    # branches:
+    # - alpha
+    # - beta
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node_version:
+          - 12
+          - 14
+          - 16
+        architecture:
+          # - arm64
+          - x64
+          # - x86
+        os:
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
+    name: node . v${{ matrix.node_version }} . ${{ matrix.architecture }} . ${{ matrix.os }}
+    steps:
+      # https://github.com/actions/checkout
+      - uses: actions/checkout@v2
+      # https://github.com/actions/setup-node
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node_version }}
+          architecture: ${{ matrix.architecture }}
+      # fetch ci.sh from trusted source
+      - run: git fetch origin alpha && git checkout origin/alpha ci.sh
+      - run: sh ci.sh shGithubCi
+      - run: sh ci.sh shGithubArtifactUpload
+        env:
+          CI_NODE_VERSION_ARCH_PLATFORM: v14.x64.linux
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

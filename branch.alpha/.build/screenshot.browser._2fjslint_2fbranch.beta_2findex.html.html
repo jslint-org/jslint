@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="description" content="JSLint, The JavaScript Code Quality Tool. This file allows JSLint
+    to be run from a web browser. It can accept a source program and analyze
+    it without sending it over the network.">
+<meta name="author" content="Douglas Crockford">
+<meta name="date" content="2020-10-23">
+<link rel="icon" type="image/png" href="image-jslint-64x64.png">
+<title>JSLint:&nbsp;The&nbsp;JavaScript&nbsp;Code Quality Tool</title>
+<style>
+@font-face {
+    font-family: "Programma";
+    font-weight: bold;
+    src: url("font-programma-bold.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Daley";
+    font-weight: bold;
+    src: url("font-daley-bold.woff2") format("woff2");
+}
+
+body {
+    background-color: antiquewhite;
+    color: black;
+    font-family: "Daley", sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+#JSLINT_TITLEBOX {
+    font-family: "Daley", sans-serif;
+    margin: 10px 40px 0 40px;
+    padding: 0;
+}
+
+#JSLINT_TITLEBOX ul {
+    float: right;
+    font-size: 12pt;
+}
+
+#JSLINT_TITLEBOX div {
+    color: darkslategray;
+    float: left;
+    font-size: 48pt;
+}
+
+#JSLINT_ fieldset {
+    background-color: gainsboro;
+    border: 0;
+    clear: both;
+    margin-bottom: 1em;
+    margin-left: 40px;
+    margin-right: 40px;
+    margin-top: 1em;
+    padding: 0;
+    width: auto;
+}
+#JSLINT_  legend {
+    background-color: darkslategray;
+    border: 0;
+    color: white;
+    font-size: 100%;
+    font-style: normal;
+    font-weight: normal;
+    margin: 0;
+    padding-bottom: 0.25em;
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0.25em;
+    text-align: center;
+    width: 100%;
+}
+#JSLINT_ button {
+    background-color: darkslategray;
+    border: 0;
+    color: white;
+    cursor: pointer;
+    font-family: "Daley", sans-serif;
+    font-size: 100%;
+    font-style: normal;
+    margin-left: 1em;
+    margin-right: 1em;
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-bottom: 0.25em;
+    padding-top: 0.25em;
+    text-align: center;
+}
+#JSLINT_ button:hover {
+    background-color: slategray;
+    color: white;
+    border: 0;
+}
+
+#JSLINT_ button:active {
+    border: 0;
+    color: black;
+}
+
+#JSLINT_ button:disabled {
+    background-color: gray;
+    border: 0;
+    color: gainsboro;
+}
+
+a:visited {
+    color: #69565c;
+}
+
+a:link {
+    color: black;
+}
+
+#JSLINT_ input[type="text"] {
+    background-color: white;
+    border: 0;
+    color: black;
+    margin-bottom: 0.2em;
+    margin-right: 0.5em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    text-align: right;
+    width: 3em;
+}
+
+#JSLINT_ textarea {
+    border: 0;
+    background-color: white;
+    border: 0;
+    font-family: Programma, monospace;
+    font-size: 100%;
+    font-weight: bold;
+    resize: none;
+}
+
+#JSLINT_ textarea::selection {
+    background-color: yellow;
+    color: black;
+}
+
+#JSLINT_NUMBER {
+    color: darkgray;
+    display: inline-block;
+    height: 4in;
+    margin: 2%;
+    margin-right: 0;
+    overflow: hidden;
+    padding-right: 0.5%;
+    text-align: right;
+    white-space: pre;
+    width: 4%;
+}
+
+#JSLINT_SOURCE {
+    color: black;
+    display: inline-block;
+    font-size: 100%;
+    height: 4in;
+    margin: 2%;
+    margin-left: 0;
+    margin-right: 0;
+    overflow: auto;
+    padding-left: 0.5%;
+    white-space: pre;
+    width: 91%;
+}
+
+#JSLINT_PROPERTY {
+    background-color: honeydew;
+    border: 0;
+    margin: 2%;
+    padding: 0.5%;
+    white-space: pre;
+    width: 95%;
+}
+
+#JSLINT_GLOBAL {
+    white-space: normal;
+    width: 95%;
+}
+#JSLINT_ label {
+    font-family: sans-serif;
+    font-size: 90%;
+    padding-left: 0.25em;
+}
+#JSLINT_OPTIONS>div {
+    float: left;
+    margin: 0.5em;
+}
+
+#JSLINT_ address {
+    color: black;
+    display: block;
+    float: right;
+    font-family: serif;
+    font-size: 90%;
+    margin-left: 1em;
+}
+#JSLINT_ dl {
+    background-color: cornsilk;
+    color: white;
+    margin: 0;
+    padding-bottom: 2pt;
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: 2pt;
+}
+#JSLINT_ dfn {
+    color: black;
+    display: block;
+    font-family: Programma, monospace;
+    font-size: 100%;
+    font-style: normal;
+    font-weight: bold;
+    margin-bottom: 2pt;
+}
+#JSLINT_ dt {
+    color: black;
+    display: block;
+    float: left;
+    font-family: serif;
+    font-size: 75%;
+    font-style: italic;
+    margin: 0;
+    width: 8em;
+    text-align: right;
+}
+#JSLINT_ dd {
+    color: black;
+    display: block;
+    font-family: Programma, monospace;
+    font-weight: bold;
+    margin-left: 8em;
+    padding-bottom: 2pt;
+}
+#JSLINT_WARNINGS>legend {
+    background-color: indianred;
+}
+#JSLINT_WARNINGS>div {
+    background-color: pink;
+    padding: 1em;
+}
+#JSLINT_WARNINGS cite {
+    color: black;
+    display: block;
+    font-family: serif;
+    font-size: 100%;
+    font-style: normal;
+    margin-bottom: 4pt;
+    margin-left: 20pt;
+    margin-right: 20pt;
+    margin-top: 4pt;
+    overflow-x: hidden;
+}
+#JSLINT_WARNINGS samp {
+    background-color: lavenderblush;
+    color: black;
+    display: block;
+    font-family: Programma, monospace;
+    font-size: 100%;
+    font-style: normal;
+    font-weight: bold;
+    padding: 4pt;
+    margin-bottom: 0;
+    margin-left: 16pt;
+    margin-right: 16pt;
+    margin-top: 0;
+    white-space: pre-wrap;
+}
+
+#JSLINT_REPORT center {
+    margin-top: 1em;
+}
+
+#JSLINT_WARNINGS dl address {
+    color: black;
+    display: inline;
+    float: none;
+    font-size: 80%;
+    margin: 0;
+}
+
+#JSLINT_REPORT>div {
+    padding: 1em;
+}
+
+#JSLINT_ dl.level0 {
+    color: black;
+    background-color: white;
+}
+
+#JSLINT_ dl.level1 {
+    color: black;
+    background-color: #ffffe0;  /* yellow */
+    margin-left: 1em;
+}
+
+#JSLINT_ dl.level2 {
+    color: black;
+    background-color: #e0ffe0;  /* green */
+    margin-left: 2em;
+}
+
+#JSLINT_ dl.level3 {
+    color: black;
+    background-color: #D0D0ff;  /* blue */
+    margin-left: 3em;
+}
+
+#JSLINT_ dl.level4 {
+    background-color: #ffe0ff;  /* purple */
+    color: black;
+    margin-left: 4em;
+}
+
+#JSLINT_ dl.level5 {
+    background-color: #ffe0e0;  /* red */
+    color: black;
+    margin-left: 5em;
+}
+
+#JSLINT_ dl.level6 {
+    background-color: #ffe390;  /* orange */
+    color: black;
+    margin-left: 6em;
+}
+
+#JSLINT_ dl.level7 {
+    background-color: #e0e0e0;  /* gray */
+    color: black;
+    margin-left: 7em;
+}
+
+#JSLINT_ dl.level8 {
+    color: black;
+    margin-left: 8em;
+}
+
+#JSLINT_ dl.level9 {
+    color: black;
+    margin-left: 9em;
+}
+
+.none {
+    display: none;
+}
+.center {
+    text-align: center;
+}
+</style>
+</head>
+<body>
+<div id="bannerFork1" style="
+    height: 100px;
+    left: 0;
+    margin: 0;
+    opacity: 0.75;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    width: 200px;
+    z-index: 99;
+">
+    <div style="
+    background: darkslategray;
+    font-size: 13px;
+    height: 20px;
+    line-height: 20px;
+    opacity: 0.75;
+    overflow: visible;
+    position: absolute;
+    right: 60px;
+    text-align: center;
+    top: 30px;
+    transform: rotate(-45deg);
+    width: 100%;
+">
+    <a href="https://github.com/jslint-org/jslint" style="color: #fff;" target="_blank">
+    fork on github
+    </a>
+    </div>
+</div>
+<div id="JSLINT_TITLEBOX">
+    <div>JSLint</div>
+    <ul>
+        <li><a href="help.html">Read the instructions.</a></li>
+        <li><a href="https://www.amazon.com/dp/1949815005/wrrrldwideweb" target="_blank">
+<i>How JavaScript Works</i> by Douglas Crockford.
+  </a></li>
+    </ul>
+</div>
+<div id="JSLINT_">
+  <fieldset><legend>Source</legend><textarea id="JSLINT_NUMBER" rows="18" readonly=""></textarea><textarea id="JSLINT_SOURCE" rows="18" autofocus="" spellcheck="false" placeholder="// Paste JavaScript source or JSON text here."></textarea></fieldset>
+  <div class="center">
+      <button name="JSLint">JSLint</button>
+      <button name="clear">clear</button>
+  </div>
+  <fieldset id="JSLINT_WARNINGS" class="none" style="display: none;">
+    <legend>Warnings</legend>
+    <div id="JSLINT_WARNINGS_LIST"></div>
+  </fieldset>
+  <fieldset id="JSLINT_REPORT" class="none" style="display: block;">
+    <legend>Function Report</legend>
+    <div id="JSLINT_REPORT_LIST"><dl class="level0"><dt>module</dt><dd>Promise, console, https, jslint</dd><dt>import from</dt><dd>./jslint.js, https</dd></dl><dl class="level1"><address>4</address><dfn><b>«async»</b>()</dfn><dt>variable</dt><dd>result</dd><dt>closure</dt><dd>result</dd><dt>module</dt><dd>Promise, jslint</dd></dl><dl class="level2"><address>6</address><dfn><b>«Promise»</b>(resolve)</dfn><dt>parameter</dt><dd>resolve</dd><dt>closure</dt><dd>resolve</dd><dt>module</dt><dd>https</dd></dl><dl class="level3"><address>7</address><dfn><b>«request»</b>(res)</dfn><dt>parameter</dt><dd>res</dd><dt>outer</dt><dd>result</dd></dl><dl class="level4"><address>9</address><dfn><b>«data»</b>(chunk)</dfn><dt>parameter</dt><dd>chunk</dd><dt>outer</dt><dd>result</dd></dl><dl class="level4"><address>11</address><dfn><b>«end»</b>()</dfn><dt>outer</dt><dd>resolve, result</dd></dl><dl class="level2"><address>17</address><dfn><b>«forEach»</b>({formatted_message})</dfn><dt>parameter</dt><dd>formatted_message</dd><dt>module</dt><dd>console</dd></dl><center>JSLint edition v2021.5.27</center></div>
+  </fieldset>
+  <fieldset id="JSLINT_PROPERTYFIELDSET" class="none" style="display: block;">
+    <legend>Property Directive</legend>
+    <textarea id="JSLINT_PROPERTY" rows="8" readonly=""></textarea>
+  </fieldset>
+  <div id="JSLINT_AUX" class="none center" style="display: block;">
+      <button name="select" id="JSLINT_SELECT">select property</button>
+      <button name="JSLint">JSLint</button>
+      <button name="clear">clear</button>
+      <button name="options" id="JSLINT_CLEAR_OPTIONS">clear options</button>
+  </div>
+  <fieldset id="JSLINT_OPTIONS"><legend>Options</legend>
+    <div>Assume...
+      <div><label><input title="devel" type="checkbox">in development</label></div>
+      <div><label><input title="browser" type="checkbox">a browser</label></div>
+      <div><label><input title="couch" type="checkbox">CouchDB</label></div>
+      <div><label><input title="node" type="checkbox">Node.js</label></div>
+    <br>Fudge...
+      <div><label><input id="JSLINT_FUDGE" title="fudge" type="checkbox">First line number is 1</label></div>
+    </div>
+    <div>Tolerate...
+      <div><label><input title="bitwise" type="checkbox">bitwise operators</label></div>
+      <div><label><input title="convert" type="checkbox">conversion operators</label></div>
+      <div><label><input title="eval" type="checkbox">eval</label></div>
+      <div><label><input title="for" type="checkbox">for statement</label></div>
+      <div><label><input title="getset" type="checkbox">get and set</label></div>
+      <div><label><input title="long" type="checkbox">long lines</label></div>
+      <div><label><input title="single" type="checkbox">single quote strings</label></div>
+      <div><label><input title="this" type="checkbox">this</label></div>
+      <div><label><input title="unordered" type="checkbox">unordered properties and params</label></div>
+      <div><label><input title="white" type="checkbox">whitespace mess</label></div>
+    </div>
+    <div>Global variables...
+      <textarea id="JSLINT_GLOBAL" title="global" spellcheck="false" placeholder="imported globals here"></textarea>
+    </div>
+  </fieldset>
+</div>
+<script src="browser.js" type="module"></script>
+
+</body></html>

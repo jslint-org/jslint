@@ -1,0 +1,14 @@
+<svg height="20" width="130" xmlns="http://www.w3.org/2000/svg">
+<rect fill="#555" height="20" width="130"/>
+<rect fill="#02db00" height="20" width="62" x="68"/>
+<g
+    fill="#fff"
+    font-family="dejavu sans,verdana,geneva,sans-serif"
+    font-size="11"
+    font-weight="bold"
+    text-anchor="middle"
+>
+<text x="34" y="14">coverage</text>
+<text x="99" y="14">99.01 %</text>
+</g>
+</svg>

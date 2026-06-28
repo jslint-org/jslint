@@ -1,0 +1,12 @@
+*
+.*
+node_modules
+!.npmignore
+!CHANGELOG.md
+!LICENSE
+!README.md
+
+!asset_*
+!jslint.mjs
+!jslint_wrapper_cjs.cjs
+!jslint_wrapper_vscode.js
