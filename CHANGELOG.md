@@ -10,6 +10,7 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.6.1-beta
+- jslint-ci - Rename ci-functions shGitPullrequestXxx to shGithubPrXxx.
 - jslint-ecma - Unify ES2015-destructure-logic into function prefix_destructure().
 - jslint-ecma - Update README.md, documenting supported ES2015+ features.
 - jslint - Update warning infix_in to recommend Object.hasOwn() over hasOwnProperty().
