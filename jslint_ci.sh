@@ -970,122 +970,6 @@ import moduleChildProcess from "child_process";
 ' "$@" # '
 )}
 
-shGitPullrequest() {(set -e
-# This function will create-and-push a github-pull-commit to origin/alpha.
-    node --input-type=module --eval '
-// init debugInline
-(function () {
-    let consoleError = console.error;
-    globalThis.debugInline = globalThis.debugInline || function (...argList) {
-
-// This function will print <argv> to stderr and then return <argv>[0].
-
-        consoleError("\n\ndebugInline");
-        consoleError(...argList);
-        consoleError("\n");
-        return argList[0];
-    };
-}());
-import moduleAssert from "assert";
-import moduleChildProcess from "child_process";
-import moduleFs from "fs";
-(async function () {
-    let branchCheckpoint = process.argv[2] || "HEAD";
-    let branchMerge = process.argv[1] || "beta";
-    let branchPull;
-    let commitMessage;
-    let data;
-    let version = process.argv[3] || new Date().toISOString().slice(0, 10);
-    version = version.replace((/-0?/g), ".");
-    // security - sanitize branchXxx
-    [
-        branchCheckpoint, branchMerge, version
-    ] = [
-        branchCheckpoint, branchMerge, version
-    ].map(function (branch) {
-        return branch.trim().replace((/[^\w.\-]/g), "_");
-    });
-    data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
-    switch (branchMerge) {
-    case "master":
-        version = `v${version}`;
-        // update CHANGELOG.md
-        data = data.replace(
-            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
-            `\n\n# ${version}\n`
-        );
-        await moduleFs.promises.writeFile("CHANGELOG.md", data);
-        commitMessage = new RegExp(
-            `\n\n# ${version}\n[\\S\\s]+?\n\n`
-        ).exec(data)[0];
-        break;
-    default:
-        version = `p${version}`;
-        commitMessage = (
-            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)(?:\n- |\n\n)/
-        ).exec(data)[1];
-    }
-    branchPull = `branch-${version}`;
-    // update README.md
-    data = await moduleFs.promises.readFile("README.md", "utf8");
-    data = data.replace(
-        new RegExp(
-            (
-                "(\\bhttps:\\/\\/github\\.com\\/[\\w.\\-\\/]+?"
-                + "\\/compare"
-                + "\\/[\\w.\\-\\/]+?\\.\\.\\.[\\w.:\\-\\/]+?)"
-                + `:branch-${version[0]}\\d\\d\\d\\d\\.\\d\\d?\\.\\d\\d?\\b`
-            ),
-            "g"
-        ),
-        `$1:${branchPull}`
-    );
-    await moduleFs.promises.writeFile("README.md", data);
-    // security - sanitize commitMessage
-    commitMessage = commitMessage.trim().replace((/[$\u0027`]/g), "?");
-    moduleChildProcess.spawn(
-        "sh",
-        [
-            "-c",
-            (`
-(set -e
-    . ./jslint_ci.sh
-    npm run test2
-    git push . HEAD:__pr_${branchMerge}_pre -f
-    shGitSquashPop ${branchCheckpoint} \u0027${commitMessage}\u0027
-    git diff origin/${branchPull} || true
-    git push origin alpha:${branchPull} -f
-    git push origin alpha -f
-    shDirHttplinkValidate
-    git push . HEAD:__pr_${branchMerge} -f
-)
-            `)
-        ],
-        {stdio: ["ignore", 1, 2]}
-    ).on("exit", function (exitCode) {
-        moduleAssert.ok(
-            exitCode === 0,
-            `shGitPullrequest - exitCode=${exitCode}`
-        );
-    });
-}());
-' "$@" # '
-)}
-
-shGitPullrequestCleanup() {(set -e
-# This function will cleanup pull-request after merge.
-    git checkout alpha
-    git push . alpha:__pr_upstream_pre -f
-    git fetch upstream beta
-    # verify no diff between alpha..upstream/beta
-    git diff alpha..upstream/beta
-    git reset upstream/beta
-    git push . alpha:beta -f
-    git push origin alpha beta -f
-    sh jslint_ci.sh shMyciUpdate
-    git push . alpha:__pr_upstream -f
-)}
-
 shGitSquashPop() {(set -e
 # This function will squash HEAD to given $COMMIT.
 # http://stackoverflow.com/questions/5189560
@@ -1249,6 +1133,122 @@ shGithubFileUpload() {(set -e
 # example usage:
 # shGithubFileUpload octocat/hello-world/master/hello.txt hello.txt
     shGithubFileDownloadUpload upload "$1" "$2"
+)}
+
+shGithubPrCreate() {(set -e
+# This function will create-and-push a github-pull-commit to origin/alpha.
+    node --input-type=module --eval '
+// init debugInline
+(function () {
+    let consoleError = console.error;
+    globalThis.debugInline = globalThis.debugInline || function (...argList) {
+
+// This function will print <argv> to stderr and then return <argv>[0].
+
+        consoleError("\n\ndebugInline");
+        consoleError(...argList);
+        consoleError("\n");
+        return argList[0];
+    };
+}());
+import moduleAssert from "assert";
+import moduleChildProcess from "child_process";
+import moduleFs from "fs";
+(async function () {
+    let branchCheckpoint = process.argv[2] || "HEAD";
+    let branchMerge = process.argv[1] || "beta";
+    let branchPull;
+    let commitMessage;
+    let data;
+    let version = process.argv[3] || new Date().toISOString().slice(0, 10);
+    version = version.replace((/-0?/g), ".");
+    // security - sanitize branchXxx
+    [
+        branchCheckpoint, branchMerge, version
+    ] = [
+        branchCheckpoint, branchMerge, version
+    ].map(function (branch) {
+        return branch.trim().replace((/[^\w.\-]/g), "_");
+    });
+    data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
+    switch (branchMerge) {
+    case "master":
+        version = `v${version}`;
+        // update CHANGELOG.md
+        data = data.replace(
+            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
+            `\n\n# ${version}\n`
+        );
+        await moduleFs.promises.writeFile("CHANGELOG.md", data);
+        commitMessage = new RegExp(
+            `\n\n# ${version}\n[\\S\\s]+?\n\n`
+        ).exec(data)[0];
+        break;
+    default:
+        version = `p${version}`;
+        commitMessage = (
+            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)(?:\n- |\n\n)/
+        ).exec(data)[1];
+    }
+    branchPull = `branch-${version}`;
+    // update README.md
+    data = await moduleFs.promises.readFile("README.md", "utf8");
+    data = data.replace(
+        new RegExp(
+            (
+                "(\\bhttps:\\/\\/github\\.com\\/[\\w.\\-\\/]+?"
+                + "\\/compare"
+                + "\\/[\\w.\\-\\/]+?\\.\\.\\.[\\w.:\\-\\/]+?)"
+                + `:branch-${version[0]}\\d\\d\\d\\d\\.\\d\\d?\\.\\d\\d?\\b`
+            ),
+            "g"
+        ),
+        `$1:${branchPull}`
+    );
+    await moduleFs.promises.writeFile("README.md", data);
+    // security - sanitize commitMessage
+    commitMessage = commitMessage.trim().replace((/[$\u0027`]/g), "?");
+    moduleChildProcess.spawn(
+        "sh",
+        [
+            "-c",
+            (`
+(set -e
+    . ./jslint_ci.sh
+    npm run test2
+    git push . HEAD:__pr_${branchMerge}_pre -f
+    shGitSquashPop ${branchCheckpoint} \u0027${commitMessage}\u0027
+    git diff origin/${branchPull} || true
+    git push origin alpha:${branchPull} -f
+    git push origin alpha -f
+    shDirHttplinkValidate
+    git push . HEAD:__pr_${branchMerge} -f
+)
+            `)
+        ],
+        {stdio: ["ignore", 1, 2]}
+    ).on("exit", function (exitCode) {
+        moduleAssert.ok(
+            exitCode === 0,
+            `shGithubPrCreate - exitCode=${exitCode}`
+        );
+    });
+}());
+' "$@" # '
+)}
+
+shGithubPrCleanup() {(set -e
+# This function will cleanup pull-request after merge.
+    git checkout alpha
+    git push . alpha:__pr_upstream_pre -f
+    git fetch upstream beta
+    # verify no diff between alpha..upstream/beta
+    git diff alpha..upstream/beta
+    git reset upstream/beta
+    git push . alpha:beta -f
+    git push origin alpha beta -f
+    sh jslint_ci.sh shMyciUpdate
+    git push . alpha:__pr_upstream -f
 )}
 
 shGithubTokenExport() {
