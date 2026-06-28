@@ -1,7 +1,6 @@
 # Changelog
 
 # Todo
-- jslint-ecma - Unify ES2015-destructure-logic into function prefix_destructure().
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
 - jslint - Add ability to auto-fix whitespace.
@@ -11,6 +10,7 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.6.1-beta
+- jslint-ecma - Unify ES2015-destructure-logic into function prefix_destructure().
 - jslint-ecma - Update README.md, documenting supported ES2015+ features.
 - jslint - Update warning infix_in to recommend Object.hasOwn() over hasOwnProperty().
 - jslint-ecma - Add ES2025-feature RegExp Modifiers.

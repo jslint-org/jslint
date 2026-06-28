@@ -5274,6 +5274,7 @@ function jslint_phase3_parse(state) {
 
             warn("wrap_fart_parameter", token_now);
             the_fart.name = "anonymous";
+            the_fart.names = [token_prv];
             the_fart.parameters = [token_prv];
             the_fart.signature = token_prv.id;
             enroll(token_prv, "parameter", false);
@@ -5740,24 +5741,23 @@ function jslint_phase3_parse(state) {
         enroll,
         role,
         readonly,
-        names,
+        name_list,
         the_function,
         the_function_toplevel
     ) {
         const is_brace = token_now.id === "{";
-        const name_list = [];
-        const parameters = the_function?.parameters || [];
-        const signature = the_function?.signature || [];
         const the_destructure = token_now;
         let optional;
         function advance_and_signature_push(id) {
             advance(id);
-            signature.push(id);
-            switch (id) {
-            case ",":
-            case ":":
-                signature.push(" ");
-                break;
+            if (the_function?.signature) {
+                the_function.signature.push(id);
+                switch (id) {
+                case ",":
+                case ":":
+                    the_function.signature.push(" ");
+                    break;
+                }
             }
         }
         function name_list_push(name) {
@@ -5823,13 +5823,26 @@ function jslint_phase3_parse(state) {
 // ["let[{aa}]=0", "name_parse", "recurse_element", "", 0]
 
                 test_cause("recurse_element");
-                parameters_push(name);
                 advance_and_signature_push(token_nxt.id);
+                if (the_function_toplevel) {
+                    the_function.parameters.push(name);
+                    name.names = [];
+                    prefix_destructure(
+                        enroll,         // enroll
+                        role,           // role
+                        readonly,       // readonly
+                        name.names,     // name_list
+                        the_function,   // the_function
+                        false           // the_function_toplevel
+                    );
+                    name_list.push(...name.names);
+                    return;
+                }
                 prefix_destructure(
                     enroll,             // enroll
                     role,               // role
                     readonly,           // readonly
-                    names,              // names
+                    name_list,          // name_list
                     the_function,       // the_function
                     false               // the_function_toplevel
                 );
@@ -5852,7 +5865,6 @@ function jslint_phase3_parse(state) {
             if (is_brace) {
                 survey(name);
             }
-            parameters_push(name);
             advance_and_signature_push(token_nxt.id);
             if (is_brace && token_nxt.id === ":") {
                 advance_and_signature_push(":");
@@ -5876,9 +5888,15 @@ function jslint_phase3_parse(state) {
                 }
                 token_nxt.label = name;
                 name = token_nxt;
+                if (the_function_toplevel) {
+                    the_function.parameters.push(name);
+                }
                 name_list_push(name);
                 advance_and_signature_push(token_nxt.id);
                 return;
+            }
+            if (the_function_toplevel) {
+                the_function.parameters.push(name);
             }
             name_list_push(name);
 
@@ -5907,13 +5925,6 @@ function jslint_phase3_parse(state) {
 // ["function aa(aa=0,bb){}", "name_parse", "required_a_optional_b", "aa", 18]
 
                 warn("required_a_optional_b", name, name.id, optional.id);
-            }
-        }
-        function parameters_push(name) {
-            if (the_function_toplevel) {
-                names = [];
-                name.names = names;
-                parameters.push(name);
             }
         }
         while (true) {
@@ -5952,7 +5963,6 @@ function jslint_phase3_parse(state) {
         } else {
             advance_and_signature_push("]");
         }
-        names.push(...name_list);
         return the_destructure;
     }
 
@@ -6125,6 +6135,7 @@ function jslint_phase3_parse(state) {
 
 // This function will parse input <parameters> at beginning of <the_function>
 
+        the_function.names = [];
         the_function.parameters = [];
         the_function.signature = ["("];
         token_now.free = false;
@@ -6136,7 +6147,7 @@ function jslint_phase3_parse(state) {
                 enroll,                 // enroll
                 "parameter",            // role
                 false,                  // readonly
-                [],                     // names
+                the_function.names,     // name_list
                 the_function,           // the_function
                 true                    // the_function_toplevel
             );
@@ -6338,7 +6349,7 @@ function jslint_phase3_parse(state) {
                 undefined,              // enroll
                 "variable",             // role
                 false,                  // readonly
-                the_token.names,        // names
+                the_token.names,        // name_list
                 undefined,              // the_function
                 false                   // the_function_toplevel
             );
@@ -7386,7 +7397,7 @@ function jslint_phase3_parse(state) {
                     enroll,             // enroll
                     "variable",         // role
                     readonly,           // readonly
-                    the_variable.names, // names
+                    the_variable.names, // name_list
                     undefined,          // the_function
                     false               // the_function_toplevel
                 );
@@ -10273,14 +10284,10 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
             level,
             line,
             name,
-
-// Bugfix - fix html-report from crashing if parameters is undefined.
-
-            parameters = [],
+            names = [],
             signature
         } = the_function;
         let list = Object.keys(context);
-        let params;
         html += (
             "<div class=\"level level" + htmlEscape(level) + "\">"
             + address(line, from + 1)
@@ -10300,26 +10307,9 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
             )
             + "</dfn>"
         );
-        params = [];
-        parameters.forEach(function extract({
-            id,
-            names
-        }) {
-            switch (id) {
-            case "[":
-            case "{":
-
-// Recurse extract().
-
-                names.forEach(extract);
-                break;
-            case "ignore":
-                break;
-            default:
-                params.push(id);
-            }
-        });
-        html += detail("parameter", params.sort());
+        html += detail("parameter", names.map(function ({id}) {
+            return id;
+        }).sort());
         list.sort();
         html += detail("variable", list.filter(function (id) {
             return (
