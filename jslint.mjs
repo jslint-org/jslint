@@ -90,7 +90,7 @@
 
 // WARNING: JSLint will hurt your feelings.
 
-/*jslint beta, node*/
+/*jslint beta, node, trace*/
 /*property
     JSLINT_BETA,
     NODE_V8_COVERAGE,
@@ -5736,10 +5736,20 @@ function jslint_phase3_parse(state) {
         return the_await;
     }
 
-    function prefix_destructure(enroll, role, readonly, names, signature) {
+    function prefix_destructure(
+        enroll,
+        role,
+        readonly,
+        names,
+        the_function,
+        the_function_toplevel
+    ) {
         const is_brace = token_now.id === "{";
         const name_list = [];
+        const parameters = the_function?.parameters || [];
+        const signature = the_function?.signature || [];
         const the_destructure = token_now;
+        let optional;
         function advance_and_signature_push(id) {
             advance(id);
             signature.push(id);
@@ -5766,12 +5776,20 @@ function jslint_phase3_parse(state) {
             switch (name.id) {
             case "...":
                 advance_and_signature_push("...");
-                if (token_nxt.id === "...") {
+                name = token_nxt;
+                if (name.id === "...") {
 
 // test_cause:
-// ["let[... ...]=0", "name_parse", "unexpected_a_after_b", "...", 5]
+// ["let[... ...]=0", "name_parse", "unexpected_a_after_b", "...", 9]
 
                     return stop("unexpected_a_after_b", name, name.id, "...");
+                }
+                if (optional) {
+
+// test_cause:
+// ["function aa(aa=0,...){}", "name_parse", "required_a_optional_b", "aa", 21]
+
+                    warn("required_a_optional_b", name, name.id, optional.id);
                 }
 
 // test_cause:
@@ -5783,21 +5801,46 @@ function jslint_phase3_parse(state) {
                 return true;
             case "[":
             case "{":
+                if (the_function?.id === "=>" && !option_dict.fart) {
+
+// test_cause:
+// ["([aa])=>0", "name_parse", "use_function_not_fart", "=>", 7]
+// ["({aa})=>0", "name_parse", "use_function_not_fart", "=>", 7]
+
+                    warn("use_function_not_fart", the_function);
+                }
+                if (optional) {
+
+// test_cause:
+// ["function aa(aa=0,[]){}", "name_parse", "required_a_optional_b", "aa", 18]
+// ["function aa(aa=0,{}){}", "name_parse", "required_a_optional_b", "aa", 18]
+
+                    warn("required_a_optional_b", name, name.id, optional.id);
+                }
 
 // test_cause:
 // ["let[[aa]]=0", "name_parse", "recurse_element", "", 0]
 // ["let[{aa}]=0", "name_parse", "recurse_element", "", 0]
 
                 test_cause("recurse_element");
+                parameters_push(name);
                 advance_and_signature_push(token_nxt.id);
-                prefix_destructure(enroll, role, readonly, names, signature);
+                prefix_destructure(
+                    enroll,             // enroll
+                    role,               // role
+                    readonly,           // readonly
+                    names,              // names
+                    the_function,       // the_function
+                    false               // the_function_toplevel
+                );
                 return;
             }
             if (!name.identifier) {
 
 // test_cause:
-// ["function aa(aa=0,[]){}", "name_parse", "expected_identifier_a", "]", 19]
-// ["function aa(aa=0,{}){}", "name_parse", "expected_identifier_a", "}", 19]
+// ["function aa(...0){}", "name_parse", "expected_identifier_a", "0", 16]
+// ["function aa(0){}", "name_parse", "expected_identifier_a", "0", 13]
+// ["function aa([0]){}", "name_parse", "expected_identifier_a", "0", 14]
 // ["function aa({0}){}", "name_parse", "expected_identifier_a", "0", 14]
 // ["function aa({aa:0}){}", "name_parse", "expected_identifier_a", "0", 17]
 // ["let[...0]=0", "name_parse", "expected_identifier_a", "0", 8]
@@ -5809,10 +5852,11 @@ function jslint_phase3_parse(state) {
             if (is_brace) {
                 survey(name);
             }
+            parameters_push(name);
             advance_and_signature_push(token_nxt.id);
             if (is_brace && token_nxt.id === ":") {
                 advance_and_signature_push(":");
-                the_destructure.open = true;
+                the_destructure.open = !the_function_toplevel;
                 if (token_nxt.id === "...") {
 
 // test_cause:
@@ -5843,17 +5887,33 @@ function jslint_phase3_parse(state) {
 // ["const{aa}=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 11]
 
             if (token_nxt.id === "=") {
+                optional = the_function_toplevel && token_now;
                 advance_and_signature_push("=");
-                the_destructure.open = true;
+                the_destructure.open = !the_function_toplevel;
                 name.expression = parse_expression(0);
 
 // test_cause:
-// ["function aa([aa=aa],aa){}", "name_parse", "default", "", 0]
-// ["function aa({aa=aa},aa){}", "name_parse", "default", "", 0]
-// ["let[aa=0]=0", "name_parse", "default", "", 0]
-// ["let{aa=0}=0", "name_parse", "default", "", 0]
+// ["function aa([aa=aa]){}", "name_parse", "optional", "", 0]
+// ["function aa({aa=aa}){}", "name_parse", "optional", "", 0]
+// ["let[aa=0]=0", "name_parse", "optional", "", 0]
+// ["let{aa=0}=0", "name_parse", "optional", "", 0]
 
-                test_cause("default");
+                test_cause("optional");
+                return;
+            }
+            if (optional) {
+
+// test_cause:
+// ["function aa(aa=0,bb){}", "name_parse", "required_a_optional_b", "aa", 18]
+
+                warn("required_a_optional_b", name, name.id, optional.id);
+            }
+        }
+        function parameters_push(name) {
+            if (the_function_toplevel) {
+                names = [];
+                name.names = names;
+                parameters.push(name);
             }
         }
         while (true) {
@@ -5866,10 +5926,10 @@ function jslint_phase3_parse(state) {
                 test_cause("ignore");
                 advance_and_signature_push(",");
             }
-
-// Break from ellipsis.
-
             if (name_parse()) {
+
+// Break early from ellipsis.
+
                 break;
             }
             if (token_nxt.id !== ",") {
@@ -5877,7 +5937,9 @@ function jslint_phase3_parse(state) {
             }
             advance_and_signature_push(",");
         }
-        if (is_brace) {
+        if (the_function_toplevel) {
+            advance_and_signature_push(")");
+        } else if (is_brace) {
 
 // test_cause:
 // ["
@@ -6063,119 +6125,26 @@ function jslint_phase3_parse(state) {
 
 // This function will parse input <parameters> at beginning of <the_function>
 
-        const parameters = [];
-        let optional;
-        let signature = ["("];
-        function advance_and_signature_push(id) {
-            advance(id);
-            signature.push(id);
-            switch (id) {
-            case ",":
-            case ":":
-                signature.push(" ");
-                break;
-            }
-        }
-        function param_parse() {
-            let param = token_nxt;
-            switch (param.id) {
-            case "...":
-                advance_and_signature_push("...");
-                param = token_nxt;
-                if (optional !== undefined) {
-
-// test_cause:
-// ["function aa(aa=0,...){}", "param_parse", "required_a_optional_b", "aa", 21]
-
-                    warn("required_a_optional_b", param, param.id, optional.id);
-                }
-                if (!param.identifier) {
-
-// test_cause:
-// ["function aa(...0){}", "param_parse", "expected_identifier_a", "0", 16]
-
-                    return stop("expected_identifier_a", param);
-                }
-                enroll(param, "parameter", false);
-                parameters.push(param);
-                advance_and_signature_push(param.id);
-                break;
-            case "[":
-            case "{":
-
-// test_cause:
-// ["([aa])=>0", "param_parse", "use_function_not_fart", "=>", 7]
-// ["({aa})=>0", "param_parse", "use_function_not_fart", "=>", 7]
-
-                if (the_function.id === "=>" && !option_dict.fart) {
-                    warn("use_function_not_fart", the_function);
-                }
-                if (optional !== undefined) {
-
-// test_cause:
-// ["function aa(aa=0,[]){}", "param_parse", "required_a_optional_b", "aa", 18]
-// ["function aa(aa=0,{}){}", "param_parse", "required_a_optional_b", "aa", 18]
-
-                    warn("required_a_optional_b", param, param.id, optional.id);
-                }
-                param.names = [];
+        the_function.parameters = [];
+        the_function.signature = ["("];
+        token_now.free = false;
+        if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
 
 // PR-xxx - Unify ES2015-destructure-logic. - function([aa]) {...}
 
-                advance_and_signature_push(param.id);
-                prefix_destructure(
-                    enroll,
-                    "parameter",
-                    false,
-                    param.names,
-                    signature
-                );
-                parameters.push(param);
-                break;
-            default:
-                if (!param.identifier) {
-
-// test_cause:
-// ["function aa(0){}", "param_parse", "expected_identifier_a", "0", 13]
-
-                    return stop("expected_identifier_a", param);
-                }
-                enroll(param, "parameter", false);
-                parameters.push(param);
-                advance_and_signature_push(param.id);
-                if (token_nxt.id === "=") {
-                    advance("=");
-                    optional = param;
-                    param.expression = parse_expression(0);
-                } else {
-                    if (optional !== undefined) {
-
-// test_cause:
-// ["function aa(aa=0,bb){}", "param_parse", "required_a_optional_b", "aa", 18]
-
-                        warn(
-                            "required_a_optional_b",
-                            param,
-                            param.id,
-                            optional.id
-                        );
-                    }
-                }
-            }
+            prefix_destructure(
+                enroll,                 // enroll
+                "parameter",            // role
+                false,                  // readonly
+                [],                     // names
+                the_function,           // the_function
+                true                    // the_function_toplevel
+            );
+        } else {
+            advance(")");
+            the_function.signature.push(")");
         }
-        token_now.free = false;
-        if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
-            while (true) {
-                param_parse();
-                if (token_nxt.id !== ",") {
-                    break;
-                }
-                advance_and_signature_push(",");
-            }
-        }
-        advance_and_signature_push(")");
-        the_function.parameters = parameters;
-        the_function.signature = signature.join("");
+        the_function.signature = the_function.signature.join("");
     }
 
     function prefix_lbrace() {
@@ -6366,11 +6335,12 @@ function jslint_phase3_parse(state) {
 // PR-xxx - Unify ES2015-destructure-logic. - [aa] = ...;
 
             element = prefix_destructure(
-                undefined,
-                "variable",
-                false,
-                the_token.names,
-                []
+                undefined,              // enroll
+                "variable",             // role
+                false,                  // readonly
+                the_token.names,        // names
+                undefined,              // the_function
+                false                   // the_function_toplevel
             );
             advance("=");
             symbol("=").led_infix(element);
@@ -7413,11 +7383,12 @@ function jslint_phase3_parse(state) {
 // PR-xxx - Unify ES2015-destructure-logic. - let [aa] = ...;
 
                 prefix_destructure(
-                    enroll,
-                    "variable",
-                    readonly,
-                    the_variable.names,
-                    []
+                    enroll,             // enroll
+                    "variable",         // role
+                    readonly,           // readonly
+                    the_variable.names, // names
+                    undefined,          // the_function
+                    false               // the_function_toplevel
                 );
                 advance("=");
                 the_variable.expression = parse_expression(0);
