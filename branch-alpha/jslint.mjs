@@ -5745,7 +5745,7 @@ function jslint_phase3_parse(state) {
         the_function,
         the_function_toplevel
     ) {
-        const is_brace = token_now.id === "{";
+        const is_lbrace = token_now.id === "{";
         const the_destructure = token_now;
         let optional;
         function advance_and_signature_push(id) {
@@ -5848,13 +5848,15 @@ function jslint_phase3_parse(state) {
 
                 return stop("expected_identifier_a", name);
             }
-            if (is_brace) {
+            if (is_lbrace) {
                 survey(name);
             }
             advance_and_signature_push(token_nxt.id);
-            if (is_brace && token_nxt.id === ":") {
+            if (is_lbrace && token_nxt.id === ":") {
                 advance_and_signature_push(":");
-                the_destructure.open = !the_function_toplevel;
+                if (!the_function_toplevel) {
+                    the_destructure.open = true;
+                }
                 if (token_nxt.id === "...") {
 
 // test_cause:
@@ -5887,7 +5889,9 @@ function jslint_phase3_parse(state) {
             if (token_nxt.id === "=") {
                 optional = the_function_toplevel && token_now;
                 advance_and_signature_push("=");
-                the_destructure.open = !the_function_toplevel;
+                if (!the_function_toplevel) {
+                    the_destructure.open = true;
+                }
                 name.expression = parse_expression(0);
 
 // test_cause:
@@ -5908,7 +5912,7 @@ function jslint_phase3_parse(state) {
             }
         }
         while (true) {
-            if (!is_brace && !the_function_toplevel && token_nxt.id === ",") {
+            if (!is_lbrace && !the_function_toplevel && token_nxt.id === ",") {
 
 // test_cause:
 // ["(,aa)=>0", "name_parse", "expected_identifier_a", ",", 2]
@@ -5935,7 +5939,7 @@ function jslint_phase3_parse(state) {
         }
         if (the_function_toplevel) {
             advance_and_signature_push(")");
-        } else if (is_brace) {
+        } else if (is_lbrace) {
 
 // test_cause:
 // ["
@@ -7979,7 +7983,9 @@ function jslint_phase4_walk(state) {
         ) {
 
 // test_cause:
+// ["(aa=aa)=>0", "lookup", "out_of_scope_a", "aa", 5]
 // ["let aa;if(aa){let bb;}bb;", "lookup", "out_of_scope_a", "bb", 23]
+// ["let aa=bb;let bb=0;", "lookup", "out_of_scope_a", "bb", 8]
 
             warn("out_of_scope_a", thing);
         }
@@ -8452,6 +8458,21 @@ function jslint_phase4_walk(state) {
 
                 test_cause("let aa=0");
                 walk_expression(name.expression);
+
+// Probably deadcode.
+// if (name.id === "{" || name.id === "[") {
+//     name.names.forEach(subactivate);
+// } else {
+//     name.init = true;
+// }
+
+// PR-500 - Unify property the_function.parameters into the_function.names.
+
+// jslint_assert(
+// !(name.id === "{" || name.id === "["),
+// `Expected !(name.id === "{" || name.id === "[").`
+// );
+
                 name.init = true;
             } else {
 
@@ -8825,6 +8846,16 @@ function jslint_phase4_walk(state) {
 
 // PR-500 - Unify property the_function.parameters into the_function.names.
 
+// thing.parameters.forEach(function (name) {
+//     walk_expression(name.expression);
+//     if (name.id === "{" || name.id === "[") {
+//         name.names.forEach(subactivate);
+//     } else {
+//         name.dead = false;
+//         name.init = true;
+//     }
+// });
+
         thing.names.forEach(function (name) {
             if (name.expression) {
 
@@ -8869,6 +8900,14 @@ function jslint_phase4_walk(state) {
             the_variable.used += 1;
         }
     }
+
+// PR-500 - Unify property the_function.parameters into the_function.names.
+
+// function subactivate(name) {
+//     name.init = true;
+//     name.dead = false;
+//     blockage.live.push(name);
+// }
 
     function walk_expression(thing) {
         if (thing) {
@@ -9060,7 +9099,7 @@ function jslint_phase5_whitage(state) {
 // "switch(){}"
 // "while(){}"
 
-    let indent_method_dict = {};
+    let indent_method_dict = empty();
     let indentage;
     let left = token_global;
     let margin = 0;
