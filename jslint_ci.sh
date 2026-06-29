@@ -304,10 +304,10 @@ shCiArtifactUpload() {(set -e
     export GITHUB_BRANCH0="$(git branch --show-current)"
     git pull --unshallow origin "$GITHUB_BRANCH0"
     # init $UPSTREAM_XXX
-    export UPSTREAM_REPOSITORY="$(node -p '(
-    /^(?:git\+)?https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
-).exec(require("./package.json").repository.url)[1]
-')" # '
+    export UPSTREAM_REPOSITORY="$(sed -En \
+        -e 's|.*"git\+https://github\.com/([^.]+)\.git".*|\1|p' \
+        package.json
+    )"
     export UPSTREAM_GITHUB_IO="$(
         printf "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
@@ -641,10 +641,10 @@ shDirHttplinkValidate() {(set -e
     # init $GITHUB_BRANCH0
     export GITHUB_BRANCH0="${GITHUB_BRANCH0:-alpha}"
     # init $UPSTREAM_XXX
-    export UPSTREAM_REPOSITORY="$(node -p '(
-    /^(?:git\+)?https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
-).exec(require("./package.json").repository.url)[1]
-')" # '
+    export UPSTREAM_REPOSITORY="$(sed -En \
+        -e 's|.*"git\+https://github\.com/([^.]+)\.git".*|\1|p' \
+        package.json
+    )"
     export UPSTREAM_GITHUB_IO="$(
         printf "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
@@ -1145,7 +1145,7 @@ shGithubPrCreate() {(set -e
     let consoleError = console.error;
     globalThis.debugInline = globalThis.debugInline || function (...argList) {
 
-// This function will print <argv> to stderr and then return <argv>[0].
+// This function will print <argList> to stderr and then return <argList>[0].
 
         consoleError("\n\ndebugInline");
         consoleError(...argList);
@@ -1253,6 +1253,44 @@ shGithubPrCleanup() {(set -e
     git push . alpha:__pr_upstream -f
 )}
 
+shGithubPrUpdatePrxxx() {(set -e
+# This function will update 'PR-xxx' placeholder in codebase
+# to next sequential github issue/pull number.
+    if ! (git grep -Ei -e '^ *?(//|#) pr-xxx')
+    then
+        return
+    fi
+    export UPSTREAM_REPOSITORY="$(sed -En \
+        -e 's|.*"git\+https://github\.com/([^.]+)\.git".*|\1|p' \
+        package.json
+    )"
+    PR_XXX="$(curl -fs --ssl-no-revoke \
+"https://api.github.com/repos/$UPSTREAM_REPOSITORY/issues?per_page=1&state=all"
+    )"
+    PR_XXX="$(
+        printf "$PR_XXX" | sed -En -e 's/.*"number": ([0-9]+).*/\1/p'
+    )"
+    if [ ! "$PR_XXX" ]
+    then
+        return
+    fi
+    PR_XXX="PR-$((PR_XXX + 1))"
+    FILE_LIST="$(
+        git grep -Ei -e '^ *?(//|#) pr-xxx - ' | sed -E -e 's/:.*//' | sort -u
+    )"
+    for FILE in $FILE_LIST
+    do
+        sed -Ei.bak \
+            -e "s/^ *?(\/\/|#) pr-xxx - /\1 $PR_XXX - /gi" \
+            "$FILE" && \
+            rm -f "$FILE".bak
+    done
+    git diff
+    git grep -Ei -e '^ *?(//|#) pr-xxx' || true
+    git commit -am "- ci - Update 'PR-xxx' placeholder to '${PR_XXX}'."
+    git log -n 2
+)}
+
 shGithubTokenExport() {
 # This function will export $MY_GITHUB_TOKEN from file.
     if [ ! "$MY_GITHUB_TOKEN" ]
@@ -1273,6 +1311,7 @@ shGithubWorkflowDispatch() {(set -e
     EXIT_CODE=0
     curl \
 "https://api.github.com/repos/$REPO/actions/workflows/ci.yml/dispatches" \
+        --ssl-no-revoke \
         -H "accept: application/vnd.github.v3+json" \
         -H "authorization: Bearer $MY_GITHUB_TOKEN" \
         -X POST \
