@@ -403,14 +403,14 @@ let debugInline = (function () {
     let __consoleError = function () {
         return;
     };
-    function debug(...argv) {
+    function debug(...argList) {
 
-// This function will print <argv> to stderr and then return <argv>[0].
+// This function will print <argList> to stderr and then return <argList>[0].
 
         __consoleError("\n\ndebugInline");
-        __consoleError(...argv);
+        __consoleError(...argList);
         __consoleError("\n");
-        return argv[0];
+        return argList[0];
     }
     debug(); // Coverage-hack.
     __consoleError = console.error; //jslint-ignore-line
@@ -5763,7 +5763,7 @@ function jslint_phase3_parse(state) {
         function name_list_push(name) {
             name_list.push(name);
 
-// PR-xxx - Fix false-warning "uninitialized_a" in statement ";[aa]=0;".
+// PR-500 - Fix false-warning "uninitialized_a" in statement ";[aa]=0;".
 
             name.arity = role;
             if (enroll) {
@@ -6126,7 +6126,7 @@ function jslint_phase3_parse(state) {
         token_now.free = false;
         if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
 
-// PR-xxx - Unify ES2015-destructure-logic. - function([aa]) {...}
+// PR-500 - Unify ES2015-destructure-logic. - function([aa]) {...}
 
             prefix_destructure(
                 enroll,                 // enroll
@@ -6328,7 +6328,7 @@ function jslint_phase3_parse(state) {
             the_token = token_now.assignment;
             the_token.names = [];
 
-// PR-xxx - Unify ES2015-destructure-logic. - [aa] = ...;
+// PR-500 - Unify ES2015-destructure-logic. - [aa] = ...;
 
             element = prefix_destructure(
                 undefined,              // enroll
@@ -7376,7 +7376,7 @@ function jslint_phase3_parse(state) {
                 }
                 advance();
 
-// PR-xxx - Unify ES2015-destructure-logic. - let [aa] = ...;
+// PR-500 - Unify ES2015-destructure-logic. - let [aa] = ...;
 
                 prefix_destructure(
                     enroll,             // enroll
@@ -7998,7 +7998,7 @@ function jslint_phase4_walk(state) {
             if (thing.names !== undefined) {
                 if (Array.isArray(thing.names)) {
 
-// PR-xxx - Fix false-warning "uninitialized_a" in statement ";[aa]=0;".
+// PR-500 - Fix false-warning "uninitialized_a" in statement ";[aa]=0;".
 
 // test_cause:
 // [";[aa]=0", "post_a", ";[aa]=0", "", 0]
@@ -8823,7 +8823,7 @@ function jslint_phase4_walk(state) {
             }
         }
 
-// PR-xxx - Unify property the_function.parameters into the_function.names.
+// PR-500 - Unify property the_function.parameters into the_function.names.
 
         thing.names.forEach(function (name) {
             if (name.expression) {

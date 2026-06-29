@@ -691,7 +691,7 @@ jstestDescribe((
             ],
             destructure: [
 
-// PR-xxx - Unify ES2015-destructure-logic.
+// PR-500 - Unify ES2015-destructure-logic.
 
                 [
                     `(function ({expr}) {\n    aa(bb, cc, dd, zz);\n}());`,

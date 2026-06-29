@@ -1010,129 +1010,171 @@ if (false) {
 
 <br><br>
 ### pull-request merge
-1. find highest issue-number at https://github.com/jslint-org/jslint/issues/, https://github.com/jslint-org/jslint/pulls/, and add +1 to it for PR-xxx
-1. checkpoint local-branch-beta
-1. `sh jslint_ci.sh shGithubPrCreate beta beta # 20xx-xx-xx`
-    - verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions
-1. `git push upstream alpha -f`
-    - verify ci-success for upstream-branch-alpha
-    - https://github.com/jslint-org/jslint/actions
+1. update `.github/workflows/ci.yml` `.github/workflows/publish.yml` to:
+    - latest nodejs-lts version @ https://nodejs.org/en/about/previous-releases
+1. update `CHANGELOG.md`
+    - verify `<CHANGELOG.md entry #1>` is most-relevant to pull-request.
+    - run
+        ```shell
+        npm run test2 # re-run until version propagates
+
+        git commit -am "<CHANGELOG.md entries>"
+        ```
+    - run
+        ```shell
+        sh jslint_ci.sh shGithubPrUpdatePrxxx
+
+        git push . HEAD:beta -f
+
+        sh jslint_ci.sh shGithubPrCreate beta beta # 20xx-xx-xx
+
+        git push upstream alpha -f
+        ```
+        - verify ci-success @ https://github.com/kaizhu256/jslint/actions
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions
+
 1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2026.6.28
-1. click `Create pull request`
-1. input `Add your description here...` with:
-```
-Fixes #xxx.
-- <primary-commit-message>
+    - click `Create pull request`
+    - input `Add a title *` with: `<CHANGELOG.md entry #1>`
+    - input `Add a description` with:
+        ```
+        Fixes #xxx.
 
-This PR will ...
+        This PR will:
+        <CHANGELOG.md entry #1>
 
-This PR will additionally:
-- <secondary-commit-message>
-...
+        This PR will additionally:
+        <CHANGELOG.md entry extra>
 
-<screenshot>
-```
-1. verify `commit into jslint-org:beta`
-1. click `Create pull request`
-    - verify ci-success for pull-request
-    - https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
+        <screenshot>
+        ```
+    - verify:
+        - base respository: `jslint-org/jslint`
+        - base: `beta`
+    - click `Create pull request`
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
+
 1. wait awhile before continuing ...
-1. click `Squash and merge`
-    - verify ci-success for upstream-branch-beta
-    - https://github.com/jslint-org/jslint/actions
-1. `sh jslint_ci.sh shGithubPrCleanup`
-    - verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions
-1. `git push upstream alpha -f`
-    - verify ci-success for upstream-branch-alpha
-    - https://github.com/jslint-org/jslint/actions
-1. click `Delete branch`
+    - click `Squash and merge`
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions
+    - run
+        ```shell
+        sh jslint_ci.sh shGithubPrCleanup
+
+        git push upstream alpha -f
+        ```
+        - verify ci-success @ https://github.com/kaizhu256/jslint/actions
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions
+    - click `Delete branch`
 
 
 <br><br>
 ### branch-master commit
-1. update ci.yml to latest nodejs-lts
-1. checkpoint local-branch-beta
-1. `sh jslint_ci.sh shGithubPrCreate master beta # re-run until version propagates`
-    - verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions
-1. `git push upstream alpha -f`
-    - verify ci-success for upstream-branch-alpha
-    - https://github.com/jslint-org/jslint/actions
+1. update `.github/workflows/ci.yml` `.github/workflows/publish.yml` to:
+    - latest nodejs-lts version @ https://nodejs.org/en/about/previous-releases
+1. update `CHANGELOG.md`
+    - verify `<CHANGELOG.md entry #1>` is most-relevant to pull-request.
+    - run
+        ```shell
+        npm run test2 # re-run until version propagates
+
+        git commit -am "<CHANGELOG.md entries>"
+        ```
+    - run
+        ```shell
+        sh jslint_ci.sh shGithubPrUpdatePrxxx
+
+        git push . HEAD:beta -f
+
+        sh jslint_ci.sh shGithubPrCreate master beta
+
+        git push upstream alpha -f
+        ```
+        - verify ci-success @ https://github.com/kaizhu256/jslint/actions
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions
+
 1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v2026.4.30
-1. click `Create pull request`
-1. input `Add a title` with: `# v20yy.mm.dd`
-1. input `Add a description` with:
-```
-- <primary-commit-message>
-- <secondary-commit-message>
-```
-1. verify `commit into jslint-org:beta`
-1. click `Create pull request`
-    - verify ci-success for pull-request
-    - https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
+    - click `Create pull request`
+    - input `Add a title *` with: `# v20yy.mm.dd`
+    - input `Add a description` with:
+        ```
+        <CHANGELOG.md entry #1>
+        <CHANGELOG.md entry extra>
+        ```
+    - verify:
+        - base respository: `jslint-org/jslint`
+        - base: `beta`
+    - click `Create pull request`
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
+
 1. wait awhile before continuing ...
-1. click `Squash and merge`
-    - verify ci-success for upstream-branch-beta
-    - https://github.com/jslint-org/jslint/actions
-1. `sh jslint_ci.sh shGithubPrCleanup`
-    - verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions
-1. `git push upstream alpha -f`
-    - verify ci-success for upstream-branch-alpha
-    - https://github.com/jslint-org/jslint/actions
-1. click `Delete branch`
-1. `git push origin beta:master`
-    - verify ci-success for origin-branch-master
-    - https://github.com/kaizhu256/jslint/actions
-1. `git push upstream beta:master`
-    - verify ci-success for upstream-branch-master
-    - https://github.com/jslint-org/jslint/actions
+    - click `Squash and merge`
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions
+    - run
+        ```shell
+        sh jslint_ci.sh shGithubPrCleanup
+
+        git push upstream alpha -f
+        ```
+        - verify ci-success @ https://github.com/kaizhu256/jslint/actions
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions
+    - click `Delete branch`
+    - run
+        ```shell
+        git push origin beta:master
+
+        git push upstream beta:master
+        ```
+        - verify ci-success @ https://github.com/kaizhu256/jslint/actions
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions
 
 
 <br><br>
 ### branch-master publish
 1. goto https://www.npmjs.com/package/@jslint-org/jslint/access <!--no-validate-->
-1. click `Github Actions`
-1. input `Organization or user*` with: `jslint-org`
-1. input `Repository*` with: `jslint`
-1. input `Workflow filename*` with: `publish.yml`
-1. click `Set up connection` or `Update Package Settings`
-1. `git push upstream beta:master`
-    - verify ci-success for upstream-branch-master
-    - https://github.com/jslint-org/jslint/actions
+    - click `Github Actions`
+    - input `Organization or user*` with: `jslint-org`
+    - input `Repository*` with: `jslint`
+    - input `Workflow filename*` with: `publish.yml`
+    - click `Set up connection` or `Update Package Settings`
+1.
+    - run
+        ```shell
+        git push upstream beta:master
+        ```
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions
 1. goto https://github.com/jslint-org/jslint/releases/new
-1. input `Choose a tag` with: `v20yy.mm.dd`
-1. click `Create new tag: v20yy.mm.dd on publish`
-    - verify correct-year `20yy`
-1. select `Target: master`
-1. select `Previous tag:auto`
-1. input `Release title` with: `v20yy.mm.dd - <primary-commit-message>`
-1. input `Describe this release` with:
-```
-- <primary-commit-message>
-- <secondary-commit-message>
-```
-1. click `Generate release notes`
-1. click `Set as the latest release`
-1. click `Preview` and review
-1. click `Publish release`
-    - verify ci-success for upstream-branch-publish
-    - https://github.com/jslint-org/jslint/actions
-    - verify email-notification `Successfully published @jslint-org/jslint@20yy.mm.dd`
+    - input `Tag: Select tag` with: `v20yy.mm.dd`
+        - click `Create new tag` and click `Create`
+        - verify correct-year `v20yy.mm.dd`
+        - select `Target: master`
+    - input `Release title` with: `v20yy.mm.dd - <CHANGELOG.md entry #1>`
+        - select `Previous tag: Auto`
+        - click `Generate release notes`
+    - input `Write` with:
+        ```
+        <CHANGELOG.md entry #1>
+        <CHANGELOG.md entry extra>
+
+        **Full Changelog**: ...
+        ```
+        - click `Preview` and review
+    - click `Latest`
+    - click `Publish release`
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions
+        - verify email-notification `Successfully published @jslint-org/jslint@20yy.mm.dd`
 
 
 <br><br>
 ### vscode-jslint publish
 1. goto https://github.com/jslint-org/jslint/tree/gh-pages/branch-beta/.artifact/jslint_wrapper_vscode
-1. click `vscode-jslint-20yy.mm.dd.vsix`
-1. click `Raw` to download
+    - click `vscode-jslint-20yy.mm.dd.vsix`
+    - click `Raw` to download
 1. goto https://marketplace.visualstudio.com/manage/publishers/jslint
-1. right-click `Update`
-1. upload downloaded file `vscode-jslint-20yy.mm.dd.vsix`
-1. click 'Upload'
-1. verify email-notification `[Succeeded] Extension publish on Visual Studio Marketplace - vscode-jslint`
+    - move mouse to version-number, right-click, and select `Update`
+    - upload downloaded file `vscode-jslint-20yy.mm.dd.vsix`
+    - click 'Upload'
+        - verify email-notification `[Succeeded] Extension publish on Visual Studio Marketplace - vscode-jslint`
 
 
 <!--
