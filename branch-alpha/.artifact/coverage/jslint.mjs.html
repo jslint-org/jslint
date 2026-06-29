@@ -5910,7 +5910,7 @@ body {
 <pre><span class="lineno"><a href="#line_5745" id="line_5745"> 5745.</a></span><span class="count                ">   1880</span><span>        the_function,</span></pre>
 <pre><span class="lineno"><a href="#line_5746" id="line_5746"> 5746.</a></span><span class="count                ">   1880</span><span>        the_function_toplevel</span></pre>
 <pre><span class="lineno"><a href="#line_5747" id="line_5747"> 5747.</a></span><span class="count                ">   1880</span><span>    ) {</span></pre>
-<pre><span class="lineno"><a href="#line_5748" id="line_5748"> 5748.</a></span><span class="count                ">   1880</span><span>        const is_lbrace = token_now.id === "{";</span></pre>
+<pre><span class="lineno"><a href="#line_5748" id="line_5748"> 5748.</a></span><span class="count                ">   1880</span><span>        const is_brace = token_now.id === "{";</span></pre>
 <pre><span class="lineno"><a href="#line_5749" id="line_5749"> 5749.</a></span><span class="count                ">   1880</span><span>        const the_destructure = token_now;</span></pre>
 <pre><span class="lineno"><a href="#line_5750" id="line_5750"> 5750.</a></span><span class="count                ">   1880</span><span>        let optional;</span></pre>
 <pre><span class="lineno"><a href="#line_5751" id="line_5751"> 5751.</a></span><span class="count                ">   6774</span><span>        function advance_and_signature_push(id) {</span></pre>
@@ -6013,11 +6013,11 @@ body {
 <pre><span class="lineno"><a href="#line_5848" id="line_5848"> 5848.</a></span><span class="count                ">     12</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_5849" id="line_5849"> 5849.</a></span><span class="count                ">     12</span><span>                return stop("expected_identifier_a", name);</span></pre>
 <pre><span class="lineno"><a href="#line_5850" id="line_5850"> 5850.</a></span><span class="count                ">   3027</span><span>            }</span></pre>
-<pre><span class="lineno"><a href="#line_5851" id="line_5851"> 5851.</a></span><span class="count                ">   3027</span><span>            if (is_lbrace) {</span></pre>
+<pre><span class="lineno"><a href="#line_5851" id="line_5851"> 5851.</a></span><span class="count                ">   3027</span><span>            if (is_brace) {</span></pre>
 <pre><span class="lineno"><a href="#line_5852" id="line_5852"> 5852.</a></span><span class="count                ">   1002</span><span>                survey(name);</span></pre>
 <pre><span class="lineno"><a href="#line_5853" id="line_5853"> 5853.</a></span><span class="count                ">   3027</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_5854" id="line_5854"> 5854.</a></span><span class="count                ">   3027</span><span>            advance_and_signature_push(token_nxt.id);</span></pre>
-<pre><span class="lineno"><a href="#line_5855" id="line_5855"> 5855.</a></span><span class="count                ">   3027</span><span>            if (is_lbrace &amp;&amp; token_nxt.id === ":") {</span></pre>
+<pre><span class="lineno"><a href="#line_5855" id="line_5855"> 5855.</a></span><span class="count                ">   3027</span><span>            if (is_brace &amp;&amp; token_nxt.id === ":") {</span></pre>
 <pre><span class="lineno"><a href="#line_5856" id="line_5856"> 5856.</a></span><span class="count                ">     18</span><span>                advance_and_signature_push(":");</span></pre>
 <pre><span class="lineno"><a href="#line_5857" id="line_5857"> 5857.</a></span><span class="count                ">     18</span><span>                if (!the_function_toplevel) {</span></pre>
 <pre><span class="lineno"><a href="#line_5858" id="line_5858"> 5858.</a></span><span class="count                ">     18</span><span>                    the_destructure.open = true;</span></pre>
@@ -6077,7 +6077,7 @@ body {
 <pre><span class="lineno"><a href="#line_5912" id="line_5912"> 5912.</a></span><span class="count                ">      1</span><span>            }</span></pre>
 <pre><span class="lineno"><a href="#line_5913" id="line_5913"> 5913.</a></span><span class="count                ">   3351</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_5914" id="line_5914"> 5914.</a></span><span class="count                ">   3327</span><span>        while (true) {</span></pre>
-<pre><span class="lineno"><a href="#line_5915" id="line_5915"> 5915.</a></span><span class="count                ">   3327</span><span>            if (!is_lbrace &amp;&amp; !the_function_toplevel &amp;&amp; token_nxt.id === ",") {</span></pre>
+<pre><span class="lineno"><a href="#line_5915" id="line_5915"> 5915.</a></span><span class="count                ">   3327</span><span>            if (!is_brace &amp;&amp; !the_function_toplevel &amp;&amp; token_nxt.id === ",") {</span></pre>
 <pre><span class="lineno"><a href="#line_5916" id="line_5916"> 5916.</a></span><span class="count                ">   3327</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_5917" id="line_5917"> 5917.</a></span><span class="count                ">   3327</span><span>// test_cause:</span></pre>
 <pre><span class="lineno"><a href="#line_5918" id="line_5918"> 5918.</a></span><span class="count                ">   3327</span><span>// ["(,aa)=&gt;0", "name_parse", "expected_identifier_a", ",", 2]</span></pre>
@@ -6104,7 +6104,7 @@ body {
 <pre><span class="lineno"><a href="#line_5939" id="line_5939"> 5939.</a></span><span class="count                ">   3327</span><span>        }</span></pre>
 <pre><span class="lineno"><a href="#line_5940" id="line_5940"> 5940.</a></span><span class="count                ">   1861</span><span>        if (the_function_toplevel) {</span></pre>
 <pre><span class="lineno"><a href="#line_5941" id="line_5941"> 5941.</a></span><span class="count                ">   1492</span><span>            advance_and_signature_push(")");</span></pre>
-<pre><span class="lineno"><a href="#line_5942" id="line_5942"> 5942.</a></span><span class="count                ">   1492</span><span>        } else if (is_lbrace) {</span></pre>
+<pre><span class="lineno"><a href="#line_5942" id="line_5942"> 5942.</a></span><span class="count                ">   1492</span><span>        } else if (is_brace) {</span></pre>
 <pre><span class="lineno"><a href="#line_5943" id="line_5943"> 5943.</a></span><span class="count                ">    369</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_5944" id="line_5944"> 5944.</a></span><span class="count                ">    369</span><span>// test_cause:</span></pre>
 <pre><span class="lineno"><a href="#line_5945" id="line_5945"> 5945.</a></span><span class="count                ">    369</span><span>// ["</span></pre>

@@ -5745,7 +5745,7 @@ function jslint_phase3_parse(state) {
         the_function,
         the_function_toplevel
     ) {
-        const is_lbrace = token_now.id === "{";
+        const is_brace = token_now.id === "{";
         const the_destructure = token_now;
         let optional;
         function advance_and_signature_push(id) {
@@ -5848,11 +5848,11 @@ function jslint_phase3_parse(state) {
 
                 return stop("expected_identifier_a", name);
             }
-            if (is_lbrace) {
+            if (is_brace) {
                 survey(name);
             }
             advance_and_signature_push(token_nxt.id);
-            if (is_lbrace && token_nxt.id === ":") {
+            if (is_brace && token_nxt.id === ":") {
                 advance_and_signature_push(":");
                 if (!the_function_toplevel) {
                     the_destructure.open = true;
@@ -5912,7 +5912,7 @@ function jslint_phase3_parse(state) {
             }
         }
         while (true) {
-            if (!is_lbrace && !the_function_toplevel && token_nxt.id === ",") {
+            if (!is_brace && !the_function_toplevel && token_nxt.id === ",") {
 
 // test_cause:
 // ["(,aa)=>0", "name_parse", "expected_identifier_a", ",", 2]
@@ -5939,7 +5939,7 @@ function jslint_phase3_parse(state) {
         }
         if (the_function_toplevel) {
             advance_and_signature_push(")");
-        } else if (is_lbrace) {
+        } else if (is_brace) {
 
 // test_cause:
 // ["
