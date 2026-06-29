@@ -884,105 +884,105 @@ if (false) {
 
 | #. | JSLint Support | ES Version | ES Feature |
 |--:|:--|:--|:--|
-|  99. | &#x274c; | ES2027 | [`Explicit Resource Management`](https://github.com/tc39/proposal-explicit-resource-management) |
-|  98. | &#x2705; | ES2027 | [`Atomics.pause`](https://github.com/tc39/proposal-atomics-microwait) |
-|  97. | &#x274c; | ES2027 | [`Joint Iteration`](https://github.com/tc39/proposal-joint-iteration) |
-|  96. | &#x2705; | ES2027 | [`Temporal`](https://github.com/tc39/proposal-temporal) |
-|  95. | &#x2705; | ES2026 | [`Upsert`](https://github.com/tc39/proposal-upsert) |
-|  94. | &#x2705; | ES2026 | [`JSON.parse source text access`](https://github.com/tc39/proposal-json-parse-with-source) |
-|  93. | &#x274c; | ES2026 | [`Iterator Sequencing`](https://github.com/tc39/proposal-iterator-sequencing) |
-|  92. | &#x2705; | ES2026 | [`Uint8Array to/from Base64`](https://github.com/tc39/proposal-arraybuffer-base64) |
-|  91. | &#x2705; | ES2026 | [`Math.sumPrecise`](https://github.com/tc39/proposal-math-sum) |
-|  90. | &#x2705; | ES2026 | [`Error.isError`](https://github.com/tc39/proposal-is-error) |
-|  89. | &#x2705; | ES2026 | [`Array.fromAsync`](https://github.com/tc39/proposal-array-from-async) |
-|  88. | &#x2705; | ES2025 | [`RegExp.escape`](https://github.com/tc39/proposal-regex-escaping) |
-|  87. | &#x2705; | ES2025 | [`Redeclarable global eval-introduced vars`](https://github.com/tc39/proposal-redeclarable-global-eval-vars) |
-|  86. | &#x2705; | ES2025 | [`Float16 on TypedArrays, DataView, Math.f16round`](https://github.com/tc39/proposal-float16array) |
-|  85. | &#x2705; | ES2025 | [`Promise.try`](https://github.com/tc39/proposal-promise-try) |
-|  84. | &#x274c; | ES2025 | [`Sync Iterator helpers`](https://github.com/tc39/proposal-iterator-helpers) |
-|  83. | &#x2705; | ES2025 | [`JSON Modules`](https://github.com/tc39/proposal-json-modules) |
-|  82. | &#x2705; | ES2025 | [`Import Attributes`](https://github.com/tc39/proposal-import-attributes) |
-|  81. | &#x2705; | ES2025 | [`RegExp Modifiers`](https://github.com/tc39/proposal-regexp-modifiers) |
-|  80. | &#x2705; | ES2025 | [`New Set methods`](https://github.com/tc39/proposal-set-methods) |
-|  79. | &#x2705; | ES2025 | [`Duplicate named capture groups`](https://github.com/tc39/proposal-duplicate-named-capturing-groups) |
-|  78. | &#x2705; | ES2024 | [`ArrayBuffer transfer`](https://github.com/tc39/proposal-arraybuffer-transfer) |
-|  77. | &#x2705; | ES2024 | [`Promise.withResolvers`](https://github.com/tc39/proposal-promise-with-resolvers) |
-|  76. | &#x2705; | ES2024 | [`Array Grouping`](https://github.com/tc39/proposal-array-grouping) |
-|  75. | &#x2705; | ES2024 | [`Resizable and growable ArrayBuffers`](https://github.com/tc39/proposal-resizablearraybuffer) |
-|  74. | &#x26a0; | ES2024 | [`RegExp v flag with set notation + properties of strings`](https://github.com/tc39/proposal-regexp-v-flag) |
-|  73. | &#x2705; | ES2024 | [`Atomics.waitAsync`](https://github.com/tc39/proposal-atomics-wait-async) |
-|  72. | &#x2705; | ES2024 | [`Well-Formed Unicode Strings`](https://github.com/tc39/proposal-is-usv-string) |
-|  71. | &#x2705; | ES2023 | [`Change Array by Copy`](https://github.com/tc39/proposal-change-array-by-copy) |
-|  70. | &#x2705; | ES2023 | [`Symbols as WeakMap keys`](https://github.com/tc39/proposal-symbols-as-weakmap-keys) |
-|  69. | &#x2705; | ES2023 | [`Hashbang Grammar`](https://github.com/tc39/proposal-hashbang) |
-|  68. | &#x2705; | ES2023 | [`Array find from last`](https://github.com/tc39/proposal-array-find-from-last) |
-|  67. | &#x2705; | ES2022 | [`Error Cause`](https://github.com/tc39/proposal-error-cause) |
-|  66. | &#x274c; | ES2022 | [`Class Static Block`](https://github.com/tc39/proposal-class-static-block) |
-|  65. | &#x2705; | ES2022 | [`Accessible Object.prototype.hasOwnProperty`](https://github.com/tc39/proposal-accessible-object-hasownproperty) |
-|  64. | &#x2705; | ES2022 | [`.at()`](https://github.com/tc39/proposal-relative-indexing-method) |
-|  63. | &#x274c; | ES2022 | [`Ergonomic brand checks for Private Fields`](https://github.com/tc39/proposal-private-fields-in-in) |
-|  62. | &#x2705; | ES2022 | [`Top-level await`](https://github.com/tc39/proposal-top-level-await) |
-|  61. | &#x2705; | ES2022 | [`RegExp Match Indices`](https://github.com/tc39/proposal-regexp-match-indices) |
-|  60. | &#x274c; | ES2022 | [`Class Public Instance Fields & Private Instance Fields`](https://github.com/tc39/proposal-class-fields) |
-|  59. | &#x2705; | ES2021 | [`Numeric separators`](https://github.com/tc39/proposal-numeric-separator) |
-|  58. | &#x2705; | ES2021 | [`Logical Assignment Operators`](https://github.com/tc39/proposal-logical-assignment) |
-|  57. | &#x2705; | ES2021 | [`WeakRefs`](https://github.com/tc39/proposal-weakrefs) |
-|  56. | &#x2705; | ES2021 | [`Promise.any`](https://github.com/tc39/proposal-promise-any) |
-|  55. | &#x2705; | ES2021 | [`String.prototype.replaceAll`](https://github.com/tc39/proposal-string-replaceall) |
-|  54. | &#x2705; | ES2020 | [`import.meta`](https://github.com/tc39/proposal-import-meta) |
-|  53. | &#x2705; | ES2020 | [`Nullish coalescing Operator`](https://github.com/tc39/proposal-nullish-coalescing) |
-|  52. | &#x2705; | ES2020 | [`Optional Chaining`](https://github.com/tc39/proposal-optional-chaining) |
-|  51. | &#x2705; | ES2020 | [`for-in mechanics`](https://github.com/tc39/proposal-for-in-order) |
-|  50. | &#x2705; | ES2020 | [`globalThis`](https://github.com/tc39/proposal-global) |
-|  49. | &#x2705; | ES2020 | [`Promise.allSettled`](https://github.com/tc39/proposal-promise-allSettled) |
-|  48. | &#x2705; | ES2020 | [`BigInt`](https://github.com/tc39/proposal-bigint) |
-|  47. | &#x2705; | ES2020 | [`import()`](https://github.com/tc39/proposal-dynamic-import) |
-|  46. | &#x2705; | ES2020 | [`String.prototype.matchAll`](https://github.com/tc39/proposal-string-matchall) |
-|  45. | &#x2705; | ES2019 | [`Array.prototype.{flat,flatMap}`](https://github.com/tc39/proposal-flatMap) |
-|  44. | &#x2705; | ES2019 | [`String.prototype.{trimStart,trimEnd}`](https://github.com/tc39/proposal-string-left-right-trim) |
-|  43. | &#x2705; | ES2019 | [`Well-formed JSON.stringify`](https://github.com/tc39/proposal-well-formed-stringify) |
-|  42. | &#x2705; | ES2019 | [`Object.fromEntries`](https://github.com/tc39/proposal-object-from-entries) |
-|  41. | &#x2705; | ES2019 | [`Function.prototype.toString revision`](https://github.com/tc39/Function-prototype-toString-revision) |
-|  40. | &#x2705; | ES2019 | [`Symbol.prototype.description`](https://github.com/tc39/proposal-Symbol-description) |
-|  39. | &#x2705; | ES2019 | [`JSON superset`](https://github.com/tc39/proposal-json-superset) |
-|  38. | &#x2705; | ES2019 | [`Optional catch binding`](https://github.com/tc39/proposal-optional-catch-binding) |
-|  37. | &#x274c; | ES2018 | [`Asynchronous Iteration`](https://github.com/tc39/proposal-async-iteration) |
-|  36. | &#x2705; | ES2018 | [`Promise.prototype.finally`](https://github.com/tc39/proposal-promise-finally) |
-|  35. | &#x2705; | ES2018 | [`RegExp Unicode Property Escapes`](https://github.com/tc39/proposal-regexp-unicode-property-escapes) |
-|  34. | &#x2705; | ES2018 | [`RegExp Lookbehind Assertions`](https://github.com/tc39/proposal-regexp-lookbehind) |
-|  33. | &#x2705; | ES2018 | [`Rest/Spread Properties`](https://github.com/tc39/proposal-object-rest-spread) |
-|  32. | &#x2705; | ES2018 | [`RegExp named capture groups`](https://github.com/tc39/proposal-regexp-named-groups) |
-|  31. | &#x2705; | ES2018 | [`s (dotAll) flag for regular expressions`](https://github.com/tc39/proposal-regexp-dotall-flag) |
-|  30. | &#x2705; | ES2018 | [`Lifting template literal restriction`](https://github.com/tc39/proposal-template-literal-revision) |
-|  29. | &#x2705; | ES2017 | [`Shared memory and atomics`](https://github.com/tc39/proposal-ecmascript-sharedmem) |
-|  28. | &#x2705; | ES2017 | [`Async functions`](https://github.com/tc39/proposal-async-await) |
-|  27. | &#x26a0; | ES2017 | [`Trailing commas in function parameter lists and calls`](https://github.com/tc39/proposal-trailing-function-commas) |
-|  26. | &#x2705; | ES2017 | [`Object.getOwnPropertyDescriptors`](https://github.com/tc39/proposal-object-getownpropertydescriptors) |
-|  25. | &#x2705; | ES2017 | [`String padding`](https://github.com/tc39/proposal-string-pad-start-end) |
-|  24. | &#x2705; | ES2017 | [`Object.values/Object.entries`](https://github.com/tc39/proposal-object-values-entries) |
-|  23. | &#x2705; | ES2016 | [`Exponentiation operator`](https://github.com/tc39/proposal-exponentiation-operator) |
-|  22. | &#x2705; | ES2016 | [`Array.prototype.includes`](https://github.com/tc39/proposal-Array.prototype.includes) |
-|  21. | &#x2705; | ES2015 | [`arrows`](https://github.com/lukehoban/es6features#arrows) |
-|  20. | &#x274c; | ES2015 | [`classes`](https://github.com/lukehoban/es6features#classes) |
-|  19. | &#x274c; | ES2015 | [`enhanced object literals`](https://github.com/lukehoban/es6features#enhanced-object-literals) |
-|  18. | &#x2705; | ES2015 | [`template strings`](https://github.com/lukehoban/es6features#template-strings) |
-|  17. | &#x2705; | ES2015 | [`destructuring`](https://github.com/lukehoban/es6features#destructuring) |
-|  16. | &#x2705; | ES2015 | [`default + rest + spread`](https://github.com/lukehoban/es6features#default--rest--spread) |
-|  15. | &#x2705; | ES2015 | [`let + const`](https://github.com/lukehoban/es6features#let--const) |
-|  14. | &#x274c; | ES2015 | [`iterators + for..of`](https://github.com/lukehoban/es6features#iterators--forof) |
-|  13. | &#x274c; | ES2015 | [`generators`](https://github.com/lukehoban/es6features#generators) |
-|  12. | &#x2705; | ES2015 | [`unicode`](https://github.com/lukehoban/es6features#unicode) |
-|  11. | &#x26a0; | ES2015 | [`modules`](https://github.com/lukehoban/es6features#modules) |
-|  10. | &#x2705; | ES2015 | [`module loaders`](https://github.com/lukehoban/es6features#module-loaders) |
-|   9. | &#x2705; | ES2015 | [`map + set + weakmap + weakset`](https://github.com/lukehoban/es6features#map--set--weakmap--weakset) |
-|   8. | &#x2705; | ES2015 | [`proxies`](https://github.com/lukehoban/es6features#proxies) |
-|   7. | &#x2705; | ES2015 | [`symbols`](https://github.com/lukehoban/es6features#symbols) |
-|   6. | &#x274c; | ES2015 | [`subclassable built-ins`](https://github.com/lukehoban/es6features#subclassable-built-ins) |
-|   5. | &#x2705; | ES2015 | [`promises`](https://github.com/lukehoban/es6features#promises) |
-|   4. | &#x2705; | ES2015 | [`math + number + string + array + object APIs`](https://github.com/lukehoban/es6features#math--number--string--array--object-apis) |
-|   3. | &#x2705; | ES2015 | [`binary and octal literals`](https://github.com/lukehoban/es6features#binary-and-octal-literals) |
-|   2. | &#x2705; | ES2015 | [`reflect api`](https://github.com/lukehoban/es6features#reflect-api) |
-|   1. | &#x2705; | ES2015 | [`tail calls`](https://github.com/lukehoban/es6features#tail-calls) |
+|  99. | ❌ | ES2027 | [`Explicit Resource Management`](https://github.com/tc39/proposal-explicit-resource-management) |
+|  98. | ✅ | ES2027 | [`Atomics.pause`](https://github.com/tc39/proposal-atomics-microwait) |
+|  97. | ❌ | ES2027 | [`Joint Iteration`](https://github.com/tc39/proposal-joint-iteration) |
+|  96. | ✅ | ES2027 | [`Temporal`](https://github.com/tc39/proposal-temporal) |
+|  95. | ✅ | ES2026 | [`Upsert`](https://github.com/tc39/proposal-upsert) |
+|  94. | ✅ | ES2026 | [`JSON.parse source text access`](https://github.com/tc39/proposal-json-parse-with-source) |
+|  93. | ❌ | ES2026 | [`Iterator Sequencing`](https://github.com/tc39/proposal-iterator-sequencing) |
+|  92. | ✅ | ES2026 | [`Uint8Array to/from Base64`](https://github.com/tc39/proposal-arraybuffer-base64) |
+|  91. | ✅ | ES2026 | [`Math.sumPrecise`](https://github.com/tc39/proposal-math-sum) |
+|  90. | ✅ | ES2026 | [`Error.isError`](https://github.com/tc39/proposal-is-error) |
+|  89. | ✅ | ES2026 | [`Array.fromAsync`](https://github.com/tc39/proposal-array-from-async) |
+|  88. | ✅ | ES2025 | [`RegExp.escape`](https://github.com/tc39/proposal-regex-escaping) |
+|  87. | ✅ | ES2025 | [`Redeclarable global eval-introduced vars`](https://github.com/tc39/proposal-redeclarable-global-eval-vars) |
+|  86. | ✅ | ES2025 | [`Float16 on TypedArrays, DataView, Math.f16round`](https://github.com/tc39/proposal-float16array) |
+|  85. | ✅ | ES2025 | [`Promise.try`](https://github.com/tc39/proposal-promise-try) |
+|  84. | ❌ | ES2025 | [`Sync Iterator helpers`](https://github.com/tc39/proposal-iterator-helpers) |
+|  83. | ✅ | ES2025 | [`JSON Modules`](https://github.com/tc39/proposal-json-modules) |
+|  82. | ✅ | ES2025 | [`Import Attributes`](https://github.com/tc39/proposal-import-attributes) |
+|  81. | ✅ | ES2025 | [`RegExp Modifiers`](https://github.com/tc39/proposal-regexp-modifiers) |
+|  80. | ✅ | ES2025 | [`New Set methods`](https://github.com/tc39/proposal-set-methods) |
+|  79. | ✅ | ES2025 | [`Duplicate named capture groups`](https://github.com/tc39/proposal-duplicate-named-capturing-groups) |
+|  78. | ✅ | ES2024 | [`ArrayBuffer transfer`](https://github.com/tc39/proposal-arraybuffer-transfer) |
+|  77. | ✅ | ES2024 | [`Promise.withResolvers`](https://github.com/tc39/proposal-promise-with-resolvers) |
+|  76. | ✅ | ES2024 | [`Array Grouping`](https://github.com/tc39/proposal-array-grouping) |
+|  75. | ✅ | ES2024 | [`Resizable and growable ArrayBuffers`](https://github.com/tc39/proposal-resizablearraybuffer) |
+|  74. | ⚠️ | ES2024 | [`RegExp v flag with set notation + properties of strings`](https://github.com/tc39/proposal-regexp-v-flag) |
+|  73. | ✅ | ES2024 | [`Atomics.waitAsync`](https://github.com/tc39/proposal-atomics-wait-async) |
+|  72. | ✅ | ES2024 | [`Well-Formed Unicode Strings`](https://github.com/tc39/proposal-is-usv-string) |
+|  71. | ✅ | ES2023 | [`Change Array by Copy`](https://github.com/tc39/proposal-change-array-by-copy) |
+|  70. | ✅ | ES2023 | [`Symbols as WeakMap keys`](https://github.com/tc39/proposal-symbols-as-weakmap-keys) |
+|  69. | ✅ | ES2023 | [`Hashbang Grammar`](https://github.com/tc39/proposal-hashbang) |
+|  68. | ✅ | ES2023 | [`Array find from last`](https://github.com/tc39/proposal-array-find-from-last) |
+|  67. | ✅ | ES2022 | [`Error Cause`](https://github.com/tc39/proposal-error-cause) |
+|  66. | ❌ | ES2022 | [`Class Static Block`](https://github.com/tc39/proposal-class-static-block) |
+|  65. | ✅ | ES2022 | [`Accessible Object.prototype.hasOwnProperty`](https://github.com/tc39/proposal-accessible-object-hasownproperty) |
+|  64. | ✅ | ES2022 | [`.at()`](https://github.com/tc39/proposal-relative-indexing-method) |
+|  63. | ❌ | ES2022 | [`Ergonomic brand checks for Private Fields`](https://github.com/tc39/proposal-private-fields-in-in) |
+|  62. | ✅ | ES2022 | [`Top-level await`](https://github.com/tc39/proposal-top-level-await) |
+|  61. | ✅ | ES2022 | [`RegExp Match Indices`](https://github.com/tc39/proposal-regexp-match-indices) |
+|  60. | ❌ | ES2022 | [`Class Public Instance Fields & Private Instance Fields`](https://github.com/tc39/proposal-class-fields) |
+|  59. | ✅ | ES2021 | [`Numeric separators`](https://github.com/tc39/proposal-numeric-separator) |
+|  58. | ✅ | ES2021 | [`Logical Assignment Operators`](https://github.com/tc39/proposal-logical-assignment) |
+|  57. | ✅ | ES2021 | [`WeakRefs`](https://github.com/tc39/proposal-weakrefs) |
+|  56. | ✅ | ES2021 | [`Promise.any`](https://github.com/tc39/proposal-promise-any) |
+|  55. | ✅ | ES2021 | [`String.prototype.replaceAll`](https://github.com/tc39/proposal-string-replaceall) |
+|  54. | ✅ | ES2020 | [`import.meta`](https://github.com/tc39/proposal-import-meta) |
+|  53. | ✅ | ES2020 | [`Nullish coalescing Operator`](https://github.com/tc39/proposal-nullish-coalescing) |
+|  52. | ✅ | ES2020 | [`Optional Chaining`](https://github.com/tc39/proposal-optional-chaining) |
+|  51. | ✅ | ES2020 | [`for-in mechanics`](https://github.com/tc39/proposal-for-in-order) |
+|  50. | ✅ | ES2020 | [`globalThis`](https://github.com/tc39/proposal-global) |
+|  49. | ✅ | ES2020 | [`Promise.allSettled`](https://github.com/tc39/proposal-promise-allSettled) |
+|  48. | ✅ | ES2020 | [`BigInt`](https://github.com/tc39/proposal-bigint) |
+|  47. | ✅ | ES2020 | [`import()`](https://github.com/tc39/proposal-dynamic-import) |
+|  46. | ✅ | ES2020 | [`String.prototype.matchAll`](https://github.com/tc39/proposal-string-matchall) |
+|  45. | ✅ | ES2019 | [`Array.prototype.{flat,flatMap}`](https://github.com/tc39/proposal-flatMap) |
+|  44. | ✅ | ES2019 | [`String.prototype.{trimStart,trimEnd}`](https://github.com/tc39/proposal-string-left-right-trim) |
+|  43. | ✅ | ES2019 | [`Well-formed JSON.stringify`](https://github.com/tc39/proposal-well-formed-stringify) |
+|  42. | ✅ | ES2019 | [`Object.fromEntries`](https://github.com/tc39/proposal-object-from-entries) |
+|  41. | ✅ | ES2019 | [`Function.prototype.toString revision`](https://github.com/tc39/Function-prototype-toString-revision) |
+|  40. | ✅ | ES2019 | [`Symbol.prototype.description`](https://github.com/tc39/proposal-Symbol-description) |
+|  39. | ✅ | ES2019 | [`JSON superset`](https://github.com/tc39/proposal-json-superset) |
+|  38. | ✅ | ES2019 | [`Optional catch binding`](https://github.com/tc39/proposal-optional-catch-binding) |
+|  37. | ❌ | ES2018 | [`Asynchronous Iteration`](https://github.com/tc39/proposal-async-iteration) |
+|  36. | ✅ | ES2018 | [`Promise.prototype.finally`](https://github.com/tc39/proposal-promise-finally) |
+|  35. | ✅ | ES2018 | [`RegExp Unicode Property Escapes`](https://github.com/tc39/proposal-regexp-unicode-property-escapes) |
+|  34. | ✅ | ES2018 | [`RegExp Lookbehind Assertions`](https://github.com/tc39/proposal-regexp-lookbehind) |
+|  33. | ✅ | ES2018 | [`Rest/Spread Properties`](https://github.com/tc39/proposal-object-rest-spread) |
+|  32. | ✅ | ES2018 | [`RegExp named capture groups`](https://github.com/tc39/proposal-regexp-named-groups) |
+|  31. | ✅ | ES2018 | [`s (dotAll) flag for regular expressions`](https://github.com/tc39/proposal-regexp-dotall-flag) |
+|  30. | ✅ | ES2018 | [`Lifting template literal restriction`](https://github.com/tc39/proposal-template-literal-revision) |
+|  29. | ✅ | ES2017 | [`Shared memory and atomics`](https://github.com/tc39/proposal-ecmascript-sharedmem) |
+|  28. | ✅ | ES2017 | [`Async functions`](https://github.com/tc39/proposal-async-await) |
+|  27. | ⚠️ | ES2017 | [`Trailing commas in function parameter lists and calls`](https://github.com/tc39/proposal-trailing-function-commas) |
+|  26. | ✅ | ES2017 | [`Object.getOwnPropertyDescriptors`](https://github.com/tc39/proposal-object-getownpropertydescriptors) |
+|  25. | ✅ | ES2017 | [`String padding`](https://github.com/tc39/proposal-string-pad-start-end) |
+|  24. | ✅ | ES2017 | [`Object.values/Object.entries`](https://github.com/tc39/proposal-object-values-entries) |
+|  23. | ✅ | ES2016 | [`Exponentiation operator`](https://github.com/tc39/proposal-exponentiation-operator) |
+|  22. | ✅ | ES2016 | [`Array.prototype.includes`](https://github.com/tc39/proposal-Array.prototype.includes) |
+|  21. | ✅ | ES2015 | [`arrows`](https://github.com/lukehoban/es6features#arrows) |
+|  20. | ❌ | ES2015 | [`classes`](https://github.com/lukehoban/es6features#classes) |
+|  19. | ❌ | ES2015 | [`enhanced object literals`](https://github.com/lukehoban/es6features#enhanced-object-literals) |
+|  18. | ✅ | ES2015 | [`template strings`](https://github.com/lukehoban/es6features#template-strings) |
+|  17. | ✅ | ES2015 | [`destructuring`](https://github.com/lukehoban/es6features#destructuring) |
+|  16. | ✅ | ES2015 | [`default + rest + spread`](https://github.com/lukehoban/es6features#default--rest--spread) |
+|  15. | ✅ | ES2015 | [`let + const`](https://github.com/lukehoban/es6features#let--const) |
+|  14. | ❌ | ES2015 | [`iterators + for..of`](https://github.com/lukehoban/es6features#iterators--forof) |
+|  13. | ❌ | ES2015 | [`generators`](https://github.com/lukehoban/es6features#generators) |
+|  12. | ✅ | ES2015 | [`unicode`](https://github.com/lukehoban/es6features#unicode) |
+|  11. | ⚠️ | ES2015 | [`modules`](https://github.com/lukehoban/es6features#modules) |
+|  10. | ✅ | ES2015 | [`module loaders`](https://github.com/lukehoban/es6features#module-loaders) |
+|   9. | ✅ | ES2015 | [`map + set + weakmap + weakset`](https://github.com/lukehoban/es6features#map--set--weakmap--weakset) |
+|   8. | ✅ | ES2015 | [`proxies`](https://github.com/lukehoban/es6features#proxies) |
+|   7. | ✅ | ES2015 | [`symbols`](https://github.com/lukehoban/es6features#symbols) |
+|   6. | ❌ | ES2015 | [`subclassable built-ins`](https://github.com/lukehoban/es6features#subclassable-built-ins) |
+|   5. | ✅ | ES2015 | [`promises`](https://github.com/lukehoban/es6features#promises) |
+|   4. | ✅ | ES2015 | [`math + number + string + array + object APIs`](https://github.com/lukehoban/es6features#math--number--string--array--object-apis) |
+|   3. | ✅ | ES2015 | [`binary and octal literals`](https://github.com/lukehoban/es6features#binary-and-octal-literals) |
+|   2. | ✅ | ES2015 | [`reflect api`](https://github.com/lukehoban/es6features#reflect-api) |
+|   1. | ✅ | ES2015 | [`tail calls`](https://github.com/lukehoban/es6features#tail-calls) |
 
 
 <br><br>
@@ -1010,129 +1010,171 @@ if (false) {
 
 <br><br>
 ### pull-request merge
-- find highest issue-number at https://github.com/jslint-org/jslint/issues/, https://github.com/jslint-org/jslint/pulls/, and add +1 to it for PR-xxx
-- checkpoint local-branch-beta
-- `shGitPullrequest beta beta`
-    - verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions
-- `git push upstream alpha -f`
-    - verify ci-success for upstream-branch-alpha
-    - https://github.com/jslint-org/jslint/actions
-- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2026.6.24
-- click `Create pull request`
-- input `Add your description here...` with:
-```
-Fixes #xxx.
-- <primary-commit-message>
+1. update `.github/workflows/ci.yml` `.github/workflows/publish.yml` to:
+    - latest nodejs-lts version @ https://nodejs.org/en/about/previous-releases
+1. update `CHANGELOG.md`
+    - verify `<CHANGELOG.md entry #1>` is most-relevant to pull-request.
+    - run
+        ```shell
+        npm run test2 # re-run until version propagates
 
-This PR will ...
+        git commit -am "<CHANGELOG.md entries>"
+        ```
+    - run
+        ```shell
+        sh jslint_ci.sh shGithubPrUpdatePrxxx
 
-This PR will additionally:
-- <secondary-commit-message>
-...
+        git push . HEAD:beta -f
 
-<screenshot>
-```
-- verify `commit into jslint-org:beta`
-- click `Create pull request`
-    - verify ci-success for pull-request
-    - https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
-- wait awhile before continuing ...
-- click `Squash and merge`
-    - verify ci-success for upstream-branch-beta
-    - https://github.com/jslint-org/jslint/actions
-- `shGitPullrequestCleanup`
-    - verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions
-- `git push upstream alpha -f`
-    - verify ci-success for upstream-branch-alpha
-    - https://github.com/jslint-org/jslint/actions
-- click `Delete branch`
+        sh jslint_ci.sh shGithubPrCreate beta beta # 20xx-xx-xx
+
+        git push upstream alpha -f
+        ```
+        - verify ci-success @ https://github.com/kaizhu256/jslint/actions
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions
+
+1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2026.6.28
+    - click `Create pull request`
+    - input `Add a title *` with: `<CHANGELOG.md entry #1>`
+    - input `Add a description` with:
+        ```
+        Fixes #xxx.
+
+        This PR will:
+        <CHANGELOG.md entry #1>
+
+        This PR will additionally:
+        <CHANGELOG.md entry extra>
+
+        <screenshot>
+        ```
+    - verify:
+        - base respository: `jslint-org/jslint`
+        - base: `beta`
+    - click `Create pull request`
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
+
+1. wait awhile before continuing ...
+    - click `Squash and merge`
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions
+    - run
+        ```shell
+        sh jslint_ci.sh shGithubPrCleanup
+
+        git push upstream alpha -f
+        ```
+        - verify ci-success @ https://github.com/kaizhu256/jslint/actions
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions
+    - click `Delete branch`
 
 
 <br><br>
 ### branch-master commit
-- update ci.yml to latest nodejs-lts
-- checkpoint local-branch-beta
-- `shGitPullrequest master beta # re-run until version propagates`
-    - verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions
-- `git push upstream alpha -f`
-    - verify ci-success for upstream-branch-alpha
-    - https://github.com/jslint-org/jslint/actions
-- goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v2026.4.30
-- click `Create pull request`
-- input `Add a title` with: `# v20yy.mm.dd`
-- input `Add a description` with:
-```
-- <primary-commit-message>
-- <secondary-commit-message>
-```
-- verify `commit into jslint-org:beta`
-- click `Create pull request`
-    - verify ci-success for pull-request
-    - https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
-- wait awhile before continuing ...
-- click `Squash and merge`
-    - verify ci-success for upstream-branch-beta
-    - https://github.com/jslint-org/jslint/actions
-- `shGitPullrequestCleanup`
-    - verify ci-success for origin-branch-alpha
-    - https://github.com/kaizhu256/jslint/actions
-- `git push upstream alpha -f`
-    - verify ci-success for upstream-branch-alpha
-    - https://github.com/jslint-org/jslint/actions
-- click `Delete branch`
-- `git push origin beta:master`
-    - verify ci-success for origin-branch-master
-    - https://github.com/kaizhu256/jslint/actions
-- `git push upstream beta:master`
-    - verify ci-success for upstream-branch-master
-    - https://github.com/jslint-org/jslint/actions
+1. update `.github/workflows/ci.yml` `.github/workflows/publish.yml` to:
+    - latest nodejs-lts version @ https://nodejs.org/en/about/previous-releases
+1. update `CHANGELOG.md`
+    - verify `<CHANGELOG.md entry #1>` is most-relevant to pull-request.
+    - run
+        ```shell
+        npm run test2 # re-run until version propagates
+
+        git commit -am "<CHANGELOG.md entries>"
+        ```
+    - run
+        ```shell
+        sh jslint_ci.sh shGithubPrUpdatePrxxx
+
+        git push . HEAD:beta -f
+
+        sh jslint_ci.sh shGithubPrCreate master beta
+
+        git push upstream alpha -f
+        ```
+        - verify ci-success @ https://github.com/kaizhu256/jslint/actions
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions
+
+1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v2026.4.30
+    - click `Create pull request`
+    - input `Add a title *` with: `# v20yy.mm.dd`
+    - input `Add a description` with:
+        ```
+        <CHANGELOG.md entry #1>
+        <CHANGELOG.md entry extra>
+        ```
+    - verify:
+        - base respository: `jslint-org/jslint`
+        - base: `beta`
+    - click `Create pull request`
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
+
+1. wait awhile before continuing ...
+    - click `Squash and merge`
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions
+    - run
+        ```shell
+        sh jslint_ci.sh shGithubPrCleanup
+
+        git push upstream alpha -f
+        ```
+        - verify ci-success @ https://github.com/kaizhu256/jslint/actions
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions
+    - click `Delete branch`
+    - run
+        ```shell
+        git push origin beta:master
+
+        git push upstream beta:master
+        ```
+        - verify ci-success @ https://github.com/kaizhu256/jslint/actions
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions
 
 
 <br><br>
 ### branch-master publish
-- goto https://www.npmjs.com/package/@jslint-org/jslint/access <!--no-validate-->
-- click `Github Actions`
-- input `Organization or user*` with: `jslint-org`
-- input `Repository*` with: `jslint`
-- input `Workflow filename*` with: `publish.yml`
-- click `Set up connection` or `Update Package Settings`
-- `git push upstream beta:master`
-    - verify ci-success for upstream-branch-master
-    - https://github.com/jslint-org/jslint/actions
-- goto https://github.com/jslint-org/jslint/releases/new
-- input `Choose a tag` with: `v20yy.mm.dd`
-- click `Create new tag: v20yy.mm.dd on publish`
-    - verify correct-year `20yy`
-- select `Target: master`
-- select `Previous tag:auto`
-- input `Release title` with: `v20yy.mm.dd - <primary-commit-message>`
-- input `Describe this release` with:
-```
-- <primary-commit-message>
-- <secondary-commit-message>
-```
-- click `Generate release notes`
-- click `Set as the latest release`
-- click `Preview` and review
-- click `Publish release`
-    - verify ci-success for upstream-branch-publish
-    - https://github.com/jslint-org/jslint/actions
-    - verify email-notification `Successfully published @jslint-org/jslint@20yy.mm.dd`
+1. goto https://www.npmjs.com/package/@jslint-org/jslint/access <!--no-validate-->
+    - click `Github Actions`
+    - input `Organization or user*` with: `jslint-org`
+    - input `Repository*` with: `jslint`
+    - input `Workflow filename*` with: `publish.yml`
+    - click `Set up connection` or `Update Package Settings`
+1.
+    - run
+        ```shell
+        git push upstream beta:master
+        ```
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions
+1. goto https://github.com/jslint-org/jslint/releases/new
+    - input `Tag: Select tag` with: `v20yy.mm.dd`
+        - click `Create new tag` and click `Create`
+        - verify correct-year `v20yy.mm.dd`
+        - select `Target: master`
+    - input `Release title` with: `v20yy.mm.dd - <CHANGELOG.md entry #1>`
+        - select `Previous tag: Auto`
+        - click `Generate release notes`
+    - input `Write` with:
+        ```
+        <CHANGELOG.md entry #1>
+        <CHANGELOG.md entry extra>
+
+        **Full Changelog**: ...
+        ```
+        - click `Preview` and review
+    - click `Latest`
+    - click `Publish release`
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions
+        - verify email-notification `Successfully published @jslint-org/jslint@20yy.mm.dd`
 
 
 <br><br>
 ### vscode-jslint publish
-- goto https://github.com/jslint-org/jslint/tree/gh-pages/branch-beta/.artifact/jslint_wrapper_vscode
-- click `vscode-jslint-20yy.mm.dd.vsix`
-- click `Raw` to download
-- goto https://marketplace.visualstudio.com/manage/publishers/jslint
-- right-click `Update`
-- upload downloaded file `vscode-jslint-20yy.mm.dd.vsix`
-- click 'Upload'
-- verify email-notification `[Succeeded] Extension publish on Visual Studio Marketplace - vscode-jslint`
+1. goto https://github.com/jslint-org/jslint/tree/gh-pages/branch-beta/.artifact/jslint_wrapper_vscode
+    - click `vscode-jslint-20yy.mm.dd.vsix`
+    - click `Raw` to download
+1. goto https://marketplace.visualstudio.com/manage/publishers/jslint
+    - move mouse to version-number, right-click, and select `Update`
+    - upload downloaded file `vscode-jslint-20yy.mm.dd.vsix`
+    - click 'Upload'
+        - verify email-notification `[Succeeded] Extension publish on Visual Studio Marketplace - vscode-jslint`
 
 
 <!--

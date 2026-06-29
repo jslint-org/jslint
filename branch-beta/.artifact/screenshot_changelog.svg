@@ -1,5 +1,5 @@
-<svg height="1262" width="800" xmlns="http://www.w3.org/2000/svg">
-<rect height="1262" fill="#222" width="800"></rect>
+<svg height="1284" width="800" xmlns="http://www.w3.org/2000/svg">
+<rect height="1284" fill="#222" width="800"></rect>
 <text
     fill="#7f7"
     font-family="consolas, menlo, monospace"
@@ -29,7 +29,7 @@
     textLength="768"
     x="10"
     y="98"
->- jslint-ecma - Unify ES2015-destructure-logic into function prefix_destructure().               </tspan>
+>- jslint-ci - Automate linting of shell-scripts with shellcheck.                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -95,253 +95,259 @@
     textLength="768"
     x="10"
     y="340"
->- jslint-ecma - Update README.md, documenting supported ES2015+ features.                        </tspan>
+>- jslint-ecma - Unify ES2015-destructure-logic into function prefix_destructure().               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="362"
->- jslint - Update warning infix_in to recommend Object.hasOwn() over hasOwnProperty().           </tspan>
+>- jslint-ci - Add shell-function shGithubPrUpdatePrxxx() to auto-update 'PR-xxx' placeholder to \</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="384"
->- jslint-ecma - Add ES2025-feature RegExp Modifiers.                                             </tspan>
+>  next sequential github issue/pull number.                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="406"
->- jslint-ecma - Add ES2022-feature RegExp Match Indices.                                         </tspan>
+>- jslint-ci - Rename shell-functions shGitPullrequestXxx() to shGithubPrXxx().                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="428"
->- jslint-ecma - Add ES2021-feature Logical Assignment Operators.                                 </tspan>
+>- jslint-ecma - Update README.md, documenting supported ES2015+ features.                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="450"
->- jslint-ecma - Add ES2027-feature Temporal.                                                     </tspan>
+>- jslint - Update warning infix_in to recommend Object.hasOwn() over hasOwnProperty().           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="472"
->- jslint-ecma - Expand ES2015-feature-support for destructuring.                                 </tspan>
+>- jslint-ecma - Add ES2025-feature RegExp Modifiers.                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="494"
->- jslint-ecma - Add ES2018-feature Rest/Spread Properties.                                       </tspan>
+>- jslint-ecma - Add ES2022-feature RegExp Match Indices.                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="516"
->- jslint-ecma - Add ES2018-feature s (dotall) flag for regular expressions.                      </tspan>
+>- jslint-ecma - Add ES2021-feature Logical Assignment Operators.                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="538"
->- jslint-ecma - Expand ES2015-feature-support for es-module-import-statement.                    </tspan>
+>- jslint-ecma - Add ES2027-feature Temporal.                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="560"
->- jslint-ecma - Add ES2023-feature ShadowRealm to global-scope.                                  </tspan>
+>- jslint-ecma - Expand ES2015-feature-support for destructuring.                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="582"
->- jslint-ecma - Add ES2024-feature .isWellFormed(), .toWellFormed() for literal string.          </tspan>
+>- jslint-ecma - Add ES2018-feature Rest/Spread Properties.                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="604"
->- jslint-ecma - Add ES2022-feature .at() for literal string/array.                               </tspan>
+>- jslint-ecma - Add ES2018-feature s (dotall) flag for regular expressions.                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="626"
->- jslint-ecma - Add ES2025-feature Float16Array to global-scope.                                 </tspan>
+>- jslint-ecma - Expand ES2015-feature-support for es-module-import-statement.                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="648"
->- jslint-ecma - Relax warning for ES2025-feature RegExp.escape().                                </tspan>
+>- jslint-ecma - Add ES2023-feature ShadowRealm to global-scope.                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="670"
->- jslint-ecma - Add ES2021-feature WeakRef to global-scope.                                      </tspan>
+>- jslint-ecma - Add ES2024-feature .isWellFormed(), .toWellFormed() for literal string.          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="692"
->- jslint-ecma - Update ES2015-feature arrow, to continue parsing unwrapped-form with warning, in\</tspan>
+>- jslint-ecma - Add ES2022-feature .at() for literal string/array.                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="714"
->  stead of stopping.                                                                             </tspan>
+>- jslint-ecma - Add ES2025-feature Float16Array to global-scope.                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="736"
->- jslint - Relax warning on multiline-method-chaining.                                           </tspan>
+>- jslint-ecma - Relax warning for ES2025-feature RegExp.escape().                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="758"
->- jslint - Replace all non-return "stop(...);" with "return stop(...)".                          </tspan>
+>- jslint-ecma - Add ES2021-feature WeakRef to global-scope.                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="780"
->- jslint - Unify ES2018-syntax-spread-operator with function prefix_ellipsis().                  </tspan>
+>- jslint-ecma - Update ES2015-feature arrow, to continue parsing unwrapped-form with warning, in\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="802"
->- jslint - Add ES2018-syntax for object-literal-spread-operator.                                 </tspan>
+>  stead of stopping.                                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="824"
->- jslint - Add ES2025-syntax "import ... with {...}".                                            </tspan>
+>- jslint - Relax warning on multiline-method-chaining.                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="846"
->- jslint - Allow more methods to be called on literal strings and arrays; make allowed methods f\</tspan>
+>- jslint - Replace all non-return "stop(...);" with "return stop(...)".                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="868"
->  or . and ?. consistent.                                                                        </tspan>
+>- jslint - Unify ES2018-syntax-spread-operator with function prefix_ellipsis().                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="890"
->                                                                                                 </tspan>
+>- jslint - Add ES2018-syntax for object-literal-spread-operator.                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="912"
-># v2026.4.30                                                                                     </tspan>
+>- jslint - Add ES2025-syntax "import ... with {...}".                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="934"
->- github-ci - Pin various github-runner-os to stable/lts version.                                </tspan>
+>- jslint - Allow more methods to be called on literal strings and arrays; make allowed methods f\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="956"
->- jslint-ci - Update file jslint_ci.sh, replacing deprecated url.parse(...).pathname with new UR\</tspan>
+>  or . and ?. consistent.                                                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="978"
->  L(...).pathname.                                                                               </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1000"
->- jslint-ci - Update shell-function shGitPullrequestCleanup() to allow squash-and-merge pull-req\</tspan>
+># v2026.4.30                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1022"
->  uest.                                                                                          </tspan>
+>- github-ci - Pin various github-runner-os to stable/lts version.                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1044"
->- ci - Update file .github/workflows/ci.yml with hook to run on pull-request.                    </tspan>
+>- jslint-ci - Update file jslint_ci.sh, replacing deprecated url.parse(...).pathname with new UR\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1066"
->- jslint-ci - Update shell-function shLintPython().                                              </tspan>
+>  L(...).pathname.                                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1088"
->                                                                                                 </tspan>
+>- jslint-ci - Update shell-function shGitPullrequestCleanup() to allow squash-and-merge pull-req\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1110"
-># v2026.2.28                                                                                     </tspan>
+>  uest.                                                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1132"
->- jslint - Update warning to suggest Boolean(...) instead of !! for ternary-expression.          </tspan>
+>- ci - Update file .github/workflows/ci.yml with hook to run on pull-request.                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1154"
->- ci - Update shell-function shCiBase() to check npm-version-support, before running npm-pkg-fix\</tspan>
+>- jslint-ci - Update shell-function shLintPython().                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1176"
->  .                                                                                              </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1198"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
+    y="1198"
+># v2026.2.28                                                                                     </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
     y="1220"
-># v2025.12.28                                                                                    </tspan>
+>- jslint - Update warning to suggest Boolean(...) instead of !! for ternary-expression.          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1242"
->- ci - Update file publish.yml to use trusted-publishing for npm packages.                       </tspan>
+>- ci - Update shell-function shCiBase() to check npm-version-support, before running npm-pkg-fix\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1264"
+>  .                                                                                              </tspan>
 
 </text>
 </svg>
