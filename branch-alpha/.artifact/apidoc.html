@@ -101,7 +101,7 @@ function assertOrThrow<span class="apidocSignatureSpan">(condition, message)</sp
 <li>
 
 <a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.debugInline">4.
-function debugInline<span class="apidocSignatureSpan">(...argv)</span>
+function debugInline<span class="apidocSignatureSpan">(...argList)</span>
 </a>
 
 </li>
@@ -442,18 +442,18 @@ jstestIt((
 <li>
     <h2>
     <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.debugInline" id="apidoc.elem.%22.%2Fjslint.mjs%22.debugInline">4.
-    function debugInline<span class="apidocSignatureSpan">(...argv)</span>
+    function debugInline<span class="apidocSignatureSpan">(...argList)</span>
     </a>
     </h2>
 </li>
-<li>Description and source-code:<pre class="apidocCodePre">function debug(...argv) {
+<li>Description and source-code:<pre class="apidocCodePre">function debug(...argList) {
 <span class="apidocCodeCommentSpan">
-// This function will print &lt;argv&gt; to stderr and then return &lt;argv&gt;[0].
+// This function will print &lt;argList&gt; to stderr and then return &lt;argList&gt;[0].
 
 </span>    __consoleError("\n\ndebugInline");
-    __consoleError(...argv);
+    __consoleError(...argList);
     __consoleError("\n");
-    return argv[0];
+    return argList[0];
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">N/A</pre></li>
 
@@ -1062,15 +1062,16 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
                                 // ... literal.
     let mode_regexp;            // true if regular expression literal seen on
                                 // ... this line.
-    let paren_backtrack_list = [];      // List of most recent "(" tokens at any
-                                        // ... paren-depth.
-    let paren_depth = 0;        // Keeps track of current paren-depth.
+    let opener_popped = empty();        // Last token popped from opener_stack.
+    let opener_stack = [];      // Stack of opener tokens: (, [.
     let snippet = "";           // A piece of string.
     let token_1;                // The first token.
     let token_prv = token_global;       // The previous token including
                                         // ... comments.
     let token_prv_expr = token_global;  // The previous token excluding
-                                        // ... comm...
+                                        // ... comments.
+
+// Most tokens, including the identifiers, operators, and pu...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
