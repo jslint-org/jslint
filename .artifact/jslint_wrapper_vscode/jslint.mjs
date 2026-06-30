@@ -5746,6 +5746,7 @@ function jslint_phase3_parse(state) {
         the_function_toplevel
     ) {
         const is_brace = token_now.id === "{";
+        const sub_list = [];
         const the_destructure = token_now;
         let optional;
         function advance_and_signature_push(id) {
@@ -5761,7 +5762,7 @@ function jslint_phase3_parse(state) {
             }
         }
         function name_list_push(name) {
-            name_list.push(name);
+            sub_list.push(name);
 
 // PR-500 - Fix false-warning "uninitialized_a" in statement ";[aa]=0;".
 
@@ -5937,6 +5938,7 @@ function jslint_phase3_parse(state) {
             }
             advance_and_signature_push(",");
         }
+        name_list.push(...sub_list);
         if (the_function_toplevel) {
             advance_and_signature_push(")");
         } else if (is_brace) {
@@ -5947,7 +5949,7 @@ function jslint_phase3_parse(state) {
 // ", "check_ordered", "expected_a_b_before_c_d", "aa", 17]
 // ["let{bb,aa}=0", "check_ordered", "expected_a_b_before_c_d", "aa", 8]
 
-            check_ordered(role, name_list);
+            check_ordered(role, sub_list);
             advance_and_signature_push("}");
         } else {
             advance_and_signature_push("]");
