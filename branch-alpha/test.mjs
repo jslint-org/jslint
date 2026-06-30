@@ -701,10 +701,10 @@ jstestDescribe((
                 ].map(function (source) {
                     source = source.replace("{expr}", (
                         `[{\n`
-                        + `    aa,\n`
-                        + `    bb = 0,\n`
-                        + `    bb: cc,\n`
-                        + `    dd: [{dd}],\n`
+                        + `    bb,\n`
+                        + `    cc = 0,\n`
+                        + `    cc: dd,\n`
+                        + `    dd: [{aa}],\n`
                         + `    ...zz\n`
                         + `}]`
                     ));
