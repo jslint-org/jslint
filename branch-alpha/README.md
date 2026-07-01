@@ -1054,6 +1054,7 @@ if (false) {
 
         <screenshot>
         ```
+    - click `Preview` and review
     - verify:
         - base respository: `jslint-org/jslint`
         - base: `beta`
@@ -1113,6 +1114,7 @@ if (false) {
         <CHANGELOG.md entry #1>
         <CHANGELOG.md entry extra>
         ```
+    - click `Preview` and review
     - verify:
         - base respository: `jslint-org/jslint`
         - base: `beta`
@@ -1170,7 +1172,7 @@ if (false) {
 
         **Full Changelog**: ...
         ```
-        - click `Preview` and review
+    - click `Preview` and review
     - click `Latest`
     - click `Publish release`
         - verify ci-success @ https://github.com/jslint-org/jslint/actions
