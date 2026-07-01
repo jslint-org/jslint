@@ -3,7 +3,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Status
-| Branch | [master<br>(v2026.4.30)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
+| Branch | [master<br>(v2026.6.30)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jslint-org/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/jslint-org/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/jslint-org/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://jslint-org.github.io/jslint/branch-alpha/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-alpha/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-alpha/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-alpha/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-alpha/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-alpha/.artifact/coverage/index.html) |
@@ -1016,24 +1016,24 @@ if (false) {
     - verify `<CHANGELOG.md entry #1>` is most-relevant to pull-request.
     - run
         ```shell
-        npm run test2 # re-run until version propagates
+        # re-run until version propagates
+        npm run test2
 
-        git commit -am "<CHANGELOG.md entries>"
-        ```
-    - run
-        ```shell
-        sh jslint_ci.sh shGithubPrUpdatePrxxx
+        # re-run until version propagates
+        sh jslint_ci.sh shGithubPrCreate alpha beta # v20xx.xx.xx
 
-        git push . HEAD:beta -f
+        # optional squash
+        sh jslint_ci.sh shGitSquashPop __pr_beta_pre "- ci - shGithubPrUpdatePrxxx."
 
-        sh jslint_ci.sh shGithubPrCreate beta beta # 20xx-xx-xx
+        # optional squash
+        sh jslint_ci.sh shGithubPrCreate alpha beta # v20xx.xx.xx
 
         git push upstream alpha -f
         ```
         - verify ci-success @ https://github.com/kaizhu256/jslint/actions
         - verify ci-success @ https://github.com/jslint-org/jslint/actions
 
-1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2026.6.28
+1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2026.7.1
     - click `Create pull request`
     - input `Add a title *` with: `<CHANGELOG.md entry #1>`
     - input `Add a description` with:
@@ -1076,24 +1076,26 @@ if (false) {
     - verify `<CHANGELOG.md entry #1>` is most-relevant to pull-request.
     - run
         ```shell
-        npm run test2 # re-run until version propagates
+        # re-run until version propagates
+        npm run test2
 
-        git commit -am "<CHANGELOG.md entries>"
-        ```
-    - run
-        ```shell
         sh jslint_ci.sh shGithubPrUpdatePrxxx
 
-        git push . HEAD:beta -f
+        # re-run until version propagates
+        sh jslint_ci.sh shGithubPrCreate alpha master # v20xx.xx.xx
 
-        sh jslint_ci.sh shGithubPrCreate master beta
+        # optional squash
+        sh jslint_ci.sh shGitSquashPop __pr_master_pre "- ci - shGithubPrUpdatePrxxx."
+
+        # optional squash
+        sh jslint_ci.sh shGithubPrCreate alpha master # v20xx.xx.xx
 
         git push upstream alpha -f
         ```
         - verify ci-success @ https://github.com/kaizhu256/jslint/actions
         - verify ci-success @ https://github.com/jslint-org/jslint/actions
 
-1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v2026.4.30
+1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v2026.6.30
     - click `Create pull request`
     - input `Add a title *` with: `# v20yy.mm.dd`
     - input `Add a description` with:
