@@ -1019,14 +1019,20 @@ if (false) {
         # re-run until version propagates
         npm run test2
 
+        # update 'PR-xxx' placeholder
+        sh jslint_ci.sh shGithubPrUpdatePrxxx
+
         # re-run until version propagates
         sh jslint_ci.sh shGithubPrCreate alpha beta # v20xx.xx.xx
 
-        # optional squash
+        # squash intermediary commits
         sh jslint_ci.sh shGitSquashPop __pr_beta_pre "- ci - shGithubPrUpdatePrxxx."
 
-        # optional squash
+        # squash intermediary commits
         sh jslint_ci.sh shGithubPrCreate alpha beta # v20xx.xx.xx
+
+        # squash intermediary commits
+        git push . __pr_beta_pre~:__pr_beta_pre -f
 
         git push upstream alpha -f
         ```
@@ -1079,16 +1085,20 @@ if (false) {
         # re-run until version propagates
         npm run test2
 
+        # update 'PR-xxx' placeholder
         sh jslint_ci.sh shGithubPrUpdatePrxxx
 
         # re-run until version propagates
         sh jslint_ci.sh shGithubPrCreate alpha master # v20xx.xx.xx
 
-        # optional squash
+        # squash intermediary commits
         sh jslint_ci.sh shGitSquashPop __pr_master_pre "- ci - shGithubPrUpdatePrxxx."
 
-        # optional squash
+        # squash intermediary commits
         sh jslint_ci.sh shGithubPrCreate alpha master # v20xx.xx.xx
+
+        # squash intermediary commits
+        git push . __pr_master_pre~:__pr_master_pre -f
 
         git push upstream alpha -f
         ```
