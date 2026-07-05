@@ -646,6 +646,18 @@ jstestDescribe((
                 "new Array(0);"
             ],
             async_await: [
+                (`
+/*jslint fart*/
+let aa = 0;
+aa = async () => {
+    try {
+        return await aa();
+    } catch (err) {
+        await err();
+    }
+};
+await aa();
+                `),
                 "async function aa() {\n    await aa();\n}\nawait aa();",
 
 // PR-405 - Bugfix - fix expression after "await" mis-identified as statement.
@@ -659,17 +671,6 @@ async function aa() {
         await err();
     }
 }
-await aa();
-                `),
-                (`
-let aa = 0;
-aa = async () => {
-    try {
-        return await aa();
-    } catch (err) {
-        await err();
-    }
-};
 await aa();
                 `)
             ],
@@ -697,11 +698,6 @@ String.aa().getTime();
 // PR-500 - Unify ES2015-destructure-logic.
 
                 [
-                    (`
-(({expr}) => {
-    aa(bb, cc, dd, ee, ff, gg);
-}());
-                    `),
                     (`
 (function ({expr}) {
     aa(bb, cc, dd, ee, ff, gg);
@@ -797,13 +793,14 @@ aa();
                 `)
             ],
             fart: [
-                "let aa = () => 0;\naa();",
                 (`
+/*jslint fart*/
 let aa = async (bb, [cc, dd], {ee, ff}, ...gg) => {
     await bb(cc, dd, ee, ff, gg);
 };
 aa();
-                `)
+                `),
+                "let aa = () => 0;\naa();"
             ],
             for: [
                 (`
