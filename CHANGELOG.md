@@ -15,7 +15,6 @@
 # v2026.7.1-beta
 - jslint-regression - Fix long-running regression where 'let x = x;' doesn't warn about temporal-dead-zone.
 - jslint-warning - Tighten warning of unused variables to be always on, regardless of module / nodejs mode.
-- jslint-warning - Relax fat-arrow-warning "use_function_not_fart".
 - jslint - Wrap all property-updates 'name.init = true/false' with calls to:
     name_lookup() - 'aa=0'
     name_push()   - 'let aa=0'
