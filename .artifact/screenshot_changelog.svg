@@ -89,37 +89,37 @@
     textLength="768"
     x="10"
     y="318"
-># v2026.6.1-beta                                                                                 </tspan>
+># v2026.6.30                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="340"
->- jslint-ecma - Unify ES2015-destructure-logic into function prefix_destructure().               </tspan>
+>- jslint-ecma - Update README.md, documenting supported ES2015+ features.                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="362"
->- jslint-ci - Add shell-function shGithubPrUpdatePrxxx() to auto-update 'PR-xxx' placeholder to \</tspan>
+>- jslint-ecma - Unify ES2015-destructure-logic into function prefix_destructure().               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="384"
->  next sequential github issue/pull number.                                                      </tspan>
+>- jslint-ci - Add shell-function shGithubPrUpdatePrxxx() to auto-update 'PR-xxx' placeholder to \</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="406"
->- jslint-ci - Rename shell-functions shGitPullrequestXxx() to shGithubPrXxx().                   </tspan>
+>  next sequential github issue/pull number.                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="428"
->- jslint-ecma - Update README.md, documenting supported ES2015+ features.                        </tspan>
+>- jslint-ci - Rename shell-functions shGitPullrequestXxx() to shGithubPrXxx().                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -233,7 +233,7 @@
     textLength="768"
     x="10"
     y="846"
->- jslint - Replace all non-return "stop(...);" with "return stop(...)".                          </tspan>
+>- jslint - Replace all non-return 'stop(...);' with 'return stop(...)'.                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -251,7 +251,7 @@
     textLength="768"
     x="10"
     y="912"
->- jslint - Add ES2025-syntax "import ... with {...}".                                            </tspan>
+>- jslint - Add ES2025-syntax 'import ... with {...}'.                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
