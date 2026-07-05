@@ -10,11 +10,11 @@
 - jslint - Add new warning requiring paren around plus-separated concatenations.
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
-# v2026.6.1-beta
+# v2026.6.30
+- jslint-ecma - Update README.md, documenting supported ES2015+ features.
 - jslint-ecma - Unify ES2015-destructure-logic into function prefix_destructure().
 - jslint-ci - Add shell-function shGithubPrUpdatePrxxx() to auto-update 'PR-xxx' placeholder to next sequential github issue/pull number.
 - jslint-ci - Rename shell-functions shGitPullrequestXxx() to shGithubPrXxx().
-- jslint-ecma - Update README.md, documenting supported ES2015+ features.
 - jslint - Update warning infix_in to recommend Object.hasOwn() over hasOwnProperty().
 - jslint-ecma - Add ES2025-feature RegExp Modifiers.
 - jslint-ecma - Add ES2022-feature RegExp Match Indices.
@@ -32,10 +32,10 @@
 - jslint-ecma - Add ES2021-feature WeakRef to global-scope.
 - jslint-ecma - Update ES2015-feature arrow, to continue parsing unwrapped-form with warning, instead of stopping.
 - jslint - Relax warning on multiline-method-chaining.
-- jslint - Replace all non-return "stop(...);" with "return stop(...)".
+- jslint - Replace all non-return 'stop(...);' with 'return stop(...)'.
 - jslint - Unify ES2018-syntax-spread-operator with function prefix_ellipsis().
 - jslint - Add ES2018-syntax for object-literal-spread-operator.
-- jslint - Add ES2025-syntax "import ... with {...}".
+- jslint - Add ES2025-syntax 'import ... with {...}'.
 - jslint - Allow more methods to be called on literal strings and arrays; make allowed methods for . and ?. consistent.
 
 # v2026.4.30
