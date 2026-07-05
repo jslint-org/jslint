@@ -58,7 +58,7 @@
 
 shBashrcDebianInit() {
 # This function will init debian:stable /etc/skel/.bashrc.
-# https://sources.debian.org/src/bash/4.4-5/debian/skel.bashrc/
+# https://salsa.debian.org/debian/bash/-/blob/e17f75c7869a4a00dbad36503c1965040b22ef32/debian/skel.bashrc
     # ~/.bashrc: executed by bash(1) for non-login shells.
     # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
     # for examples
@@ -89,7 +89,7 @@ shBashrcDebianInit() {
     #shopt -s globstar
 
     # make less more friendly for non-text input files, see lesspipe(1)
-    [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+    #[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
     # set variable identifying the chroot you work in (used in the prompt below)
     if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
@@ -107,7 +107,7 @@ shBashrcDebianInit() {
     #force_color_prompt=yes
 
     if [ -n "$force_color_prompt" ]; then
-        if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+        if [ -x /usr/bin/tput ] && tput setaf 1 >/dev/null 2>&1; then
         # We have color support; assume it's compliant with Ecma-48
         # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
         # a case would tend to support setf rather than setaf.)
@@ -140,7 +140,7 @@ shBashrcDebianInit() {
         #alias dir='dir --color=auto'
         #alias vdir='vdir --color=auto'
 
-        alias grep='grep --color=auto'
+        #alias grep='grep --color=auto'
         #alias fgrep='fgrep --color=auto'
         #alias egrep='egrep --color=auto'
     fi
@@ -149,7 +149,7 @@ shBashrcDebianInit() {
     #export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
     # some more ls aliases
-    alias ll='ls -alF'
+    #alias ll='ls -l'
     #alias la='ls -A'
     #alias l='ls -CF'
 
@@ -166,11 +166,11 @@ shBashrcDebianInit() {
     # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
     # sources /etc/bash.bashrc).
     if ! shopt -oq posix; then
-        if [ -f /usr/share/bash-completion/bash_completion ]; then
-            . /usr/share/bash-completion/bash_completion
-        elif [ -f /etc/bash_completion ]; then
-            . /etc/bash_completion
-        fi
+      if [ -f /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+      elif [ -f /etc/bash_completion ]; then
+        . /etc/bash_completion
+      fi
     fi
 }
 
@@ -304,10 +304,10 @@ shCiArtifactUpload() {(set -e
     export GITHUB_BRANCH0="$(git branch --show-current)"
     git pull --unshallow origin "$GITHUB_BRANCH0"
     # init $UPSTREAM_XXX
-    export UPSTREAM_REPOSITORY="$(node -p '(
-    /^(?:git\+)?https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
-).exec(require("./package.json").repository.url)[1]
-')" # '
+    export UPSTREAM_REPOSITORY="$(sed -En \
+        -e 's|.*"git\+https://github\.com/([^.]+)\.git".*|\1|p' \
+        package.json
+    )"
     export UPSTREAM_GITHUB_IO="$(
         printf "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
@@ -370,12 +370,13 @@ shCiArtifactUpload() {(set -e
         done
     fi
     # update README.md with branch-$GITHUB_BRANCH0 and $GITHUB_REPOSITORY
-    sed -i \
+    sed -i.bak \
         -e "s|/branch-[a-z]*/|/branch-$GITHUB_BRANCH0/|g" \
         -e "s|\\b$UPSTREAM_GITHUB_IO\\b|$GITHUB_GITHUB_IO|g" \
         -e "s|\\b$UPSTREAM_REPOSITORY\\b|$GITHUB_REPOSITORY|g" \
         -e "s|_2fbranch-[a-z]*_2f|_2fbranch-${GITHUB_BRANCH0}_2f|g" \
-        "branch-$GITHUB_BRANCH0/README.md"
+        "branch-$GITHUB_BRANCH0/README.md" && \
+        rm -f "branch-$GITHUB_BRANCH0/README.md".bak
     git status
     # git push
     shGitCommitPushOrSquash "" 50
@@ -607,9 +608,10 @@ shCiPublishNpm() {(set -e
     # update package-name
     if [ "$NPM_REGISTRY" = github ]
     then
-        sed -i \
-            "s|^    \"name\":.*|    \"name\": \"@$GITHUB_REPOSITORY\",|" \
-            package.json
+        sed -i.bak \
+            -e "s|^    \"name\":.*|    \"name\": \"@$GITHUB_REPOSITORY\",|" \
+            package.json && \
+            rm -f package.json.bak
     fi
     if (command -v shCiPublishNpmCustom >/dev/null)
     then
@@ -639,10 +641,10 @@ shDirHttplinkValidate() {(set -e
     # init $GITHUB_BRANCH0
     export GITHUB_BRANCH0="${GITHUB_BRANCH0:-alpha}"
     # init $UPSTREAM_XXX
-    export UPSTREAM_REPOSITORY="$(node -p '(
-    /^(?:git\+)?https:\/\/github\.com\/([^\/]*?\/[^.]*?)\.git$/
-).exec(require("./package.json").repository.url)[1]
-')" # '
+    export UPSTREAM_REPOSITORY="$(sed -En \
+        -e 's|.*"git\+https://github\.com/([^.]+)\.git".*|\1|p' \
+        package.json
+    )"
     export UPSTREAM_GITHUB_IO="$(
         printf "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
@@ -784,8 +786,8 @@ shGitCmdWithGithubToken() {(set -e
     if [ -f .git/config ]
     then
         # security - scrub token from url
-        sed -i.bak "s|://.*@|://|g" .git/config
-        rm -f .git/config.bak
+        sed -i.bak -e "s|://.*@|://|g" .git/config && \
+            rm -f .git/config.bak
     fi
     CMD="$1"
     case "$CMD" in
@@ -887,8 +889,8 @@ shGitInitBase() {(set -e
         git branch -D "$BRANCH" 2>/dev/null || true
         git checkout -b "$BRANCH" base/base
     done
-    sed -i.bak "s|owner/repo|${1:-owner/repo}|" .gitconfig
-    rm -f .gitconfig.bak
+    sed -i.bak -e "s|owner/repo|${1:-owner/repo}|" .gitconfig && \
+        rm -f .gitconfig.bak
     cp .gitconfig .git/config
     git commit -am "update owner/repo to $1" || true
 )}
@@ -970,122 +972,6 @@ import moduleChildProcess from "child_process";
 ' "$@" # '
 )}
 
-shGitPullrequest() {(set -e
-# This function will create-and-push a github-pull-commit to origin/alpha.
-    node --input-type=module --eval '
-// init debugInline
-(function () {
-    let consoleError = console.error;
-    globalThis.debugInline = globalThis.debugInline || function (...argList) {
-
-// This function will print <argv> to stderr and then return <argv>[0].
-
-        consoleError("\n\ndebugInline");
-        consoleError(...argList);
-        consoleError("\n");
-        return argList[0];
-    };
-}());
-import moduleAssert from "assert";
-import moduleChildProcess from "child_process";
-import moduleFs from "fs";
-(async function () {
-    let branchCheckpoint = process.argv[2] || "HEAD";
-    let branchMerge = process.argv[1] || "beta";
-    let branchPull;
-    let commitMessage;
-    let data;
-    let version = process.argv[3] || new Date().toISOString().slice(0, 10);
-    version = version.replace((/-0?/g), ".");
-    // security - sanitize branchXxx
-    [
-        branchCheckpoint, branchMerge, version
-    ] = [
-        branchCheckpoint, branchMerge, version
-    ].map(function (branch) {
-        return branch.trim().replace((/[^\w.\-]/g), "_");
-    });
-    data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
-    switch (branchMerge) {
-    case "master":
-        version = `v${version}`;
-        // update CHANGELOG.md
-        data = data.replace(
-            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
-            `\n\n# ${version}\n`
-        );
-        await moduleFs.promises.writeFile("CHANGELOG.md", data);
-        commitMessage = new RegExp(
-            `\n\n# ${version}\n[\\S\\s]+?\n\n`
-        ).exec(data)[0];
-        break;
-    default:
-        version = `p${version}`;
-        commitMessage = (
-            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)(?:\n- |\n\n)/
-        ).exec(data)[1];
-    }
-    branchPull = `branch-${version}`;
-    // update README.md
-    data = await moduleFs.promises.readFile("README.md", "utf8");
-    data = data.replace(
-        new RegExp(
-            (
-                "(\\bhttps:\\/\\/github\\.com\\/[\\w.\\-\\/]+?"
-                + "\\/compare"
-                + "\\/[\\w.\\-\\/]+?\\.\\.\\.[\\w.:\\-\\/]+?)"
-                + `:branch-${version[0]}\\d\\d\\d\\d\\.\\d\\d?\\.\\d\\d?\\b`
-            ),
-            "g"
-        ),
-        `$1:${branchPull}`
-    );
-    await moduleFs.promises.writeFile("README.md", data);
-    // security - sanitize commitMessage
-    commitMessage = commitMessage.trim().replace((/[$\u0027`]/g), "?");
-    moduleChildProcess.spawn(
-        "sh",
-        [
-            "-c",
-            (`
-(set -e
-    . ./jslint_ci.sh
-    npm run test2
-    git push . HEAD:__pr_${branchMerge}_pre -f
-    shGitSquashPop ${branchCheckpoint} \u0027${commitMessage}\u0027
-    git diff origin/${branchPull} || true
-    git push origin alpha:${branchPull} -f
-    git push origin alpha -f
-    shDirHttplinkValidate
-    git push . HEAD:__pr_${branchMerge} -f
-)
-            `)
-        ],
-        {stdio: ["ignore", 1, 2]}
-    ).on("exit", function (exitCode) {
-        moduleAssert.ok(
-            exitCode === 0,
-            `shGitPullrequest - exitCode=${exitCode}`
-        );
-    });
-}());
-' "$@" # '
-)}
-
-shGitPullrequestCleanup() {(set -e
-# This function will cleanup pull-request after merge.
-    git checkout alpha
-    git push . alpha:__pr_upstream_pre -f
-    git fetch upstream beta
-    # verify no diff between alpha..upstream/beta
-    git diff alpha..upstream/beta
-    git reset upstream/beta
-    git push . alpha:beta -f
-    git push origin alpha beta -f
-    sh jslint_ci.sh shMyciUpdate
-    git push . alpha:__pr_upstream -f
-)}
-
 shGitSquashPop() {(set -e
 # This function will squash HEAD to given $COMMIT.
 # http://stackoverflow.com/questions/5189560
@@ -1096,7 +982,8 @@ shGitSquashPop() {(set -e
     git reset "$COMMIT"
     git add .
     # commit HEAD immediately after previous $COMMIT
-    git commit -am "$MESSAGE" || true
+    git commit --allow-empty -am "$MESSAGE" || true
+    git log -n 4
 )}
 
 shGithubCheckoutRemote() {(set -e
@@ -1251,6 +1138,162 @@ shGithubFileUpload() {(set -e
     shGithubFileDownloadUpload upload "$1" "$2"
 )}
 
+shGithubPrCreate() {(set -e
+# This function will create-and-push a github-pull-commit to origin/alpha.
+    node --input-type=module --eval '
+// init debugInline
+(function () {
+    let consoleError = console.error;
+    globalThis.debugInline = globalThis.debugInline || function (...argList) {
+
+// This function will print <argList> to stderr and then return <argList>[0].
+
+        consoleError("\n\ndebugInline");
+        consoleError(...argList);
+        consoleError("\n");
+        return argList[0];
+    };
+}());
+import moduleAssert from "assert";
+import moduleChildProcess from "child_process";
+import moduleFs from "fs";
+(async function () {
+    let branchCheckpoint = process.argv[1] || "HEAD";
+    let branchMerge = process.argv[2] || "beta";
+    let branchPull;
+    let commitMessage;
+    let data;
+    let version = process.argv[3] || new Date().toISOString().slice(0, 10);
+    version = version.replace((/-0?/g), ".").replace((/^v/), "");
+    // security - sanitize branchXxx
+    [
+        branchCheckpoint, branchMerge, version
+    ] = [
+        branchCheckpoint, branchMerge, version
+    ].map(function (branch) {
+        return branch.trim().replace((/[^\w.\-]/g), "_");
+    });
+    data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
+    switch (branchMerge) {
+    case "main":
+    case "master":
+        version = `v${version}`;
+        // update CHANGELOG.md
+        data = data.replace(
+            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n/,
+            `\n\n# ${version}\n`
+        );
+        await moduleFs.promises.writeFile("CHANGELOG.md", data);
+        commitMessage = new RegExp(
+            `\n\n# ${version}\n[\\S\\s]+?\n\n`
+        ).exec(data)[0];
+        break;
+    default:
+        version = `p${version}`;
+        commitMessage = (
+            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)(?:\n- |\n\n)/
+        ).exec(data)[1];
+    }
+    branchPull = `branch-${version}`;
+    // update README.md
+    data = await moduleFs.promises.readFile("README.md", "utf8");
+    data = data.replace(
+        new RegExp(
+            (
+                "(\\bhttps:\\/\\/github\\.com\\/[\\w.\\-\\/]+?"
+                + "\\/compare"
+                + "\\/[\\w.\\-\\/]+?\\.\\.\\.[\\w.:\\-\\/]+?)"
+                + `:branch-${version[0]}\\d\\d\\d\\d\\.\\d\\d?\\.\\d\\d?\\b`
+            ),
+            "g"
+        ),
+        `$1:${branchPull}`
+    );
+    await moduleFs.promises.writeFile("README.md", data);
+    // security - sanitize commitMessage
+    commitMessage = commitMessage.trim().replace((/[$\u0027`]/g), "?");
+    moduleChildProcess.spawn(
+        "sh",
+        [
+            "-c",
+            (`
+(set -e
+    . ./jslint_ci.sh
+    npm run test2
+    git push . HEAD:__pr_${branchMerge}_pre -f
+    shGitSquashPop ${branchCheckpoint} \u0027${commitMessage}\u0027
+    git diff origin/${branchPull} || true
+    git push origin alpha:${branchPull} -f
+    git push origin alpha -f
+    shDirHttplinkValidate
+    git push . HEAD:__pr_${branchMerge} -f
+    git log -n 4
+)
+            `)
+        ],
+        {stdio: ["ignore", 1, 2]}
+    ).on("exit", function (exitCode) {
+        moduleAssert.ok(
+            exitCode === 0,
+            `shGithubPrCreate - exitCode=${exitCode}`
+        );
+    });
+}());
+' "$@" # '
+)}
+
+shGithubPrCleanup() {(set -e
+# This function will cleanup pull-request after merge.
+    git checkout alpha
+    git push . alpha:__pr_upstream_pre -f
+    git fetch upstream beta
+    # verify no diff between alpha..upstream/beta
+    git diff alpha..upstream/beta
+    git reset upstream/beta
+    git push . alpha:beta -f
+    git push origin alpha beta -f
+    sh jslint_ci.sh shMyciUpdate
+    git push . alpha:__pr_upstream -f
+)}
+
+shGithubPrUpdatePrxxx() {(set -e
+# This function will update 'PR-xxx' placeholder in codebase
+# to next sequential github issue/pull number.
+    if ! (git grep -Ei -e '^ *?(//|#) pr-xxx')
+    then
+        return
+    fi
+    export UPSTREAM_REPOSITORY="$(sed -En \
+        -e 's|.*"git\+https://github\.com/([^.]+)\.git".*|\1|p' \
+        package.json
+    )"
+    PR_XXX="$(curl -fs --ssl-no-revoke \
+"https://api.github.com/repos/$UPSTREAM_REPOSITORY/issues?per_page=1&state=all"
+    )"
+    PR_XXX="$(
+        printf "$PR_XXX" | sed -En -e 's/.*"number": ([0-9]+).*/\1/p'
+    )"
+    if [ ! "$PR_XXX" ]
+    then
+        return
+    fi
+    PR_XXX="PR-$((PR_XXX + 1))"
+    FILE_LIST="$(
+        git grep -Ei -e '^ *?(//|#) pr-xxx - ' | sed -E -e 's/:.*//' | sort -u
+    )"
+    for FILE in $FILE_LIST
+    do
+        sed -Ei.bak \
+            -e "s/^ *?(\/\/|#) pr-xxx - /\1 $PR_XXX - /gi" \
+            "$FILE" && \
+            rm -f "$FILE".bak
+    done
+    git diff
+    git grep -Ei -e '^ *?(//|#) pr-xxx' || true
+    git commit -am "- ci - Update 'PR-xxx' placeholder to '${PR_XXX}'."
+    git log -n 2
+)}
+
 shGithubTokenExport() {
 # This function will export $MY_GITHUB_TOKEN from file.
     if [ ! "$MY_GITHUB_TOKEN" ]
@@ -1271,6 +1314,7 @@ shGithubWorkflowDispatch() {(set -e
     EXIT_CODE=0
     curl \
 "https://api.github.com/repos/$REPO/actions/workflows/ci.yml/dispatches" \
+        --ssl-no-revoke \
         -H "accept: application/vnd.github.v3+json" \
         -H "authorization: Bearer $MY_GITHUB_TOKEN" \
         -X POST \
@@ -2395,13 +2439,10 @@ function globExclude({
  };
 }
 function htmlEscape(str) {
- return String(str).replace((
-  /&/g
- ), "&amp;").replace((
-  /</g
- ), "&lt;").replace((
-  />/g
- ), "&gt;");
+ return String(str)
+  .replace((/&/g), "&amp;")
+  .replace((/</g), "&lt;")
+  .replace((/>/g), "&gt;");
 }
 async function moduleFsInit() {
 
@@ -3345,13 +3386,9 @@ function sentinel() {}
   exitCode = await new Promise(function (resolve) {
    let processArgv0 = processArgv[0];
    if (processArgv0 === "npm") {
-    processArgv0 = process.platform.replace(
-     "win32",
-     "npm.cmd"
-    ).replace(
-     process.platform,
-     "npm"
-    );
+    processArgv0 = process.platform
+     .replace("win32", "npm.cmd")
+     .replace(process.platform, "npm");
    }
    moduleChildProcess.spawn(
     processArgv0,

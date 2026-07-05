@@ -93,9 +93,9 @@ jstestDescribe((
                     ]
                 });
             }, (
-                "Weird character "
-                + JSON.stringify(char).replace("\\", "\\\\")
-                + " found in "
+                "Weird character " +
+                JSON.stringify(char).replace((/\\/g), "\\\\") +
+                " found in "
             ));
         }));
     });
@@ -689,11 +689,90 @@ jstestDescribe((
                 "let aa = aa().getTime();",
                 "let aa = aa.aa().getTime();"
             ],
+            destructure: [
+
+// PR-500 - Unify ES2015-destructure-logic.
+
+                [
+                    String(`
+(function ({expr}) {
+    aa(bb, cc, dd, ee, ff, gg);
+}());
+                    `).trim(),
+                    "const {expr}",
+                    "let {expr}",
+                    "let [aa, bb, cc, dd, ee, ff, gg] = 0;\n{expr}"
+                ].map(function (source) {
+                    source = source.replace("{expr}", String(`
+[
+    {
+        cc,
+        dd = 0,
+        dd: ee,
+        ee: [{bb}],
+        ...aa
+    },
+    [
+        gg,
+        ...ff
+    ]
+]
+                    `).trim());
+                    if (!(/function/).test(source)) {
+                        source = (
+                            `${source} = (function () {\n`
+                            + `    return;\n`
+                            + `}());\n`
+                            + `aa(bb, cc, dd, ee, ff, gg);\n`
+                        );
+                    }
+                    source = `/*jslint node*/\n${source}`;
+                    return source;
+                }),
+
+// PR-459 - Allow destructuring-assignment after function-definition.
+
+                (
+                    "let aa;\n"
+                    + "let bb;\n"
+                    + "function cc() {\n"
+                    + "    return;\n"
+                    + "}\n"
+                    + "[aa, bb] = cc();\n"
+                )
+            ].flat(),
             directive: [
                 "#!\n/*jslint browser:false, node*/\n\"use strict\";",
                 "/*property aa bb*/"
             ],
             ellipsis: [
+
+// Issue #401 - Add ES2018-syntax for object-literal-spread-operator.
+
+                String(`
+let aa = 0;
+aa = [
+    [
+        0,
+        ...aa(),
+        0,
+        ...aa,
+        0,
+        ...aa.aa,
+        0
+    ],
+    {
+        aa: 0,
+        ...aa(),
+        bb: 0,
+        ...aa,
+        cc: 0,
+        ...aa.aa,
+        dd: 0
+    }
+];
+aa();
+                `).trim(),
 
 // PR-483 - Allow parenthesis after ellipsis inside a function call.
 
@@ -716,6 +795,15 @@ jstestDescribe((
                     + "}\n"
                 )
             ],
+            import: [
+                `let aa = 0;\nimport(aa).then(aa).catch(aa).finally(aa);`,
+                `let aa = await import("aa");`,
+                `let aa = await import("aa", {with: {type: "json"}});`,
+                `let {aa, bb} = await import("aa");`
+            ],
+            indent_method: [
+                "let aa = 0;\naa\n    .bb\n    .cc(\n        0\n    );"
+            ],
             jslint_disable: [
                 "/*jslint-disable*/\n0\n/*jslint-enable*/"
             ],
@@ -736,6 +824,15 @@ jstestDescribe((
                     + "    }\n"
                     + "}\n"
                 )
+            ],
+            literal: [
+                "String(\"\".at());",
+                "String([].at());"
+            ],
+            logical_assignment: [
+                "let aa = 0;\naa &&= 0;",
+                "let aa = 0;\naa ??= 0;",
+                "let aa = 0;\naa ||= 0;"
             ],
             loop: [
                 (
@@ -768,14 +865,12 @@ jstestDescribe((
                     + "    return await 0;\n"
                     + "});\n"
                 ),
-                "import {aa, bb} from \"aa\";\naa(bb);",
-                "import {} from \"aa\";",
-                "import(\"aa\").then(function () {\n    return;\n});",
-                (
-                    "let aa = 0;\n"
-                    + "import(aa).then(aa).then(aa)"
-                    + ".catch(aa).finally(aa);\n"
-                )
+                // `import "aa";`,
+                `import * as aa from "aa";\naa();`,
+                `import aa from "aa" with {type: "json"};\naa();`,
+                `import aa from "aa";\naa();`,
+                `import aa, {aa as bb, cc} from "aa";\naa(bb, cc);`,
+                `import {} from "aa";`
             ],
             number: [
                 "let aa = 0.0e0;",
@@ -808,10 +903,12 @@ jstestDescribe((
                 "let aa = aa[`!`];"
             ],
             regexp: [
-                "function aa() {\n    return /./;\n}",
-                "let aa = /(?!.)(?:.)(?=.)/;",
-                "let aa = /./gimuy;",
-                "let aa = /[\\--\\-]/;"
+                `RegExp.escape("");`,
+                `function aa() {\n    return /./;\n}`,
+                `let aa = /(?!.)(?:.)(?=.)/;`,
+                `let aa = /(?ims-ims:.)/;`,
+                `let aa = /./dgimsuvy;`,
+                `let aa = /[\\--\\-]/;`
             ],
             ternary: [
                 (
@@ -882,56 +979,36 @@ jstestDescribe((
                 )
             ],
             var: [
-
-// PR-363 - Bugfix
-// Add test against false-warning <uninitialized 'bb'> in code
-// '/*jslint node*/\nlet {aa:bb} = {}; bb();'.
-
                 "/*jslint node*/\n",
                 ""
             ].map(function (directive) {
                 return [
-                    "let [\n    aa, bb = 0\n] = 0;\naa();\nbb();",
-                    "let aa = 0;\nlet [...bb] = [...aa];\nbb();",
-
-// PR-459 - Allow destructuring-assignment after function-definition.
-
-                    (
-                        "let aa;\n"
-                        + "let bb;\n"
-                        + "function cc() {\n"
-                        + "    return;\n"
-                        + "}\n"
-                        + "[aa, bb] = cc();\n"
-                    ),
-                    "let constructor = 0;\nconstructor();",
-                    "let {\n    aa: bb\n} = 0;\nbb();",
-                    "let {\n    aa: bb,\n    bb: cc\n} = 0;\nbb();\ncc();",
-                    "let {aa, bb} = 0;\naa();\nbb();",
-                    "let {constructor} = 0;\nconstructor();"
-                ].map(function (code) {
-                    return directive + code;
+                    "const aa = 0;\naa();\n",
+                    "let aa = 0;\naa();\n",
+                    "var aa = 0;\naa();\n"
+                ].map(function (source) {
+                    return directive + source;
                 });
             }).flat()
         }).forEach(function (codeList) {
             let elemPrv = "";
-            codeList.forEach(function (code) {
+            codeList.forEach(function (source) {
                 let warnings;
                 // Assert codeList is sorted.
-                assertOrThrow(elemPrv < code, JSON.stringify([
-                    elemPrv, code
+                assertOrThrow(elemPrv < source, JSON.stringify([
+                    elemPrv, source
                 ], undefined, 4));
-                elemPrv = code;
+                elemPrv = source;
                 [
                     jslint.jslint,
                     jslintCjs.jslint
                 ].forEach(function (jslint) {
-                    warnings = jslint(code, {
+                    warnings = jslint(source, {
                         beta: true
                     }).warnings;
                     assertOrThrow(
                         warnings.length === 0,
-                        JSON.stringify([code, warnings])
+                        `${source}\n${JSON.stringify(warnings, undefined, 4)}`
                     );
                 });
             });
@@ -1062,15 +1139,14 @@ jstestDescribe((
                 jslintCjs.jslint
             ].forEach(function (jslint) {
                 // test jslint's option handling-behavior
+                let warnings = jslint(
+                    source,
+                    option_dict,
+                    global_list
+                ).warnings;
                 assertOrThrow(
-                    jslint(
-                        source,
-                        option_dict,
-                        global_list
-                    ).warnings.length === warningsLength,
-                    "jslint.jslint(" + JSON.stringify([
-                        source, option_dict, global_list
-                    ]) + ")"
+                    warnings.length === warningsLength,
+                    `${source}\n${JSON.stringify(warnings, undefined, 4)}`
                 );
                 // test jslint's directive handling-behavior
                 source = (

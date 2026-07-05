@@ -67,7 +67,7 @@ body {
 </head>
 <body>
 <div class="apidocDiv">
-<h1>API Doc for <a href="https://github.com/jslint-org/jslint">JSLint (v2026.4.30)</a></h1>
+<h1>API Doc for <a href="https://github.com/jslint-org/jslint">JSLint (v2026.6.30)</a></h1>
 <div class="apidocSectionDiv">
     <a href="#apidocTableOfContents1" id="apidocTableOfContents1">
         <h1>Table of Contents</h1>
@@ -101,7 +101,7 @@ function assertOrThrow<span class="apidocSignatureSpan">(condition, message)</sp
 <li>
 
 <a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.debugInline">4.
-function debugInline<span class="apidocSignatureSpan">(...argv)</span>
+function debugInline<span class="apidocSignatureSpan">(...argList)</span>
 </a>
 
 </li>
@@ -442,18 +442,18 @@ jstestIt((
 <li>
     <h2>
     <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.debugInline" id="apidoc.elem.%22.%2Fjslint.mjs%22.debugInline">4.
-    function debugInline<span class="apidocSignatureSpan">(...argv)</span>
+    function debugInline<span class="apidocSignatureSpan">(...argList)</span>
     </a>
     </h2>
 </li>
-<li>Description and source-code:<pre class="apidocCodePre">function debug(...argv) {
+<li>Description and source-code:<pre class="apidocCodePre">function debug(...argList) {
 <span class="apidocCodeCommentSpan">
-// This function will print &lt;argv&gt; to stderr and then return &lt;argv&gt;[0].
+// This function will print &lt;argList&gt; to stderr and then return &lt;argList&gt;[0].
 
 </span>    __consoleError("\n\ndebugInline");
-    __consoleError(...argv);
+    __consoleError(...argList);
     __consoleError("\n");
-    return argv[0];
+    return argList[0];
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">N/A</pre></li>
 
@@ -620,13 +620,10 @@ await jslint.jslint_cli({
 <span class="apidocCodeCommentSpan">
 // This function will make &lt;str&gt; html-safe by escaping &amp; &lt; &gt;.
 
-</span>    return String(str).replace((
-        /&amp;/g
-    ), "&amp;amp;").replace((
-        /&lt;/g
-    ), "&amp;lt;").replace((
-        /&gt;/g
-    ), "&amp;gt;");
+</span>    return String(str)
+        .replace((/&amp;/g), "&amp;amp;")
+        .replace((/&lt;/g), "&amp;lt;")
+        .replace((/&gt;/g), "&amp;gt;");
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
                             }
@@ -787,13 +784,10 @@ ${name}
             /(\([\S\s]*?\)) \{/
         ), function (match0, match1) {
             signature = htmlEscape(
-                match1.replace((
-                    / *?\/\*[\S\s]*?\*\/ */g
-                ), "").replace((
-                    / *?\/\/.*/g
-                ), "").replace((
-                    /\n{2,}/g
-                ), "\n")
+                match1
+                    .replace((/ *?\/\*[\S\s]*?\*\/ */g), "")
+                    .replace((/ *?\/\/.*/g), "")
+                    .replace((/\n{2,}/g), "\n")
             );
             return match0;
         });
@@ -809,7 +803,7 @@ ${name}
                     + key
                     + "(\\((?:.*?\\n){8})"
                 ), "g"),
-  ...
+                function (ignore, header, isDeclarati...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -853,7 +847,7 @@ ${String(message).slice(0, 2000)}`
     );
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-// ["let aa={};", "whitage", "opener", "", 0]
+// ["let aa={};", "whitage_case", "opener", "", 0]
 
 test_cause("opener");
 
@@ -1068,15 +1062,16 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
                                 // ... literal.
     let mode_regexp;            // true if regular expression literal seen on
                                 // ... this line.
-    let paren_backtrack_list = [];      // List of most recent "(" tokens at any
-                                        // ... paren-depth.
-    let paren_depth = 0;        // Keeps track of current paren-depth.
+    let opener_popped = empty();        // Last token popped from opener_stack.
+    let opener_stack = [];      // Stack of opener tokens: (, [.
     let snippet = "";           // A piece of string.
     let token_1;                // The first token.
     let token_prv = token_global;       // The previous token including
                                         // ... comments.
     let token_prv_expr = token_global;  // The previous token excluding
-                                        // ... comm...
+                                        // ... comments.
+
+// Most tokens, including the identifiers, operators, and pu...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1152,6 +1147,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
                                         // ... the parse.
     let token_nxt = token_global;       // The next token to be examined in
                                         // ... &lt;token_list&gt;.
+    let token_prv = token_global;       // The previous token examined.
 
     function advance(id, match) {
 
@@ -1167,8 +1163,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
             anon = token_now.id;
         } else if (
             token_now.id === "(string)"
-            &amp;&amp; jslint_rgx_identifier.test(token_now.value)
-       ...
+  ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1333,6 +1328,8 @@ jslint_assert(
 // "switch(){}"
 // "while(){}"
 
+    let indent_method_dict = empty();
+    let indentage;
     let left = token_global;
     let margin = 0;
     let mode_indent = (
@@ -1351,9 +1348,19 @@ jslint_assert(
 // This is the set of infix operators that require a space on each side.
 
     let spaceop = object_assign_from_list(empty(), [
-        "!=", "!==", "%", "%=", "&amp;", "&amp;&amp;", "&amp;=", "*", "*=", "+=", "-=", "/",
-        "/=", "&lt;", "&lt;&lt;", "&lt;&lt;=", "&lt;=", "=", "==", "===", "=&gt;", "&gt;", "&gt;=", "&gt;&gt;",
-        "&gt;&gt;=", "&gt;&gt;&gt;", "&gt;&gt;&gt;=", "^", "^=", "|", "|=", "||"
+        "!=", "!==",
+        "%", "%=",
+        "&amp;", "&amp;&amp;", "&amp;&amp;=", "&amp;=",
+        "*", "*=",
+        "+=",
+        "-=",
+        "/", "/=",
+        "&lt;", "&lt;&lt;", "&lt;&lt;=", "&lt;=",
+        "=", "==", "===", "=&gt;",
+        "&gt;", "&gt;=", "&gt;&gt;", "&gt;&gt;=", "&gt;&gt;&gt;", "&gt;&gt;&gt;=",
+        "??", "??=",
+        "^", "^=",
+        "|", "|=", "||", "||="
     ], true);
 
     function at_margin(fit) {
@@ -1376,13 +1383,7 @@ jslint_assert(
                     name.used === 0
 
 // Probably deadcode.
-// &amp;&amp; (
-//     name.role !== "function"
-//     || name.parent.arity !== "unary"
-// )
-
-                    &amp;&amp; jslint_assert(
-                        name.role...
+/...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1457,10 +1458,10 @@ jslint_assert(
 // Google Lighthouse Accessibility - &lt;dl&gt;'s do not contain only properly-ordered
 // &lt;dt&gt; and &lt;dd&gt; groups, &lt;script&gt;, &lt;template&gt; or &lt;div&gt; elements.
 
-                "&lt;dl&gt;"
-                + "&lt;dt&gt;" + htmlEscape(title) + "&lt;/dt&gt;"
-                + "&lt;dd&gt;" + list.join(", ") + "&lt;/dd&gt;"
-                + "&lt;/dl&gt;"
+                "&lt;dl&gt;" +
+                "&lt;dt&gt;" + htmlEscape(title) + "&lt;/dt&gt;" +
+                "&lt;dd&gt;" + list.map(htmlEscape).join(", ") + "&lt;/dd&gt;" +
+                "&lt;/dl&gt;"
             )
             : ""
         );
@@ -1482,7 +1483,7 @@ KDflSQnlJ0bP+QnPQAy744n9mup6H9PaCDFwM5zjf8exB89bZ1cdrYOP0NgnuRDRWlk9u/fE\
 llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOtz\
 7sIKEGgLdDNl/IrfqWVZG/wr42ekomEm91VA1p4LhHBuFzHF8//u7vvbREHMQqGtNLmiOOD/\
 X7WWiwqyCE98qt0jk5JJmgR5WJJElBmzRb1F7a66MmSLTNWZ2XSHfKBSKHoVteSEJ6EOdvVw\
-fNZOtXKDe39jXdRlkmMnOWIOFBgeEK/b0mFsgffnP...
+fNZOtXKDe39jXdRlkmMnOWIOF...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
