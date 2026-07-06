@@ -156,7 +156,7 @@ import moduleChildProcess from "child_process";
     GITHUB_REPO_BASENAME="$(printf "$GITHUB_GITHUB_IO" | cut -d'/' -f2)"
     if [ "$GITHUB_REPO_BASENAME" != jslint ]
     then
-        for FILE in $(ls .artifact/*_2f"${GITHUB_REPO_BASENAME}"_2f*)
+        for FILE in .artifact/*_2f"$GITHUB_REPO_BASENAME"_2f*
         do
             mv "$FILE" "$(printf "$FILE" | \
                 sed -e "s|_2f${GITHUB_REPO_BASENAME}_2f|_2fjslint_2f|")"
@@ -456,7 +456,7 @@ import moduleFs from "fs";
                     "type": "git",
                     "url": "https://github.com/jslint-org/jslint.git"
                 },
-                "version": "2026.6.30"
+                "version": "2026.7.1"
             }, undefined, 4)
         }
     ].map(async function ({
