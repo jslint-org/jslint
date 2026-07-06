@@ -5143,7 +5143,7 @@ function jslint_phase3_parse(state) {
         name.parent.context[id] = name;
     }
 
-// PR-xxx - Unify name_list.push() logic with helper-function name_push().
+// PR-502 - Unify name_list.push() logic with helper-function name_push().
 
     function name_push(name_list, enroll, name, role, readonly, init) {
 
@@ -5898,7 +5898,7 @@ function jslint_phase3_parse(state) {
 // ", "check_ordered", "expected_a_b_before_c_d", "aa", 17]
 // ["let{bb,aa}=0", "check_ordered", "expected_a_b_before_c_d", "aa", 8]
 
-// PR-xxx - Fix false-warning about ordering in nested-object-destructuring.
+// PR-501 - Fix false-warning about ordering in nested-object-destructuring.
 
             check_ordered(role, sub_list);
             advance_and_signature_push("}");
@@ -8478,7 +8478,7 @@ function jslint_phase4_walk(state) {
                 test_cause("let aa");
             }
 
-// PR-xxx - Fix long-running regression where 'let x = x;'
+// PR-502 - Fix long-running regression where 'let x = x;'
 // doesn't warn about temporal-dead-zone.
 
 // 1a. Mark not dead, the variable, after variable-initialization.
@@ -8737,7 +8737,7 @@ function jslint_phase4_walk(state) {
         warn("unexpected_a", thing);
     }
 
-// PR-xxx - Probably deadcode.
+// PR-502 - Probably deadcode.
 
 //     function pre_b_lparen(thing) {
 //
@@ -9105,7 +9105,7 @@ function jslint_phase4_walk(state) {
     preaction("assignment", pre_a_bitwise);
     preaction("binary", "!=", pre_b_noteq);
 
-// PR-xxx - Probably deadcode.
+// PR-502 - Probably deadcode.
 
 //     preaction("binary", "(", pre_b_lparen);
 
@@ -9763,7 +9763,7 @@ function jslint_phase5_whitage(state) {
 // or used. If the file imports or exports, then its global object is also
 // delved.
 
-// PR-xxx - tighten warning of unused variables to be always on.
+// PR-502 - tighten warning of unused variables to be always on.
 
     delve(token_global);
     catch_list.forEach(delve);
