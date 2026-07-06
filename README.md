@@ -1023,16 +1023,7 @@ if (false) {
         sh jslint_ci.sh shGithubPrUpdatePrxxx
 
         # re-run until version propagates
-        sh jslint_ci.sh shGithubPrCreate alpha beta # v20xx.xx.xx
-
-        # squash intermediary commits
-        sh jslint_ci.sh shGitSquashPop __pr_beta_pre "- ci - shGithubPrUpdatePrxxx."
-
-        # squash intermediary commits
-        sh jslint_ci.sh shGithubPrCreate alpha beta # v20xx.xx.xx
-
-        # squash intermediary commits
-        git push . __pr_beta_pre~:__pr_beta_pre -f
+        sh jslint_ci.sh shGithubPrCreate alpha beta # v20yy.mm.dd __pr_beta_pre
 
         git push upstream alpha -f
         ```
@@ -1090,16 +1081,7 @@ if (false) {
         sh jslint_ci.sh shGithubPrUpdatePrxxx
 
         # re-run until version propagates
-        sh jslint_ci.sh shGithubPrCreate alpha master # v20xx.xx.xx
-
-        # squash intermediary commits
-        sh jslint_ci.sh shGitSquashPop __pr_master_pre "- ci - shGithubPrUpdatePrxxx."
-
-        # squash intermediary commits
-        sh jslint_ci.sh shGithubPrCreate alpha master # v20xx.xx.xx
-
-        # squash intermediary commits
-        git push . __pr_master_pre~:__pr_master_pre -f
+        sh jslint_ci.sh shGithubPrCreate alpha master # v20yy.mm.dd __pr_master_pre
 
         git push upstream alpha -f
         ```

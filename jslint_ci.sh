@@ -1158,12 +1158,16 @@ import moduleAssert from "assert";
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
 (async function () {
-    let branchCheckpoint = process.argv[1] || "HEAD";
-    let branchMerge = process.argv[2] || "beta";
+    let [
+        ,
+        branchCheckpoint = "HEAD",
+        branchMerge = "beta",
+        version = new Date().toISOString().slice(0, 10),
+        branchSquash = "HEAD"
+    ] = process.argv;
     let branchPull;
     let commitMessage;
     let data;
-    let version = process.argv[3] || new Date().toISOString().slice(0, 10);
     version = version.replace((/-0?/g), ".").replace((/^v/), "");
     // security - sanitize branchXxx
     [
@@ -1193,6 +1197,7 @@ import moduleFs from "fs";
         commitMessage = (
             /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)(?:\n- |\n\n)/
         ).exec(data)[1];
+        commitMessage = `- shGithubPrCreate ${commitMessage}`;
     }
     branchPull = `branch-${version}`;
     // update README.md
@@ -1211,7 +1216,7 @@ import moduleFs from "fs";
     );
     await moduleFs.promises.writeFile("README.md", data);
     // security - sanitize commitMessage
-    commitMessage = commitMessage.trim().replace((/[$\u0027`]/g), "?");
+    commitMessage = commitMessage.trim().replace((/\u0027/g), "$&\"$&\"$&");
     moduleChildProcess.spawn(
         "sh",
         [
@@ -1220,13 +1225,14 @@ import moduleFs from "fs";
 (set -e
     . ./jslint_ci.sh
     npm run test2
-    git push . HEAD:__pr_${branchMerge}_pre -f
-    shGitSquashPop ${branchCheckpoint} \u0027${commitMessage}\u0027
-    git diff origin/${branchPull} || true
-    git push origin alpha:${branchPull} -f
+    git reset "${branchSquash}"
+    git push . HEAD:__pr_"${branchMerge}"_pre -f
+    shGitSquashPop "${branchCheckpoint}" \u0027${commitMessage}\u0027
+    git diff origin/"${branchPull}" || true
+    git push origin alpha:"${branchPull}" -f
     git push origin alpha -f
     shDirHttplinkValidate
-    git push . HEAD:__pr_${branchMerge} -f
+    git push . HEAD:__pr_"${branchMerge}" -f
     git log -n 4
 )
             `)
@@ -1235,7 +1241,7 @@ import moduleFs from "fs";
     ).on("exit", function (exitCode) {
         moduleAssert.ok(
             exitCode === 0,
-            `shGithubPrCreate - exitCode=${exitCode}`
+            `shGithubPrCreate - exitCode="${exitCode}"`
         );
     });
 }());
