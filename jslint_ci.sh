@@ -982,8 +982,7 @@ shGitSquashPop() {(set -e
     git reset "$COMMIT"
     git add .
     # commit HEAD immediately after previous $COMMIT
-    git commit --allow-empty -am "$MESSAGE" || true
-    git log -n 4
+    git commit -am "$MESSAGE" || true
 )}
 
 shGithubCheckoutRemote() {(set -e
@@ -1158,13 +1157,13 @@ import moduleAssert from "assert";
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
 (async function () {
-    let branchCheckpoint = process.argv[1] || "HEAD";
-    let branchMerge = process.argv[2] || "beta";
+    let branchCheckpoint = process.argv[2] || "HEAD";
+    let branchMerge = process.argv[1] || "beta";
     let branchPull;
     let commitMessage;
     let data;
     let version = process.argv[3] || new Date().toISOString().slice(0, 10);
-    version = version.replace((/-0?/g), ".").replace((/^v/), "");
+    version = version.replace((/-0?/g), ".");
     // security - sanitize branchXxx
     [
         branchCheckpoint, branchMerge, version
@@ -1175,7 +1174,6 @@ import moduleFs from "fs";
     });
     data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
     switch (branchMerge) {
-    case "main":
     case "master":
         version = `v${version}`;
         // update CHANGELOG.md
@@ -1227,7 +1225,6 @@ import moduleFs from "fs";
     git push origin alpha -f
     shDirHttplinkValidate
     git push . HEAD:__pr_${branchMerge} -f
-    git log -n 4
 )
             `)
         ],
