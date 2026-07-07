@@ -1,6 +1,7 @@
 # Changelog
 
 # Todo
+- jslint-warning - Relax fat-arrow-warning "use_function_not_fart".
 - jslint-ci - Automate linting of shell-scripts with shellcheck.
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
@@ -11,6 +12,7 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.6.1-beta
+- jslint - regression-fix - Revisit warn about variable usage before initialization.
 - jslint-ecma - Unify ES2015-destructure-logic into function prefix_destructure().
 - jslint-ci - Add shell-function shGithubPrUpdatePrxxx() to auto-update 'PR-xxx' placeholder to next sequential github issue/pull number.
 - jslint-ci - Rename shell-functions shGitPullrequestXxx() to shGithubPrXxx().
