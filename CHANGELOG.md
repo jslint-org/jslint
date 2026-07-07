@@ -14,6 +14,9 @@
 
 # v2026.6.1-beta
 - jslint - regression-fix - Revisit warn about variable usage before initialization.
+- jslint - Wrap all property-updates 'name.init = true/false' with calls to:
+    name_lookup() - 'aa=0'
+    name_push()   - 'let aa=0'
 - jslint-ecma - Unify ES2015-destructure-logic into function prefix_destructure().
 - jslint-ci - Add shell-function shGithubPrUpdatePrxxx() to auto-update 'PR-xxx' placeholder to next sequential github issue/pull number.
 - jslint-ci - Rename shell-functions shGitPullrequestXxx() to shGithubPrXxx().

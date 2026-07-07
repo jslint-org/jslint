@@ -2020,16 +2020,22 @@ function jslint_assert(condition, message) {
 
 // This function will throw <message> if <condition> is falsy.
 
+    let error;
     if (condition) {
-        return condition;
+        return;
     }
-    throw new Error(
+    error = new Error(
         `This was caused by a bug in JSLint.
 Please open an issue with this stack-trace (and possible example-code) at
 https://github.com/jslint-org/jslint/issues.
 edition = "${jslint_edition}";
 ${String(message).slice(0, 2000)}`
     );
+    if (message === "test_internal_error") {
+        error = {};
+    }
+    console.error(error);
+    throw error;
 }
 
 async function jslint_cli({
@@ -4368,8 +4374,8 @@ function jslint_phase3_parse(state) {
                 the_token.name_list = [];       // 1. name_list for "aa = ..."
                 name_push(
                     the_token.name_list,        // name_list
-                    left,               // name
                     false,              // enroll
+                    left,               // name
                     "variable",         // role
                     false,              // readonly
                     true                // init
@@ -5116,7 +5122,6 @@ function jslint_phase3_parse(state) {
 
         Object.assign(name, {
             dead: true,
-            init: false,
             parent: (
                 role === "exception"
                 ? catchage
@@ -5131,7 +5136,7 @@ function jslint_phase3_parse(state) {
 
 // PR-xxx - Unify name_list.push() logic with helper-function name_push().
 
-    function name_push(name_list, name, enroll, role, readonly, init) {
+    function name_push(name_list, enroll, name, role, readonly, init) {
 
 // This function will:
 // 1. Push variable or function-parameter <name> to <name_list>.
@@ -5143,7 +5148,9 @@ function jslint_phase3_parse(state) {
         if (enroll) {
             name_enroll(name, role, readonly);
         }
-        name.arity = role;
+        if (role === "variable") {
+            name.arity = "variable";
+        }
         name.init = init;
     }
 
@@ -5447,9 +5454,15 @@ function jslint_phase3_parse(state) {
 // ["aa:while{}", "parse_statement", "the_statement_label", "while", 0]
 
                 test_cause("the_statement_label", token_nxt.id);
-                name_enroll(the_label, "label", true);
+                name_push(
+                    [],                 // name_list
+                    true,               // enroll
+                    the_label,          // name
+                    "label",            // role
+                    true,               // readonly
+                    true                // init
+                );
                 the_label.dead = false;
-                the_label.init = true;
                 the_statement = parse_statement();
 
 // Issue #458 - Regression - Warn about variable usage before initialization.
@@ -5805,11 +5818,11 @@ function jslint_phase3_parse(state) {
                 }
                 token_nxt.label = name;
                 name = token_nxt;
-                name_push(sub_list, name, enroll, role, readonly, true);
+                name_push(sub_list, enroll, name, role, readonly, true);
                 advance_and_signature_push(token_nxt.id);
                 return;
             }
-            name_push(sub_list, name, enroll, role, readonly, true);
+            name_push(sub_list, enroll, name, role, readonly, true);
             if (token_nxt.id === "=") {
                 optional = the_function_toplevel && token_now;
                 advance_and_signature_push("=");
@@ -5902,84 +5915,52 @@ function jslint_phase3_parse(state) {
         return stop("expected_a_before_b", token_now, "()", "=>");
     }
 
-    function prefix_function(the_function, mode_fart, mode_infix_fart) {
-        let name = the_function?.name;
+    function prefix_function(the_function, mode_fart, mode_fart_infix) {
+        let name;
+        let role = "function";
+        the_function = the_function || token_now;
         if (mode_fart) {
             the_function.arity = "binary";
-            the_function.name = anon;
-        } else if (!the_function) {
-            the_function = token_now;
 
 // A function statement must have a name that will be in the parent's scope.
 
-            if (the_function.arity === "statement") {
-                if (!token_nxt.identifier) {
+        } else if (the_function.arity === "statement") {
+            if (!token_nxt.identifier) {
 
 // test_cause:
 // ["function(){}", "prefix_function", "expected_identifier_a", "(", 9]
 // ["function*aa(){}", "prefix_function", "expected_identifier_a", "*", 9]
 
-                    return stop("expected_identifier_a", token_nxt);
-                }
-                name = token_nxt;
-                name_enroll(name, "variable", true);
-                the_function.name = Object.assign(name, {
-                    calls: empty(),
-
-// PR-331 - Bugfix - Fixes issue #272 - function hoisting not allowed.
-
-                    dead: false,
-                    init: true
-                });
-                advance();
-            } else if (!name) {
+                return stop("expected_identifier_a", token_nxt);
+            }
+            name = token_nxt;
+            name.calls = empty();
+            role = "variable";
+            advance();
+        } else if (token_nxt.identifier) {
 
 // A function expression may have an optional name.
 
-                the_function.name = anon;
-                if (token_nxt.identifier) {
-                    name = token_nxt;
-                    the_function.name = name;
-                    advance();
-                }
-            }
-        }
-        if (
-            !mode_fart
-            && the_function.arity !== "statement"
-            && typeof name === "object"
-        ) {
-
 // test_cause:
-// ["let aa=function bb(){return;};", "prefix_function", "expression", "bb", 0]
+// ["(function bb(){}())", "prefix_function", "expression", "bb", 0]
+// ["aa=function bb(){}", "prefix_function", "expression", "bb", 0]
 
-            test_cause("expression", name.id);
-            name_enroll(name, "function", true);
-            name.dead = false;
-            name.init = true;
-            name.used = 1;
+            test_cause("expression", token_nxt.id);
+            name = token_nxt;
+            advance();
         }
-
-//  Probably deadcode.
-//  if (mode_mega) {
-//      warn("unexpected_a", the_function);
-//  }
-//  jslint_assert(!mode_mega, `Expected !mode_mega.`);
-
-// PR-378 - Relax warning "function_in_loop".
-//
-// // Don't create functions in loops. It is inefficient, and it can lead to
-// // scoping errors.
-//
-//         if (functionage.loop > 0) {
-//
-// // test_cause:
-// // ["
-// // while(0){aa.map(function(){});}
-// // ", "prefix_function", "function_in_loop", "function", 17]
-//
-//             warn("function_in_loop", the_function);
-//         }
+        if (name?.identifier) {
+            name_push(
+                [],                     // name_list
+                true,                   // enroll
+                name,                   // name
+                role,                   // role
+                false,                  // readonly
+                true                    // init
+            );
+            name.dead = the_function.arity !== "statement";
+            name.used = Number(the_function.arity !== "statement");
+        }
 
 // Give the function properties for storing its names and for observing the
 // depth of loops and switches.
@@ -5990,6 +5971,19 @@ function jslint_phase3_parse(state) {
             finally: 0,
             level: functionage.level + 1,
             loop: 0,
+            name: (
+                name?.identifier
+                ? name
+                : mode_fart_infix
+                ? "anonymous"
+                : anon
+            ),
+            parameter_count: Number(Boolean(mode_fart_infix)),
+            signature: (
+                mode_fart_infix
+                ? token_prv.id
+                : ["("]
+            ),
             statement_prv: undefined,
             switch: 0,
             try: 0
@@ -6013,15 +6007,40 @@ function jslint_phase3_parse(state) {
 
 // Parse the parameter list.
 
-        if (mode_fart) {
-            prefix_function_parameter(the_function, mode_infix_fart);
-            if (!mode_infix_fart) {
-                advance("=>");
-            }
-        } else {
+        if (!mode_fart) {
             advance("(");
             token_now.arity = "function";
-            prefix_function_parameter(the_function);
+        }
+        the_function.name_list = [];    // 2. name_list for "function (aa)"
+        if (mode_fart_infix) {
+            name_push(
+                the_function.name_list, // name_list
+                true,                   // enroll
+                token_prv,              // name
+                "parameter",            // role
+                false,                  // readonly
+                true                    // init
+            );
+        } else {
+            token_now.free = false;
+            if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
+
+// PR-500 - Unify ES2015-destructure-logic. - function ([aa]) {...}
+
+                prefix_destructure(
+                    true,               // enroll
+                    "parameter",        // role
+                    false,              // readonly
+                    the_function.name_list,     // name_list
+                    the_function,       // the_function
+                    true                // the_function_toplevel
+                );
+            }
+            advance(")");
+            the_function.signature = the_function.signature.join("") + ")";
+        }
+        if (mode_fart && !mode_fart_infix) {
+            advance("=>");
         }
         if (mode_fart && token_nxt.id !== "{") {
 
@@ -6106,45 +6125,6 @@ function jslint_phase3_parse(state) {
 
         functionage = function_stack.pop();
         return the_function;
-    }
-
-    function prefix_function_parameter(the_function, mode_infix_fart) {
-
-// This function will parse input <parameters> at beginning of <the_function>
-
-        the_function.name_list = [];    // 2. name_list for "function (aa)"
-        if (mode_infix_fart) {
-            the_function.name = "anonymous";
-            the_function.parameter_count = 1;
-            the_function.signature = token_prv.id;
-            name_push(
-                the_function.name_list, // name_list
-                token_prv,              // name
-                true,                   // enroll
-                "parameter",            // role
-                false,                  // readonly
-                true                    // init
-            );
-            return;
-        }
-        the_function.parameter_count = 0;
-        the_function.signature = ["("];
-        token_now.free = false;
-        if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
-
-// PR-500 - Unify ES2015-destructure-logic. - function ([aa]) {...}
-
-            prefix_destructure(
-                true,                   // enroll
-                "parameter",            // role
-                false,                  // readonly
-                the_function.name_list, // name_list
-                the_function,           // the_function
-                true                    // the_function_toplevel
-            );
-        }
-        advance(")");
-        the_function.signature = the_function.signature.join("") + ")";
     }
 
     function prefix_lbrace() {
@@ -6913,8 +6893,8 @@ function jslint_phase3_parse(state) {
                 }
                 name_push(
                     the_import.name_list,       // name_list
-                    name,               // name
                     true,               // enroll
+                    name,               // name
                     "variable",         // role
                     true,               // readonly
                     true                // init
@@ -6946,8 +6926,8 @@ function jslint_phase3_parse(state) {
                         }
                         name_push(
                             the_import.name_list,       // name_list
-                            name,       // name
                             true,       // enroll
+                            name,       // name
                             "variable", // role
                             true,       // readonly
                             true        // init
@@ -7277,8 +7257,8 @@ function jslint_phase3_parse(state) {
                     the_catch.name = token_nxt;
                     name_push(
                         [],             // name_list
-                        token_nxt,      // name
                         true,           // enroll
+                        token_nxt,      // name
                         "exception",    // role
                         true,           // readonly
                         true            // init
@@ -7321,7 +7301,6 @@ function jslint_phase3_parse(state) {
     function stmt_var() {
         const readonly = token_now.id === "const";
         let name;
-        let name_init;
         let the_variable = token_now;
         let variable_prv;
         the_variable.name_list = [];    // 5. name_list for "let [aa] = ..."
@@ -7428,15 +7407,14 @@ function jslint_phase3_parse(state) {
                 if (token_nxt.id === "=" || readonly) {
                     advance("=");
                     name.expression = parse_expression(0);
-                    name_init = true;
                 }
                 name_push(
                     the_variable.name_list,     // name_list
-                    name,               // name
                     true,               // enroll
+                    name,               // name
                     "variable",         // role
                     readonly,           // readonly
-                    name_init           // init
+                    Boolean(name.expression)    // init
                 );
             } else {
 
@@ -9122,24 +9100,11 @@ function jslint_phase5_whitage(state) {
 // ["function aa(aa) {return aa;}", "delve", "id", "", 0]
 
                 test_cause("id");
-                if (
-                    name.used === 0
-
-// Probably deadcode.
-// && (
-//     name.role !== "function"
-//     || name.parent.arity !== "unary"
-// )
-
-                    && jslint_assert(
-                        name.role !== "function",
-                        `Expected name.role !== "function".`
-                    )
-                ) {
+                if (!name.used) {
 
 // test_cause:
 // ["/*jslint node*/\nlet aa;", "delve", "unused_a", "aa", 5]
-// ["function aa(aa){return;}", "delve", "unused_a", "aa", 13]
+// ["function aa(bb){return;}", "delve", "unused_a", "bb", 13]
 // ["let aa=0;try{aa();}catch(bb){aa();}", "delve", "unused_a", "bb", 26]
 
                     warn("unused_a", name);
