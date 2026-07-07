@@ -279,7 +279,7 @@
     moduleName,
     module_list,
     name,
-    names,
+    name_list,
     node,
     nomen,
     noop,
@@ -4365,7 +4365,7 @@ function jslint_phase3_parse(state) {
             the_token.arity = "assignment";
             right = parse_expression(20 - 1);
             if (id === "=" && left.arity === "variable") {
-                the_token.names = left;
+                the_token.name_list = [left];
                 the_token.expression = right;
             } else {
                 the_token.expression = [left, right];
@@ -5274,7 +5274,7 @@ function jslint_phase3_parse(state) {
 
             warn("wrap_fart_parameter", token_now);
             the_fart.name = "anonymous";
-            the_fart.names = [token_prv];
+            the_fart.name_list = [token_prv];
             the_fart.parameter_count = 1;
             the_fart.signature = token_prv.id;
             enroll(token_prv, "parameter", false);
@@ -5745,7 +5745,7 @@ function jslint_phase3_parse(state) {
         the_function,
         the_function_toplevel
     ) {
-        const is_brace = token_now.id === "{";
+        const is_lbrace = token_now.id === "{";
         const the_destructure = token_now;
         let optional;
         function advance_and_signature_push(id) {
@@ -5848,11 +5848,11 @@ function jslint_phase3_parse(state) {
 
                 return stop("expected_identifier_a", name);
             }
-            if (is_brace) {
+            if (is_lbrace) {
                 survey(name);
             }
             advance_and_signature_push(token_nxt.id);
-            if (is_brace && token_nxt.id === ":") {
+            if (is_lbrace && token_nxt.id === ":") {
                 advance_and_signature_push(":");
                 if (!the_function_toplevel) {
                     the_destructure.open = true;
@@ -5912,7 +5912,7 @@ function jslint_phase3_parse(state) {
             }
         }
         while (true) {
-            if (!is_brace && !the_function_toplevel && token_nxt.id === ",") {
+            if (!is_lbrace && !the_function_toplevel && token_nxt.id === ",") {
 
 // test_cause:
 // ["(,aa)=>0", "name_parse", "expected_identifier_a", ",", 2]
@@ -5939,7 +5939,7 @@ function jslint_phase3_parse(state) {
         }
         if (the_function_toplevel) {
             advance_and_signature_push(")");
-        } else if (is_brace) {
+        } else if (is_lbrace) {
 
 // test_cause:
 // ["
@@ -6124,7 +6124,7 @@ function jslint_phase3_parse(state) {
 
 // This function will parse input <parameters> at beginning of <the_function>
 
-        the_function.names = [];
+        the_function.name_list = [];
         the_function.parameter_count = 0;
         the_function.signature = ["("];
         token_now.free = false;
@@ -6136,7 +6136,7 @@ function jslint_phase3_parse(state) {
                 enroll,                 // enroll
                 "parameter",            // role
                 false,                  // readonly
-                the_function.names,     // name_list
+                the_function.name_list, // name_list
                 the_function,           // the_function
                 true                    // the_function_toplevel
             );
@@ -6330,7 +6330,7 @@ function jslint_phase3_parse(state) {
         the_token.expression = [];
         if (the_token.assignment) {
             the_token = token_now.assignment;
-            the_token.names = [];
+            the_token.name_list = [];
 
 // PR-500 - Unify ES2015-destructure-logic. - [aa] = ...;
 
@@ -6338,7 +6338,7 @@ function jslint_phase3_parse(state) {
                 undefined,              // enroll
                 "variable",             // role
                 false,                  // readonly
-                the_token.names,        // name_list
+                the_token.name_list,    // name_list
                 undefined,              // the_function
                 false                   // the_function_toplevel
             );
@@ -6872,7 +6872,7 @@ function jslint_phase3_parse(state) {
     function stmt_import() {
         const the_import = token_now;
         let name;
-        the_import.name = [];
+        the_import.name_list = [];
         state.mode_module = true;
         while (true) {
 
@@ -6911,7 +6911,7 @@ function jslint_phase3_parse(state) {
                     warn("unexpected_a", name);
                 }
                 enroll(name, "variable", true);
-                the_import.name.push(name);
+                the_import.name_list.push(name);
             } else {
                 advance("{");
                 if (token_nxt.id !== "}") {
@@ -6938,7 +6938,7 @@ function jslint_phase3_parse(state) {
                             warn("unexpected_a", name);
                         }
                         enroll(name, "variable", true);
-                        the_import.name.push(name);
+                        the_import.name_list.push(name);
                         if (token_nxt.id !== ",") {
                             break;
                         }
@@ -7303,7 +7303,7 @@ function jslint_phase3_parse(state) {
         let name;
         let the_variable = token_now;
         let variable_prv;
-        the_variable.names = [];
+        the_variable.name_list = [];
 
 // A program may use var or let, but not both.
 
@@ -7386,7 +7386,7 @@ function jslint_phase3_parse(state) {
                     enroll,             // enroll
                     "variable",         // role
                     readonly,           // readonly
-                    the_variable.names, // name_list
+                    the_variable.name_list,     // name_list
                     undefined,          // the_function
                     false               // the_function_toplevel
                 );
@@ -7419,7 +7419,7 @@ function jslint_phase3_parse(state) {
 
                     name.expression = parse_expression(0);
                 }
-                the_variable.names.push(name);
+                the_variable.name_list.push(name);
             } else {
 
 // test_cause:
@@ -7446,8 +7446,8 @@ function jslint_phase3_parse(state) {
             && !option_dict.variable
             && variable_prv
             && (
-                variable_prv.id + " " + variable_prv.names[0].id
-                > the_variable.id + " " + the_variable.names[0].id
+                variable_prv.id + " " + variable_prv.name_list[0].id
+                > the_variable.id + " " + the_variable.name_list[0].id
             )
         ) {
 
@@ -7460,9 +7460,9 @@ function jslint_phase3_parse(state) {
                 "expected_a_b_before_c_d",
                 the_variable,
                 the_variable.id,
-                the_variable.names[0].id,
+                the_variable.name_list[0].id,
                 variable_prv.id,
-                variable_prv.names[0].id
+                variable_prv.name_list[0].id
             );
         }
         semicolon();
@@ -7900,15 +7900,6 @@ function jslint_phase4_walk(state) {
         };
     }
 
-    function init_variable(name) {
-        let the_variable = lookup(name);
-        if (!the_variable || the_variable.readonly) {
-            warn("bad_assignment_a", name);
-            return;
-        }
-        the_variable.init = true;
-    }
-
     function lookup(thing) {
         let id = thing.id;
         let the_variable;
@@ -8000,57 +7991,24 @@ function jslint_phase4_walk(state) {
 
         const lvalue = thing.expression[0];
         let right;
-        if (thing.id === "=") {
-            if (thing.names !== undefined) {
-                if (Array.isArray(thing.names)) {
-
-// PR-500 - Fix false-warning "uninitialized_a" in statement ";[aa]=0;".
-
-// test_cause:
-// [";[aa]=0", "post_a", ";[aa]=0", "", 0]
-
-                    test_cause(";[aa]=0");
-                    thing.names.forEach(init_variable);
-                } else {
+        if (thing.id !== "=") {
+            if (
+                lvalue.arity === "variable"
+                && (!lvalue.variable || lvalue.variable.readonly)
+            ) {
 
 // test_cause:
-// ["aa=0", "post_a", "aa=0", "", 0]
+// ["aa+=0", "post_a", "+=", "aa", 0]
+// ["aa+=0", "post_a", "bad_assignment_a", "aa", 1]
+// ["const aa=0;aa+=0", "post_a", "+=", "aa", 0]
+// ["const aa=0;aa+=0", "post_a", "bad_assignment_a", "aa", 12]
 
-                    test_cause("aa=0");
-                    init_variable(thing.names);
-                }
-            } else {
-                if (lvalue.id === "[" || lvalue.id === "{") {
-                    lvalue.expression.forEach(function (thing) {
-                        if (thing.variable) {
-                            thing.variable.init = true;
-                        }
-                    });
-                } else if (
-                    lvalue.id === "."
-                    && thing.expression[1].id === "undefined"
-                ) {
-
-// test_cause:
-// ["aa.aa=undefined", "post_a", "expected_a_b", "undefined", 1]
-
-                    warn(
-                        "expected_a_b",
-                        lvalue.expression,
-                        "delete",
-                        "undefined"
-                    );
-                }
-            }
-        } else {
-            if (lvalue.arity === "variable") {
-                if (!lvalue.variable || lvalue.variable.readonly) {
-                    warn("bad_assignment_a", lvalue);
-                }
+                test_cause("+=", lvalue.id);
+                warn("bad_assignment_a", lvalue);
             }
             right = syntax_dict[thing.expression[1].id];
             if (
-                right !== undefined
+                right
                 && (
                     right.id === "function"
                     || right.id === "=>"
@@ -8067,6 +8025,34 @@ function jslint_phase4_walk(state) {
 
                 warn("unexpected_a", thing.expression[1]);
             }
+            return;
+        }
+        if (thing.name_list) {
+            thing.name_list.forEach(function (name) {
+                const the_variable = lookup(name);
+                if (!the_variable || the_variable.readonly) {
+
+// test_cause:
+// ["aa=0", "post_a", "=", "aa", 0]
+// ["aa=0", "post_a", "bad_assignment_a", "aa", 1]
+// ["const aa=0;aa=0", "post_a", "=", "aa", 0]
+// ["const aa=0;aa=0", "post_a", "bad_assignment_a", "aa", 12]
+
+                    test_cause("=", name.id);
+                    warn("bad_assignment_a", name);
+                    return;
+                }
+                the_variable.init = true;
+            });
+            return;
+        }
+        if (lvalue.id === "." && thing.expression[1].id === "undefined") {
+
+// test_cause:
+// ["aa.aa=undefined", "post_a", "expected_a_b", "undefined", 1]
+
+            warn("expected_a_b", lvalue.expression, "delete", "undefined");
+            return;
         }
     }
 
@@ -8413,7 +8399,7 @@ function jslint_phase4_walk(state) {
     }
 
     function post_s_import(the_thing) {
-        the_thing.name.forEach(function (name) {
+        the_thing.name_list.forEach(function (name) {
             name.dead = false;
             name.init = true;
             blockage.live.push(name);
@@ -8449,7 +8435,7 @@ function jslint_phase4_walk(state) {
     }
 
     function post_s_var(thing) {
-        thing.names.forEach(function (name) {
+        thing.name_list.forEach(function (name) {
             name.dead = false;
             if (name.expression) {
 
@@ -8461,12 +8447,12 @@ function jslint_phase4_walk(state) {
 
 // Probably deadcode.
 // if (name.id === "{" || name.id === "[") {
-//     name.names.forEach(subactivate);
+//     name.name_list.forEach(subactivate);
 // } else {
 //     name.init = true;
 // }
 
-// PR-500 - Unify property the_function.parameters into the_function.names.
+// PR-500 - Unify property the_function.parameters into the_function.name_list.
 
 // jslint_assert(
 // !(name.id === "{" || name.id === "["),
@@ -8844,19 +8830,19 @@ function jslint_phase4_walk(state) {
             }
         }
 
-// PR-500 - Unify property the_function.parameters into the_function.names.
+// PR-500 - Unify property the_function.parameters into the_function.name_list.
 
 // thing.parameters.forEach(function (name) {
 //     walk_expression(name.expression);
 //     if (name.id === "{" || name.id === "[") {
-//         name.names.forEach(subactivate);
+//         name.name_list.forEach(subactivate);
 //     } else {
 //         name.dead = false;
 //         name.init = true;
 //     }
 // });
 
-        thing.names.forEach(function (name) {
+        thing.name_list.forEach(function (name) {
             if (name.expression) {
 
 // test_cause:
@@ -8901,7 +8887,7 @@ function jslint_phase4_walk(state) {
         }
     }
 
-// PR-500 - Unify property the_function.parameters into the_function.names.
+// PR-500 - Unify property the_function.parameters into the_function.name_list.
 
 // function subactivate(name) {
 //     name.init = true;
@@ -10314,7 +10300,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
             level,
             line,
             name,
-            names = [],
+            name_list = [],
             signature
         } = the_function;
         let list = Object.keys(context);
@@ -10337,7 +10323,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
             )
             + "</dfn>"
         );
-        html += detail("parameter", names.map(function ({id}) {
+        html += detail("parameter", name_list.map(function ({id}) {
             return id;
         }).sort());
         list.sort();
