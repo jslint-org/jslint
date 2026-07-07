@@ -4365,7 +4365,15 @@ function jslint_phase3_parse(state) {
             the_token.arity = "assignment";
             right = parse_expression(20 - 1);
             if (id === "=" && left.arity === "variable") {
-                the_token.name_list = [left];
+                the_token.name_list = [];       // 1. name_list for "aa = ..."
+                name_list_push(
+                    the_token.name_list,        // name_list
+                    left,               // name
+                    undefined,          // enroll
+                    "variable",         // role
+                    false,              // readonly
+                    true                // init
+                );
                 the_token.expression = right;
             } else {
                 the_token.expression = [left, right];
@@ -5106,6 +5114,24 @@ function jslint_phase3_parse(state) {
         return the_symbol;
     }
 
+// PR-xxx - Unify name_list.push() logic with helper-function name_list_push().
+
+    function name_list_push(name_list, name, enroll, role, readonly, init) {
+
+// This function will:
+// 1. Push variable or function-parameter token <name> to <name_list>.
+// 2. Enroll <name> if its either a declared-variable or function-parameter.
+// 3. Set <name>.init = true, if its either an assigned-variable or
+//    function-parameter.
+
+        name_list.push(name);
+        if (enroll) {
+            enroll(name, role, readonly);
+        }
+        name.arity = role;
+        name.init = init;
+    }
+
     function parse_expression(rbp, initial) {
 
 // This is the heart of JSLINT, the Pratt parser. In addition to parsing, it
@@ -5226,7 +5252,7 @@ function jslint_phase3_parse(state) {
         return left;
     }
 
-    function parse_fart(the_fart, mode_infix) {
+    function parse_fart(the_fart, mode_infix_fart) {
 
 // Give the function properties storing its names and for observing the depth
 // of loops and switches.
@@ -5257,32 +5283,11 @@ function jslint_phase3_parse(state) {
         function_list.push(the_fart);
         function_stack.push(functionage);
         functionage = the_fart;
-        if (mode_infix) {
-            if (!token_prv.identifier) {
-
-// test_cause:
-// ["0=>0", "parse_fart", "expected_identifier_a", "0", 1]
-
-                return stop("expected_identifier_a", token_prv);
-            }
-
-// PR-499 - Update ES2015-feature arrow, to continue parsing unwrapped-form
-// with warning, instead of stopping.
-
-// test_cause:
-// ["aa=>0", "parse_fart", "wrap_fart_parameter", "=>", 3]
-
-            warn("wrap_fart_parameter", token_now);
-            the_fart.name = "anonymous";
-            the_fart.name_list = [token_prv];
-            the_fart.parameter_count = 1;
-            the_fart.signature = token_prv.id;
-            enroll(token_prv, "parameter", false);
-        } else {
 
 // Parse the parameter list.
 
-            prefix_function_parameter(the_fart);
+        prefix_function_parameter(the_fart, mode_infix_fart);
+        if (!mode_infix_fart) {
             advance("=>");
         }
 
@@ -5746,6 +5751,7 @@ function jslint_phase3_parse(state) {
         the_function_toplevel
     ) {
         const is_lbrace = token_now.id === "{";
+        const sub_list = [];
         const the_destructure = token_now;
         let optional;
         function advance_and_signature_push(id) {
@@ -5758,17 +5764,6 @@ function jslint_phase3_parse(state) {
                     the_function.signature.push(" ");
                     break;
                 }
-            }
-        }
-        function name_list_push(name) {
-            name_list.push(name);
-
-// PR-500 - Fix false-warning "uninitialized_a" in statement ";[aa]=0;".
-
-            name.arity = role;
-            if (enroll) {
-                enroll(name, role, readonly);
-                name.init = true;
             }
         }
         function name_parse() {
@@ -5876,11 +5871,11 @@ function jslint_phase3_parse(state) {
                 }
                 token_nxt.label = name;
                 name = token_nxt;
-                name_list_push(name);
+                name_list_push(sub_list, name, enroll, role, readonly, true);
                 advance_and_signature_push(token_nxt.id);
                 return;
             }
-            name_list_push(name);
+            name_list_push(sub_list, name, enroll, role, readonly, true);
 
 // test_cause:
 // ["const[aa]=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 11]
@@ -5937,9 +5932,11 @@ function jslint_phase3_parse(state) {
             }
             advance_and_signature_push(",");
         }
+        name_list.push(...sub_list);
         if (the_function_toplevel) {
-            advance_and_signature_push(")");
-        } else if (is_lbrace) {
+            return the_destructure;
+        }
+        if (is_lbrace) {
 
 // test_cause:
 // ["
@@ -5947,11 +5944,13 @@ function jslint_phase3_parse(state) {
 // ", "check_ordered", "expected_a_b_before_c_d", "aa", 17]
 // ["let{bb,aa}=0", "check_ordered", "expected_a_b_before_c_d", "aa", 8]
 
-            check_ordered(role, name_list);
+// PR-xxx - Fix false-warning about ordering in nested-object-destructuring.
+
+            check_ordered(role, sub_list);
             advance_and_signature_push("}");
-        } else {
-            advance_and_signature_push("]");
+            return the_destructure;
         }
+        advance_and_signature_push("]");
         return the_destructure;
     }
 
@@ -6120,17 +6119,46 @@ function jslint_phase3_parse(state) {
         return the_function;
     }
 
-    function prefix_function_parameter(the_function) {
+    function prefix_function_parameter(the_function, mode_infix_fart) {
 
 // This function will parse input <parameters> at beginning of <the_function>
 
-        the_function.name_list = [];
+        the_function.name_list = [];    // 2. name_list for "function (aa)"
+        if (mode_infix_fart) {
+            if (!token_prv.identifier) {
+
+// test_cause:
+// ["0=>0", "prefix_function_parameter", "expected_identifier_a", "0", 1]
+
+                return stop("expected_identifier_a", token_prv);
+            }
+
+// PR-499 - Update ES2015-feature arrow, to continue parsing unwrapped-form
+// with warning, instead of stopping.
+
+// test_cause:
+// ["aa=>0", "prefix_function_parameter", "wrap_fart_parameter", "=>", 3]
+
+            warn("wrap_fart_parameter", token_now);
+            the_function.name = "anonymous";
+            the_function.parameter_count = 1;
+            the_function.signature = token_prv.id;
+            name_list_push(
+                the_function.name_list, // name_list
+                token_prv,              // name
+                enroll,                 // enroll
+                "parameter",            // role
+                false,                  // readonly
+                true                    // init
+            );
+            return;
+        }
         the_function.parameter_count = 0;
         the_function.signature = ["("];
         token_now.free = false;
         if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
 
-// PR-500 - Unify ES2015-destructure-logic. - function([aa]) {...}
+// PR-500 - Unify ES2015-destructure-logic. - function ([aa]) {...}
 
             prefix_destructure(
                 enroll,                 // enroll
@@ -6140,11 +6168,9 @@ function jslint_phase3_parse(state) {
                 the_function,           // the_function
                 true                    // the_function_toplevel
             );
-        } else {
-            advance(")");
-            the_function.signature.push(")");
         }
-        the_function.signature = the_function.signature.join("");
+        advance(")");
+        the_function.signature = the_function.signature.join("") + ")";
     }
 
     function prefix_lbrace() {
@@ -6330,7 +6356,7 @@ function jslint_phase3_parse(state) {
         the_token.expression = [];
         if (the_token.assignment) {
             the_token = token_now.assignment;
-            the_token.name_list = [];
+            the_token.name_list = [];   // 3. name_list for "[aa] = ..."
 
 // PR-500 - Unify ES2015-destructure-logic. - [aa] = ...;
 
@@ -6354,9 +6380,10 @@ function jslint_phase3_parse(state) {
                 if (!state.mode_json && token_nxt.id === "...") {
 
 // test_cause:
-// ["aa=[...aa]", "prefix_lbracket", "ellipsis", "", 0]
+// [";[...aa,aa]", "advance", "expected_a_b", ",", 8]
+// [";[...aa,aa]", "prefix_lbracket", "ellipsis", "...", 0]
 
-                    test_cause("ellipsis");
+                    test_cause("ellipsis", token_nxt.id);
                     element = prefix_ellipsis();
                     the_token.expression.push(element);
                     break;
@@ -6872,7 +6899,7 @@ function jslint_phase3_parse(state) {
     function stmt_import() {
         const the_import = token_now;
         let name;
-        the_import.name_list = [];
+        the_import.name_list = [];      // 4. name_list for "import ..."
         state.mode_module = true;
         while (true) {
 
@@ -6910,8 +6937,14 @@ function jslint_phase3_parse(state) {
 
                     warn("unexpected_a", name);
                 }
-                enroll(name, "variable", true);
-                the_import.name_list.push(name);
+                name_list_push(
+                    the_import.name_list,       // name_list
+                    name,               // name
+                    enroll,             // enroll
+                    "variable",         // role
+                    true,               // readonly
+                    true                // init
+                );
             } else {
                 advance("{");
                 if (token_nxt.id !== "}") {
@@ -6937,8 +6970,14 @@ function jslint_phase3_parse(state) {
 
                             warn("unexpected_a", name);
                         }
-                        enroll(name, "variable", true);
-                        the_import.name_list.push(name);
+                        name_list_push(
+                            the_import.name_list,       // name_list
+                            name,       // name
+                            enroll,     // enroll
+                            "variable", // role
+                            true,       // readonly
+                            true        // init
+                        );
                         if (token_nxt.id !== ",") {
                             break;
                         }
@@ -7301,9 +7340,10 @@ function jslint_phase3_parse(state) {
     function stmt_var() {
         const readonly = token_now.id === "const";
         let name;
+        let name_init;
         let the_variable = token_now;
         let variable_prv;
-        the_variable.name_list = [];
+        the_variable.name_list = [];    // 5. name_list for "let [aa] = ..."
 
 // A program may use var or let, but not both.
 
@@ -7404,22 +7444,19 @@ function jslint_phase3_parse(state) {
 
                     warn("unexpected_a", name);
                 }
-                enroll(name, "variable", readonly);
                 if (token_nxt.id === "=" || readonly) {
                     advance("=");
-
-// Issue #458 - Regression - Warn about variable usage before initialization.
-
-//                    name.dead = false;
-
-                    name.init = true;
-
-// test_cause:
-// ["const aa=bb;\nconst bb=0;", "lookup", "out_of_scope_a", "bb", 10]
-
                     name.expression = parse_expression(0);
+                    name_init = true;
                 }
-                the_variable.name_list.push(name);
+                name_list_push(
+                    the_variable.name_list,     // name_list
+                    name,               // name
+                    enroll,             // enroll
+                    "variable",         // role
+                    readonly,           // readonly
+                    name_init           // init
+                );
             } else {
 
 // test_cause:
@@ -8401,7 +8438,6 @@ function jslint_phase4_walk(state) {
     function post_s_import(the_thing) {
         the_thing.name_list.forEach(function (name) {
             name.dead = false;
-            name.init = true;
             blockage.live.push(name);
         });
         return post_s_export(the_thing);
@@ -8436,7 +8472,7 @@ function jslint_phase4_walk(state) {
 
     function post_s_var(thing) {
         thing.name_list.forEach(function (name) {
-            name.dead = false;
+            name.dead = false; // t0d0 - move to end
             if (name.expression) {
 
 // test_cause:
@@ -8444,22 +8480,6 @@ function jslint_phase4_walk(state) {
 
                 test_cause("let aa=0");
                 walk_expression(name.expression);
-
-// Probably deadcode.
-// if (name.id === "{" || name.id === "[") {
-//     name.name_list.forEach(subactivate);
-// } else {
-//     name.init = true;
-// }
-
-// PR-500 - Unify property the_function.parameters into the_function.name_list.
-
-// jslint_assert(
-// !(name.id === "{" || name.id === "["),
-// `Expected !(name.id === "{" || name.id === "[").`
-// );
-
-                name.init = true;
             } else {
 
 // test_cause:
@@ -8804,7 +8824,6 @@ function jslint_phase4_walk(state) {
         thing.live = [];
         if (typeof thing.name === "object") {
             thing.name.dead = false;
-            thing.name.init = true;
         }
         if (thing.extra === "get") {
             if (thing.parameter_count !== 0) {
@@ -8829,19 +8848,6 @@ function jslint_phase4_walk(state) {
                 warn("bad_set", thing);
             }
         }
-
-// PR-500 - Unify property the_function.parameters into the_function.name_list.
-
-// thing.parameters.forEach(function (name) {
-//     walk_expression(name.expression);
-//     if (name.id === "{" || name.id === "[") {
-//         name.name_list.forEach(subactivate);
-//     } else {
-//         name.dead = false;
-//         name.init = true;
-//     }
-// });
-
         thing.name_list.forEach(function (name) {
             if (name.expression) {
 
@@ -8859,7 +8865,6 @@ function jslint_phase4_walk(state) {
             }
             walk_expression(name.expression);
             name.dead = false;
-            name.init = true;
         });
     }
 
@@ -8886,14 +8891,6 @@ function jslint_phase4_walk(state) {
             the_variable.used += 1;
         }
     }
-
-// PR-500 - Unify property the_function.parameters into the_function.name_list.
-
-// function subactivate(name) {
-//     name.init = true;
-//     name.dead = false;
-//     blockage.live.push(name);
-// }
 
     function walk_expression(thing) {
         if (thing) {
