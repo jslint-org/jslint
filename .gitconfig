@@ -2,9 +2,6 @@
 [branch "alpha"]
     merge = refs/heads/alpha
     remote = origin
-[branch "alpha2"]
-    merge = refs/heads/alpha2
-    remote = origin
 [branch "base"]
     merge = refs/heads/base
     remote = origin
