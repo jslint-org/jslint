@@ -1420,15 +1420,6 @@ function jslint(
         case "use_double":
             mm = `Use double quotes, not single quotes.`;
             break;
-
-// PR-386 - Fix issue #382 - Make fart-related warnings more readable.
-
-        case "use_function_not_fart":
-            mm = (
-                `Use 'function (...)', not '(...) =>' when arrow functions`
-                + ` become too complex.`
-            );
-            break;
         case "use_open":
             mm = (
                 `Wrap a ternary expression in parens,`
@@ -4459,6 +4450,10 @@ function jslint_phase3_parse(state) {
         const id = left.id;
         if (
             !left.identifier
+
+// PR-xxx - Relax warning for ((...) => {...}());
+
+            && left.id !== "=>"
             && (
                 left.arity !== "ternary"
                 || (
@@ -5639,13 +5634,6 @@ function jslint_phase3_parse(state) {
             the_function = Object.assign(token_now.fart, {
                 async: 1
             });
-            if (!option_dict.fart) {
-
-// test_cause:
-// ["async()=>0", "prefix_async", "use_function_not_fart", "=>", 8]
-
-                warn("use_function_not_fart", the_function);
-            }
             prefix_lparen();
 
 // Parse async function.
@@ -5751,14 +5739,6 @@ function jslint_phase3_parse(state) {
                 return true;
             case "[":
             case "{":
-                if (the_function?.id === "=>" && !option_dict.fart) {
-
-// test_cause:
-// ["([aa])=>0", "name_parse", "use_function_not_fart", "=>", 7]
-// ["({aa})=>0", "name_parse", "use_function_not_fart", "=>", 7]
-
-                    warn("use_function_not_fart", the_function);
-                }
                 if (optional) {
 
 // test_cause:
@@ -6079,19 +6059,10 @@ function jslint_phase3_parse(state) {
                 );
             }
             the_function.expression = parse_expression(0);
-        } else if (mode_fart) {
+        } else {
 
 // The function's body is a block.
 
-            if (!option_dict.fart) {
-
-// test_cause:
-// ["()=>{}", "prefix_function", "use_function_not_fart", "=>", 3]
-
-                warn("use_function_not_fart", the_function);
-            }
-            the_function.block = block("body");
-        } else {
             the_function.block = block("body");
             if (
                 the_function.arity === "statement"
@@ -8468,6 +8439,9 @@ function jslint_phase4_walk(state) {
 
 // t0d0 - Move to after walk_expression().
 
+// PR-xxx - Fix long-running regression where 'let x = x;'
+// doesn't warn about uninitialized variables.
+
 // 1a. Mark not dead, the variable, after variable-initialization.
 
             name.dead = false;
@@ -9795,12 +9769,11 @@ function jslint_phase5_whitage(state) {
 // or used. If the file imports or exports, then its global object is also
 // delved.
 
-    if (state.mode_module === true || option_dict.node) {
-        delve(token_global);
-    }
+// PR-xxx - tighten warning of unused variables to be always on.
+
+    delve(token_global);
     catch_list.forEach(delve);
     function_list.forEach(delve);
-
     if (option_dict.white) {
         return;
     }
