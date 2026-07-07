@@ -251,7 +251,7 @@
     lines,
     linesCovered,
     linesTotal,
-    live,
+    live_list,
     log,
     long,
     loop,
@@ -893,7 +893,7 @@ function jslint(
         id: "(global)",
         level: 0,
         line: jslint_fudge,
-        live: [],
+        live_list: [],
         loop: 0,
         switch: 0,
         thru: 0,
@@ -4521,13 +4521,20 @@ function jslint_phase3_parse(state) {
 
 // This function will warn if <token_list> is unordered.
 
-        token_list.reduce(function (aa, token) {
-            const bb = artifact(token);
-            if (!option_dict.unordered && aa > bb) {
-                warn("expected_a_b_before_c_d", token, type, bb, type, aa);
-            }
-            return bb;
-        }, "");
+        token_list
+            .filter(function (token) {
+
+// Issue #401 - Regression - Ignore tokens prefixed by ellipsis for sorting.
+
+                return token && !token.ellipsis;
+            })
+            .reduce(function (aa, token) {
+                const bb = artifact(token);
+                if (!option_dict.unordered && aa > bb) {
+                    warn("expected_a_b_before_c_d", token, type, bb, type, aa);
+                }
+                return bb;
+            }, "");
     }
 
     function check_ordered_case(case_list) {
@@ -4980,7 +4987,6 @@ function jslint_phase3_parse(state) {
 
                     test_cause("aa(...aa)");
                     the_argument = prefix_ellipsis();
-                    the_argument.ellipsis = true;
                 } else {
                     the_argument = parse_expression(10);
                 }
@@ -5121,6 +5127,9 @@ function jslint_phase3_parse(state) {
 // Enroll it.
 
         Object.assign(name, {
+
+// 1z. Mark as dead, the variable, during variable-initialization.
+
             dead: true,
             parent: (
                 role === "exception"
@@ -5286,8 +5295,10 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["[-.0]", "parse_json", "unexpected_a", ".", 3]
 // ["[-0x0]", "parse_json", "unexpected_a", "0x0", 3]
+// ["[...]", "parse_json", "unexpected_a", "...", 2]
 // ["[.0]", "parse_json", "unexpected_a", ".", 2]
 // ["[0x0]", "parse_json", "unexpected_a", "0x0", 2]
+// ["{...}", "parse_json", "unexpected_a", "...", 2]
 
                 warn("unexpected_a");
             }
@@ -5462,10 +5473,13 @@ function jslint_phase3_parse(state) {
                     true,               // readonly
                     true                // init
                 );
+
+// 2a. Mark not dead, the label-statement, before control-flow-block.
+
                 the_label.dead = false;
                 the_statement = parse_statement();
 
-// Issue #458 - Regression - Warn about variable usage before initialization.
+// 2z. Mark as dead, the label-statement, after control-flow-block.
 
                 the_label.dead = true;
                 functionage.statement_prv = the_statement;
@@ -5514,13 +5528,6 @@ function jslint_phase3_parse(state) {
             }
             semicolon();
         }
-
-// Issue #458 - Regression - Warn about variable usage before initialization.
-
-//        if (the_label !== undefined) {
-//            the_label.dead = true;
-//        }
-
         return the_statement;
     }
 
@@ -5719,6 +5726,7 @@ function jslint_phase3_parse(state) {
             case "...":
                 advance_and_signature_push("...");
                 name = token_nxt;
+                name.ellipsis = true;
                 if (name.id === "...") {
 
 // test_cause:
@@ -5904,6 +5912,7 @@ function jslint_phase3_parse(state) {
         let after_ellipsis;
         advance("...");
         after_ellipsis = parse_expression(0);
+        after_ellipsis.ellipsis = true;
         return after_ellipsis;
     }
 
@@ -5949,7 +5958,7 @@ function jslint_phase3_parse(state) {
             name = token_nxt;
             advance();
         }
-        if (name?.identifier) {
+        if (name) {
             name_push(
                 [],                     // name_list
                 true,                   // enroll
@@ -5958,8 +5967,14 @@ function jslint_phase3_parse(state) {
                 false,                  // readonly
                 true                    // init
             );
-            name.dead = the_function.arity !== "statement";
-            name.used = Number(the_function.arity !== "statement");
+            if (the_function.arity === "statement") {
+
+// 3a. Mark not dead, the function-name, in function-statement.
+
+                name.dead = false;
+            } else {
+                name.used += 1;
+            }
         }
 
 // Give the function properties for storing its names and for observing the
@@ -5972,11 +5987,11 @@ function jslint_phase3_parse(state) {
             level: functionage.level + 1,
             loop: 0,
             name: (
-                name?.identifier
-                ? name
-                : mode_fart_infix
-                ? "anonymous"
-                : anon
+                name || (
+                    mode_fart_infix
+                    ? "anonymous"
+                    : anon
+                )
             ),
             parameter_count: Number(Boolean(mode_fart_infix)),
             signature: (
@@ -6154,7 +6169,6 @@ function jslint_phase3_parse(state) {
 
                 test_cause("ellipsis");
                 value = prefix_ellipsis();
-                value.ellipsis = true;
                 return value;
             }
             advance();
@@ -6290,11 +6304,7 @@ function jslint_phase3_parse(state) {
 
         check_ordered(
             "property",
-            the_brace.expression.filter(function ({
-                ellipsis
-            }) {
-                return !ellipsis;
-            }).map(function ({
+            the_brace.expression.map(function ({
                 label
             }) {
                 return label;
@@ -6334,16 +6344,16 @@ function jslint_phase3_parse(state) {
                 if (!state.mode_json && token_nxt.id === "...") {
 
 // test_cause:
-// [";[...aa,aa]", "advance", "expected_a_b", ",", 8]
-// [";[...aa,aa]", "prefix_lbracket", "ellipsis", "...", 0]
+// ["aa=[...aa]", "prefix_lbracket", "ellipsis", "...", 0]
 
                     test_cause("ellipsis", token_nxt.id);
-                    element = prefix_ellipsis();
-                    the_token.expression.push(element);
-                    break;
+                    the_token.expression.push(prefix_ellipsis());
+
+// Issue #401 - Regression - Allow multiple-ellipsis in array-literal.
+
+                } else {
+                    the_token.expression.push(parse_expression(10));
                 }
-                element = parse_expression(10);
-                the_token.expression.push(element);
                 if (token_nxt.id !== ",") {
                     break;
                 }
@@ -6351,7 +6361,7 @@ function jslint_phase3_parse(state) {
                 if (token_nxt.id === "]") {
 
 // test_cause:
-// ["let aa=[0,]", "prefix_lbracket", "unexpected_a", ",", 10]
+// ["aa=[0,]", "prefix_lbracket", "unexpected_a", ",", 6]
 
                     warn("unexpected_a", token_now);
                     break;
@@ -7932,10 +7942,6 @@ function jslint_phase4_walk(state) {
                     the_variable = context[id];
                 }
             });
-
-// If it isn't in any of those either, perhaps it is a predefined global.
-// If so, add it to the global context.
-
             if (!the_variable && global_dict[id] === undefined) {
 
 // test_cause:
@@ -7951,8 +7957,15 @@ function jslint_phase4_walk(state) {
                 warn("undeclared_a", thing);
                 return;
             }
+
+// If it isn't in any of those either, perhaps it is a predefined global.
+// If so, add it to the global context.
+
             if (!the_variable) {
                 the_variable = {
+
+// 4a. Mark not dead, the global-variable, anywhere.
+
                     dead: false,
                     id,
                     init: true,
@@ -8365,7 +8378,7 @@ function jslint_phase4_walk(state) {
         }
     }
 
-    function post_s_export(the_thing) {
+    function post_s_export_toplevel(the_thing) {
 
 // Some features must be at the most outermost level.
 
@@ -8374,7 +8387,7 @@ function jslint_phase4_walk(state) {
 // test_cause:
 // ["
 // if(0){import aa from "aa";}
-// ", "post_s_export", "misplaced_a", "import", 7]
+// ", "post_s_export_toplevel", "misplaced_a", "import", 7]
 
             warn("misplaced_a", the_thing);
         }
@@ -8402,22 +8415,31 @@ function jslint_phase4_walk(state) {
 
             warn("unexpected_parens", thing);
         }
-        return post_s_lbrace();
+        return post_s_lbrace_pop_block();
     }
 
     function post_s_import(the_thing) {
         the_thing.name_list.forEach(function (name) {
+
+// 5a. Mark not dead, the import-name, after import-statement.
+
             name.dead = false;
-            blockage.live.push(name);
+
+// 5z. Mark as dead, the import-name, after module-scope.
+
+            blockage.live_list.push(name);
         });
-        return post_s_export(the_thing);
+        return post_s_export_toplevel(the_thing);
     }
 
-    function post_s_lbrace() {
-        blockage.live.forEach(function (name) {
+    function post_s_lbrace_pop_block() {
+        blockage.live_list.forEach(function (name) {
+
+// 1z. Mark as dead, the variable, after block-scope.
+
             name.dead = true;
         });
-        delete blockage.live;
+        delete blockage.live_list;
         blockage = block_stack.pop();
     }
 
@@ -8426,6 +8448,9 @@ function jslint_phase4_walk(state) {
             return;
         }
         if (thing.catch.name) {
+
+// 6a. Mark not dead, the exception-variable, before catch-block.
+
             catchage.context[thing.catch.name.id].dead = false;
         }
 
@@ -8440,7 +8465,12 @@ function jslint_phase4_walk(state) {
 
     function post_s_var(thing) {
         thing.name_list.forEach(function (name) {
-            name.dead = false; // t0d0 - move to end
+
+// t0d0 - Move to after walk_expression().
+
+// 1a. Mark not dead, the variable, after variable-initialization.
+
+            name.dead = false;
             if (name.expression) {
 
 // test_cause:
@@ -8455,7 +8485,15 @@ function jslint_phase4_walk(state) {
 
                 test_cause("let aa");
             }
-            blockage.live.push(name);
+            switch (thing.id) {
+            case "const":
+            case "let":
+
+// 1z. Mark as dead, the variable, after block-scope.
+
+                blockage.live_list.push(name);
+                break;
+            }
         });
     }
 
@@ -8700,33 +8738,99 @@ function jslint_phase4_walk(state) {
         warn("unexpected_a", thing);
     }
 
-    function pre_b_lparen(thing) {
-        const left = thing.expression[0];
-        let left_variable;
-        let parent;
-        if (
-            left.identifier
-            && functionage.context[left.id] === undefined
-            && typeof functionage.name === "object"
-        ) {
-            parent = functionage.name.parent;
-            if (parent) {
-                left_variable = parent.context[left.id];
-                if (
-                    left_variable !== undefined
+// PR-xxx - Probably deadcode.
 
-// Probably deadcode.
-// && left_variable.dead
-
-                    && left_variable.parent === parent
-                    && left_variable.calls !== undefined
-                    && left_variable.calls[functionage.name.id] !== undefined
-                ) {
-                    left_variable.dead = false;
-                }
-            }
-        }
-    }
+//     function pre_b_lparen(thing) {
+//
+// // This function runs right before the parser handles a "(" symbol
+// // (like in "myFunction()"). It is a safety valve to prevent
+// // incorrect "use before definition" warnings.
+// //
+// // Example code triggering this preaction:
+// // my_function();
+//
+// // Step 1: Find out what is being called.
+// // If the code is "foo()", "left" gets the "foo" part.
+// //
+// // Code representation:
+// // left === token_foo;
+//
+//         const left = thing.expression[0];
+//         let left_variable;
+//         let parent;
+//
+// // Step 2: Make sure we are calling a named thing (an identifier),
+// // and check that this thing is NOT defined locally inside the
+// // active function. We also make sure the active function
+// // actually has a name.
+// //
+// // Code structure matched here:
+// // function active_function() {
+// //     foo(); // "foo" is not defined inside active_function
+// // }
+//
+//         if (
+//             left.identifier
+//             && functionage.context[left.id] === undefined
+//             && typeof functionage.name === "object"
+//         ) {
+//
+// // Step 3: Find the outer function (the parent) that
+// // wraps our current function.
+// //
+// // Code structure matched here:
+// // function outer_parent() {
+// //     function active_function() { ... }
+// // }
+//
+//             parent = functionage.name.parent;
+//             if (parent) {
+//
+// // Step 4: Look up the variable we are calling ("foo")
+// // inside that parent function.
+// //
+// // Code structure matched here:
+// // function outer_parent() {
+// //     function foo() {} // Defined in the parent scope
+// //     function active_function() { foo(); }
+// // }
+//
+//                 left_variable = parent.context[left.id];
+//
+// // Step 5: Check if we need to temporarily "bring it
+// // back to life".
+// // We verify it was found in the parent scope, is currently marked
+// // as "dead", belongs to this parent, and has a registered call from
+// // our active function. If so, we revive it!
+// //
+// // Code structure matched here (Mutual Recursion):
+// // function outer_parent() {
+// //     function active_function() {
+// //         foo(); // "foo" is forward-referenced & currently dead
+// //     }
+// //     function foo() {
+// //         active_function();
+// //     }
+// // }
+//
+//                 if (
+//                     left_variable !== undefined
+// // Probably deadcode.
+// // && left_variable.dead
+//                     && left_variable.parent === parent
+//                     && left_variable.calls !== undefined
+//                     && left_variable.calls[functionage.name.id] !== undefined
+//                 ) {
+//
+// // If all those match, revive it! Mark "dead" as
+// // false so JSLint won't raise an error for
+// // calling it before its line is executed.
+//
+//                     left_variable.dead = false;
+//                 }
+//             }
+//         }
+//     }
 
     function pre_b_noteq(thing) {
 
@@ -8751,6 +8855,9 @@ function jslint_phase4_walk(state) {
     function pre_s_for(thing) {
         let the_variable;
         if (thing.name !== undefined) {
+
+// 7a. Mark not dead, the iterator variable, during for-loop-initialization.
+
             thing.name.dead = false;
             the_variable = name_lookup(thing.name, true);
             if (the_variable !== undefined) {
@@ -8788,8 +8895,11 @@ function jslint_phase4_walk(state) {
         block_stack.push(blockage);
         functionage = thing;
         blockage = thing;
-        thing.live = [];
+        thing.live_list = [];
         if (typeof thing.name === "object") {
+
+// 3a. Mark not dead, the function-name, in function-expression.
+
             thing.name.dead = false;
         }
         if (thing.extra === "get") {
@@ -8831,6 +8941,9 @@ function jslint_phase4_walk(state) {
                 test_cause("(aa)=>0");
             }
             walk_expression(name.expression);
+
+// 8a. Mark not dead, the function-parameter, after destructuring.
+
             name.dead = false;
         });
     }
@@ -8838,7 +8951,7 @@ function jslint_phase4_walk(state) {
     function pre_s_lbrace(thing) {
         block_stack.push(blockage);
         blockage = thing;
-        thing.live = [];
+        thing.live_list = [];
     }
 
     function pre_try(thing) {
@@ -8978,21 +9091,25 @@ function jslint_phase4_walk(state) {
     postaction("binary", "||", post_b_or);
     postaction("binary", post_b);
     postaction("statement", "const", post_s_var);
-    postaction("statement", "export", post_s_export);
+    postaction("statement", "export", post_s_export_toplevel);
     postaction("statement", "for", post_s_for);
     postaction("statement", "function", post_s_function);
     postaction("statement", "import", post_s_import);
     postaction("statement", "let", post_s_var);
     postaction("statement", "try", post_s_try);
     postaction("statement", "var", post_s_var);
-    postaction("statement", "{", post_s_lbrace);
+    postaction("statement", "{", post_s_lbrace_pop_block);
     postaction("ternary", post_t);
     postaction("unary", "+", post_u_plus);
     postaction("unary", "function", post_s_function);
     postaction("unary", post_u);
     preaction("assignment", pre_a_bitwise);
     preaction("binary", "!=", pre_b_noteq);
-    preaction("binary", "(", pre_b_lparen);
+
+// PR-xxx - Probably deadcode.
+
+//     preaction("binary", "(", pre_b_lparen);
+
     preaction("binary", "==", pre_b_eqeq);
     preaction("binary", "=>", pre_s_function);
     preaction("binary", "in", pre_b_in);

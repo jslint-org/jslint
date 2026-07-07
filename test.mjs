@@ -694,26 +694,36 @@ jstestDescribe((
 // PR-500 - Unify ES2015-destructure-logic.
 
                 [
-                    `(function ({expr}) {\n    aa(bb, cc, dd, zz);\n}());`,
-                    `const {expr}`,
-                    `let [aa, bb, cc, dd, zz] = 0;\n{expr}`,
-                    `let {expr}`
+                    String(`
+(function ({expr}) {
+    aa(bb, cc, dd, ee, ff, gg);
+}());
+                    `).trim(),
+                    "const {expr}",
+                    "let {expr}",
+                    "let [aa, bb, cc, dd, ee, ff, gg] = 0;\n{expr}"
                 ].map(function (source) {
-                    source = source.replace("{expr}", (
-                        `[{\n`
-                        + `    bb,\n`
-                        + `    cc = 0,\n`
-                        + `    cc: dd,\n`
-                        + `    dd: [{aa}],\n`
-                        + `    ...zz\n`
-                        + `}]`
-                    ));
+                    source = source.replace("{expr}", String(`
+[
+    {
+        cc,
+        dd = 0,
+        dd: ee,
+        ee: [{bb}],
+        ...aa
+    },
+    [
+        gg,
+        ...ff
+    ]
+]
+                    `).trim());
                     if (!(/function/).test(source)) {
                         source = (
                             `${source} = (function () {\n`
                             + `    return;\n`
                             + `}());\n`
-                            + `aa(bb, cc, dd, zz);\n`
+                            + `aa(bb, cc, dd, ee, ff, gg);\n`
                         );
                     }
                     source = `/*jslint node*/\n${source}`;
@@ -739,9 +749,30 @@ jstestDescribe((
 
 // Issue #401 - Add ES2018-syntax for object-literal-spread-operator.
 
-                "let aa = 0;\naa = {aa: 1, ...aa(), bb: 2};",
-                "let aa = 0;\naa = {aa: 1, ...aa, bb: 2};",
-                "let aa = 0;\naa = {aa: 1, ...aa.aa, bb: 2};",
+                String(`
+let aa = 0;
+aa = [
+    [
+        0,
+        ...aa(),
+        0,
+        ...aa,
+        0,
+        ...aa.aa,
+        0
+    ],
+    {
+        aa: 0,
+        ...aa(),
+        bb: 0,
+        ...aa,
+        cc: 0,
+        ...aa.aa,
+        dd: 0
+    }
+];
+aa();
+                `).trim(),
 
 // PR-483 - Allow parenthesis after ellipsis inside a function call.
 

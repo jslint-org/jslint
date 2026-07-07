@@ -1,6 +1,8 @@
 # Changelog
 
 # Todo
+- jslint-regression - Fix multiline-method-chaining whitespace-check not working when function-call's parameter-list spans more than one line.
+- jslint-warning - Tighten warning of unused variables to be always on, regardless of module / nodejs mode.
 - jslint-warning - Relax warnings for console.log() and friends.
 - jslint-warning - Relax fat-arrow-warning "use_function_not_fart".
 - jslint-ci - Automate linting of shell-scripts with shellcheck.
@@ -13,7 +15,7 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.6.1-beta
-- jslint - regression-fix - Revisit warn about variable usage before initialization.
+- jslint-regression - Fix long-running regression where 'let x = x;' doesn't warn about uninitialized variables.
 - jslint - Wrap all property-updates 'name.init = true/false' with calls to:
     name_lookup() - 'aa=0'
     name_push()   - 'let aa=0'
