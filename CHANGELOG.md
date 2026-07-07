@@ -1,6 +1,7 @@
 # Changelog
 
 # Todo
+- jslint-warning - Relax warnings for console.log() and friends.
 - jslint-warning - Relax fat-arrow-warning "use_function_not_fart".
 - jslint-ci - Automate linting of shell-scripts with shellcheck.
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
