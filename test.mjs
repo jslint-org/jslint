@@ -600,7 +600,7 @@ jstestDescribe((
                 "aa.js"
             ],
             process_exit: processExit0,
-            source: "let aa = 0;"
+            source: "String();"
         });
         jslint.jslint_cli({
             // suppress error
@@ -646,64 +646,73 @@ jstestDescribe((
                 "new Array(0);"
             ],
             async_await: [
-                "async function aa() {\n    await aa();\n}",
+                "async function aa() {\n    await aa();\n}\nawait aa();",
 
 // PR-405 - Bugfix - fix expression after "await" mis-identified as statement.
 
-                "async function aa() {\n    await aa;\n}",
-                (
-                    "async function aa() {\n"
-                    + "    try {\n"
-                    + "        aa();\n"
-                    + "    } catch (err) {\n"
-                    + "        await err();\n"
-                    + "    }\n"
-                    + "}\n"
-                ),
-                (
-                    "async function aa() {\n"
-                    + "    try {\n"
-                    + "        await aa();\n"
-                    + "    } catch (err) {\n"
-                    + "        await err();\n"
-                    + "    }\n"
-                    + "}\n"
-                ),
-
-// PR-370 - Add top-level-await support.
-
-                "await String();\n"
+                "async function aa() {\n    await aa;\n}\nawait aa();",
+                (`
+async function aa() {
+    try {
+        return await aa();
+    } catch (err) {
+        await err();
+    }
+}
+await aa();
+                `),
+                (`
+let aa = async () => {
+    try {
+        return await aa();
+    } catch (err) {
+        await err();
+    }
+};
+await aa();
+                `)
             ],
 
 // PR-351 - Add BigInt support.
 
             bigint: [
-                "let aa = 0b0n;\n",
-                "let aa = 0o0n;\n",
-                "let aa = 0x0n;\n",
-                "let aa = BigInt(0n);\n",
-                "let aa = typeof aa === \"bigint\";\n"
+                (`
+const aa = 0;
+String(0b0n);
+String(0o0n);
+String(0x0n);
+String(BigInt(0n));
+aa(typeof aa === "bigint");
+                `)
             ],
             date: [
-                "Date.getTime();",
-                "let aa = aa().getTime();",
-                "let aa = aa.aa().getTime();"
+                (`
+const aa = 0;
+Date.getTime();
+aa().getTime();
+aa.aa().getTime();
+                `)
             ],
             destructure: [
 
 // PR-500 - Unify ES2015-destructure-logic.
 
                 [
-                    String(`
+                    (`
+(({expr}) => {
+    aa(bb, cc, dd, ee, ff, gg);
+}());
+                    `),
+                    (`
 (function ({expr}) {
     aa(bb, cc, dd, ee, ff, gg);
 }());
-                    `).trim(),
+                    `),
                     "const {expr}",
                     "let {expr}",
                     "let [aa, bb, cc, dd, ee, ff, gg] = 0;\n{expr}"
                 ].map(function (source) {
-                    source = source.replace("{expr}", String(`
+                    source = source.trim().replace("{expr}", String(`
 [
     {
         cc,
@@ -718,32 +727,38 @@ jstestDescribe((
     ]
 ]
                     `).trim());
-                    if (!(/function/).test(source)) {
-                        source = (
-                            `${source} = (function () {\n`
-                            + `    return;\n`
-                            + `}());\n`
-                            + `aa(bb, cc, dd, ee, ff, gg);\n`
-                        );
+                    if (!(/\=>|function/).test(source)) {
+                        source = (`
+${source} = (function () {
+    return;
+}());
+aa(bb, cc, dd, ee, ff, gg);
+                        `);
                     }
-                    source = `/*jslint node*/\n${source}`;
                     return source;
                 }),
 
 // PR-459 - Allow destructuring-assignment after function-definition.
 
-                (
-                    "let aa;\n"
-                    + "let bb;\n"
-                    + "function cc() {\n"
-                    + "    return;\n"
-                    + "}\n"
-                    + "[aa, bb] = cc();\n"
-                )
-            ].flat(),
+                (`
+let aa;
+let bb;
+function cc() {
+    return;
+}
+[aa, bb] = cc();
+aa(bb, cc);
+                `)
+            ],
             directive: [
-                "#!\n/*jslint browser:false, node*/\n\"use strict\";",
-                "/*property aa bb*/"
+                (`
+#!/usr/bin/env node
+/*global aa*/
+/*jslint browser:false, node*/
+/*property bb*/
+"use strict";
+aa.bb();
+                `)
             ],
             ellipsis: [
 
@@ -776,33 +791,51 @@ aa();
 
 // PR-483 - Allow parenthesis after ellipsis inside a function call.
 
-                (
-                    "let aa = 0;\n"
-                    + "aa(...(\n"
-                    + "    aa()\n"
-                    + "    ? [0]\n"
-                    + "    : [1]\n"
-                    + "));"
-                )
+                (`
+let aa = 0;
+aa(...(
+    aa()
+    ? 0
+    : 1
+));
+                `)
+            ],
+            fart: [
+                "let aa = () => 0;\naa();",
+                (`
+let aa = async (bb, {cc, dd}, [ee, ff], ...gg) => {
+    bb += 1;
+    return await (bb + cc + dd + ee + ff + gg);
+};
+aa();
+                `)
             ],
             for: [
-                (
-                    "/*jslint for*/\n"
-                    + "function aa(bb) {\n"
-                    + "    for (bb = 0; bb < 0; bb += 1) {\n"
-                    + "        bb();\n"
-                    + "    }\n"
-                    + "}\n"
-                )
+                (`
+/*jslint for*/
+function aa(bb) {
+    for (bb = 0; bb < 0; bb += 1) {
+        bb();
+    }
+}
+aa();
+                `)
             ],
             import: [
                 `let aa = 0;\nimport(aa).then(aa).catch(aa).finally(aa);`,
-                `let aa = await import("aa");`,
-                `let aa = await import("aa", {with: {type: "json"}});`,
-                `let {aa, bb} = await import("aa");`
+                `let aa = await import("aa");\naa();`,
+                `let aa = await import("aa", {with: {type: "json"}});\naa();`,
+                `let {aa, bb} = await import("aa");\naa(bb);`
             ],
             indent_method: [
-                "let aa = 0;\naa\n    .bb\n    .cc(\n        0\n    );"
+                (`
+let aa = 0;
+aa
+    .bb
+    .cc(
+        0
+    );
+                `)
             ],
             jslint_disable: [
                 "/*jslint-disable*/\n0\n/*jslint-enable*/"
@@ -814,16 +847,17 @@ aa();
                 "{\"aa\":[[],-0,null]}"
             ],
             label: [
-                (
-                    "function aa() {\n"
-                    + "bb:\n"
-                    + "    while (true) {\n"
-                    + "        if (true) {\n"
-                    + "            break bb;\n"
-                    + "        }\n"
-                    + "    }\n"
-                    + "}\n"
-                )
+                (`
+function aa() {
+bb:
+    while (true) {
+        if (true) {
+            break bb;
+        }
+    }
+}
+aa();
+                `)
             ],
             literal: [
                 "String(\"\".at());",
@@ -835,36 +869,38 @@ aa();
                 "let aa = 0;\naa ||= 0;"
             ],
             loop: [
-                (
-                    "function aa() {\n"
-                    + "    do {\n"
-                    + "        aa();\n"
-                    + "    } while (aa());\n"
-                    + "}\n"
-                ),
+                (`
+function aa() {
+    do {
+        aa();
+    } while (aa());
+}
+aa();
+                `),
 
 // PR-378 - Relax warning "function_in_loop".
 
-                (
-                    "function aa() {\n"
-                    + "    while (true) {\n"
-                    + "        (function () {\n"
-                    + "            return;\n"
-                    + "        }());\n"
-                    + "    }\n"
-                    + "}\n"
-                )
+                (`
+function aa() {
+    while (true) {
+        (function () {
+            return;
+        }());
+    }
+}
+aa();
+                `)
             ],
             module: [
                 "export default Object.freeze();",
 
 // PR-439 - Add grammar for "export async function ...".
 
-                (
-                    "export default Object.freeze(async function () {\n"
-                    + "    return await 0;\n"
-                    + "});\n"
-                ),
+                (`
+export default Object.freeze(async function () {
+    return await 0;
+});
+                `),
                 // `import "aa";`,
                 `import * as aa from "aa";\naa();`,
                 `import aa from "aa" with {type: "json"};\naa();`,
@@ -873,127 +909,124 @@ aa();
                 `import {} from "aa";`
             ],
             number: [
-                "let aa = 0.0e0;",
-                "let aa = 0b0;",
-                "let aa = 0o0;",
-                "let aa = 0x0;"
+                "String(0.0e0);",
+                "String(0b0);",
+                "String(0o0);",
+                "String(0x0);"
             ],
 
 // PR-390 - Add numeric-separator support.
 
             numeric_separator: [
-                "let aa = 0.0_0_0;",
-                "let aa = 0b0_1111_1111n;\n",
-                "let aa = 0o0_1234_1234n;\n",
-                "let aa = 0x0_1234_1234n;\n",
-                "let aa = 1_234_234.1_234_234E1_234_234;"
+                "String(0.0_0_0);",
+                "String(0b0_1111_1111n);",
+                "String(0o0_1234_1234n);",
+                "String(0x0_1234_1234n);",
+                "String(1_234_234.1_234_234E1_234_234);"
             ],
             optional_chaining: [
-                "let aa = aa?.bb?.cc;"
+                "String().aa?.bb?.cc();"
             ],
             param: [
-                "function aa({aa, bb}) {\n    return {aa, bb};\n}\n",
-                (
-                    "function aa({constructor}) {\n"
-                    + "    return {constructor};\n"
-                    + "}\n"
-                )
+                "function aa({aa, bb}) {\n    return {aa, bb};\n}\naa();",
+                (`
+function aa({constructor}) {
+    return {constructor};
+}
+aa();
+                `)
             ],
             property: [
-                "let aa = aa[`!`];"
+                "let aa = 0;\naa[`!`]();"
             ],
             regexp: [
                 `RegExp.escape("");`,
-                `function aa() {\n    return /./;\n}`,
-                `let aa = /(?!.)(?:.)(?=.)/;`,
-                `let aa = /(?ims-ims:.)/;`,
-                `let aa = /./dgimsuvy;`,
-                `let aa = /[\\--\\-]/;`
+                `String(/(?!.)(?:.)(?=.)/);`,
+                `String(/(?ims-ims:.)/);`,
+                `String(/./dgimsuvy);`,
+                `String(/[\\--\\-]/);`,
+                `function aa() {\n    return /./;\n}\naa();`
             ],
             ternary: [
-                (
-                    "let aa = (\n"
-                    + "    aa()\n"
-                    + "    ? 0\n"
-                    + "    : 1\n"
-                    + ") "
-                    + "&& (\n"
-                    + "    aa()\n"
-                    + "    ? 0\n"
-                    + "    : 1\n"
-                    + ");"
-                ),
-                (
-                    "let aa = (\n"
-                    + "    aa()\n"
-                    + "    ? `${0}`\n"
-                    + "    : `${1}`\n"
-                    + ");"
-                ),
+                (`
+let aa = (
+    aa()
+    ? 0
+    : 1
+) && (
+    aa()
+    ? 0
+    : 1
+);
+aa();
+                `),
+                (`
+let aa = (
+    aa()
+    ? \`$\{0}\`
+    : \`$\{1}\`
+);
+aa();
+                `),
 
 // PR-394 - Bugfix
 // Fix jslint falsely believing megastring literals `0` and `1` are similar.
 
-                (
-                    "let aa = (\n"
-                    + "    aa()\n"
-                    + "    ? `0`\n"
-                    + "    : `1`\n"
-                    + ");"
-                )
+                (`
+let aa = (
+    aa()
+    ? \`0\`
+    : \`1\`
+);
+                `)
             ],
             try_catch: [
-                (
-                    "let aa = 0;\n"
-                    + "try {\n"
-                    + "    aa();\n"
-                    + "} catch (err) {\n"
-                    + "    aa = err;\n"
-                    + "}\n"
-                    + "try {\n"
-                    + "    aa();\n"
-                    + "} catch (err) {\n"
-                    + "    aa = err;\n"
-                    + "}\n"
-                    + "aa();\n"
-                )
+                (`
+let aa = 0;
+try {
+    aa();
+} catch (err) {
+    aa = err;
+}
+try {
+    aa();
+} catch (err) {
+    aa = err;
+}
+aa();
+                `)
             ],
             try_finally: [
-                (
-                    "let aa = 0;\n"
-                    + "try {\n"
-                    + "    aa();\n"
-                    + "} finally {\n"
-                    + "    aa();\n"
-                    + "}\n"
-                )
+                (`
+let aa = 0;
+try {
+    aa();
+} finally {
+    aa();
+}
+                `)
             ],
             use_strict: [
-                (
-                    "\"use strict\";\n"
-                    + "let aa = 0;\n"
-                    + "function bb() {\n"
-                    + "    \"use strict\";\n"
-                    + "    return aa;\n"
-                    + "}\n"
-                )
+                (`
+"use strict";
+let aa = 0;
+function bb() {
+    "use strict";
+    return aa;
+}
+bb();
+                `)
             ],
             var: [
-                "/*jslint node*/\n",
-                ""
-            ].map(function (directive) {
-                return [
-                    "const aa = 0;\naa();\n",
-                    "let aa = 0;\naa();\n",
-                    "var aa = 0;\naa();\n"
-                ].map(function (source) {
-                    return directive + source;
-                });
-            }).flat()
+                "const aa = 0;\naa();\n",
+                "let aa = 0;\naa();\n",
+                "var aa = 0;\naa();\n"
+            ]
         }).forEach(function (codeList) {
             let elemPrv = "";
-            codeList.forEach(function (source) {
+            codeList.flat().flat().forEach(function (source) {
                 let warnings;
+                source = source.trim();
                 // Assert codeList is sorted.
                 assertOrThrow(elemPrv < source, JSON.stringify([
                     elemPrv, source
@@ -1008,7 +1041,11 @@ aa();
                     }).warnings;
                     assertOrThrow(
                         warnings.length === 0,
-                        `${source}\n${JSON.stringify(warnings, undefined, 4)}`
+                        `\n\n${source}\n\n${JSON.stringify(
+                            warnings,
+                            undefined,
+                            4
+                        )}`
                     );
                 });
             });
@@ -1026,7 +1063,7 @@ jstestDescribe((
         ], [
             ";\naa(new XMLHttpRequest());", {browser: true}, ["aa"]
         ], [
-            "let aa = \"aa\" + 0;", {convert: true}, []
+            "let aa = \"aa\" + 0;\naa();", {convert: true}, []
         ], [
             "registerType();", {couch: true}, []
         ], [
@@ -1037,69 +1074,70 @@ jstestDescribe((
 
             "new Function();\neval();", {eval: true, evil: true}, []
         ], [
-            "let aa = () => 0;", {fart: true}, []
+            (`
+function aa(aa) {
+    for (aa = 0; aa < 0; aa += 1) {
+        aa();
+    }
+}
+aa();
+            `), {for: true}, []
         ], [
-            (
-                "let aa = async (bb, {cc, dd}, [ee, ff], ...gg) => {\n"
-                + "    bb += 1;\n"
-                + "    return await (bb + cc + dd + ee + ff + gg);\n"
-                + "};\n"
-            ), {fart: true}, []
+            (`
+String({get aa() {
+    return;
+}});
+            `), {getset: true}, []
         ], [
-            (
-                "function aa(aa) {\n"
-                + "    for (aa = 0; aa < 0; aa += 1) {\n"
-                + "        aa();\n"
-                + "    }\n"
-                + "}\n"
-            ), {for: true}, []
-        ], [
-            "let aa = {get aa() {\n    return;\n}};", {getset: true}, []
-        ], [
-            "let aa = {set aa(aa) {\n    return aa;\n}};", {getset: true}, []
+            (`
+String({set aa(aa) {
+    return aa;
+}});
+            `), {getset: true}, []
         ], [
             sourceJslintMjs.replace((
                 /    /g
             ), "  "), {indent2: true}, []
         ], [
-            "function aa() {\n  return;\n}", {indent2: true}, []
+            "function aa() {\n  return;\n}\naa();", {indent2: true}, []
         ], [
             "/".repeat(100), {long: true}, []
         ], [
 
 // PR-404 - Alias "nomen" to jslint-directive "name" for backwards-compat.
 
-            "let aa = aa._;", {name: true, nomen: true}, []
+            "let aa = 0;\naa._();", {name: true, nomen: true}, []
         ], [
             "require();", {node: true}, []
         ], [
-            "let aa = 'aa';", {single: true}, []
+            "String('aa');", {single: true}, []
         ], [
 
 // PR-404 - Add new directive "subscript" to play nice with Google Closure.
 
-            "aa[\"aa\"] = 1;", {subscript: true}, ["aa"]
+            "aa[\"aa\"]();", {subscript: true}, ["aa"]
         ], [
             "", {test_internal_error: true}, []
         ], [
-            "let aa = this;", {this: true}, []
+            "String(this);", {this: true}, []
         ], [
             "", {trace: true}, []
         ], [
-            (
-                "function aa({bb, aa}) {\n"
-                + "    switch (aa) {\n"
-                + "    case 1:\n"
-                + "        break;\n"
-                + "    case 0:\n"
-                + "        break;\n"
-                + "    default:\n"
-                + "        return {bb, aa};\n"
-                + "    }\n"
-                + "}\n"
-            ), {unordered: true}, []
+            (`
+function aa({bb, aa}) {
+    switch (aa) {
+    case 1:
+        break;
+    case 0:
+        break;
+    default:
+        return {bb, aa};
+    }
+}
+aa();
+            `), {unordered: true}, []
         ], [
-            "let {bb, aa} = 0;", {unordered: true}, []
+            "let {bb, aa} = 0;\naa(bb);", {unordered: true}, []
         ], [
             (
                 "function aa() {\n"
@@ -1110,13 +1148,14 @@ jstestDescribe((
                 + "}\n"
             ), {variable: true}, []
         ], [
-            "let bb = 0;\nlet aa = 0;", {variable: true}, []
+            "let bb = 0;\nlet aa = 0;\naa(bb);", {variable: true}, []
         ], [
             "\t", {white: true}, []
         ]
     ].forEach(function ([
         source, option_dict, global_list
     ]) {
+        source = source.trim();
         jstestIt((
             `test option=${JSON.stringify(option_dict)} handling-behavior`
         ), function () {
@@ -1139,14 +1178,15 @@ jstestDescribe((
                 jslintCjs.jslint
             ].forEach(function (jslint) {
                 // test jslint's option handling-behavior
-                let warnings = jslint(
+                let warnings;
+                warnings = jslint(
                     source,
                     option_dict,
                     global_list
                 ).warnings;
                 assertOrThrow(
                     warnings.length === warningsLength,
-                    `${source}\n${JSON.stringify(warnings, undefined, 4)}`
+                    `\n\n${source}\n\n${JSON.stringify(warnings, undefined, 4)}`
                 );
                 // test jslint's directive handling-behavior
                 source = (
@@ -1164,9 +1204,10 @@ jstestDescribe((
                         /^#!/
                     ), "//")
                 );
+                warnings = jslint(source).warnings;
                 assertOrThrow(
-                    jslint(source).warnings.length === warningsLength,
-                    source
+                    warnings.length === warningsLength,
+                    `\n\n${source}\n\n${JSON.stringify(warnings, undefined, 4)}`
                 );
             });
         });
