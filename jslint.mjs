@@ -4891,7 +4891,22 @@ function jslint_phase3_parse(state) {
     }
 
     function infix_fart_unwrapped() {
-        return parse_fart(token_now, true);
+        if (!token_prv.identifier) {
+
+// test_cause:
+// ["0=>0", "infix_fart_unwrapped", "expected_identifier_a", "0", 1]
+
+            return stop("expected_identifier_a", token_prv);
+        }
+
+// PR-499 - Update ES2015-feature arrow, to continue parsing unwrapped-form
+// with warning, instead of stopping.
+
+// test_cause:
+// ["aa=>0", "infix_fart_unwrapped", "wrap_fart_parameter", "=>", 3]
+
+        warn("wrap_fart_parameter", token_now);
+        return prefix_function(token_now, true, true);
     }
 
     function infix_grave(left) {
@@ -5250,87 +5265,6 @@ function jslint_phase3_parse(state) {
             left = the_symbol.led_infix(left);
         }
         return left;
-    }
-
-    function parse_fart(the_fart, mode_infix_fart) {
-
-// Give the function properties storing its names and for observing the depth
-// of loops and switches.
-
-        Object.assign(the_fart, {
-            arity: "binary",
-            context: empty(),
-            finally: 0,
-            level: functionage.level + 1,
-            loop: 0,
-            name: anon,
-            switch: 0,
-            try: 0
-        });
-
-// PR-384 - Relax warning "function_in_loop".
-//
-//         if (functionage.loop > 0) {
-
-// // test_cause:
-// // ["while(0){aa.map(()=>0);}", "parse_fart", "function_in_loop", "=>", 19]
-//
-//             warn("function_in_loop", the_fart);
-//         }
-
-// Push the current function context and establish a new one.
-
-        function_list.push(the_fart);
-        function_stack.push(functionage);
-        functionage = the_fart;
-
-// Parse the parameter list.
-
-        prefix_function_parameter(the_fart, mode_infix_fart);
-        if (!mode_infix_fart) {
-            advance("=>");
-        }
-
-// The function's body is a block.
-
-        if (token_nxt.id === "{") {
-            if (!option_dict.fart) {
-
-// test_cause:
-// ["()=>{}", "parse_fart", "use_function_not_fart", "=>", 3]
-
-                warn("use_function_not_fart", the_fart);
-            }
-            the_fart.block = block("body");
-
-// The function's body is an expression.
-
-        } else {
-
-// PR-384 - Bugfix - Fixes issue #379 - warn against naked-statement in fart.
-
-            if (
-                syntax_dict[token_nxt.id] !== undefined
-                && syntax_dict[token_nxt.id].fud_stmt !== undefined
-            ) {
-
-// test_cause:
-// ["()=>delete aa", "parse_fart", "unexpected_a_after_b", "=>", 5]
-
-                return stop(
-                    "unexpected_a_after_b",
-                    token_nxt,
-                    token_nxt.id,
-                    "=>"
-                );
-            }
-            the_fart.expression = parse_expression(0);
-        }
-
-// Restore the previous context.
-
-        functionage = function_stack.pop();
-        return the_fart;
     }
 
     function parse_json() {
@@ -5968,9 +5902,12 @@ function jslint_phase3_parse(state) {
         return stop("expected_a_before_b", token_now, "()", "=>");
     }
 
-    function prefix_function(the_function) {
-        let name = the_function && the_function.name;
-        if (the_function === undefined) {
+    function prefix_function(the_function, mode_fart, mode_infix_fart) {
+        let name = the_function?.name;
+        if (mode_fart) {
+            the_function.arity = "binary";
+            the_function.name = anon;
+        } else if (!the_function) {
             the_function = token_now;
 
 // A function statement must have a name that will be in the parent's scope.
@@ -5995,7 +5932,7 @@ function jslint_phase3_parse(state) {
                     init: true
                 });
                 advance();
-            } else if (name === undefined) {
+            } else if (!name) {
 
 // A function expression may have an optional name.
 
@@ -6006,6 +5943,21 @@ function jslint_phase3_parse(state) {
                     advance();
                 }
             }
+        }
+        if (
+            !mode_fart
+            && the_function.arity !== "statement"
+            && typeof name === "object"
+        ) {
+
+// test_cause:
+// ["let aa=function bb(){return;};", "prefix_function", "expression", "bb", 0]
+
+            test_cause("expression", name.id);
+            name_enroll(name, "function", true);
+            name.dead = false;
+            name.init = true;
+            name.used = 1;
         }
 
 //  Probably deadcode.
@@ -6042,19 +5994,17 @@ function jslint_phase3_parse(state) {
             switch: 0,
             try: 0
         });
-        if (the_function.arity !== "statement" && typeof name === "object") {
 
-// test_cause:
-// ["let aa=function bb(){return;};", "prefix_function", "expression", "bb", 0]
+// PR-384 - Relax warning "function_in_loop".
+//
+//         if (functionage.loop > 0) {
 
-            test_cause("expression", name.id);
-            name_enroll(name, "function", true);
-            name.dead = false;
-            name.init = true;
-            name.used = 1;
-        }
+// // test_cause:
+// // ["while(0){aa.map(()=>0);}", "parse_fart", "function_in_loop", "=>", 19]
+//
+//             warn("function_in_loop", the_function);
+//         }
 
-// PR-334 - Bugfix - fix function-redefinition not warned inside function-call.
 // Push the current function context and establish a new one.
 
         function_list.push(the_function);
@@ -6063,54 +6013,94 @@ function jslint_phase3_parse(state) {
 
 // Parse the parameter list.
 
-        advance("(");
-        token_now.arity = "function";
-        prefix_function_parameter(the_function);
+        if (mode_fart) {
+            prefix_function_parameter(the_function, mode_infix_fart);
+            if (!mode_infix_fart) {
+                advance("=>");
+            }
+        } else {
+            advance("(");
+            token_now.arity = "function";
+            prefix_function_parameter(the_function);
+        }
+        if (mode_fart && token_nxt.id !== "{") {
+
+// The function's body is an expression.
+
+// PR-384 - Bugfix - Fixes issue #379 - warn against naked-statement in fart.
+
+            if (
+                syntax_dict[token_nxt.id]
+                && syntax_dict[token_nxt.id].fud_stmt
+            ) {
+
+// test_cause:
+// ["()=>delete aa", "prefix_function", "unexpected_a_after_b", "=>", 5]
+
+                return stop(
+                    "unexpected_a_after_b",
+                    token_nxt,
+                    token_nxt.id,
+                    "=>"
+                );
+            }
+            the_function.expression = parse_expression(0);
+        } else if (mode_fart) {
 
 // The function's body is a block.
 
-        the_function.block = block("body");
-        if (
-            the_function.arity === "statement"
-            && token_nxt.line === token_now.line
-        ) {
+            if (!option_dict.fart) {
+
+// test_cause:
+// ["()=>{}", "prefix_function", "use_function_not_fart", "=>", 3]
+
+                warn("use_function_not_fart", the_function);
+            }
+            the_function.block = block("body");
+        } else {
+            the_function.block = block("body");
+            if (
+                the_function.arity === "statement"
+                && token_nxt.line === token_now.line
+            ) {
 
 // test_cause:
 // ["function aa(){}0", "prefix_function", "unexpected_a", "0", 16]
 
-            return stop("unexpected_a");
-        }
-        if (
-            token_nxt.id === "."
-            || token_nxt.id === "?."
+                return stop("unexpected_a");
+            }
+            if (
+                token_nxt.id === "."
+                || token_nxt.id === "?."
 
 // PR-459 - Allow destructuring-assignment after function-definition.
 
-            // || token_nxt.id === "["
-        ) {
+                // || token_nxt.id === "["
+            ) {
 
 // test_cause:
 // ["function aa(){}\n.aa", "prefix_function", "unexpected_a", ".", 1]
 // ["function aa(){}\n?.aa", "prefix_function", "unexpected_a", "?.", 1]
 
-            warn("unexpected_a");
-        }
+                warn("unexpected_a");
+            }
 
 // Check functions are ordered.
 
-        check_ordered(
-            "function",
-            function_list.slice(
-                function_list.indexOf(the_function) + 1
-            ).map(function ({
-                level,
-                name
-            }) {
-                return (level === the_function.level + 1) && name;
-            }).filter(function (name) {
-                return option_dict.beta && name && name.id;
-            })
-        );
+            check_ordered(
+                "function",
+                function_list.slice(
+                    function_list.indexOf(the_function) + 1
+                ).map(function ({
+                    level,
+                    name
+                }) {
+                    return (level === the_function.level + 1) && name;
+                }).filter(function (name) {
+                    return option_dict.beta && name && name.id;
+                })
+            );
+        }
 
 // Restore the previous context.
 
@@ -6124,21 +6114,6 @@ function jslint_phase3_parse(state) {
 
         the_function.name_list = [];    // 2. name_list for "function (aa)"
         if (mode_infix_fart) {
-            if (!token_prv.identifier) {
-
-// test_cause:
-// ["0=>0", "prefix_function_parameter", "expected_identifier_a", "0", 1]
-
-                return stop("expected_identifier_a", token_prv);
-            }
-
-// PR-499 - Update ES2015-feature arrow, to continue parsing unwrapped-form
-// with warning, instead of stopping.
-
-// test_cause:
-// ["aa=>0", "prefix_function_parameter", "wrap_fart_parameter", "=>", 3]
-
-            warn("wrap_fart_parameter", token_now);
             the_function.name = "anonymous";
             the_function.parameter_count = 1;
             the_function.signature = token_prv.id;
@@ -6414,7 +6389,7 @@ function jslint_phase3_parse(state) {
 // PR-385 - Bugfix - Fixes issue #382 - failure to detect destructured fart.
 
         if (token_now.fart) {
-            return parse_fart(token_now.fart);
+            return prefix_function(token_now.fart, true, false);
         }
 
 // test_cause:
