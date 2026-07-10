@@ -2502,13 +2502,13 @@ body {
 <pre><span class="lineno"><a href="#line_2337" id="line_2337"> 2337.</a></span><span class="count                ">      4</span><span>            data = await moduleFs.promises.readdir(file, "utf8");</span></pre>
 <pre><span class="lineno"><a href="#line_2338" id="line_2338"> 2338.</a></span><span class="count                ">      4</span><span>        } catch (ignore) {}</span></pre>
 <pre><span class="lineno"><a href="#line_2339" id="line_2339"> 2339.</a></span><span class="count                ">      4</span><span>        if (data) {</span></pre>
-<pre><span class="lineno"><a href="#line_2340" id="line_2340"> 2340.</a></span><span class="count                ">     33</span><span>            await Promise.all(data.map(async function (file2) {</span></pre>
-<pre><span class="lineno"><a href="#line_2341" id="line_2341"> 2341.</a></span><span class="count                ">     33</span><span>                let code;</span></pre>
-<pre><span class="lineno"><a href="#line_2342" id="line_2342"> 2342.</a></span><span class="count                ">     33</span><span>                let time_start = Date.now();</span></pre>
-<pre><span class="lineno"><a href="#line_2343" id="line_2343"> 2343.</a></span><span class="count                ">     33</span><span>                file2 = file + "/" + file2;</span></pre>
-<pre><span class="lineno"><a href="#line_2344" id="line_2344"> 2344.</a></span><span class="count                ">     33</span><span>                switch ((</span></pre>
-<pre><span class="lineno"><a href="#line_2345" id="line_2345"> 2345.</a></span><span class="count                ">     33</span><span>                    /\.\w+?$|$/m</span></pre>
-<pre><span class="lineno"><a href="#line_2346" id="line_2346"> 2346.</a></span><span class="count                ">     33</span><span>                ).exec(file2)[0]) {</span></pre>
+<pre><span class="lineno"><a href="#line_2340" id="line_2340"> 2340.</a></span><span class="count                ">     34</span><span>            await Promise.all(data.map(async function (file2) {</span></pre>
+<pre><span class="lineno"><a href="#line_2341" id="line_2341"> 2341.</a></span><span class="count                ">     34</span><span>                let code;</span></pre>
+<pre><span class="lineno"><a href="#line_2342" id="line_2342"> 2342.</a></span><span class="count                ">     34</span><span>                let time_start = Date.now();</span></pre>
+<pre><span class="lineno"><a href="#line_2343" id="line_2343"> 2343.</a></span><span class="count                ">     34</span><span>                file2 = file + "/" + file2;</span></pre>
+<pre><span class="lineno"><a href="#line_2344" id="line_2344"> 2344.</a></span><span class="count                ">     34</span><span>                switch ((</span></pre>
+<pre><span class="lineno"><a href="#line_2345" id="line_2345"> 2345.</a></span><span class="count                ">     34</span><span>                    /\.\w+?$|$/m</span></pre>
+<pre><span class="lineno"><a href="#line_2346" id="line_2346"> 2346.</a></span><span class="count                ">     34</span><span>                ).exec(file2)[0]) {</span></pre>
 <pre><span class="lineno"><a href="#line_2347" id="line_2347"> 2347.</a></span><span class="count                ">      4</span><span>                case ".cjs":</span></pre>
 <pre><span class="lineno"><a href="#line_2348" id="line_2348"> 2348.</a></span><span class="count                ">      5</span><span>                case ".html":</span></pre>
 <pre><span class="lineno"><a href="#line_2349" id="line_2349"> 2349.</a></span><span class="count                ">      8</span><span>                case ".js":</span></pre>
@@ -2517,8 +2517,8 @@ body {
 <pre><span class="lineno"><a href="#line_2352" id="line_2352"> 2352.</a></span><span class="count                ">     14</span><span>                case ".mjs":</span></pre>
 <pre><span class="lineno"><a href="#line_2353" id="line_2353"> 2353.</a></span><span class="count                ">     16</span><span>                case ".sh":</span></pre>
 <pre><span class="lineno"><a href="#line_2354" id="line_2354"> 2354.</a></span><span class="count                ">     16</span><span>                    break;</span></pre>
-<pre><span class="lineno"><a href="#line_2355" id="line_2355"> 2355.</a></span><span class="count                ">     17</span><span>                default:</span></pre>
-<pre><span class="lineno"><a href="#line_2356" id="line_2356"> 2356.</a></span><span class="count                ">     17</span><span>                    return;</span></pre>
+<pre><span class="lineno"><a href="#line_2355" id="line_2355"> 2355.</a></span><span class="count                ">     18</span><span>                default:</span></pre>
+<pre><span class="lineno"><a href="#line_2356" id="line_2356"> 2356.</a></span><span class="count                ">     18</span><span>                    return;</span></pre>
 <pre><span class="lineno"><a href="#line_2357" id="line_2357"> 2357.</a></span><span class="count                ">     16</span><span>                }</span></pre>
 <pre><span class="lineno"><a href="#line_2358" id="line_2358"> 2358.</a></span><span class="count                ">     16</span><span>                try {</span></pre>
 <pre><span class="lineno"><a href="#line_2359" id="line_2359"> 2359.</a></span><span class="count                ">     16</span><span>                    code = await moduleFs.promises.readFile(file2, "utf8");</span></pre>
