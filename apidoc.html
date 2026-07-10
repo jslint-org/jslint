@@ -67,7 +67,7 @@ body {
 </head>
 <body>
 <div class="apidocDiv">
-<h1>API Doc for <a href="https://github.com/jslint-org/jslint">JSLint (v2026.6.30)</a></h1>
+<h1>API Doc for <a href="https://github.com/jslint-org/jslint">JSLint (v2026.7.1-beta)</a></h1>
 <div class="apidocSectionDiv">
     <a href="#apidocTableOfContents1" id="apidocTableOfContents1">
         <h1>Table of Contents</h1>
@@ -835,33 +835,39 @@ case "jslint_report":
 <span class="apidocCodeCommentSpan">
 // This function will throw &lt;message&gt; if &lt;condition&gt; is falsy.
 
-</span>    if (condition) {
-        return condition;
+</span>    let error;
+    if (condition) {
+        return;
     }
-    throw new Error(
+    error = new Error(
         `This was caused by a bug in JSLint.
 Please open an issue with this stack-trace (and possible example-code) at
 https://github.com/jslint-org/jslint/issues.
 edition = "${jslint_edition}";
 ${String(message).slice(0, 2000)}`
     );
+    if (message === "test_internal_error") {
+        error = {};
+    }
+    console.error(error);
+    throw error;
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-// ["let aa={};", "whitage_case", "opener", "", 0]
+//     }
+// } else {
+//     if (right.from !== margin + 8) {
+//         expected_at(margin + 8);
+//     }
+// }
 
-test_cause("opener");
+        <span class="apidocCodeKeywordSpan">jslint_assert</span>(open, `Expected open.`);
+        jslint_assert(free, `Expected free.`);
+        if (right.from &lt; margin) {
 
-// Probably deadcode.
-// case "${}":
+// test_cause:
+// ["String(\nString\n()\n);", "no_space", "expected_at(margin)", "(", 0]
 
-<span class="apidocCodeKeywordSpan">jslint_assert</span>(
-    !(left.id + right.id === "${}"),
-    "Expected !(left.id + right.id === \"${}\")."
-);
-switch (left.id + right.id) {
-case "()":
-case "[]":
-case "{}":
+test_cause("expected_at(margin)", right.id);
 ...</pre></li>
 
 <li>
@@ -1379,11 +1385,10 @@ jslint_assert(
 // ["function aa(aa) {return aa;}", "delve", "id", "", 0]
 
                 test_cause("id");
-                if (
-                    name.used === 0
+                if (!name.used) {
 
-// Probably deadcode.
-/...
+// test_cause:
+// ["function aa(bb){return;}",...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
