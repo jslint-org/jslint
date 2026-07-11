@@ -31,21 +31,20 @@
 # http://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
 
 # sh one-liner
-# git add .; npm run test2; git checkout .
-# git branch -d -r origin/aa
-# git config --global diff.algorithm histogram
-# git fetch --prune
-# git fetch origin alpha beta master && git fetch upstream alpha beta master
-# git fetch origin alpha beta master --tags
-# git fetch upstream "refs/tags/*:refs/tags/*"
-# git ls-files --stage | sort
-# git ls-remote --heads origin
-# git update-index --chmod=+x aa.js
-# head CHANGELOG.md -n50
-# ln -f jslint.mjs ~/jslint.mjs
-# openssl rand -base64 32 # random key
-# sh jslint_ci.sh shRunWithScreenshotTxt .artifact/screenshot_changelog.svg head -n50 CHANGELOG.md
-# vim rgx-lowercase \L\1\e
+: '
+git add .; npm run test2; git checkout .
+git branch -d -r origin/aa
+git config --global diff.algorithm histogram
+git fetch --prune
+git fetch origin alpha beta master && git fetch upstream alpha beta master
+git fetch origin alpha beta master --tags
+git fetch upstream "refs/tags/*:refs/tags/*"
+git ls-files --stage | sort
+git ls-remote --heads origin
+git update-index --chmod=+x aa.js
+openssl rand -base64 32 # random key
+sh jslint_ci.sh shRunWithScreenshotTxt .artifact/screenshot_changelog.svg head -n50 CHANGELOG.md
+'
 
 # charset - ascii
 # \u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007
@@ -1297,7 +1296,7 @@ shGithubPrUpdatePrxxx() {(set -e
     git diff
     git grep -Ei -e '^ *?(//|#) pr-xxx' || true
     git commit -am "- ci - Update 'PR-xxx' placeholder to '${PR_XXX}'."
-    git log -n 2
+    git log -n 4
 )}
 
 shGithubTokenExport() {
