@@ -12,6 +12,7 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.7.1-beta
+- jslint-regression - Fix jslint crashing before warning about dangling ')' or ']'.
 - jslint-parse - Fix jslint unable to continue parsing 'async aa => 0'.
 - jslint-parse - Fix jslint unable to continue parsing 'function aa(){}0'.
 - jslint-regression - Fix long-running regression where 'let x = x;' doesn't warn about temporal-dead-zone.
