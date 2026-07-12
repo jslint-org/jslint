@@ -12,34 +12,44 @@ Douglas Crockford <douglas@crockford.com>
 
 
 <br><br>
+# Web Demo
+- https://www.jslint.com
+
+[![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2fjslint_2fbranch-beta_2findex.html.png)](https://jslint-org.github.io/jslint/index.html)
+
+
+<br><br>
+# Web Demo Archived
+- [Web Demo 2020](https://www.jslint.com/branch-v2020.11.6/index.html)
+- [Web Demo 2014 (ES5 only)](https://www.jslint.com/branch-v2014.7.8/jslint.html)
+- [Web Demo 2013 (ES5, CSS, HTML)](https://www.jslint.com/branch-v2013.3.13/jslint.html)
+
+
+<br><br>
 # Table of Contents
 
-1. [Web Demo](#web-demo)
-
-2. [Web Demo Archived](#web-demo-archived)
-
-3. [Quickstart Install](#quickstart-install)
+1. [Quickstart Install](#quickstart-install)
     - [To install, just download and save https://www.jslint.com/jslint.mjs to file:](#to-install-just-download-and-save-httpswwwjslintcomjslintmjs-to-file)
     - [To run `jslint.mjs` in shell:](#to-run-jslintmjs-in-shell)
     - [To import `jslint.mjs` in ES Module environment:](#to-import-jslintmjs-in-es-module-environment)
     - [To import `jslint.mjs` in CommonJS environment:](#to-import-jslintmjs-in-commonjs-environment)
     - [To JSLint entire directory in shell:](#to-jslint-entire-directory-in-shell)
 
-4. [Quickstart JSLint Report](#quickstart-jslint-report)
+2. [Quickstart JSLint Report](#quickstart-jslint-report)
     - [To create a JSLint report in shell:](#to-create-a-jslint-report-in-shell)
     - [To create a JSLint report in javascript:](#to-create-a-jslint-report-in-javascript)
 
-5. [Quickstart V8 Coverage Report](#quickstart-v8-coverage-report)
+3. [Quickstart V8 Coverage Report](#quickstart-v8-coverage-report)
     - [To create V8 coverage report from Node.js / Npm program in shell:](#to-create-v8-coverage-report-from-nodejs--npm-program-in-shell)
     - [To create V8 coverage report from Node.js / Npm program in javascript:](#to-create-v8-coverage-report-from-nodejs--npm-program-in-javascript)
 
-6. [Quickstart JSLint in CodeMirror](#quickstart-jslint-in-codemirror)
+4. [Quickstart JSLint in CodeMirror](#quickstart-jslint-in-codemirror)
 
-7. [Quickstart JSLint in Vim](#quickstart-jslint-in-vim)
+5. [Quickstart JSLint in Vim](#quickstart-jslint-in-vim)
 
-8. [Quickstart JSLint in VSCode](#quickstart-jslint-in-vscode)
+6. [Quickstart JSLint in VSCode](#quickstart-jslint-in-vscode)
 
-9. [Documentation](#documentation)
+7. [Documentation](#documentation)
     - [API Doc](#api-doc)
     - [Directive](#directive)
         - [`/*jslint beta*/`](#jslint-beta)
@@ -70,31 +80,17 @@ Douglas Crockford <douglas@crockford.com>
         - [`//coverage-ignore-line`](#coverage-ignore-line)
     - [ECMAScript Feature Support](#ecmascript-feature-support)
 
-10. [Package Listing](#package-listing)
+8. [Package Listing](#package-listing)
 
-11. [Changelog](#changelog)
+9. [Changelog](#changelog)
 
-12. [License](#license)
+10. [License](#license)
 
-13. [Devops Instruction](#devops-instruction)
+11. [Devops Instruction](#devops-instruction)
     - [pull-request merge](#pull-request-merge)
     - [branch-master commit](#branch-master-commit)
     - [branch-master publish](#branch-master-publish)
     - [vscode-jslint publish](#vscode-jslint-publish)
-
-
-<br><br>
-# Web Demo
-- https://www.jslint.com
-
-[![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_browser__2fjslint_2fbranch-beta_2findex.html.png)](https://jslint-org.github.io/jslint/index.html)
-
-
-<br><br>
-# Web Demo Archived
-- [Web Demo 2020](https://www.jslint.com/branch-v2020.11.6/index.html)
-- [Web Demo 2014 (ES5 only)](https://www.jslint.com/branch-v2014.7.8/jslint.html)
-- [Web Demo 2013 (ES5, CSS, HTML)](https://www.jslint.com/branch-v2013.3.13/jslint.html)
 
 
 <br><br>
@@ -1030,7 +1026,7 @@ if (false) {
         - verify ci-success @ https://github.com/kaizhu256/jslint/actions
         - verify ci-success @ https://github.com/jslint-org/jslint/actions
 
-1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2026.7.1
+1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2026.7.2
     - click `Create pull request`
     - input `Add a title *` with: `<CHANGELOG.md entry #1>`
     - input `Add a description` with:

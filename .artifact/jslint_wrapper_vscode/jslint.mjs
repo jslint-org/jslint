@@ -1864,13 +1864,12 @@ ${name}<span class="apidocSignatureSpan">${signature}</span>
                 );
             }).map(function (elem) {
                 elem_ii += 1;
+
+// PR-503 - Fix codeql-warning - Incomplete string escaping or encoding.
+
                 elem.signature = elem.signature.replace(
-                    ">",
-                    ">" + elem_ii + ". "
-                );
-                elem.source = elem.source.replace(
-                    "\">",
-                    "\">" + elem_ii + ". "
+                    (/<a[^>]*?>|">/),
+                    `$&${elem_ii}. `
                 );
                 return elem;
             }),
@@ -2010,9 +2009,11 @@ body {
 </body>
 </html>
     `);
-    html = html.trim().replace((
-        / +?$/gm
-    ), "") + "\n";
+
+// PR-503 - Fix codeql-warning - Polynomial regular expression used on
+// uncontrolled data.
+
+    html = html.trim().replace((/(?<! ) +$/gm), "") + "\n";
     await fsWriteFileWithParents(pathname, html);
 }
 
@@ -2417,7 +2418,7 @@ function jslint_phase2_lex(state) {
 
 // PHASE 2. Lex <line_list> into <token_list>.
 
-    let {
+    const {
         artifact,
         directive_list,
         global_dict,
@@ -4174,18 +4175,30 @@ import moduleHttps from "https";
             break;
         case ")":
         case "]":
-            opener_popped = opener_stack.pop();
-            if (noop(
-                id === ")"
-                ? opener_popped.id !== "("
-                : opener_popped.id !== "["
-            )) {
+
+// PR-503 - Fix jslint crashing before warning about dangling ')' or ']'.
+
+            opener_popped = opener_stack.pop() || empty();
+            if (
+                (id === ")" && opener_popped.id !== "(")
+                || (id === "]" && opener_popped.id !== "[")
+            ) {
 
 // test_cause:
+// [")", "token_create", "unexpected_a", ")", 1]
 // [";(]", "token_create", "unexpected_a", "]", 3]
 // [";[)", "token_create", "unexpected_a", ")", 3]
+// ["]", "token_create", "unexpected_a", "]", 1]
 
                 return stop("unexpected_a", the_token);
+            }
+            break;
+
+// PR-503 - Fix jslint unable to continue parsing 'async aa => 0'.
+
+        case "=>":
+            if (token_prv_expr.identifier) {
+                token_prv_expr.fart = the_token;
             }
             break;
         }
@@ -4257,8 +4270,7 @@ function jslint_phase3_parse(state) {
 
 // Specialized tokens may have additional properties.
 
-    let anon = "anonymous";     // The guessed name for anonymous functions.
-    let {
+    const {
         artifact,
         catch_list,
         catch_stack,
@@ -4279,6 +4291,7 @@ function jslint_phase3_parse(state) {
         warn,
         warn_at
     } = state;
+    let anon = "anonymous";     // The guessed name for anonymous functions.
     let catchage = catch_stack[0];      // The current catch-block.
     let functionage = token_global;     // The current function.
     let mode_var;               // "var" if using var; "let" if using let.
@@ -4915,10 +4928,6 @@ function jslint_phase3_parse(state) {
 // PR-499 - Update ES2015-feature arrow, to continue parsing unwrapped-form
 // with warning, instead of stopping.
 
-// test_cause:
-// ["aa=>0", "infix_fart_unwrapped", "wrap_fart_parameter", "=>", 3]
-
-        warn("wrap_fart_parameter", token_now);
         return prefix_function(token_now, true, true);
     }
 
@@ -5628,34 +5637,34 @@ function jslint_phase3_parse(state) {
     }
 
     function prefix_async() {
-        let the_async = token_now;
-        let the_function;
+        const the_async = token_now;
+        const the_function = token_nxt.fart || token_nxt;
+        the_function.async = 1;
         token_nxt.arity = the_async.arity;
+        if (token_nxt.fart && token_nxt.identifier) {
+
+// PR-503 - Parse async fart (unwrapped).
+
+            advance();
+            advance("=>");
+
+// test_cause:
+// ["async aa=>0", "prefix_async", "fart_unwrapped", "aa", 0]
+
+            test_cause("fart_unwrapped", token_prv.id);
+            prefix_function(the_function, true, true);
+        } else if (token_nxt.fart) {
 
 // PR-414 - Parse async fart.
 
-        if (token_nxt.fart) {
             advance("(");
-            the_function = Object.assign(token_now.fart, {
-                async: 1
-            });
-            if (!option_dict.fart) {
-
-// test_cause:
-// ["async()=>0", "prefix_async", "use_function_not_fart", "=>", 8]
-
-                warn("use_function_not_fart", the_function);
-            }
-            prefix_lparen();
+            prefix_function(the_function, true, false);
+        } else {
 
 // Parse async function.
 
-        } else {
             advance("function");
-            the_function = Object.assign(token_now, {
-                async: 1
-            });
-            prefix_function();
+            prefix_function(the_function, false, false);
         }
         if (the_function.async === 1) {
 
@@ -5681,17 +5690,16 @@ function jslint_phase3_parse(state) {
 // ["function aa(){await 0}", "prefix_await", "unexpected_a", "await", 15]
 
             warn("unexpected_a", the_await);
-        } else {
-            functionage.async += 1;
         }
+        if (functionage.async === 1) {
+            functionage.async = 2;
+        }
+        the_await.expression = parse_expression(150);
         if (the_await.arity === "statement") {
 
 // PR-405 - Bugfix - fix expression after "await" mis-identified as statement.
 
-            the_await.expression = parse_expression(150);
             semicolon();
-        } else {
-            the_await.expression = parse_expression(150);
         }
         return the_await;
     }
@@ -5924,16 +5932,16 @@ function jslint_phase3_parse(state) {
         return stop("expected_a_before_b", token_now, "()", "=>");
     }
 
-    function prefix_function(the_function, mode_fart, mode_fart_infix) {
+    function prefix_function(the_function, mode_fart, mode_fart_unwrapped) {
         let name;
         let role = "function";
         the_function = the_function || token_now;
         if (mode_fart) {
             the_function.arity = "binary";
+        } else if (the_function.arity === "statement") {
 
 // A function statement must have a name that will be in the parent's scope.
 
-        } else if (the_function.arity === "statement") {
             if (!token_nxt.identifier) {
 
 // test_cause:
@@ -5988,14 +5996,14 @@ function jslint_phase3_parse(state) {
             loop: 0,
             name: (
                 name || (
-                    mode_fart_infix
+                    mode_fart_unwrapped
                     ? "anonymous"
                     : anon
                 )
             ),
-            parameter_count: Number(Boolean(mode_fart_infix)),
+            parameter_count: Number(Boolean(mode_fart_unwrapped)),
             signature: (
-                mode_fart_infix
+                mode_fart_unwrapped
                 ? token_prv.id
                 : ["("]
             ),
@@ -6027,7 +6035,12 @@ function jslint_phase3_parse(state) {
             token_now.arity = "function";
         }
         the_function.name_list = [];    // 2. name_list for "function (aa)"
-        if (mode_fart_infix) {
+        if (mode_fart_unwrapped) {
+
+// test_cause:
+// ["aa=>0", "prefix_function", "wrap_fart_parameter", "aa", 1]
+
+            warn("wrap_fart_parameter", token_prv);
             name_push(
                 the_function.name_list, // name_list
                 true,                   // enroll
@@ -6054,7 +6067,7 @@ function jslint_phase3_parse(state) {
             advance(")");
             the_function.signature = the_function.signature.join("") + ")";
         }
-        if (mode_fart && !mode_fart_infix) {
+        if (mode_fart && !mode_fart_unwrapped) {
             advance("=>");
         }
         if (mode_fart && token_nxt.id !== "{") {
@@ -6096,12 +6109,20 @@ function jslint_phase3_parse(state) {
             if (
                 the_function.arity === "statement"
                 && token_nxt.line === token_now.line
+                && !option_dict.white
             ) {
 
-// test_cause:
-// ["function aa(){}0", "prefix_function", "unexpected_a", "0", 16]
+// PR-503 - Fix jslint unable to continue parsing 'function aa(){}0'.
 
-                return stop("unexpected_a");
+// test_cause:
+// ["function aa(){}0", "prefix_function", "expected_line_break_a_b", "0", 16]
+
+                warn(
+                    "expected_line_break_a_b",
+                    token_nxt,
+                    artifact(token_now),
+                    artifact(token_nxt)
+                );
             }
             if (
                 token_nxt.id === "."
@@ -6236,18 +6257,22 @@ function jslint_phase3_parse(state) {
 // ["aa={get aa(){}}", "property_parse", "paren", "", 0]
 
                 test_cause("paren");
-                value = prefix_function({
-                    arity: "unary",
-                    from: name.from,
-                    id: "function",
-                    line: name.line,
-                    name: (
-                        typeof extra === "string"
-                        ? extra
-                        : id
-                    ),
-                    thru: name.from
-                });
+                value = prefix_function(
+                    {
+                        arity: "unary",
+                        from: name.from,
+                        id: "function",
+                        line: name.line,
+                        name: (
+                            typeof extra === "string"
+                            ? extra
+                            : id
+                        ),
+                        thru: name.from
+                    },
+                    false,
+                    false
+                );
             } else {
                 if (typeof extra === "string") {
 
@@ -6291,7 +6316,7 @@ function jslint_phase3_parse(state) {
                 if (token_nxt.id === "}") {
 
 // test_cause:
-// ["let aa={aa:0,}", "prefix_lbrace", "unexpected_a", ",", 13]
+// ["aa={aa:0,}", "prefix_lbrace", "unexpected_a", ",", 9]
 
                     warn("unexpected_a", token_now);
                     break;
@@ -7797,7 +7822,7 @@ function jslint_phase4_walk(state) {
 //          recursive traversal. Each node may be processed on the way down
 //          (preaction) and on the way up (postaction).
 
-    let {
+    const {
         artifact,
         catch_stack,
         function_stack,
@@ -9131,7 +9156,7 @@ function jslint_phase5_whitage(state) {
 
 // PHASE 5. Check whitespace between tokens in <token_list>.
 
-    let {
+    const {
         artifact,
         catch_list,
         function_list,
