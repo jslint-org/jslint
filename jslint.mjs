@@ -6105,12 +6105,20 @@ function jslint_phase3_parse(state) {
             if (
                 the_function.arity === "statement"
                 && token_nxt.line === token_now.line
+                && !option_dict.white
             ) {
 
-// test_cause:
-// ["function aa(){}0", "prefix_function", "unexpected_a", "0", 16]
+// PR-503 - Fix jslint unable to continue parsing 'function aa(){}0'.
 
-                return stop("unexpected_a");
+// test_cause:
+// ["function aa(){}0", "prefix_function", "expected_line_break_a_b", "0", 16]
+
+                warn(
+                    "expected_line_break_a_b",
+                    token_nxt,
+                    artifact(token_now),
+                    artifact(token_nxt)
+                );
             }
             if (
                 token_nxt.id === "."
@@ -6304,7 +6312,7 @@ function jslint_phase3_parse(state) {
                 if (token_nxt.id === "}") {
 
 // test_cause:
-// ["let aa={aa:0,}", "prefix_lbrace", "unexpected_a", ",", 13]
+// ["aa={aa:0,}", "prefix_lbrace", "unexpected_a", ",", 9]
 
                     warn("unexpected_a", token_now);
                     break;
