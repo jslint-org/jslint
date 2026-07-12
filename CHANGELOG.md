@@ -7,13 +7,13 @@
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
 - jslint - Add ability to auto-fix whitespace.
-- jslint - bugfix - Fix false-positive unused-variable when variable is used in function argument-default.
 - jslint - Add html and css linting back into jslint.
 - jslint - Add new warning requiring paren around plus-separated concatenations.
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.7.1-beta
-- jslint - Fix jslint unable to continue parsing 'async aa => 0'.
+- jslint-parse - Fix jslint unable to continue parsing 'async aa => 0'.
+- jslint-parse - Fix jslint unable to continue parsing 'function aa(){}0'.
 - jslint-regression - Fix long-running regression where 'let x = x;' doesn't warn about temporal-dead-zone.
 - jslint-warning - Tighten warning of unused variables to be always on, regardless of module / nodejs mode.
 - jslint - Wrap all property-updates 'name.init = true/false' with calls to:
