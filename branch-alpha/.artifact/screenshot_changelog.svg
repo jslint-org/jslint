@@ -71,49 +71,49 @@
     textLength="768"
     x="10"
     y="252"
->- jslint - bugfix - Fix false-positive unused-variable when variable is used in function argumen\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="274"
->  t-default.                                                                                     </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="296"
 >- jslint - Add html and css linting back into jslint.                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="318"
+    y="274"
 >- jslint - Add new warning requiring paren around plus-separated concatenations.                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="340"
+    y="296"
 >- jslint - Try to improve parser to be able to parse jquery.js without stopping.                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="362"
+    y="318"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="384"
+    y="340"
 ># v2026.7.1-beta                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
+    y="362"
+>- jslint-regression - Fix jslint crashing before warning about dangling ')' or ']'.              </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="384"
+>- jslint-parse - Fix jslint unable to continue parsing 'async aa =&gt; 0'.                          </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
     y="406"
->- jslint - Fix jslint unable to continue parsing 'async aa =&gt; 0'.                                </tspan>
+>- jslint-parse - Fix jslint unable to continue parsing 'function aa(){}0'.                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

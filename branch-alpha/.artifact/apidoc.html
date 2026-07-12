@@ -1036,7 +1036,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
 <span class="apidocCodeCommentSpan">
 // PHASE 2. Lex &lt;line_list&gt; into &lt;token_list&gt;.
 
-</span>    let {
+</span>    const {
         artifact,
         directive_list,
         global_dict,
@@ -1077,7 +1077,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
     let token_prv_expr = token_global;  // The previous token excluding
                                         // ... comments.
 
-// Most tokens, including the identifiers, operators, and pu...
+// Most tokens, including the identifiers, operators, and ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1123,8 +1123,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
 
 // Specialized tokens may have additional properties.
 
-    let anon = "anonymous";     // The guessed name for anonymous functions.
-    let {
+    const {
         artifact,
         catch_list,
         catch_stack,
@@ -1145,6 +1144,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
         warn,
         warn_at
     } = state;
+    let anon = "anonymous";     // The guessed name for anonymous functions.
     let catchage = catch_stack[0];      // The current catch-block.
     let functionage = token_global;     // The current function.
     let mode_var;               // "var" if using var; "let" if using let.
@@ -1169,7 +1169,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
             anon = token_now.id;
         } else if (
             token_now.id === "(string)"
-  ...
+...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1203,7 +1203,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
 //          recursive traversal. Each node may be processed on the way down
 //          (preaction) and on the way up (postaction).
 
-</span>    let {
+</span>    const {
         artifact,
         catch_stack,
         function_stack,
@@ -1268,8 +1268,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
                 a_set[id] = i_set;
             }
 
-// Register the task with the arity and the id.
-...
+// Register the task with the arity and the id...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1300,7 +1299,7 @@ jslint_assert(
 <span class="apidocCodeCommentSpan">
 // PHASE 5. Check whitespace between tokens in &lt;token_list&gt;.
 
-</span>    let {
+</span>    const {
         artifact,
         catch_list,
         function_list,
@@ -1388,7 +1387,7 @@ jslint_assert(
                 if (!name.used) {
 
 // test_cause:
-// ["function aa(bb){return;}",...
+// ["function aa(bb){return;}...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

@@ -2418,7 +2418,7 @@ function jslint_phase2_lex(state) {
 
 // PHASE 2. Lex <line_list> into <token_list>.
 
-    let {
+    const {
         artifact,
         directive_list,
         global_dict,
@@ -4175,7 +4175,7 @@ import moduleHttps from "https";
             break;
         case ")":
         case "]":
-            opener_popped = opener_stack.pop();
+            opener_popped = opener_stack.pop() || empty();
             if (noop(
                 id === ")"
                 ? opener_popped.id !== "("
@@ -4183,8 +4183,10 @@ import moduleHttps from "https";
             )) {
 
 // test_cause:
+// [")", "token_create", "unexpected_a", ")", 1]
 // [";(]", "token_create", "unexpected_a", "]", 3]
 // [";[)", "token_create", "unexpected_a", ")", 3]
+// ["]", "token_create", "unexpected_a", "]", 1]
 
                 return stop("unexpected_a", the_token);
             }
@@ -4266,8 +4268,7 @@ function jslint_phase3_parse(state) {
 
 // Specialized tokens may have additional properties.
 
-    let anon = "anonymous";     // The guessed name for anonymous functions.
-    let {
+    const {
         artifact,
         catch_list,
         catch_stack,
@@ -4288,6 +4289,7 @@ function jslint_phase3_parse(state) {
         warn,
         warn_at
     } = state;
+    let anon = "anonymous";     // The guessed name for anonymous functions.
     let catchage = catch_stack[0];      // The current catch-block.
     let functionage = token_global;     // The current function.
     let mode_var;               // "var" if using var; "let" if using let.
@@ -6105,12 +6107,20 @@ function jslint_phase3_parse(state) {
             if (
                 the_function.arity === "statement"
                 && token_nxt.line === token_now.line
+                && !option_dict.white
             ) {
 
-// test_cause:
-// ["function aa(){}0", "prefix_function", "unexpected_a", "0", 16]
+// PR-503 - Fix jslint unable to continue parsing 'function aa(){}0'.
 
-                return stop("unexpected_a");
+// test_cause:
+// ["function aa(){}0", "prefix_function", "expected_line_break_a_b", "0", 16]
+
+                warn(
+                    "expected_line_break_a_b",
+                    token_nxt,
+                    artifact(token_now),
+                    artifact(token_nxt)
+                );
             }
             if (
                 token_nxt.id === "."
@@ -6304,7 +6314,7 @@ function jslint_phase3_parse(state) {
                 if (token_nxt.id === "}") {
 
 // test_cause:
-// ["let aa={aa:0,}", "prefix_lbrace", "unexpected_a", ",", 13]
+// ["aa={aa:0,}", "prefix_lbrace", "unexpected_a", ",", 9]
 
                     warn("unexpected_a", token_now);
                     break;
@@ -7810,7 +7820,7 @@ function jslint_phase4_walk(state) {
 //          recursive traversal. Each node may be processed on the way down
 //          (preaction) and on the way up (postaction).
 
-    let {
+    const {
         artifact,
         catch_stack,
         function_stack,
@@ -9144,7 +9154,7 @@ function jslint_phase5_whitage(state) {
 
 // PHASE 5. Check whitespace between tokens in <token_list>.
 
-    let {
+    const {
         artifact,
         catch_list,
         function_list,
