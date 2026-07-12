@@ -4175,12 +4175,14 @@ import moduleHttps from "https";
             break;
         case ")":
         case "]":
+
+// PR-503 - Fix jslint crashing before warning about dangling ')' or ']'.
+
             opener_popped = opener_stack.pop() || empty();
-            if (noop(
-                id === ")"
-                ? opener_popped.id !== "("
-                : opener_popped.id !== "["
-            )) {
+            if (
+                (id === ")" && opener_popped.id !== "(")
+                || (id === "]" && opener_popped.id !== "[")
+            ) {
 
 // test_cause:
 // [")", "token_create", "unexpected_a", ")", 1]
