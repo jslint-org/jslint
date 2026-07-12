@@ -9397,129 +9397,6 @@ function jslint_phase5_whitage(state) {
         }
     }
 
-    function whitage_case() {
-
-// test_cause:
-// ["String();", "whitage_case", "opener", "(", 0]
-// ["let aa=[];", "whitage_case", "opener", "[", 0]
-// ["let aa=`${0}`;", "whitage_case", "opener", "${", 0]
-// ["let aa={};", "whitage_case", "opener", "{", 0]
-
-        test_cause("opener", left.id);
-        switch (left.id + right.id) {
-
-// Probably deadcode.
-// case "${}":
-
-// test_cause:
-// ["let aa=`${}`;", "parse_expression", "unexpected_a", "}", 11]
-
-        case "()":
-        case "[]":
-        case "{}":
-
-// If left and right are opener and closer, then the placement of right depends
-// on the openness. Illegal pairs (like '{]') have already been detected.
-
-            if (left.line === right.line) {
-
-// test_cause:
-// ["String();", "whitage_case", "()", "(", 0]
-
-                test_cause("()", left.id);
-                no_space();
-            } else {
-
-// test_cause:
-// ["String(\n);", "whitage_case", "(\n)", "(", 0]
-
-                test_cause("(\n)", left.id);
-                at_margin(0);
-            }
-            break;
-        default:
-            opening = left.open || (left.line !== right.line);
-            indentage = {
-                closer,
-                free,
-                margin,
-                open,
-                opening
-            };
-            function_stack.push(indentage);
-            switch (left.id) {
-            case "${":
-                closer = "}";
-                break;
-            case "(":
-                closer = ")";
-                break;
-            case "[":
-                closer = "]";
-                break;
-            case "{":
-                closer = "}";
-                break;
-            }
-            if (opening) {
-
-// test_cause:
-// ["String(\n0);", "whitage_case", "(\n0)", "0", 0]
-
-                test_cause("(\n0)", right.value);
-                free = closer === ")" && left.free;
-                open = true;
-                margin += mode_indent;
-                if (indent_method_dict[left.line]) {
-
-// PR-498 - Relax warning on multiline-method-chaining.
-
-                    margin += mode_indent;
-                    indentage.indent_method = true;
-                }
-                if (right.role === "label") {
-                    if (right.from !== 0) {
-
-// test_cause:
-// ["
-// function aa(){
-//  bb:while(aa){aa();}}
-// ", "whitage_case", "{\n label", "bb", 0]
-
-                        test_cause("{\n label", right.id);
-                        expected_at(0);
-                    }
-                } else if (right.switch) {
-                    at_margin(-mode_indent);
-                } else {
-                    at_margin(0);
-                }
-                break;
-            }
-            if (right.statement || right.role === "label") {
-
-// test_cause:
-// ["function aa(){bb:while(aa){aa();}}", "whitage_case", "{label", "bb", 0]
-
-                test_cause("{label", right.id);
-                warn(
-                    "expected_line_break_a_b",
-                    right,
-                    artifact(left),
-                    artifact(right)
-                );
-            }
-            free = false;
-            open = false;
-
-// test_cause:
-// ["String(0);", "whitage_case", "(0)", "0", 0]
-
-            test_cause("(0)", right.value);
-            no_space_only();
-        }
-    }
-
     function whitage_default() {
         if (right.statement === true) {
             if (left.id === "else") {
@@ -9546,6 +9423,14 @@ function jslint_phase5_whitage(state) {
 // If right is a closer, then pop the previous state.
 
         if (right.id === closer) {
+
+// test_cause:
+// ["String(0);", "whitage_default", "closer", ")", 0]
+// ["let aa=[0];", "whitage_default", "closer", "]", 0]
+// ["let aa=`${0}`;", "whitage_default", "closer", "}", 0]
+// ["let aa={String};", "whitage_default", "closer", "}", 0]
+
+            test_cause("closer", right.id);
             indentage = function_stack.pop();
             closer = indentage.closer;
             free = indentage.free;
@@ -9783,6 +9668,129 @@ function jslint_phase5_whitage(state) {
         }
     }
 
+    function whitage_opener() {
+
+// test_cause:
+// ["String();", "whitage_opener", "opener", "(", 0]
+// ["let aa=[];", "whitage_opener", "opener", "[", 0]
+// ["let aa=`${0}`;", "whitage_opener", "opener", "${", 0]
+// ["let aa={};", "whitage_opener", "opener", "{", 0]
+
+        test_cause("opener", left.id);
+        switch (left.id + right.id) {
+
+// Probably deadcode.
+// case "${}":
+
+// test_cause:
+// ["let aa=`${}`;", "parse_expression", "unexpected_a", "}", 11]
+
+        case "()":
+        case "[]":
+        case "{}":
+
+// If left and right are opener and closer, then the placement of right depends
+// on the openness. Illegal pairs (like '{]') have already been detected.
+
+            if (left.line === right.line) {
+
+// test_cause:
+// ["String();", "whitage_opener", "()", "(", 0]
+
+                test_cause("()", left.id);
+                no_space();
+            } else {
+
+// test_cause:
+// ["String(\n);", "whitage_opener", "(\n)", "(", 0]
+
+                test_cause("(\n)", left.id);
+                at_margin(0);
+            }
+            break;
+        default:
+            opening = left.open || (left.line !== right.line);
+            indentage = {
+                closer,
+                free,
+                margin,
+                open,
+                opening
+            };
+            function_stack.push(indentage);
+            switch (left.id) {
+            case "${":
+                closer = "}";
+                break;
+            case "(":
+                closer = ")";
+                break;
+            case "[":
+                closer = "]";
+                break;
+            case "{":
+                closer = "}";
+                break;
+            }
+            if (opening) {
+
+// test_cause:
+// ["String(\n0);", "whitage_opener", "(\n0)", "0", 0]
+
+                test_cause("(\n0)", right.value);
+                free = closer === ")" && left.free;
+                open = true;
+                margin += mode_indent;
+                if (indent_method_dict[left.line]) {
+
+// PR-498 - Relax warning on multiline-method-chaining.
+
+                    margin += mode_indent;
+                    indentage.indent_method = true;
+                }
+                if (right.role === "label") {
+                    if (right.from !== 0) {
+
+// test_cause:
+// ["
+// function aa(){
+//  bb:while(aa){aa();}}
+// ", "whitage_opener", "{\n label", "bb", 0]
+
+                        test_cause("{\n label", right.id);
+                        expected_at(0);
+                    }
+                } else if (right.switch) {
+                    at_margin(-mode_indent);
+                } else {
+                    at_margin(0);
+                }
+                break;
+            }
+            if (right.statement || right.role === "label") {
+
+// test_cause:
+// ["function aa(){bb:while(aa){aa();}}", "whitage_opener", "{label", "bb", 0]
+
+                test_cause("{label", right.id);
+                warn(
+                    "expected_line_break_a_b",
+                    right,
+                    artifact(left),
+                    artifact(right)
+                );
+            }
+            free = false;
+            open = false;
+
+// test_cause:
+// ["String(0);", "whitage_opener", "(0)", "0", 0]
+
+            test_cause("(0)", right.value);
+            no_space_only();
+        }
+    }
+
 // uninitialized_and_unused();
 // Delve into the functions looking for variables that were not initialized
 // or used. If the file imports or exports, then its global object is also
@@ -9821,7 +9829,7 @@ function jslint_phase5_whitage(state) {
         case "(":
         case "[":
         case "{":
-            whitage_case();
+            whitage_opener();
             break;
         default:
             whitage_default();
