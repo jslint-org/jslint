@@ -148,6 +148,7 @@
     dirname,
     disrupt,
     dot,
+    dot_depth,
     edition,
     elem_list,
     ellipsis,
@@ -9168,6 +9169,7 @@ function jslint_phase5_whitage(state) {
         warn
     } = state;
     let closer = "(end)";
+    let dot_depth = 0;
 
 // free = false
 
@@ -9190,7 +9192,6 @@ function jslint_phase5_whitage(state) {
 // "while(){}"
 
     let free = false;
-    let indent_method_dict = empty();
     let indentage;
     let left = token_global;
     let margin = 0;
@@ -9355,6 +9356,12 @@ function jslint_phase5_whitage(state) {
         margin = indentage.margin;
         open = indentage.open;
         opening = indentage.opening;
+
+// PR-xxx - Cleanup indent for multiline-method-chaining.
+
+        if (dot_depth > 1) {
+            dot_depth -= 1;
+        }
         if (opening && right.id !== ";") {
 
 // test_cause:
@@ -9362,9 +9369,9 @@ function jslint_phase5_whitage(state) {
 
             test_cause("aa(\n0)", left.value);
             at_margin(
-                indentage.indent_method
+                indentage.dot_depth === 1
 
-// PR-498 - Relax warning on multiline-method-chaining.
+// PR-xxx - Cleanup indent for multiline-method-chaining.
 
                 ? mode_indent
                 : 0
@@ -9543,10 +9550,6 @@ function jslint_phase5_whitage(state) {
                 no_space_only();
                 return;
             }
-
-// PR-498 - Relax warning on multiline-method-chaining.
-
-            indent_method_dict[right.line] = true;
             at_margin(mode_indent);
             return;
         }
@@ -9654,12 +9657,22 @@ function jslint_phase5_whitage(state) {
         opening = left.open || (left.line !== right.line);
         indentage = {
             closer,
+            dot_depth,
             free,
             margin,
             open,
             opening
         };
         function_stack.push(indentage);
+
+// PR-xxx - Cleanup indent for multiline-method-chaining.
+
+        if (dot_depth >= 1) {
+            dot_depth += 1;
+            if (dot_depth === 2) {
+                margin += mode_indent;
+            }
+        }
         switch (left.id) {
         case "${":
             closer = "}";
@@ -9687,13 +9700,6 @@ function jslint_phase5_whitage(state) {
             free = closer === ")" && left.free;
             open = true;
             margin += mode_indent;
-            if (indent_method_dict[left.line]) {
-
-// PR-498 - Relax warning on multiline-method-chaining.
-
-                margin += mode_indent;
-                indentage.indent_method = true;
-            }
             if (right.role === "label") {
                 if (right.from !== 0) {
 
@@ -9768,6 +9774,18 @@ function jslint_phase5_whitage(state) {
 // are always in open form.
 
         whitage_default();
+
+// PR-xxx - Cleanup indent for multiline-method-chaining.
+
+        if (left.line !== right.line) {
+            dot_depth = 0;
+            switch (right.id) {
+            case ".":
+            case "?.":
+                dot_depth = dot_depth || 1;
+                break;
+            }
+        }
         nr_comments_skipped = 0;
         delete left.calls;
         delete left.dead;

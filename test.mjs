@@ -823,9 +823,28 @@ aa();
                 (`
 String
     .aa
-    .bb(
-        0
-    );
+    .aa()
+    .aa(0)
+    .aa(
+        0,
+        [0],
+        \`${0}\`
+    )
+    .aa(
+        String
+            .aa()
+            .aa(0)
+            .aa(
+                0,
+                [0],
+                \`${0}\`
+            )
+    )
+    .aa(function ({
+        aa
+    }) {
+        return aa;
+    });
                 `)
             ],
             jslint_disable: [
