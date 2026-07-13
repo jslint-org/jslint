@@ -55,6 +55,7 @@ sh jslint_ci.sh shRunWithScreenshotTxt .artifact/screenshot_changelog.svg head -
 # @ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_
 # `abcdefghijklmnopqrstuvwxyz{|}~\u007f
 
+# shellcheck disable=SC2015,SC3044
 shBashrcDebianInit() {
 # This function will init debian:stable /etc/skel/.bashrc.
 # https://salsa.debian.org/debian/bash/-/blob/e17f75c7869a4a00dbad36503c1965040b22ef32/debian/skel.bashrc
@@ -308,12 +309,12 @@ shCiArtifactUpload() {(set -e
         package.json
     )"
     export UPSTREAM_GITHUB_IO="$(
-        printf "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
+        printf "%s" "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
     # init $GITHUB_XXX
     export GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-$UPSTREAM_REPOSITORY}"
     export GITHUB_GITHUB_IO="$(
-        printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
+        printf "%s" "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
     # screenshot changelog and files
     PID_LIST=""
@@ -359,14 +360,11 @@ shCiArtifactUpload() {(set -e
         rm -rf .artifact
         git checkout beta .
         # update apidoc.html
-        for FILE in apidoc.html
-        do
-            if [ -f ".artifact/$FILE" ]
-            then
-                cp -a ".artifact/$FILE" .
-                git add -f "$FILE"
-            fi
-        done
+        if [ -f .artifact/apidoc.html ]
+        then
+            cp -a .artifact/apidoc.html .
+            git add -f apidoc.html
+        fi
     fi
     # update README.md with branch-$GITHUB_BRANCH0 and $GITHUB_REPOSITORY
     sed -i.bak \
@@ -538,6 +536,17 @@ import moduleFs from "fs";
     await moduleFs.promises.writeFile("README.md", data);
 }());
 ' "$@" # '
+    FILE_LIST=""
+    FILE_LIST="$FILE_LIST *.sh"
+    for FILE in .ci.sh .ci2.sh
+    do
+        if [ -f "$FILE" ]
+        then
+            FILE_LIST="$FILE_LIST $FILE"
+        fi
+    done
+    # shellcheck disable=SC2086
+    shLintShell $FILE_LIST
     JSLINT_BETA=1 node jslint.mjs .
     if (command -v shCiLintCustom >/dev/null)
     then
@@ -560,7 +569,7 @@ import moduleFs from "fs";
 
 shCiMatrixIsmainName() {(set -e
 # This function will return 0 if current ci-job is main job.
-    CI_MATRIX_NAME="$(printf "$CI_MATRIX_NAME" | xargs)"
+    CI_MATRIX_NAME="$(printf "%s" "$CI_MATRIX_NAME" | xargs)"
     [ "$CI_MATRIX_NAME" ] && [ "$CI_MATRIX_NAME" = "$CI_MATRIX_NAME_MAIN" ]
 )}
 
@@ -578,7 +587,7 @@ shCiPre() {(set -e
 # )}
     if [ -f ./myci2.sh ]
     then
-        . ./myci2.sh :
+        . ./myci2.sh
         shMyciInit
     fi
     if (command -v shCiPreCustom >/dev/null)
@@ -645,12 +654,12 @@ shDirHttplinkValidate() {(set -e
         package.json
     )"
     export UPSTREAM_GITHUB_IO="$(
-        printf "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
+        printf "%s" "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
     # init $GITHUB_XXX
     export GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-$UPSTREAM_REPOSITORY}"
     export GITHUB_GITHUB_IO="$(
-        printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
+        printf "%s" "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
     node --input-type=module --eval '
 import moduleAssert from "assert";
@@ -771,7 +780,7 @@ import moduleHttps from "https";
         });
     });
 }());
-' "$@" # '
+' # '
 )}
 
 shDuList() {(set -e
@@ -781,7 +790,7 @@ shDuList() {(set -e
 
 shGitCmdWithGithubToken() {(set -e
 # This function will run git $CMD with $MY_GITHUB_TOKEN.
-    printf "shGitCmdWithGithubToken $*\n"
+    printf "shGitCmdWithGithubToken %s\n" "$*"
     if [ -f .git/config ]
     then
         # security - scrub token from url
@@ -805,21 +814,21 @@ shGitCmdWithGithubToken() {(set -e
     shift
     URL="$1"
     shift
-    if (printf "$URL" | grep -qv "^https://")
+    if (printf "%s" "$URL" | grep -qv "^https://")
     then
         URL="$(git config "remote.$URL.url")"
     fi
     if [ "$MY_GITHUB_TOKEN" ]
     then
         URL="$(
-            printf "$URL" \
+            printf "%s" "$URL" \
             | sed -e "s|https://|https://x-access-token:$MY_GITHUB_TOKEN@|"
         )"
     fi
     EXIT_CODE=0
     # hide $MY_GITHUB_TOKEN in case of err
     git "$CMD" "$URL" "$@" 2>/dev/null || EXIT_CODE="$?"
-    printf "shGitCmdWithGithubToken - EXIT_CODE=$EXIT_CODE\n" 1>&2
+    printf "shGitCmdWithGithubToken - EXIT_CODE=%s\n" "$EXIT_CODE" 1>&2
     return "$EXIT_CODE"
 )}
 
@@ -838,8 +847,9 @@ shGitCommitPushOrSquash() {(set -e
     then
         MODE_SQUASH=squash
     fi
-    printf "shGitCommitPushOrSquash COMMIT_COUNT=$COMMIT_COUNT \
-COMMIT_LIMIT=$COMMIT_LIMIT MODE_SQUASH=$MODE_SQUASH\n"
+    printf "shGitCommitPushOrSquash \
+COMMIT_COUNT=%s COMMIT_LIMIT=%s MODE_SQUASH=%s\n" \
+        "$COMMIT_COUNT" "$COMMIT_LIMIT" "$MODE_SQUASH"
     if [ "$MODE_SQUASH" != squash ]
     then
         shGitCmdWithGithubToken push origin "$BRANCH"
@@ -968,7 +978,7 @@ import moduleChildProcess from "child_process";
         }).join(""));
     });
 }());
-' "$@" # '
+' # '
 )}
 
 shGitSquashPop() {(set -e
@@ -989,7 +999,7 @@ shGithubCheckoutRemote() {(set -e
 # This function will run like actions/checkout, except checkout remote-branch.
     # GITHUB_REF_NAME="owner/repo/branch"
     GITHUB_REF_NAME="$1"
-    if (printf "$GITHUB_REF_NAME" | grep -q ".*/.*/.*")
+    if (printf "%s" "$GITHUB_REF_NAME" | grep -q ".*/.*/.*")
     then
         # branch - */*/*
         git fetch origin alpha
@@ -1006,10 +1016,10 @@ shGithubCheckoutRemote() {(set -e
         # branch - alpha, beta, master
         GITHUB_REF_NAME="$GITHUB_REPOSITORY/$GITHUB_REF_NAME"
     fi
-    GITHUB_REPOSITORY="$(printf "$GITHUB_REF_NAME" | cut -d'/' -f1,2)"
-    GITHUB_REF_NAME="$(printf "$GITHUB_REF_NAME" | cut -d'/' -f3)"
+    GITHUB_REPOSITORY="$(printf "%s" "$GITHUB_REF_NAME" | cut -d'/' -f1,2)"
+    GITHUB_REF_NAME="$(printf "%s" "$GITHUB_REF_NAME" | cut -d'/' -f3)"
     # replace current git-checkout with $GITHUB_REF_NAME
-    rm -rf * ..?* .[!.]*
+    rm -rf ./* ./..?* ./.[!.]*
     shGitCmdWithGithubToken clone \
         "https://github.com/$GITHUB_REPOSITORY" __tmp1 \
         --branch="$GITHUB_REF_NAME" --depth=1 --single-branch
@@ -1276,7 +1286,7 @@ shGithubPrUpdatePrxxx() {(set -e
 "https://api.github.com/repos/$UPSTREAM_REPOSITORY/issues?per_page=1&state=all"
     )"
     PR_XXX="$(
-        printf "$PR_XXX" | sed -En -e 's/.*"number": ([0-9]+).*/\1/p'
+        printf "%s" "$PR_XXX" | sed -En -e 's/.*"number": ([0-9]+).*/\1/p'
     )"
     if [ ! "$PR_XXX" ]
     then
@@ -1326,7 +1336,7 @@ shGithubWorkflowDispatch() {(set -e
         -d '{"ref":"'"$BRANCH"'"}' \
         -s \
         "$@" || EXIT_CODE="$?"
-    printf "shGithubWorkflowDispatch - EXIT_CODE=$EXIT_CODE\n" 1>&2
+    printf "shGithubWorkflowDispatch - EXIT_CODE=%s\n" "$EXIT_CODE" 1>&2
     return "$EXIT_CODE"
 )}
 
@@ -1402,9 +1412,9 @@ shHttpFileServer() {(set -e
         do
             printf "\n"
             git diff --color 2>/dev/null | cat || true
-            printf "\nshHttpFileServer - (re)starting $*\n"
+            printf "\nshHttpFileServer - (re)starting %s\n" "$*"
             (shHttpFileServer "$@") || EXIT_CODE="$?"
-            printf "process exited with code $EXIT_CODE\n"
+            printf "\nshHttpFileServer - EXIT_CODE=%s\n" "$EXIT_CODE"
             # if $EXIT_CODE != 77, then exit process
             # http://en.wikipedia.org/wiki/Unix_signal
             if [ "$EXIT_CODE" != 77 ]
@@ -1667,7 +1677,7 @@ shImageLogoCreate() {(set -e
     shBrowserScreenshot asset_image_logo_256.html \
         "-screenshot=$(node --print "path.resolve(process.argv[1])" "$FILE")"
     gm mogrify -crop 256x256 "$FILE"
-    printf "shImageLogoCreate - wrote - $FILE\n" 1>&2
+    printf "shImageLogoCreate - wrote - %s\n" "$FILE" 1>&2
     # convert to svg @ https://convertio.co/png-svg/
 )}
 
@@ -1770,10 +1780,45 @@ function objectDeepCopyWithKeysSorted(obj) {
 ' "$@" # '
 )}
 
+shLintShell() {(set -e
+    if (! shellcheck --version >/dev/null 2>&1)
+    then
+        return
+    fi
+    FILE_LIST="$*"
+    OPTION=""
+    # https://www.shellcheck.net/wiki/
+    # SC1090 – Can't follow non-constant source.
+    # Use a directive to specify location
+    OPTION="$OPTION --exclude=SC1090"
+    # SC1091 – Not following: (error message here)
+    OPTION="$OPTION --exclude=SC1091"
+    # SC2016 – Expressions don't expand in single quotes,
+    # use double quotes for that.
+    OPTION="$OPTION --exclude=SC2016"
+    # SC2030 – Modification of var is local (to subshell caused by pipeline).
+    OPTION="$OPTION --exclude=SC2030"
+    # SC2031 – var was modified in a subshell. That change might be lost.
+    OPTION="$OPTION --exclude=SC2031"
+    # SC2119 – Use `foo "$@"` if function's `$1` should mean script's `$1`.
+    OPTION="$OPTION --exclude=SC2119"
+    # SC2115 – Use `"${var:?}"` to ensure this never expands to `/*` .
+    OPTION="$OPTION --exclude=SC2155"
+    EXIT_CODE=0
+    # shellcheck disable=SC2086
+    shellcheck $OPTION $FILE_LIST >/dev/null || EXIT_CODE="$?"
+    if [ "$EXIT_CODE" != 0 ]
+    then
+        # shellcheck disable=SC2086
+        shellcheck $OPTION $FILE_LIST | head -n 50
+    fi
+    return "$EXIT_CODE"
+)}
+
 shLintPython() {(set -e
 # This function will lint python file.
 # https://docs.astral.sh/ruff/rules/
-    FILE_LIST="$@"
+    FILE_LIST="$*"
     (
     printf "\n\nlint ruff\n"
     OPTION=""
@@ -1835,6 +1880,7 @@ shLintPython() {(set -e
     # T201 - print
     # print found
     OPTION="$OPTION --ignore=T201"
+    # shellcheck disable=SC2086
     ruff check $OPTION $FILE_LIST
     ) &
     PID_LIST="$PID_LIST $!"
@@ -1855,6 +1901,7 @@ shLintPython() {(set -e
     # Line breaks should occur after the binary operator to keep all variable
     # names aligned.
     OPTION="$OPTION,W503"
+    # shellcheck disable=SC2086
     pycodestyle $OPTION $FILE_LIST
     ) &
     PID_LIST="$PID_LIST $!"
@@ -1867,7 +1914,7 @@ shNpmPublishV0() {(set -e
 # This function will npm-publish name $1 with bare package.json.
     DIR=/tmp/shNpmPublishV0
     rm -rf "$DIR" && mkdir -p "$DIR" && cd "$DIR"
-    printf "{\"name\":\"$1\",\"version\":\"0.0.1\"}\n" > package.json
+    printf "{\"name\":\"%s\",\"version\":\"0.0.1\"}\n" "$1" > package.json
     shift
     npm publish "$@"
 )}
@@ -1879,11 +1926,11 @@ shPidListWait() {
     TASK="$1"
     for PID in $PID_LIST
     do
-        printf "$TASK - pid=$PID ...\n"
+        printf "%s - pid=%s ...\n" "$TASK" "$PID"
         wait "$PID" || EXIT_CODE="$?"
-        printf "$TASK - pid=$PID EXIT_CODE=$EXIT_CODE\n"
+        printf "%s - pid=%s EXIT_CODE=%s\n" "$TASK" "$PID" "$EXIT_CODE"
     done
-    printf "$TASK - pid=done EXIT_CODE=$EXIT_CODE\n\n\n\n"
+    printf "%s - pid=done EXIT_CODE=%s\n\n\n\n" "$TASK" "$EXIT_CODE"
     return "$EXIT_CODE"
 }
 
@@ -3598,13 +3645,14 @@ shRunWithScreenshotTxt() {(set -e
     SCREENSHOT_SVG="$1"
     shift
     printf "0\n" > "$SCREENSHOT_SVG.exit_code"
-    printf "shRunWithScreenshotTxt - ($* 2>&1)\n" 1>&2
+    printf "shRunWithScreenshotTxt - (%s 2>&1)\n" "$*" 1>&2
     # run "$@" with screenshot
     (
-        "$@" 2>&1 || printf "$?\n" > "$SCREENSHOT_SVG.exit_code"
+        "$@" 2>&1 || printf "%s\n" "$?" > "$SCREENSHOT_SVG.exit_code"
     ) | tee "$SCREENSHOT_SVG.txt"
     EXIT_CODE="$(cat "$SCREENSHOT_SVG.exit_code")"
-    printf "shRunWithScreenshotTxt - EXIT_CODE=$EXIT_CODE - $SCREENSHOT_SVG\n" \
+    printf "shRunWithScreenshotTxt - EXIT_CODE=%s - %s\n" \
+        "$EXIT_CODE" "$SCREENSHOT_SVG" \
         1>&2
     # format text-output
     node --input-type=module --eval '
@@ -3680,7 +3728,7 @@ ${result}
     moduleFs.promises.writeFile(process.argv[1], result);
 }());
 ' "$SCREENSHOT_SVG" # '
-    printf "shRunWithScreenshotTxt - wrote - $SCREENSHOT_SVG\n"
+    printf "shRunWithScreenshotTxt - wrote - %s\n" "$SCREENSHOT_SVG"
     # cleanup
     rm "$SCREENSHOT_SVG.exit_code" "$SCREENSHOT_SVG.txt"
     return "$EXIT_CODE"
@@ -3695,7 +3743,7 @@ shBashrcWindowsInit
 # source myci2.sh
 if [ -f ~/myci2.sh ]
 then
-    . ~/myci2.sh :
+    . ~/myci2.sh
 fi
 
 # run "$@"
@@ -3715,15 +3763,15 @@ fi
     unset shCiPublishPypiCustom
     if [ -f ./myci2.sh ]
     then
-        . ./myci2.sh :
+        . ./myci2.sh
     fi
     if [ -f ./.ci.sh ]
     then
-        . ./.ci.sh :
+        . ./.ci.sh
     fi
     if [ -f ./.ci2.sh ]
     then
-        . ./.ci2.sh :
+        . ./.ci2.sh
     fi
     "$@"
 )
