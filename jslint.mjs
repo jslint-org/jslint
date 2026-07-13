@@ -9357,7 +9357,7 @@ function jslint_phase5_whitage(state) {
         open = indentage.open;
         opening = indentage.opening;
 
-// PR-xxx - Cleanup indent for multiline-method-chaining.
+// Commit 3903449a - Cleanup indent for multiline-method-chaining.
 
         if (dot_depth > 1) {
             dot_depth -= 1;
@@ -9371,7 +9371,7 @@ function jslint_phase5_whitage(state) {
             at_margin(
                 indentage.dot_depth === 1
 
-// PR-xxx - Cleanup indent for multiline-method-chaining.
+// Commit 3903449a - Cleanup indent for multiline-method-chaining.
 
                 ? mode_indent
                 : 0
@@ -9504,7 +9504,7 @@ function jslint_phase5_whitage(state) {
 
             test_cause("aa(0", right.id);
 
-// PR-xxx - Inline internal-function no_space() into whitage_default().
+// Commit 3903449a - Inline internal-function no_space() into whitage_default().
 
             if (right.from < margin) {
 
@@ -9665,7 +9665,7 @@ function jslint_phase5_whitage(state) {
         };
         function_stack.push(indentage);
 
-// PR-xxx - Cleanup indent for multiline-method-chaining.
+// Commit 3903449a - Cleanup indent for multiline-method-chaining.
 
         if (dot_depth >= 1) {
             dot_depth += 1;
@@ -9775,7 +9775,7 @@ function jslint_phase5_whitage(state) {
 
         whitage_default();
 
-// PR-xxx - Cleanup indent for multiline-method-chaining.
+// Commit 3903449a - Cleanup indent for multiline-method-chaining.
 
         if (left.line !== right.line) {
             dot_depth = 0;
