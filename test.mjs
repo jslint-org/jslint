@@ -957,6 +957,16 @@ aa();
                 `String(/[\\--\\-]/);`,
                 `function aa() {\n    return /./;\n}\naa();`
             ],
+            scope: [
+                "(function aa(bb = aa) {\n    aa(bb);\n}());",
+                "function aa(bb = aa) {\n    aa(bb);\n}\naa();",
+                (`
+if (String) {
+    var aa = 0; //jslint-ignore-line
+}
+aa();
+                `)
+            ],
             ternary: [
                 (`
 String(
