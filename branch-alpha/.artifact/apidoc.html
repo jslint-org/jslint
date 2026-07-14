@@ -853,21 +853,21 @@ ${String(message).slice(0, 2000)}`
     throw error;
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-//     }
-// } else {
-//     if (right.from !== margin + 8) {
-//         expected_at(margin + 8);
-//     }
+    function expected_at(at) {
+
+// Probably deadcode.
+// if (right === undefined) {
+//     right = token_nxt;
 // }
 
-        <span class="apidocCodeKeywordSpan">jslint_assert</span>(open, `Expected open.`);
-        jslint_assert(free, `Expected free.`);
-        if (right.from &lt; margin) {
-
-// test_cause:
-// ["String(\nString\n()\n);", "no_space", "expected_at(margin)", "(", 0]
-
-test_cause("expected_at(margin)", right.id);
+<span class="apidocCodeKeywordSpan">jslint_assert</span>(
+    !(right === undefined),
+    `Expected !(right === undefined).`
+);
+warn(
+    "expected_a_at_b_c",
+    right,
+    artifact(right),
 ...</pre></li>
 
 <li>
@@ -1311,7 +1311,7 @@ jslint_assert(
         warn
     } = state;
     let closer = "(end)";
-    let free = false;
+    let dot_depth = 0;
 
 // free = false
 
@@ -1333,7 +1333,7 @@ jslint_assert(
 // "switch(){}"
 // "while(){}"
 
-    let indent_method_dict = empty();
+    let free = false;
     let indentage;
     let left = token_global;
     let margin = 0;
@@ -1387,7 +1387,7 @@ jslint_assert(
                 if (!name.used) {
 
 // test_cause:
-// ["function aa(bb){return;}...
+// ["function aa(bb){return;}", "delve", "un...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
