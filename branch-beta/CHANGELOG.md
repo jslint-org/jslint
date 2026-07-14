@@ -1,9 +1,7 @@
 # Changelog
 
 # Todo
-- jslint-regression - Fix multiline-method-chaining whitespace-check not working when function-call's parameter-list spans more than one line.
 - jslint-warning - Relax warnings for console.log() and friends.
-- jslint-ci - Automate linting of shell-scripts with shellcheck.
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
 - jslint - Add ability to auto-fix whitespace.
@@ -12,6 +10,8 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.7.1-beta
+- jslint-ci - Add automated ci for shellcheck to lint shell-scripts.
+- jslint-regression - Cleanup indent for multiline-method-chaining.
 - jslint-regression - Fix jslint crashing before warning about dangling ')' or ']'.
 - jslint-parse - Fix jslint unable to continue parsing 'async aa => 0'.
 - jslint-parse - Fix jslint unable to continue parsing 'function aa(){}0'.

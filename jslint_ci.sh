@@ -55,58 +55,52 @@ sh jslint_ci.sh shRunWithScreenshotTxt .artifact/screenshot_changelog.svg head -
 # @ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_
 # `abcdefghijklmnopqrstuvwxyz{|}~\u007f
 
+# shellcheck disable=SC2015,SC3021,SC3044
 shBashrcDebianInit() {
 # This function will init debian:stable /etc/skel/.bashrc.
 # https://salsa.debian.org/debian/bash/-/blob/e17f75c7869a4a00dbad36503c1965040b22ef32/debian/skel.bashrc
+    if [ ! "$BASH_VERSION" ]
+    then
+        return
+    fi
     # ~/.bashrc: executed by bash(1) for non-login shells.
     # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
     # for examples
-
     # If not running interactively, don't do anything
     case $- in
         *i*) ;;
           *) return;;
     esac
-
     # don't put duplicate lines or lines starting with space in the history.
     # See bash(1) for more options
     HISTCONTROL=ignoreboth
-
     # append to the history file, don't overwrite it
     shopt -s histappend
-
     # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
     HISTSIZE=1000
     HISTFILESIZE=2000
-
     # check the window size after each command and, if necessary,
     # update the values of LINES and COLUMNS.
     shopt -s checkwinsize
-
     # If set, the pattern "**" used in a pathname expansion context will
     # match all files and zero or more directories and subdirectories.
     #shopt -s globstar
-
     # make less more friendly for non-text input files, see lesspipe(1)
     #[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
-
     # set variable identifying the chroot you work in (used in the prompt below)
     if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
         debian_chroot=$(cat /etc/debian_chroot)
     fi
-
     # set a fancy prompt (non-color, unless we know we "want" color)
     case "$TERM" in
         xterm-color|*-256color) color_prompt=yes;;
     esac
-
     # uncomment for a colored prompt, if the terminal has the capability; turned
     # off by default to not distract the user: the focus in a terminal window
     # should be on the output of commands, not on the prompt
     #force_color_prompt=yes
-
     if [ -n "$force_color_prompt" ]; then
-        if [ -x /usr/bin/tput ] && tput setaf 1 >/dev/null 2>&1; then
+        if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
         # We have color support; assume it's compliant with Ecma-48
         # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
         # a case would tend to support setf rather than setaf.)
@@ -115,14 +109,12 @@ shBashrcDebianInit() {
         color_prompt=
         fi
     fi
-
     if [ "$color_prompt" = yes ]; then
         PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
     else
         PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
     fi
     unset color_prompt force_color_prompt
-
     # If this is an xterm set the title to user@host:dir
     case "$TERM" in
     xterm*|rxvt*)
@@ -131,36 +123,29 @@ shBashrcDebianInit() {
     *)
         ;;
     esac
-
     # enable color support of ls and also add handy aliases
     if [ -x /usr/bin/dircolors ]; then
         test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
         alias ls='ls --color=auto'
         #alias dir='dir --color=auto'
         #alias vdir='vdir --color=auto'
-
         #alias grep='grep --color=auto'
         #alias fgrep='fgrep --color=auto'
         #alias egrep='egrep --color=auto'
     fi
-
     # colored GCC warnings and errors
     #export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
-
     # some more ls aliases
     #alias ll='ls -l'
     #alias la='ls -A'
     #alias l='ls -CF'
-
     # Alias definitions.
     # You may want to put all your additions into a separate file like
     # ~/.bash_aliases, instead of adding them here directly.
     # See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
     if [ -f ~/.bash_aliases ]; then
         . ~/.bash_aliases
     fi
-
     # enable programmable completion features (you don't need to enable
     # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
     # sources /etc/bash.bashrc).
@@ -282,9 +267,9 @@ shCiArtifactUpload() {(set -e
 # # This function will run custom-code to upload build-artifacts.
 #     return
 # )}
-    if ! (shCiMatrixIsmainName \
-        && [ -f package.json ] \
-        && grep -q '^    "shCiArtifactUpload": 1,$' package.json)
+    if ! shCiMatrixIsmainName || \
+        [ ! -f package.json ] || \
+        ! grep -q '^    "shCiArtifactUpload": 1,$' package.json
     then
         return
     fi
@@ -308,12 +293,12 @@ shCiArtifactUpload() {(set -e
         package.json
     )"
     export UPSTREAM_GITHUB_IO="$(
-        printf "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
+        printf "%s" "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
     # init $GITHUB_XXX
     export GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-$UPSTREAM_REPOSITORY}"
     export GITHUB_GITHUB_IO="$(
-        printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
+        printf "%s" "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
     # screenshot changelog and files
     PID_LIST=""
@@ -359,14 +344,11 @@ shCiArtifactUpload() {(set -e
         rm -rf .artifact
         git checkout beta .
         # update apidoc.html
-        for FILE in apidoc.html
-        do
-            if [ -f ".artifact/$FILE" ]
-            then
-                cp -a ".artifact/$FILE" .
-                git add -f "$FILE"
-            fi
-        done
+        if [ -f .artifact/apidoc.html ]
+        then
+            cp -a .artifact/apidoc.html .
+            git add -f apidoc.html
+        fi
     fi
     # update README.md with branch-$GITHUB_BRANCH0 and $GITHUB_REPOSITORY
     sed -i.bak \
@@ -489,7 +471,7 @@ import moduleFs from "fs";
         });
     }
 }());
-' "$@" # '
+' # '
     fi
     # update table-of-contents in README.md
     node --input-type=module --eval '
@@ -537,7 +519,18 @@ import moduleFs from "fs";
     });
     await moduleFs.promises.writeFile("README.md", data);
 }());
-' "$@" # '
+' # '
+    FILE_LIST=""
+    FILE_LIST="$FILE_LIST *.sh"
+    for FILE in .ci.sh .ci2.sh
+    do
+        if [ -f "$FILE" ]
+        then
+            FILE_LIST="$FILE_LIST $FILE"
+        fi
+    done
+    # shellcheck disable=SC2086
+    shLintShell $FILE_LIST
     JSLINT_BETA=1 node jslint.mjs .
     if (command -v shCiLintCustom >/dev/null)
     then
@@ -555,19 +548,19 @@ import moduleFs from "fs";
     then
         shCiBaseCustom2
     fi
-    git diff
+    git --no-pager diff
 )}
 
 shCiMatrixIsmainName() {(set -e
 # This function will return 0 if current ci-job is main job.
-    CI_MATRIX_NAME="$(printf "$CI_MATRIX_NAME" | xargs)"
+    CI_MATRIX_NAME="$(printf "%s" "$CI_MATRIX_NAME" | xargs)"
     [ "$CI_MATRIX_NAME" ] && [ "$CI_MATRIX_NAME" = "$CI_MATRIX_NAME_MAIN" ]
 )}
 
 shCiMatrixIsmainNodeversion() {(set -e
 # This function will return 0 if current ci-job is main job.
-    [ "$CI_MATRIX_NODE_VERSION" ] \
-        && [ "$CI_MATRIX_NODE_VERSION" = "$CI_MATRIX_NODE_VERSION_MAIN" ]
+    [ "$CI_MATRIX_NODE_VERSION" ] && \
+        [ "$CI_MATRIX_NODE_VERSION" = "$CI_MATRIX_NODE_VERSION_MAIN" ]
 )}
 
 shCiPre() {(set -e
@@ -578,7 +571,7 @@ shCiPre() {(set -e
 # )}
     if [ -f ./myci2.sh ]
     then
-        . ./myci2.sh :
+        . ./myci2.sh
         shMyciInit
     fi
     if (command -v shCiPreCustom >/dev/null)
@@ -597,8 +590,8 @@ shCiPublishNpm() {(set -e
 # # This function will run custom-code to publish npm-package.
 #     # npm publish --access public
 # )}
-    if ! ([ -f package.json ] \
-        && grep -q '^    "shCiPublishNpm": 1,$' package.json)
+    if [ ! -f package.json ] || \
+        ! grep -q '^    "shCiPublishNpm": 1,$' package.json
     then
         return
     fi
@@ -624,8 +617,8 @@ shCiPublishPypi() {(set -e
 # # This function will run custom-code to publish pypi-package.
 #     # npm publish --access public
 # )}
-    if ! ([ -f pyproject.toml ] \
-        && grep -q '^shCiPublishPypi = 1$' pyproject.toml)
+    if [ ! -f pyproject.toml ] || \
+        ! grep -q '^shCiPublishPypi = 1$' pyproject.toml
     then
         return
     fi
@@ -645,12 +638,12 @@ shDirHttplinkValidate() {(set -e
         package.json
     )"
     export UPSTREAM_GITHUB_IO="$(
-        printf "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
+        printf "%s" "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
     # init $GITHUB_XXX
     export GITHUB_REPOSITORY="${GITHUB_REPOSITORY:-$UPSTREAM_REPOSITORY}"
     export GITHUB_GITHUB_IO="$(
-        printf "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
+        printf "%s" "$GITHUB_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
     node --input-type=module --eval '
 import moduleAssert from "assert";
@@ -771,7 +764,7 @@ import moduleHttps from "https";
         });
     });
 }());
-' "$@" # '
+' # '
 )}
 
 shDuList() {(set -e
@@ -781,7 +774,7 @@ shDuList() {(set -e
 
 shGitCmdWithGithubToken() {(set -e
 # This function will run git $CMD with $MY_GITHUB_TOKEN.
-    printf "shGitCmdWithGithubToken $*\n"
+    printf "shGitCmdWithGithubToken %s\n" "$*"
     if [ -f .git/config ]
     then
         # security - scrub token from url
@@ -805,21 +798,21 @@ shGitCmdWithGithubToken() {(set -e
     shift
     URL="$1"
     shift
-    if (printf "$URL" | grep -qv "^https://")
+    if (printf "%s" "$URL" | grep -qv "^https://")
     then
         URL="$(git config "remote.$URL.url")"
     fi
     if [ "$MY_GITHUB_TOKEN" ]
     then
         URL="$(
-            printf "$URL" \
-            | sed -e "s|https://|https://x-access-token:$MY_GITHUB_TOKEN@|"
+            printf "%s" "$URL" | \
+            sed -e "s|https://|https://x-access-token:$MY_GITHUB_TOKEN@|"
         )"
     fi
     EXIT_CODE=0
     # hide $MY_GITHUB_TOKEN in case of err
     git "$CMD" "$URL" "$@" 2>/dev/null || EXIT_CODE="$?"
-    printf "shGitCmdWithGithubToken - EXIT_CODE=$EXIT_CODE\n" 1>&2
+    printf "shGitCmdWithGithubToken - EXIT_CODE=%s\n" "$EXIT_CODE" 1>&2
     return "$EXIT_CODE"
 )}
 
@@ -828,7 +821,7 @@ shGitCommitPushOrSquash() {(set -e
 # then backup, squash, force-push,
 # else normal-push.
     BRANCH="$(git branch --show-current)"
-    COMMIT_MESSAGE="${1:-$(git diff HEAD --stat)}"
+    COMMIT_MESSAGE="${1:-$(git --no-pager diff HEAD --stat)}"
     COMMIT_LIMIT="$2"
     MODE_NOBACKUP="$3"
     MODE_SQUASH="$4"
@@ -838,8 +831,9 @@ shGitCommitPushOrSquash() {(set -e
     then
         MODE_SQUASH=squash
     fi
-    printf "shGitCommitPushOrSquash COMMIT_COUNT=$COMMIT_COUNT \
-COMMIT_LIMIT=$COMMIT_LIMIT MODE_SQUASH=$MODE_SQUASH\n"
+    printf "shGitCommitPushOrSquash \
+COMMIT_COUNT=%s COMMIT_LIMIT=%s MODE_SQUASH=%s\n" \
+        "$COMMIT_COUNT" "$COMMIT_LIMIT" "$MODE_SQUASH"
     if [ "$MODE_SQUASH" != squash ]
     then
         shGitCmdWithGithubToken push origin "$BRANCH"
@@ -968,7 +962,7 @@ import moduleChildProcess from "child_process";
         }).join(""));
     });
 }());
-' "$@" # '
+' # '
 )}
 
 shGitSquashPop() {(set -e
@@ -989,14 +983,14 @@ shGithubCheckoutRemote() {(set -e
 # This function will run like actions/checkout, except checkout remote-branch.
     # GITHUB_REF_NAME="owner/repo/branch"
     GITHUB_REF_NAME="$1"
-    if (printf "$GITHUB_REF_NAME" | grep -q ".*/.*/.*")
+    if (printf "%s" "$GITHUB_REF_NAME" | grep -q ".*/.*/.*")
     then
         # branch - */*/*
         git fetch origin alpha
         # assert latest ci
-        if (git rev-parse "$GITHUB_REF_NAME" 2>/dev/null) \
-            && [ "$(git rev-parse "$GITHUB_REF_NAME")" \
-            != "$(git rev-parse origin/alpha)" ]
+        if git rev-parse "$GITHUB_REF_NAME" 2>/dev/null && \
+            [ "$(git rev-parse "$GITHUB_REF_NAME")" != \
+                "$(git rev-parse origin/alpha)" ]
         then
             git push -f origin "origin/alpha:$GITHUB_REF_NAME"
             shGithubWorkflowDispatch "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME"
@@ -1006,10 +1000,10 @@ shGithubCheckoutRemote() {(set -e
         # branch - alpha, beta, master
         GITHUB_REF_NAME="$GITHUB_REPOSITORY/$GITHUB_REF_NAME"
     fi
-    GITHUB_REPOSITORY="$(printf "$GITHUB_REF_NAME" | cut -d'/' -f1,2)"
-    GITHUB_REF_NAME="$(printf "$GITHUB_REF_NAME" | cut -d'/' -f3)"
+    GITHUB_REPOSITORY="$(printf "%s" "$GITHUB_REF_NAME" | cut -d'/' -f1,2)"
+    GITHUB_REF_NAME="$(printf "%s" "$GITHUB_REF_NAME" | cut -d'/' -f3)"
     # replace current git-checkout with $GITHUB_REF_NAME
-    rm -rf * ..?* .[!.]*
+    rm -rf ./* ./..?* ./.[!.]*
     shGitCmdWithGithubToken clone \
         "https://github.com/$GITHUB_REPOSITORY" __tmp1 \
         --branch="$GITHUB_REF_NAME" --depth=1 --single-branch
@@ -1227,7 +1221,7 @@ import moduleFs from "fs";
     git reset "${branchSquash}"
     git push . HEAD:__pr_"${branchMerge}"_pre -f
     shGitSquashPop "${branchCheckpoint}" \u0027${commitMessage}\u0027
-    git diff origin/"${branchPull}" || true
+    git --no-pager diff origin/"${branchPull}" || true
     git push origin alpha:"${branchPull}" -f
     git push origin alpha -f
     shDirHttplinkValidate
@@ -1253,7 +1247,7 @@ shGithubPrCleanup() {(set -e
     git push . alpha:__pr_upstream_pre -f
     git fetch upstream beta
     # verify no diff between alpha..upstream/beta
-    git diff alpha..upstream/beta
+    git --no-pager diff alpha..upstream/beta
     git reset upstream/beta
     git push . alpha:beta -f
     git push origin alpha beta -f
@@ -1264,7 +1258,7 @@ shGithubPrCleanup() {(set -e
 shGithubPrUpdatePrxxx() {(set -e
 # This function will update 'PR-xxx' placeholder in codebase
 # to next sequential github issue/pull number.
-    if ! (git grep -Ei -e '^ *?(//|#) pr-xxx')
+    if ! git grep -Ei -e '^ *?(//|#) pr-xxx'
     then
         return
     fi
@@ -1276,7 +1270,7 @@ shGithubPrUpdatePrxxx() {(set -e
 "https://api.github.com/repos/$UPSTREAM_REPOSITORY/issues?per_page=1&state=all"
     )"
     PR_XXX="$(
-        printf "$PR_XXX" | sed -En -e 's/.*"number": ([0-9]+).*/\1/p'
+        printf "%s" "$PR_XXX" | sed -En -e 's/.*"number": ([0-9]+).*/\1/p'
     )"
     if [ ! "$PR_XXX" ]
     then
@@ -1293,7 +1287,7 @@ shGithubPrUpdatePrxxx() {(set -e
             "$FILE" && \
             rm -f "$FILE".bak
     done
-    git diff
+    git --no-pager diff
     git grep -Ei -e '^ *?(//|#) pr-xxx' || true
     git commit -am "- ci - Update 'PR-xxx' placeholder to '${PR_XXX}'."
     git log -n 4
@@ -1326,7 +1320,7 @@ shGithubWorkflowDispatch() {(set -e
         -d '{"ref":"'"$BRANCH"'"}' \
         -s \
         "$@" || EXIT_CODE="$?"
-    printf "shGithubWorkflowDispatch - EXIT_CODE=$EXIT_CODE\n" 1>&2
+    printf "shGithubWorkflowDispatch - EXIT_CODE=%s\n" "$EXIT_CODE" 1>&2
     return "$EXIT_CODE"
 )}
 
@@ -1389,7 +1383,7 @@ import modulePath from "path";
         moduleFs.promises.writeFile(file, data.join("\n"));
     });
 }());
-' "$@" # '
+' # '
 )}
 
 shHttpFileServer() {(set -e
@@ -1401,10 +1395,10 @@ shHttpFileServer() {(set -e
         while true
         do
             printf "\n"
-            git diff --color 2>/dev/null | cat || true
-            printf "\nshHttpFileServer - (re)starting $*\n"
+            git --no-pager diff 2>/dev/null | cat || true
+            printf "\nshHttpFileServer - (re)starting %s\n" "$*"
             (shHttpFileServer "$@") || EXIT_CODE="$?"
-            printf "process exited with code $EXIT_CODE\n"
+            printf "\nshHttpFileServer - EXIT_CODE=%s\n" "$EXIT_CODE"
             # if $EXIT_CODE != 77, then exit process
             # http://en.wikipedia.org/wiki/Unix_signal
             if [ "$EXIT_CODE" != 77 ]
@@ -1559,10 +1553,6 @@ import moduleRepl from "repl";
             // syntax-sugar - run shell-cmd
             case "$":
                 switch (match2.split(" ").slice(0, 2).join(" ")) {
-                // syntax-sugar - run git diff
-                case "git diff":
-                    match2 += " --color";
-                    break;
                 // syntax-sugar - run git log
                 case "git log":
                     match2 += " -n 10";
@@ -1667,7 +1657,7 @@ shImageLogoCreate() {(set -e
     shBrowserScreenshot asset_image_logo_256.html \
         "-screenshot=$(node --print "path.resolve(process.argv[1])" "$FILE")"
     gm mogrify -crop 256x256 "$FILE"
-    printf "shImageLogoCreate - wrote - $FILE\n" 1>&2
+    printf "shImageLogoCreate - wrote - %s\n" "$FILE" 1>&2
     # convert to svg @ https://convertio.co/png-svg/
 )}
 
@@ -1770,10 +1760,45 @@ function objectDeepCopyWithKeysSorted(obj) {
 ' "$@" # '
 )}
 
+shLintShell() {(set -e
+    if (! shellcheck --version >/dev/null 2>&1)
+    then
+        return
+    fi
+    FILE_LIST="$*"
+    OPTION=""
+    # https://www.shellcheck.net/wiki/
+    # SC1090 – Can't follow non-constant source.
+    # Use a directive to specify location
+    OPTION="$OPTION --exclude=SC1090"
+    # SC1091 – Not following: (error message here)
+    OPTION="$OPTION --exclude=SC1091"
+    # SC2016 – Expressions don't expand in single quotes,
+    # use double quotes for that.
+    OPTION="$OPTION --exclude=SC2016"
+    # SC2030 – Modification of var is local (to subshell caused by pipeline).
+    OPTION="$OPTION --exclude=SC2030"
+    # SC2031 – var was modified in a subshell. That change might be lost.
+    OPTION="$OPTION --exclude=SC2031"
+    # SC2119 – Use `foo "$@"` if function's `$1` should mean script's `$1`.
+    OPTION="$OPTION --exclude=SC2119"
+    # SC2115 – Use `"${var:?}"` to ensure this never expands to `/*` .
+    OPTION="$OPTION --exclude=SC2155"
+    EXIT_CODE=0
+    # shellcheck disable=SC2086
+    shellcheck $OPTION $FILE_LIST >/dev/null || EXIT_CODE="$?"
+    if [ "$EXIT_CODE" != 0 ]
+    then
+        # shellcheck disable=SC2086
+        shellcheck $OPTION $FILE_LIST | head -n 50
+    fi
+    return "$EXIT_CODE"
+)}
+
 shLintPython() {(set -e
 # This function will lint python file.
 # https://docs.astral.sh/ruff/rules/
-    FILE_LIST="$@"
+    FILE_LIST="$*"
     (
     printf "\n\nlint ruff\n"
     OPTION=""
@@ -1835,6 +1860,7 @@ shLintPython() {(set -e
     # T201 - print
     # print found
     OPTION="$OPTION --ignore=T201"
+    # shellcheck disable=SC2086
     ruff check $OPTION $FILE_LIST
     ) &
     PID_LIST="$PID_LIST $!"
@@ -1855,6 +1881,7 @@ shLintPython() {(set -e
     # Line breaks should occur after the binary operator to keep all variable
     # names aligned.
     OPTION="$OPTION,W503"
+    # shellcheck disable=SC2086
     pycodestyle $OPTION $FILE_LIST
     ) &
     PID_LIST="$PID_LIST $!"
@@ -1867,7 +1894,7 @@ shNpmPublishV0() {(set -e
 # This function will npm-publish name $1 with bare package.json.
     DIR=/tmp/shNpmPublishV0
     rm -rf "$DIR" && mkdir -p "$DIR" && cd "$DIR"
-    printf "{\"name\":\"$1\",\"version\":\"0.0.1\"}\n" > package.json
+    printf "{\"name\":\"%s\",\"version\":\"0.0.1\"}\n" "$1" > package.json
     shift
     npm publish "$@"
 )}
@@ -1879,11 +1906,11 @@ shPidListWait() {
     TASK="$1"
     for PID in $PID_LIST
     do
-        printf "$TASK - pid=$PID ...\n"
+        printf "%s - pid=%s ...\n" "$TASK" "$PID"
         wait "$PID" || EXIT_CODE="$?"
-        printf "$TASK - pid=$PID EXIT_CODE=$EXIT_CODE\n"
+        printf "%s - pid=%s EXIT_CODE=%s\n" "$TASK" "$PID" "$EXIT_CODE"
     done
-    printf "$TASK - pid=done EXIT_CODE=$EXIT_CODE\n\n\n\n"
+    printf "%s - pid=done EXIT_CODE=%s\n\n\n\n" "$TASK" "$EXIT_CODE"
     return "$EXIT_CODE"
 }
 
@@ -2264,7 +2291,7 @@ function replaceListReplace(replaceList, data) {
     });
 }());
 ' "$@" # '
-    git diff
+    git --no-pager diff
 )}
 
 shRunWithCoverage() {(set -e
@@ -3598,13 +3625,14 @@ shRunWithScreenshotTxt() {(set -e
     SCREENSHOT_SVG="$1"
     shift
     printf "0\n" > "$SCREENSHOT_SVG.exit_code"
-    printf "shRunWithScreenshotTxt - ($* 2>&1)\n" 1>&2
+    printf "shRunWithScreenshotTxt - (%s 2>&1)\n" "$*" 1>&2
     # run "$@" with screenshot
     (
-        "$@" 2>&1 || printf "$?\n" > "$SCREENSHOT_SVG.exit_code"
+        "$@" 2>&1 || printf "%s\n" "$?" > "$SCREENSHOT_SVG.exit_code"
     ) | tee "$SCREENSHOT_SVG.txt"
     EXIT_CODE="$(cat "$SCREENSHOT_SVG.exit_code")"
-    printf "shRunWithScreenshotTxt - EXIT_CODE=$EXIT_CODE - $SCREENSHOT_SVG\n" \
+    printf "shRunWithScreenshotTxt - EXIT_CODE=%s - %s\n" \
+        "$EXIT_CODE" "$SCREENSHOT_SVG" \
         1>&2
     # format text-output
     node --input-type=module --eval '
@@ -3680,7 +3708,7 @@ ${result}
     moduleFs.promises.writeFile(process.argv[1], result);
 }());
 ' "$SCREENSHOT_SVG" # '
-    printf "shRunWithScreenshotTxt - wrote - $SCREENSHOT_SVG\n"
+    printf "shRunWithScreenshotTxt - wrote - %s\n" "$SCREENSHOT_SVG"
     # cleanup
     rm "$SCREENSHOT_SVG.exit_code" "$SCREENSHOT_SVG.txt"
     return "$EXIT_CODE"
@@ -3695,7 +3723,7 @@ shBashrcWindowsInit
 # source myci2.sh
 if [ -f ~/myci2.sh ]
 then
-    . ~/myci2.sh :
+    . ~/myci2.sh
 fi
 
 # run "$@"
@@ -3715,15 +3743,15 @@ fi
     unset shCiPublishPypiCustom
     if [ -f ./myci2.sh ]
     then
-        . ./myci2.sh :
+        . ./myci2.sh
     fi
     if [ -f ./.ci.sh ]
     then
-        . ./.ci.sh :
+        . ./.ci.sh
     fi
     if [ -f ./.ci2.sh ]
     then
-        . ./.ci2.sh :
+        . ./.ci2.sh
     fi
     "$@"
 )

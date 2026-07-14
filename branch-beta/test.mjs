@@ -823,9 +823,28 @@ aa();
                 (`
 String
     .aa
-    .bb(
-        0
-    );
+    .aa()
+    .aa(0)
+    .aa(
+        0,
+        [0],
+        \`${0}\`
+    )
+    .aa(
+        String
+            .aa()
+            .aa(0)
+            .aa(
+                0,
+                [0],
+                \`${0}\`
+            )
+    )
+    .aa(function ({
+        aa
+    }) {
+        return aa;
+    });
                 `)
             ],
             jslint_disable: [
@@ -937,6 +956,16 @@ aa();
                 `String(/./dgimsuvy);`,
                 `String(/[\\--\\-]/);`,
                 `function aa() {\n    return /./;\n}\naa();`
+            ],
+            scope: [
+                "(function aa(bb = aa) {\n    aa(bb);\n}());",
+                "function aa(bb = aa) {\n    aa(bb);\n}\naa();",
+                (`
+if (String) {
+    var aa = 0; //jslint-ignore-line
+}
+aa();
+                `)
             ],
             ternary: [
                 (`

@@ -1,3 +1,5 @@
+#!/bin/sh
+
 shCiArtifactUploadCustom() {(set -e
 # this function will run custom-code to upload build-artifacts
     # .github_cache - restore
@@ -153,12 +155,12 @@ import moduleChildProcess from "child_process";
 }());
 ' "$@" # '
     # Rename arbitrary $GITHUB_REPO_BASENAME to "jslint" in screenshot file.
-    GITHUB_REPO_BASENAME="$(printf "$GITHUB_GITHUB_IO" | cut -d'/' -f2)"
+    GITHUB_REPO_BASENAME="$(printf "%s" "$GITHUB_GITHUB_IO" | cut -d'/' -f2)"
     if [ "$GITHUB_REPO_BASENAME" != jslint ]
     then
         for FILE in .artifact/*_2f"$GITHUB_REPO_BASENAME"_2f*
         do
-            mv "$FILE" "$(printf "$FILE" | \
+            mv "$FILE" "$(printf "%s" "$FILE" | \
                 sed -e "s|_2f${GITHUB_REPO_BASENAME}_2f|_2fjslint_2f|")"
         done
     fi
@@ -306,10 +308,10 @@ shCiVscePackageJslintWrapperVscode() {(set -e
     (set -e
     cd .artifact/jslint_wrapper_vscode
     ln -f ../../.npmignore .vscodeignore
-    ln -f ../../LICENSE
-    ln -f ../../asset_image_logo_256.png
-    ln -f ../../jslint.mjs
-    ln -f ../../jslint_wrapper_vscode.js
+    ln -f ../../LICENSE .
+    ln -f ../../asset_image_logo_256.png .
+    ln -f ../../jslint.mjs .
+    ln -f ../../jslint_wrapper_vscode.js .
     node --input-type=module --eval '
 import moduleFs from "fs";
 (async function () {
@@ -466,7 +468,7 @@ import moduleFs from "fs";
         await moduleFs.promises.writeFile(file, src.trim() + "\n");
     }));
 }());
-' "$@" # '
+' # '
     npx @vscode/vsce package
     rm -rf node_modules
     )
