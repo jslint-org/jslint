@@ -307,8 +307,18 @@ shCiJslintGlobalDictAllFetch() {(set -e
 # from online-resources.
     node --input-type=module --eval '
 import moduleFs from "fs";
-function isDeprecated(text) {
-    return (/(?:deprecated|experimental|non-standard)_inline/i).test(text);
+function nameOk(name, deprecatedText, minLength) {
+    const deprecatedList = [
+        "atob",
+        "btoa"
+    ];
+    return (
+        !deprecatedList.includes(name)
+        && !(
+            /(?:deprecated|experimental|non-standard)_inline/i
+        ).test(deprecatedText)
+        && !new RegExp(`^[a-z].{0,${minLength - 1}}$`).test(name)
+    );
 }
 function objectDeepCopyWithKeysSorted(obj) {
 
@@ -346,24 +356,11 @@ function objectDeepCopyWithKeysSorted(obj) {
         );
         response = await response.text();
         response.replace((
-            /^- \{\{domxref\("Window\.(\w+?)(\W.*?)$/gm
-        ), function (ignore, key, deprecated) {
-            dict[key] = !isDeprecated(deprecated);
-            return "";
-        });
-    }());
-    promiseList.push(async function () {
-        const dict = Object.create(null);
-        let response;
-        dictAll.browser_auto_worker = dict;
-        response = await fetch(
-"https://raw.githubusercontent.com/mdn/content/main/files/en-us/web/api/workerglobalscope/index.md" //jslint-ignore-line
-        );
-        response = await response.text();
-        response.replace((
-            /^- \{\{domxref\("WorkerGlobalScope\.(\w+?)(\W.*?)$/gm
-        ), function (ignore, key, deprecated) {
-            dict[key] = !isDeprecated(deprecated);
+            /^- \{\{domxref\("Window\.(\w+?)["(](.*?)$/gm
+        ), function (ignore, name, deprecated) {
+            if (nameOk(name, deprecated, 8)) {
+                dict[name] = true;
+            }
             return "";
         });
     }());
@@ -376,11 +373,11 @@ function objectDeepCopyWithKeysSorted(obj) {
         );
         response = await response.text();
         response.replace((
-            /^- \{\{jsxref\("(\w+?)(\W.*?)$/gm
-        ), function (ignore, key, deprecated) {
-            dict[key] = (
-                Object.hasOwn(globalThis, key) && !isDeprecated(deprecated)
-            );
+            /^- \{\{jsxref\("(\w+?)["(](.*?)$/gm
+        ), function (ignore, name, deprecated) {
+            if (nameOk(name, deprecated, 0)) {
+                dict[name] = true;
+            }
             return "";
         });
     }());
@@ -396,14 +393,14 @@ function objectDeepCopyWithKeysSorted(obj) {
         response = await response.text();
         response.replace((
             /^## (?:Class: )?`(\w+?)\W/gm //`
-        ), function (ignore, key) {
-            dict[key] = Object.hasOwn(globalThis, key);
+        ), function (ignore, name) {
+            dict[name] = nameOk(name, "", 4) && Object.hasOwn(globalThis, name);
             return "";
         });
         response.replace((
             /^\* \[`(\w+?)\W/gm //`
-        ), function (ignore, key) {
-            dict[key] = true;
+        ), function (ignore, name) {
+            dict[name] = nameOk(name, "", 4);
             return "";
         });
         response = await fetch(
@@ -414,25 +411,33 @@ function objectDeepCopyWithKeysSorted(obj) {
             return path;
         });
         response = JSON.stringify(response);
-        await Promise.all(Object.keys(dict).map(async function (key) {
+        await Promise.all(Object.keys(dict).map(async function (name) {
             let response2;
-            dictBrowserNode[key] = false;
+            if (!nameOk(name, "", 4)) {
+                return;
+            }
             response2 = new RegExp(
                 `"files/en-us/web/api/(?:window/)?`
-                + key.toLowerCase()
+                + name.toLowerCase()
                 + `/index.md"`
             ).exec(response);
-            if (response2) {
-                response2 = await fetch(
-                    "https://raw.githubusercontent.com/mdn/content/main/"
-                    + response2[0].slice(1, -1)
-                );
-                response2 = await response2.text();
-                if (!(/\{\{deprecated_header\}\}/).test(response2)) {
-                    dictBrowserNode[key] = true;
-                }
+            if (!response2) {
+                return;
+            }
+            response2 = await fetch(
+                "https://raw.githubusercontent.com/mdn/content/main/"
+                + response2[0].slice(1, -1)
+            );
+            response2 = await response2.text();
+            if (!(/\{\{deprecated_header\}\}/).test(response2)) {
+                dictBrowserNode[name] = true;
             }
         }));
+        Object.keys(dict).forEach(function (name) {
+            if (!dict[name]) {
+                delete dict[name];
+            }
+        });
     }());
     await Promise.all(promiseList);
     result = await moduleFs.promises.readFile("jslint.mjs", "utf8");
