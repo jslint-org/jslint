@@ -9,5 +9,5 @@ printf '> #!/bin/sh
 
 echo "% Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                      Dload  Upload   Total   Spent    Left  Speed
-100  338k  100  338k    0     0   338k      0  0:00:01 --:--:--  0:00:01  338k"
+100  342k  100  342k    0     0   342k      0  0:00:01 --:--:--  0:00:01  342k"
 )

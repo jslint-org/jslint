@@ -1,7 +1,6 @@
 # Changelog
 
 # Todo
-- jslint-warning - Relax warnings for console.log() and friends.
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
 - jslint - Add ability to auto-fix whitespace.
@@ -10,6 +9,7 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.7.1-beta
+- jslint - Expand built-in-globals for browser, ecma, and node - auto-generated from online-sources.
 - jslint-ci - Add automated ci for shellcheck to lint shell-scripts.
 - jslint-regression - Cleanup indent for multiline-method-chaining.
 - jslint-regression - Fix jslint crashing before warning about dangling ')' or ']'.
