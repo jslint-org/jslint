@@ -440,6 +440,8 @@ const jslint_global_dict_all = {
         "WebAssembly": true,
         "Worker": true,
         "XMLHttpRequest": true,
+        "document": true,
+        "location": true,
         "window": true
     },
 
@@ -556,7 +558,6 @@ const jslint_global_dict_all = {
         "cancelIdleCallback": true,
         "clearInterval": true,
         "clearTimeout": true,
-        "confirm": true,
         "cookieStore": true,
         "createImageBitmap": true,
         "crossOriginIsolated": true,
@@ -565,21 +566,17 @@ const jslint_global_dict_all = {
         "devicemotion_event": true,
         "deviceorientation_event": true,
         "deviceorientationabsolute_event": true,
-        "document": true,
         "documentPictureInPicture": true,
         "frameElement": true,
         "getComputedStyle": true,
         "getSelection": true,
-        "history": true,
         "indexedDB": true,
         "innerHeight": true,
         "innerWidth": true,
         "isSecureContext": true,
         "localStorage": true,
-        "location": true,
         "locationbar": true,
         "matchMedia": true,
-        "menubar": true,
         "navigation": true,
         "navigator": true,
         "originAgentCluster": true,
@@ -594,15 +591,7 @@ const jslint_global_dict_all = {
         "reportError": true,
         "requestAnimationFrame": true,
         "requestIdleCallback": true,
-        "resizeBy": true,
-        "resizeTo": true,
         "scheduler": true,
-        "screenX": true,
-        "screenY": true,
-        "scrollBy": true,
-        "scrollTo": true,
-        "scrollX": true,
-        "scrollY": true,
         "scrollbars": true,
         "sessionStorage": true,
         "setInterval": true,
@@ -610,7 +599,6 @@ const jslint_global_dict_all = {
         "speechSynthesis": true,
         "statusbar": true,
         "structuredClone": true,
-        "toolbar": true,
         "trustedTypes": true,
         "visualViewport": true
     },
@@ -4029,9 +4017,19 @@ function jslint_phase2_lex(state) {
                 key2, dict
             ]) {
                 if (key2.startsWith(key)) {
-                    Object.entries(dict).forEach(function ([key, val]) {
-                        if (val) {
-                            global_dict[key] = true;
+                    Object.entries(dict).forEach(function ([name, is_global]) {
+                        if (is_global) {
+                            global_dict[name] = (
+                                key2.startsWith("browser")
+                                ? "browser"
+                                : key2.startsWith("couch")
+                                ? "CouchDb"
+                                : key2.startsWith("devel")
+                                ? "development"
+                                : key2.startsWith("ecma")
+                                ? "ECMAScript"
+                                : "Node.js"
+                            );
                         }
                     });
                 }

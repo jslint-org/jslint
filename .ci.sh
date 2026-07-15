@@ -358,7 +358,7 @@ function objectDeepCopyWithKeysSorted(obj) {
         response.replace((
             /^- \{\{domxref\("Window\.(\w+?)["(](.*?)$/gm
         ), function (ignore, name, deprecated) {
-            if (nameOk(name, deprecated, 6)) {
+            if (nameOk(name, deprecated, 8)) {
                 dict[name] = true;
             }
             return "";
@@ -394,13 +394,13 @@ function objectDeepCopyWithKeysSorted(obj) {
         response.replace((
             /^## (?:Class: )?`(\w+?)\W/gm //`
         ), function (ignore, name) {
-            dict[name] = nameOk(name, "", 0) && Object.hasOwn(globalThis, name);
+            dict[name] = nameOk(name, "", 4) && Object.hasOwn(globalThis, name);
             return "";
         });
         response.replace((
             /^\* \[`(\w+?)\W/gm //`
         ), function (ignore, name) {
-            dict[name] = nameOk(name, "", 0);
+            dict[name] = nameOk(name, "", 4);
             return "";
         });
         response = await fetch(
@@ -413,23 +413,24 @@ function objectDeepCopyWithKeysSorted(obj) {
         response = JSON.stringify(response);
         await Promise.all(Object.keys(dict).map(async function (name) {
             let response2;
+            if (!nameOk(name, "", 4)) {
+                return;
+            }
             response2 = new RegExp(
                 `"files/en-us/web/api/(?:window/)?`
                 + name.toLowerCase()
                 + `/index.md"`
             ).exec(response);
-            if (response2) {
-                response2 = await fetch(
-                    "https://raw.githubusercontent.com/mdn/content/main/"
-                    + response2[0].slice(1, -1)
-                );
-                response2 = await response2.text();
-                if (
-                    nameOk(name, "", 0)
-                    && !(/\{\{deprecated_header\}\}/).test(response2)
-                ) {
-                    dictBrowserNode[name] = true;
-                }
+            if (!response2) {
+                return;
+            }
+            response2 = await fetch(
+                "https://raw.githubusercontent.com/mdn/content/main/"
+                + response2[0].slice(1, -1)
+            );
+            response2 = await response2.text();
+            if (!(/\{\{deprecated_header\}\}/).test(response2)) {
+                dictBrowserNode[name] = true;
             }
         }));
         Object.keys(dict).forEach(function (name) {
