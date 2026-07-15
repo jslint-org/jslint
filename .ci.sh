@@ -307,13 +307,18 @@ shCiJslintGlobalDictAllFetch() {(set -e
 # from online-resources.
     node --input-type=module --eval '
 import moduleFs from "fs";
-function nameDeprecated(text) {
+function nameOk(name, deprecatedText, minLength) {
+    const deprecatedList = [
+        "atob",
+        "btoa"
+    ];
     return (
-        (/(?:deprecated|experimental|non-standard)_inline/i).test(text)
+        !deprecatedList.includes(name)
+        && !(
+            /(?:deprecated|experimental|non-standard)_inline/i
+        ).test(deprecatedText)
+        && !new RegExp(`^[a-z].{0,${minLength - 1}}$`).test(name)
     );
-}
-function nameTooShort(name) {
-    return (/^[a-z].{0,5}$/).test(name);
 }
 function objectDeepCopyWithKeysSorted(obj) {
 
@@ -351,9 +356,9 @@ function objectDeepCopyWithKeysSorted(obj) {
         );
         response = await response.text();
         response.replace((
-            /^- \{\{domxref\("Window\.(\w+?)(\W.*?)$/gm
+            /^- \{\{domxref\("Window\.(\w+?)["(](.*?)$/gm
         ), function (ignore, name, deprecated) {
-            if (!nameDeprecated(deprecated) && !nameTooShort(name)) {
+            if (nameOk(name, deprecated, 6)) {
                 dict[name] = true;
             }
             return "";
@@ -368,9 +373,9 @@ function objectDeepCopyWithKeysSorted(obj) {
         );
         response = await response.text();
         response.replace((
-            /^- \{\{jsxref\("(\w+?)(\W.*?)$/gm
+            /^- \{\{jsxref\("(\w+?)["(](.*?)$/gm
         ), function (ignore, name, deprecated) {
-            if (!nameDeprecated(deprecated)) {
+            if (nameOk(name, deprecated, 0)) {
                 dict[name] = true;
             }
             return "";
@@ -389,13 +394,13 @@ function objectDeepCopyWithKeysSorted(obj) {
         response.replace((
             /^## (?:Class: )?`(\w+?)\W/gm //`
         ), function (ignore, name) {
-            dict[name] = Object.hasOwn(globalThis, name);
+            dict[name] = nameOk(name, "", 0) && Object.hasOwn(globalThis, name);
             return "";
         });
         response.replace((
             /^\* \[`(\w+?)\W/gm //`
         ), function (ignore, name) {
-            dict[name] = true;
+            dict[name] = nameOk(name, "", 0);
             return "";
         });
         response = await fetch(
@@ -419,7 +424,10 @@ function objectDeepCopyWithKeysSorted(obj) {
                     + response2[0].slice(1, -1)
                 );
                 response2 = await response2.text();
-                if (!(/\{\{deprecated_header\}\}/).test(response2)) {
+                if (
+                    nameOk(name, "", 0)
+                    && !(/\{\{deprecated_header\}\}/).test(response2)
+                ) {
                     dictBrowserNode[name] = true;
                 }
             }
