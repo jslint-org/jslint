@@ -399,7 +399,7 @@
 */
 
 // init debugInline
-let debugInline = (function () {
+const debugInline = (function () {
     let __consoleError = function () {
         return;
     };
@@ -416,7 +416,7 @@ let debugInline = (function () {
     __consoleError = console.error; //jslint-ignore-line
     return debug;
 }());
-let jslint_charset_ascii = (
+const jslint_charset_ascii = (
     "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007"
     + "\b\t\n\u000b\f\r\u000e\u000f"
     + "\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017"
@@ -425,67 +425,298 @@ let jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-let jslint_edition = "v2026.7.1-beta";
-let jslint_export;                      // The jslint object to be exported.
-let jslint_fudge = 1;                   // Fudge starting line and starting
+const jslint_edition = "v2026.7.1-beta";
+const jslint_fudge = 1;                 // Fudge starting line and starting
                                         // ... column to 1.
-let jslint_import_meta_url = "";        // import.meta.url used by cli.
-let jslint_rgx_cap = (
+const jslint_global_dict_all = {
+/*jslint-disable*/
+
+// Assign global browser variables to global_dict.
+
+    "browser": {
+    },
+
+// https://docs.couchdb.org/en/stable/query-server/javascript.html#javascript
+
+    "couch": {
+        "emit": true,
+        "getRow": true,
+        "isArray": true,
+        "log": true,
+        "provides": true,
+        "registerType": true,
+        "require": true,
+        "send": true,
+        "start": true,
+        "sum": true,
+        "toJSON": true
+    },
+    "devel": {
+        "alert": true,
+        "confirm": true,
+        "console": true,
+        "prompt": true
+    },
+
+// These are the globals that are provided by the language standard.
+// Assign global ECMAScript variables to global_dict.
+
+    "ecma": {
+    },
+
+// Assign global Node.js variables to global_dict.
+
+    "node": {
+        "fetch": true
+    },
+
+// sh jslint_ci.sh shCiJslintGlobalDictAllFetch
+
+// jslint_global_dict_all - auto-generated - start.
+
+    "browser_auto_node": {
+        "AbortController": true,
+        "Buffer": false,
+        "Crypto": false,
+        "CryptoKey": false,
+        "Event": true,
+        "EventTarget": true,
+        "MessageChannel": true,
+        "MessageEvent": true,
+        "MessagePort": true,
+        "Request": false,
+        "Response": false,
+        "SubtleCrypto": false,
+        "TextDecoder": true,
+        "TextEncoder": true,
+        "URL": true,
+        "URLSearchParams": true,
+        "WebAssembly": true,
+        "__dirname": false,
+        "__filename": false,
+        "atob": false,
+        "btoa": false,
+        "clearImmediate": false,
+        "clearInterval": true,
+        "clearTimeout": true,
+        "console": false,
+        "crypto": false,
+        "exports": false,
+        "fetch": false,
+        "global": false,
+        "module": false,
+        "performance": true,
+        "process": false,
+        "queueMicrotask": true,
+        "require": false,
+        "setImmediate": false,
+        "setInterval": true,
+        "setTimeout": true
+    },
+    "browser_auto_window": {
+        "Blob": true,
+        "CharacterData": false,
+        "DocumentType": false,
+        "Element": false,
+        "Event": false,
+        "FileReader": true,
+        "FontFace": false,
+        "FormData": true,
+        "IntersectionObserver": true,
+        "MutationObserver": true,
+        "Storage": false,
+        "TextDecoder": false,
+        "TextEncoder": false,
+        "URL": false,
+        "Worker": true,
+        "XMLHttpRequest": true,
+        "caches": false,
+        "clearInterval": false,
+        "clearTimeout": false,
+        "document": true,
+        "event": false,
+        "fetch": true,
+        "history": false,
+        "indexedDb": true,
+        "localStorage": true,
+        "location": true,
+        "name": false,
+        "navigator": true,
+        "postMessage": true,
+        "screen": false,
+        "sessionStorage": true,
+        "setInterval": false,
+        "setTimeout": false,
+        "structuredClone": true,
+        "window": true
+    },
+    "browser_auto_worker": {
+        "importScripts": true
+    },
+    "ecma_auto": {
+        "AggregateError": true,
+        "Array": true,
+        "ArrayBuffer": true,
+        "Atomics": true,
+        "BigInt": true,
+        "BigInt64Array": true,
+        "BigUint64Array": true,
+        "Boolean": true,
+        "DataView": true,
+        "Date": true,
+        "Error": true,
+        "EvalError": true,
+        "Float16Array": true,
+        "Float32Array": true,
+        "Float64Array": true,
+        "Function": true,
+        "Infinity": true,
+        "Int16Array": true,
+        "Int32Array": true,
+        "Int8Array": true,
+        "Intl": true,
+        "JSON": true,
+        "Map": true,
+        "Math": true,
+        "NaN": true,
+        "Number": true,
+        "Object": true,
+        "Promise": true,
+        "Proxy": true,
+        "RangeError": true,
+        "ReferenceError": true,
+        "Reflect": true,
+        "RegExp": true,
+        "Set": true,
+        "ShadowRealm": true,
+        "SharedArrayBuffer": true,
+        "String": true,
+        "Symbol": true,
+        "SyntaxError": true,
+        "Temporal": true,
+        "TypeError": true,
+        "URIError": true,
+        "Uint16Array": true,
+        "Uint32Array": true,
+        "Uint8Array": true,
+        "Uint8ClampedArray": true,
+        "WeakMap": true,
+        "WeakRef": true,
+        "WeakSet": true,
+        "WebAssembly": true,
+        "decodeURI": true,
+        "decodeURIComponent": true,
+        "encodeURI": true,
+        "encodeURIComponent": true,
+        "eval": true,
+        "globalThis": true,
+        "import": true,
+        "isFinite": true,
+        "isNaN": true,
+        "parseFloat": true,
+        "parseInt": true,
+        "undefined": true
+    },
+    "node_auto": {
+        "AbortController": true,
+        "Buffer": true,
+        "Crypto": false,
+        "CryptoKey": false,
+        "Event": true,
+        "EventTarget": true,
+        "MessageChannel": true,
+        "MessageEvent": true,
+        "MessagePort": true,
+        "Request": false,
+        "Response": false,
+        "SubtleCrypto": false,
+        "TextDecoder": true,
+        "TextEncoder": true,
+        "URL": true,
+        "URLSearchParams": true,
+        "WebAssembly": true,
+        "__dirname": true,
+        "__filename": true,
+        "atob": false,
+        "btoa": false,
+        "clearImmediate": true,
+        "clearInterval": true,
+        "clearTimeout": true,
+        "console": true,
+        "crypto": false,
+        "exports": true,
+        "fetch": false,
+        "global": true,
+        "module": true,
+        "performance": true,
+        "process": true,
+        "queueMicrotask": true,
+        "require": true,
+        "setImmediate": true,
+        "setInterval": true,
+        "setTimeout": true
+    }
+
+// jslint_global_dict_all - auto-generated - end.
+
+/*jslint-enable*/
+};
+const jslint_rgx_cap = (
     /^[A-Z]/
 );
-let jslint_rgx_crlf = (
+const jslint_rgx_crlf = (
     /\n|\r\n?/
 );
-let jslint_rgx_digits_bits = (
+const jslint_rgx_digits_bits = (
     /^[01_]*/
 );
-let jslint_rgx_digits_decimals = (
+const jslint_rgx_digits_decimals = (
     /^[0-9_]*/
 );
-let jslint_rgx_digits_hexs = (
+const jslint_rgx_digits_hexs = (
     /^[0-9A-F_]*/i
 );
-let jslint_rgx_digits_octals = (
+const jslint_rgx_digits_octals = (
     /^[0-7_]*/
 );
-let jslint_rgx_directive = (
+const jslint_rgx_directive = (
     /^(jslint|property|global)\s+?(\S.*?)$/
 );
-let jslint_rgx_directive_part = (
+const jslint_rgx_directive_part = (
     /([a-zA-Z$_][a-zA-Z0-9$_]*)(?::\s*(true|false))?,?\s*|$/g
 );
-let jslint_rgx_identifier = (
+const jslint_rgx_identifier = (
     /^([a-zA-Z_$][a-zA-Z0-9_$]*)$/
 );
-let jslint_rgx_json_number = (
+const jslint_rgx_json_number = (
 
 // https://datatracker.ietf.org/doc/html/rfc7159#section-6
 // number = [ minus ] int [ frac ] [ exp ]
 
     /^-?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][\-+]?\d+)?$/
 );
-let jslint_rgx_mega = (
+const jslint_rgx_mega = (
 
 // Vim-hack - vim-editor has trouble parsing naked '`' in regexp
 
     /[\u0060\\]|\$\{/
 );
-let jslint_rgx_module = (
+const jslint_rgx_module = (
     /^[a-zA-Z0-9_$:.@\-\/]+$/
 );
-let jslint_rgx_numeric_separator_illegal = (
+const jslint_rgx_numeric_separator_illegal = (
     /__|_$|_n$/m
 );
-let jslint_rgx_slash_star_or_slash = (
+const jslint_rgx_slash_star_or_slash = (
     /\/\*|\/$/
 );
-let jslint_rgx_tab = (
+const jslint_rgx_tab = (
     /\t/g
 );
-let jslint_rgx_todo = (
+const jslint_rgx_todo = (
     /\b(?:todo|TO\s?DO|HACK)\b/
 );
-let jslint_rgx_token = new RegExp(
+const jslint_rgx_token = new RegExp(
     "^("
     + "(\\s+)"
     + "|([a-zA-Z_$][a-zA-Z0-9_$]*)"
@@ -514,12 +745,14 @@ let jslint_rgx_token = new RegExp(
     + ")"
     + "(.*)$"
 );
-let jslint_rgx_url_search_window_jslint = (
+const jslint_rgx_url_search_window_jslint = (
     /[&?]window_jslint=1(?:$|&)/m
 );
-let jslint_rgx_weird_property = (
+const jslint_rgx_weird_property = (
     /^_|\$|Sync$|_$/m
 );
+let jslint_export;                      // The jslint object to be exported.
+let jslint_import_meta_url = "";        // import.meta.url used by cli.
 let jstestCountFailed = 0;
 let jstestCountTotal = 0;
 let jstestItCount = 0;
@@ -3683,293 +3916,22 @@ function jslint_phase2_lex(state) {
 // Initialize global-variables.
 
         switch (val && key) {
-
-// Assign global browser variables to global_dict.
-/*
-// /\*jslint beta, browser, devel*\/
-console.log(JSON.stringify(Object.keys(window).sort(), undefined, 4));
-*/
-
         case "browser":
-            object_assign_from_list(global_dict, [
-
-// Shared with Node.js.
-
-                "AbortController",
-                // "Buffer",
-                // "Crypto",
-                // "CryptoKey",
-                "Event",
-                "EventTarget",
-                "MessageChannel",
-                "MessageEvent",
-                "MessagePort",
-                // "Request",
-                // "Response",
-                // "SubtleCrypto",
-                "TextDecoder",
-                "TextEncoder",
-                "URL",
-                "URLSearchParams",
-                "WebAssembly",
-                // "__dirname",
-                // "__filename",
-                // "atob",
-                // "btoa",
-                // "clearImmediate",
-                "clearInterval",
-                "clearTimeout",
-                // "console",
-                // "crypto",
-                // "exports",
-                // "fetch",
-                // "global",
-                // "module",
-                "performance",
-                // "process",
-                "queueMicrotask",
-                // "require",
-                // "setImmediate",
-                "setInterval",
-                "setTimeout",
-
-// Web worker only.
-// https://github.com/mdn/content/blob/main/files/en-us/web/api
-// /workerglobalscope/index.md
-
-                "importScripts",
-
-// Window.
-
-                "Blob",
-                // "CharacterData",
-                // "DocumentType",
-                // "Element",
-                // "Event",
-                "FileReader",
-                // "FontFace",
-                "FormData",
-                "IntersectionObserver",
-                "MutationObserver",
-                // "Storage",
-                // "TextDecoder",
-                // "TextEncoder",
-                // "URL",
-                "Worker",
-                "XMLHttpRequest",
-                // "caches",
-                // "clearInterval",
-                // "clearTimeout",
-                "document",
-                // "event",
-                "fetch",
-                // "history",
-                "indexedDb",
-                "localStorage",
-                "location",
-                // "name",
-                "navigator",
-                "postMessage",
-                // "screen",
-                "sessionStorage",
-                // "setInterval",
-                // "setTimeout",
-                "structuredClone",
-                "window"
-            ], "browser");
-            break;
-
-// https://docs.couchdb.org/en/stable/query-server/javascript.html#javascript
-
         case "couch":
-            object_assign_from_list(global_dict, [
-                "emit",
-                "getRow",
-                "isArray",
-                "log",
-                "provides",
-                "registerType",
-                "require",
-                "send",
-                "start",
-                "sum",
-                "toJSON"
-            ], "CouchDb");
-            break;
         case "devel":
-            object_assign_from_list(global_dict, [
-                "alert", "confirm", "console", "prompt"
-            ], "development");
-            break;
-
-// These are the globals that are provided by the language standard.
-// Assign global ECMAScript variables to global_dict.
-/*
-node --input-type=module --eval '
-// /\*jslint beta, node*\/
-import https from "https";
-(async function () {
-    let dict = {import: true};
-    let result = "";
-    await new Promise(function (resolve) {
-        https.get((
-            "https://raw.githubusercontent.com/mdn/content/main/files"
-            + "/en-us/web/javascript/reference/global_objects/index.md"
-        ), function (res) {
-            res.on("data", function (chunk) {
-                result += chunk;
-            }).on("end", resolve).setEncoding("utf8");
-        });
-    });
-    result.replace((
-        /\n- \{\{jsxref\("(?:global_objects\/)?([^"]+?)"/ig
-    ), function (ignore, key) {
-        if (Object.hasOwn(globalThis, key)) {
-            dict[key] = true;
-        }
-        return "";
-    });
-    console.log(JSON.stringify(Object.keys(dict).sort(), undefined, 4));
-}());
-'
-*/
-
         case "ecma":
-            object_assign_from_list(global_dict, [
-                "AggregateError",
-                "Array",
-                "ArrayBuffer",
-                "Atomics",
-                "BigInt",
-                "BigInt64Array",
-                "BigUint64Array",
-                "Boolean",
-                "DataView",
-                "Date",
-                "Error",
-                "EvalError",
-                "Float16Array",
-                "Float32Array",
-                "Float64Array",
-                "Function",
-                "Infinity",
-                "Int16Array",
-                "Int32Array",
-                "Int8Array",
-                "Intl",
-                "JSON",
-                "Map",
-                "Math",
-                "NaN",
-                "Number",
-                "Object",
-                "Promise",
-                "Proxy",
-                "RangeError",
-                "ReferenceError",
-                "Reflect",
-                "RegExp",
-                "Set",
-                "ShadowRealm",
-                "SharedArrayBuffer",
-                "String",
-                "Symbol",
-                "SyntaxError",
-                "Temporal",
-                "TypeError",
-                "URIError",
-                "Uint16Array",
-                "Uint32Array",
-                "Uint8Array",
-                "Uint8ClampedArray",
-                "WeakMap",
-                "WeakRef",
-                "WeakSet",
-                "WebAssembly",
-                "decodeURI",
-                "decodeURIComponent",
-                "encodeURI",
-                "encodeURIComponent",
-                "eval",
-                "globalThis",
-                "import",
-                "isFinite",
-                "isNaN",
-                "parseFloat",
-                "parseInt",
-                "undefined"
-            ], "ECMAScript");
-            break;
-
-// Assign global Node.js variables to global_dict.
-/*
-node --input-type=module --eval '
-// /\*jslint beta, node*\/
-import moduleHttps from "https";
-(async function () {
-    let dict = Object.create(null);
-    let result = "";
-    await new Promise(function (resolve) {
-        moduleHttps.get((
-            "https://raw.githubusercontent.com/nodejs/node/v16.x/doc/api"
-            + "/globals.md"
-        ), function (res) {
-            res.on("data", function (chunk) {
-                result += chunk;
-            }).on("end", resolve).setEncoding("utf8");
-        });
-    });
-    result.replace((
-        /\n(?:\* \[`|## |## Class: )`\w+/g
-    ), function (match0) {
-        dict[match0.split("`")[1]] = true;
-        return "";
-    });
-    console.log(JSON.stringify(Object.keys(dict).sort(), undefined, 4));
-}());
-'
-*/
-
         case "node":
-            object_assign_from_list(global_dict, [
-                "AbortController",
-                "Buffer",
-                // "Crypto",
-                // "CryptoKey",
-                "Event",
-                "EventTarget",
-                "MessageChannel",
-                "MessageEvent",
-                "MessagePort",
-                // "Request",
-                // "Response",
-                // "SubtleCrypto",
-                "TextDecoder",
-                "TextEncoder",
-                "URL",
-                "URLSearchParams",
-                "WebAssembly",
-                "__dirname",
-                "__filename",
-                // "atob",
-                // "btoa",
-                "clearImmediate",
-                "clearInterval",
-                "clearTimeout",
-                "console",
-                // "crypto",
-                "exports",
-                // "fetch",
-                "global",
-                "module",
-                "performance",
-                "process",
-                "queueMicrotask",
-                "require",
-                "setImmediate",
-                "setInterval",
-                "setTimeout"
-            ], "Node.js");
+            Object.entries(jslint_global_dict_all).forEach(function ([
+                key2, dict
+            ]) {
+                if (key2.startsWith(key)) {
+                    Object.entries(dict).forEach(function ([key, val]) {
+                        if (val) {
+                            global_dict[key] = true;
+                        }
+                    });
+                }
+            });
             break;
         }
         return true;
