@@ -375,7 +375,10 @@ function objectDeepCopyWithKeysSorted(obj) {
         response.replace((
             /^## (?:Class: )?`(\w+?)\W/gm //`
         ), function (ignore, name) {
-            dict[name] = nameOk(name, "", 4) && Object.hasOwn(globalThis, name);
+            dict[name] = (
+                nameOk(name, "", 4)
+                // && Object.hasOwn(globalThis, name)
+            );
             return "";
         });
         response.replace((
