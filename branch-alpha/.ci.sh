@@ -350,23 +350,6 @@ function objectDeepCopyWithKeysSorted(obj) {
     promiseList.push(async function () {
         const dict = Object.create(null);
         let response;
-        dictAll.browser_auto_window = dict;
-        response = await fetch(
-"https://raw.githubusercontent.com/mdn/content/main/files/en-us/web/api/window/index.md" //jslint-ignore-line
-        );
-        response = await response.text();
-        response.replace((
-            /^- \{\{domxref\("Window\.(\w+?)["(](.*?)$/gm
-        ), function (ignore, name, deprecated) {
-            if (nameOk(name, deprecated, 8)) {
-                dict[name] = true;
-            }
-            return "";
-        });
-    }());
-    promiseList.push(async function () {
-        const dict = Object.create(null);
-        let response;
         dictAll.ecma_auto = dict;
         response = await fetch(
 "https://raw.githubusercontent.com/mdn/content/main/files/en-us/web/javascript/reference/global_objects/index.md" //jslint-ignore-line
@@ -375,9 +358,7 @@ function objectDeepCopyWithKeysSorted(obj) {
         response.replace((
             /^- \{\{jsxref\("(\w+?)["(](.*?)$/gm
         ), function (ignore, name, deprecated) {
-            if (nameOk(name, deprecated, 0)) {
-                dict[name] = true;
-            }
+            dict[name] = nameOk(name, deprecated, 0);
             return "";
         });
     }());
@@ -413,6 +394,7 @@ function objectDeepCopyWithKeysSorted(obj) {
         response = JSON.stringify(response);
         await Promise.all(Object.keys(dict).map(async function (name) {
             let response2;
+            dictBrowserNode[name] = false;
             if (!nameOk(name, "", 4)) {
                 return;
             }
@@ -433,13 +415,27 @@ function objectDeepCopyWithKeysSorted(obj) {
                 dictBrowserNode[name] = true;
             }
         }));
-        Object.keys(dict).forEach(function (name) {
-            if (!dict[name]) {
-                delete dict[name];
-            }
-        });
     }());
     await Promise.all(promiseList);
+    Object.entries(dictAll).forEach(function ([dictName, dict]) {
+        Object.keys(dict).forEach(function (name) {
+            let val;
+            if (dictName !== "ecma_auto" && dictAll.ecma_auto[name]) {
+                delete dict[name];
+            }
+            if (dictName === "node_auto") {
+                val = ["----", "----"];
+                if (dict[name]) {
+                    val[0] = "node";
+                }
+                if (dictAll.browser_auto_node[name]) {
+                    val[1] = "brow";
+                }
+                dict[name] = val.join(" ");
+            }
+        });
+    });
+    delete dictAll.browser_auto_node;
     result = await moduleFs.promises.readFile("jslint.mjs", "utf8");
     result = result.replace(
         new RegExp(String(`
@@ -455,7 +451,18 @@ function objectDeepCopyWithKeysSorted(obj) {
                 objectDeepCopyWithKeysSorted(dictAll),
                 undefined,
                 4
-            ).slice(1, -1).trim()
+            )
+                .slice(1, -1)
+                .trim()
+                .replace((
+                    /^( *?".*?": )(".*?")/gm
+                ), function (ignore, name, val) {
+                    return (
+                        name
+                        + " ".repeat(Math.max(0, 40 - name.length))
+                        + val
+                    );
+                })
             + "$2"
         )
     );

@@ -208,6 +208,7 @@
     import_meta_url,
     inc,
     includeList,
+    includes,
     indent2,
     index,
     indexOf,
@@ -434,21 +435,46 @@ const jslint_global_dict_all = {
 // Assign global browser variables to global_dict.
 
     "browser": {
+        "CharacterData": true,
+        "DOMException": true,
+        "DocumentType": true,
+        "Element": true,
+        "Event": true,
         "FileReader": true,
+        "FontFace": true,
+        "FormData": true,
         "IntersectionObserver": true,
         "MutationObserver": true,
+        "Storage": true,
+        "TextDecoder": true,
+        "TextEncoder": true,
+        "URL": true,
         "WebAssembly": true,
         "Worker": true,
         "XMLHttpRequest": true,
+        "caches": false,
+        "clearInterval": true,
+        "clearTimeout": true,
         "document": true,
+        "event": false,
+        "fetch": true,
+        "history": false,
+        "indexedDB": true,
+        "localStorage": true,
         "location": true,
+        "name": false,
+        "navigator": true,
+        "postMessage": true,
+        "screen": false,
+        "sessionStorage": true,
+        "setInterval": true,
+        "setTimeout": true,
         "window": true
     },
 
 // https://docs.couchdb.org/en/stable/query-server/javascript.html#javascript
 
     "couch": {
-        "JSON": true,
         "emit": true,
         "getRow": true,
         "isArray": true,
@@ -480,128 +506,14 @@ const jslint_global_dict_all = {
 // Assign global Node.js variables to global_dict.
 
     "node": {
+        "__dirname": true,
+        "__filename": true
     },
 
 // sh jslint_ci.sh shCiJslintGlobalDictAllFetch
 
 // jslint_global_dict_all - auto-generated - start.
 
-    "browser_auto_node": {
-        "AbortController": true,
-        "AbortSignal": true,
-        "Blob": true,
-        "BroadcastChannel": true,
-        "ByteLengthQueuingStrategy": true,
-        "CloseEvent": true,
-        "CompressionStream": true,
-        "CountQueuingStrategy": true,
-        "Crypto": true,
-        "CryptoKey": true,
-        "CustomEvent": true,
-        "DOMException": true,
-        "DecompressionStream": true,
-        "Event": true,
-        "EventSource": true,
-        "EventTarget": true,
-        "File": true,
-        "FormData": true,
-        "Headers": true,
-        "MessageChannel": true,
-        "MessageEvent": true,
-        "MessagePort": true,
-        "Navigator": true,
-        "PerformanceEntry": true,
-        "PerformanceMark": true,
-        "PerformanceMeasure": true,
-        "PerformanceObserver": true,
-        "PerformanceObserverEntryList": true,
-        "PerformanceResourceTiming": true,
-        "ReadableByteStreamController": true,
-        "ReadableStream": true,
-        "ReadableStreamBYOBReader": true,
-        "ReadableStreamBYOBRequest": true,
-        "ReadableStreamDefaultController": true,
-        "ReadableStreamDefaultReader": true,
-        "Request": true,
-        "Response": true,
-        "Storage": true,
-        "SubtleCrypto": true,
-        "TextDecoder": true,
-        "TextDecoderStream": true,
-        "TextEncoder": true,
-        "TextEncoderStream": true,
-        "TransformStream": true,
-        "TransformStreamDefaultController": true,
-        "URL": true,
-        "URLPattern": true,
-        "URLSearchParams": true,
-        "WebSocket": true,
-        "WritableStream": true,
-        "WritableStreamDefaultController": true,
-        "WritableStreamDefaultWriter": true,
-        "clearInterval": true,
-        "clearTimeout": true,
-        "console": true,
-        "crypto": true,
-        "fetch": true,
-        "localStorage": true,
-        "navigator": true,
-        "performance": true,
-        "queueMicrotask": true,
-        "sessionStorage": true,
-        "setInterval": true,
-        "setTimeout": true,
-        "structuredClone": true
-    },
-    "browser_auto_window": {
-        "cancelAnimationFrame": true,
-        "cancelIdleCallback": true,
-        "clearInterval": true,
-        "clearTimeout": true,
-        "cookieStore": true,
-        "createImageBitmap": true,
-        "crossOriginIsolated": true,
-        "customElements": true,
-        "devicePixelRatio": true,
-        "devicemotion_event": true,
-        "deviceorientation_event": true,
-        "deviceorientationabsolute_event": true,
-        "documentPictureInPicture": true,
-        "frameElement": true,
-        "getComputedStyle": true,
-        "getSelection": true,
-        "indexedDB": true,
-        "innerHeight": true,
-        "innerWidth": true,
-        "isSecureContext": true,
-        "localStorage": true,
-        "locationbar": true,
-        "matchMedia": true,
-        "navigation": true,
-        "navigator": true,
-        "originAgentCluster": true,
-        "outerHeight": true,
-        "outerWidth": true,
-        "pagereveal_event": true,
-        "pageswap_event": true,
-        "performance": true,
-        "personalbar": true,
-        "postMessage": true,
-        "queueMicrotask": true,
-        "reportError": true,
-        "requestAnimationFrame": true,
-        "requestIdleCallback": true,
-        "scheduler": true,
-        "scrollbars": true,
-        "sessionStorage": true,
-        "setInterval": true,
-        "setTimeout": true,
-        "speechSynthesis": true,
-        "statusbar": true,
-        "structuredClone": true,
-        "trustedTypes": true,
-        "visualViewport": true
-    },
     "ecma_auto": {
         "AggregateError": true,
         "Array": true,
@@ -632,6 +544,7 @@ const jslint_global_dict_all = {
         "Int16Array": true,
         "Int32Array": true,
         "Int8Array": true,
+        "InternalError": false,
         "Intl": true,
         "Iterator": true,
         "JSON": true,
@@ -667,86 +580,94 @@ const jslint_global_dict_all = {
         "decodeURIComponent": true,
         "encodeURI": true,
         "encodeURIComponent": true,
+        "escape": false,
         "globalThis": true,
         "isFinite": true,
         "isNaN": true,
         "parseFloat": true,
         "parseInt": true,
-        "undefined": true
+        "undefined": true,
+        "unescape": false
     },
     "node_auto": {
-        "AbortController": true,
-        "AbortSignal": true,
-        "Blob": true,
-        "BroadcastChannel": true,
-        "Buffer": true,
-        "ByteLengthQueuingStrategy": true,
-        "CloseEvent": true,
-        "CompressionStream": true,
-        "CountQueuingStrategy": true,
-        "Crypto": true,
-        "CryptoKey": true,
-        "CustomEvent": true,
-        "DOMException": true,
-        "DecompressionStream": true,
-        "Event": true,
-        "EventTarget": true,
-        "File": true,
-        "FormData": true,
-        "Headers": true,
-        "MessageChannel": true,
-        "MessageEvent": true,
-        "MessagePort": true,
-        "Navigator": true,
-        "PerformanceEntry": true,
-        "PerformanceMark": true,
-        "PerformanceMeasure": true,
-        "PerformanceObserver": true,
-        "PerformanceObserverEntryList": true,
-        "PerformanceResourceTiming": true,
-        "ReadableByteStreamController": true,
-        "ReadableStream": true,
-        "ReadableStreamBYOBReader": true,
-        "ReadableStreamBYOBRequest": true,
-        "ReadableStreamDefaultController": true,
-        "ReadableStreamDefaultReader": true,
-        "Request": true,
-        "Response": true,
-        "SubtleCrypto": true,
-        "TextDecoder": true,
-        "TextDecoderStream": true,
-        "TextEncoder": true,
-        "TextEncoderStream": true,
-        "TransformStream": true,
-        "TransformStreamDefaultController": true,
-        "URL": true,
-        "URLPattern": true,
-        "URLSearchParams": true,
-        "WebAssembly": true,
-        "WebSocket": true,
-        "WritableStream": true,
-        "WritableStreamDefaultController": true,
-        "WritableStreamDefaultWriter": true,
-        "__dirname": true,
-        "__filename": true,
-        "clearImmediate": true,
-        "clearInterval": true,
-        "clearTimeout": true,
-        "console": true,
-        "crypto": true,
-        "exports": true,
-        "fetch": true,
-        "global": true,
-        "module": true,
-        "navigator": true,
-        "performance": true,
-        "process": true,
-        "queueMicrotask": true,
-        "require": true,
-        "setImmediate": true,
-        "setInterval": true,
-        "setTimeout": true,
-        "structuredClone": true
+        "AbortController":              "node brow",
+        "AbortSignal":                  "node brow",
+        "Blob":                         "node brow",
+        "BroadcastChannel":             "node brow",
+        "Buffer":                       "node ----",
+        "ByteLengthQueuingStrategy":    "node brow",
+        "CloseEvent":                   "node brow",
+        "CompressionStream":            "node brow",
+        "CountQueuingStrategy":         "node brow",
+        "Crypto":                       "node brow",
+        "CryptoKey":                    "node brow",
+        "CustomEvent":                  "node brow",
+        "DOMException":                 "node brow",
+        "DecompressionStream":          "node brow",
+        "Event":                        "node brow",
+        "EventSource":                  "---- brow",
+        "EventTarget":                  "node brow",
+        "File":                         "node brow",
+        "FormData":                     "node brow",
+        "Headers":                      "node brow",
+        "MessageChannel":               "node brow",
+        "MessageEvent":                 "node brow",
+        "MessagePort":                  "node brow",
+        "Navigator":                    "node brow",
+        "PerformanceEntry":             "node brow",
+        "PerformanceMark":              "node brow",
+        "PerformanceMeasure":           "node brow",
+        "PerformanceObserver":          "node brow",
+        "PerformanceObserverEntryList": "node brow",
+        "PerformanceResourceTiming":    "node brow",
+        "ReadableByteStreamController": "node brow",
+        "ReadableStream":               "node brow",
+        "ReadableStreamBYOBReader":     "node brow",
+        "ReadableStreamBYOBRequest":    "node brow",
+        "ReadableStreamDefaultController": "node brow",
+        "ReadableStreamDefaultReader":  "node brow",
+        "Request":                      "node brow",
+        "Response":                     "node brow",
+        "Storage":                      "---- brow",
+        "SubtleCrypto":                 "node brow",
+        "TextDecoder":                  "node brow",
+        "TextDecoderStream":            "node brow",
+        "TextEncoder":                  "node brow",
+        "TextEncoderStream":            "node brow",
+        "TransformStream":              "node brow",
+        "TransformStreamDefaultController": "node brow",
+        "URL":                          "node brow",
+        "URLPattern":                   "node brow",
+        "URLSearchParams":              "node brow",
+        "WebAssembly":                  "node ----",
+        "WebSocket":                    "node brow",
+        "WritableStream":               "node brow",
+        "WritableStreamDefaultController": "node brow",
+        "WritableStreamDefaultWriter":  "node brow",
+        "__dirname":                    "node ----",
+        "__filename":                   "node ----",
+        "atob":                         "---- ----",
+        "btoa":                         "---- ----",
+        "clearImmediate":               "node ----",
+        "clearInterval":                "node brow",
+        "clearTimeout":                 "node brow",
+        "console":                      "node brow",
+        "crypto":                       "node brow",
+        "exports":                      "node ----",
+        "fetch":                        "node brow",
+        "global":                       "node ----",
+        "localStorage":                 "---- brow",
+        "module":                       "node ----",
+        "navigator":                    "node brow",
+        "performance":                  "node brow",
+        "process":                      "node ----",
+        "queueMicrotask":               "node brow",
+        "require":                      "node ----",
+        "sessionStorage":               "---- brow",
+        "setImmediate":                 "node ----",
+        "setInterval":                  "node brow",
+        "setTimeout":                   "node brow",
+        "structuredClone":              "node brow"
     }
 
 // jslint_global_dict_all - auto-generated - end.
@@ -4014,22 +3935,40 @@ function jslint_phase2_lex(state) {
         case "ecma":
         case "node":
             Object.entries(jslint_global_dict_all).forEach(function ([
-                key2, dict
+                dict_name, dict
             ]) {
-                if (key2.startsWith(key)) {
+                if (
+                    dict_name.startsWith(key)
+                    || (key === "browser" && dict_name === "node_auto")
+                ) {
                     Object.entries(dict).forEach(function ([name, is_global]) {
-                        if (is_global) {
-                            global_dict[name] = (
-                                key2.startsWith("browser")
-                                ? "browser"
-                                : key2.startsWith("couch")
-                                ? "CouchDb"
-                                : key2.startsWith("devel")
-                                ? "development"
-                                : key2.startsWith("ecma")
-                                ? "ECMAScript"
-                                : "Node.js"
-                            );
+                        if (dict_name === "node_auto") {
+                            switch (dict_name === "node_auto" && key) {
+                            case "browser":
+                                if (is_global.includes("brow")) {
+                                    global_dict[name] = "browser";
+                                }
+                                break;
+                            case "node":
+                                if (is_global.includes("node")) {
+                                    global_dict[name] = "Node.js";
+                                }
+                                break;
+                            }
+                        } else {
+                            if (is_global) {
+                                global_dict[name] = (
+                                    dict_name.startsWith("browser")
+                                    ? "browser"
+                                    : dict_name.startsWith("couch")
+                                    ? "CouchDb"
+                                    : dict_name.startsWith("devel")
+                                    ? "development"
+                                    : dict_name.startsWith("ecma")
+                                    ? "ECMAScript"
+                                    : "Node.js"
+                                );
+                            }
                         }
                     });
                 }
