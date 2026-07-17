@@ -4378,7 +4378,7 @@ function jslint_phase3_parse(state) {
                 the_token.expression = right;
                 the_token.name_list = [];       // 1. name_list for "aa = ..."
                 name_enroll(
-                    false,              // enroll
+                    undefined,          // enroll_parent
                     "variable",         // role
                     false,              // readonly
                     the_token.name_list,        // name_list
@@ -5054,13 +5054,20 @@ function jslint_phase3_parse(state) {
 
 // PR-502 - Unify name_list.push() logic with helper-function name_enroll().
 
-    function name_enroll(enroll, role, readonly, name_list, name, init) {
+    function name_enroll(
+        enroll_parent,
+        role,
+        readonly,
+        name_list,
+        name,
+        init
+    ) {
 
 // This function will:
 // 1. Push variable or function-parameter <name> to <name_list>.
 // 2. Set <name>.init = true, if its an assigned-variable,
 //    a function-parameter, or existing variable assigned new value.
-// 3. Enroll <name> in <name>.parent.context, if its a declared-variable,
+// 3. Enroll <name> in <enroll_parent>.context, if its a declared-variable,
 //    or function-parameter.
 
 // Most calls to name_enroll() are commented about the thing being enrolled,
@@ -5119,7 +5126,7 @@ function jslint_phase3_parse(state) {
         if (role === "variable") {
             name.arity = "variable";
         }
-        if (!enroll) {
+        if (!enroll_parent) {
             return;
         }
 
@@ -5193,16 +5200,12 @@ function jslint_phase3_parse(state) {
 // Enroll it.
 
         Object.assign(name, {
-            parent: (
-                role === "exception"
-                ? catchage
-                : functionage
-            ),
+            parent: enroll_parent,
             readonly,
             role,
             used: 0
         });
-        name.parent.context[id] = name;
+        enroll_parent.context[id] = name;
     }
 
     function parse_expression(rbp, initial) {
@@ -5511,7 +5514,7 @@ function jslint_phase3_parse(state) {
 
 // 5.lab.1 - Mark 'enrolled', the label-statement, before control-flow-block.
 
-                    true,               // enroll
+                    functionage,        // enroll_parent
                     "label",            // role
                     true,               // readonly
                     [],                 // name_list
@@ -5744,7 +5747,7 @@ function jslint_phase3_parse(state) {
     }
 
     function prefix_destructure(
-        enroll,
+        enroll_parent,
         role,
         readonly,
         name_list,
@@ -5822,7 +5825,7 @@ function jslint_phase3_parse(state) {
                 test_cause("recurse_element");
                 advance_and_signature_push(token_nxt.id);
                 prefix_destructure(
-                    enroll,             // enroll
+                    enroll_parent,      // enroll_parent
                     role,               // role
                     readonly,           // readonly
                     name_list,          // name_list
@@ -5873,11 +5876,25 @@ function jslint_phase3_parse(state) {
                 }
                 token_nxt.label = name;
                 name = token_nxt;
-                name_enroll(enroll, role, readonly, sub_list, name, true);
+                name_enroll(
+                    enroll_parent,      // enroll_parent
+                    role,               // role
+                    readonly,           // readonly
+                    sub_list,           // name_list
+                    name,               // name
+                    true                // init
+                );
                 advance_and_signature_push(token_nxt.id);
                 return;
             }
-            name_enroll(enroll, role, readonly, sub_list, name, true);
+            name_enroll(
+                enroll_parent,          // enroll_parent
+                role,                   // role
+                readonly,               // readonly
+                sub_list,               // name_list
+                name,                   // name
+                true                    // init
+            );
             if (token_nxt.id === "=") {
                 optional = the_function_toplevel && token_now;
                 advance_and_signature_push("=");
@@ -5997,7 +6014,7 @@ function jslint_phase3_parse(state) {
 
 // 2.fun.1 - Mark 'enrolled', the function-name, immediately.
 
-                true,                   // enroll
+                functionage,            // enroll_parent
                 (                       // role
                     the_function.arity === "statement"
                     ? "variable"
@@ -6089,7 +6106,7 @@ function jslint_phase3_parse(state) {
 
 // 4.par.1 - Mark 'enrolled', the function-parameter, if unwrapped.
 
-                true,                   // enroll
+                functionage,            // enroll_parent
                 "parameter",            // role
                 false,                  // readonly
                 the_function.name_list, // name_list
@@ -6108,7 +6125,7 @@ function jslint_phase3_parse(state) {
 
 // 4.par.1 - Mark 'enrolled', the function-parameter, during destructuring.
 
-                    true,               // enroll
+                    functionage,        // enroll_parent
                     "parameter",        // role
                     false,              // readonly
                     the_function.name_list,     // name_list
@@ -6402,7 +6419,7 @@ function jslint_phase3_parse(state) {
 // PR-500 - Unify ES2015-destructure-logic. - [aa] = ...;
 
             element = prefix_destructure(
-                false,                  // enroll
+                undefined,              // enroll_parent
                 "variable",             // role
                 false,                  // readonly
                 the_token.name_list,    // name_list
@@ -6992,7 +7009,7 @@ function jslint_phase3_parse(state) {
 
 // 1.imp.1 - Mark 'enrolled', the import-name, during import-statement.
 
-                    true,               // enroll
+                    functionage,        // enroll_parent
                     "variable",         // role
                     true,               // readonly
                     the_import.name_list,       // name_list
@@ -7031,7 +7048,7 @@ function jslint_phase3_parse(state) {
 
 // 1.imp.1 - Mark 'enrolled', the import-name, during import-statement.
 
-                            true,       // enroll
+                            functionage,        // enroll_parent
                             "variable", // role
                             true,       // readonly
                             the_import.name_list,       // name_list
@@ -7368,7 +7385,7 @@ function jslint_phase3_parse(state) {
 
 // 3.exc.1 - Mark 'enrolled', the exception-variable, before catch-block.
 
-                        true,           // enroll
+                        catchage,       // enroll_parent
                         "exception",    // role
                         true,           // readonly
                         [],             // name_list
@@ -7498,7 +7515,7 @@ function jslint_phase3_parse(state) {
 // PR-500 - Unify ES2015-destructure-logic. - let [aa] = ...;
 
                 prefix_destructure(
-                    true,               // enroll
+                    functionage,        // enroll_parent
                     "variable",         // role
                     readonly,           // readonly
                     the_variable.name_list,     // name_list
@@ -7527,7 +7544,7 @@ function jslint_phase3_parse(state) {
 
 // 3.var.1 - Mark 'enrolled', the variable, during variable-initialization.
 
-                    true,               // enroll
+                    functionage,        // enroll_parent
                     "variable",         // role
                     readonly,           // readonly
                     the_variable.name_list,     // name_list
