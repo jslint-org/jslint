@@ -291,6 +291,7 @@
     ok,
     on,
     open,
+    opener_stack,
     opening,
     option,
     option_dict,
@@ -1086,27 +1087,28 @@ function jslint(
 
 // The jslint function itself.
 
-    let catch_list = [];        // The array containing all catch-blocks.
-    let catch_stack = [         // The stack of catch-blocks.
+    const catch_list = [];      // The array containing all catch-blocks.
+    const catch_stack = [       // The stack of catch-blocks.
         {
             context: empty()
         }
     ];
-    let cause_dict = empty();   // The object of test-causes.
-    let directive_list = [];    // The directive comments.
-    let export_dict = empty();  // The exported names and values.
-    let function_list = [];     // The array containing all functions.
-    let function_stack = [];    // The stack of functions.
-    let global_dict = empty();  // The object containing the global
-                                // ... declarations.
-    let import_list = [];       // The array collecting all import-from strings.
-    let line_list = String(     // The array containing source lines.
+    const cause_dict = empty(); // The object of test-causes.
+    const directive_list = [];  // The directive comments.
+    const export_dict = empty();        // The exported names and values.
+    const function_list = [];   // The array containing all functions.
+    const function_stack = [];  // The stack of functions.
+    const global_dict = empty();        // The object containing the global
+                                        // ... declarations.
+    const import_list = [];     // The array collecting all import-from strings.
+    const line_list = String(   // The array containing source lines.
         "\n" + source
     ).split(jslint_rgx_crlf).map(function (line_source) {
         return {
             line_source
         };
     });
+    const opener_stack = [];    // Stack of opener tokens: (, [.
     let mode_stop = false;      // true if JSLint cannot finish.
     let property_dict = empty();        // The object containing the tallied
                                         // ... property names.
@@ -1764,6 +1766,7 @@ function jslint(
             mode_property: false,       // true if directive /*property*/ is
                                         // ... used.
             mode_shebang: false,        // true if #! is seen on the first line.
+            opener_stack,
             option_dict,
             property_dict,
             source,
@@ -1783,28 +1786,25 @@ function jslint(
 // PHASE 1. Split <source> by newlines into <line_list>.
 
         jslint_phase1_split(state);
-        jslint_assert(catch_stack.length === 1, `catch_stack.length === 1.`);
-        jslint_assert(
-            function_stack.length === 0,
-            `function_stack.length === 0.`
-        );
 
 // PHASE 2. Lex <line_list> into <token_list>.
 
         jslint_phase2_lex(state);
-        jslint_assert(catch_stack.length === 1, `catch_stack.length === 1.`);
-        jslint_assert(
-            function_stack.length === 0,
-            `function_stack.length === 0.`
-        );
 
 // PHASE 3. Parse <token_list> into <token_tree> using the Pratt-parser.
 
         jslint_phase3_parse(state);
-        jslint_assert(catch_stack.length === 1, `catch_stack.length === 1.`);
+        jslint_assert(
+            catch_stack.length === 1,
+            `catch_stack.length=${catch_stack.length}.`
+        );
         jslint_assert(
             function_stack.length === 0,
-            `function_stack.length === 0.`
+            `function_stack.length=${function_stack.length}.`
+        );
+        jslint_assert(
+            opener_stack.length === 0,
+            `opener_stack.length=${opener_stack.length}.`
         );
 
 // PHASE 4. Walk <token_tree>, traversing all nodes of the tree. It is a
@@ -1814,10 +1814,13 @@ function jslint(
         if (!state.mode_json) {
             jslint_phase4_walk(state);
         }
-        jslint_assert(catch_stack.length === 1, `catch_stack.length === 1.`);
+        jslint_assert(
+            catch_stack.length === 1,
+            `catch_stack.length=${catch_stack.length}.`
+        );
         jslint_assert(
             function_stack.length === 0,
-            `function_stack.length === 0.`
+            `function_stack.length=${function_stack.length}.`
         );
 
 // PHASE 5. Check whitespace between tokens in <token_list>.
@@ -1825,10 +1828,9 @@ function jslint(
         if (!state.mode_json && warning_list.length === 0) {
             jslint_phase5_whitage(state);
         }
-        jslint_assert(catch_stack.length === 1, `catch_stack.length === 1.`);
         jslint_assert(
-            function_stack.length === 0,
-            `function_stack.length === 0.`
+            opener_stack.length === 0,
+            `opener_stack.length=${opener_stack.length}.`
         );
 
 // PR-347 - Disable warning "missing_browser".
@@ -2656,6 +2658,7 @@ function jslint_phase2_lex(state) {
         global_dict,
         global_list,
         line_list,
+        opener_stack,
         option_dict,
         stop,
         stop_at,
@@ -2683,7 +2686,6 @@ function jslint_phase2_lex(state) {
     let mode_regexp;            // true if regular expression literal seen on
                                 // ... this line.
     let opener_popped = empty();        // Last token popped from opener_stack.
-    let opener_stack = [];      // Stack of opener tokens: (, [.
     let snippet = "";           // A piece of string.
     let token_1;                // The first token.
     let token_prv = token_global;       // The previous token including
@@ -6788,7 +6790,9 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["for(const aa in aa){}", "stmt_for", "unexpected_a", "const", 5]
 
-            return stop("unexpected_a");
+            warn("unexpected_a");
+            advance();
+            break;
         }
         first = parse_expression(0);
         if (first.id === "in") {
@@ -6802,6 +6806,12 @@ function jslint_phase3_parse(state) {
             the_for.name = first.expression[0];
             the_for.expression = first.expression[1];
             warn("expected_a_b", the_for, "Object.keys", "for in");
+        } else if (first.id === "of") {
+
+// Issue #176 - Add ES2015-feature for..of.
+
+            the_for.name = first.expression[0];
+            the_for.expression = first.expression[1];
         } else {
             the_for.initial = first;
             advance(";");
@@ -7665,6 +7675,10 @@ function jslint_phase3_parse(state) {
     infix(110, ">=");
     infix(110, "in");
     infix(110, "instanceof");
+
+// Issue #176 - Add ES2015-feature for..of.
+
+    infix(110, "of");
     infix(120, "<<");
     infix(120, ">>");
     infix(120, ">>>");
@@ -8520,7 +8534,7 @@ function jslint_phase4_walk(state) {
         });
     }
 
-    function post_t(thing) {
+    function post_ternary(thing) {
         if (
             is_weird(thing.expression[0])
             || thing.expression[0].constant === true
@@ -8528,20 +8542,20 @@ function jslint_phase4_walk(state) {
         ) {
 
 // test_cause:
-// ["let aa=(aa?`${0}`:`${0}`)", "post_t", "unexpected_a", "?", 11]
-// ["let aa=(aa?`0`:`0`)", "post_t", "unexpected_a", "?", 11]
+// ["let aa=(aa?`${0}`:`${0}`)", "post_ternary", "unexpected_a", "?", 11]
+// ["let aa=(aa?`0`:`0`)", "post_ternary", "unexpected_a", "?", 11]
 
             warn("unexpected_a", thing);
         } else if (is_equal(thing.expression[0], thing.expression[1])) {
 
 // test_cause:
-// ["aa?aa:0", "post_t", "expected_a_b", "?", 3]
+// ["aa?aa:0", "post_ternary", "expected_a_b", "?", 3]
 
             warn("expected_a_b", thing, "||", "?");
         } else if (is_equal(thing.expression[0], thing.expression[2])) {
 
 // test_cause:
-// ["aa?0:aa", "post_t", "expected_a_b", "?", 3]
+// ["aa?0:aa", "post_ternary", "expected_a_b", "?", 3]
 
             warn("expected_a_b", thing, "&&", "?");
         } else if (
@@ -8550,7 +8564,7 @@ function jslint_phase4_walk(state) {
         ) {
 
 // test_cause:
-// ["aa?true:false", "post_t", "expected_a_b", "?", 3]
+// ["aa?true:false", "post_ternary", "expected_a_b", "?", 3]
 
             warn("expected_a_b", thing, "Boolean(...)", "?");
         } else if (
@@ -8559,7 +8573,7 @@ function jslint_phase4_walk(state) {
         ) {
 
 // test_cause:
-// ["aa?false:true", "post_t", "expected_a_b", "?", 3]
+// ["aa?false:true", "post_ternary", "expected_a_b", "?", 3]
 
             warn("expected_a_b", thing, "!", "?");
         } else if (
@@ -8571,7 +8585,7 @@ function jslint_phase4_walk(state) {
         ) {
 
 // test_cause:
-// ["(aa&&!aa?0:1)", "post_t", "wrap_condition", "&&", 4]
+// ["(aa&&!aa?0:1)", "post_ternary", "wrap_condition", "&&", 4]
 
             warn("wrap_condition", thing.expression[0]);
         }
@@ -9120,7 +9134,7 @@ function jslint_phase4_walk(state) {
     postaction("statement", "try", post_s_try);
     postaction("statement", "var", post_s_var);
     postaction("statement", "{", post_s_lbrace_pop_block);
-    postaction("ternary", post_t);
+    postaction("ternary", post_ternary);
     postaction("unary", "+", post_u_plus);
     postaction("unary", "function", post_s_function);
     postaction("unary", post_u);
@@ -9157,7 +9171,7 @@ function jslint_phase5_whitage(state) {
         artifact,
         catch_list,
         function_list,
-        function_stack,
+        opener_stack,
         option_dict,
         test_cause,
         token_global,
@@ -9346,7 +9360,7 @@ function jslint_phase5_whitage(state) {
 
 // If right is a closer, then pop the previous state.
 
-        indentage = function_stack.pop();
+        indentage = opener_stack.pop();
         closer = indentage.closer;
         free = indentage.free;
         margin = indentage.margin;
@@ -9659,7 +9673,7 @@ function jslint_phase5_whitage(state) {
             open,
             opening
         };
-        function_stack.push(indentage);
+        opener_stack.push(indentage);
 
 // Commit 3903449a - Cleanup indent for multiline-method-chaining.
 
