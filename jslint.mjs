@@ -1109,14 +1109,13 @@ function jslint(
         };
     });
     const opener_stack = [];    // Stack of opener tokens: (, [.
-    let mode_stop = false;      // true if JSLint cannot finish.
-    let property_dict = empty();        // The object containing the tallied
+    const property_dict = empty();      // The object containing the tallied
                                         // ... property names.
-    let state = empty();        // jslint state-object to be passed between
                                 // jslint functions.
-    let syntax_dict = empty();  // The object containing the parser.
-    let tenure = empty();       // The predefined property registry.
-    let token_global = {        // The global object; the outermost context.
+    const state = empty();      // jslint state-object to be passed between
+    const syntax_dict = empty();        // The object containing the parser.
+    const tenure = empty();     // The predefined property registry.
+    const token_global = {      // The global object; the outermost context.
         alive_list: [],
         async: 0,
         body: true,
@@ -1131,8 +1130,9 @@ function jslint(
         thru: 0,
         try: 0
     };
-    let token_list = [];        // The array of tokens.
-    let warning_list = [];      // The array collecting all generated warnings.
+    const token_list = [];      // The array of tokens.
+    const warning_list = [];    // The array collecting all generated warnings.
+    let mode_stop = false;      // true if JSLint cannot finish.
 
 // Error reportage functions:
 
@@ -1378,7 +1378,7 @@ function jslint(
 // resembles an exception.
 
         let mm;
-        let warning = Object.assign(empty(), {
+        let warning = {
             a,
             b,
             c,
@@ -1390,8 +1390,9 @@ function jslint(
             d,
             line,
             line_source: "",
-            name: "JSLintError"
-        }, line_list[line]);
+            name: "JSLintError",
+            ...line_list[line]
+        };
         warning.column = Math.max(
             Math.min(warning.column, warning.line_source.length),
             jslint_fudge
@@ -1746,42 +1747,47 @@ function jslint(
 // automatic semicolon insertion and nested megastring literals, which allows
 // full tokenization to precede parsing.
 
-        option_dict = Object.assign(empty(), option_dict);
-        Object.assign(state, {
-            artifact,
-            catch_list,
-            catch_stack,
-            directive_list,
-            export_dict,
-            function_list,
-            function_stack,
-            global_dict,
-            global_list,
-            import_list,
-            is_equal,
-            is_weird,
-            line_list,
-            mode_json: false,           // true if parsing JSON.
-            mode_module: false,         // true if import or export was used.
-            mode_property: false,       // true if directive /*property*/ is
+        option_dict = {
+            ...option_dict
+        };
+        Object.assign(
+            state,
+            {
+                artifact,
+                catch_list,
+                catch_stack,
+                directive_list,
+                export_dict,
+                function_list,
+                function_stack,
+                global_dict,
+                global_list,
+                import_list,
+                is_equal,
+                is_weird,
+                line_list,
+                mode_json: false,       // true if parsing JSON.
+                mode_module: false,     // true if import or export was used.
+                mode_property: false,   // true if directive /*property*/ is
                                         // ... used.
-            mode_shebang: false,        // true if #! is seen on the first line.
-            opener_stack,
-            option_dict,
-            property_dict,
-            source,
-            stop,
-            stop_at,
-            syntax_dict,
-            tenure,
-            test_cause,
-            token_global,
-            token_list,
-            token_nxt: token_global,
-            warn,
-            warn_at,
-            warning_list
-        });
+                mode_shebang: false,    // true if #! is seen on the first line.
+                opener_stack,
+                option_dict,
+                property_dict,
+                source,
+                stop,
+                stop_at,
+                syntax_dict,
+                tenure,
+                test_cause,
+                token_global,
+                token_list,
+                token_nxt: token_global,
+                warn,
+                warn_at,
+                warning_list
+            }
+        );
 
 // PHASE 1. Split <source> by newlines into <line_list>.
 
@@ -1855,12 +1861,10 @@ function jslint(
         err.message = "[JSLint was unable to finish] " + err.message;
         err.mode_stop = true;
         if (err.name !== "JSLintError") {
-            Object.assign(err, {
-                column: jslint_fudge,
-                line: jslint_fudge,
-                line_source: "",
-                stack_trace: err.stack
-            });
+            err.column = jslint_fudge;
+            err.line = jslint_fudge;
+            err.line_source = "";
+            err.stack_trace = err.stack;
         }
         if (warning_list.indexOf(err) === -1) {
             warning_list.push(err);
@@ -2312,9 +2316,10 @@ async function jslint_cli({
         ) {
             return;
         }
-        option = Object.assign(empty(), option, {
+        option = {
+            ...option,
             file
-        });
+        };
         switch ((
             /\.\w+?$|$/m
         ).exec(file)[0]) {
@@ -2329,9 +2334,10 @@ async function jslint_cli({
                     code: match1,
                     file: file + ".<script>.js",
                     line_offset: string_line_count(code.slice(0, ii)) + 1,
-                    option: Object.assign(empty(), {
-                        browser: true
-                    }, option)
+                    option: {
+                        browser: true,
+                        ...option
+                    }
                 });
                 return "";
             });
@@ -2411,15 +2417,16 @@ async function jslint_cli({
                 file: file + ".<node -e>.js",
                 line_offset: string_line_count(code.slice(0, ii)) + 1,
                 mode_conditional,
-                option: Object.assign(empty(), {
+                option: {
                     beta: Boolean(
                         process_env.JSLINT_BETA
                         && !(
                             /0|false|null|undefined/
                         ).test(process_env.JSLINT_BETA)
                     ),
-                    node: true
-                }, option)
+                    node: true,
+                    ...option
+                }
             });
             return "";
         });
@@ -2512,9 +2519,10 @@ async function jslint_cli({
 // PR-362 - Add API Doc.
 
     case "jslint_apidoc":
-        await jslint_apidoc(Object.assign(JSON.parse(process_argv[3]), {
+        await jslint_apidoc({
+            ...JSON.parse(process_argv[3]),
             pathname: command[1]
-        }));
+        });
         return;
 
 // PR-363 - Add command jslint_report.
@@ -5199,13 +5207,11 @@ function jslint_phase3_parse(state) {
 
 // Enroll it.
 
-        Object.assign(name, {
-            parent: enroll_parent,
-            readonly,
-            role,
-            used: 0
-        });
         enroll_parent.context[id] = name;
+        name.parent = enroll_parent;
+        name.readonly = readonly;
+        name.role = role;
+        name.used = 0;
     }
 
     function parse_expression(rbp, initial) {
@@ -5455,9 +5461,12 @@ function jslint_phase3_parse(state) {
 
 // Recurse parse_json().
 
-                        Object.assign(parse_json(), {
-                            label: name
-                        })
+                        Object.assign(
+                            parse_json(),
+                            {
+                                label: name
+                            }
+                        )
                     );
                     if (token_nxt.id !== ",") {
                         break;
@@ -6049,29 +6058,27 @@ function jslint_phase3_parse(state) {
 // Give the function properties for storing its names and for observing the
 // depth of loops and switches.
 
-        Object.assign(the_function, {
-            async: the_function.async || 0,
-            context: empty(),
-            finally: 0,
-            level: functionage.level + 1,
-            loop: 0,
-            name: (
-                name || (
-                    mode_fart_unwrapped
-                    ? "anonymous"
-                    : anon
-                )
-            ),
-            parameter_count: Number(Boolean(mode_fart_unwrapped)),
-            signature: (
+        the_function.async = the_function.async || 0;
+        the_function.context = empty();
+        the_function.finally = 0;
+        the_function.level = functionage.level + 1;
+        the_function.loop = 0;
+        the_function.name = (
+            name
+            || (
                 mode_fart_unwrapped
-                ? token_prv.id
-                : ["("]
-            ),
-            statement_prv: undefined,
-            switch: 0,
-            try: 0
-        });
+                ? "anonymous"
+                : anon
+            )
+        );
+        the_function.parameter_count = Number(Boolean(mode_fart_unwrapped));
+        the_function.signature = (
+            mode_fart_unwrapped
+            ? token_prv.id
+            : ["("]
+        );
+        the_function.switch = 0;
+        the_function.try = 0;
 
 // PR-384 - Relax warning "function_in_loop".
 //
@@ -6121,6 +6128,7 @@ function jslint_phase3_parse(state) {
             if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
 
 // PR-500 - Unify ES2015-destructure-logic. - function ([aa]) {...}
+
                 prefix_destructure(
 
 // 4.par.1 - Mark 'enrolled', the function-parameter, during destructuring.
@@ -11883,9 +11891,10 @@ function sentinel() {}
                 processArgv0,
                 processArgv.slice(1),
                 {
-                    env: Object.assign({}, process.env, {
+                    env: {
+                        ...process.env,
                         NODE_V8_COVERAGE: coverageDir
-                    }),
+                    },
 
 // PR-465
 // https://nodejs.org/en/blog/vulnerability/april-2024-security-releases-2
@@ -12117,35 +12126,40 @@ function sentinel() {}
 
 // Export jslint as cjs/esm.
 
-jslint_export = Object.freeze(Object.assign(jslint, {
-    assertErrorThrownAsync,
-    assertJsonEqual,
-    assertOrThrow,
-    debugInline,
-    fsWriteFileWithParents,
-    globExclude,
-    htmlEscape,
-    jslint,
-    jslint_apidoc,
-    jslint_assert,
-    jslint_charset_ascii,
-    jslint_cli,
-    jslint_edition,
-    jslint_phase1_split,
-    jslint_phase2_lex,
-    jslint_phase3_parse,
-    jslint_phase4_walk,
-    jslint_phase5_whitage,
-    jslint_report,
-    jstestDescribe,
-    jstestIt,
-    jstestOnExit,
-    moduleFsInit,
-    noop,
-    objectDeepCopyWithKeysSorted,
-    v8CoverageListMerge,
-    v8CoverageReportCreate
-}));
+jslint_export = Object.freeze(
+    Object.assign(
+        jslint,
+        {
+            assertErrorThrownAsync,
+            assertJsonEqual,
+            assertOrThrow,
+            debugInline,
+            fsWriteFileWithParents,
+            globExclude,
+            htmlEscape,
+            jslint,
+            jslint_apidoc,
+            jslint_assert,
+            jslint_charset_ascii,
+            jslint_cli,
+            jslint_edition,
+            jslint_phase1_split,
+            jslint_phase2_lex,
+            jslint_phase3_parse,
+            jslint_phase4_walk,
+            jslint_phase5_whitage,
+            jslint_report,
+            jstestDescribe,
+            jstestIt,
+            jstestOnExit,
+            moduleFsInit,
+            noop,
+            objectDeepCopyWithKeysSorted,
+            v8CoverageListMerge,
+            v8CoverageReportCreate
+        }
+    )
+);
 // module.exports = jslint_export;              // Export jslint as cjs.
 export default Object.freeze(jslint_export);    // Export jslint as esm.
 jslint_import_meta_url = import.meta.url;
