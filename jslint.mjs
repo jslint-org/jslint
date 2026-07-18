@@ -139,6 +139,7 @@
     cwd,
     d,
     debugInline,
+    declared_scope,
     default,
     delta,
     devel,
@@ -300,7 +301,6 @@
     padEnd,
     padStart,
     parameter_count,
-    parent,
     parentIi,
     parse,
     pathname,
@@ -4385,8 +4385,8 @@ function jslint_phase3_parse(state) {
             if (id === "=" && left.arity === "variable") {
                 the_token.expression = right;
                 the_token.name_list = [];       // 1. name_list for "aa = ..."
-                name_enroll(
-                    undefined,          // enroll_parent
+                name_declare(
+                    undefined,          // declared_scope
                     "variable",         // role
                     false,              // readonly
                     the_token.name_list,        // name_list
@@ -5060,10 +5060,10 @@ function jslint_phase3_parse(state) {
         return the_symbol;
     }
 
-// PR-502 - Unify name_list.push() logic with helper-function name_enroll().
+// PR-502 - Unify name_list.push() logic with helper-function name_declare().
 
-    function name_enroll(
-        enroll_parent,
+    function name_declare(
+        declared_scope,
         role,
         readonly,
         name_list,
@@ -5075,52 +5075,52 @@ function jslint_phase3_parse(state) {
 // 1. Push variable or function-parameter <name> to <name_list>.
 // 2. Set <name>.init = true, if its an assigned-variable,
 //    a function-parameter, or existing variable assigned new value.
-// 3. Enroll <name> in <enroll_parent>.context, if its a declared-variable,
+// 3. Declare <name> in <declared_scope>.context, if its a declared-variable,
 //    or function-parameter.
-
-// Most calls to name_enroll() are commented about the thing being enrolled,
-// and its lifecycle.  Here is a list of all lifecycle comments.
 //
-// 1.imp.1 - Mark 'enrolled', the import-name, during import-statement.
+// Most calls to name_declare() are commented regarding thing being declared,
+// and its lifecycle.  Below is a copy of all such comments.
+//
+// 1.imp.1 - Mark 'declared', the import-name, during import-statement.
 // 1.imp.2 - Mark 'alive', the import-name, after import-statement.
 // 1.imp.3 - Mark 'init', the import-name, during import-statement.
 // 1.imp.4 - Mark 'out-of-scope', the import-name, after module-scope.
 //
-// 2.fun.1 - Mark 'enrolled', the function-name, immediately.
-// 2.fun.2 - Mark 'alive', the function-name, immediately.
-// 2.fun.3 - Mark 'init', the function-name, immediately.
+// 2.fun.1 - Mark 'declared', the function-name, during function-declaration.
+// 2.fun.2 - Mark 'alive', the function-name, during function-declaration.
+// 2.fun.3 - Mark 'init', the function-name, during function-declaration.
 // 2.fun.4 - Mark 'out-of-scope', the function-name, after expression-scope.
 // 2.fun.4 - Mark 'out-of-scope', the function-name, after function-scope.
 //
-// 3.exc.1 - Mark 'enrolled', the exception-variable, before catch-block.
+// 3.exc.1 - Mark 'declared', the exception-variable, before catch-block.
 // 3.exc.2 - Mark 'alive', the exception-variable, before catch-block.
 // 3.exc.3 - Mark 'init', the exception-variable, before catch-block.
 // 3.exc.4 - Mark 'out-of-scope', the exception-variable, after catch-block.
 //
-// 3.for.1 - Mark 'enrolled', the for-variable, ???.
+// 3.for.1 - Mark 'declared', the for-variable, ???.
 // 3.for.2 - Mark 'alive', the for-variable, before for-block.
 // 3.for.3 - Mark 'init', the for-variable, before for-block.
 // 3.for.4 - Mark 'out-of-scope', the for-variable, ???.
 //
-// 3.glo.1 - Mark 'enrolled', the global-variable, immediately.
+// 3.glo.1 - Mark 'declared', the global-variable, immediately.
 // 3.glo.2 - Mark 'alive', the global-variable, immediately.
 // 3.glo.3 - Mark 'init', the global-variable, immediately.
 // 3.glo.4 - Mark 'out-of-scope', the global-variable, never.
 //
-// 3.var.1 - Mark 'enrolled', the variable, during variable-initialization.
-// 3.var.2 - Mark 'alive', the variable, after variable-initialization.
+// 3.var.1 - Mark 'declared', the variable, during variable-declaration.
+// 3.var.2 - Mark 'alive', the variable, after variable-declaration.
 // 3.var.3 - Mark 'init', the variable, after assignment.
-// 3.var.3 - Mark 'init', the variable, during variable-initialization.
+// 3.var.3 - Mark 'init', the variable, during variable-declaration.
 // 3.var.4 - Mark 'out-of-scope', the variable, after block-scope.
 // 3.var.4 - Mark 'out-of-scope', the variable, after function-scope.
 //
-// 4.par.1 - Mark 'enrolled', the function-parameter, during destructuring.
-// 4.par.1 - Mark 'enrolled', the function-parameter, if unwrapped.
+// 4.par.1 - Mark 'declared', the function-parameter, during destructuring.
+// 4.par.1 - Mark 'declared', the function-parameter, if unwrapped.
 // 4.par.2 - Mark 'alive', the function-parameter, after destructuring.
 // 4.par.3 - Mark 'init', the function-parameter, if unwrapped.
 // 4.par.4 - Mark 'out-of-scope', the function-parameter, after function-scope.
 //
-// 5.lab.1 - Mark 'enrolled', the label-statement, before control-flow-block.
+// 5.lab.1 - Mark 'declared', the label-statement, before control-flow-block.
 // 5.lab.2 - Mark 'alive', the label-statement, before control-flow-block.
 // 5.lab.3 - Mark 'init', the label-statement, before control-flow-block.
 // 5.lab.4 - Mark 'out-of-scope', the label-statement, after control-flow-block.
@@ -5128,44 +5128,44 @@ function jslint_phase3_parse(state) {
         let earlier;
         let id = name.id;
         name_list.push(name);
-        if (init) {
-            name.init = true;
-        }
+        name.init = init;
+        name.readonly = readonly;
+        name.role = role;
         if (role === "variable") {
             name.arity = "variable";
         }
-        if (!enroll_parent) {
+        if (!declared_scope) {
             return;
         }
 
-// Enroll a name into the current function context. The role can be exception,
-// function, label, parameter, or variable. We look for variable redefinition
-// because it causes confusion.
+// Declare a name into the current declared_scope's context. The role can be
+// exception, function, label, parameter, or variable. We look for variable
+// redefinition because it causes confusion.
 
-// Reserved words may not be enrolled.
+// Reserved words may not be declared.
 
         if (syntax_dict[id] !== undefined && id !== "ignore") {
 
 // test_cause:
-// ["let undefined", "name_enroll", "reserved_a", "undefined", 5]
+// ["let undefined", "name_declare", "reserved_a", "undefined", 5]
 
             warn("reserved_a", name);
             return;
         }
 
-// Has the name been enrolled in this context?
+// Has the name been declared in this context?
 
         earlier = functionage.context[id] || catchage.context[id];
         if (earlier) {
 
 // test_cause:
-// ["let aa;let aa", "name_enroll", "redefinition_a_b", "1", 12]
+// ["let aa;let aa", "name_declare", "redefinition_a_b", "1", 12]
 
             warn("redefinition_a_b", name, id, earlier.line);
             return;
         }
 
-// Has the name been enrolled in an outer context?
+// Has the name been declared in an outer context?
 
         function_stack.forEach(function ({
             context
@@ -5176,7 +5176,7 @@ function jslint_phase3_parse(state) {
             if (earlier.role === "variable") {
 
 // test_cause:
-// ["let ignore;(ignore)=>0", "name_enroll", "redefinition_a_b", "1", 13]
+// ["let ignore;(ignore)=>0", "name_declare", "redefinition_a_b", "1", 13]
 
                 warn("redefinition_a_b", name, id, earlier.line);
             }
@@ -5189,8 +5189,8 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["
 // function aa(){try{aa();}catch(aa){aa();}}
-// ", "name_enroll", "redefinition_a_b", "1", 31]
-// ["function aa(){var aa}", "name_enroll", "redefinition_a_b", "1", 19]
+// ", "name_declare", "redefinition_a_b", "1", 31]
+// ["function aa(){var aa}", "name_declare", "redefinition_a_b", "1", 19]
 
             warn("redefinition_a_b", name, id, earlier.line);
         } else if (
@@ -5200,18 +5200,15 @@ function jslint_phase3_parse(state) {
         ) {
 
 // test_cause:
-// ["let Array", "name_enroll", "redefinition_global_a_b", "Array", 5]
+// ["let Array", "name_declare", "redefinition_global_a_b", "Array", 5]
 
             warn("redefinition_global_a_b", name, global_dict[id], id);
         }
 
-// Enroll it.
+// Declare it.
 
-        enroll_parent.context[id] = name;
-        name.parent = enroll_parent;
-        name.readonly = readonly;
-        name.role = role;
-        name.used = 0;
+        declared_scope.context[id] = name;
+        name.declared_scope = declared_scope;
     }
 
     function parse_expression(rbp, initial) {
@@ -5519,11 +5516,11 @@ function jslint_phase3_parse(state) {
 // ["aa:while{}", "parse_statement", "the_statement_label", "while", 0]
 
                 test_cause("the_statement_label", token_nxt.id);
-                name_enroll(
+                name_declare(
 
-// 5.lab.1 - Mark 'enrolled', the label-statement, before control-flow-block.
+// 5.lab.1 - Mark 'declared', the label-statement, before control-flow-block.
 
-                    functionage,        // enroll_parent
+                    functionage,        // declared_scope
                     "label",            // role
                     true,               // readonly
                     [],                 // name_list
@@ -5756,7 +5753,7 @@ function jslint_phase3_parse(state) {
     }
 
     function prefix_destructure(
-        enroll_parent,
+        declared_scope,
         role,
         readonly,
         name_list,
@@ -5834,7 +5831,7 @@ function jslint_phase3_parse(state) {
                 test_cause("recurse_element");
                 advance_and_signature_push(token_nxt.id);
                 prefix_destructure(
-                    enroll_parent,      // enroll_parent
+                    declared_scope,     // declared_scope
                     role,               // role
                     readonly,           // readonly
                     name_list,          // name_list
@@ -5885,8 +5882,8 @@ function jslint_phase3_parse(state) {
                 }
                 token_nxt.label = name;
                 name = token_nxt;
-                name_enroll(
-                    enroll_parent,      // enroll_parent
+                name_declare(
+                    declared_scope,     // declared_scope
                     role,               // role
                     readonly,           // readonly
                     sub_list,           // name_list
@@ -5896,8 +5893,8 @@ function jslint_phase3_parse(state) {
                 advance_and_signature_push(token_nxt.id);
                 return;
             }
-            name_enroll(
-                enroll_parent,          // enroll_parent
+            name_declare(
+                declared_scope,         // declared_scope
                 role,                   // role
                 readonly,               // readonly
                 sub_list,               // name_list
@@ -6019,11 +6016,11 @@ function jslint_phase3_parse(state) {
         }
         if (name) {
             advance();
-            name_enroll(
+            name_declare(
 
-// 2.fun.1 - Mark 'enrolled', the function-name, immediately.
+// 2.fun.1 - Mark 'declared', the function-name, during function-declaration.
 
-                functionage,            // enroll_parent
+                functionage,            // declared_scope
                 (                       // role
                     the_function.arity === "statement"
                     ? "variable"
@@ -6033,12 +6030,12 @@ function jslint_phase3_parse(state) {
                 [],                     // name_list
                 name,                   // name
 
-// 2.fun.3 - Mark 'init', the function-name, immediately.
+// 2.fun.3 - Mark 'init', the function-name, during function-declaration.
 
                 true                    // init
             );
 
-// 2.fun.2 - Mark 'alive', the function-name, immediately.
+// 2.fun.2 - Mark 'alive', the function-name, during function-declaration.
 
             name.alive = true;
             if (the_function.arity === "statement") {
@@ -6051,7 +6048,7 @@ function jslint_phase3_parse(state) {
 // 2.fun.4 - Mark 'out-of-scope', the function-name, after expression-scope.
 
                 the_function.alive_list.push(name);
-                name.used += 1;
+                name.used = true;
             }
         }
 
@@ -6109,11 +6106,11 @@ function jslint_phase3_parse(state) {
 // ["aa=>0", "prefix_function", "wrap_fart_parameter", "aa", 1]
 
             warn("wrap_fart_parameter", token_prv);
-            name_enroll(
+            name_declare(
 
-// 4.par.1 - Mark 'enrolled', the function-parameter, if unwrapped.
+// 4.par.1 - Mark 'declared', the function-parameter, if unwrapped.
 
-                functionage,            // enroll_parent
+                functionage,            // declared_scope
                 "parameter",            // role
                 false,                  // readonly
                 the_function.name_list, // name_list
@@ -6131,9 +6128,9 @@ function jslint_phase3_parse(state) {
 
                 prefix_destructure(
 
-// 4.par.1 - Mark 'enrolled', the function-parameter, during destructuring.
+// 4.par.1 - Mark 'declared', the function-parameter, during destructuring.
 
-                    functionage,        // enroll_parent
+                    functionage,        // declared_scope
                     "parameter",        // role
                     false,              // readonly
                     the_function.name_list,     // name_list
@@ -6427,7 +6424,7 @@ function jslint_phase3_parse(state) {
 // PR-500 - Unify ES2015-destructure-logic. - [aa] = ...;
 
             element = prefix_destructure(
-                undefined,              // enroll_parent
+                undefined,              // declared_scope
                 "variable",             // role
                 false,                  // readonly
                 the_token.name_list,    // name_list
@@ -6625,7 +6622,7 @@ function jslint_phase3_parse(state) {
                     warn("not_label_a");
                 }
             } else {
-                the_label.used += 1;
+                the_label.used = true;
             }
             the_break.label = token_nxt;
             advance();
@@ -6762,7 +6759,7 @@ function jslint_phase3_parse(state) {
                 the_thing = parse_statement();
                 the_name = the_thing.name;
                 the_id = the_name.id;
-                the_name.used += 1;
+                the_name.used = true;
                 if (export_dict[the_id] !== undefined) {
 
 // test_cause:
@@ -6814,7 +6811,7 @@ function jslint_phase3_parse(state) {
 
                         warn("unexpected_a");
                     } else {
-                        the_name.used += 1;
+                        the_name.used = true;
                         if (export_dict[the_id] !== undefined) {
 
 // test_cause:
@@ -7013,11 +7010,11 @@ function jslint_phase3_parse(state) {
 
                     warn("unexpected_a", name);
                 }
-                name_enroll(
+                name_declare(
 
-// 1.imp.1 - Mark 'enrolled', the import-name, during import-statement.
+// 1.imp.1 - Mark 'declared', the import-name, during import-statement.
 
-                    functionage,        // enroll_parent
+                    functionage,        // declared_scope
                     "variable",         // role
                     true,               // readonly
                     the_import.name_list,       // name_list
@@ -7052,11 +7049,11 @@ function jslint_phase3_parse(state) {
 
                             warn("unexpected_a", name);
                         }
-                        name_enroll(
+                        name_declare(
 
-// 1.imp.1 - Mark 'enrolled', the import-name, during import-statement.
+// 1.imp.1 - Mark 'declared', the import-name, during import-statement.
 
-                            functionage,        // enroll_parent
+                            functionage,        // declared_scope
                             "variable", // role
                             true,       // readonly
                             the_import.name_list,       // name_list
@@ -7389,11 +7386,11 @@ function jslint_phase3_parse(state) {
                 if (token_nxt.id !== "ignore") {
                     ignored = undefined;
                     the_catch.name = token_nxt;
-                    name_enroll(
+                    name_declare(
 
-// 3.exc.1 - Mark 'enrolled', the exception-variable, before catch-block.
+// 3.exc.1 - Mark 'declared', the exception-variable, before catch-block.
 
-                        catchage,       // enroll_parent
+                        catchage,       // declared_scope
                         "exception",    // role
                         true,           // readonly
                         [],             // name_list
@@ -7523,7 +7520,7 @@ function jslint_phase3_parse(state) {
 // PR-500 - Unify ES2015-destructure-logic. - let [aa] = ...;
 
                 prefix_destructure(
-                    functionage,        // enroll_parent
+                    functionage,        // declared_scope
                     "variable",         // role
                     readonly,           // readonly
                     the_variable.name_list,     // name_list
@@ -7548,17 +7545,17 @@ function jslint_phase3_parse(state) {
                     advance("=");
                     name.expression = parse_expression(0);
                 }
-                name_enroll(
+                name_declare(
 
-// 3.var.1 - Mark 'enrolled', the variable, during variable-initialization.
+// 3.var.1 - Mark 'declared', the variable, during variable-declaration.
 
-                    functionage,        // enroll_parent
+                    functionage,        // declared_scope
                     "variable",         // role
                     readonly,           // readonly
                     the_variable.name_list,     // name_list
                     name,               // name
 
-// 3.var.3 - Mark 'init', the variable, during variable-initialization.
+// 3.var.3 - Mark 'init', the variable, during variable-declaration.
 
                     Boolean(name.expression)    // init
                 );
@@ -7865,8 +7862,6 @@ function jslint_phase3_parse(state) {
     symbol(":");
     symbol(";");
     symbol("]");
-    symbol("async");
-    symbol("await");
     symbol("case");
     symbol("catch");
     symbol("class");
@@ -8100,23 +8095,22 @@ function jslint_phase4_walk(state) {
 // 3.glo.2 - Mark 'alive', the global-variable, immediately.
 
                     alive: true,
+                    declared_scope: token_global,
                     id,
 
 // 3.glo.3 - Mark 'init', the global-variable, immediately.
 
                     init: true,
-                    parent: token_global,
                     readonly: true,
-                    role: "variable",
-                    used: 0
+                    role: "variable"
                 };
                 token_global.context[id] = the_variable;
             }
             the_variable.closure = true;
 
-// 3.glo.1 - Mark 'enrolled', the global-variable, immediately.
+// 3.glo.1 - Mark 'declared', the global-variable, immediately.
 
-            functionage.context[id] = the_variable;
+            token_global.context[id] = the_variable;
 
 // 3.glo.4 - Mark 'out-of-scope', the global-variable, never.
         }
@@ -8631,7 +8625,7 @@ function jslint_phase4_walk(state) {
 // PR-502 - Fix long-running regression where 'let x = x;'
 // doesn't warn about temporal-dead-zone.
 
-// 3.var.2 - Mark 'alive', the variable, after variable-initialization.
+// 3.var.2 - Mark 'alive', the variable, after variable-declaration.
 
             name.alive = true;
             switch (thing.id) {
@@ -8938,7 +8932,7 @@ function jslint_phase4_walk(state) {
 // //     function active_function() { ... }
 // // }
 //
-//             parent = functionage.name.parent;
+//             parent = functionage.name.declared_scope;
 //             if (parent) {
 //
 // // Step 4: Look up the variable we are calling ("foo")
@@ -8972,7 +8966,7 @@ function jslint_phase4_walk(state) {
 //                     left_variable !== undefined
 // // Probably deadcode.
 // // && !left_variable.alive
-//                     && left_variable.parent === parent
+//                     && left_variable.declared_scope === parent
 //                     && left_variable.calls !== undefined
 //                     && left_variable.calls[functionage.name.id] !== undefined
 //                 ) {
@@ -9011,7 +9005,7 @@ function jslint_phase4_walk(state) {
         let the_variable;
         if (thing.name !== undefined) {
 
-// 3.for.1 - Mark 'enrolled', the for-variable, ???.
+// 3.for.1 - Mark 'declared', the for-variable, ???.
 // 3.for.2 - Mark 'alive', the for-variable, before for-block.
 // 3.for.4 - Mark 'out-of-scope', the for-variable, ???.
 
@@ -9128,7 +9122,7 @@ function jslint_phase4_walk(state) {
         const the_variable = name_lookup(thing);
         if (the_variable !== undefined) {
             thing.variable = the_variable;
-            the_variable.used += 1;
+            the_variable.used = true;
         }
     }
 
@@ -9371,7 +9365,7 @@ function jslint_phase5_whitage(state) {
     function delve(the_function) {
         Object.keys(the_function.context).forEach(function (id) {
             const name = the_function.context[id];
-            if (id !== "ignore" && name.parent === the_function) {
+            if (id !== "ignore" && name.declared_scope === the_function) {
 
 // test_cause:
 // ["function aa(aa) {return aa;}", "delve", "id", "", 0]
@@ -10485,7 +10479,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         html += detail("variable", list.filter(function (id) {
             return (
                 context[id].role === "variable"
-                && context[id].parent === the_function
+                && context[id].declared_scope === the_function
             );
         }));
         html += detail("exception", list.filter(function (id) {
@@ -10494,17 +10488,17 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         html += detail("closure", list.filter(function (id) {
             return (
                 context[id].closure === true
-                && context[id].parent === the_function
+                && context[id].declared_scope === the_function
             );
         }));
         html += detail("outer", list.filter(function (id) {
             return (
-                context[id].parent !== the_function
-                && context[id].parent.id !== "(global)"
+                context[id].declared_scope.id !== "(global)"
+                && context[id].declared_scope !== the_function
             );
         }));
         html += detail(module, list.filter(function (id) {
-            return context[id].parent.id === "(global)";
+            return context[id].declared_scope.id === "(global)";
         }));
         html += detail("label", list.filter(function (id) {
             return context[id].role === "label";
