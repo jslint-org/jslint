@@ -111,14 +111,13 @@
     beta,
     bitwise,
     block,
+    block_list,
     block_stack,
     body,
     browser,
     c,
     calls,
     catch,
-    catch_list,
-    catch_stack,
     causes,
     char,
     children,
@@ -1087,13 +1086,8 @@ function jslint(
 
 // The jslint function itself.
 
-    const block_stack = [];     // The stack of blocks.
-    const catch_list = [];      // The array containing all catch-blocks.
-    const catch_stack = [       // The stack of catch-blocks.
-        {
-            context: empty()
-        }
-    ];
+    const block_list = [];      // The array containing all lexical-blocks.
+    const block_stack = [];     // The stack of lexical-blocks.
     const cause_dict = empty(); // The object of test-causes.
     const directive_list = [];  // The directive comments.
     const export_dict = empty();        // The exported names and values.
@@ -1754,9 +1748,8 @@ function jslint(
             state,
             {
                 artifact,
+                block_list,
                 block_stack,
-                catch_list,
-                catch_stack,
                 directive_list,
                 export_dict,
                 function_list,
@@ -1806,10 +1799,6 @@ function jslint(
             `block_stack.length=${block_stack.length}.`
         );
         jslint_assert(
-            catch_stack.length === 1,
-            `catch_stack.length=${catch_stack.length}.`
-        );
-        jslint_assert(
             function_stack.length === 0,
             `function_stack.length=${function_stack.length}.`
         );
@@ -1824,10 +1813,6 @@ function jslint(
         jslint_assert(
             block_stack.length === 0,
             `block_stack.length=${block_stack.length}.`
-        );
-        jslint_assert(
-            catch_stack.length === 1,
-            `catch_stack.length=${catch_stack.length}.`
         );
         jslint_assert(
             function_stack.length === 0,
@@ -4284,9 +4269,8 @@ function jslint_phase3_parse(state) {
 
     const {
         artifact,
+        block_list,
         block_stack,
-        catch_list,
-        catch_stack,
         export_dict,
         function_list,
         function_stack,
@@ -4306,7 +4290,6 @@ function jslint_phase3_parse(state) {
     } = state;
     let anon = "anonymous";     // The guessed name for anonymous functions.
     let blockage = token_global;        // The current block.
-    let catchage = catch_stack[0];      // The current catch-block.
     let functionage = token_global;     // The current function.
     let mode_var;               // "var" if using var; "let" if using let.
     let token_ii = 0;           // The number of the next token.
@@ -5107,13 +5090,12 @@ function jslint_phase3_parse(state) {
 // 2.fun.1 - Mark 'declared', the function-name, during function-declaration.
 // 2.fun.2 - Mark 'alive', the function-name, during function-declaration.
 // 2.fun.3 - Mark 'init', the function-name, during function-declaration.
-// 2.fun.4 - Mark 'out-of-scope', the function-name, after expression-scope.
+// 2.fun.4 - Mark 'out-of-scope', the function-name, after function-body.
 // 2.fun.4 - Mark 'out-of-scope', the function-name, after function-scope.
 //
-// 3.exc.1 - Mark 'declared', the exception-variable, before catch-block.
-// 3.exc.2 - Mark 'alive', the exception-variable, before catch-block.
-// 3.exc.3 - Mark 'init', the exception-variable, before catch-block.
-// 3.exc.4 - Mark 'out-of-scope', the exception-variable, after catch-block.
+// 3.cat.1 - Mark 'declared', the catch-variable, before catch-block.
+// 3.cat.2 - Mark 'alive', the catch-variable, before catch-block.
+// 3.cat.3 - Mark 'init', the catch-variable, before catch-block.
 //
 // 3.for.1 - Mark 'declared', the for-variable, ???.
 // 3.for.2 - Mark 'alive', the for-variable, before for-block.
@@ -5173,7 +5155,7 @@ function jslint_phase3_parse(state) {
 
 // Has the name been declared in this context?
 
-        earlier = functionage.context[id] || catchage.context[id];
+        earlier = declared_scope?.context?.[id];
         if (earlier) {
 
 // test_cause:
@@ -6063,7 +6045,7 @@ function jslint_phase3_parse(state) {
                 functionage.alive_list.push(name);
             } else {
 
-// 2.fun.4 - Mark 'out-of-scope', the function-name, after expression-scope.
+// 2.fun.4 - Mark 'out-of-scope', the function-name, after function-body.
 
                 the_function.alive_list.push(name);
                 name.used = true;
@@ -7391,9 +7373,9 @@ function jslint_phase3_parse(state) {
 
 // Create new catch-scope for catch-parameter.
 
-            catch_stack.push(catchage);
-            catchage = the_catch;
-            catch_list.push(catchage);
+            block_stack.push(blockage);
+            blockage = the_catch;
+            block_list.push(blockage);
             the_catch.context = empty();
             if (token_nxt.id === "(") {
                 advance("(");
@@ -7409,18 +7391,22 @@ function jslint_phase3_parse(state) {
                     the_catch.name = token_nxt;
                     name_declare(
 
-// 3.exc.1 - Mark 'declared', the exception-variable, before catch-block.
+// 3.cat.1 - Mark 'declared', the catch-variable, before catch-block.
 
-                        catchage,       // declared_scope
+                        blockage,       // declared_scope
                         "exception",    // role
                         true,           // readonly
                         [],             // name_list
                         token_nxt,      // name
 
-// 3.exc.3 - Mark 'init', the exception-variable, before catch-block.
+// 3.cat.3 - Mark 'init', the catch-variable, before catch-block.
 
                         true            // init
                     );
+
+// 3.cat.2 - Mark 'alive', the catch-variable, before catch-block.
+
+                    token_nxt.alive = true;
                 }
                 advance();
                 advance(")");
@@ -7432,7 +7418,7 @@ function jslint_phase3_parse(state) {
 
 // Restore previous catch-scope after catch-block.
 
-            catchage = jslint_assert_and_pop(catch_stack, "catch_stack");
+            blockage = jslint_assert_and_pop(block_stack, "block_stack");
 
 // PR-404 - Relax warning about missing `catch` in `try...finally` statement.
 //
@@ -7458,8 +7444,9 @@ function jslint_phase3_parse(state) {
 
     function stmt_var() {
         const readonly = token_now.id === "const";
+        const the_variable = token_now;
+        let declared_scope = functionage;
         let name;
-        let the_variable = token_now;
         let variable_prv;
         the_variable.name_list = [];    // 5. name_list for "let [aa] = ..."
 
@@ -7501,6 +7488,11 @@ function jslint_phase3_parse(state) {
 
             test_cause("var_prv", functionage.statement_prv.id);
             variable_prv = functionage.statement_prv;
+            //!! declared_scope = (
+                //!! variable_prv === "var"
+                //!! ? functionage
+                //!! : blockage
+            //!! );
             break;
         case "import":
 
@@ -7541,7 +7533,7 @@ function jslint_phase3_parse(state) {
 // PR-500 - Unify ES2015-destructure-logic. - let [aa] = ...;
 
                 prefix_destructure(
-                    functionage,        // declared_scope
+                    declared_scope,     // declared_scope
                     "variable",         // role
                     readonly,           // readonly
                     the_variable.name_list,     // name_list
@@ -7956,7 +7948,6 @@ function jslint_phase4_walk(state) {
     const {
         artifact,
         block_stack,
-        catch_stack,
         function_stack,
         global_dict,
         is_equal,
@@ -7968,7 +7959,6 @@ function jslint_phase4_walk(state) {
         warn
     } = state;
     let blockage = token_global;        // The current block.
-    let catchage = catch_stack[0];      // The current catch-block.
     let functionage = token_global;     // The current function.
     let postaction;
     let postamble;
@@ -8067,7 +8057,7 @@ function jslint_phase4_walk(state) {
 // This function will lookup and return variable or function-parameter
 // <the_variable> in current context from given <thing>.id.
 
-        let id = thing.id;
+        const id = thing.id;
         let the_variable;
         if (thing.arity !== "variable") {
             return;
@@ -8075,28 +8065,16 @@ function jslint_phase4_walk(state) {
 
 // Look up the variable in the current context.
 
-        the_variable = functionage.context[id] || catchage.context[id];
+        the_variable = functionage.context[id];
 
 // If it isn't local, search all the other contexts. If there are name
 // collisions, take the most recent.
 
-        if (the_variable && the_variable.role === "label") {
-
-// test_cause:
-// ["aa:while(0){aa}", "name_lookup", "label_a", "aa", 13]
-
-            warn("label_a", thing);
-            return the_variable;
-        }
         if (!the_variable) {
-            function_stack.forEach(function ({
-                context
-            }) {
-                if (context[id] && context[id].role !== "label") {
-                    the_variable = context[id];
-                }
+            block_stack.forEach(function (blockage) {
+                the_variable = blockage?.context?.[id] || the_variable;
             });
-            if (!the_variable && global_dict[id] === undefined) {
+            if (!the_variable && !global_dict[id]) {
 
 // test_cause:
 // ["aa", "name_lookup", "undeclared_a", "aa", 1]
@@ -8134,6 +8112,15 @@ function jslint_phase4_walk(state) {
             token_global.context[id] = the_variable;
 
 // 3.glo.4 - Mark 'out-of-scope', the global-variable, never.
+
+        }
+        if (the_variable?.role === "label") {
+
+// test_cause:
+// ["aa:while(0){aa}", "name_lookup", "label_a", "aa", 13]
+
+            warn("label_a", thing);
+            return the_variable;
         }
         if (
             (
@@ -8593,7 +8580,7 @@ function jslint_phase4_walk(state) {
     }
 
     function post_s_lbrace_pop_block() {
-        blockage.alive_list.forEach(function (name) {
+        blockage?.alive_list?.forEach(function (name) {
             name.alive = false;
         });
         delete blockage.alive_list;
@@ -8601,29 +8588,16 @@ function jslint_phase4_walk(state) {
     }
 
     function post_s_try(thing) {
-        if (!thing.catch) {
-            return;
-        }
-        if (thing.catch.name) {
-
-// 3.exc.2 - Mark 'alive', the exception-variable, before catch-block.
-
-            catchage.context[thing.catch.name.id].alive = true;
-        }
+        if (thing.catch) {
 
 // Recurse walk_statement().
 
-        walk_statement(thing.catch.block);
-        if (thing.catch.name) {
-
-// 3.exc.4 - Mark 'out-of-scope', the exception-variable, after catch-block.
-
-            catchage.context[thing.catch.name.id].alive = false;
-        }
+            walk_statement(thing?.catch?.block);
 
 // Restore previous catch-scope after catch-block.
 
-        catchage = jslint_assert_and_pop(catch_stack, "catch_stack");
+            blockage = jslint_assert_and_pop(block_stack, "block_stack");
+        }
     }
 
     function post_s_var(thing) {
@@ -9130,12 +9104,12 @@ function jslint_phase4_walk(state) {
     }
 
     function pre_s_try(thing) {
-        if (thing.catch !== undefined) {
+        if (thing.catch) {
 
 // Create new catch-scope for catch-parameter.
 
-            catch_stack.push(catchage);
-            catchage = thing.catch;
+            block_stack.push(blockage);
+            blockage = thing.catch;
         }
     }
 
@@ -9309,8 +9283,8 @@ function jslint_phase5_whitage(state) {
 
     const {
         artifact,
+        block_list,
         block_stack,
-        catch_list,
         function_list,
         option_dict,
         test_cause,
@@ -9900,7 +9874,7 @@ function jslint_phase5_whitage(state) {
 // PR-502 - tighten warning of unused variables to be always on.
 
     delve(token_global);
-    catch_list.forEach(delve);
+    block_list.forEach(delve);
     function_list.forEach(delve);
     if (option_dict.white) {
         return;
