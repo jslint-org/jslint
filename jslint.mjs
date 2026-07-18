@@ -111,6 +111,7 @@
     beta,
     bitwise,
     block,
+    block_stack,
     body,
     browser,
     c,
@@ -292,7 +293,6 @@
     ok,
     on,
     open,
-    opener_stack,
     opening,
     option,
     option_dict,
@@ -1087,6 +1087,7 @@ function jslint(
 
 // The jslint function itself.
 
+    const block_stack = [];     // The stack of blocks.
     const catch_list = [];      // The array containing all catch-blocks.
     const catch_stack = [       // The stack of catch-blocks.
         {
@@ -1108,7 +1109,6 @@ function jslint(
             line_source
         };
     });
-    const opener_stack = [];    // Stack of opener tokens: (, [.
     const property_dict = empty();      // The object containing the tallied
                                         // ... property names.
                                 // jslint functions.
@@ -1365,7 +1365,7 @@ function jslint(
 // likely that the first warning will be the most meaningful.
 
         if (the_token.warning) {
-            warning_list.pop();
+            jslint_assert_and_pop(warning_list, "warning_list");
             return the_warning;
         }
         the_token.warning = the_warning;
@@ -1754,6 +1754,7 @@ function jslint(
             state,
             {
                 artifact,
+                block_stack,
                 catch_list,
                 catch_stack,
                 directive_list,
@@ -1771,7 +1772,6 @@ function jslint(
                 mode_property: false,   // true if directive /*property*/ is
                                         // ... used.
                 mode_shebang: false,    // true if #! is seen on the first line.
-                opener_stack,
                 option_dict,
                 property_dict,
                 source,
@@ -1796,10 +1796,15 @@ function jslint(
 // PHASE 2. Lex <line_list> into <token_list>.
 
         jslint_phase2_lex(state);
+        block_stack.length = 0;
 
 // PHASE 3. Parse <token_list> into <token_tree> using the Pratt-parser.
 
         jslint_phase3_parse(state);
+        jslint_assert(
+            block_stack.length === 0,
+            `block_stack.length=${block_stack.length}.`
+        );
         jslint_assert(
             catch_stack.length === 1,
             `catch_stack.length=${catch_stack.length}.`
@@ -1807,10 +1812,6 @@ function jslint(
         jslint_assert(
             function_stack.length === 0,
             `function_stack.length=${function_stack.length}.`
-        );
-        jslint_assert(
-            opener_stack.length === 0,
-            `opener_stack.length=${opener_stack.length}.`
         );
 
 // PHASE 4. Walk <token_tree>, traversing all nodes of the tree. It is a
@@ -1820,6 +1821,10 @@ function jslint(
         if (!state.mode_json) {
             jslint_phase4_walk(state);
         }
+        jslint_assert(
+            block_stack.length === 0,
+            `block_stack.length=${block_stack.length}.`
+        );
         jslint_assert(
             catch_stack.length === 1,
             `catch_stack.length=${catch_stack.length}.`
@@ -1835,8 +1840,8 @@ function jslint(
             jslint_phase5_whitage(state);
         }
         jslint_assert(
-            opener_stack.length === 0,
-            `opener_stack.length=${opener_stack.length}.`
+            block_stack.length === 0,
+            `block_stack.length=${block_stack.length}.`
         );
 
 // PR-347 - Disable warning "missing_browser".
@@ -2277,6 +2282,14 @@ ${String(message).slice(0, 2000)}`
     throw error;
 }
 
+function jslint_assert_and_pop(list, list_name) {
+
+// This function will assert <list>.length > 0, before returning <list>.pop().
+
+    jslint_assert(list.length > 0, `${list_name}.length=${list.length}`);
+    return list.pop();
+}
+
 async function jslint_cli({
     console_error,
     console_log,
@@ -2662,11 +2675,11 @@ function jslint_phase2_lex(state) {
 
     const {
         artifact,
+        block_stack,
         directive_list,
         global_dict,
         global_list,
         line_list,
-        opener_stack,
         option_dict,
         stop,
         stop_at,
@@ -2693,7 +2706,7 @@ function jslint_phase2_lex(state) {
                                 // ... literal.
     let mode_regexp;            // true if regular expression literal seen on
                                 // ... this line.
-    let opener_popped = empty();        // Last token popped from opener_stack.
+    let opener_popped = empty();        // Last token popped from block_stack.
     let snippet = "";           // A piece of string.
     let token_1;                // The first token.
     let token_prv = token_global;       // The previous token including
@@ -4170,14 +4183,14 @@ function jslint_phase2_lex(state) {
         switch (id) {
         case "(":
         case "[":
-            opener_stack.push(the_token);
+            block_stack.push(the_token);
             break;
         case ")":
         case "]":
 
 // PR-503 - Fix jslint crashing before warning about dangling ')' or ']'.
 
-            opener_popped = opener_stack.pop() || empty();
+            opener_popped = block_stack.pop() || empty();
             if (
                 (id === ")" && opener_popped.id !== "(")
                 || (id === "]" && opener_popped.id !== "[")
@@ -4271,6 +4284,7 @@ function jslint_phase3_parse(state) {
 
     const {
         artifact,
+        block_stack,
         catch_list,
         catch_stack,
         export_dict,
@@ -4291,6 +4305,7 @@ function jslint_phase3_parse(state) {
         warn_at
     } = state;
     let anon = "anonymous";     // The guessed name for anonymous functions.
+    let blockage = token_global;        // The current block.
     let catchage = catch_stack[0];      // The current catch-block.
     let functionage = token_global;     // The current function.
     let mode_var;               // "var" if using var; "let" if using let.
@@ -4423,6 +4438,8 @@ function jslint_phase3_parse(state) {
             advance("{");
         }
         the_block = token_now;
+        block_stack.push(blockage);
+        blockage = token_now;
         if (special !== "body") {
             functionage.statement_prv = the_block;
         }
@@ -4455,6 +4472,7 @@ function jslint_phase3_parse(state) {
             the_block.disrupt = stmts[stmts.length - 1].disrupt;
         }
         advance("}");
+        blockage = jslint_assert_and_pop(block_stack, "block_stack");
         return the_block;
     }
 
@@ -6089,6 +6107,8 @@ function jslint_phase3_parse(state) {
 
 // Push the current function context and establish a new one.
 
+        block_stack.push(blockage);
+        blockage = the_function;
         function_list.push(the_function);
         function_stack.push(functionage);
         functionage = the_function;
@@ -6233,7 +6253,8 @@ function jslint_phase3_parse(state) {
 
 // Restore the previous context.
 
-        functionage = function_stack.pop();
+        blockage = jslint_assert_and_pop(block_stack, "block_stack");
+        functionage = jslint_assert_and_pop(function_stack, "function_stack");
         return the_function;
     }
 
@@ -7411,7 +7432,7 @@ function jslint_phase3_parse(state) {
 
 // Restore previous catch-scope after catch-block.
 
-            catchage = catch_stack.pop();
+            catchage = jslint_assert_and_pop(catch_stack, "catch_stack");
 
 // PR-404 - Relax warning about missing `catch` in `try...finally` statement.
 //
@@ -7934,6 +7955,7 @@ function jslint_phase4_walk(state) {
 
     const {
         artifact,
+        block_stack,
         catch_stack,
         function_stack,
         global_dict,
@@ -7945,7 +7967,6 @@ function jslint_phase4_walk(state) {
         token_global,
         warn
     } = state;
-    let block_stack = [];               // The stack of blocks.
     let blockage = token_global;        // The current block.
     let catchage = catch_stack[0];      // The current catch-block.
     let functionage = token_global;     // The current function.
@@ -8546,7 +8567,7 @@ function jslint_phase4_walk(state) {
         delete functionage.statement_prv;
         delete functionage.switch;
         delete functionage.try;
-        functionage = function_stack.pop();
+        functionage = jslint_assert_and_pop(function_stack, "function_stack");
         if (thing.wrapped) {
 
 // test_cause:
@@ -8576,7 +8597,7 @@ function jslint_phase4_walk(state) {
             name.alive = false;
         });
         delete blockage.alive_list;
-        blockage = block_stack.pop();
+        blockage = jslint_assert_and_pop(block_stack, "block_stack");
     }
 
     function post_s_try(thing) {
@@ -8602,7 +8623,7 @@ function jslint_phase4_walk(state) {
 
 // Restore previous catch-scope after catch-block.
 
-        catchage = catch_stack.pop();
+        catchage = jslint_assert_and_pop(catch_stack, "catch_stack");
     }
 
     function post_s_var(thing) {
@@ -9048,10 +9069,10 @@ function jslint_phase4_walk(state) {
 
             warn("unexpected_a", thing);
         }
-        function_stack.push(functionage);
         block_stack.push(blockage);
-        functionage = thing;
         blockage = thing;
+        function_stack.push(functionage);
+        functionage = thing;
         if (thing.extra === "get") {
             if (thing.parameter_count !== 0) {
 
@@ -9288,9 +9309,9 @@ function jslint_phase5_whitage(state) {
 
     const {
         artifact,
+        block_stack,
         catch_list,
         function_list,
-        opener_stack,
         option_dict,
         test_cause,
         token_global,
@@ -9479,7 +9500,7 @@ function jslint_phase5_whitage(state) {
 
 // If right is a closer, then pop the previous state.
 
-        indentage = opener_stack.pop();
+        indentage = jslint_assert_and_pop(block_stack, "block_stack");
         closer = indentage.closer;
         free = indentage.free;
         margin = indentage.margin;
@@ -9792,7 +9813,7 @@ function jslint_phase5_whitage(state) {
             open,
             opening
         };
-        opener_stack.push(indentage);
+        block_stack.push(indentage);
 
 // Commit 3903449a - Cleanup indent for multiline-method-chaining.
 
