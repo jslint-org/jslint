@@ -95,8 +95,6 @@
     JSLINT_BETA,
     NODE_V8_COVERAGE,
     a,
-    alive,
-    alive_list,
     all,
     argv,
     arity,
@@ -111,13 +109,13 @@
     beta,
     bitwise,
     block,
-    block_list,
-    block_stack,
     body,
     browser,
     c,
     calls,
     catch,
+    catch_list,
+    catch_stack,
     causes,
     char,
     children,
@@ -139,7 +137,6 @@
     cwd,
     d,
     debugInline,
-    declared_scope,
     default,
     delta,
     devel,
@@ -183,7 +180,6 @@
     floor,
     for,
     forEach,
-    for_inc,
     formatted_message,
     free,
     freeze,
@@ -210,6 +206,7 @@
     import,
     import_list,
     import_meta_url,
+    inc,
     includeList,
     includes,
     indent2,
@@ -254,6 +251,8 @@
     lines,
     linesCovered,
     linesTotal,
+    live,
+    live_list,
     log,
     long,
     loop,
@@ -300,6 +299,7 @@
     padEnd,
     padStart,
     parameter_count,
+    parent,
     parentIi,
     parse,
     pathname,
@@ -1086,31 +1086,35 @@ function jslint(
 
 // The jslint function itself.
 
-    const block_list = [];      // The array containing all lexical-blocks.
-    const block_stack = [];     // The stack of lexical-blocks.
-    const cause_dict = empty(); // The object of test-causes.
-    const directive_list = [];  // The directive comments.
-    const export_dict = empty();        // The exported names and values.
-    const function_list = [];   // The array containing all functions.
-    const function_stack = [];  // The stack of functions.
-    const global_dict = empty();        // The object containing the global
-                                        // ... declarations.
-    const import_list = [];     // The array collecting all import-from strings.
-    const line_list = String(   // The array containing source lines.
+    let catch_list = [];        // The array containing all catch-blocks.
+    let catch_stack = [         // The stack of catch-blocks.
+        {
+            context: empty()
+        }
+    ];
+    let cause_dict = empty();   // The object of test-causes.
+    let directive_list = [];    // The directive comments.
+    let export_dict = empty();  // The exported names and values.
+    let function_list = [];     // The array containing all functions.
+    let function_stack = [];    // The stack of functions.
+    let global_dict = empty();  // The object containing the global
+                                // ... declarations.
+    let import_list = [];       // The array collecting all import-from strings.
+    let line_list = String(     // The array containing source lines.
         "\n" + source
     ).split(jslint_rgx_crlf).map(function (line_source) {
         return {
             line_source
         };
     });
-    const property_dict = empty();      // The object containing the tallied
+    let mode_stop = false;      // true if JSLint cannot finish.
+    let property_dict = empty();        // The object containing the tallied
                                         // ... property names.
+    let state = empty();        // jslint state-object to be passed between
                                 // jslint functions.
-    const state = empty();      // jslint state-object to be passed between
-    const syntax_dict = empty();        // The object containing the parser.
-    const tenure = empty();     // The predefined property registry.
-    const token_global = {      // The global object; the outermost context.
-        alive_list: [],
+    let syntax_dict = empty();  // The object containing the parser.
+    let tenure = empty();       // The predefined property registry.
+    let token_global = {        // The global object; the outermost context.
         async: 0,
         body: true,
         context: empty(),
@@ -1119,14 +1123,14 @@ function jslint(
         id: "(global)",
         level: 0,
         line: jslint_fudge,
+        live_list: [],
         loop: 0,
         switch: 0,
         thru: 0,
         try: 0
     };
-    const token_list = [];      // The array of tokens.
-    const warning_list = [];    // The array collecting all generated warnings.
-    let mode_stop = false;      // true if JSLint cannot finish.
+    let token_list = [];        // The array of tokens.
+    let warning_list = [];      // The array collecting all generated warnings.
 
 // Error reportage functions:
 
@@ -1359,7 +1363,7 @@ function jslint(
 // likely that the first warning will be the most meaningful.
 
         if (the_token.warning) {
-            jslint_assert_and_pop(warning_list, "warning_list");
+            warning_list.pop();
             return the_warning;
         }
         the_token.warning = the_warning;
@@ -1372,7 +1376,7 @@ function jslint(
 // resembles an exception.
 
         let mm;
-        let warning = {
+        let warning = Object.assign(empty(), {
             a,
             b,
             c,
@@ -1384,9 +1388,8 @@ function jslint(
             d,
             line,
             line_source: "",
-            name: "JSLintError",
-            ...line_list[line]
-        };
+            name: "JSLintError"
+        }, line_list[line]);
         warning.column = Math.max(
             Math.min(warning.column, warning.line_source.length),
             jslint_fudge
@@ -1741,66 +1744,67 @@ function jslint(
 // automatic semicolon insertion and nested megastring literals, which allows
 // full tokenization to precede parsing.
 
-        option_dict = {
-            ...option_dict
-        };
-        Object.assign(
-            state,
-            {
-                artifact,
-                block_list,
-                block_stack,
-                directive_list,
-                export_dict,
-                function_list,
-                function_stack,
-                global_dict,
-                global_list,
-                import_list,
-                is_equal,
-                is_weird,
-                line_list,
-                mode_json: false,       // true if parsing JSON.
-                mode_module: false,     // true if import or export was used.
-                mode_property: false,   // true if directive /*property*/ is
+        option_dict = Object.assign(empty(), option_dict);
+        Object.assign(state, {
+            artifact,
+            catch_list,
+            catch_stack,
+            directive_list,
+            export_dict,
+            function_list,
+            function_stack,
+            global_dict,
+            global_list,
+            import_list,
+            is_equal,
+            is_weird,
+            line_list,
+            mode_json: false,           // true if parsing JSON.
+            mode_module: false,         // true if import or export was used.
+            mode_property: false,       // true if directive /*property*/ is
                                         // ... used.
-                mode_shebang: false,    // true if #! is seen on the first line.
-                option_dict,
-                property_dict,
-                source,
-                stop,
-                stop_at,
-                syntax_dict,
-                tenure,
-                test_cause,
-                token_global,
-                token_list,
-                token_nxt: token_global,
-                warn,
-                warn_at,
-                warning_list
-            }
-        );
+            mode_shebang: false,        // true if #! is seen on the first line.
+            option_dict,
+            property_dict,
+            source,
+            stop,
+            stop_at,
+            syntax_dict,
+            tenure,
+            test_cause,
+            token_global,
+            token_list,
+            token_nxt: token_global,
+            warn,
+            warn_at,
+            warning_list
+        });
 
 // PHASE 1. Split <source> by newlines into <line_list>.
 
         jslint_phase1_split(state);
+        jslint_assert(catch_stack.length === 1, `catch_stack.length === 1.`);
+        jslint_assert(
+            function_stack.length === 0,
+            `function_stack.length === 0.`
+        );
 
 // PHASE 2. Lex <line_list> into <token_list>.
 
         jslint_phase2_lex(state);
-        block_stack.length = 0;
+        jslint_assert(catch_stack.length === 1, `catch_stack.length === 1.`);
+        jslint_assert(
+            function_stack.length === 0,
+            `function_stack.length === 0.`
+        );
 
 // PHASE 3. Parse <token_list> into <token_tree> using the Pratt-parser.
 
         jslint_phase3_parse(state);
-        jslint_assert(
-            block_stack.length === 0,
-            `block_stack.length=${block_stack.length}.`
-        );
+        jslint_assert(catch_stack.length === 1, `catch_stack.length === 1.`);
         jslint_assert(
             function_stack.length === 0,
-            `function_stack.length=${function_stack.length}.`
+            `function_stack.length === 0.`
         );
 
 // PHASE 4. Walk <token_tree>, traversing all nodes of the tree. It is a
@@ -1810,13 +1814,10 @@ function jslint(
         if (!state.mode_json) {
             jslint_phase4_walk(state);
         }
-        jslint_assert(
-            block_stack.length === 0,
-            `block_stack.length=${block_stack.length}.`
-        );
+        jslint_assert(catch_stack.length === 1, `catch_stack.length === 1.`);
         jslint_assert(
             function_stack.length === 0,
-            `function_stack.length=${function_stack.length}.`
+            `function_stack.length === 0.`
         );
 
 // PHASE 5. Check whitespace between tokens in <token_list>.
@@ -1824,9 +1825,10 @@ function jslint(
         if (!state.mode_json && warning_list.length === 0) {
             jslint_phase5_whitage(state);
         }
+        jslint_assert(catch_stack.length === 1, `catch_stack.length === 1.`);
         jslint_assert(
-            block_stack.length === 0,
-            `block_stack.length=${block_stack.length}.`
+            function_stack.length === 0,
+            `function_stack.length === 0.`
         );
 
 // PR-347 - Disable warning "missing_browser".
@@ -1851,10 +1853,12 @@ function jslint(
         err.message = "[JSLint was unable to finish] " + err.message;
         err.mode_stop = true;
         if (err.name !== "JSLintError") {
-            err.column = jslint_fudge;
-            err.line = jslint_fudge;
-            err.line_source = "";
-            err.stack_trace = err.stack;
+            Object.assign(err, {
+                column: jslint_fudge,
+                line: jslint_fudge,
+                line_source: "",
+                stack_trace: err.stack
+            });
         }
         if (warning_list.indexOf(err) === -1) {
             warning_list.push(err);
@@ -2267,14 +2271,6 @@ ${String(message).slice(0, 2000)}`
     throw error;
 }
 
-function jslint_assert_and_pop(list, list_name) {
-
-// This function will assert <list>.length > 0, before returning <list>.pop().
-
-    jslint_assert(list.length > 0, `${list_name}.length=${list.length}`);
-    return list.pop();
-}
-
 async function jslint_cli({
     console_error,
     console_log,
@@ -2314,10 +2310,9 @@ async function jslint_cli({
         ) {
             return;
         }
-        option = {
-            ...option,
+        option = Object.assign(empty(), option, {
             file
-        };
+        });
         switch ((
             /\.\w+?$|$/m
         ).exec(file)[0]) {
@@ -2332,10 +2327,9 @@ async function jslint_cli({
                     code: match1,
                     file: file + ".<script>.js",
                     line_offset: string_line_count(code.slice(0, ii)) + 1,
-                    option: {
-                        browser: true,
-                        ...option
-                    }
+                    option: Object.assign(empty(), {
+                        browser: true
+                    }, option)
                 });
                 return "";
             });
@@ -2415,16 +2409,15 @@ async function jslint_cli({
                 file: file + ".<node -e>.js",
                 line_offset: string_line_count(code.slice(0, ii)) + 1,
                 mode_conditional,
-                option: {
+                option: Object.assign(empty(), {
                     beta: Boolean(
                         process_env.JSLINT_BETA
                         && !(
                             /0|false|null|undefined/
                         ).test(process_env.JSLINT_BETA)
                     ),
-                    node: true,
-                    ...option
-                }
+                    node: true
+                }, option)
             });
             return "";
         });
@@ -2517,10 +2510,9 @@ async function jslint_cli({
 // PR-362 - Add API Doc.
 
     case "jslint_apidoc":
-        await jslint_apidoc({
-            ...JSON.parse(process_argv[3]),
+        await jslint_apidoc(Object.assign(JSON.parse(process_argv[3]), {
             pathname: command[1]
-        });
+        }));
         return;
 
 // PR-363 - Add command jslint_report.
@@ -2660,7 +2652,6 @@ function jslint_phase2_lex(state) {
 
     const {
         artifact,
-        block_stack,
         directive_list,
         global_dict,
         global_list,
@@ -2691,7 +2682,8 @@ function jslint_phase2_lex(state) {
                                 // ... literal.
     let mode_regexp;            // true if regular expression literal seen on
                                 // ... this line.
-    let opener_popped = empty();        // Last token popped from block_stack.
+    let opener_popped = empty();        // Last token popped from opener_stack.
+    let opener_stack = [];      // Stack of opener tokens: (, [.
     let snippet = "";           // A piece of string.
     let token_1;                // The first token.
     let token_prv = token_global;       // The previous token including
@@ -4168,14 +4160,14 @@ function jslint_phase2_lex(state) {
         switch (id) {
         case "(":
         case "[":
-            block_stack.push(the_token);
+            opener_stack.push(the_token);
             break;
         case ")":
         case "]":
 
 // PR-503 - Fix jslint crashing before warning about dangling ')' or ']'.
 
-            opener_popped = block_stack.pop() || empty();
+            opener_popped = opener_stack.pop() || empty();
             if (
                 (id === ")" && opener_popped.id !== "(")
                 || (id === "]" && opener_popped.id !== "[")
@@ -4269,8 +4261,8 @@ function jslint_phase3_parse(state) {
 
     const {
         artifact,
-        block_list,
-        block_stack,
+        catch_list,
+        catch_stack,
         export_dict,
         function_list,
         function_stack,
@@ -4289,7 +4281,7 @@ function jslint_phase3_parse(state) {
         warn_at
     } = state;
     let anon = "anonymous";     // The guessed name for anonymous functions.
-    let blockage = token_global;        // The current block.
+    let catchage = catch_stack[0];      // The current catch-block.
     let functionage = token_global;     // The current function.
     let mode_var;               // "var" if using var; "let" if using let.
     let token_ii = 0;           // The number of the next token.
@@ -4381,16 +4373,16 @@ function jslint_phase3_parse(state) {
             the_token.arity = "assignment";
             right = parse_expression(20 - 1);
             if (id === "=" && left.arity === "variable") {
-                the_token.expression = right;
                 the_token.name_list = [];       // 1. name_list for "aa = ..."
-                name_declare(
-                    undefined,          // declared_scope
+                name_push(
+                    the_token.name_list,        // name_list
+                    false,              // enroll
+                    left,               // name
                     "variable",         // role
                     false,              // readonly
-                    the_token.name_list,        // name_list
-                    left,               // name
-                    false               // init
+                    true                // init
                 );
+                the_token.expression = right;
             } else {
                 the_token.expression = [left, right];
             }
@@ -4421,8 +4413,6 @@ function jslint_phase3_parse(state) {
             advance("{");
         }
         the_block = token_now;
-        block_stack.push(blockage);
-        blockage = token_now;
         if (special !== "body") {
             functionage.statement_prv = the_block;
         }
@@ -4455,7 +4445,6 @@ function jslint_phase3_parse(state) {
             the_block.disrupt = stmts[stmts.length - 1].disrupt;
         }
         advance("}");
-        blockage = jslint_assert_and_pop(block_stack, "block_stack");
         return the_block;
     }
 
@@ -5061,111 +5050,39 @@ function jslint_phase3_parse(state) {
         return the_symbol;
     }
 
-// PR-502 - Unify name_list.push() logic with helper-function name_declare().
+    function name_enroll(name, role, readonly) {
 
-    function name_declare(
-        declared_scope,
-        role,
-        readonly,
-        name_list,
-        name,
-        init
-    ) {
-
-// This function will:
-// 1. Push variable or function-parameter <name> to <name_list>.
-// 2. Set <name>.init = true, if its an assigned-variable,
-//    a function-parameter, or existing variable assigned new value.
-// 3. Declare <name> in <declared_scope>.context, if its a declared-variable,
-//    or function-parameter.
-//
-// Most calls to name_declare() are commented regarding thing being declared,
-// and its lifecycle.  Below is a copy of all such comments.
-//
-// 1.imp.1 - Mark 'declared', the import-name, during import-statement.
-// 1.imp.2 - Mark 'alive', the import-name, after import-statement.
-// 1.imp.3 - Mark 'init', the import-name, during import-statement.
-// 1.imp.4 - Mark 'out-of-scope', the import-name, after module-scope.
-//
-// 2.fun.1 - Mark 'declared', the function-name, during function-declaration.
-// 2.fun.2 - Mark 'alive', the function-name, during function-declaration.
-// 2.fun.3 - Mark 'init', the function-name, during function-declaration.
-// 2.fun.4 - Mark 'out-of-scope', the function-name, after function-body.
-// 2.fun.4 - Mark 'out-of-scope', the function-name, after function-scope.
-//
-// 3.cat.1 - Mark 'declared', the catch-variable, before catch-block.
-// 3.cat.2 - Mark 'alive', the catch-variable, before catch-block.
-// 3.cat.3 - Mark 'init', the catch-variable, before catch-block.
-//
-// 3.for.1 - Mark 'declared', the for-variable, ???.
-// 3.for.2 - Mark 'alive', the for-variable, before for-block.
-// 3.for.3 - Mark 'init', the for-variable, before for-block.
-// 3.for.4 - Mark 'out-of-scope', the for-variable, ???.
-//
-// 3.glo.1 - Mark 'declared', the global-variable, immediately.
-// 3.glo.2 - Mark 'alive', the global-variable, immediately.
-// 3.glo.3 - Mark 'init', the global-variable, immediately.
-// 3.glo.4 - Mark 'out-of-scope', the global-variable, never.
-//
-// 3.var.1 - Mark 'declared', the variable, during variable-declaration.
-// 3.var.2 - Mark 'alive', the variable, after variable-declaration.
-// 3.var.3 - Mark 'init', the variable, after assignment.
-// 3.var.3 - Mark 'init', the variable, during variable-declaration.
-// 3.var.4 - Mark 'out-of-scope', the variable, after block-scope.
-// 3.var.4 - Mark 'out-of-scope', the variable, after function-scope.
-//
-// 4.par.1 - Mark 'declared', the function-parameter, during destructuring.
-// 4.par.1 - Mark 'declared', the function-parameter, if unwrapped.
-// 4.par.2 - Mark 'alive', the function-parameter, after destructuring.
-// 4.par.3 - Mark 'init', the function-parameter, if unwrapped.
-// 4.par.4 - Mark 'out-of-scope', the function-parameter, after function-scope.
-//
-// 5.lab.1 - Mark 'declared', the label-statement, before control-flow-block.
-// 5.lab.2 - Mark 'alive', the label-statement, before control-flow-block.
-// 5.lab.3 - Mark 'init', the label-statement, before control-flow-block.
-// 5.lab.4 - Mark 'out-of-scope', the label-statement, after control-flow-block.
+// Enroll a name into the current function context. The role can be exception,
+// function, label, parameter, or variable. We look for variable redefinition
+// because it causes confusion.
 
         let earlier;
         let id = name.id;
-        name_list.push(name);
-        name.init = init;
-        name.readonly = readonly;
-        name.role = role;
-        if (role === "variable") {
-            name.arity = "variable";
-        }
-        if (!declared_scope) {
-            return;
-        }
 
-// Declare a name into the current declared_scope's context. The role can be
-// exception, function, label, parameter, or variable. We look for variable
-// redefinition because it causes confusion.
-
-// Reserved words may not be declared.
+// Reserved words may not be enrolled.
 
         if (syntax_dict[id] !== undefined && id !== "ignore") {
 
 // test_cause:
-// ["let undefined", "name_declare", "reserved_a", "undefined", 5]
+// ["let undefined", "name_enroll", "reserved_a", "undefined", 5]
 
             warn("reserved_a", name);
             return;
         }
 
-// Has the name been declared in this context?
+// Has the name been enrolled in this context?
 
-        earlier = declared_scope?.context?.[id];
+        earlier = functionage.context[id] || catchage.context[id];
         if (earlier) {
 
 // test_cause:
-// ["let aa;let aa", "name_declare", "redefinition_a_b", "1", 12]
+// ["let aa;let aa", "name_enroll", "redefinition_a_b", "1", 12]
 
             warn("redefinition_a_b", name, id, earlier.line);
             return;
         }
 
-// Has the name been declared in an outer context?
+// Has the name been enrolled in an outer context?
 
         function_stack.forEach(function ({
             context
@@ -5176,7 +5093,7 @@ function jslint_phase3_parse(state) {
             if (earlier.role === "variable") {
 
 // test_cause:
-// ["let ignore;(ignore)=>0", "name_declare", "redefinition_a_b", "1", 13]
+// ["let ignore;(ignore)=>0", "name_enroll", "redefinition_a_b", "1", 13]
 
                 warn("redefinition_a_b", name, id, earlier.line);
             }
@@ -5189,8 +5106,8 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["
 // function aa(){try{aa();}catch(aa){aa();}}
-// ", "name_declare", "redefinition_a_b", "1", 31]
-// ["function aa(){var aa}", "name_declare", "redefinition_a_b", "1", 19]
+// ", "name_enroll", "redefinition_a_b", "1", 31]
+// ["function aa(){var aa}", "name_enroll", "redefinition_a_b", "1", 19]
 
             warn("redefinition_a_b", name, id, earlier.line);
         } else if (
@@ -5200,15 +5117,44 @@ function jslint_phase3_parse(state) {
         ) {
 
 // test_cause:
-// ["let Array", "name_declare", "redefinition_global_a_b", "Array", 5]
+// ["let Array", "name_enroll", "redefinition_global_a_b", "Array", 5]
 
             warn("redefinition_global_a_b", name, global_dict[id], id);
         }
 
-// Declare it.
+// Enroll it.
 
-        declared_scope.context[id] = name;
-        name.declared_scope = declared_scope;
+        Object.assign(name, {
+            parent: (
+                role === "exception"
+                ? catchage
+                : functionage
+            ),
+            readonly,
+            role,
+            used: 0
+        });
+        name.parent.context[id] = name;
+    }
+
+// PR-502 - Unify name_list.push() logic with helper-function name_push().
+
+    function name_push(name_list, enroll, name, role, readonly, init) {
+
+// This function will:
+// 1. Push variable or function-parameter <name> to <name_list>.
+// 2. Enroll <name> if its either a declared-variable or function-parameter.
+// 3. Set <name>.init = true, if its either an assigned-variable or
+//    function-parameter.
+
+        name_list.push(name);
+        if (enroll) {
+            name_enroll(name, role, readonly);
+        }
+        if (role === "variable") {
+            name.arity = "variable";
+        }
+        name.init = init;
     }
 
     function parse_expression(rbp, initial) {
@@ -5458,12 +5404,9 @@ function jslint_phase3_parse(state) {
 
 // Recurse parse_json().
 
-                        Object.assign(
-                            parse_json(),
-                            {
-                                label: name
-                            }
-                        )
+                        Object.assign(parse_json(), {
+                            label: name
+                        })
                     );
                     if (token_nxt.id !== ",") {
                         break;
@@ -5516,29 +5459,23 @@ function jslint_phase3_parse(state) {
 // ["aa:while{}", "parse_statement", "the_statement_label", "while", 0]
 
                 test_cause("the_statement_label", token_nxt.id);
-                name_declare(
-
-// 5.lab.1 - Mark 'declared', the label-statement, before control-flow-block.
-
-                    functionage,        // declared_scope
+                name_push(
+                    [],                 // name_list
+                    true,               // enroll
+                    the_label,          // name
                     "label",            // role
                     true,               // readonly
-                    [],                 // name_list
-                    the_label,          // name
-
-// 5.lab.3 - Mark 'init', the label-statement, before control-flow-block.
-
                     true                // init
                 );
 
-// 5.lab.2 - Mark 'alive', the label-statement, before control-flow-block.
+// 5.lab.1 - Mark 'initialized', the label-statement, before control-flow-block.
 
-                the_label.alive = true;
+                the_label.live = true;
                 the_statement = parse_statement();
 
-// 5.lab.4 - Mark 'out-of-scope', the label-statement, after control-flow-block.
+// 5.lab.2 - Mark 'out-of-scope', the label-statement, after control-flow-block.
 
-                the_label.alive = false;
+                the_label.live = false;
                 functionage.statement_prv = the_statement;
                 the_statement.label = the_label;
                 the_statement.statement = true;
@@ -5753,7 +5690,7 @@ function jslint_phase3_parse(state) {
     }
 
     function prefix_destructure(
-        declared_scope,
+        enroll,
         role,
         readonly,
         name_list,
@@ -5831,7 +5768,7 @@ function jslint_phase3_parse(state) {
                 test_cause("recurse_element");
                 advance_and_signature_push(token_nxt.id);
                 prefix_destructure(
-                    declared_scope,     // declared_scope
+                    enroll,             // enroll
                     role,               // role
                     readonly,           // readonly
                     name_list,          // name_list
@@ -5882,25 +5819,11 @@ function jslint_phase3_parse(state) {
                 }
                 token_nxt.label = name;
                 name = token_nxt;
-                name_declare(
-                    declared_scope,     // declared_scope
-                    role,               // role
-                    readonly,           // readonly
-                    sub_list,           // name_list
-                    name,               // name
-                    true                // init
-                );
+                name_push(sub_list, enroll, name, role, readonly, true);
                 advance_and_signature_push(token_nxt.id);
                 return;
             }
-            name_declare(
-                declared_scope,         // declared_scope
-                role,                   // role
-                readonly,               // readonly
-                sub_list,               // name_list
-                name,                   // name
-                true                    // init
-            );
+            name_push(sub_list, enroll, name, role, readonly, true);
             if (token_nxt.id === "=") {
                 optional = the_function_toplevel && token_now;
                 advance_and_signature_push("=");
@@ -5997,7 +5920,7 @@ function jslint_phase3_parse(state) {
     function prefix_function(the_function, mode_fart, mode_fart_unwrapped) {
         const name = !mode_fart && token_nxt.identifier && token_nxt;
         the_function = the_function || token_now;
-        the_function.alive_list = [];
+        the_function.live_list = [];
         if (mode_fart) {
             the_function.arity = "binary";
         }
@@ -6016,66 +5939,62 @@ function jslint_phase3_parse(state) {
         }
         if (name) {
             advance();
-            name_declare(
-
-// 2.fun.1 - Mark 'declared', the function-name, during function-declaration.
-
-                functionage,            // declared_scope
+            name_push(
+                [],                     // name_list
+                true,                   // enroll
+                name,                   // name
                 (                       // role
                     the_function.arity === "statement"
                     ? "variable"
                     : "function"
                 ),
                 false,                  // readonly
-                [],                     // name_list
-                name,                   // name
-
-// 2.fun.3 - Mark 'init', the function-name, during function-declaration.
-
                 true                    // init
             );
 
-// 2.fun.2 - Mark 'alive', the function-name, during function-declaration.
+// 2.fun.1 - Mark 'initialized', the function-name, immediately.
 
-            name.alive = true;
+            name.live = true;
             if (the_function.arity === "statement") {
 
-// 2.fun.4 - Mark 'out-of-scope', the function-name, after function-scope.
+// 2.fun.2 - Mark 'out-of-scope', the function-name, after function-scope.
 
-                functionage.alive_list.push(name);
+                functionage.live_list.push(name);
             } else {
 
-// 2.fun.4 - Mark 'out-of-scope', the function-name, after function-body.
+// 2.fun.2 - Mark 'out-of-scope', the function-name, after expression-scope.
 
-                the_function.alive_list.push(name);
-                name.used = true;
+                the_function.live_list.push(name);
+                name.used += 1;
             }
         }
 
 // Give the function properties for storing its names and for observing the
 // depth of loops and switches.
 
-        the_function.async = the_function.async || 0;
-        the_function.context = empty();
-        the_function.finally = 0;
-        the_function.level = functionage.level + 1;
-        the_function.loop = 0;
-        the_function.name = (
-            name
-            || (
+        Object.assign(the_function, {
+            async: the_function.async || 0,
+            context: empty(),
+            finally: 0,
+            level: functionage.level + 1,
+            loop: 0,
+            name: (
+                name || (
+                    mode_fart_unwrapped
+                    ? "anonymous"
+                    : anon
+                )
+            ),
+            parameter_count: Number(Boolean(mode_fart_unwrapped)),
+            signature: (
                 mode_fart_unwrapped
-                ? "anonymous"
-                : anon
-            )
-        );
-        the_function.parameter_count = Number(Boolean(mode_fart_unwrapped));
-        the_function.signature = (
-            mode_fart_unwrapped
-            ? token_prv.id
-            : ["("]
-        );
-        the_function.switch = 0;
-        the_function.try = 0;
+                ? token_prv.id
+                : ["("]
+            ),
+            statement_prv: undefined,
+            switch: 0,
+            try: 0
+        });
 
 // PR-384 - Relax warning "function_in_loop".
 //
@@ -6089,8 +6008,6 @@ function jslint_phase3_parse(state) {
 
 // Push the current function context and establish a new one.
 
-        block_stack.push(blockage);
-        blockage = the_function;
         function_list.push(the_function);
         function_stack.push(functionage);
         functionage = the_function;
@@ -6108,18 +6025,12 @@ function jslint_phase3_parse(state) {
 // ["aa=>0", "prefix_function", "wrap_fart_parameter", "aa", 1]
 
             warn("wrap_fart_parameter", token_prv);
-            name_declare(
-
-// 4.par.1 - Mark 'declared', the function-parameter, if unwrapped.
-
-                functionage,            // declared_scope
+            name_push(
+                the_function.name_list, // name_list
+                true,                   // enroll
+                token_prv,              // name
                 "parameter",            // role
                 false,                  // readonly
-                the_function.name_list, // name_list
-                token_prv,              // name
-
-// 4.par.3 - Mark 'init', the function-parameter, if unwrapped.
-
                 true                    // init
             );
         } else {
@@ -6129,10 +6040,7 @@ function jslint_phase3_parse(state) {
 // PR-500 - Unify ES2015-destructure-logic. - function ([aa]) {...}
 
                 prefix_destructure(
-
-// 4.par.1 - Mark 'declared', the function-parameter, during destructuring.
-
-                    functionage,        // declared_scope
+                    true,               // enroll
                     "parameter",        // role
                     false,              // readonly
                     the_function.name_list,     // name_list
@@ -6235,8 +6143,7 @@ function jslint_phase3_parse(state) {
 
 // Restore the previous context.
 
-        blockage = jslint_assert_and_pop(block_stack, "block_stack");
-        functionage = jslint_assert_and_pop(function_stack, "function_stack");
+        functionage = function_stack.pop();
         return the_function;
     }
 
@@ -6427,7 +6334,7 @@ function jslint_phase3_parse(state) {
 // PR-500 - Unify ES2015-destructure-logic. - [aa] = ...;
 
             element = prefix_destructure(
-                undefined,              // declared_scope
+                false,                  // enroll
                 "variable",             // role
                 false,                  // readonly
                 the_token.name_list,    // name_list
@@ -6607,9 +6514,9 @@ function jslint_phase3_parse(state) {
             if (
                 !the_label
                 || the_label.role !== "label"
-                || !the_label.alive
+                || !the_label.live
             ) {
-                if (the_label && !the_label.alive) {
+                if (the_label && !the_label.live) {
 
 // Warn label-statement is 'out-of-scope'.
 
@@ -6625,7 +6532,7 @@ function jslint_phase3_parse(state) {
                     warn("not_label_a");
                 }
             } else {
-                the_label.used = true;
+                the_label.used += 1;
             }
             the_break.label = token_nxt;
             advance();
@@ -6762,7 +6669,7 @@ function jslint_phase3_parse(state) {
                 the_thing = parse_statement();
                 the_name = the_thing.name;
                 the_id = the_name.id;
-                the_name.used = true;
+                the_name.used += 1;
                 if (export_dict[the_id] !== undefined) {
 
 // test_cause:
@@ -6814,7 +6721,7 @@ function jslint_phase3_parse(state) {
 
                         warn("unexpected_a");
                     } else {
-                        the_name.used = true;
+                        the_name.used += 1;
                         if (export_dict[the_id] !== undefined) {
 
 // test_cause:
@@ -6881,9 +6788,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["for(const aa in aa){}", "stmt_for", "unexpected_a", "const", 5]
 
-            warn("unexpected_a");
-            advance();
-            break;
+            return stop("unexpected_a");
         }
         first = parse_expression(0);
         if (first.id === "in") {
@@ -6897,24 +6802,18 @@ function jslint_phase3_parse(state) {
             the_for.name = first.expression[0];
             the_for.expression = first.expression[1];
             warn("expected_a_b", the_for, "Object.keys", "for in");
-        } else if (first.id === "of") {
-
-// Issue #176 - Add ES2015-feature for..of.
-
-            the_for.name = first.expression[0];
-            the_for.expression = first.expression[1];
         } else {
             the_for.initial = first;
             advance(";");
             the_for.expression = parse_expression(0);
             advance(";");
-            the_for.for_inc = parse_expression(0);
-            if (the_for.for_inc.id === "++") {
+            the_for.inc = parse_expression(0);
+            if (the_for.inc.id === "++") {
 
 // test_cause:
 // ["for(aa;aa;aa++){}", "stmt_for", "expected_a_b", "++", 13]
 
-                warn("expected_a_b", the_for.for_inc, "+= 1", "++");
+                warn("expected_a_b", the_for.inc, "+= 1", "++");
             }
         }
         advance(")");
@@ -7013,18 +6912,12 @@ function jslint_phase3_parse(state) {
 
                     warn("unexpected_a", name);
                 }
-                name_declare(
-
-// 1.imp.1 - Mark 'declared', the import-name, during import-statement.
-
-                    functionage,        // declared_scope
+                name_push(
+                    the_import.name_list,       // name_list
+                    true,               // enroll
+                    name,               // name
                     "variable",         // role
                     true,               // readonly
-                    the_import.name_list,       // name_list
-                    name,               // name
-
-// 1.imp.3 - Mark 'init', the import-name, during import-statement.
-
                     true                // init
                 );
             } else {
@@ -7052,18 +6945,12 @@ function jslint_phase3_parse(state) {
 
                             warn("unexpected_a", name);
                         }
-                        name_declare(
-
-// 1.imp.1 - Mark 'declared', the import-name, during import-statement.
-
-                            functionage,        // declared_scope
+                        name_push(
+                            the_import.name_list,       // name_list
+                            true,       // enroll
+                            name,       // name
                             "variable", // role
                             true,       // readonly
-                            the_import.name_list,       // name_list
-                            name,       // name
-
-// 1.imp.3 - Mark 'init', the import-name, during import-statement.
-
                             true        // init
                         );
                         if (token_nxt.id !== ",") {
@@ -7373,9 +7260,9 @@ function jslint_phase3_parse(state) {
 
 // Create new catch-scope for catch-parameter.
 
-            block_stack.push(blockage);
-            blockage = the_catch;
-            block_list.push(blockage);
+            catch_stack.push(catchage);
+            catchage = the_catch;
+            catch_list.push(catchage);
             the_catch.context = empty();
             if (token_nxt.id === "(") {
                 advance("(");
@@ -7389,24 +7276,14 @@ function jslint_phase3_parse(state) {
                 if (token_nxt.id !== "ignore") {
                     ignored = undefined;
                     the_catch.name = token_nxt;
-                    name_declare(
-
-// 3.cat.1 - Mark 'declared', the catch-variable, before catch-block.
-
-                        blockage,       // declared_scope
+                    name_push(
+                        [],             // name_list
+                        true,           // enroll
+                        token_nxt,      // name
                         "exception",    // role
                         true,           // readonly
-                        [],             // name_list
-                        token_nxt,      // name
-
-// 3.cat.3 - Mark 'init', the catch-variable, before catch-block.
-
                         true            // init
                     );
-
-// 3.cat.2 - Mark 'alive', the catch-variable, before catch-block.
-
-                    token_nxt.alive = true;
                 }
                 advance();
                 advance(")");
@@ -7418,7 +7295,7 @@ function jslint_phase3_parse(state) {
 
 // Restore previous catch-scope after catch-block.
 
-            blockage = jslint_assert_and_pop(block_stack, "block_stack");
+            catchage = catch_stack.pop();
 
 // PR-404 - Relax warning about missing `catch` in `try...finally` statement.
 //
@@ -7444,9 +7321,8 @@ function jslint_phase3_parse(state) {
 
     function stmt_var() {
         const readonly = token_now.id === "const";
-        const the_variable = token_now;
-        let declared_scope = functionage;
         let name;
+        let the_variable = token_now;
         let variable_prv;
         the_variable.name_list = [];    // 5. name_list for "let [aa] = ..."
 
@@ -7488,11 +7364,6 @@ function jslint_phase3_parse(state) {
 
             test_cause("var_prv", functionage.statement_prv.id);
             variable_prv = functionage.statement_prv;
-            //!! declared_scope = (
-                //!! variable_prv === "var"
-                //!! ? functionage
-                //!! : blockage
-            //!! );
             break;
         case "import":
 
@@ -7533,7 +7404,7 @@ function jslint_phase3_parse(state) {
 // PR-500 - Unify ES2015-destructure-logic. - let [aa] = ...;
 
                 prefix_destructure(
-                    declared_scope,     // declared_scope
+                    true,               // enroll
                     "variable",         // role
                     readonly,           // readonly
                     the_variable.name_list,     // name_list
@@ -7558,18 +7429,12 @@ function jslint_phase3_parse(state) {
                     advance("=");
                     name.expression = parse_expression(0);
                 }
-                name_declare(
-
-// 3.var.1 - Mark 'declared', the variable, during variable-declaration.
-
-                    functionage,        // declared_scope
+                name_push(
+                    the_variable.name_list,     // name_list
+                    true,               // enroll
+                    name,               // name
                     "variable",         // role
                     readonly,           // readonly
-                    the_variable.name_list,     // name_list
-                    name,               // name
-
-// 3.var.3 - Mark 'init', the variable, during variable-declaration.
-
                     Boolean(name.expression)    // init
                 );
             } else {
@@ -7800,10 +7665,6 @@ function jslint_phase3_parse(state) {
     infix(110, ">=");
     infix(110, "in");
     infix(110, "instanceof");
-
-// Issue #176 - Add ES2015-feature for..of.
-
-    infix(110, "of");
     infix(120, "<<");
     infix(120, ">>");
     infix(120, ">>>");
@@ -7875,6 +7736,8 @@ function jslint_phase3_parse(state) {
     symbol(":");
     symbol(";");
     symbol("]");
+    symbol("async");
+    symbol("await");
     symbol("case");
     symbol("catch");
     symbol("class");
@@ -7947,7 +7810,7 @@ function jslint_phase4_walk(state) {
 
     const {
         artifact,
-        block_stack,
+        catch_stack,
         function_stack,
         global_dict,
         is_equal,
@@ -7958,7 +7821,9 @@ function jslint_phase4_walk(state) {
         token_global,
         warn
     } = state;
+    let block_stack = [];               // The stack of blocks.
     let blockage = token_global;        // The current block.
+    let catchage = catch_stack[0];      // The current catch-block.
     let functionage = token_global;     // The current function.
     let postaction;
     let postamble;
@@ -8052,12 +7917,14 @@ function jslint_phase4_walk(state) {
         };
     }
 
-    function name_lookup(thing) {
+    function name_lookup(thing, init) {
 
-// This function will lookup and return variable or function-parameter
-// <the_variable> in current context from given <thing>.id.
+// This function will:
+// 1. Lookup and return variable or function-parameter <the_variable> in current
+//    context from given <thing>.id.
+// 2. Set <the_variable>.init = true, if lookup was from an assignment.
 
-        const id = thing.id;
+        let id = thing.id;
         let the_variable;
         if (thing.arity !== "variable") {
             return;
@@ -8065,16 +7932,28 @@ function jslint_phase4_walk(state) {
 
 // Look up the variable in the current context.
 
-        the_variable = functionage.context[id];
+        the_variable = functionage.context[id] || catchage.context[id];
 
 // If it isn't local, search all the other contexts. If there are name
 // collisions, take the most recent.
 
+        if (the_variable && the_variable.role === "label") {
+
+// test_cause:
+// ["aa:while(0){aa}", "name_lookup", "label_a", "aa", 13]
+
+            warn("label_a", thing);
+            return the_variable;
+        }
         if (!the_variable) {
-            block_stack.forEach(function (blockage) {
-                the_variable = blockage?.context?.[id] || the_variable;
+            function_stack.forEach(function ({
+                context
+            }) {
+                if (context[id] && context[id].role !== "label") {
+                    the_variable = context[id];
+                }
             });
-            if (!the_variable && !global_dict[id]) {
+            if (!the_variable && global_dict[id] === undefined) {
 
 // test_cause:
 // ["aa", "name_lookup", "undeclared_a", "aa", 1]
@@ -8090,37 +7969,22 @@ function jslint_phase4_walk(state) {
 
             if (!the_variable) {
                 the_variable = {
-
-// 3.glo.2 - Mark 'alive', the global-variable, immediately.
-
-                    alive: true,
-                    declared_scope: token_global,
                     id,
-
-// 3.glo.3 - Mark 'init', the global-variable, immediately.
-
                     init: true,
+
+// 3.glo.1 - Mark 'initialized', the global-variable, immediately.
+// 3.glo.2 - Mark 'out-of-scope', the global-variable, never.
+
+                    live: true,
+                    parent: token_global,
                     readonly: true,
-                    role: "variable"
+                    role: "variable",
+                    used: 0
                 };
                 token_global.context[id] = the_variable;
             }
             the_variable.closure = true;
-
-// 3.glo.1 - Mark 'declared', the global-variable, immediately.
-
-            token_global.context[id] = the_variable;
-
-// 3.glo.4 - Mark 'out-of-scope', the global-variable, never.
-
-        }
-        if (the_variable?.role === "label") {
-
-// test_cause:
-// ["aa:while(0){aa}", "name_lookup", "label_a", "aa", 13]
-
-            warn("label_a", thing);
-            return the_variable;
+            functionage.context[id] = the_variable;
         }
         if (
             (
@@ -8128,7 +7992,7 @@ function jslint_phase4_walk(state) {
                 || !functionage.name
                 || !the_variable.calls[functionage.name.id]
             )
-            && !the_variable.alive
+            && !the_variable.live
         ) {
 
 // Warn variable is 'out-of-scope'.
@@ -8144,10 +8008,16 @@ function jslint_phase4_walk(state) {
 
             warn("out_of_scope_a", thing);
         }
+
+// Set variable as initialized, if lookup was from an assignment.
+
+        if (init && the_variable && !the_variable.readonly) {
+            the_variable.init = true;
+        }
         return the_variable;
     }
 
-    function post_a_assignment(thing) {
+    function post_a(thing) {
 
 // Assignment using = sets the init property of a variable. No other assignment
 // operator can do this. A = token keeps that variable (or array of variables
@@ -8162,10 +8032,10 @@ function jslint_phase4_walk(state) {
             ) {
 
 // test_cause:
-// ["aa+=0", "post_a_assignment", "+=", "aa", 0]
-// ["aa+=0", "post_a_assignment", "bad_assignment_a", "aa", 1]
-// ["const aa=0;aa+=0", "post_a_assignment", "+=", "aa", 0]
-// ["const aa=0;aa+=0", "post_a_assignment", "bad_assignment_a", "aa", 12]
+// ["aa+=0", "post_a", "+=", "aa", 0]
+// ["aa+=0", "post_a", "bad_assignment_a", "aa", 1]
+// ["const aa=0;aa+=0", "post_a", "+=", "aa", 0]
+// ["const aa=0;aa+=0", "post_a", "bad_assignment_a", "aa", 12]
 
                 test_cause("+=", lvalue.id);
                 warn("bad_assignment_a", lvalue);
@@ -8185,7 +8055,7 @@ function jslint_phase4_walk(state) {
             ) {
 
 // test_cause:
-// ["aa+=undefined", "post_a_assignment", "unexpected_a", "undefined", 5]
+// ["aa+=undefined", "post_a", "unexpected_a", "undefined", 5]
 
                 warn("unexpected_a", thing.expression[1]);
             }
@@ -8193,30 +8063,26 @@ function jslint_phase4_walk(state) {
         }
         if (thing.name_list) {
             thing.name_list.forEach(function (name) {
-                const the_variable = name_lookup(name);
-                if (the_variable && !the_variable.readonly) {
-
-// 3.var.3 - Mark 'init', the variable, after assignment.
-
-                    the_variable.init = true;
-                    return;
-                }
+                const the_variable = name_lookup(name, true);
+                if (!the_variable || the_variable.readonly) {
 
 // test_cause:
-// ["aa=0", "post_a_assignment", "=", "aa", 0]
-// ["aa=0", "post_a_assignment", "bad_assignment_a", "aa", 1]
-// ["const aa=0;aa=0", "post_a_assignment", "=", "aa", 0]
-// ["const aa=0;aa=0", "post_a_assignment", "bad_assignment_a", "aa", 12]
+// ["aa=0", "post_a", "=", "aa", 0]
+// ["aa=0", "post_a", "bad_assignment_a", "aa", 1]
+// ["const aa=0;aa=0", "post_a", "=", "aa", 0]
+// ["const aa=0;aa=0", "post_a", "bad_assignment_a", "aa", 12]
 
-                test_cause("=", name.id);
-                warn("bad_assignment_a", name);
+                    test_cause("=", name.id);
+                    warn("bad_assignment_a", name);
+                    return;
+                }
             });
             return;
         }
         if (lvalue.id === "." && thing.expression[1].id === "undefined") {
 
 // test_cause:
-// ["aa.aa=undefined", "post_a_assignment", "expected_a_b", "undefined", 1]
+// ["aa.aa=undefined", "post_a", "expected_a_b", "undefined", 1]
 
             warn("expected_a_b", lvalue.expression, "delete", "undefined");
             return;
@@ -8235,6 +8101,92 @@ function jslint_phase4_walk(state) {
                 || Number.isNaN(right.value)
             ) {
                 warn("unexpected_a", right);
+            }
+        }
+    }
+
+    function post_b(thing) {
+        let right;
+        if (relationop[thing.id]) {
+            if (
+                is_weird(thing.expression[0])
+                || is_weird(thing.expression[1])
+                || is_equal(thing.expression[0], thing.expression[1])
+                || (
+                    thing.expression[0].constant === true
+                    && thing.expression[1].constant === true
+                )
+            ) {
+
+// test_cause:
+// ["if(0===0){0}", "post_b", "weird_relation_a", "===", 5]
+
+                warn("weird_relation_a", thing);
+            }
+        }
+        if (thing.id === "+") {
+            if (!option_dict.convert) {
+                if (thing.expression[0].value === "") {
+
+// test_cause:
+// ["\"\"+0", "post_b", "expected_a_b", "\"\" +", 3]
+
+                    warn("expected_a_b", thing, "String(...)", "\"\" +");
+                } else if (thing.expression[1].value === "") {
+
+// test_cause:
+// ["0+\"\"", "post_b", "expected_a_b", "+ \"\"", 2]
+
+                    warn("expected_a_b", thing, "String(...)", "+ \"\"");
+                }
+            }
+        } else if (thing.id === "[") {
+            if (thing.expression[0].id === "window") {
+
+// test_cause:
+// ["aa=window[0]", "post_b", "weird_expression_a", "window[...]", 10]
+
+                warn("weird_expression_a", thing, "window[...]");
+            }
+            if (thing.expression[0].id === "self") {
+
+// test_cause:
+// ["aa=self[0]", "post_b", "weird_expression_a", "self[...]", 8]
+
+                warn("weird_expression_a", thing, "self[...]");
+            }
+        } else if (thing.id === "." || thing.id === "?.") {
+            if (thing.expression.id === "RegExp") {
+
+// PR-499 - Relax warning for ES2025-feature RegExp.escape().
+
+                if (!thing.name || thing.name.id !== "escape") {
+
+// test_cause:
+// ["aa=RegExp.aa", "post_b", "weird_expression_a", ".", 10]
+
+                    warn("weird_expression_a", thing);
+                }
+            }
+        } else if (thing.id !== "=>" && thing.id !== "(") {
+            right = thing.expression[1];
+            if (
+                (thing.id === "+" || thing.id === "-")
+                && right.id === thing.id
+                && right.arity === "unary"
+                && !right.wrapped
+            ) {
+
+// test_cause:
+// ["0- -0", "post_b", "wrap_unary", "-", 4]
+
+                warn("wrap_unary", right);
+            }
+            if (
+                thing.expression[0].constant === true
+                && right.constant === true
+            ) {
+                thing.constant = true;
             }
         }
     }
@@ -8260,92 +8212,6 @@ function jslint_phase4_walk(state) {
 // ["aa={}&&{}", "post_b_and", "weird_condition_a", "&&", 6]
 
             warn("weird_condition_a", thing);
-        }
-    }
-
-    function post_b_binary(thing) {
-        let right;
-        if (relationop[thing.id]) {
-            if (
-                is_weird(thing.expression[0])
-                || is_weird(thing.expression[1])
-                || is_equal(thing.expression[0], thing.expression[1])
-                || (
-                    thing.expression[0].constant === true
-                    && thing.expression[1].constant === true
-                )
-            ) {
-
-// test_cause:
-// ["if(0===0){0}", "post_b_binary", "weird_relation_a", "===", 5]
-
-                warn("weird_relation_a", thing);
-            }
-        }
-        if (thing.id === "+") {
-            if (!option_dict.convert) {
-                if (thing.expression[0].value === "") {
-
-// test_cause:
-// ["\"\"+0", "post_b_binary", "expected_a_b", "\"\" +", 3]
-
-                    warn("expected_a_b", thing, "String(...)", "\"\" +");
-                } else if (thing.expression[1].value === "") {
-
-// test_cause:
-// ["0+\"\"", "post_b_binary", "expected_a_b", "+ \"\"", 2]
-
-                    warn("expected_a_b", thing, "String(...)", "+ \"\"");
-                }
-            }
-        } else if (thing.id === "[") {
-            if (thing.expression[0].id === "window") {
-
-// test_cause:
-// ["aa=window[0]", "post_b_binary", "weird_expression_a", "window[...]", 10]
-
-                warn("weird_expression_a", thing, "window[...]");
-            }
-            if (thing.expression[0].id === "self") {
-
-// test_cause:
-// ["aa=self[0]", "post_b_binary", "weird_expression_a", "self[...]", 8]
-
-                warn("weird_expression_a", thing, "self[...]");
-            }
-        } else if (thing.id === "." || thing.id === "?.") {
-            if (thing.expression.id === "RegExp") {
-
-// PR-499 - Relax warning for ES2025-feature RegExp.escape().
-
-                if (!thing.name || thing.name.id !== "escape") {
-
-// test_cause:
-// ["aa=RegExp.aa", "post_b_binary", "weird_expression_a", ".", 10]
-
-                    warn("weird_expression_a", thing);
-                }
-            }
-        } else if (thing.id !== "=>" && thing.id !== "(") {
-            right = thing.expression[1];
-            if (
-                (thing.id === "+" || thing.id === "-")
-                && right.id === thing.id
-                && right.arity === "unary"
-                && !right.wrapped
-            ) {
-
-// test_cause:
-// ["0- -0", "post_b_binary", "wrap_unary", "-", 4]
-
-                warn("wrap_unary", right);
-            }
-            if (
-                thing.expression[0].constant === true
-                && right.constant === true
-            ) {
-                thing.constant = true;
-            }
         }
     }
 
@@ -8544,7 +8410,7 @@ function jslint_phase4_walk(state) {
 
 // Recurse walk_statement().
 
-        walk_statement(thing.for_inc);
+        walk_statement(thing.inc);
     }
 
     function post_s_function(thing) {
@@ -8554,7 +8420,7 @@ function jslint_phase4_walk(state) {
         delete functionage.statement_prv;
         delete functionage.switch;
         delete functionage.try;
-        functionage = jslint_assert_and_pop(function_stack, "function_stack");
+        functionage = function_stack.pop();
         if (thing.wrapped) {
 
 // test_cause:
@@ -8568,36 +8434,49 @@ function jslint_phase4_walk(state) {
     function post_s_import(the_thing) {
         the_thing.name_list.forEach(function (name) {
 
-// 1.imp.2 - Mark 'alive', the import-name, after import-statement.
+// 1.imp.1 - Mark 'initialized', the import-name, after import-statement.
 
-            name.alive = true;
+            name.live = true;
 
-// 1.imp.4 - Mark 'out-of-scope', the import-name, after module-scope.
+// 1.imp.2 - Mark 'out-of-scope', the import-name, after module-scope.
 
-            blockage.alive_list.push(name);
+            blockage.live_list.push(name);
         });
         post_s_export_toplevel(the_thing);
     }
 
     function post_s_lbrace_pop_block() {
-        blockage?.alive_list?.forEach(function (name) {
-            name.alive = false;
+        blockage.live_list.forEach(function (name) {
+            name.live = false;
         });
-        delete blockage.alive_list;
-        blockage = jslint_assert_and_pop(block_stack, "block_stack");
+        delete blockage.live_list;
+        blockage = block_stack.pop();
     }
 
     function post_s_try(thing) {
-        if (thing.catch) {
+        if (!thing.catch) {
+            return;
+        }
+        if (thing.catch.name) {
+
+// 3.exc.1 - Mark 'initialized', the exception-variable, before catch-block.
+
+            catchage.context[thing.catch.name.id].live = true;
+        }
 
 // Recurse walk_statement().
 
-            walk_statement(thing?.catch?.block);
+        walk_statement(thing.catch.block);
+        if (thing.catch.name) {
+
+// 3.exc.2 - Mark 'out-of-scope', the exception-variable, after catch-block.
+
+            catchage.context[thing.catch.name.id].live = false;
+        }
 
 // Restore previous catch-scope after catch-block.
 
-            blockage = jslint_assert_and_pop(block_stack, "block_stack");
-        }
+        catchage = catch_stack.pop();
     }
 
     function post_s_var(thing) {
@@ -8620,28 +8499,28 @@ function jslint_phase4_walk(state) {
 // PR-502 - Fix long-running regression where 'let x = x;'
 // doesn't warn about temporal-dead-zone.
 
-// 3.var.2 - Mark 'alive', the variable, after variable-declaration.
+// 3.var.1 - Mark 'initialized', the variable, after variable-initialization.
 
-            name.alive = true;
+            name.live = true;
             switch (thing.id) {
             case "const":
             case "let":
 
-// 3.var.4 - Mark 'out-of-scope', the variable, after block-scope.
+// 3.var.2 - Mark 'out-of-scope', the variable, after block-scope.
 
-                blockage.alive_list.push(name);
+                blockage.live_list.push(name);
                 break;
             // case "var":
             default:
 
-// 3.var.4 - Mark 'out-of-scope', the variable, after function-scope.
+// 3.var.2 - Mark 'out-of-scope', the variable, after function-scope.
 
-                functionage.alive_list.push(name);
+                functionage.live_list.push(name);
             }
         });
     }
 
-    function post_ternary(thing) {
+    function post_t(thing) {
         if (
             is_weird(thing.expression[0])
             || thing.expression[0].constant === true
@@ -8649,20 +8528,20 @@ function jslint_phase4_walk(state) {
         ) {
 
 // test_cause:
-// ["let aa=(aa?`${0}`:`${0}`)", "post_ternary", "unexpected_a", "?", 11]
-// ["let aa=(aa?`0`:`0`)", "post_ternary", "unexpected_a", "?", 11]
+// ["let aa=(aa?`${0}`:`${0}`)", "post_t", "unexpected_a", "?", 11]
+// ["let aa=(aa?`0`:`0`)", "post_t", "unexpected_a", "?", 11]
 
             warn("unexpected_a", thing);
         } else if (is_equal(thing.expression[0], thing.expression[1])) {
 
 // test_cause:
-// ["aa?aa:0", "post_ternary", "expected_a_b", "?", 3]
+// ["aa?aa:0", "post_t", "expected_a_b", "?", 3]
 
             warn("expected_a_b", thing, "||", "?");
         } else if (is_equal(thing.expression[0], thing.expression[2])) {
 
 // test_cause:
-// ["aa?0:aa", "post_ternary", "expected_a_b", "?", 3]
+// ["aa?0:aa", "post_t", "expected_a_b", "?", 3]
 
             warn("expected_a_b", thing, "&&", "?");
         } else if (
@@ -8671,7 +8550,7 @@ function jslint_phase4_walk(state) {
         ) {
 
 // test_cause:
-// ["aa?true:false", "post_ternary", "expected_a_b", "?", 3]
+// ["aa?true:false", "post_t", "expected_a_b", "?", 3]
 
             warn("expected_a_b", thing, "Boolean(...)", "?");
         } else if (
@@ -8680,7 +8559,7 @@ function jslint_phase4_walk(state) {
         ) {
 
 // test_cause:
-// ["aa?false:true", "post_ternary", "expected_a_b", "?", 3]
+// ["aa?false:true", "post_t", "expected_a_b", "?", 3]
 
             warn("expected_a_b", thing, "!", "?");
         } else if (
@@ -8692,7 +8571,7 @@ function jslint_phase4_walk(state) {
         ) {
 
 // test_cause:
-// ["(aa&&!aa?0:1)", "post_ternary", "wrap_condition", "&&", 4]
+// ["(aa&&!aa?0:1)", "post_t", "wrap_condition", "&&", 4]
 
             warn("wrap_condition", thing.expression[0]);
         }
@@ -8806,7 +8685,7 @@ function jslint_phase4_walk(state) {
         }
     }
 
-    function pre_b_binary(thing) {
+    function pre_b(thing) {
         let left;
         let right;
         let value;
@@ -8816,7 +8695,7 @@ function jslint_phase4_walk(state) {
             if (left.id === "NaN" || right.id === "NaN") {
 
 // test_cause:
-// ["NaN===NaN", "pre_b_binary", "number_isNaN", "===", 4]
+// ["NaN===NaN", "pre_b", "number_isNaN", "===", 4]
 
                 warn("number_isNaN", thing);
             } else if (left.id === "typeof") {
@@ -8824,7 +8703,7 @@ function jslint_phase4_walk(state) {
                     if (right.id !== "typeof") {
 
 // test_cause:
-// ["typeof 0===0", "pre_b_binary", "expected_string_a", "0", 12]
+// ["typeof 0===0", "pre_b", "expected_string_a", "0", 12]
 
                         warn("expected_string_a", right);
                     }
@@ -8835,7 +8714,7 @@ function jslint_phase4_walk(state) {
 // test_cause:
 // ["
 // typeof aa==="undefined"
-// ", "pre_b_binary", "unexpected_typeof_a", "undefined", 13]
+// ", "pre_b", "unexpected_typeof_a", "undefined", 13]
 
                         warn("unexpected_typeof_a", right, value);
                     } else if (
@@ -8849,7 +8728,7 @@ function jslint_phase4_walk(state) {
                     ) {
 
 // test_cause:
-// ["typeof 0===\"aa\"", "pre_b_binary", "expected_type_string_a", "aa", 12]
+// ["typeof 0===\"aa\"", "pre_b", "expected_type_string_a", "aa", 12]
 
                         warn("expected_type_string_a", right, value);
                     }
@@ -8927,7 +8806,7 @@ function jslint_phase4_walk(state) {
 // //     function active_function() { ... }
 // // }
 //
-//             parent = functionage.name.declared_scope;
+//             parent = functionage.name.parent;
 //             if (parent) {
 //
 // // Step 4: Look up the variable we are calling ("foo")
@@ -8960,8 +8839,8 @@ function jslint_phase4_walk(state) {
 //                 if (
 //                     left_variable !== undefined
 // // Probably deadcode.
-// // && !left_variable.alive
-//                     && left_variable.declared_scope === parent
+// // && !left_variable.live
+//                     && left_variable.parent === parent
 //                     && left_variable.calls !== undefined
 //                     && left_variable.calls[functionage.name.id] !== undefined
 //                 ) {
@@ -8970,7 +8849,7 @@ function jslint_phase4_walk(state) {
 // // false so JSLint won't raise an error for
 // // calling it before its line is executed.
 //
-//                     left_variable.alive = true;
+//                     left_variable.live = true;
 //                 }
 //             }
 //         }
@@ -9000,18 +8879,11 @@ function jslint_phase4_walk(state) {
         let the_variable;
         if (thing.name !== undefined) {
 
-// 3.for.1 - Mark 'declared', the for-variable, ???.
-// 3.for.2 - Mark 'alive', the for-variable, before for-block.
-// 3.for.4 - Mark 'out-of-scope', the for-variable, ???.
+// 3.for.1 - Mark 'initialized', the iterator-variable, in for-statement.
+// 3.for.2 - Mark 'out-of-scope', the iterator-variable, ???.
 
-            thing.name.alive = true;
-            the_variable = name_lookup(thing.name);
-            if (the_variable && !the_variable.readonly) {
-
-// 3.for.3 - Mark 'init', the for-variable, before for-block.
-
-                the_variable.init = true;
-            }
+            thing.name.live = true;
+            the_variable = name_lookup(thing.name, true);
             if (the_variable !== undefined) {
                 if (the_variable.init && the_variable.readonly) {
 
@@ -9043,10 +8915,10 @@ function jslint_phase4_walk(state) {
 
             warn("unexpected_a", thing);
         }
-        block_stack.push(blockage);
-        blockage = thing;
         function_stack.push(functionage);
+        block_stack.push(blockage);
         functionage = thing;
+        blockage = thing;
         if (thing.extra === "get") {
             if (thing.parameter_count !== 0) {
 
@@ -9087,37 +8959,37 @@ function jslint_phase4_walk(state) {
             }
             walk_expression(name.expression);
 
-// 4.par.2 - Mark 'alive', the function-parameter, after destructuring.
+// 4.par.1 - Mark 'initialized', the function-parameter, after destructuring.
 
-            name.alive = true;
+            name.live = true;
 
-// 4.par.4 - Mark 'out-of-scope', the function-parameter, after function-scope.
+// 4.par.2 - Mark 'out-of-scope', the function-parameter, after function-scope.
 
-            functionage.alive_list.push(name);
+            functionage.live_list.push(name);
         });
     }
 
     function pre_s_lbrace(thing) {
         block_stack.push(blockage);
         blockage = thing;
-        thing.alive_list = [];
+        thing.live_list = [];
     }
 
-    function pre_s_try(thing) {
-        if (thing.catch) {
+    function pre_try(thing) {
+        if (thing.catch !== undefined) {
 
 // Create new catch-scope for catch-parameter.
 
-            block_stack.push(blockage);
-            blockage = thing.catch;
+            catch_stack.push(catchage);
+            catchage = thing.catch;
         }
     }
 
-    function pre_v_var(thing) {
-        const the_variable = name_lookup(thing);
+    function pre_v(thing) {
+        const the_variable = name_lookup(thing, false);
         if (the_variable !== undefined) {
             thing.variable = the_variable;
-            the_variable.used = true;
+            the_variable.used += 1;
         }
     }
 
@@ -9232,13 +9104,13 @@ function jslint_phase4_walk(state) {
     preaction = action(pres);
     preamble = amble(pres);
     postaction("assignment", "+=", post_a_pluseq);
-    postaction("assignment", post_a_assignment);
+    postaction("assignment", post_a);
     postaction("binary", "&&", post_b_and);
     postaction("binary", "(", post_b_lparen);
     postaction("binary", "=>", post_s_function);
     postaction("binary", "[", post_b_lbracket);
     postaction("binary", "||", post_b_or);
-    postaction("binary", post_b_binary);
+    postaction("binary", post_b);
     postaction("statement", "const", post_s_var);
     postaction("statement", "export", post_s_export_toplevel);
     postaction("statement", "for", post_s_for);
@@ -9248,7 +9120,7 @@ function jslint_phase4_walk(state) {
     postaction("statement", "try", post_s_try);
     postaction("statement", "var", post_s_var);
     postaction("statement", "{", post_s_lbrace_pop_block);
-    postaction("ternary", post_ternary);
+    postaction("ternary", post_t);
     postaction("unary", "+", post_u_plus);
     postaction("unary", "function", post_s_function);
     postaction("unary", post_u);
@@ -9264,15 +9136,15 @@ function jslint_phase4_walk(state) {
     preaction("binary", "in", pre_b_in);
     preaction("binary", "instanceof", pre_b_instanceof);
     preaction("binary", "||", pre_b_or);
-    preaction("binary", pre_b_binary);
+    preaction("binary", pre_b);
     preaction("binary", pre_a_bitwise);
     preaction("statement", "for", pre_s_for);
     preaction("statement", "function", pre_s_function);
-    preaction("statement", "try", pre_s_try);
+    preaction("statement", "try", pre_try);
     preaction("statement", "{", pre_s_lbrace);
     preaction("unary", "function", pre_s_function);
     preaction("unary", "~", pre_a_bitwise);
-    preaction("variable", pre_v_var);
+    preaction("variable", pre_v);
 
     walk_statement(state.token_tree);
 }
@@ -9283,9 +9155,9 @@ function jslint_phase5_whitage(state) {
 
     const {
         artifact,
-        block_list,
-        block_stack,
+        catch_list,
         function_list,
+        function_stack,
         option_dict,
         test_cause,
         token_global,
@@ -9360,7 +9232,7 @@ function jslint_phase5_whitage(state) {
     function delve(the_function) {
         Object.keys(the_function.context).forEach(function (id) {
             const name = the_function.context[id];
-            if (id !== "ignore" && name.declared_scope === the_function) {
+            if (id !== "ignore" && name.parent === the_function) {
 
 // test_cause:
 // ["function aa(aa) {return aa;}", "delve", "id", "", 0]
@@ -9474,7 +9346,7 @@ function jslint_phase5_whitage(state) {
 
 // If right is a closer, then pop the previous state.
 
-        indentage = jslint_assert_and_pop(block_stack, "block_stack");
+        indentage = function_stack.pop();
         closer = indentage.closer;
         free = indentage.free;
         margin = indentage.margin;
@@ -9787,7 +9659,7 @@ function jslint_phase5_whitage(state) {
             open,
             opening
         };
-        block_stack.push(indentage);
+        function_stack.push(indentage);
 
 // Commit 3903449a - Cleanup indent for multiline-method-chaining.
 
@@ -9874,7 +9746,7 @@ function jslint_phase5_whitage(state) {
 // PR-502 - tighten warning of unused variables to be always on.
 
     delve(token_global);
-    block_list.forEach(delve);
+    catch_list.forEach(delve);
     function_list.forEach(delve);
     if (option_dict.white) {
         return;
@@ -9911,10 +9783,10 @@ function jslint_phase5_whitage(state) {
             }
         }
         nr_comments_skipped = 0;
-        delete left.alive;
         delete left.calls;
         delete left.free;
         delete left.init;
+        delete left.live;
         delete left.open;
         delete left.used;
         left = right;
@@ -10474,7 +10346,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         html += detail("variable", list.filter(function (id) {
             return (
                 context[id].role === "variable"
-                && context[id].declared_scope === the_function
+                && context[id].parent === the_function
             );
         }));
         html += detail("exception", list.filter(function (id) {
@@ -10483,17 +10355,17 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         html += detail("closure", list.filter(function (id) {
             return (
                 context[id].closure === true
-                && context[id].declared_scope === the_function
+                && context[id].parent === the_function
             );
         }));
         html += detail("outer", list.filter(function (id) {
             return (
-                context[id].declared_scope.id !== "(global)"
-                && context[id].declared_scope !== the_function
+                context[id].parent !== the_function
+                && context[id].parent.id !== "(global)"
             );
         }));
         html += detail(module, list.filter(function (id) {
-            return context[id].declared_scope.id === "(global)";
+            return context[id].parent.id === "(global)";
         }));
         html += detail("label", list.filter(function (id) {
             return context[id].role === "label";
@@ -11880,10 +11752,9 @@ function sentinel() {}
                 processArgv0,
                 processArgv.slice(1),
                 {
-                    env: {
-                        ...process.env,
+                    env: Object.assign({}, process.env, {
                         NODE_V8_COVERAGE: coverageDir
-                    },
+                    }),
 
 // PR-465
 // https://nodejs.org/en/blog/vulnerability/april-2024-security-releases-2
@@ -12115,40 +11986,35 @@ function sentinel() {}
 
 // Export jslint as cjs/esm.
 
-jslint_export = Object.freeze(
-    Object.assign(
-        jslint,
-        {
-            assertErrorThrownAsync,
-            assertJsonEqual,
-            assertOrThrow,
-            debugInline,
-            fsWriteFileWithParents,
-            globExclude,
-            htmlEscape,
-            jslint,
-            jslint_apidoc,
-            jslint_assert,
-            jslint_charset_ascii,
-            jslint_cli,
-            jslint_edition,
-            jslint_phase1_split,
-            jslint_phase2_lex,
-            jslint_phase3_parse,
-            jslint_phase4_walk,
-            jslint_phase5_whitage,
-            jslint_report,
-            jstestDescribe,
-            jstestIt,
-            jstestOnExit,
-            moduleFsInit,
-            noop,
-            objectDeepCopyWithKeysSorted,
-            v8CoverageListMerge,
-            v8CoverageReportCreate
-        }
-    )
-);
+jslint_export = Object.freeze(Object.assign(jslint, {
+    assertErrorThrownAsync,
+    assertJsonEqual,
+    assertOrThrow,
+    debugInline,
+    fsWriteFileWithParents,
+    globExclude,
+    htmlEscape,
+    jslint,
+    jslint_apidoc,
+    jslint_assert,
+    jslint_charset_ascii,
+    jslint_cli,
+    jslint_edition,
+    jslint_phase1_split,
+    jslint_phase2_lex,
+    jslint_phase3_parse,
+    jslint_phase4_walk,
+    jslint_phase5_whitage,
+    jslint_report,
+    jstestDescribe,
+    jstestIt,
+    jstestOnExit,
+    moduleFsInit,
+    noop,
+    objectDeepCopyWithKeysSorted,
+    v8CoverageListMerge,
+    v8CoverageReportCreate
+}));
 // module.exports = jslint_export;              // Export jslint as cjs.
 export default Object.freeze(jslint_export);    // Export jslint as esm.
 jslint_import_meta_url = import.meta.url;

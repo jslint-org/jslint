@@ -9,9 +9,6 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.7.1-beta
-- jslint - Move catch-variable from its special-scope into lexical-scope.
-- jslint - Add lexical-scope to internal-function jslint_phase3_parse().
-- jslint-ecma - Add ES2015-feature for..of.
 - jslint - Expand built-in-globals for browser, ecma, and node - auto-generated from online-sources.
 - jslint-ci - Add automated ci for shellcheck to lint shell-scripts.
 - jslint-regression - Cleanup indent for multiline-method-chaining.

@@ -809,12 +809,6 @@ function aa(bb) {
     for (bb = 0; bb < 0; bb += 1) {
         bb();
     }
-    for (const bb in bb) { //jslint-ignore-line
-        bb();
-    }
-    for (const bb of bb) { //jslint-ignore-line
-        bb();
-    }
 }
 aa();
                 `)

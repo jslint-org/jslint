@@ -112,11 +112,10 @@ echo "\
                     "sh", file + ".sh"
                 ],
                 {
-                    env: {
+                    env: Object.assign({
                         // limit stdout to xxx lines
-                        SH_RUN_WITH_SCREENSHOT_TXT_MAX_LINES: 64,
-                        ...process.env
-                    },
+                        SH_RUN_WITH_SCREENSHOT_TXT_MAX_LINES: 64
+                    }, process.env),
                     stdio: ["ignore", 1, 2]
                 }
             ).on("exit", resolve);
