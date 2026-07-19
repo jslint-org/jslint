@@ -4400,7 +4400,7 @@ function jslint_phase3_parse(state) {
 //          "naked"     No advance.
 //          undefined   An ordinary block.
 
-        let stmts;
+        let parsed_block;
         let the_block;
         if (special !== "naked") {
             advance("{");
@@ -4424,9 +4424,9 @@ function jslint_phase3_parse(state) {
             advance("(string)");
             semicolon();
         }
-        stmts = parse_statements();
-        the_block.block = stmts;
-        if (stmts.length === 0) {
+        parsed_block = parse_statement_block();
+        the_block.block = parsed_block;
+        if (parsed_block.length === 0) {
             if (!option_dict.devel && special !== "ignore") {
 
 // test_cause:
@@ -4436,7 +4436,7 @@ function jslint_phase3_parse(state) {
             }
             the_block.disrupt = false;
         } else {
-            the_block.disrupt = stmts[stmts.length - 1].disrupt;
+            the_block.disrupt = parsed_block[parsed_block.length - 1].disrupt;
         }
         blockage = block_stack_pop(block_stack);
         advance("}");
@@ -5464,7 +5464,49 @@ function jslint_phase3_parse(state) {
         }
     }
 
-    function parse_statement() {
+    function parse_statement_block() {
+
+// Parse a list of statements. Give a warning if an unreachable statement
+// follows a disruptive statement.
+
+        const statement_list = [];
+        let a_statement;
+        let disrupt = false;
+
+// Parse/loop each statement until a statement-terminator is reached.
+
+        while (true) {
+            switch (token_nxt.id) {
+            case "(end)":
+            case "case":
+            case "default":
+            case "else":
+            case "}":
+
+// test_cause:
+// [";", "parse_statement_block", "closer", "", 0]
+// ["case", "parse_statement_block", "closer", "", 0]
+// ["default", "parse_statement_block", "closer", "", 0]
+// ["else", "parse_statement_block", "closer", "", 0]
+// ["}", "parse_statement_block", "closer", "", 0]
+
+                test_cause("closer");
+                return statement_list;
+            }
+            a_statement = parse_statement_single();
+            statement_list.push(a_statement);
+            if (disrupt) {
+
+// test_cause:
+// ["while(0){break;0}", "parse_statement_block", "unreachable_a", "0", 16]
+
+                warn("unreachable_a", a_statement);
+            }
+            disrupt = a_statement.disrupt;
+        }
+    }
+
+    function parse_statement_single() {
 
 // Parse a statement. Any statement may have a label, but only four statements
 // have use for one. A statement can be one of the standard statements, or
@@ -5480,7 +5522,7 @@ function jslint_phase3_parse(state) {
             if (the_label.id === "ignore") {
 
 // test_cause:
-// ["ignore:", "parse_statement", "unexpected_a", "ignore", 1]
+// ["ignore:", "parse_statement_single", "unexpected_a", "ignore", 1]
 
                 warn("unexpected_a", the_label);
             }
@@ -5492,10 +5534,10 @@ function jslint_phase3_parse(state) {
             case "while":
 
 // test_cause:
-// ["aa:do", "parse_statement", "label", "do", 0]
-// ["aa:for", "parse_statement", "label", "for", 0]
-// ["aa:switch", "parse_statement", "label", "switch", 0]
-// ["aa:while", "parse_statement", "label", "while", 0]
+// ["aa:do", "parse_statement_single", "label", "do", 0]
+// ["aa:for", "parse_statement_single", "label", "for", 0]
+// ["aa:switch", "parse_statement_single", "label", "switch", 0]
+// ["aa:while", "parse_statement_single", "label", "while", 0]
 
                 test_cause("label", token_nxt.id);
                 name_declare(
@@ -5516,7 +5558,7 @@ function jslint_phase3_parse(state) {
 // 5.lab.2 - Mark 'alive', the label-statement, before control-flow-block.
 
                 the_label.alive = true;
-                the_statement = parse_statement();
+                the_statement = parse_statement_single();
 
 // 5.lab.4 - Mark 'out-of-scope', the label-statement, after control-flow-block.
 
@@ -5528,12 +5570,12 @@ function jslint_phase3_parse(state) {
             default:
 
 // test_cause:
-// ["()=>{aa:0}", "parse_statement", "unexpected_label_a", "aa", 6]
-// [";{aa:0}", "parse_statement", "unexpected_label_a", "aa", 3]
-// ["aa:", "parse_statement", "unexpected_label_a", "aa", 1]
-// ["aa:0", "parse_statement", "unexpected_label_a", "aa", 1]
-// ["aa:0?0:0", "parse_statement", "unexpected_label_a", "aa", 1]
-// ["aa:bb:0", "parse_statement", "unexpected_label_a", "aa", 1]
+// ["()=>{aa:0}", "parse_statement_single", "unexpected_label_a", "aa", 6]
+// [";{aa:0}", "parse_statement_single", "unexpected_label_a", "aa", 3]
+// ["aa:", "parse_statement_single", "unexpected_label_a", "aa", 1]
+// ["aa:0", "parse_statement_single", "unexpected_label_a", "aa", 1]
+// ["aa:0?0:0", "parse_statement_single", "unexpected_label_a", "aa", 1]
+// ["aa:bb:0", "parse_statement_single", "unexpected_label_a", "aa", 1]
 
                 warn("unexpected_label_a", the_label);
                 advance();
@@ -5565,7 +5607,7 @@ function jslint_phase3_parse(state) {
             if (the_statement.wrapped && the_statement.id !== "(") {
 
 // test_cause:
-// ["(0)", "parse_statement", "unexpected_a", "(", 1]
+// ["(0)", "parse_statement_single", "unexpected_a", "(", 1]
 
                 warn("unexpected_a", first);
             }
@@ -5573,48 +5615,6 @@ function jslint_phase3_parse(state) {
         }
         functionage.statement_prv = the_statement;
         return the_statement;
-    }
-
-    function parse_statements() {
-
-// Parse a list of statements. Give a warning if an unreachable statement
-// follows a disruptive statement.
-
-        const statement_list = [];
-        let a_statement;
-        let disrupt = false;
-
-// Parse/loop each statement until a statement-terminator is reached.
-
-        while (true) {
-            switch (token_nxt.id) {
-            case "(end)":
-            case "case":
-            case "default":
-            case "else":
-            case "}":
-
-// test_cause:
-// [";", "parse_statements", "closer", "", 0]
-// ["case", "parse_statements", "closer", "", 0]
-// ["default", "parse_statements", "closer", "", 0]
-// ["else", "parse_statements", "closer", "", 0]
-// ["}", "parse_statements", "closer", "", 0]
-
-                test_cause("closer");
-                return statement_list;
-            }
-            a_statement = parse_statement();
-            statement_list.push(a_statement);
-            if (disrupt) {
-
-// test_cause:
-// ["while(0){break;0}", "parse_statements", "unreachable_a", "0", 16]
-
-                warn("unreachable_a", a_statement);
-            }
-            disrupt = a_statement.disrupt;
-        }
     }
 
     function postassign(id) {
@@ -6745,7 +6745,7 @@ function jslint_phase3_parse(state) {
 // ["export function aa(){}", "stmt_export", "freeze_exports", "function", 8]
 
                 warn("freeze_exports");
-                the_thing = parse_statement();
+                the_thing = parse_statement_single();
                 the_name = the_thing.name;
                 the_id = the_name.id;
                 the_name.used = true;
@@ -6774,7 +6774,7 @@ function jslint_phase3_parse(state) {
 // ["export var", "stmt_export", "unexpected_a", "var", 8]
 
                 warn("unexpected_a");
-                parse_statement();
+                parse_statement_single();
             } else if (token_nxt.id === "{") {
 
 // test_cause:
@@ -6929,7 +6929,7 @@ function jslint_phase3_parse(state) {
             the_else = token_now;
             the_if.else = (
                 token_nxt.id === "if"
-                ? parse_statement()
+                ? parse_statement_single()
                 : block()
             );
 
@@ -7151,7 +7151,7 @@ function jslint_phase3_parse(state) {
         let dups = [];
         let exp;
         let last;
-        let stmts;
+        let parsed_block;
         let the_case;
         let the_default;
         let the_disrupt = true;
@@ -7225,8 +7225,8 @@ function jslint_phase3_parse(state) {
 // ", "check_ordered_case", "expected_a_b_before_c_d", "aa", 24]
 
             check_ordered_case(the_case.expression);
-            stmts = parse_statements();
-            if (stmts.length < 1) {
+            parsed_block = parse_statement_block();
+            if (parsed_block.length < 1) {
 
 // test_cause:
 // ["
@@ -7240,9 +7240,9 @@ function jslint_phase3_parse(state) {
 
                 break;
             }
-            the_case.block = stmts;
+            the_case.block = parsed_block;
             the_cases.push(the_case);
-            last = stmts[stmts.length - 1];
+            last = parsed_block[parsed_block.length - 1];
             if (last.disrupt) {
                 if (last.id === "break" && last.label === undefined) {
                     the_disrupt = false;
@@ -7283,7 +7283,7 @@ function jslint_phase3_parse(state) {
             advance("default");
             token_now.switch = true;
             advance(":");
-            the_switch.else = parse_statements();
+            the_switch.else = parse_statement_block();
             if (the_switch.else.length < 1) {
 
 // test_cause:
@@ -7918,7 +7918,7 @@ function jslint_phase3_parse(state) {
         advance("(string)");
         semicolon();
     }
-    state.token_tree = parse_statements();
+    state.token_tree = parse_statement_block();
     advance("(end)");
 
 // Check global functions are ordered.
