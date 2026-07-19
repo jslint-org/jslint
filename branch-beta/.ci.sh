@@ -1,5 +1,10 @@
 #!/bin/sh
 
+# sh one-liner
+: '
+sh jslint_ci.sh shCiJslintGlobalDictAllFetch
+'
+
 shCiArtifactUploadCustom() {(set -e
 # this function will run custom-code to upload build-artifacts
     # .github_cache - restore
@@ -295,6 +300,179 @@ import moduleFs from "fs";
     fi
     # run test with coverage-report
     npm run test
+)}
+
+shCiJslintGlobalDictAllFetch() {(set -e
+# this function will fetch list of common, javascript global-objects
+# from online-resources.
+    node --input-type=module --eval '
+import moduleFs from "fs";
+function nameOk(name, deprecatedText, minLength) {
+    const deprecatedList = [
+        "atob",
+        "btoa"
+    ];
+    return (
+        !deprecatedList.includes(name)
+        && !(
+            /(?:deprecated|experimental|non-standard)_inline/i
+        ).test(deprecatedText)
+        && !new RegExp(`^[a-z].{0,${minLength - 1}}$`).test(name)
+    );
+}
+function objectDeepCopyWithKeysSorted(obj) {
+
+// This function will recursively deep-copy <obj> with keys sorted.
+
+    let sorted;
+    if (typeof obj !== "object" || !obj) {
+        return obj;
+    }
+
+// Recursively deep-copy list with child-keys sorted.
+
+    if (Array.isArray(obj)) {
+        return obj.map(objectDeepCopyWithKeysSorted);
+    }
+
+// Recursively deep-copy obj with keys sorted.
+
+    sorted = Object.create(null);
+    Object.keys(obj).sort().forEach(function (key) {
+        sorted[key] = objectDeepCopyWithKeysSorted(obj[key]);
+    });
+    return sorted;
+}
+(async function () {
+    const dictAll = Object.create(null);
+    const promiseList = [];
+    let result;
+    promiseList.push(async function () {
+        const dict = Object.create(null);
+        let response;
+        dictAll.ecma_auto = dict;
+        response = await fetch(
+"https://raw.githubusercontent.com/mdn/content/main/files/en-us/web/javascript/reference/global_objects/index.md" //jslint-ignore-line
+        );
+        response = await response.text();
+        response.replace((
+            /^- \{\{jsxref\("(\w+?)["(](.*?)$/gm
+        ), function (ignore, name, deprecated) {
+            dict[name] = nameOk(name, deprecated, 0);
+            return "";
+        });
+    }());
+    promiseList.push(async function () {
+        const dict = Object.create(null);
+        const dictBrowserNode = Object.create(null);
+        let response;
+        dictAll.node_auto = dict;
+        dictAll.browser_auto_node = dictBrowserNode;
+        response = await fetch(
+"https://raw.githubusercontent.com/nodejs/node/v24.x/doc/api/globals.md" //jslint-ignore-line
+        );
+        response = await response.text();
+        response.replace((
+            /^## (?:Class: )?`(\w+?)\W/gm //`
+        ), function (ignore, name) {
+            dict[name] = (
+                nameOk(name, "", 4)
+                // && Object.hasOwn(globalThis, name)
+            );
+            return "";
+        });
+        response.replace((
+            /^\* \[`(\w+?)\W/gm //`
+        ), function (ignore, name) {
+            dict[name] = nameOk(name, "", 4);
+            return "";
+        });
+        response = await fetch(
+"https://api.github.com/repos/mdn/content/git/trees/main?recursive=1" //jslint-ignore-line
+        );
+        response = await response.json();
+        response = response.tree.map(function ({path}) {
+            return path;
+        });
+        response = JSON.stringify(response);
+        await Promise.all(Object.keys(dict).map(async function (name) {
+            let response2;
+            dictBrowserNode[name] = false;
+            if (!nameOk(name, "", 4)) {
+                return;
+            }
+            response2 = new RegExp(
+                `"files/en-us/web/api/(?:window/)?`
+                + name.toLowerCase()
+                + `/index.md"`
+            ).exec(response);
+            if (!response2) {
+                return;
+            }
+            response2 = await fetch(
+                "https://raw.githubusercontent.com/mdn/content/main/"
+                + response2[0].slice(1, -1)
+            );
+            response2 = await response2.text();
+            if (!(/\{\{deprecated_header\}\}/).test(response2)) {
+                dictBrowserNode[name] = true;
+            }
+        }));
+    }());
+    await Promise.all(promiseList);
+    Object.entries(dictAll).forEach(function ([dictName, dict]) {
+        Object.keys(dict).forEach(function (name) {
+            let val;
+            if (dictName !== "ecma_auto" && dictAll.ecma_auto[name]) {
+                delete dict[name];
+            }
+            if (dictName === "node_auto") {
+                val = ["----", "----"];
+                if (dict[name]) {
+                    val[0] = "node";
+                }
+                if (dictAll.browser_auto_node[name]) {
+                    val[1] = "brow";
+                }
+                dict[name] = val.join(" ");
+            }
+        });
+    });
+    delete dictAll.browser_auto_node;
+    result = await moduleFs.promises.readFile("jslint.mjs", "utf8");
+    result = result.replace(
+        new RegExp(String(`
+(// jslint_global_dict_all - auto-generated - start.
+
+)[\\S\\s]*?(
+
+// jslint_global_dict_all - auto-generated - end.)
+        `).trim()),
+        (
+            "$1    "
+            + JSON.stringify(
+                objectDeepCopyWithKeysSorted(dictAll),
+                undefined,
+                4
+            )
+                .slice(1, -1)
+                .trim()
+                .replace((
+                    /^( *?".*?": )(".*?")/gm
+                ), function (ignore, name, val) {
+                    return (
+                        name
+                        + " ".repeat(Math.max(0, 40 - name.length))
+                        + val
+                    );
+                })
+            + "$2"
+        )
+    );
+    await moduleFs.promises.writeFile("jslint.mjs", result);
+}());
+' # '
+    git --no-pager diff
 )}
 
 shCiPublishNpmCustom() {(set -e
