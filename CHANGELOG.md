@@ -2,11 +2,10 @@
 
 # Todo
 - jslint - Rename token-property for variables '.init' to '.assigned', to improve readability.
-- jslint - Rename internal variable 'blockage' to 'block_scope', 'functionage' to 'function_scope', to imporove readability.
 - jslint - Change warning 'uninitialized_a' to 'unassigned_variable_a'.
 - jslint - Change warning 'out_of_scope_a' to 'temporal_dead_zone_a'.
 - jslint - Add warning and tdz for function-declaration inside block-scope.
-- jslint - Add implicit block-scope for:
+- jslint - Add implicit scope_block for:
     - if-else
     - for-loop
         - for-semicolon
@@ -22,14 +21,17 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.7.1-beta
-- jslint - Change scope from function-scope to block-scope:
+- jslint - Change scope from scope_function to scope_block:
     - const-declaration
     - let-declaration
     - function-declaration
-- jslint - Restrict scope from function-scope to its own function-body:
+- jslint - Restrict scope from scope_function to its own function-body:
     - named-function-expression
-- jslint - Change scope from special-catch-scope to block-scope:
+- jslint - Change scope from special-catch-scope to scope_block:
     - catch-variable
+- jslint - Rename internal scope-variables to imporove readability of scope-logic:
+    - 'blockage' to 'scope_block'
+    - 'functionage' to 'scope_function'
 - jslint - Add block-scope to internal-function jslint_phase3_parse().
 - jslint-ecma - Add ES2015-feature for..of.
 - jslint - Expand built-in-globals for browser, ecma, and node - auto-generated from online-sources.
