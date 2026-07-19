@@ -96,7 +96,6 @@
     NODE_V8_COVERAGE,
     a,
     alive,
-    alive_list,
     all,
     argv,
     arity,
@@ -1112,7 +1111,6 @@ function jslint(
     const syntax_dict = empty();        // The object containing the parser.
     const tenure = empty();     // The predefined property registry.
     const token_global = {      // The global object; the outermost context.
-        alive_list: [],
         async: 0,
         body: true,
         context: empty(),
@@ -1725,6 +1723,8 @@ function jslint(
         case "wrap_unary":
             mm = `Wrap the unary expression in parens.`;
             break;
+        //!! default:
+            //!! jslint_assert(undefined, `warning_code=${code}`);
         }
 
 // Validate mm.
@@ -5064,7 +5064,6 @@ function jslint_phase3_parse(state) {
 // 2.fun.1 - Mark 'declared', the function-name, during function-declaration.
 // 2.fun.2 - Mark 'alive', the function-name, during function-declaration.
 // 2.fun.3 - Mark 'init', the function-name, during function-declaration.
-// 2.fun.4 - Mark 'out-of-scope', the function-name, after function-body.
 //
 // 3.cat.1 - Mark 'declared', the catch-variable, before catch-block.
 // 3.cat.2 - Mark 'alive', the catch-variable, before catch-block.
@@ -5073,7 +5072,6 @@ function jslint_phase3_parse(state) {
 // 3.for.1 - Mark 'declared', the for-variable, ???.
 // 3.for.2 - Mark 'alive', the for-variable, before for-block.
 // 3.for.3 - Mark 'init', the for-variable, before for-block.
-// 3.for.4 - Mark 'out-of-scope', the for-variable, ???.
 //
 // 3.glo.1 - Mark 'declared', the global-variable, immediately.
 // 3.glo.2 - Mark 'alive', the global-variable, immediately.
@@ -5083,7 +5081,6 @@ function jslint_phase3_parse(state) {
 // 3.var.2 - Mark 'alive', the variable, after variable-declaration.
 // 3.var.3 - Mark 'init', the variable, after assignment.
 // 3.var.3 - Mark 'init', the variable, during variable-declaration.
-// 3.var.4 - Mark 'out-of-scope', the variable, after block-scope.
 //
 // 4.par.1 - Mark 'declared', the function-parameter, during destructuring.
 // 4.par.1 - Mark 'declared', the function-parameter, if unwrapped.
@@ -5093,6 +5090,7 @@ function jslint_phase3_parse(state) {
 // 5.lab.1 - Mark 'declared', the label-statement, before control-flow-block.
 // 5.lab.2 - Mark 'alive', the label-statement, before control-flow-block.
 // 5.lab.3 - Mark 'init', the label-statement, before control-flow-block.
+// 5.lab.4 - Mark 'out-of-scope', the label-statement, after control-flow-block.
 
         let earlier;
         let id = name.id;
@@ -5121,23 +5119,20 @@ function jslint_phase3_parse(state) {
             warn("reserved_a", name);
             return;
         }
+        block_stack.some(function (blockage, ii) {
+            earlier = blockage.context[id];
+            if (earlier && ii === 0) {
 
 // Has the name been declared in this context?
 
-        earlier = declared_scope.context[id];
-        if (earlier) {
-
 // test_cause:
-// ["let aa;let aa", "name_declare", "redefinition_a_b", "1", 12]
+// ["let aa;(function aa(){})", "name_declare", "scope_current", "aa", 0]
+// ["let aa;function aa(){}", "name_declare", "scope_current", "aa", 0]
+// ["let aa;let aa", "name_declare", "scope_current", "aa", 0]
 
-            warn("redefinition_a_b", name, id, earlier.line);
-            return;
-        }
-
-// Has the name been declared in an outer context?
-
-        block_stack.some(function (blockage) {
-            earlier = blockage.context[id];
+                test_cause("scope_current", id);
+                warn("redefinition_a_b", name, id, earlier.line);
+            }
             return earlier;
         });
 
@@ -5152,8 +5147,9 @@ function jslint_phase3_parse(state) {
             if (earlier.role === "variable") {
 
 // test_cause:
-// ["let ignore;(ignore)=>0", "name_declare", "redefinition_a_b", "1", 13]
+// ["let ignore;(ignore)=>0", "name_declare", "ignore", "ignore", 0]
 
+                test_cause("ignore", id);
                 warn("redefinition_a_b", name, id, earlier.line);
             }
             return;
@@ -5167,9 +5163,10 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["
 // function aa(){try{aa();}catch(aa){aa();}}
-// ", "name_declare", "redefinition_a_b", "1", 31]
-// ["function aa(){var aa}", "name_declare", "redefinition_a_b", "1", 19]
+// ", "name_declare", "scope_outer", "aa", 0]
+// ["function aa(){var aa}", "name_declare", "scope_outer", "aa", 0]
 
+            test_cause("scope_outer", id);
             warn("redefinition_a_b", name, id, earlier.line);
             return;
         }
@@ -5511,6 +5508,10 @@ function jslint_phase3_parse(state) {
 
                 the_label.alive = true;
                 the_statement = parse_statement();
+
+// 5.lab.4 - Mark 'out-of-scope', the label-statement, after control-flow-block.
+
+                the_label.alive = false;
                 functionage.statement_prv = the_statement;
                 the_statement.label = the_label;
                 the_statement.statement = true;
@@ -5968,8 +5969,13 @@ function jslint_phase3_parse(state) {
 
     function prefix_function(the_function, mode_fart, mode_fart_unwrapped) {
         const name = !mode_fart && token_nxt.identifier && token_nxt;
+
+// PR-xxx - Change scope from function-scope to block-scope:
+// - function-declaration
+
+        let declared_scope = blockage;
+        let role = "variable";
         the_function = the_function || token_now;
-        the_function.alive_list = [];
         if (mode_fart) {
             the_function.arity = "binary";
         }
@@ -5985,6 +5991,16 @@ function jslint_phase3_parse(state) {
                 return stop("expected_identifier_a", token_nxt);
             }
             name.calls = empty();
+        } else if (name) {
+
+// A function expression may have an optional name.
+
+// PR-xxx - Restrict scope from function-scope to its own function-body:
+// - named-function-expression
+
+            declared_scope = the_function;
+            name.used = true;
+            the_function.context = empty();
         }
         if (name) {
             advance();
@@ -5992,17 +6008,8 @@ function jslint_phase3_parse(state) {
 
 // 2.fun.1 - Mark 'declared', the function-name, during function-declaration.
 
-                functionage,            // declared_scope
-                //!! (                       // declared_scope
-                    //!! the_function.arity === "statement"
-                    //!! ? functionage
-                    //!! : the_function
-                //!! ),
-                (                       // role
-                    the_function.arity === "statement"
-                    ? "variable"
-                    : "function"
-                ),
+                declared_scope,         // declared_scope
+                role,                   // role
                 false,                  // readonly
                 [],                     // name_list
                 name,                   // name
@@ -6015,13 +6022,6 @@ function jslint_phase3_parse(state) {
 // 2.fun.2 - Mark 'alive', the function-name, during function-declaration.
 
             name.alive = true;
-            if (the_function.arity !== "statement") {
-
-// 2.fun.4 - Mark 'out-of-scope', the function-name, after function-body.
-
-                the_function.alive_list.push(name);
-                name.used = true;
-            }
         }
 
 // Give the function properties for storing its names and for observing the
@@ -7362,6 +7362,9 @@ function jslint_phase3_parse(state) {
 
 // 3.cat.1 - Mark 'declared', the catch-variable, before catch-block.
 
+// PR-xxx - Change scope from special-catch-scope to block-scope:
+// - catch-variable
+
                         blockage,       // declared_scope
                         "exception",    // role
                         true,           // readonly
@@ -7412,9 +7415,18 @@ function jslint_phase3_parse(state) {
     }
 
     function stmt_var() {
+        const declared_scope = (
+            token_now.id === "var"
+            ? functionage
+
+// PR-xxx - Change scope from function-scope to block-scope:
+// - const-declaration
+// - let-declaration
+
+            : blockage
+        );
         const readonly = token_now.id === "const";
         const the_variable = token_now;
-        let declared_scope = functionage;
         let name;
         let variable_prv;
         the_variable.name_list = [];    // 5. name_list for "let [aa] = ..."
@@ -7457,11 +7469,6 @@ function jslint_phase3_parse(state) {
 
             test_cause("var_prv", functionage.statement_prv.id);
             variable_prv = functionage.statement_prv;
-            //!! declared_scope = (
-                //!! variable_prv === "var"
-                //!! ? functionage
-                //!! : blockage
-            //!! );
             break;
         case "import":
 
@@ -7531,7 +7538,7 @@ function jslint_phase3_parse(state) {
 
 // 3.var.1 - Mark 'declared', the variable, during variable-declaration.
 
-                    functionage,        // declared_scope
+                    declared_scope,     // declared_scope
                     "variable",         // role
                     readonly,           // readonly
                     the_variable.name_list,     // name_list
@@ -8054,64 +8061,67 @@ function jslint_phase4_walk(state) {
             return;
         }
 
-// Look up the variable in the current context.
+// Look up the variable, from current-scope, moving up the scope-chain.
 
-        the_variable = blockage.context[id];
+        block_stack.some(function (blockage, ii) {
+            the_variable = blockage.context[id];
+            if (the_variable && ii > 0) {
 
-// If it isn't local, search all the other contexts. If there are name
-// collisions, take the most recent.
+// If found outside current-scope, mark as closure.
 
-        if (!the_variable) {
-            block_stack.some(function (blockage) {
-                the_variable = blockage.context[id];
-                return the_variable;
-            });
-            if (!the_variable && !global_dict[id]) {
+                the_variable.closure = true;
+            }
+            return the_variable;
+        });
+        if (!the_variable && !global_dict[id]) {
 
 // test_cause:
+// ["(function aa(){})aa", "name_lookup", "undeclared_a", "aa", 18]
 // ["aa", "name_lookup", "undeclared_a", "aa", 1]
 // ["class aa{}", "name_lookup", "undeclared_a", "aa", 7]
+// ["function aa(){function bb(){}}bb", "name_lookup", "undeclared_a", "bb", 31]
+// ["function aa(){var bb}bb", "name_lookup", "undeclared_a", "bb", 22]
+// ["if(0){const aa=0}aa", "name_lookup", "undeclared_a", "aa", 18]
+// ["if(0){function aa(){}}aa", "name_lookup", "undeclared_a", "aa", 23]
+// ["if(0){let aa}aa", "name_lookup", "undeclared_a", "aa", 14]
 // ["try{}catch(aa){}aa", "name_lookup", "undeclared_a", "aa", 17]
 
-                warn("undeclared_a", thing);
-                return;
-            }
+//!! // ["aa:while(0){}aa", "name_lookup", "undeclared_a", "aa", 14]
+
+            warn("undeclared_a", thing);
+            return;
+        }
 
 // If it isn't in any of those either, perhaps it is a predefined global.
 // If so, add it to the global context.
 
-            if (!the_variable) {
-                the_variable = {
+        if (!the_variable) {
+            the_variable = {
 
 // 3.glo.2 - Mark 'alive', the global-variable, immediately.
 
-                    alive: true,
-                    declared_scope: token_global,
-                    id,
+                alive: true,
+                declared_scope: token_global,
+                id,
 
 // 3.glo.3 - Mark 'init', the global-variable, immediately.
 
-                    init: true,
-                    readonly: true,
-                    role: "variable"
-                };
-                token_global.context[id] = the_variable;
-            }
-            the_variable.closure = true;
+                init: true,
+                readonly: true,
+                role: "variable"
+            };
 
 // 3.glo.1 - Mark 'declared', the global-variable, immediately.
 
             token_global.context[id] = the_variable;
         }
-        if (the_variable?.role === "label") {
+        if (the_variable.role === "label") {
 
 // test_cause:
 // ["aa:while(0){aa}", "name_lookup", "label_a", "aa", 13]
 
             warn("label_a", thing);
-            return the_variable;
-        }
-        if (
+        } else if (
             (
                 !the_variable.calls
                 || !functionage.name
@@ -8124,8 +8134,6 @@ function jslint_phase4_walk(state) {
 
 // test_cause:
 // ["(aa=aa)=>0", "name_lookup", "out_of_scope_a", "aa", 5]
-// ["(function aa(){})aa", "name_lookup", "out_of_scope_a", "aa", 18]
-// ["if(0){let aa}aa", "name_lookup", "out_of_scope_a", "aa", 14]
 // ["let [aa]=aa", "name_lookup", "out_of_scope_a", "aa", 10]
 // ["let aa=()=>aa", "name_lookup", "out_of_scope_a", "aa", 12]
 // ["let aa=aa", "name_lookup", "out_of_scope_a", "aa", 8]
@@ -8565,10 +8573,6 @@ function jslint_phase4_walk(state) {
     }
 
     function post_s_lbrace_pop_block() {
-        blockage?.alive_list?.forEach(function (name) {
-            name.alive = false;
-        });
-        delete blockage.alive_list;
         blockage = block_stack_pop(block_stack);
     }
 
@@ -8577,7 +8581,7 @@ function jslint_phase4_walk(state) {
 
 // Recurse walk_statement().
 
-            walk_statement(thing?.catch?.block);
+            walk_statement(thing.catch.block);
 
 // Restore previous catch-scope after catch-block.
 
@@ -8608,15 +8612,6 @@ function jslint_phase4_walk(state) {
 // 3.var.2 - Mark 'alive', the variable, after variable-declaration.
 
             name.alive = true;
-            switch (thing.id) {
-            case "const":
-            case "let":
-
-// 3.var.4 - Mark 'out-of-scope', the variable, after block-scope.
-
-                blockage.alive_list.push(name);
-                break;
-            }
         });
     }
 
@@ -8861,100 +8856,6 @@ function jslint_phase4_walk(state) {
         warn("unexpected_a", thing);
     }
 
-// PR-502 - Probably deadcode.
-
-//     function pre_b_lparen(thing) {
-//
-// // This function runs right before the parser handles a "(" symbol
-// // (like in "myFunction()"). It is a safety valve to prevent
-// // incorrect "use before definition" warnings.
-// //
-// // Example code triggering this preaction:
-// // my_function();
-//
-// // Step 1: Find out what is being called.
-// // If the code is "foo()", "left" gets the "foo" part.
-// //
-// // Code representation:
-// // left === token_foo;
-//
-//         const left = thing.expression[0];
-//         let left_variable;
-//         let parent;
-//
-// // Step 2: Make sure we are calling a named thing (an identifier),
-// // and check that this thing is NOT defined locally inside the
-// // active function. We also make sure the active function
-// // actually has a name.
-// //
-// // Code structure matched here:
-// // function active_function() {
-// //     foo(); // "foo" is not defined inside active_function
-// // }
-//
-//         if (
-//             left.identifier
-//             && functionage.context[left.id] === undefined
-//             && typeof functionage.name === "object"
-//         ) {
-//
-// // Step 3: Find the outer function (the parent) that
-// // wraps our current function.
-// //
-// // Code structure matched here:
-// // function outer_parent() {
-// //     function active_function() { ... }
-// // }
-//
-//             parent = functionage.name.declared_scope;
-//             if (parent) {
-//
-// // Step 4: Look up the variable we are calling ("foo")
-// // inside that parent function.
-// //
-// // Code structure matched here:
-// // function outer_parent() {
-// //     function foo() {} // Defined in the parent scope
-// //     function active_function() { foo(); }
-// // }
-//
-//                 left_variable = parent.context[left.id];
-//
-// // Step 5: Check if we need to temporarily "bring it
-// // back to life".
-// // We verify it was found in the parent scope, is currently marked
-// // as "dead", belongs to this parent, and has a registered call from
-// // our active function. If so, we revive it!
-// //
-// // Code structure matched here (Mutual Recursion):
-// // function outer_parent() {
-// //     function active_function() {
-// //         foo(); // "foo" is forward-referenced & currently dead
-// //     }
-// //     function foo() {
-// //         active_function();
-// //     }
-// // }
-//
-//                 if (
-//                     left_variable !== undefined
-// // Probably deadcode.
-// // && !left_variable.alive
-//                     && left_variable.declared_scope === parent
-//                     && left_variable.calls !== undefined
-//                     && left_variable.calls[functionage.name.id] !== undefined
-//                 ) {
-//
-// // If all those match, revive it! Mark "dead" as
-// // false so JSLint won't raise an error for
-// // calling it before its line is executed.
-//
-//                     left_variable.alive = true;
-//                 }
-//             }
-//         }
-//     }
-
     function pre_b_noteq(thing) {
 
 // test_cause:
@@ -8981,7 +8882,6 @@ function jslint_phase4_walk(state) {
 
 // 3.for.1 - Mark 'declared', the for-variable, ???.
 // 3.for.2 - Mark 'alive', the for-variable, before for-block.
-// 3.for.4 - Mark 'out-of-scope', the for-variable, ???.
 
             thing.name.alive = true;
             the_variable = name_lookup(thing.name);
@@ -9072,7 +8972,6 @@ function jslint_phase4_walk(state) {
 
     function pre_s_lbrace(thing) {
         blockage = block_stack_push(block_stack, thing, undefined);
-        thing.alive_list = [];
     }
 
     function pre_s_try(thing) {
@@ -9225,11 +9124,6 @@ function jslint_phase4_walk(state) {
     postaction("unary", post_u);
     preaction("assignment", pre_a_bitwise);
     preaction("binary", "!=", pre_b_noteq);
-
-// PR-502 - Probably deadcode.
-
-//     preaction("binary", "(", pre_b_lparen);
-
     preaction("binary", "==", pre_b_eqeq);
     preaction("binary", "=>", pre_s_function);
     preaction("binary", "in", pre_b_in);
@@ -10474,10 +10368,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         }).sort());
         list.sort();
         html += detail("variable", list.filter(function (id) {
-            return (
-                context[id].role === "variable"
-                && context[id].declared_scope === the_function
-            );
+            return context[id].role === "variable";
         }));
         html += detail("exception", list.filter(function (id) {
             return context[id].role === "exception";
