@@ -8628,7 +8628,7 @@ function jslint_phase4_walk(state) {
         });
     }
 
-    function post_ternary(thing) {
+    function post_t_ternary(thing) {
         if (
             is_weird(thing.expression[0])
             || thing.expression[0].constant === true
@@ -8636,20 +8636,20 @@ function jslint_phase4_walk(state) {
         ) {
 
 // test_cause:
-// ["let aa=(aa?`${0}`:`${0}`)", "post_ternary", "unexpected_a", "?", 11]
-// ["let aa=(aa?`0`:`0`)", "post_ternary", "unexpected_a", "?", 11]
+// ["let aa=(aa?`${0}`:`${0}`)", "post_t_ternary", "unexpected_a", "?", 11]
+// ["let aa=(aa?`0`:`0`)", "post_t_ternary", "unexpected_a", "?", 11]
 
             warn("unexpected_a", thing);
         } else if (is_equal(thing.expression[0], thing.expression[1])) {
 
 // test_cause:
-// ["aa?aa:0", "post_ternary", "expected_a_b", "?", 3]
+// ["aa?aa:0", "post_t_ternary", "expected_a_b", "?", 3]
 
             warn("expected_a_b", thing, "||", "?");
         } else if (is_equal(thing.expression[0], thing.expression[2])) {
 
 // test_cause:
-// ["aa?0:aa", "post_ternary", "expected_a_b", "?", 3]
+// ["aa?0:aa", "post_t_ternary", "expected_a_b", "?", 3]
 
             warn("expected_a_b", thing, "&&", "?");
         } else if (
@@ -8658,7 +8658,7 @@ function jslint_phase4_walk(state) {
         ) {
 
 // test_cause:
-// ["aa?true:false", "post_ternary", "expected_a_b", "?", 3]
+// ["aa?true:false", "post_t_ternary", "expected_a_b", "?", 3]
 
             warn("expected_a_b", thing, "Boolean(...)", "?");
         } else if (
@@ -8667,7 +8667,7 @@ function jslint_phase4_walk(state) {
         ) {
 
 // test_cause:
-// ["aa?false:true", "post_ternary", "expected_a_b", "?", 3]
+// ["aa?false:true", "post_t_ternary", "expected_a_b", "?", 3]
 
             warn("expected_a_b", thing, "!", "?");
         } else if (
@@ -8679,40 +8679,9 @@ function jslint_phase4_walk(state) {
         ) {
 
 // test_cause:
-// ["(aa&&!aa?0:1)", "post_ternary", "wrap_condition", "&&", 4]
+// ["(aa&&!aa?0:1)", "post_t_ternary", "wrap_condition", "&&", 4]
 
             warn("wrap_condition", thing.expression[0]);
-        }
-    }
-
-    function post_u(thing) {
-        if (thing.id === "`") {
-            if (thing.expression.every(function (thing) {
-                return thing.constant;
-            })) {
-                thing.constant = true;
-            }
-        } else if (thing.id === "!") {
-            if (thing.expression.constant === true) {
-                warn("unexpected_a", thing);
-            }
-        } else if (thing.id === "!!") {
-            if (!option_dict.convert) {
-
-// test_cause:
-// ["!!0", "post_u", "expected_a_b", "!!", 1]
-
-                warn("expected_a_b", thing, "Boolean(...)", "!!");
-            }
-        } else if (
-            thing.id !== "["
-            && thing.id !== "{"
-            && thing.id !== "function"
-            && thing.id !== "new"
-        ) {
-            if (thing.expression.constant === true) {
-                thing.constant = true;
-            }
         }
     }
 
@@ -8733,6 +8702,37 @@ function jslint_phase4_walk(state) {
             || (right.id === "[" && right.arity !== "binary")
         ) {
             warn("unexpected_a", thing, "+");
+        }
+    }
+
+    function post_u_unary(thing) {
+        if (thing.id === "`") {
+            if (thing.expression.every(function (thing) {
+                return thing.constant;
+            })) {
+                thing.constant = true;
+            }
+        } else if (thing.id === "!") {
+            if (thing.expression.constant === true) {
+                warn("unexpected_a", thing);
+            }
+        } else if (thing.id === "!!") {
+            if (!option_dict.convert) {
+
+// test_cause:
+// ["!!0", "post_u_unary", "expected_a_b", "!!", 1]
+
+                warn("expected_a_b", thing, "Boolean(...)", "!!");
+            }
+        } else if (
+            thing.id !== "["
+            && thing.id !== "{"
+            && thing.id !== "function"
+            && thing.id !== "new"
+        ) {
+            if (thing.expression.constant === true) {
+                thing.constant = true;
+            }
         }
     }
 
@@ -9131,8 +9131,8 @@ function jslint_phase4_walk(state) {
     postaction("statement", "try", post_s_try);
     postaction("statement", "var", post_s_var);
     postaction("statement", "{", post_s_lbrace_pop_block);
-    postaction("ternary", "(all)", post_ternary);
-    postaction("unary", "(all)", post_u);
+    postaction("ternary", "(all)", post_t_ternary);
+    postaction("unary", "(all)", post_u_unary);
     postaction("unary", "+", post_u_plus);
     postaction("unary", "function", post_s_function);
     preaction("assignment", "(all)", pre_a_bitwise);
