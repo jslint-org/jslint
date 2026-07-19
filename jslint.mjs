@@ -113,6 +113,8 @@
     block,
     block_list,
     block_stack,
+    block_stack_pop,
+    block_stack_push,
     body,
     browser,
     c,
@@ -1142,6 +1144,28 @@ function jslint(
         );
     }
 
+    function block_stack_pop(stack) {
+        jslint_assert(stack.length > 1, `block_stack.length=${stack.length}`);
+        stack.shift();
+        return stack[0];
+    }
+
+    function block_stack_push(stack, stack_pushed, list_pushed) {
+        stack.unshift(stack_pushed);
+        if (stack === block_stack && !stack_pushed.context) {
+            stack_pushed.context = empty();
+        }
+        switch (list_pushed && stack) {
+        case block_stack:
+            block_list.push(list_pushed);
+            break;
+        case function_stack:
+            function_list.push(list_pushed);
+            break;
+        }
+        return stack_pushed;
+    }
+
     function is_equal(aa, bb) {
 
 // test_cause:
@@ -1359,7 +1383,7 @@ function jslint(
 // likely that the first warning will be the most meaningful.
 
         if (the_token.warning) {
-            jslint_assert_and_pop(warning_list, "warning_list");
+            warning_list.pop();
             return the_warning;
         }
         the_token.warning = the_warning;
@@ -1511,13 +1535,6 @@ function jslint(
         case "missing_await_statement":
             mm = `Expected await statement in async function.`;
             break;
-
-// PR-347 - Disable warning "missing_browser".
-//
-//         case "missing_browser":
-//             mm = `/*global*/ requires the Assume a browser option.`;
-//             break;
-
         case "missing_m":
             mm = `Expected 'm' flag on a multiline regular expression.`;
             break;
@@ -1741,7 +1758,6 @@ function jslint(
 // automatic semicolon insertion and nested megastring literals, which allows
 // full tokenization to precede parsing.
 
-        block_list.push(token_global);
         option_dict = {
             ...option_dict
         };
@@ -1751,6 +1767,8 @@ function jslint(
                 artifact,
                 block_list,
                 block_stack,
+                block_stack_pop,
+                block_stack_push,
                 directive_list,
                 export_dict,
                 function_list,
@@ -1790,19 +1808,10 @@ function jslint(
 // PHASE 2. Lex <line_list> into <token_list>.
 
         jslint_phase2_lex(state);
-        block_stack.length = 0;
 
 // PHASE 3. Parse <token_list> into <token_tree> using the Pratt-parser.
 
         jslint_phase3_parse(state);
-        jslint_assert(
-            block_stack.length === 0,
-            `block_stack.length=${block_stack.length}.`
-        );
-        jslint_assert(
-            function_stack.length === 0,
-            `function_stack.length=${function_stack.length}.`
-        );
 
 // PHASE 4. Walk <token_tree>, traversing all nodes of the tree. It is a
 //          recursive traversal. Each node may be processed on the way down
@@ -1811,39 +1820,12 @@ function jslint(
         if (!state.mode_json) {
             jslint_phase4_walk(state);
         }
-        jslint_assert(
-            block_stack.length === 0,
-            `block_stack.length=${block_stack.length}.`
-        );
-        jslint_assert(
-            function_stack.length === 0,
-            `function_stack.length=${function_stack.length}.`
-        );
 
 // PHASE 5. Check whitespace between tokens in <token_list>.
 
         if (!state.mode_json && warning_list.length === 0) {
             jslint_phase5_whitage(state);
         }
-        jslint_assert(
-            block_stack.length === 0,
-            `block_stack.length=${block_stack.length}.`
-        );
-
-// PR-347 - Disable warning "missing_browser".
-//
-//         if (!option_dict.browser) {
-//             directive_list.forEach(function (comment) {
-//                 if (comment.directive === "global") {
-//
-// // test_cause:
-// // ["/*global aa*/", "jslint", "missing_browser", "(comment)", 1]
-//
-//                     warn("missing_browser", comment);
-//                 }
-//             });
-//         }
-
         if (option_dict.test_internal_error) {
             jslint_assert(undefined, "test_internal_error");
         }
@@ -2266,14 +2248,6 @@ ${String(message).slice(0, 2000)}`
     }
     console.error(error);
     throw error;
-}
-
-function jslint_assert_and_pop(list, list_name) {
-
-// This function will assert <list>.length > 0, before returning <list>.pop().
-
-    jslint_assert(list.length > 0, `${list_name}.length=${list.length}`);
-    return list.pop();
 }
 
 async function jslint_cli({
@@ -4270,8 +4244,9 @@ function jslint_phase3_parse(state) {
 
     const {
         artifact,
-        block_list,
         block_stack,
+        block_stack_pop,
+        block_stack_push,
         export_dict,
         function_list,
         function_stack,
@@ -4293,7 +4268,7 @@ function jslint_phase3_parse(state) {
     let blockage = token_global;        // The current block.
     let functionage = token_global;     // The current function.
     let mode_var;               // "var" if using var; "let" if using let.
-    let token_ii = 0;           // The number of the next token.
+    let token_ii = 0;           // The index of the next token in <token_list>.
     let token_now = token_global;       // The current token being examined in
                                         // ... the parse.
     let token_nxt = token_global;       // The next token to be examined in
@@ -4422,7 +4397,7 @@ function jslint_phase3_parse(state) {
             advance("{");
         }
         the_block = token_now;
-        block_stack_push(token_now);
+        blockage = block_stack_push(block_stack, token_now, token_now);
         if (special !== "body") {
             functionage.statement_prv = the_block;
         }
@@ -4433,7 +4408,7 @@ function jslint_phase3_parse(state) {
 
         if (
             special === "body"
-            && function_stack.length === 1
+            && function_stack.length === 2
             && token_nxt.value === "use strict"
         ) {
             token_nxt.statement = true;
@@ -4454,16 +4429,9 @@ function jslint_phase3_parse(state) {
         } else {
             the_block.disrupt = stmts[stmts.length - 1].disrupt;
         }
-        blockage = jslint_assert_and_pop(block_stack, "block_stack");
+        blockage = block_stack_pop(block_stack);
         advance("}");
         return the_block;
-    }
-
-    function block_stack_push(blockage_nxt) {
-        block_stack.push(blockage);
-        blockage = blockage_nxt;
-        blockage.context = empty();
-        block_list.push(blockage);
     }
 
     function check_left(left, right) {
@@ -5168,9 +5136,18 @@ function jslint_phase3_parse(state) {
 
 // Has the name been declared in an outer context?
 
-        block_stack.forEach(function (blockage) {
-            earlier = blockage.context[id] || earlier;
+        block_stack.some(function (blockage) {
+            earlier = blockage.context[id];
+            return earlier;
         });
+
+// Declare it.
+
+        declared_scope.context[id] = name;
+        name.declared_scope = declared_scope;
+
+// Warn about variable redefinition.
+
         if (earlier && id === "ignore") {
             if (earlier.role === "variable") {
 
@@ -5179,7 +5156,9 @@ function jslint_phase3_parse(state) {
 
                 warn("redefinition_a_b", name, id, earlier.line);
             }
-        } else if (
+            return;
+        }
+        if (
             earlier
             && role !== "parameter" && role !== "function"
             && (role !== "exception" || earlier.role !== "exception")
@@ -5192,7 +5171,9 @@ function jslint_phase3_parse(state) {
 // ["function aa(){var aa}", "name_declare", "redefinition_a_b", "1", 19]
 
             warn("redefinition_a_b", name, id, earlier.line);
-        } else if (
+            return;
+        }
+        if (
             option_dict.beta
             && global_dict[id]
             && role !== "parameter"
@@ -5202,12 +5183,8 @@ function jslint_phase3_parse(state) {
 // ["let Array", "name_declare", "redefinition_global_a_b", "Array", 5]
 
             warn("redefinition_global_a_b", name, global_dict[id], id);
+            return;
         }
-
-// Declare it.
-
-        declared_scope.context[id] = name;
-        name.declared_scope = declared_scope;
     }
 
     function parse_expression(rbp, initial) {
@@ -6051,7 +6028,6 @@ function jslint_phase3_parse(state) {
 // depth of loops and switches.
 
         the_function.async = the_function.async || 0;
-        the_function.context = empty();
         the_function.finally = 0;
         the_function.level = functionage.level + 1;
         the_function.loop = 0;
@@ -6084,10 +6060,12 @@ function jslint_phase3_parse(state) {
 
 // Push the current function context and establish a new one.
 
-        block_stack_push(the_function);
-        function_list.push(the_function);
-        function_stack.push(functionage);
-        functionage = the_function;
+        blockage = block_stack_push(block_stack, the_function, the_function);
+        functionage = block_stack_push(
+            function_stack,
+            the_function,
+            the_function
+        );
 
 // Parse the parameter list.
 
@@ -6229,8 +6207,8 @@ function jslint_phase3_parse(state) {
 
 // Restore the previous context.
 
-        blockage = jslint_assert_and_pop(block_stack, "block_stack");
-        functionage = jslint_assert_and_pop(function_stack, "function_stack");
+        blockage = block_stack_pop(block_stack);
+        functionage = block_stack_pop(function_stack);
         return the_function;
     }
 
@@ -7367,7 +7345,7 @@ function jslint_phase3_parse(state) {
 
 // Create new catch-scope for catch-parameter.
 
-            block_stack_push(the_catch);
+            blockage = block_stack_push(block_stack, the_catch, the_catch);
             if (token_nxt.id === "(") {
                 advance("(");
                 if (!token_nxt.identifier) {
@@ -7409,7 +7387,7 @@ function jslint_phase3_parse(state) {
 
 // Restore previous catch-scope after catch-block.
 
-            blockage = jslint_assert_and_pop(block_stack, "block_stack");
+            blockage = block_stack_pop(block_stack);
 
 // PR-404 - Relax warning about missing `catch` in `try...finally` statement.
 //
@@ -7886,6 +7864,13 @@ function jslint_phase3_parse(state) {
     symbol("}");
     ternary("?", ":");
 
+// Init block_stack, function_stack.
+
+    block_stack.length = 0;
+    function_stack.length = 0;
+    block_stack_push(block_stack, token_global, token_global);
+    block_stack_push(function_stack, token_global, undefined);
+
 // Init token_nxt.
 
     advance();
@@ -7928,6 +7913,19 @@ function jslint_phase3_parse(state) {
             return option_dict.beta && name && name.id;
         })
     );
+
+// Cleanup block_stack, function_stack.
+
+    jslint_assert(
+        block_stack.length === 1,
+        `block_stack.length=${block_stack.length}.`
+    );
+    jslint_assert(
+        function_stack.length === 1,
+        `function_stack.length=${function_stack.length}.`
+    );
+    block_stack.length = 0;
+    function_stack.length = 0;
 }
 
 function jslint_phase4_walk(state) {
@@ -7939,6 +7937,8 @@ function jslint_phase4_walk(state) {
     const {
         artifact,
         block_stack,
+        block_stack_pop,
+        block_stack_push,
         function_stack,
         global_dict,
         is_equal,
@@ -8062,8 +8062,9 @@ function jslint_phase4_walk(state) {
 // collisions, take the most recent.
 
         if (!the_variable) {
-            block_stack.forEach(function (blockage) {
-                the_variable = blockage.context[id] || the_variable;
+            block_stack.some(function (blockage) {
+                the_variable = blockage.context[id];
+                return the_variable;
             });
             if (!the_variable && !global_dict[id]) {
 
@@ -8542,7 +8543,7 @@ function jslint_phase4_walk(state) {
         delete functionage.statement_prv;
         delete functionage.switch;
         delete functionage.try;
-        functionage = jslint_assert_and_pop(function_stack, "function_stack");
+        functionage = block_stack_pop(function_stack);
         if (thing.wrapped) {
 
 // test_cause:
@@ -8568,7 +8569,7 @@ function jslint_phase4_walk(state) {
             name.alive = false;
         });
         delete blockage.alive_list;
-        blockage = jslint_assert_and_pop(block_stack, "block_stack");
+        blockage = block_stack_pop(block_stack);
     }
 
     function post_s_try(thing) {
@@ -8580,7 +8581,7 @@ function jslint_phase4_walk(state) {
 
 // Restore previous catch-scope after catch-block.
 
-            blockage = jslint_assert_and_pop(block_stack, "block_stack");
+            blockage = block_stack_pop(block_stack);
         }
     }
 
@@ -9021,10 +9022,8 @@ function jslint_phase4_walk(state) {
 
             warn("unexpected_a", thing);
         }
-        block_stack.push(blockage);
-        blockage = thing;
-        function_stack.push(functionage);
-        functionage = thing;
+        blockage = block_stack_push(block_stack, thing, undefined);
+        functionage = block_stack_push(function_stack, thing, undefined);
         if (thing.extra === "get") {
             if (thing.parameter_count !== 0) {
 
@@ -9072,8 +9071,7 @@ function jslint_phase4_walk(state) {
     }
 
     function pre_s_lbrace(thing) {
-        block_stack.push(blockage);
-        blockage = thing;
+        blockage = block_stack_push(block_stack, thing, undefined);
         thing.alive_list = [];
     }
 
@@ -9082,8 +9080,7 @@ function jslint_phase4_walk(state) {
 
 // Create new catch-scope for catch-parameter.
 
-            block_stack.push(blockage);
-            blockage = thing.catch;
+            blockage = block_stack_push(block_stack, thing.catch, undefined);
         }
     }
 
@@ -9248,7 +9245,29 @@ function jslint_phase4_walk(state) {
     preaction("unary", "~", pre_a_bitwise);
     preaction("variable", pre_v_var);
 
+// Init block_stack, function_stack.
+
+    block_stack.length = 0;
+    function_stack.length = 0;
+    block_stack_push(block_stack, token_global, undefined);
+    block_stack_push(function_stack, token_global, undefined);
+
+// Walk the token_tree.
+
     walk_statement(state.token_tree);
+
+// Cleanup block_stack, function_stack.
+
+    jslint_assert(
+        block_stack.length === 1,
+        `block_stack.length=${block_stack.length}.`
+    );
+    jslint_assert(
+        function_stack.length === 1,
+        `function_stack.length=${function_stack.length}.`
+    );
+    block_stack.length = 0;
+    function_stack.length = 0;
 }
 
 function jslint_phase5_whitage(state) {
@@ -9447,7 +9466,7 @@ function jslint_phase5_whitage(state) {
 
 // If right is a closer, then pop the previous state.
 
-        indentage = jslint_assert_and_pop(block_stack, "block_stack");
+        indentage = block_stack.pop();
         closer = indentage.closer;
         free = indentage.free;
         margin = indentage.margin;
@@ -9839,6 +9858,10 @@ function jslint_phase5_whitage(state) {
         no_space_only();
     }
 
+// Init block_stack.
+
+    block_stack.length = 0;
+
 // uninitialized_and_unused();
 // Delve into the functions looking for variables that were not initialized
 // or used. If the file imports or exports, then its global object is also
@@ -9890,6 +9913,14 @@ function jslint_phase5_whitage(state) {
         delete left.used;
         left = right;
     });
+
+// Cleanup block_stack.
+
+    jslint_assert(
+        block_stack.length === 0,
+        `block_stack.length=${block_stack.length}.`
+    );
+    block_stack.length = 0;
 }
 
 function jslint_report({
