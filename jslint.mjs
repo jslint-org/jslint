@@ -5101,8 +5101,8 @@ function jslint_phase3_parse(state) {
 // 5.lab.3 - Mark 'init', the label-statement, before control-flow-block.
 // 5.lab.4 - Mark 'out-of-scope', the label-statement, after control-flow-block.
 
+        const id = name.id;
         let earlier;
-        let id = name.id;
         name_list.push(name);
         name.init = init;
         name.readonly = readonly;
@@ -5492,12 +5492,12 @@ function jslint_phase3_parse(state) {
             case "while":
 
 // test_cause:
-// ["aa:do{}", "parse_statement", "the_statement_label", "do", 0]
-// ["aa:for{}", "parse_statement", "the_statement_label", "for", 0]
-// ["aa:switch{}", "parse_statement", "the_statement_label", "switch", 0]
-// ["aa:while{}", "parse_statement", "the_statement_label", "while", 0]
+// ["aa:do", "parse_statement", "label", "do", 0]
+// ["aa:for", "parse_statement", "label", "for", 0]
+// ["aa:switch", "parse_statement", "label", "switch", 0]
+// ["aa:while", "parse_statement", "label", "while", 0]
 
-                test_cause("the_statement_label", token_nxt.id);
+                test_cause("label", token_nxt.id);
                 name_declare(
 
 // 5.lab.1 - Mark 'declared', the label-statement, before control-flow-block.
@@ -5521,17 +5521,23 @@ function jslint_phase3_parse(state) {
 // 5.lab.4 - Mark 'out-of-scope', the label-statement, after control-flow-block.
 
                 the_label.alive = false;
-                functionage.statement_prv = the_statement;
                 the_statement.label = the_label;
                 the_statement.statement = true;
+                functionage.statement_prv = the_statement;
                 return the_statement;
-            }
-            advance();
+            default:
 
 // test_cause:
+// ["()=>{aa:0}", "parse_statement", "unexpected_label_a", "aa", 6]
+// [";{aa:0}", "parse_statement", "unexpected_label_a", "aa", 3]
 // ["aa:", "parse_statement", "unexpected_label_a", "aa", 1]
+// ["aa:0", "parse_statement", "unexpected_label_a", "aa", 1]
+// ["aa:0?0:0", "parse_statement", "unexpected_label_a", "aa", 1]
+// ["aa:bb:0", "parse_statement", "unexpected_label_a", "aa", 1]
 
-            warn("unexpected_label_a", the_label);
+                warn("unexpected_label_a", the_label);
+                advance();
+            }
         }
 
 // Parse the statement.
@@ -5551,13 +5557,11 @@ function jslint_phase3_parse(state) {
             the_symbol.statement = true;
             token_now.arity = "statement";
             the_statement = the_symbol.fud_stmt();
-            functionage.statement_prv = the_statement;
         } else {
 
 // It is an expression statement.
 
             the_statement = parse_expression(0, true);
-            functionage.statement_prv = the_statement;
             if (the_statement.wrapped && the_statement.id !== "(") {
 
 // test_cause:
@@ -5567,6 +5571,7 @@ function jslint_phase3_parse(state) {
             }
             semicolon();
         }
+        functionage.statement_prv = the_statement;
         return the_statement;
     }
 
@@ -7991,14 +7996,6 @@ function jslint_phase4_walk(state) {
             let a_set = when[arity];
             let i_set;
 
-// The id parameter is optional. If excluded, the task will be applied to all
-// ids.
-
-            if (typeof id !== "string") {
-                task = id;
-                id = "(all)";
-            }
-
 // If this arity has no registrations yet, then create a set object to hold
 // them.
 
@@ -8066,9 +8063,16 @@ function jslint_phase4_walk(state) {
 
         const id = thing.id;
         let the_variable;
-        if (thing.arity !== "variable") {
-            return;
-        }
+
+// PR-xxx - Probably deadcode.
+// if (thing.arity !== "variable") {
+//     return;
+// }
+
+        jslint_assert(
+            thing.arity === "variable",
+            `Expected thing.arity === "variable".`
+        );
 
 // Look up the variable, from current-scope, moving up the scope-chain.
 
@@ -8568,7 +8572,7 @@ function jslint_phase4_walk(state) {
 
             warn("unexpected_parens", thing);
         }
-        post_s_lbrace_pop_block();
+        blockage = block_stack_pop(block_stack);
     }
 
     function post_s_import(the_thing) {
@@ -8887,7 +8891,7 @@ function jslint_phase4_walk(state) {
 
     function pre_s_for(thing) {
         let the_variable;
-        if (thing.name !== undefined) {
+        if (thing.name?.identifier) {
 
 // 3.for.1 - Mark 'declared', the for-variable, ???.
 // 3.for.2 - Mark 'alive', the for-variable, before for-block.
@@ -9110,14 +9114,14 @@ function jslint_phase4_walk(state) {
     postamble = amble(posts);
     preaction = action(pres);
     preamble = amble(pres);
+    postaction("assignment", "(all)", post_a_assignment);
     postaction("assignment", "+=", post_a_pluseq);
-    postaction("assignment", post_a_assignment);
     postaction("binary", "&&", post_b_and);
     postaction("binary", "(", post_b_lparen);
+    postaction("binary", "(all)", post_b_binary);
     postaction("binary", "=>", post_s_function);
     postaction("binary", "[", post_b_lbracket);
     postaction("binary", "||", post_b_or);
-    postaction("binary", post_b_binary);
     postaction("statement", "const", post_s_var);
     postaction("statement", "export", post_s_export_toplevel);
     postaction("statement", "for", post_s_for);
@@ -9127,26 +9131,26 @@ function jslint_phase4_walk(state) {
     postaction("statement", "try", post_s_try);
     postaction("statement", "var", post_s_var);
     postaction("statement", "{", post_s_lbrace_pop_block);
-    postaction("ternary", post_ternary);
+    postaction("ternary", "(all)", post_ternary);
+    postaction("unary", "(all)", post_u);
     postaction("unary", "+", post_u_plus);
     postaction("unary", "function", post_s_function);
-    postaction("unary", post_u);
-    preaction("assignment", pre_a_bitwise);
+    preaction("assignment", "(all)", pre_a_bitwise);
     preaction("binary", "!=", pre_b_noteq);
+    preaction("binary", "(all)", pre_a_bitwise);
+    preaction("binary", "(all)", pre_b_binary);
     preaction("binary", "==", pre_b_eqeq);
     preaction("binary", "=>", pre_s_function);
     preaction("binary", "in", pre_b_in);
     preaction("binary", "instanceof", pre_b_instanceof);
     preaction("binary", "||", pre_b_or);
-    preaction("binary", pre_b_binary);
-    preaction("binary", pre_a_bitwise);
     preaction("statement", "for", pre_s_for);
     preaction("statement", "function", pre_s_function);
     preaction("statement", "try", pre_s_try);
     preaction("statement", "{", pre_s_lbrace);
     preaction("unary", "function", pre_s_function);
     preaction("unary", "~", pre_a_bitwise);
-    preaction("variable", pre_v_var);
+    preaction("variable", "(all)", pre_v_var);
 
 // Init block_stack, function_stack.
 
