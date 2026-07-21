@@ -60,7 +60,6 @@ Douglas Crockford <douglas@crockford.com>
         - [`/*jslint devel*/`](#jslint-devel)
         - [`/*jslint eval*/`](#jslint-eval)
         - [`/*jslint fart*/`](#jslint-fart)
-        - [`/*jslint for*/`](#jslint-for)
         - [`/*jslint getset*/`](#jslint-getset)
         - [`/*jslint indent2*/`](#jslint-indent2)
         - [`/*jslint long*/`](#jslint-long)
@@ -629,21 +628,6 @@ eval("1");
 let foo = async ({bar, baz}) => {
     return await bar(baz);
 };
-```
-
-<br>
-
-##### `/*jslint for*/`
-```js
-/*jslint for*/
-// Allow for-loop.
-
-function foo() {
-    let ii;
-    for (ii = 0; ii < 10; ii += 1) {
-        foo();
-    }
-}
 ```
 
 <br>

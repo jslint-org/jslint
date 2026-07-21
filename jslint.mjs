@@ -181,7 +181,9 @@
     floor,
     for,
     forEach,
-    for_inc,
+    for_init,
+    for_of,
+    for_semicolon,
     formatted_message,
     free,
     freeze,
@@ -214,7 +216,6 @@
     index,
     indexOf,
     init,
-    initial,
     isArray,
     isBlockCoverage,
     isHole,
@@ -291,6 +292,7 @@
     on,
     open,
     opening,
+    operator,
     option,
     option_dict,
     order,
@@ -2642,7 +2644,6 @@ function jslint_phase2_lex(state) {
 
     const {
         artifact,
-        block_stack,
         directive_list,
         global_dict,
         global_list,
@@ -2657,6 +2658,7 @@ function jslint_phase2_lex(state) {
         warn,
         warn_at
     } = state;
+    const opener_stack = [];    // Stack of opener tokens: (, [.
     let char;                   // The current character being lexed.
     let column = 0;             // The column number of the next character.
     let from;                   // The starting column number of the token.
@@ -2673,7 +2675,7 @@ function jslint_phase2_lex(state) {
                                 // ... literal.
     let mode_regexp;            // true if regular expression literal seen on
                                 // ... this line.
-    let opener_popped = empty();        // Last token popped from block_stack.
+    let opener_popped = empty();        // Last token popped from opener_stack.
     let snippet = "";           // A piece of string.
     let token_1;                // The first token.
     let token_prv = token_global;       // The previous token including
@@ -4094,7 +4096,7 @@ function jslint_phase2_lex(state) {
 
 // Create the token object and append it to token_list.
 
-        let the_token = {
+        const the_token = {
             from,
             id,
             identifier: Boolean(identifier),
@@ -4152,14 +4154,14 @@ function jslint_phase2_lex(state) {
         switch (id) {
         case "(":
         case "[":
-            block_stack.push(the_token);
+            opener_stack.unshift(the_token);
             break;
         case ")":
         case "]":
 
 // PR-503 - Fix jslint crashing before warning about dangling ')' or ']'.
 
-            opener_popped = block_stack.pop() || empty();
+            opener_popped = opener_stack.shift() || empty();
             if (
                 (id === ")" && opener_popped.id !== "(")
                 || (id === "]" && opener_popped.id !== "[")
@@ -4172,6 +4174,11 @@ function jslint_phase2_lex(state) {
 // ["]", "token_create", "unexpected_a", "]", 1]
 
                 return stop("unexpected_a", the_token);
+            }
+            break;
+        case ";":
+            if (opener_stack[0]?.for) {
+                opener_stack[0].for.for_semicolon = [];
             }
             break;
 
@@ -4189,6 +4196,9 @@ function jslint_phase2_lex(state) {
             break;
         case "] =":
             opener_popped.assignment = the_token;
+            break;
+        case "for (":
+            the_token.for = token_prv_expr;
             break;
         }
 
@@ -5078,10 +5088,6 @@ function jslint_phase3_parse(state) {
 // 3.cat.2 - Mark 'alive', the catch-variable, before catch-block.
 // 3.cat.3 - Mark 'init', the catch-variable, before catch-block.
 //
-// 3.for.1 - Mark 'declared', the for-variable, ???.
-// 3.for.2 - Mark 'alive', the for-variable, before for-block.
-// 3.for.3 - Mark 'init', the for-variable, before for-block.
-//
 // 3.glo.1 - Mark 'declared', the global-variable, immediately.
 // 3.glo.2 - Mark 'alive', the global-variable, immediately.
 // 3.glo.3 - Mark 'init', the global-variable, immediately.
@@ -5174,6 +5180,7 @@ function jslint_phase3_parse(state) {
 // function aa(){try{aa();}catch(aa){aa();}}
 // ", "name_declare", "scope_outer", "aa", 0]
 // ["function aa(){var aa}", "name_declare", "scope_outer", "aa", 0]
+// ["let aa;for(let aa;;){}", "name_declare", "scope_outer", "aa", 0]
 
             test_cause("scope_outer", id);
             warn("redefinition_a_b", name, id, earlier.line);
@@ -6839,68 +6846,140 @@ function jslint_phase3_parse(state) {
     }
 
     function stmt_for() {
-        let first;
-        let the_for = token_now;
-        if (!option_dict.for) {
-
-// test_cause:
-// ["for", "stmt_for", "unexpected_a", "for", 1]
-
-            warn("unexpected_a", the_for);
-        }
+        const the_for = token_now;
+        let the_operator;
+        let the_variable;
         check_not_top_level(the_for);
         scope_function.loop += 1;
+
+// PR-xxx - Add implicit scope_block for:
+// - for-loop
+
+        scope_block = scope_stack_push(block_stack, token_now, token_now);
         advance("(");
         token_now.free = true;
-        if (token_nxt.id === ";") {
+        if (the_for.for_semicolon) {
+            switch (token_nxt.id) {
+            case ";":
 
 // test_cause:
 // ["for(;;){}", "stmt_for", "expected_a_b", "for (;", 1]
 
-            return stop("expected_a_b", the_for, "while (", "for (;");
-        }
-        switch (token_nxt.id) {
-        case "const":
-        case "let":
-        case "var":
+                warn("expected_a_b", the_for, "while (", "for (;");
+                break;
+            case "const":
+            case "var":
 
 // test_cause:
-// ["for(const aa in aa){}", "stmt_for", "unexpected_a", "const", 5]
+// ["for(const aa;;){}", "stmt_for", "expected_a_b", "const", 5]
+// ["for(var aa;;){}", "stmt_for", "expected_a_b", "var", 5]
 
-            warn("unexpected_a");
-            advance();
-            break;
-        }
-        first = parse_expression(0);
-        if (first.id === "in") {
-            if (first.expression[0].arity !== "variable") {
+                warn("expected_a_b", token_nxt, "let", token_nxt.id);
+                break;
+            case "let":
 
 // test_cause:
-// ["for(0 in aa){}", "stmt_for", "bad_assignment_a", "0", 5]
+// ["for(let aa;;){}", "stmt_for", "let", "let", 0]
 
-                warn("bad_assignment_a", first.expression[0]);
+                test_cause("let", token_nxt.id);
+                break;
+            default:
+
+// test_cause:
+// ["for(aa;;){}", "stmt_for", "expected_a", "let", 5]
+
+                warn("expected_a", token_nxt, "let");
             }
-            the_for.name = first.expression[0];
-            the_for.expression = first.expression[1];
-            warn("expected_a_b", the_for, "Object.keys", "for in");
-        } else if (first.id === "of") {
+            token_nxt.for_init = true;
+            the_for.for_semicolon.push(parse_statement_single());
+            token_nxt.for_init = true;
+            the_for.for_semicolon.push(parse_expression(0));
+            advance(";");
+            token_nxt.for_init = true;
+            the_for.for_semicolon.push(parse_expression(0));
+        } else {
+            switch (token_nxt.id) {
+            case "const":
+            case "let":
+
+// test_cause:
+// ["for(const aa in aa){}", "stmt_for", "for_of_const", "const", 0]
+// ["for(const aa of aa){}", "stmt_for", "for_of_const", "const", 0]
+// ["for(let aa in aa){}", "stmt_for", "for_of_const", "let", 0]
+// ["for(let aa of aa){}", "stmt_for", "for_of_const", "let", 0]
+
+                test_cause("for_of_const", token_nxt.id);
+                break;
+            case "var":
+
+// test_cause:
+// ["for(var aa in aa){}", "stmt_for", "expected_a_b", "var", 5]
+// ["for(var aa of aa){}", "stmt_for", "expected_a_b", "var", 5]
+
+                warn("expected_a_b", token_nxt, "const or let", "var");
+                break;
+            default:
+
+// test_cause:
+// ["for(aa in aa){}", "stmt_for", "expected_a", "const or let", 5]
+// ["for(aa of aa){}", "stmt_for", "expected_a", "const or let", 5]
+
+                warn("expected_a", token_nxt, "const or let");
+            }
+            token_nxt.for_init = true;
+            switch (token_nxt.id) {
+            case "const":
+            case "let":
+            case "var":
+                the_variable = parse_statement_single();
+                the_for.for_of = the_variable;
+                the_operator = the_variable.operator;
+                break;
+            default:
+                the_variable = parse_expression(0);
+                the_for.for_of = the_variable;
+                the_operator = the_variable;
+            }
+            the_variable.for_init = true;
+            switch (the_operator.id) {
+            case "in":
+
+// test_cause:
+// ["for(aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
+// ["for(const aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
+// ["for(let aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
+// ["for(var aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
+
+                warn("expected_a_b", the_for, "Object.keys", "for in");
+                break;
 
 // Issue #176 - Add ES2015-feature for..of.
 
-            the_for.name = first.expression[0];
-            the_for.expression = first.expression[1];
-        } else {
-            the_for.initial = first;
-            advance(";");
-            the_for.expression = parse_expression(0);
-            advance(";");
-            the_for.for_inc = parse_expression(0);
-            if (the_for.for_inc.id === "++") {
+            case "of":
 
 // test_cause:
-// ["for(aa;aa;aa++){}", "stmt_for", "expected_a_b", "++", 13]
+// ["for(aa of aa){}", "stmt_for", "of", "of", 0]
+// ["for(const aa of aa){}", "stmt_for", "of", "of", 0]
+// ["for(let aa of aa){}", "stmt_for", "of", "of", 0]
+// ["for(var aa of aa){}", "stmt_for", "of", "of", 0]
 
-                warn("expected_a_b", the_for.for_inc, "+= 1", "++");
+                test_cause("of", the_operator.id);
+                the_operator.for_init = true;
+                break;
+            default:
+
+// test_cause:
+// ["for(aa=aa){}", "stmt_for", "expected_a_b", "=", 7]
+// ["for(const aa=aa){}", "stmt_for", "expected_a_b", "=", 13]
+// ["for(let aa=aa){}", "stmt_for", "expected_a_b", "=", 11]
+// ["for(var aa=aa){}", "stmt_for", "expected_a_b", "=", 11]
+
+                return stop(
+                    "expected_a_b",
+                    the_operator,
+                    "of",
+                    the_operator.id
+                );
             }
         }
         advance(")");
@@ -6915,6 +6994,7 @@ function jslint_phase3_parse(state) {
 
             warn("weird_loop", the_for);
         }
+        scope_block = scope_stack_pop(block_stack);
         scope_function.loop -= 1;
         return the_for;
     }
@@ -7429,6 +7509,7 @@ function jslint_phase3_parse(state) {
     }
 
     function stmt_var() {
+        const for_init = token_now.for_init;
         const readonly = token_now.id === "const";
         const scope_declared = (
             token_now.id === "var"
@@ -7469,7 +7550,7 @@ function jslint_phase3_parse(state) {
             warn("var_switch", the_variable);
         }
         switch (
-            Boolean(scope_function.statement_prv)
+            Boolean(scope_function.statement_prv && !for_init)
             && scope_function.statement_prv.id
         ) {
         case "const":
@@ -7544,9 +7625,41 @@ function jslint_phase3_parse(state) {
 
                     warn("unexpected_a", name);
                 }
-                if (token_nxt.id === "=" || readonly) {
+                switch (token_nxt.id) {
+                case "=":
+                    the_variable.operator = token_nxt;
                     advance("=");
                     name.expression = parse_expression(0);
+                    break;
+                case "in":
+                case "of":
+                    if (for_init) {
+
+// test_cause:
+// ["for(let aa in 0){}", "stmt_var", "for_init", "in", 0]
+// ["for(let aa of 0){}", "stmt_var", "for_init", "of", 0]
+
+                        test_cause("for_init", token_nxt.id);
+                        the_variable.operator = token_nxt;
+                        advance();
+                        name.expression = parse_expression(0);
+                        break;
+                    }
+
+// test_cause:
+// ["let aa in 0", "stmt_var", "not_for_init", "in", 0]
+// ["let aa of 0", "stmt_var", "not_for_init", "of", 0]
+
+                    test_cause("not_for_init", token_nxt.id);
+                    the_variable.operator = token_nxt;
+                    advance("=");
+                    break;
+                default:
+                    if (readonly) {
+                        the_variable.operator = token_nxt;
+                        advance("=");
+                        name.expression = parse_expression(0);
+                    }
                 }
                 name_declare(
 
@@ -7607,7 +7720,9 @@ function jslint_phase3_parse(state) {
                 variable_prv.name_list[0].id
             );
         }
-        semicolon();
+        if (!for_init || token_nxt.id === ";") {
+            semicolon();
+        }
         return the_variable;
     }
 
@@ -7965,6 +8080,7 @@ function jslint_phase4_walk(state) {
         option_dict,
         scope_stack_pop,
         scope_stack_push,
+        stop,
         syntax_dict,
         test_cause,
         token_global,
@@ -8554,7 +8670,10 @@ function jslint_phase4_walk(state) {
 
 // Recurse walk_statement().
 
-        walk_statement(thing.for_inc);
+        if (thing.for_semicolon) {
+            walk_statement(thing.for_semicolon[2]);
+        }
+        scope_block = scope_stack_pop(block_stack);
     }
 
     function post_s_function(thing) {
@@ -8858,7 +8977,9 @@ function jslint_phase4_walk(state) {
 // test_cause:
 // ["aa in aa", "pre_b_in", "infix_in", "in", 4]
 
-        warn("infix_in", thing);
+        if (!thing.for_init) {
+            warn("infix_in", thing);
+        }
     }
 
     function pre_b_instanceof(thing) {
@@ -8877,6 +8998,16 @@ function jslint_phase4_walk(state) {
         warn("expected_a_b", thing, "!==", "!=");
     }
 
+    function pre_b_of(thing) {
+        if (!thing.for_init) {
+
+// test_cause:
+// ["0 of 0", "pre_b_of", "unexpected_a", "of", 3]
+
+            return stop("unexpected_a", thing);
+        }
+    }
+
     function pre_b_or(thing) {
         thing.expression.forEach(function (thang) {
             if (thang.id === "&&" && !thang.wrapped) {
@@ -8890,34 +9021,26 @@ function jslint_phase4_walk(state) {
     }
 
     function pre_s_for(thing) {
-        let the_variable;
-        if (thing.name?.identifier) {
 
-// 3.for.1 - Mark 'declared', the for-variable, ???.
-// 3.for.2 - Mark 'alive', the for-variable, before for-block.
+// PR-xxx - Add implicit scope_block for:
+// - for-loop
 
-            thing.name.alive = true;
-            the_variable = name_lookup(thing.name);
-            if (the_variable && !the_variable.readonly) {
-
-// 3.for.3 - Mark 'init', the for-variable, before for-block.
-
-                the_variable.init = true;
-            }
-            if (the_variable !== undefined) {
-                if (the_variable.init && the_variable.readonly) {
-
-// test_cause:
-// ["const aa=0;for(aa in aa){}", "pre_s_for", "bad_assignment_a", "aa", 16]
-
-                    warn("bad_assignment_a", thing.name);
-                }
+        scope_block = scope_stack_push(block_stack, thing, undefined);
+        if (thing.for_semicolon) {
+            walk_statement(thing.for_semicolon[0]);
+            walk_expression(thing.for_semicolon[1]);
+        }
+        if (thing.for_of) {
+            switch (thing.for_of.id) {
+            case "const":
+            case "let":
+            case "var":
+                post_s_var(thing.for_of);
+                break;
+            default:
+                walk_expression(thing.for_of);
             }
         }
-
-// Recurse walk_statement().
-
-        walk_statement(thing.initial);
     }
 
     function pre_s_function(thing) {
@@ -9039,6 +9162,8 @@ function jslint_phase4_walk(state) {
 // test_cause:
 // ["aa=++aa", "walk_expression", "unexpected_a", "++", 4]
 // ["aa=--aa", "walk_expression", "unexpected_a", "--", 4]
+// ["aa=aa++", "walk_expression", "unexpected_a", "++", 6]
+// ["aa=aa--", "walk_expression", "unexpected_a", "--", 6]
 
                     warn("unexpected_a", thing);
                 } else if (
@@ -9143,6 +9268,7 @@ function jslint_phase4_walk(state) {
     preaction("binary", "=>", pre_s_function);
     preaction("binary", "in", pre_b_in);
     preaction("binary", "instanceof", pre_b_instanceof);
+    preaction("binary", "of", pre_b_of);
     preaction("binary", "||", pre_b_or);
     preaction("statement", "for", pre_s_for);
     preaction("statement", "function", pre_s_function);
@@ -9581,14 +9707,13 @@ function jslint_phase5_whitage(state) {
 
 // test_cause:
 // ["
-// /*jslint for*/
 // function aa() {
 //     for (
-//         aa();
-// aa;
-//         aa()
+//         let bb = 0;
+// bb < 0;
+//         bb += 1
 //     ) {
-//         aa();
+//         aa(bb);
 //     }
 // }
 // ", "whitage_default", "for(;;)", ";", 0]
@@ -9742,7 +9867,10 @@ function jslint_phase5_whitage(state) {
             }
             return;
         }
-        if (right.statement || right.role === "label") {
+        if (
+            (right.statement || right.role === "label")
+            && (!right.for_init || left.line !== right.line)
+        ) {
 
 // test_cause:
 // ["function aa(){bb:while(aa){aa();}}", "whitage_opener", "{label", "bb", 0]

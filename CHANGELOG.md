@@ -1,16 +1,14 @@
 # Changelog
 
 # Todo
+- jslint-ecma - Add ES2018-feature Asynchronous Iteration.
+- jslint - Audit token-property '.free'.
 - jslint - Rename token-property for variables '.init' to '.assigned', to improve readability.
 - jslint - Change warning 'uninitialized_a' to 'unassigned_variable_a'.
 - jslint - Change warning 'out_of_scope_a' to 'temporal_dead_zone_a'.
 - jslint - Add warning and tdz for function-declaration inside block-scope.
 - jslint - Add implicit scope_block for:
     - if-else
-    - for-loop
-        - for-semicolon
-        - for-in
-        - for-of
     - while-loop
     - do-while
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
@@ -21,6 +19,8 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.7.1-beta
+- jslint - Add implicit scope_block for:
+    - for-loop
 - jslint - Change scope from scope_function to scope_block:
     - const-declaration
     - let-declaration
@@ -33,6 +33,7 @@
     - 'blockage' to 'scope_block'
     - 'functionage' to 'scope_function'
 - jslint - Add block-scope to internal-function jslint_phase3_parse().
+- jslint - Disable directive-option /*jslint for*/, replacing it with for-loop specific warnings.
 - jslint-ecma - Add ES2015-feature for..of.
 - jslint - Expand built-in-globals for browser, ecma, and node - auto-generated from online-sources.
 - jslint-ci - Add automated ci for shellcheck to lint shell-scripts.

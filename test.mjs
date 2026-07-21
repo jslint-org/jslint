@@ -810,16 +810,30 @@ aa();
             ],
             for: [
                 (`
-/*jslint for*/
-function aa(bb) {
-    for (bb = 0; bb < 0; bb += 1) {
-        bb();
+function aa(bb, cc) {
+    for (; bb < 0; bb += 1) { //jslint-ignore-line
+        bb(cc);
     }
-    for (const bb in bb) { //jslint-ignore-line
-        bb();
+    for (bb = 0; bb < 0; bb += 1) { //jslint-ignore-line
+        bb(cc);
     }
-    for (const bb of bb) { //jslint-ignore-line
-        bb();
+    for (cc in bb) { //jslint-ignore-line
+        bb(cc);
+    }
+    for (cc of bb) { //jslint-ignore-line
+        cc();
+    }
+    for (const ii in bb) { //jslint-ignore-line
+        bb(cc, ii);
+    }
+    for (const ii of bb) {
+        bb(cc, ii);
+    }
+    for (let ii = 0; ii < 0; ii += 1) {
+        bb(cc, ii);
+    }
+    for (let ii of bb) {
+        bb(cc, ii);
     }
 }
 aa();
@@ -1082,17 +1096,6 @@ jstestDescribe((
 // PR-404 - Alias "evil" to jslint-directive "eval" for backwards-compat.
 
         [{eval: true, evil: true}, "new Function();\neval();"],
-        [
-            {for: true},
-            (`
-function aa(aa) {
-    for (aa = 0; aa < 0; aa += 1) {
-        aa();
-    }
-}
-aa();
-            `)
-        ],
         [{getset: true}, "String({get aa() {\n    return;\n}});"],
         [{getset: true}, "String({set aa(aa) {\n    return aa;\n}});"],
         [{indent2: true}, sourceJslintMjs.replace((/    /g), "  ")],
