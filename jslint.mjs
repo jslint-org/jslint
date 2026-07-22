@@ -330,9 +330,11 @@
     role,
     round,
     scope_block,
+    scope_block_pop,
+    scope_block_push,
     scope_declared,
-    scope_stack_pop,
-    scope_stack_push,
+    scope_function_pop,
+    scope_function_push,
     scriptId,
     search,
     set,
@@ -1291,26 +1293,41 @@ function jslint(
         }
     }
 
-    function scope_stack_pop(stack) {
-        jslint_assert(stack.length > 1, `block_stack.length=${stack.length}`);
-        stack.shift();
-        return stack[0];
+    function scope_block_pop() {
+        jslint_assert(
+            block_stack.length > 1,
+            `block_stack.length=${block_stack.length}`
+        );
+        block_stack.shift();
+        return block_stack[0];
     }
 
-    function scope_stack_push(stack, stack_pushed, list_pushed) {
-        stack.unshift(stack_pushed);
-        if (stack === block_stack && !stack_pushed.context) {
-            stack_pushed.context = empty();
+    function scope_block_push(value, list_push) {
+        if (!value.context) {
+            value.context = empty();
         }
-        switch (list_pushed && stack) {
-        case block_stack:
-            block_list.push(list_pushed);
-            break;
-        case function_stack:
-            function_list.push(list_pushed);
-            break;
+        block_stack.unshift(value);
+        if (list_push) {
+            block_list.push(value);
         }
-        return stack_pushed;
+        return value;
+    }
+
+    function scope_function_pop() {
+        jslint_assert(
+            function_stack.length > 1,
+            `function_stack.length=${function_stack.length}`
+        );
+        function_stack.shift();
+        return function_stack[0];
+    }
+
+    function scope_function_push(value, list_push) {
+        function_stack.unshift(value);
+        if (list_push) {
+            function_list.push(value);
+        }
+        return value;
     }
 
     function stop(code, the_token, a, b, c, d) {
@@ -1789,8 +1806,10 @@ function jslint(
                 mode_shebang: false,    // true if #! is seen on the first line.
                 option_dict,
                 property_dict,
-                scope_stack_pop,
-                scope_stack_push,
+                scope_block_pop,
+                scope_block_push,
+                scope_function_pop,
+                scope_function_push,
                 source,
                 stop,
                 stop_at,
@@ -4278,8 +4297,10 @@ function jslint_phase3_parse(state) {
         is_equal,
         option_dict,
         property_dict,
-        scope_stack_pop,
-        scope_stack_push,
+        scope_block_pop,
+        scope_block_push,
+        scope_function_pop,
+        scope_function_push,
         stop,
         syntax_dict,
         tenure,
@@ -4445,7 +4466,7 @@ function jslint_phase3_parse(state) {
         }
         the_block = token_now;
         the_block.scope_block = true;
-        scope_block = scope_stack_push(block_stack, the_block, the_block);
+        scope_block = scope_block_push(the_block, true);
         if (special !== "body") {
             scope_function.statement_prv = the_block;
         }
@@ -4477,7 +4498,7 @@ function jslint_phase3_parse(state) {
         } else {
             the_block.disrupt = parsed_block[parsed_block.length - 1].disrupt;
         }
-        scope_block = scope_stack_pop(block_stack);
+        scope_block = scope_block_pop();
         if (!implicit) {
             advance("}");
         }
@@ -6073,12 +6094,8 @@ function jslint_phase3_parse(state) {
 
 // Push the current function context and establish a new one.
 
-        scope_block = scope_stack_push(block_stack, the_function, the_function);
-        scope_function = scope_stack_push(
-            function_stack,
-            the_function,
-            the_function
-        );
+        scope_block = scope_block_push(the_function, true);
+        scope_function = scope_function_push(the_function, true);
 
 // Parse the parameter list.
 
@@ -6220,8 +6237,8 @@ function jslint_phase3_parse(state) {
 
 // Restore the previous context.
 
-        scope_block = scope_stack_pop(block_stack);
-        scope_function = scope_stack_pop(function_stack);
+        scope_block = scope_block_pop();
+        scope_function = scope_function_pop();
         return the_function;
     }
 
@@ -6847,7 +6864,7 @@ function jslint_phase3_parse(state) {
 // PR-xxx - Add hidden scope_block for:
 // - for-variable
 
-        scope_block = scope_stack_push(block_stack, the_for, the_for);
+        scope_block = scope_block_push(the_for, true);
         advance("(");
         the_for.free = true;
         if (the_for.for_semicolon) {
@@ -7002,7 +7019,7 @@ function jslint_phase3_parse(state) {
 
             warn("weird_loop", the_for);
         }
-        scope_block = scope_stack_pop(block_stack);
+        scope_block = scope_block_pop();
         scope_function.loop -= 1;
         return the_for;
     }
@@ -7516,7 +7533,7 @@ function jslint_phase3_parse(state) {
 // PR-xxx - Add hidden scope_block for:
 // - catch-variable
 
-            scope_block = scope_stack_push(block_stack, the_catch, the_catch);
+            scope_block = scope_block_push(the_catch, true);
             if (token_nxt.id === "(") {
                 advance("(");
                 if (!token_nxt.identifier) {
@@ -7558,7 +7575,7 @@ function jslint_phase3_parse(state) {
 
 // Restore previous catch-scope after catch-block.
 
-            scope_block = scope_stack_pop(block_stack);
+            scope_block = scope_block_pop();
 
 // PR-404 - Relax warning about missing `catch` in `try...finally` statement.
 //
@@ -8078,8 +8095,8 @@ function jslint_phase3_parse(state) {
 
     block_stack.length = 0;
     function_stack.length = 0;
-    scope_block = scope_stack_push(block_stack, token_global, token_global);
-    scope_function = scope_stack_push(function_stack, token_global, undefined);
+    scope_block = scope_block_push(token_global, true);
+    scope_function = scope_function_push(token_global, false);
 
 // Init token_nxt.
 
@@ -8152,8 +8169,10 @@ function jslint_phase4_walk(state) {
         is_equal,
         is_weird,
         option_dict,
-        scope_stack_pop,
-        scope_stack_push,
+        scope_block_pop,
+        scope_block_push,
+        scope_function_pop,
+        scope_function_push,
         stop,
         syntax_dict,
         test_cause,
@@ -8747,7 +8766,7 @@ function jslint_phase4_walk(state) {
         if (thing.for_semicolon) {
             walk_statement(thing.for_semicolon[2]);
         }
-        scope_block = scope_stack_pop(block_stack);
+        scope_block = scope_block_pop();
     }
 
     function post_s_function(thing) {
@@ -8764,8 +8783,8 @@ function jslint_phase4_walk(state) {
 
             warn("unexpected_parens", thing);
         }
-        scope_block = scope_stack_pop(block_stack);
-        scope_function = scope_stack_pop(function_stack);
+        scope_block = scope_block_pop();
+        scope_function = scope_function_pop();
     }
 
     function post_s_import(the_thing) {
@@ -8782,7 +8801,7 @@ function jslint_phase4_walk(state) {
 // PR-xxx - Add hidden scope_block for:
 // - catch-variable
 
-            scope_block = scope_stack_push(block_stack, thing.catch, undefined);
+            scope_block = scope_block_push(thing.catch, false);
 
 // Recurse walk_statement().
 
@@ -8790,7 +8809,7 @@ function jslint_phase4_walk(state) {
 
 // Restore previous catch-scope after catch-block.
 
-            scope_block = scope_stack_pop(block_stack);
+            scope_block = scope_block_pop();
         }
     }
 
@@ -9098,7 +9117,7 @@ function jslint_phase4_walk(state) {
 // PR-xxx - Add hidden scope_block for:
 // - for-variable
 
-        scope_block = scope_stack_push(block_stack, thing, undefined);
+        scope_block = scope_block_push(thing, false);
         if (thing.for_semicolon) {
             walk_statement(thing.for_semicolon[0]);
             walk_expression(thing.for_semicolon[1]);
@@ -9135,8 +9154,8 @@ function jslint_phase4_walk(state) {
 // PR-xxx - Add hidden scope_block for:
 // - function-parameter
 
-        scope_block = scope_stack_push(block_stack, thing, undefined);
-        scope_function = scope_stack_push(function_stack, thing, undefined);
+        scope_block = scope_block_push(thing, false);
+        scope_function = scope_function_push(thing, false);
         if (thing.extra === "get") {
             if (thing.parameter_count !== 0) {
 
@@ -9250,7 +9269,7 @@ function jslint_phase4_walk(state) {
             return;
         }
         if (thing.scope_block) {
-            scope_block = scope_stack_push(block_stack, thing, undefined);
+            scope_block = scope_block_push(thing, false);
         }
         preamble(thing);
         walk_expression(thing.expression);
@@ -9284,7 +9303,7 @@ function jslint_phase4_walk(state) {
         walk_statement(thing.else);
         postamble(thing);
         if (thing.scope_block) {
-            scope_block = scope_stack_pop(block_stack);
+            scope_block = scope_block_pop();
         }
     }
 
@@ -9332,8 +9351,8 @@ function jslint_phase4_walk(state) {
 
     block_stack.length = 0;
     function_stack.length = 0;
-    scope_block = scope_stack_push(block_stack, token_global, undefined);
-    scope_function = scope_stack_push(function_stack, token_global, undefined);
+    scope_block = scope_block_push(token_global, false);
+    scope_function = scope_function_push(token_global, false);
 
 // Walk the token_tree.
 
@@ -9360,13 +9379,13 @@ function jslint_phase5_whitage(state) {
     const {
         artifact,
         block_list,
-        block_stack,
         option_dict,
         test_cause,
         token_global,
         token_list,
         warn
     } = state;
+    const indent_stack = [];
     let closer = "(end)";
     let dot_depth = 0;
 
@@ -9549,7 +9568,7 @@ function jslint_phase5_whitage(state) {
 
 // If right is a closer, then pop the previous state.
 
-        indentage = block_stack.pop();
+        indentage = indent_stack.pop();
         closer = indentage.closer;
         free = indentage.free;
         margin = indentage.margin;
@@ -9861,7 +9880,7 @@ function jslint_phase5_whitage(state) {
             open,
             opening
         };
-        block_stack.push(indentage);
+        indent_stack.push(indentage);
 
 // Commit 3903449a - Cleanup indent for multiline-method-chaining.
 
@@ -9943,10 +9962,6 @@ function jslint_phase5_whitage(state) {
         no_space_only();
     }
 
-// Init block_stack.
-
-    block_stack.length = 0;
-
 // uninitialized_and_unused();
 // Delve into the functions looking for variables that were not initialized
 // or used. If the file imports or exports, then its global object is also
@@ -9998,14 +10013,10 @@ function jslint_phase5_whitage(state) {
         delete left.used;
         left = right;
     });
-
-// Cleanup block_stack.
-
     jslint_assert(
-        block_stack.length === 0,
-        `block_stack.length=${block_stack.length}.`
+        indent_stack.length === 0,
+        `indent_stack.length=${indent_stack.length}.`
     );
-    block_stack.length = 0;
 }
 
 function jslint_report({
