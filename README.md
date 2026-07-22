@@ -949,7 +949,7 @@ if (false) {
 |  17. | ✅ | ES2015 | [`destructuring`](https://github.com/lukehoban/es6features#destructuring) |
 |  16. | ✅ | ES2015 | [`default + rest + spread`](https://github.com/lukehoban/es6features#default--rest--spread) |
 |  15. | ✅ | ES2015 | [`let + const`](https://github.com/lukehoban/es6features#let--const) |
-|  14. | ❌ | ES2015 | [`iterators + for..of`](https://github.com/lukehoban/es6features#iterators--forof) |
+|  14. | ⚠️ | ES2015 | [`iterators + for..of`](https://github.com/lukehoban/es6features#iterators--forof) |
 |  13. | ❌ | ES2015 | [`generators`](https://github.com/lukehoban/es6features#generators) |
 |  12. | ✅ | ES2015 | [`unicode`](https://github.com/lukehoban/es6features#unicode) |
 |  11. | ⚠️ | ES2015 | [`modules`](https://github.com/lukehoban/es6features#modules) |

@@ -985,16 +985,17 @@ aa();
             ],
             scope: [
                 "(function aa(bb = aa) {\n    aa(bb);\n}());",
+                (`
+/*jslint variable*/
+if (String) {
+    let aa = 0;
+    aa();
+} else {
+    let aa = 0;
+    aa();
+}
+                `),
                 "function aa(bb = aa) {\n    aa(bb);\n}\naa();",
-                //!! (`
-//!! if (String) {
-    //!! let aa = 0;
-    //!! aa();
-//!! } else {
-    //!! let aa = 0;
-    //!! aa();
-//!! }
-                //!! `),
                 (`
 if (String) {
     var aa = 0; //jslint-ignore-line

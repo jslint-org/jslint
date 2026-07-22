@@ -112,7 +112,6 @@
     block,
     block_list,
     block_stack,
-    body,
     browser,
     c,
     calls,
@@ -192,6 +191,7 @@
     fsWriteFileWithParents,
     fud_stmt,
     functionName,
+    function_body,
     function_list,
     function_stack,
     functions,
@@ -328,6 +328,7 @@
     reverse,
     role,
     round,
+    scope_block,
     scope_declared,
     scope_stack_pop,
     scope_stack_push,
@@ -1115,10 +1116,10 @@ function jslint(
     const tenure = empty();     // The predefined property registry.
     const token_global = {      // The global object; the outermost context.
         async: 0,
-        body: true,
         context: empty(),
         finally: 0,
         from: 0,
+        function_body: true,
         id: "(global)",
         level: 0,
         line: jslint_fudge,
@@ -4178,7 +4179,11 @@ function jslint_phase2_lex(state) {
             break;
         case ";":
             if (opener_stack[0]?.for) {
-                opener_stack[0].for.for_semicolon = [];
+                opener_stack[0].for.for_semicolon = [
+                    undefined,
+                    undefined,
+                    undefined
+                ];
             }
             break;
 
@@ -4406,22 +4411,45 @@ function jslint_phase3_parse(state) {
 
 // Parse a block, a sequence of statements wrapped in braces.
 //  special "body"      The block is a function body.
-//          "ignore"    No warning on an empty block.
-//          "naked"     No advance.
+//          "ignore"    No warning on an empty block '{}'.
+//          "naked"     No advance '{'.
 //          undefined   An ordinary block.
 
+        const implicit = (      // No advance '{'. No advance '}'.
+            token_nxt.id !== "{" && special !== "body" && special !== "naked"
+        );
         let parsed_block;
         let the_block;
-        if (special !== "naked") {
+        if (implicit) {
+
+// PR-xxx - Add implicit scope_block for:
+// - if-else
+// - for-loop
+// - while-loop
+// - do-while
+
+// test_cause:
+// ["do;while(0);", "block", "expected_a", "{", 12]
+// ["do;while(0);", "block", "expected_a", "{", 3]
+// ["for(;;);", "block", "expected_a", "{", 8]
+// ["if(0);else if(0);else;", "block", "expected_a", "{", 17]
+// ["if(0);else if(0);else;", "block", "expected_a", "{", 22]
+// ["if(0);else if(0);else;", "block", "expected_a", "{", 6]
+// ["while(0);", "block", "expected_a", "{", 9]
+
+            warn("expected_a", token_nxt, "{");
+        }
+        if (!implicit && special !== "naked") {
             advance("{");
         }
         the_block = token_now;
-        scope_block = scope_stack_push(block_stack, token_now, token_now);
+        the_block.scope_block = true;
+        scope_block = scope_stack_push(block_stack, the_block, the_block);
         if (special !== "body") {
             scope_function.statement_prv = the_block;
         }
         the_block.arity = "statement";
-        the_block.body = special === "body";
+        the_block.function_body = special === "body";
 
 // Top level function bodies may include the "use strict" pragma.
 
@@ -4449,7 +4477,9 @@ function jslint_phase3_parse(state) {
             the_block.disrupt = parsed_block[parsed_block.length - 1].disrupt;
         }
         scope_block = scope_stack_pop(block_stack);
-        advance("}");
+        if (!implicit) {
+            advance("}");
+        }
         return the_block;
     }
 
@@ -5134,20 +5164,26 @@ function jslint_phase3_parse(state) {
             warn("reserved_a", name);
             return;
         }
-        block_stack.some(function (scope_block, ii) {
-            earlier = scope_block.context[id];
-            if (earlier && ii === 0) {
 
 // Has the name been declared in this context?
+
+        earlier = scope_block.context[id];
+        if (earlier) {
 
 // test_cause:
 // ["let aa;(function aa(){})", "name_declare", "scope_current", "aa", 0]
 // ["let aa;function aa(){}", "name_declare", "scope_current", "aa", 0]
 // ["let aa;let aa", "name_declare", "scope_current", "aa", 0]
 
-                test_cause("scope_current", id);
-                warn("redefinition_a_b", name, id, earlier.line);
-            }
+            test_cause("scope_current", id);
+            warn("redefinition_a_b", name, id, earlier.line);
+            return;
+        }
+
+// Has the name been declared in an outer context?
+
+        block_stack.slice(1).some(function (scope_block) {
+            earlier = scope_block.context[id];
             return earlier;
         });
 
@@ -5176,11 +5212,18 @@ function jslint_phase3_parse(state) {
         ) {
 
 // test_cause:
+// ["for(let aa;;)let aa", "name_declare", "scope_outer", "aa", 0]
 // ["
 // function aa(){try{aa();}catch(aa){aa();}}
 // ", "name_declare", "scope_outer", "aa", 0]
 // ["function aa(){var aa}", "name_declare", "scope_outer", "aa", 0]
+// ["let aa;do let aa;while(0)", "name_declare", "scope_outer", "aa", 0]
+// ["let aa;do;while(0)let aa", "name_declare", "scope_outer", "aa", 0]
 // ["let aa;for(let aa;;){}", "name_declare", "scope_outer", "aa", 0]
+// ["let aa;if(0);else if(0)let aa", "name_declare", "scope_outer", "aa", 0]
+// ["let aa;if(0);else let aa", "name_declare", "scope_outer", "aa", 0]
+// ["let aa;if(0)let aa", "name_declare", "scope_outer", "aa", 0]
+// ["let aa;while(0)let aa", "name_declare", "scope_outer", "aa", 0]
 
             test_cause("scope_outer", id);
             warn("redefinition_a_b", name, id, earlier.line);
@@ -5523,6 +5566,10 @@ function jslint_phase3_parse(state) {
         let the_label;
         let the_statement;
         let the_symbol;
+        if (token_nxt.id === ";") {
+            semicolon();
+            return stmt_semicolon();
+        }
         advance();
         if (token_now.identifier && token_nxt.id === ":") {
             the_label = token_now;
@@ -6016,7 +6063,7 @@ function jslint_phase3_parse(state) {
 
 // A function expression may have an optional name.
 
-// PR-xxx - Restrict scope from scope_function to its own function-body:
+// PR-xxx - Restrict scope from scope_function to its own function_body:
 // - named-function-expression
 
             scope_declared = the_function;
@@ -6852,20 +6899,20 @@ function jslint_phase3_parse(state) {
         check_not_top_level(the_for);
         scope_function.loop += 1;
 
-// PR-xxx - Add implicit scope_block for:
-// - for-loop
+// PR-xxx - Add hidden scope_block for:
+// - for-variable
 
-        scope_block = scope_stack_push(block_stack, token_now, token_now);
+        scope_block = scope_stack_push(block_stack, the_for, the_for);
         advance("(");
-        token_now.free = true;
+        the_for.free = true;
         if (the_for.for_semicolon) {
             switch (token_nxt.id) {
             case ";":
 
 // test_cause:
-// ["for(;;){}", "stmt_for", "expected_a_b", "for (;", 1]
+// ["for(;;){}", "stmt_for", "expected_a_b", "for (;", 5]
 
-                warn("expected_a_b", the_for, "while (", "for (;");
+                warn("expected_a_b", token_nxt, "while (", "for (;");
                 break;
             case "const":
             case "var":
@@ -6891,12 +6938,28 @@ function jslint_phase3_parse(state) {
                 warn("expected_a", token_nxt, "let");
             }
             token_nxt.for_init = true;
-            the_for.for_semicolon.push(parse_statement_single());
+            the_for.for_semicolon[0] = parse_statement_single();
             token_nxt.for_init = true;
-            the_for.for_semicolon.push(parse_expression(0));
+            if (token_nxt.id === ";") {
+
+// test_cause:
+// ["for(;;){}", "stmt_for", "unexpected_a", ";", 6]
+
+                warn("unexpected_a", token_nxt);
+            } else {
+                the_for.for_semicolon[1] = parse_expression(0);
+            }
             advance(";");
             token_nxt.for_init = true;
-            the_for.for_semicolon.push(parse_expression(0));
+            if (token_nxt.id === ")") {
+
+// test_cause:
+// ["for(;;){}", "stmt_for", "unexpected_a", ")", 7]
+
+                warn("unexpected_a", token_nxt);
+            } else {
+                the_for.for_semicolon[2] = parse_expression(0);
+            }
         } else {
             switch (token_nxt.id) {
             case "const":
@@ -7437,7 +7500,8 @@ function jslint_phase3_parse(state) {
             the_try.catch = the_catch;
             advance("catch");
 
-// Create new catch-scope for catch-parameter.
+// PR-xxx - Add hidden scope_block for:
+// - catch-variable
 
             scope_block = scope_stack_push(block_stack, the_catch, the_catch);
             if (token_nxt.id === "(") {
@@ -7455,9 +7519,6 @@ function jslint_phase3_parse(state) {
                     name_declare(
 
 // 3.cat.1 - Mark 'declared', the catch-variable, before catch-block.
-
-// PR-xxx - Change scope from special-catch-scope to scope_block:
-// - catch-variable
 
                         scope_block,    // scope_declared
                         "exception",    // role
@@ -8683,7 +8744,6 @@ function jslint_phase4_walk(state) {
         delete scope_function.statement_prv;
         delete scope_function.switch;
         delete scope_function.try;
-        scope_function = scope_stack_pop(function_stack);
         if (thing.wrapped) {
 
 // test_cause:
@@ -8692,6 +8752,7 @@ function jslint_phase4_walk(state) {
             warn("unexpected_parens", thing);
         }
         scope_block = scope_stack_pop(block_stack);
+        scope_function = scope_stack_pop(function_stack);
     }
 
     function post_s_import(the_thing) {
@@ -8704,12 +8765,13 @@ function jslint_phase4_walk(state) {
         post_s_export_toplevel(the_thing);
     }
 
-    function post_s_lbrace_pop_block() {
-        scope_block = scope_stack_pop(block_stack);
-    }
-
     function post_s_try(thing) {
         if (thing.catch) {
+
+// PR-xxx - Add hidden scope_block for:
+// - catch-variable
+
+            scope_block = scope_stack_push(block_stack, thing.catch, undefined);
 
 // Recurse walk_statement().
 
@@ -9022,8 +9084,8 @@ function jslint_phase4_walk(state) {
 
     function pre_s_for(thing) {
 
-// PR-xxx - Add implicit scope_block for:
-// - for-loop
+// PR-xxx - Add hidden scope_block for:
+// - for-variable
 
         scope_block = scope_stack_push(block_stack, thing, undefined);
         if (thing.for_semicolon) {
@@ -9051,10 +9113,10 @@ function jslint_phase4_walk(state) {
 // ["function aa(){}", "pre_s_function", "", "", 0]
 
         test_cause("");
-        if (thing.arity === "statement" && scope_block.body !== true) {
+        if (thing.arity === "statement" && !scope_block.function_body) {
 
 // test_cause:
-// ["if(0){function aa(){}\n}", "pre_s_function", "unexpected_a", "function", 7]
+// ["if(0){function aa(){}}", "pre_s_function", "unexpected_a", "function", 7]
 
             warn("unexpected_a", thing);
         }
@@ -9104,19 +9166,6 @@ function jslint_phase4_walk(state) {
 
             name.alive = true;
         });
-    }
-
-    function pre_s_lbrace(thing) {
-        scope_block = scope_stack_push(block_stack, thing, undefined);
-    }
-
-    function pre_s_try(thing) {
-        if (thing.catch) {
-
-// Create new catch-scope for catch-parameter.
-
-            scope_block = scope_stack_push(block_stack, thing.catch, undefined);
-        }
     }
 
     function pre_v_var(thing) {
@@ -9202,6 +9251,9 @@ function jslint_phase4_walk(state) {
             thing.forEach(walk_statement);
             return;
         }
+        if (thing.scope_block) {
+            scope_block = scope_stack_push(block_stack, thing, undefined);
+        }
         preamble(thing);
         walk_expression(thing.expression);
         if (thing.arity === "binary") {
@@ -9233,6 +9285,9 @@ function jslint_phase4_walk(state) {
         walk_statement(thing.block);
         walk_statement(thing.else);
         postamble(thing);
+        if (thing.scope_block) {
+            scope_block = scope_stack_pop(block_stack);
+        }
     }
 
     postaction = action(posts);
@@ -9255,7 +9310,6 @@ function jslint_phase4_walk(state) {
     postaction("statement", "let", post_s_var);
     postaction("statement", "try", post_s_try);
     postaction("statement", "var", post_s_var);
-    postaction("statement", "{", post_s_lbrace_pop_block);
     postaction("ternary", "(all)", post_t_ternary);
     postaction("unary", "(all)", post_u_unary);
     postaction("unary", "+", post_u_plus);
@@ -9272,8 +9326,6 @@ function jslint_phase4_walk(state) {
     preaction("binary", "||", pre_b_or);
     preaction("statement", "for", pre_s_for);
     preaction("statement", "function", pre_s_function);
-    preaction("statement", "try", pre_s_try);
-    preaction("statement", "{", pre_s_lbrace);
     preaction("unary", "function", pre_s_function);
     preaction("unary", "~", pre_a_bitwise);
     preaction("variable", "(all)", pre_v_var);
