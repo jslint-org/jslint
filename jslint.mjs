@@ -1565,6 +1565,9 @@ function jslint(
         case "nested_comment":
             mm = `Nested comment.`;
             break;
+        case "not_label_a":
+            mm = `'${a}' is not a label.`;
+            break;
         case "number_isNaN":
             mm = `Use Number.isNaN function to compare with NaN.`;
             break;
@@ -1612,9 +1615,6 @@ function jslint(
             break;
         case "undeclared_a":
             mm = `Undeclared '${a}'.`;
-            break;
-        case "undeclared_label_a":
-            mm = `Undeclared label '${a}'.`;
             break;
         case "unexpected_a":
             mm = `Unexpected '${a}'.`;
@@ -5192,7 +5192,6 @@ function jslint_phase3_parse(state) {
         if (earlier) {
 
 // test_cause:
-// ["aa:let aa", "name_declare", "scope_current", "aa", 0]
 // ["let aa;(function aa(){})", "name_declare", "scope_current", "aa", 0]
 // ["let aa;function aa(){}", "name_declare", "scope_current", "aa", 0]
 // ["let aa;let aa", "name_declare", "scope_current", "aa", 0]
@@ -5211,7 +5210,7 @@ function jslint_phase3_parse(state) {
                 if (earlier.role !== "label") {
 
 // test_cause:
-// ["let aa;aa:0", "name_declare", "label_vs_not_label", "aa", 0]
+// ["let aa;aa:while(0){}", "name_declare", "label_vs_not_label", "aa", 0]
 
                     test_cause("label_vs_not_label", id);
                     warn("redefinition_a_b", name, id, earlier.line);
@@ -5224,7 +5223,7 @@ function jslint_phase3_parse(state) {
                 if (earlier.role === "label") {
 
 // test_cause:
-// ["aa:{let aa}", "name_declare", "default_vs_label", "aa", 0]
+// ["aa:while(0){let aa}", "name_declare", "default_vs_label", "aa", 0]
 
                     test_cause("default_vs_label", id);
                     warn("redefinition_a_b", name, id, earlier.line);
@@ -5618,11 +5617,10 @@ function jslint_phase3_parse(state) {
         }
         advance();
         if (token_now.identifier && token_nxt.id === ":") {
-            //!! the_statement = stmt_label();
-            //!! if (the_statement) {
-                //!! return the_statement;
-            //!! }
-            return stmt_label();
+            the_statement = stmt_label();
+            if (the_statement) {
+                return the_statement;
+            }
         }
 
 // Parse the statement.
@@ -6644,10 +6642,10 @@ function jslint_phase3_parse(state) {
             if (!the_label) {
 
 // test_cause:
-// ["aa:while(0){}break aa", "stmt_break", "undeclared_label_a", "aa", 20]
-// ["break aa", "stmt_break", "undeclared_label_a", "aa", 7]
+// ["aa:while(0){}break aa", "stmt_break", "not_label_a", "aa", 20]
+// ["break aa", "stmt_break", "not_label_a", "aa", 7]
 
-                warn("undeclared_label_a", token_nxt);
+                warn("not_label_a", token_nxt);
             }
             the_break.label_break = token_nxt;
             advance();
@@ -7234,11 +7232,6 @@ function jslint_phase3_parse(state) {
     function stmt_label() {
         const the_label = token_now;
         let the_statement;
-
-// PR-xxx - Add hidden scope_block for:
-// - label-name
-
-        scope_block = scope_block_push(the_label, true);
         if (the_label.id === "ignore") {
 
 // test_cause:
@@ -7272,9 +7265,14 @@ function jslint_phase3_parse(state) {
 // ["aa:bb:0", "stmt_label", "unexpected_label_a", "aa", 1]
 
             warn("unexpected_label_a", the_label);
-            //!! advance();
-            //!! return;
+            advance();
+            return;
         }
+
+// PR-xxx - Add hidden scope_block for:
+// - label-name
+
+        scope_block = scope_block_push(the_label, true);
         name_declare(
 
 // 5.lab.1 - Mark 'declared', the label-name, before control-flow-block.
@@ -7635,7 +7633,47 @@ function jslint_phase3_parse(state) {
         );
         const the_variable = token_now;
         let name;
+        let the_operator;
         let variable_prv;
+        function advance_operator() {
+            switch (the_operator.id) {
+            case "=":
+                the_variable.operator = the_operator;
+                advance("=");
+                break;
+            case "in":
+            case "of":
+                if (for_init) {
+
+// test_cause:
+// ["for(let aa in 0){}", "advance_operator", "for_init", "in", 0]
+// ["for(let aa of 0){}", "advance_operator", "for_init", "of", 0]
+// ["for(let {aa} in 0){}", "advance_operator", "for_init", "in", 0]
+// ["for(let {aa} of 0){}", "advance_operator", "for_init", "of", 0]
+
+                    test_cause("for_init", the_operator.id);
+                    the_variable.operator = the_operator;
+                    advance();
+                    break;
+                }
+
+// test_cause:
+// ["let aa in 0", "advance_operator", "not_for_init", "in", 0]
+// ["let aa of 0", "advance_operator", "not_for_init", "of", 0]
+// ["let {aa} in 0", "advance_operator", "not_for_init", "in", 0]
+// ["let {aa} of 0", "advance_operator", "not_for_init", "of", 0]
+
+                test_cause("not_for_init", the_operator.id);
+                the_variable.operator = the_operator;
+                advance("=");
+                break;
+            default:
+                if (readonly) {
+                    the_variable.operator = the_operator;
+                    advance("=");
+                }
+            }
+        }
         the_variable.name_list = [];    // 5. name_list for "let [aa] = ..."
 
 // A program may use var or let, but not both.
@@ -7723,7 +7761,8 @@ function jslint_phase3_parse(state) {
                     undefined,          // the_function
                     false               // the_function_toplevel
                 );
-                advance("=");
+                the_operator = token_nxt;
+                advance_operator();
                 the_variable.expression = parse_expression(0);
             } else if (token_nxt.identifier) {
                 name = token_nxt;
@@ -7737,41 +7776,14 @@ function jslint_phase3_parse(state) {
 
                     warn("unexpected_a", name);
                 }
-                switch (token_nxt.id) {
+                the_operator = token_nxt;
+                advance_operator();
+                switch (the_operator.id) {
                 case "=":
-                    the_variable.operator = token_nxt;
-                    advance("=");
-                    name.expression = parse_expression(0);
-                    break;
                 case "in":
                 case "of":
-                    if (for_init) {
-
-// test_cause:
-// ["for(let aa in 0){}", "stmt_var", "for_init", "in", 0]
-// ["for(let aa of 0){}", "stmt_var", "for_init", "of", 0]
-
-                        test_cause("for_init", token_nxt.id);
-                        the_variable.operator = token_nxt;
-                        advance();
-                        name.expression = parse_expression(0);
-                        break;
-                    }
-
-// test_cause:
-// ["let aa in 0", "stmt_var", "not_for_init", "in", 0]
-// ["let aa of 0", "stmt_var", "not_for_init", "of", 0]
-
-                    test_cause("not_for_init", token_nxt.id);
-                    the_variable.operator = token_nxt;
-                    advance("=");
+                    name.expression = parse_expression(0);
                     break;
-                default:
-                    if (readonly) {
-                        the_variable.operator = token_nxt;
-                        advance("=");
-                        name.expression = parse_expression(0);
-                    }
                 }
                 name_declare(
 
@@ -8316,7 +8328,7 @@ function jslint_phase4_walk(state) {
             }
             return the_variable;
         });
-        if (!the_variable && !global_dict[id]) {
+        if (!the_variable && global_dict[id] === undefined) {
 
 // test_cause:
 // ["(function aa(){})aa", "name_lookup", "undeclared_a", "aa", 18]
@@ -8815,7 +8827,7 @@ function jslint_phase4_walk(state) {
     }
 
     function post_s_try(thing) {
-        if (thing.catch) {
+        if (thing.catch !== undefined) {
 
 // PR-xxx - Add hidden scope_block for:
 // - catch-variable

@@ -1584,8 +1584,7 @@ if (!mode_debug) {
     editor.setValue(String(`
 #!/usr/bin/env node
 /*jslint browser, node*/
-/*global caches, indexedDb*/
-import https from "https";
+/*global indexedDb, localStorage*/
 import jslint from \u0022./jslint.mjs\u0022;
 
 /*jslint-disable*/
@@ -1597,6 +1596,15 @@ eval("console.log(\\"hello world\\");"); //jslint-ignore-line
 
 eval("console.log(\\"hello world\\");");
 
+await (async function () {
+    let result = await fetch("https://www.jslint.com/jslint.mjs");
+    result = await result.text();
+    result = jslint.jslint(result);
+    for (const {formatted_message} of result.warnings) {
+        console.error(formatted_message);
+    }
+}());
+
 // Optional directives.
 // .... /*jslint beta*/ .......... Enable experimental warnings.
 // .... /*jslint bitwise*/ ....... Allow bitwise operator.
@@ -1606,7 +1614,6 @@ eval("console.log(\\"hello world\\");");
 // .... /*jslint devel*/ ......... Allow console.log() and friends.
 // .... /*jslint eval*/ .......... Allow eval().
 // .... /*jslint fart*/ .......... Allow complex fat-arrow.
-// .... /*jslint for*/ ........... Allow for-statement.
 // .... /*jslint getset*/ ........ Allow get() and set().
 // .... /*jslint indent2*/ ....... Use 2-space indent.
 // .... /*jslint long*/ .......... Allow long lines.
@@ -1619,25 +1626,6 @@ eval("console.log(\\"hello world\\");");
 // .... /*jslint unordered*/ ..... Allow unordered cases, params, properties,
 // ................................... variables, and exports.
 // .... /*jslint white*/ ......... Allow messy whitespace.
-
-await (async function () {
-    let result = await new Promise(function (resolve) {
-        https.request("https://www.jslint.com/jslint.mjs", function (res) {
-            result = "";
-            res.on("data", function (chunk) {
-                result += chunk;
-            }).on("end", function () {
-                resolve(result);
-            }).setEncoding("utf8");
-        }).end();
-    });
-    result = jslint.jslint(result);
-    result.warnings.forEach(function ({
-        formatted_message
-    }) {
-        console.error(formatted_message);
-    });
-}());
     `).trim() + "\n");
 }
 

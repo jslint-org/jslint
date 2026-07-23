@@ -703,13 +703,13 @@ String.aa().getTime();
     aa(bb, cc, dd, ee, ff, gg);
 }());
                     `),
-                    //!! (`
-//!! (function zz() {
-    //!! for (const {expr} of zz) {
-        //!! aa(bb, cc, dd, ee, ff, gg);
-    //!! }
-//!! }());
-                    //!! `),
+                    (`
+(function for_loop() {
+    for (const {expr} of for_loop) {
+        aa(bb, cc, dd, ee, ff, gg);
+    }
+}());
+                    `),
                     (`
 /*jslint fart*/
 (({expr}) => {
@@ -720,7 +720,7 @@ String.aa().getTime();
                     "let {expr}",
                     "let [aa, bb, cc, dd, ee, ff, gg] = 0;\n{expr}"
                 ].map(function (source) {
-                    source = source.trim().replace("{expr}", String(`
+                    let expr = String(`
 [
     {
         cc,
@@ -734,7 +734,11 @@ String.aa().getTime();
         ...ff
     ]
 ]
-                    `).trim());
+                    `).trim();
+                    if ((/function for_loop/).test(source)) {
+                        expr = expr.replace((/\n/g), "\n    ");
+                    }
+                    source = source.trim().replace("{expr}", expr);
                     if (!(/\=>|function/).test(source)) {
                         source = (`
 ${source} = (function () {
