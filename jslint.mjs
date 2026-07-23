@@ -240,7 +240,8 @@
     jstestIt,
     jstestOnExit,
     keys,
-    label_goto,
+    label_break,
+    label_name,
     lbp,
     led_infix,
     length,
@@ -1564,9 +1565,6 @@ function jslint(
         case "nested_comment":
             mm = `Nested comment.`;
             break;
-        case "not_label_a":
-            mm = `'${a}' is not a label.`;
-            break;
         case "number_isNaN":
             mm = `Use Number.isNaN function to compare with NaN.`;
             break;
@@ -1614,6 +1612,9 @@ function jslint(
             break;
         case "undeclared_a":
             mm = `Undeclared '${a}'.`;
+            break;
+        case "undeclared_label_a":
+            mm = `Undeclared label '${a}'.`;
             break;
         case "unexpected_a":
             mm = `Unexpected '${a}'.`;
@@ -4451,8 +4452,7 @@ function jslint_phase3_parse(state) {
 // - do-while
 
 // test_cause:
-// ["do;while(0);", "block", "expected_a", "{", 12]
-// ["do;while(0);", "block", "expected_a", "{", 3]
+// ["do;while(0)", "block", "expected_a", "{", 3]
 // ["for(;;);", "block", "expected_a", "{", 8]
 // ["if(0);else if(0);else;", "block", "expected_a", "{", 17]
 // ["if(0);else if(0);else;", "block", "expected_a", "{", 22]
@@ -5154,10 +5154,9 @@ function jslint_phase3_parse(state) {
 // 4.par.2 - Mark 'alive', the function-parameter, after destructuring.
 // 4.par.3 - Mark 'init', the function-parameter, if unwrapped.
 //
-// 5.lab.1 - Mark 'declared', the statement-label, before control-flow-block.
-// 5.lab.2 - Mark 'alive', the statement-label, before control-flow-block.
-// 5.lab.3 - Mark 'init', the statement-label, before control-flow-block.
-// 5.lab.4 - Mark 'out-of-scope', the statement-label, after control-flow-block.
+// 5.lab.1 - Mark 'declared', the label-name, before control-flow-block.
+// 5.lab.2 - Mark 'alive', the label-name, before control-flow-block.
+// 5.lab.3 - Mark 'init', the label-name, before control-flow-block.
 
         const id = name.id;
         let earlier;
@@ -5193,6 +5192,7 @@ function jslint_phase3_parse(state) {
         if (earlier) {
 
 // test_cause:
+// ["aa:let aa", "name_declare", "scope_current", "aa", 0]
 // ["let aa;(function aa(){})", "name_declare", "scope_current", "aa", 0]
 // ["let aa;function aa(){}", "name_declare", "scope_current", "aa", 0]
 // ["let aa;let aa", "name_declare", "scope_current", "aa", 0]
@@ -5206,6 +5206,31 @@ function jslint_phase3_parse(state) {
 
         block_stack.slice(1).some(function (scope_block) {
             earlier = scope_block.context[id];
+            switch (Boolean(earlier) && role) {
+            case "label":
+                if (earlier.role !== "label") {
+
+// test_cause:
+// ["let aa;aa:0", "name_declare", "label_vs_not_label", "aa", 0]
+
+                    test_cause("label_vs_not_label", id);
+                    warn("redefinition_a_b", name, id, earlier.line);
+                    earlier = undefined;
+                }
+                break;
+            case false:
+                break;
+            default:
+                if (earlier.role === "label") {
+
+// test_cause:
+// ["aa:{let aa}", "name_declare", "default_vs_label", "aa", 0]
+
+                    test_cause("default_vs_label", id);
+                    warn("redefinition_a_b", name, id, earlier.line);
+                    earlier = undefined;
+                }
+            }
             return earlier;
         });
 
@@ -5593,10 +5618,11 @@ function jslint_phase3_parse(state) {
         }
         advance();
         if (token_now.identifier && token_nxt.id === ":") {
-            the_statement = stmt_label();
-            if (the_statement) {
-                return the_statement;
-            }
+            //!! the_statement = stmt_label();
+            //!! if (the_statement) {
+                //!! return the_statement;
+            //!! }
+            return stmt_label();
         }
 
 // Parse the statement.
@@ -6605,31 +6631,25 @@ function jslint_phase3_parse(state) {
         }
         the_break.disrupt = true;
         if (token_nxt.identifier && token_now.line === token_nxt.line) {
-            the_label = scope_function.context[token_nxt.id];
-            if (
-                !the_label
-                || the_label.role !== "label"
-                || !the_label.alive
-            ) {
-                if (the_label && !the_label.alive) {
-
-// Warn statement-label is 'out-of-scope'.
-
-// test_cause:
-// ["aa:{function aa(aa){break aa}}", "stmt_break", "out_of_scope_a", "aa", 27]
-
-                    warn("out_of_scope_a");
-                } else {
-
-// test_cause:
-// ["aa:{break aa}", "stmt_break", "not_label_a", "aa", 11]
-
-                    warn("not_label_a");
+            block_stack.some(function (scope_block) {
+                the_label = scope_block.context[token_nxt.id];
+                if (the_label?.role !== "label") {
+                    the_label = undefined;
                 }
-            } else {
-                the_label.used = true;
+                if (the_label) {
+                    the_label.used = true;
+                    return true;
+                }
+            });
+            if (!the_label) {
+
+// test_cause:
+// ["aa:while(0){}break aa", "stmt_break", "undeclared_label_a", "aa", 20]
+// ["break aa", "stmt_break", "undeclared_label_a", "aa", 7]
+
+                warn("undeclared_label_a", token_nxt);
             }
-            the_break.label_goto = token_nxt;
+            the_break.label_break = token_nxt;
             advance();
         }
         semicolon();
@@ -6643,8 +6663,8 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["continue", "stmt_continue", "unexpected_a", "continue", 1]
 // ["
-// function aa(){while(0){try{}finally{continue}}}
-// ", "stmt_continue", "unexpected_a", "continue", 37]
+// while(0){try{}finally{continue}}
+// ", "stmt_continue", "unexpected_a", "continue", 23]
 
             warn("unexpected_a", the_continue);
         }
@@ -6697,7 +6717,7 @@ function jslint_phase3_parse(state) {
         if (the_do.block.disrupt === true) {
 
 // test_cause:
-// ["function aa(){do{break}while(0)}", "stmt_do", "weird_loop", "do", 15]
+// ["do{break}while(0)", "stmt_do", "weird_loop", "do", 1]
 
             warn("weird_loop", the_do);
         }
@@ -7214,6 +7234,11 @@ function jslint_phase3_parse(state) {
     function stmt_label() {
         const the_label = token_now;
         let the_statement;
+
+// PR-xxx - Add hidden scope_block for:
+// - label-name
+
+        scope_block = scope_block_push(the_label, true);
         if (the_label.id === "ignore") {
 
 // test_cause:
@@ -7247,35 +7272,31 @@ function jslint_phase3_parse(state) {
 // ["aa:bb:0", "stmt_label", "unexpected_label_a", "aa", 1]
 
             warn("unexpected_label_a", the_label);
-            advance();
-            return;
+            //!! advance();
+            //!! return;
         }
         name_declare(
 
-// 5.lab.1 - Mark 'declared', the statement-label, before control-flow-block.
+// 5.lab.1 - Mark 'declared', the label-name, before control-flow-block.
 
-            scope_function,     // scope_declared
+            scope_block,        // scope_declared
             "label",            // role
             true,               // readonly
             [],                 // name_list
             the_label,          // name
 
-// 5.lab.3 - Mark 'init', the statement-label, before control-flow-block.
+// 5.lab.3 - Mark 'init', the label-name, before control-flow-block.
 
             true                // init
         );
 
-// 5.lab.2 - Mark 'alive', the statement-label, before control-flow-block.
+// 5.lab.2 - Mark 'alive', the label-name, before control-flow-block.
 
         the_label.alive = true;
         the_statement = parse_statement_single();
-
-// 5.lab.4 - Mark 'out-of-scope', the statement-label, after control-flow-block.
-
-        the_label.alive = false;
-        //!! the_statement.label = the_label;
-        //!! the_statement.statement = true;
+        the_statement.label_name = the_label;
         scope_function.statement_prv = the_statement;
+        scope_block = scope_block_pop();
         return the_statement;
     }
 
@@ -7417,7 +7438,7 @@ function jslint_phase3_parse(state) {
             the_cases.push(the_case);
             last = parsed_block[parsed_block.length - 1];
             if (last.disrupt) {
-                if (last.id === "break" && last.label_goto === undefined) {
+                if (last.id === "break" && last.label_break === undefined) {
                     the_disrupt = false;
                 }
             } else {
@@ -7472,7 +7493,7 @@ function jslint_phase3_parse(state) {
                 ];
                 if (
                     the_last.id === "break"
-                    && the_last.label_goto === undefined
+                    && the_last.label_break === undefined
                 ) {
 
 // test_cause:
@@ -7826,7 +7847,7 @@ function jslint_phase3_parse(state) {
         if (the_while.block.disrupt === true) {
 
 // test_cause:
-// ["function aa(){while(0){break}}", "stmt_while", "weird_loop", "while", 15]
+// ["while(0){break}", "stmt_while", "weird_loop", "while", 1]
 
             warn("weird_loop", the_while);
         }
@@ -8307,8 +8328,6 @@ function jslint_phase4_walk(state) {
 // ["if(0){function aa(){}}aa", "name_lookup", "undeclared_a", "aa", 23]
 // ["if(0){let aa}aa", "name_lookup", "undeclared_a", "aa", 14]
 // ["try{}catch(aa){}aa", "name_lookup", "undeclared_a", "aa", 17]
-
-//!! // ["aa:while(0){}aa", "name_lookup", "undeclared_a", "aa", 14]
 
             warn("undeclared_a", thing);
             return;
@@ -9268,6 +9287,13 @@ function jslint_phase4_walk(state) {
             thing.forEach(walk_statement);
             return;
         }
+
+// PR-xxx - Add hidden scope_block for:
+// - label-name
+
+        if (thing.label_name) {
+            scope_block = scope_block_push(thing.label_name, false);
+        }
         if (thing.scope_block) {
             scope_block = scope_block_push(thing, false);
         }
@@ -9303,6 +9329,9 @@ function jslint_phase4_walk(state) {
         walk_statement(thing.else);
         postamble(thing);
         if (thing.scope_block) {
+            scope_block = scope_block_pop();
+        }
+        if (thing.label_name) {
             scope_block = scope_block_pop();
         }
     }

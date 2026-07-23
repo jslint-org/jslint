@@ -8,8 +8,6 @@
 - jslint - Change warning 'uninitialized_a' to 'unassigned_variable_a'.
 - jslint - Change warning 'out_of_scope_a' to 'temporal_dead_zone_a'.
 - jslint - Add warning and tdz for function-declaration inside block-scope.
-- jslint - Add hidden scope_block for:
-    - statement-label
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
 - jslint - Add ability to auto-fix whitespace.
@@ -18,19 +16,20 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.7.1-beta
-- jslint - Add implicit scope_block for:
-    - if-else
-    - for-loop
-    - while-loop
-    - do-while
-- jslint - Add hidden scope_block for:
-    - catch-variable
-    - for-variable
-    - function-parameter
 - jslint - Change scope from scope_function to scope_block:
     - const-declaration
     - let-declaration
     - function-declaration
+- jslint - Add implicit scope_block for:
+    - do-while
+    - for-loop
+    - if-else
+    - while-loop
+- jslint - Add hidden scope_block for:
+    - catch-variable
+    - for-variable
+    - function-parameter
+    - label-name
 - jslint - Restrict scope from scope_function to its own function-body:
     - named-function-expression
 - jslint - Rename internal scope-variables to imporove readability of scope-logic:

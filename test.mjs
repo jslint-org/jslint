@@ -703,6 +703,13 @@ String.aa().getTime();
     aa(bb, cc, dd, ee, ff, gg);
 }());
                     `),
+                    //!! (`
+//!! (function zz() {
+    //!! for (const {expr} of zz) {
+        //!! aa(bb, cc, dd, ee, ff, gg);
+    //!! }
+//!! }());
+                    //!! `),
                     (`
 /*jslint fart*/
 (({expr}) => {
@@ -885,8 +892,46 @@ String
             label: [
                 (`
 function aa() {
-bb:
-    while (true) {
+bb: do {
+        if (true) {
+            break bb;
+        }
+    } while (true);
+}
+aa();
+                `),
+                (`
+function aa() {
+bb: for (const ii of aa) {
+        if (ii) {
+            break bb;
+        }
+    }
+}
+aa();
+                `),
+                (`
+function aa() {
+bb: for (let ii = 0; ii < 0; ii += 1) {
+        if (ii) {
+            break bb;
+        }
+    }
+}
+aa();
+                `),
+                (`
+function aa() {
+bb: switch (aa) {
+    case 0:
+        break bb;
+    }
+}
+aa();
+                `),
+                (`
+function aa() {
+bb: while (true) {
         if (true) {
             break bb;
         }
