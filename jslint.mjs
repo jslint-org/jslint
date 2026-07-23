@@ -357,7 +357,6 @@
     startOffset,
     startsWith,
     statement,
-    statement_prv,
     stdio,
     stop,
     stop_at,
@@ -395,7 +394,9 @@
     v8CoverageListMerge,
     v8CoverageReportCreate,
     value,
+    var_on_top,
     variable,
+    variable_prv,
     version,
     versions,
     warn,
@@ -1703,8 +1704,8 @@ function jslint(
         case "use_spaces":
             mm = `Use spaces, not tabs.`;
             break;
-        case "var_on_top":
-            mm = `Move variable declaration to top of function or script.`;
+        case "var_on_top_a_b":
+            mm = `Move ${a} declaration to top of ${b} or script.`;
             break;
         case "var_switch":
             mm = `Don't declare variables in a switch.`;
@@ -4468,7 +4469,7 @@ function jslint_phase3_parse(state) {
         the_block.scope_block = true;
         scope_block = scope_block_push(the_block, true);
         if (special !== "body") {
-            scope_function.statement_prv = the_block;
+            check_ordered_var(the_block);
         }
         the_block.arity = "statement";
         the_block.function_body = special === "body";
@@ -4648,6 +4649,87 @@ function jslint_phase3_parse(state) {
             }
             return bb;
         }, undefined);
+    }
+
+    function check_ordered_var(the_variable) {
+
+// This function will check:
+// - const and let declarations are on top of scope_block.
+// - const and let declarations are ordered within scope_block
+// - var declarations are on top of scope_function.
+// - var declarations are ordered within scope_function
+
+        function check(variable_prv, bb) {
+            switch (
+                Boolean(variable_prv)
+                && !variable_prv.for_init
+                && variable_prv.id
+            ) {
+            case "const":
+            case "let":
+            case "var":
+                if (
+                    option_dict.beta
+                    && !option_dict.unordered
+                    && !option_dict.variable
+                    && variable_prv
+                    && (
+                        variable_prv.id + " " + variable_prv.name_list[0].id
+                        > the_variable.id + " " + the_variable.name_list[0].id
+                    )
+                ) {
+
+// test_cause:
+// ["const bb=0;const aa=0", "check", "expected_a_b_before_c_d", "aa", 12]
+// ["let bb;let aa", "check", "expected_a_b_before_c_d", "aa", 8]
+// ["var bb;var aa", "check", "expected_a_b_before_c_d", "aa", 8]
+
+                    warn(
+                        "expected_a_b_before_c_d",
+                        the_variable,
+                        the_variable.id,
+                        the_variable.name_list[0].id,
+                        variable_prv.id,
+                        variable_prv.name_list[0].id
+                    );
+                }
+                break;
+            case "import":
+            case false:
+
+// test_cause:
+// ["import \"aa\";let aa", "check", "import", "", 0]
+
+                test_cause("import");
+                break;
+            default:
+                if (option_dict.beta && !option_dict.variable) {
+
+// test_cause:
+// ["String();const aa=0", "check", "var_on_top_a_b", "block", 10]
+// ["String();let aa", "check", "var_on_top_a_b", "block", 10]
+// ["String();var aa", "check", "var_on_top_a_b", "function", 10]
+// ["try{}catch{var aa}", "check", "var_on_top_a_b", "function", 12]
+// ["while(0){var aa}", "check", "var_on_top_a_b", "function", 10]
+
+                    warn("var_on_top_a_b", the_variable, the_variable.id, bb);
+                }
+            }
+        }
+        switch (the_variable.id) {
+        case "const":
+        case "let":
+            check(scope_block.variable_prv, "block");
+            scope_block.variable_prv = the_variable;
+            break;
+        case "var":
+            check(scope_function.variable_prv, "function");
+            scope_function.variable_prv = the_variable;
+            break;
+        default:
+            scope_block.variable_prv = the_variable;
+            scope_function.variable_prv = the_variable;
+        }
     }
 
     function condition() {
@@ -5654,7 +5736,7 @@ function jslint_phase3_parse(state) {
             }
             semicolon();
         }
-        scope_function.statement_prv = the_statement;
+        check_ordered_var(the_statement);
         return the_statement;
     }
 
@@ -7293,7 +7375,7 @@ function jslint_phase3_parse(state) {
         the_label.alive = true;
         the_statement = parse_statement_single();
         the_statement.label_name = the_label;
-        scope_function.statement_prv = the_statement;
+        check_ordered_var(the_statement);
         scope_block = scope_block_pop();
         return the_statement;
     }
@@ -7634,7 +7716,6 @@ function jslint_phase3_parse(state) {
         const the_variable = token_now;
         let name;
         let the_operator;
-        let variable_prv;
         function advance_operator() {
             switch (the_operator.id) {
             case "=":
@@ -7698,46 +7779,6 @@ function jslint_phase3_parse(state) {
 // ["switch(0){case 0:var aa}", "stmt_var", "var_switch", "var", 18]
 
             warn("var_switch", the_variable);
-        }
-        switch (
-            Boolean(scope_function.statement_prv && !for_init)
-            && scope_function.statement_prv.id
-        ) {
-        case "const":
-        case "let":
-        case "var":
-
-// test_cause:
-// ["const aa=0;const bb=0", "stmt_var", "var_prv", "const", 0]
-// ["let aa=0;let bb=0", "stmt_var", "var_prv", "let", 0]
-// ["var aa=0;var bb=0", "stmt_var", "var_prv", "var", 0]
-
-            test_cause("var_prv", scope_function.statement_prv.id);
-            variable_prv = scope_function.statement_prv;
-            break;
-        case "import":
-
-// test_cause:
-// ["import aa from \"aa\";\nlet bb=0;", "stmt_var", "import_prv", "", 0]
-
-            test_cause("import_prv");
-            break;
-        case false:
-            break;
-        default:
-            if (
-                (option_dict.beta && !option_dict.variable)
-                || the_variable.id === "var"
-            ) {
-
-// test_cause:
-// ["console.log();let aa=0", "stmt_var", "var_on_top", "let", 15]
-// ["console.log();var aa=0", "stmt_var", "var_on_top", "var", 15]
-// ["try{}catch{var aa=0}", "stmt_var", "var_on_top", "var", 12]
-// ["while(0){var aa}", "stmt_var", "var_on_top", "var", 10]
-
-                warn("var_on_top", token_now);
-            }
         }
         while (true) {
             if (token_nxt.id === "{" || token_nxt.id === "[") {
@@ -7815,34 +7856,6 @@ function jslint_phase3_parse(state) {
 
             warn("expected_a_b", token_nxt, ";", ",");
             advance(",");
-        }
-
-// Warn if variable declarations are unordered.
-
-        if (
-            option_dict.beta
-            && !option_dict.unordered
-            && !option_dict.variable
-            && variable_prv
-            && (
-                variable_prv.id + " " + variable_prv.name_list[0].id
-                > the_variable.id + " " + the_variable.name_list[0].id
-            )
-        ) {
-
-// test_cause:
-// ["const bb=0;const aa=0", "stmt_var", "expected_a_b_before_c_d", "aa", 12]
-// ["let bb;let aa", "stmt_var", "expected_a_b_before_c_d", "aa", 8]
-// ["var bb;var aa", "stmt_var", "expected_a_b_before_c_d", "aa", 8]
-
-            warn(
-                "expected_a_b_before_c_d",
-                the_variable,
-                the_variable.id,
-                the_variable.name_list[0].id,
-                variable_prv.id,
-                variable_prv.name_list[0].id
-            );
         }
         if (!for_init || token_nxt.id === ";") {
             semicolon();
@@ -8804,7 +8817,6 @@ function jslint_phase4_walk(state) {
         delete scope_function.async;
         delete scope_function.finally;
         delete scope_function.loop;
-        delete scope_function.statement_prv;
         delete scope_function.switch;
         delete scope_function.try;
         if (thing.wrapped) {

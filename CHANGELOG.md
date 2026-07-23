@@ -16,6 +16,9 @@
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.7.1-beta
+- jslint-ecma - Add ES2015-feature for..of.
+- jslint - Disable directive-option /*jslint for*/, replacing it with for-loop specific warnings.
+- jslint - Update scope-related warnings for variables, depending on whether they are let/const (scope_block) or var (scope_function).
 - jslint - Change scope from scope_function to scope_block:
     - const-declaration
     - let-declaration
@@ -36,8 +39,6 @@
     - 'blockage' to 'scope_block'
     - 'functionage' to 'scope_function'
 - jslint - Add block-scope to internal-function jslint_phase3_parse().
-- jslint - Disable directive-option /*jslint for*/, replacing it with for-loop specific warnings.
-- jslint-ecma - Add ES2015-feature for..of.
 - jslint - Expand built-in-globals for browser, ecma, and node - auto-generated from online-sources.
 - jslint-ci - Add automated ci for shellcheck to lint shell-scripts.
 - jslint-regression - Cleanup indent for multiline-method-chaining.
