@@ -4446,7 +4446,7 @@ function jslint_phase3_parse(state) {
         let the_block;
         if (implicit) {
 
-// PR-xxx - Add implicit scope_block for:
+// PR-504 - Add implicit scope_block for:
 // - if-else
 // - for-loop
 // - while-loop
@@ -6108,7 +6108,7 @@ function jslint_phase3_parse(state) {
         const name = !mode_fart && token_nxt.identifier && token_nxt;
         let role = "variable";
 
-// PR-xxx - Change scope from scope_function to scope_block:
+// PR-504 - Change scope from scope_function to scope_block:
 // - function-declaration
 
         let scope_declared = scope_block;
@@ -6132,7 +6132,7 @@ function jslint_phase3_parse(state) {
 
 // A function expression may have an optional name.
 
-// PR-xxx - Restrict scope from scope_function to its own function_body:
+// PR-504 - Restrict scope from scope_function to its own function_body:
 // - named-function-expression
 
             scope_declared = the_function;
@@ -6195,7 +6195,7 @@ function jslint_phase3_parse(state) {
 //             warn("function_in_loop", the_function);
 //         }
 
-// PR-xxx - Add hidden scope_block for:
+// PR-504 - Add hidden scope_block for:
 // - function-parameter
 
 // Push the current function context and establish a new one.
@@ -6961,7 +6961,7 @@ function jslint_phase3_parse(state) {
         check_not_top_level(the_for);
         scope_function.loop += 1;
 
-// PR-xxx - Add hidden scope_block for:
+// PR-504 - Add hidden scope_block for:
 // - for-variable
 
         scope_block = scope_block_push(the_for, true);
@@ -7351,7 +7351,7 @@ function jslint_phase3_parse(state) {
             return;
         }
 
-// PR-xxx - Add hidden scope_block for:
+// PR-504 - Add hidden scope_block for:
 // - label-name
 
         scope_block = scope_block_push(the_label, true);
@@ -7631,7 +7631,7 @@ function jslint_phase3_parse(state) {
             the_try.catch = the_catch;
             advance("catch");
 
-// PR-xxx - Add hidden scope_block for:
+// PR-504 - Add hidden scope_block for:
 // - catch-variable
 
             scope_block = scope_block_push(the_catch, true);
@@ -7707,7 +7707,7 @@ function jslint_phase3_parse(state) {
             token_now.id === "var"
             ? scope_function
 
-// PR-xxx - Change scope from scope_function to scope_block:
+// PR-504 - Change scope from scope_function to scope_block:
 // - const-declaration
 // - let-declaration
 
@@ -8319,7 +8319,7 @@ function jslint_phase4_walk(state) {
         const id = thing.id;
         let the_variable;
 
-// PR-xxx - Probably deadcode.
+// PR-504 - Probably deadcode.
 // if (thing.arity !== "variable") {
 //     return;
 // }
@@ -8841,7 +8841,7 @@ function jslint_phase4_walk(state) {
     function post_s_try(thing) {
         if (thing.catch !== undefined) {
 
-// PR-xxx - Add hidden scope_block for:
+// PR-504 - Add hidden scope_block for:
 // - catch-variable
 
             scope_block = scope_block_push(thing.catch, false);
@@ -9157,7 +9157,7 @@ function jslint_phase4_walk(state) {
 
     function pre_s_for(thing) {
 
-// PR-xxx - Add hidden scope_block for:
+// PR-504 - Add hidden scope_block for:
 // - for-variable
 
         scope_block = scope_block_push(thing, false);
@@ -9194,7 +9194,7 @@ function jslint_phase4_walk(state) {
             warn("unexpected_a", thing);
         }
 
-// PR-xxx - Add hidden scope_block for:
+// PR-504 - Add hidden scope_block for:
 // - function-parameter
 
         scope_block = scope_block_push(thing, false);
@@ -9312,7 +9312,7 @@ function jslint_phase4_walk(state) {
             return;
         }
 
-// PR-xxx - Add hidden scope_block for:
+// PR-504 - Add hidden scope_block for:
 // - label-name
 
         if (thing.label_name) {
