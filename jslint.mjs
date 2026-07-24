@@ -7078,7 +7078,7 @@ function jslint_phase3_parse(state) {
                 warn("expected_a_b", the_for, "Object.keys", "for in");
                 break;
 
-// Issue #176 - Add ES2015-feature for..of.
+// PR-504 - Add ES2015-feature for..of.
 
             case "of":
 
@@ -8043,7 +8043,7 @@ function jslint_phase3_parse(state) {
     infix(110, "in");
     infix(110, "instanceof");
 
-// Issue #176 - Add ES2015-feature for..of.
+// PR-504 - Add ES2015-feature for..of.
 
     infix(110, "of");
     infix(120, "<<");
