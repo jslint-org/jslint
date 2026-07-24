@@ -1,5 +1,5 @@
-<svg height="1262" width="800" xmlns="http://www.w3.org/2000/svg">
-<rect height="1262" fill="#222" width="800"></rect>
+<svg height="1240" width="800" xmlns="http://www.w3.org/2000/svg">
+<rect height="1240" fill="#222" width="800"></rect>
 <text
     fill="#7f7"
     font-family="consolas, menlo, monospace"
@@ -29,319 +29,313 @@
     textLength="768"
     x="10"
     y="98"
->- jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.                    </tspan>
+>- jslint-ecma - Add ES2018-feature Asynchronous Iteration.                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="120"
->- jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.   </tspan>
+>- jslint-ecma - Add ES2015-feature iterators.                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="142"
->- jslint - Add ability to auto-fix whitespace.                                                   </tspan>
+>- jslint - Audit token-property '.free'.                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="164"
->- jslint - Add html and css linting back into jslint.                                            </tspan>
+>- jslint - Rename token-property for variables '.init' to '.assigned', to improve readability.   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="186"
->- jslint - Add new warning requiring paren around plus-separated concatenations.                 </tspan>
+>- jslint - Change warning 'uninitialized_a' to 'unassigned_variable_a'.                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="208"
->- jslint - Try to improve parser to be able to parse jquery.js without stopping.                 </tspan>
+>- jslint - Change warning 'out_of_scope_a' to 'temporal_dead_zone_a'.                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="230"
->                                                                                                 </tspan>
+>- jslint - Add warning and tdz for function-declaration inside block-scope.                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="252"
-># v2026.7.1-beta                                                                                 </tspan>
+>- jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="274"
->- jslint - Expand built-in-globals for browser, ecma, and node - auto-generated from online-sour\</tspan>
+>- jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="296"
->  ces.                                                                                           </tspan>
+>- jslint - Add ability to auto-fix whitespace.                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="318"
->- jslint-ci - Add automated ci for shellcheck to lint shell-scripts.                             </tspan>
+>- jslint - Add html and css linting back into jslint.                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="340"
->- jslint-regression - Cleanup indent for multiline-method-chaining.                              </tspan>
+>- jslint - Add new warning requiring paren around plus-separated concatenations.                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="362"
->- jslint-regression - Fix jslint crashing before warning about dangling ')' or ']'.              </tspan>
+>- jslint - Try to improve parser to be able to parse jquery.js without stopping.                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="384"
->- jslint-parse - Fix jslint unable to continue parsing 'async aa =&gt; 0'.                          </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="406"
->- jslint-parse - Fix jslint unable to continue parsing 'function aa(){}0'.                       </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="428"
->- jslint-regression - Fix long-running regression where 'let x = x;' doesn't warn about temporal\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="450"
->  -dead-zone.                                                                                    </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="472"
->- jslint-warning - Tighten warning of unused variables to be always on, regardless of module / n\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="494"
->  odejs mode.                                                                                    </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="516"
->- jslint - Wrap all property-updates 'name.init = true/false' with calls to:                     </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="538"
->    name_lookup() - 'aa=0'                                                                       </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="560"
->    name_push()   - 'let aa=0'                                                                   </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="582"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
+    y="406"
+># v2026.7.1-beta                                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="428"
+>- jslint-ecma - Add ES2015-feature for..of.                                                      </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="450"
+>- jslint - Disable directive-option /*jslint for*/, replacing it with for-loop specific warnings\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="472"
+>  .                                                                                              </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="494"
+>- jslint - Update scope-related warnings for variables, depending on whether they are let/const \</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="516"
+>  (scope_block) or var (scope_function).                                                         </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="538"
+>- jslint - Change scope from scope_function to scope_block:                                      </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="560"
+>    - const-declaration                                                                          </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="582"
+>    - let-declaration                                                                            </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
     y="604"
-># v2026.6.30                                                                                     </tspan>
+>    - function-declaration                                                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="626"
->- jslint-ecma - Update README.md, documenting supported ES2015+ features.                        </tspan>
+>- jslint - Add implicit scope_block for:                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="648"
->- jslint-ecma - Unify ES2015-destructure-logic into function prefix_destructure().               </tspan>
+>    - do-while                                                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="670"
->- jslint-ci - Add shell-function shGithubPrUpdatePrxxx() to auto-update 'PR-xxx' placeholder to \</tspan>
+>    - for-loop                                                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="692"
->  next sequential github issue/pull number.                                                      </tspan>
+>    - if-else                                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="714"
->- jslint-ci - Rename shell-functions shGitPullrequestXxx() to shGithubPrXxx().                   </tspan>
+>    - while-loop                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="736"
->- jslint - Update warning infix_in to recommend Object.hasOwn() over hasOwnProperty().           </tspan>
+>- jslint - Add hidden scope_block for:                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="758"
->- jslint-ecma - Add ES2025-feature RegExp Modifiers.                                             </tspan>
+>    - catch-variable                                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="780"
->- jslint-ecma - Add ES2022-feature RegExp Match Indices.                                         </tspan>
+>    - for-variable                                                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="802"
->- jslint-ecma - Add ES2021-feature Logical Assignment Operators.                                 </tspan>
+>    - function-parameter                                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="824"
->- jslint-ecma - Add ES2027-feature Temporal.                                                     </tspan>
+>    - label-name                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="846"
->- jslint-ecma - Expand ES2015-feature-support for destructuring.                                 </tspan>
+>- jslint - Restrict scope from scope_function to its own function-body:                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="868"
->- jslint-ecma - Add ES2018-feature Rest/Spread Properties.                                       </tspan>
+>    - named-function-expression                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="890"
->- jslint-ecma - Add ES2018-feature s (dotall) flag for regular expressions.                      </tspan>
+>- jslint - Rename internal scope-variables to imporove readability of scope-logic:               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="912"
->- jslint-ecma - Expand ES2015-feature-support for es-module-import-statement.                    </tspan>
+>    - 'blockage' to 'scope_block'                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="934"
->- jslint-ecma - Add ES2023-feature ShadowRealm to global-scope.                                  </tspan>
+>    - 'functionage' to 'scope_function'                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="956"
->- jslint-ecma - Add ES2024-feature .isWellFormed(), .toWellFormed() for literal string.          </tspan>
+>- jslint - Add block-scope to internal-function jslint_phase3_parse().                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="978"
->- jslint-ecma - Add ES2022-feature .at() for literal string/array.                               </tspan>
+>- jslint - Expand built-in-globals for browser, ecma, and node - auto-generated from online-sour\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1000"
->- jslint-ecma - Add ES2025-feature Float16Array to global-scope.                                 </tspan>
+>  ces.                                                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1022"
->- jslint-ecma - Relax warning for ES2025-feature RegExp.escape().                                </tspan>
+>- jslint-ci - Add automated ci for shellcheck to lint shell-scripts.                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1044"
->- jslint-ecma - Add ES2021-feature WeakRef to global-scope.                                      </tspan>
+>- jslint-regression - Cleanup indent for multiline-method-chaining.                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1066"
->- jslint-ecma - Update ES2015-feature arrow, to continue parsing unwrapped-form with warning, in\</tspan>
+>- jslint-regression - Fix jslint crashing before warning about dangling ')' or ']'.              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1088"
->  stead of stopping.                                                                             </tspan>
+>- jslint-parse - Fix jslint unable to continue parsing 'async aa =&gt; 0'.                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1110"
->- jslint - Relax warning on multiline-method-chaining.                                           </tspan>
+>- jslint-parse - Fix jslint unable to continue parsing 'function aa(){}0'.                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1132"
->- jslint - Replace all non-return 'stop(...);' with 'return stop(...)'.                          </tspan>
+>- jslint-regression - Fix long-running regression where 'let x = x;' doesn't warn about temporal\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1154"
->- jslint - Unify ES2018-syntax-spread-operator with function prefix_ellipsis().                  </tspan>
+>  -dead-zone.                                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1176"
->- jslint - Add ES2018-syntax for object-literal-spread-operator.                                 </tspan>
+>- jslint-warning - Tighten warning of unused variables to be always on, regardless of module / n\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1198"
->- jslint - Add ES2025-syntax 'import ... with {...}'.                                            </tspan>
+>  odejs mode.                                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1220"
->- jslint - Allow more methods to be called on literal strings and arrays; make allowed methods f\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1242"
->  or . and ?. consistent.                                                                        </tspan>
+>- jslint - Wrap all property-updates 'name.init = true/false' with calls to:                     </tspan>
 
 </text>
 </svg>
