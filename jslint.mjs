@@ -394,7 +394,6 @@
     v8CoverageListMerge,
     v8CoverageReportCreate,
     value,
-    var_on_top,
     variable,
     variable_prv,
     version,
@@ -1572,9 +1571,6 @@ function jslint(
         case "number_isNaN":
             mm = `Use Number.isNaN function to compare with NaN.`;
             break;
-        case "out_of_scope_a":
-            mm = `'${a}' is out of scope.`;
-            break;
         case "redefinition_a_b":
             mm = `Redefinition of '${a}' from line ${b}.`;
             break;
@@ -1590,6 +1586,9 @@ function jslint(
         case "subscript_a":
             mm = `['${a}'] is better written in dot notation.`;
             break;
+        case "temporal_dead_zone_a":
+            mm = `'${a}' was used before it was defined.`;
+            break;
         case "todo_comment":
             mm = `Unexpected TODO comment.`;
             break;
@@ -1598,6 +1597,9 @@ function jslint(
             break;
         case "too_many_digits":
             mm = `Too many digits.`;
+            break;
+        case "unassigned_var_a":
+            mm = `Unassigned variable '${a}'.`;
             break;
         case "unclosed_comment":
             mm = `Unclosed comment.`;
@@ -1664,9 +1666,6 @@ function jslint(
             mm = (
                 `Unexpected 'typeof'. Use '===' to compare directly with ${a}.`
             );
-            break;
-        case "uninitialized_a":
-            mm = `Uninitialized '${a}'.`;
             break;
         case "unopened_enable":
             mm = (
@@ -5242,10 +5241,10 @@ function jslint_phase3_parse(state) {
 
         const id = name.id;
         let earlier;
+        name_list.push(name);
         name.assigned = assigned;
         name.readonly = readonly;
         name.role = role;
-        name_list.push(name);
         if (role === "variable") {
             name.arity = "variable";
         }
@@ -6020,13 +6019,13 @@ function jslint_phase3_parse(state) {
                 name.expression = parse_expression(0);
 
 // test_cause:
-// ["function aa([aa=aa]){}", "name_lookup", "out_of_scope_a", "aa", 17]
+// ["function aa([aa=aa]){}", "name_lookup", "temporal_dead_zone_a", "aa", 17]
 // ["function aa([aa=aa]){}", "name_parse", "optional", "aa", 0]
-// ["function aa({aa=aa}){}", "name_lookup", "out_of_scope_a", "aa", 17]
+// ["function aa({aa=aa}){}", "name_lookup", "temporal_dead_zone_a", "aa", 17]
 // ["function aa({aa=aa}){}", "name_parse", "optional", "aa", 0]
-// ["let[aa=bb]=0;let bb", "name_lookup", "out_of_scope_a", "bb", 8]
+// ["let[aa=bb]=0;let bb", "name_lookup", "temporal_dead_zone_a", "bb", 8]
 // ["let[aa=bb]=0;let bb", "name_parse", "optional", "aa", 0]
-// ["let{aa=bb}=0;let bb", "name_lookup", "out_of_scope_a", "bb", 8]
+// ["let{aa=bb}=0;let bb", "name_lookup", "temporal_dead_zone_a", "bb", 8]
 // ["let{aa=bb}=0;let bb", "name_parse", "optional", "aa", 0]
 
                 test_cause("optional", name.id);
@@ -8399,13 +8398,13 @@ function jslint_phase4_walk(state) {
 // Warn variable is 'out-of-scope'.
 
 // test_cause:
-// ["(aa=aa)=>0", "name_lookup", "out_of_scope_a", "aa", 5]
-// ["let [aa]=aa", "name_lookup", "out_of_scope_a", "aa", 10]
-// ["let aa=()=>aa", "name_lookup", "out_of_scope_a", "aa", 12]
-// ["let aa=aa", "name_lookup", "out_of_scope_a", "aa", 8]
-// ["let aa=bb;let bb", "name_lookup", "out_of_scope_a", "bb", 8]
+// ["(aa=aa)=>0", "name_lookup", "temporal_dead_zone_a", "aa", 5]
+// ["let [aa]=aa", "name_lookup", "temporal_dead_zone_a", "aa", 10]
+// ["let aa=()=>aa", "name_lookup", "temporal_dead_zone_a", "aa", 12]
+// ["let aa=aa", "name_lookup", "temporal_dead_zone_a", "aa", 8]
+// ["let aa=bb;let bb", "name_lookup", "temporal_dead_zone_a", "bb", 8]
 
-            warn("out_of_scope_a", thing);
+            warn("temporal_dead_zone_a", thing);
         }
         return the_variable;
     }
@@ -9524,9 +9523,9 @@ function jslint_phase5_whitage(state) {
                 } else if (!name.assigned) {
 
 // test_cause:
-// ["let aa;aa();", "delve", "uninitialized_a", "aa", 5]
+// ["let aa;aa();", "delve", "unassigned_var_a", "aa", 5]
 
-                    warn("uninitialized_a", name);
+                    warn("unassigned_var_a", name);
                 }
             }
         });
@@ -10015,10 +10014,9 @@ function jslint_phase5_whitage(state) {
         no_space_only();
     }
 
-// uninitialized_and_unused();
-// Delve into the functions looking for variables that were not initialized
-// or used. If the file imports or exports, then its global object is also
-// delved.
+// unassigned_or_unused();
+// Delve into the functions looking for variables that were not assigned or
+// used. If the file imports or exports, then its global object is also delved.
 
 // PR-502 - tighten warning of unused variables to be always on.
 
