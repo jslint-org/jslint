@@ -4,7 +4,6 @@
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration.
 - jslint-ecma - Add ES2015-feature iterators.
 - jslint - Audit token-property '.free'.
-- jslint - Rename token-property for variables '.init' to '.assigned', to improve readability.
 - jslint - Change warning 'uninitialized_a' to 'unassigned_variable_a'.
 - jslint - Change warning 'out_of_scope_a' to 'temporal_dead_zone_a'.
 - jslint - Add warning and tdz for function-declaration inside block-scope.
