@@ -4,9 +4,6 @@
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration.
 - jslint-ecma - Add ES2015-feature iterators.
 - jslint - Audit token-property '.free'.
-- jslint - Rename token-property for variables '.init' to '.assigned', to improve readability.
-- jslint - Change warning 'uninitialized_a' to 'unassigned_variable_a'.
-- jslint - Change warning 'out_of_scope_a' to 'temporal_dead_zone_a'.
 - jslint - Add warning and tdz for function-declaration inside block-scope.
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
@@ -19,6 +16,8 @@
 - jslint-ecma - Add ES2015-feature for..of.
 - jslint - Disable directive-option /*jslint for*/, replacing it with for-loop specific warnings.
 - jslint - Update scope-related warnings for variables, depending on whether they are let/const (scope_block) or var (scope_function).
+- jslint - Change warning 'out_of_scope_a' to 'temporal_dead_zone_a'.
+- jslint - Change warning 'uninitialized_a' to 'unassigned_var_a'.
 - jslint - Change scope from scope_function to scope_block:
     - const-declaration
     - let-declaration

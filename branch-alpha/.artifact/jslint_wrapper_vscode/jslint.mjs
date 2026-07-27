@@ -104,6 +104,7 @@
     assertJsonEqual,
     assertOrThrow,
     assign,
+    assigned,
     assignment,
     async,
     b,
@@ -215,7 +216,6 @@
     indent2,
     index,
     indexOf,
-    init,
     isArray,
     isBlockCoverage,
     isHole,
@@ -394,7 +394,6 @@
     v8CoverageListMerge,
     v8CoverageReportCreate,
     value,
-    var_on_top,
     variable,
     variable_prv,
     version,
@@ -1572,9 +1571,6 @@ function jslint(
         case "number_isNaN":
             mm = `Use Number.isNaN function to compare with NaN.`;
             break;
-        case "out_of_scope_a":
-            mm = `'${a}' is out of scope.`;
-            break;
         case "redefinition_a_b":
             mm = `Redefinition of '${a}' from line ${b}.`;
             break;
@@ -1590,6 +1586,9 @@ function jslint(
         case "subscript_a":
             mm = `['${a}'] is better written in dot notation.`;
             break;
+        case "temporal_dead_zone_a":
+            mm = `'${a}' was used before it was defined.`;
+            break;
         case "todo_comment":
             mm = `Unexpected TODO comment.`;
             break;
@@ -1598,6 +1597,9 @@ function jslint(
             break;
         case "too_many_digits":
             mm = `Too many digits.`;
+            break;
+        case "unassigned_var_a":
+            mm = `Unassigned variable '${a}'.`;
             break;
         case "unclosed_comment":
             mm = `Unclosed comment.`;
@@ -1664,9 +1666,6 @@ function jslint(
             mm = (
                 `Unexpected 'typeof'. Use '===' to compare directly with ${a}.`
             );
-            break;
-        case "uninitialized_a":
-            mm = `Uninitialized '${a}'.`;
             break;
         case "unopened_enable":
             mm = (
@@ -4413,7 +4412,7 @@ function jslint_phase3_parse(state) {
                     false,              // readonly
                     the_token.name_list,        // name_list
                     left,               // name
-                    false               // init
+                    false               // assigned
                 );
             } else {
                 the_token.expression = [left, right];
@@ -5197,12 +5196,12 @@ function jslint_phase3_parse(state) {
         readonly,
         name_list,
         name,
-        init
+        assigned
     ) {
 
 // This function will:
 // 1. Push variable or function-parameter <name> to <name_list>.
-// 2. Set <name>.init = true, if its an assigned-variable,
+// 2. Set <name>.assigned = true, if its an assigned-variable,
 //    a function-parameter, or existing variable assigned new value.
 // 3. Declare <name> in <scope_declared>.context, if its a declared-variable,
 //    or function-parameter.
@@ -5212,38 +5211,38 @@ function jslint_phase3_parse(state) {
 //
 // 1.imp.1 - Mark 'declared', the import-name, during import-statement.
 // 1.imp.2 - Mark 'alive', the import-name, after import-statement.
-// 1.imp.3 - Mark 'init', the import-name, during import-statement.
+// 1.imp.3 - Mark 'assigned', the import-name, during import-statement.
 //
 // 2.fun.1 - Mark 'declared', the function-name, during function-declaration.
 // 2.fun.2 - Mark 'alive', the function-name, during function-declaration.
-// 2.fun.3 - Mark 'init', the function-name, during function-declaration.
+// 2.fun.3 - Mark 'assigned', the function-name, during function-declaration.
 //
 // 3.cat.1 - Mark 'declared', the catch-variable, before catch-block.
 // 3.cat.2 - Mark 'alive', the catch-variable, before catch-block.
-// 3.cat.3 - Mark 'init', the catch-variable, before catch-block.
+// 3.cat.3 - Mark 'assigned', the catch-variable, before catch-block.
 //
 // 3.glo.1 - Mark 'declared', the global-variable, immediately.
 // 3.glo.2 - Mark 'alive', the global-variable, immediately.
-// 3.glo.3 - Mark 'init', the global-variable, immediately.
+// 3.glo.3 - Mark 'assigned', the global-variable, immediately.
 //
 // 3.var.1 - Mark 'declared', the variable, during variable-declaration.
 // 3.var.2 - Mark 'alive', the variable, after variable-declaration.
-// 3.var.3 - Mark 'init', the variable, after assignment.
-// 3.var.3 - Mark 'init', the variable, during variable-declaration.
+// 3.var.3 - Mark 'assigned', the variable, after assignment.
+// 3.var.3 - Mark 'assigned', the variable, during variable-declaration.
 //
 // 4.par.1 - Mark 'declared', the function-parameter, during destructuring.
 // 4.par.1 - Mark 'declared', the function-parameter, if unwrapped.
 // 4.par.2 - Mark 'alive', the function-parameter, after destructuring.
-// 4.par.3 - Mark 'init', the function-parameter, if unwrapped.
+// 4.par.3 - Mark 'assigned', the function-parameter, if unwrapped.
 //
 // 5.lab.1 - Mark 'declared', the label-name, before control-flow-block.
 // 5.lab.2 - Mark 'alive', the label-name, before control-flow-block.
-// 5.lab.3 - Mark 'init', the label-name, before control-flow-block.
+// 5.lab.3 - Mark 'assigned', the label-name, before control-flow-block.
 
         const id = name.id;
         let earlier;
         name_list.push(name);
-        name.init = init;
+        name.assigned = assigned;
         name.readonly = readonly;
         name.role = role;
         if (role === "variable") {
@@ -5998,7 +5997,7 @@ function jslint_phase3_parse(state) {
                     readonly,           // readonly
                     sub_list,           // name_list
                     name,               // name
-                    true                // init
+                    true                // assigned
                 );
                 advance_and_signature_push(token_nxt.id);
                 return;
@@ -6009,7 +6008,7 @@ function jslint_phase3_parse(state) {
                 readonly,               // readonly
                 sub_list,               // name_list
                 name,                   // name
-                true                    // init
+                true                    // assigned
             );
             if (token_nxt.id === "=") {
                 optional = the_function_toplevel && token_now;
@@ -6020,13 +6019,13 @@ function jslint_phase3_parse(state) {
                 name.expression = parse_expression(0);
 
 // test_cause:
-// ["function aa([aa=aa]){}", "name_lookup", "out_of_scope_a", "aa", 17]
+// ["function aa([aa=aa]){}", "name_lookup", "temporal_dead_zone_a", "aa", 17]
 // ["function aa([aa=aa]){}", "name_parse", "optional", "aa", 0]
-// ["function aa({aa=aa}){}", "name_lookup", "out_of_scope_a", "aa", 17]
+// ["function aa({aa=aa}){}", "name_lookup", "temporal_dead_zone_a", "aa", 17]
 // ["function aa({aa=aa}){}", "name_parse", "optional", "aa", 0]
-// ["let[aa=bb]=0;let bb", "name_lookup", "out_of_scope_a", "bb", 8]
+// ["let[aa=bb]=0;let bb", "name_lookup", "temporal_dead_zone_a", "bb", 8]
 // ["let[aa=bb]=0;let bb", "name_parse", "optional", "aa", 0]
-// ["let{aa=bb}=0;let bb", "name_lookup", "out_of_scope_a", "bb", 8]
+// ["let{aa=bb}=0;let bb", "name_lookup", "temporal_dead_zone_a", "bb", 8]
 // ["let{aa=bb}=0;let bb", "name_parse", "optional", "aa", 0]
 
                 test_cause("optional", name.id);
@@ -6151,9 +6150,9 @@ function jslint_phase3_parse(state) {
                 [],                     // name_list
                 name,                   // name
 
-// 2.fun.3 - Mark 'init', the function-name, during function-declaration.
+// 2.fun.3 - Mark 'assigned', the function-name, during function-declaration.
 
-                true                    // init
+                true                    // assigned
             );
 
 // 2.fun.2 - Mark 'alive', the function-name, during function-declaration.
@@ -6226,9 +6225,9 @@ function jslint_phase3_parse(state) {
                 the_function.name_list, // name_list
                 token_prv,              // name
 
-// 4.par.3 - Mark 'init', the function-parameter, if unwrapped.
+// 4.par.3 - Mark 'assigned', the function-parameter, if unwrapped.
 
-                true                    // init
+                true                    // assigned
             );
         } else {
             token_now.free = false;
@@ -7214,9 +7213,9 @@ function jslint_phase3_parse(state) {
                     the_import.name_list,       // name_list
                     name,               // name
 
-// 1.imp.3 - Mark 'init', the import-name, during import-statement.
+// 1.imp.3 - Mark 'assigned', the import-name, during import-statement.
 
-                    true                // init
+                    true                // assigned
                 );
             } else {
                 advance("{");
@@ -7253,9 +7252,9 @@ function jslint_phase3_parse(state) {
                             the_import.name_list,       // name_list
                             name,       // name
 
-// 1.imp.3 - Mark 'init', the import-name, during import-statement.
+// 1.imp.3 - Mark 'assigned', the import-name, during import-statement.
 
-                            true        // init
+                            true        // assigned
                         );
                         if (token_nxt.id !== ",") {
                             break;
@@ -7365,9 +7364,9 @@ function jslint_phase3_parse(state) {
             [],                 // name_list
             the_label,          // name
 
-// 5.lab.3 - Mark 'init', the label-name, before control-flow-block.
+// 5.lab.3 - Mark 'assigned', the label-name, before control-flow-block.
 
-            true                // init
+            true                // assigned
         );
 
 // 5.lab.2 - Mark 'alive', the label-name, before control-flow-block.
@@ -7657,9 +7656,9 @@ function jslint_phase3_parse(state) {
                         [],             // name_list
                         token_nxt,      // name
 
-// 3.cat.3 - Mark 'init', the catch-variable, before catch-block.
+// 3.cat.3 - Mark 'assigned', the catch-variable, before catch-block.
 
-                        true            // init
+                        true            // assigned
                     );
 
 // 3.cat.2 - Mark 'alive', the catch-variable, before catch-block.
@@ -7836,9 +7835,9 @@ function jslint_phase3_parse(state) {
                     the_variable.name_list,     // name_list
                     name,               // name
 
-// 3.var.3 - Mark 'init', the variable, during variable-declaration.
+// 3.var.3 - Mark 'assigned', the variable, during variable-declaration.
 
-                    Boolean(name.expression)    // init
+                    Boolean(name.expression)    // assigned
                 );
             } else {
 
@@ -8367,11 +8366,11 @@ function jslint_phase4_walk(state) {
 // 3.glo.2 - Mark 'alive', the global-variable, immediately.
 
                 alive: true,
+
+// 3.glo.3 - Mark 'assigned', the global-variable, immediately.
+
+                assigned: true,
                 id,
-
-// 3.glo.3 - Mark 'init', the global-variable, immediately.
-
-                init: true,
                 readonly: true,
                 role: "variable",
                 scope_declared: token_global
@@ -8399,22 +8398,22 @@ function jslint_phase4_walk(state) {
 // Warn variable is 'out-of-scope'.
 
 // test_cause:
-// ["(aa=aa)=>0", "name_lookup", "out_of_scope_a", "aa", 5]
-// ["let [aa]=aa", "name_lookup", "out_of_scope_a", "aa", 10]
-// ["let aa=()=>aa", "name_lookup", "out_of_scope_a", "aa", 12]
-// ["let aa=aa", "name_lookup", "out_of_scope_a", "aa", 8]
-// ["let aa=bb;let bb", "name_lookup", "out_of_scope_a", "bb", 8]
+// ["(aa=aa)=>0", "name_lookup", "temporal_dead_zone_a", "aa", 5]
+// ["let [aa]=aa", "name_lookup", "temporal_dead_zone_a", "aa", 10]
+// ["let aa=()=>aa", "name_lookup", "temporal_dead_zone_a", "aa", 12]
+// ["let aa=aa", "name_lookup", "temporal_dead_zone_a", "aa", 8]
+// ["let aa=bb;let bb", "name_lookup", "temporal_dead_zone_a", "bb", 8]
 
-            warn("out_of_scope_a", thing);
+            warn("temporal_dead_zone_a", thing);
         }
         return the_variable;
     }
 
     function post_a_assignment(thing) {
 
-// Assignment using = sets the init property of a variable. No other assignment
-// operator can do this. A = token keeps that variable (or array of variables
-// in case of destructuring) in its name property.
+// Assignment using = sets the assigned property of a variable. No other
+// assignment operator can do this. A = token keeps that variable (or array of
+// variables in case of destructuring) in its name property.
 
         const lvalue = thing.expression[0];
         let right;
@@ -8459,9 +8458,9 @@ function jslint_phase4_walk(state) {
                 const the_variable = name_lookup(name);
                 if (the_variable && !the_variable.readonly) {
 
-// 3.var.3 - Mark 'init', the variable, after assignment.
+// 3.var.3 - Mark 'assigned', the variable, after assignment.
 
-                    the_variable.init = true;
+                    the_variable.assigned = true;
                     return;
                 }
 
@@ -9521,12 +9520,12 @@ function jslint_phase5_whitage(state) {
 // ["let aa=0;try{aa();}catch(bb){aa();}", "delve", "unused_a", "bb", 26]
 
                     warn("unused_a", name);
-                } else if (!name.init) {
+                } else if (!name.assigned) {
 
 // test_cause:
-// ["let aa;aa();", "delve", "uninitialized_a", "aa", 5]
+// ["let aa;aa();", "delve", "unassigned_var_a", "aa", 5]
 
-                    warn("uninitialized_a", name);
+                    warn("unassigned_var_a", name);
                 }
             }
         });
@@ -10015,10 +10014,9 @@ function jslint_phase5_whitage(state) {
         no_space_only();
     }
 
-// uninitialized_and_unused();
-// Delve into the functions looking for variables that were not initialized
-// or used. If the file imports or exports, then its global object is also
-// delved.
+// unassigned_or_unused();
+// Delve into the functions looking for variables that were not assigned or
+// used. If the file imports or exports, then its global object is also delved.
 
 // PR-502 - tighten warning of unused variables to be always on.
 
@@ -10059,9 +10057,9 @@ function jslint_phase5_whitage(state) {
         }
         nr_comments_skipped = 0;
         delete left.alive;
+        delete left.assigned;
         delete left.calls;
         delete left.free;
-        delete left.init;
         delete left.open;
         delete left.used;
         left = right;
