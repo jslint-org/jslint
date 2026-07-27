@@ -60,7 +60,6 @@ Douglas Crockford <douglas@crockford.com>
         - [`/*jslint devel*/`](#jslint-devel)
         - [`/*jslint eval*/`](#jslint-eval)
         - [`/*jslint fart*/`](#jslint-fart)
-        - [`/*jslint for*/`](#jslint-for)
         - [`/*jslint getset*/`](#jslint-getset)
         - [`/*jslint indent2*/`](#jslint-indent2)
         - [`/*jslint long*/`](#jslint-long)
@@ -633,21 +632,6 @@ let foo = async ({bar, baz}) => {
 
 <br>
 
-##### `/*jslint for*/`
-```js
-/*jslint for*/
-// Allow for-loop.
-
-function foo() {
-    let ii;
-    for (ii = 0; ii < 10; ii += 1) {
-        foo();
-    }
-}
-```
-
-<br>
-
 ##### `/*jslint getset*/`
 ```js
 /*jslint getset, this, devel*/
@@ -965,7 +949,7 @@ if (false) {
 |  17. | ✅ | ES2015 | [`destructuring`](https://github.com/lukehoban/es6features#destructuring) |
 |  16. | ✅ | ES2015 | [`default + rest + spread`](https://github.com/lukehoban/es6features#default--rest--spread) |
 |  15. | ✅ | ES2015 | [`let + const`](https://github.com/lukehoban/es6features#let--const) |
-|  14. | ❌ | ES2015 | [`iterators + for..of`](https://github.com/lukehoban/es6features#iterators--forof) |
+|  14. | ⚠️ | ES2015 | [`iterators + for..of`](https://github.com/lukehoban/es6features#iterators--forof) |
 |  13. | ❌ | ES2015 | [`generators`](https://github.com/lukehoban/es6features#generators) |
 |  12. | ✅ | ES2015 | [`unicode`](https://github.com/lukehoban/es6features#unicode) |
 |  11. | ⚠️ | ES2015 | [`modules`](https://github.com/lukehoban/es6features#modules) |
@@ -1026,7 +1010,7 @@ if (false) {
         - verify ci-success @ https://github.com/kaizhu256/jslint/actions
         - verify ci-success @ https://github.com/jslint-org/jslint/actions
 
-1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2026.7.3
+1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2026.7.20
     - click `Create pull request`
     - input `Add a title *` with: `<CHANGELOG.md entry #1>`
     - input `Add a description` with:

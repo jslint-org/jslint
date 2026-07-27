@@ -365,7 +365,7 @@
     textLength="768"
     x="10"
     y="1330"
->up to date, audited 398 packages in 2s                                                           </tspan>
+>up to date, audited 398 packages in 3s                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -395,7 +395,7 @@
     textLength="768"
     x="10"
     y="1440"
->26 vulnerabilities (6 low, 8 moderate, 12 high)                                                  </tspan>
+>30 vulnerabilities (6 low, 7 moderate, 16 high, 1 critical)                                      </tspan>
 
 </text>
 </svg>

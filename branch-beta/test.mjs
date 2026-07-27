@@ -703,11 +703,24 @@ String.aa().getTime();
     aa(bb, cc, dd, ee, ff, gg);
 }());
                     `),
+                    (`
+(function for_loop() {
+    for (const {expr} of for_loop) {
+        aa(bb, cc, dd, ee, ff, gg);
+    }
+}());
+                    `),
+                    (`
+/*jslint fart*/
+(({expr}) => {
+    aa(bb, cc, dd, ee, ff, gg);
+}());
+                    `),
                     "const {expr}",
                     "let {expr}",
                     "let [aa, bb, cc, dd, ee, ff, gg] = 0;\n{expr}"
                 ].map(function (source) {
-                    source = source.trim().replace("{expr}", String(`
+                    let expr = String(`
 [
     {
         cc,
@@ -721,7 +734,11 @@ String.aa().getTime();
         ...ff
     ]
 ]
-                    `).trim());
+                    `).trim();
+                    if ((/function for_loop/).test(source)) {
+                        expr = expr.replace((/\n/g), "\n    ");
+                    }
+                    source = source.trim().replace("{expr}", expr);
                     if (!(/\=>|function/).test(source)) {
                         source = (`
 ${source} = (function () {
@@ -804,10 +821,30 @@ aa();
             ],
             for: [
                 (`
-/*jslint for*/
-function aa(bb) {
-    for (bb = 0; bb < 0; bb += 1) {
-        bb();
+function aa(bb, cc) {
+    for (; bb < 0; bb += 1) { //jslint-ignore-line
+        bb(cc);
+    }
+    for (bb = 0; bb < 0; bb += 1) { //jslint-ignore-line
+        bb(cc);
+    }
+    for (cc in bb) { //jslint-ignore-line
+        bb(cc);
+    }
+    for (cc of bb) { //jslint-ignore-line
+        cc();
+    }
+    for (const ii in bb) { //jslint-ignore-line
+        bb(cc, ii);
+    }
+    for (const ii of bb) {
+        bb(cc, ii);
+    }
+    for (let ii = 0; ii < 0; ii += 1) {
+        bb(cc, ii);
+    }
+    for (let ii of bb) {
+        bb(cc, ii);
     }
 }
 aa();
@@ -859,8 +896,46 @@ String
             label: [
                 (`
 function aa() {
-bb:
-    while (true) {
+bb: do {
+        if (true) {
+            break bb;
+        }
+    } while (true);
+}
+aa();
+                `),
+                (`
+function aa() {
+bb: for (const ii of aa) {
+        if (ii) {
+            break bb;
+        }
+    }
+}
+aa();
+                `),
+                (`
+function aa() {
+bb: for (let ii = 0; ii < 0; ii += 1) {
+        if (ii) {
+            break bb;
+        }
+    }
+}
+aa();
+                `),
+                (`
+function aa() {
+bb: switch (aa) {
+    case 0:
+        break bb;
+    }
+}
+aa();
+                `),
+                (`
+function aa() {
+bb: while (true) {
         if (true) {
             break bb;
         }
@@ -959,6 +1034,16 @@ aa();
             ],
             scope: [
                 "(function aa(bb = aa) {\n    aa(bb);\n}());",
+                (`
+/*jslint variable*/
+if (String) {
+    let aa = 0;
+    aa();
+} else {
+    let aa = 0;
+    aa();
+}
+                `),
                 "function aa(bb = aa) {\n    aa(bb);\n}\naa();",
                 (`
 if (String) {
@@ -1061,17 +1146,6 @@ jstestDescribe((
 // PR-404 - Alias "evil" to jslint-directive "eval" for backwards-compat.
 
         [{eval: true, evil: true}, "new Function();\neval();"],
-        [
-            {for: true},
-            (`
-function aa(aa) {
-    for (aa = 0; aa < 0; aa += 1) {
-        aa();
-    }
-}
-aa();
-            `)
-        ],
         [{getset: true}, "String({get aa() {\n    return;\n}});"],
         [{getset: true}, "String({set aa(aa) {\n    return aa;\n}});"],
         [{indent2: true}, sourceJslintMjs.replace((/    /g), "  ")],
@@ -1088,6 +1162,7 @@ aa();
 
         [{subscript: true}, "String[\"aa\"]();"],
         [{test_internal_error: true}, ""],
+        [{test_unknown_warning_code: true}, ""],
         [{this: true}, "String(this);"],
         [{trace: true}, ""],
         [{unordered: true}, (`
@@ -1124,11 +1199,12 @@ function aa() {
         jstestIt((
             `test option=${JSON.stringify(option_dict)} handling-behavior`
         ), function () {
-            let elemNow = JSON.stringify([
-                option_dict, source
-            ]);
-            let warningsLength = (
-                option_dict.test_internal_error
+            const elemNow = JSON.stringify([option_dict, source]);
+            const warningsLength = (
+                (
+                    option_dict.test_internal_error
+                    || option_dict.test_unknown_warning_code
+                )
                 ? 1
                 : 0
             );
