@@ -404,7 +404,7 @@ globalThis.assert(
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
 (async function () {
-    let fileDict = {};
+    const fileDict = {};
     let fileMain;
     let fileModified;
     let packageJson;
@@ -447,14 +447,14 @@ import moduleFs from "fs";
             file: fileMain,
             // update version
             src: fileDict[fileMain].replace((
-                /^let version = ".*?";$/m
-            ), `let version = "v${versionBeta}";`)
+                /^const version = ".*?";$/m
+            ), `const version = "v${versionBeta}";`)
         }
     ].map(async function ({
         file,
         src
     }) {
-        let src0 = fileDict[file];
+        const src0 = fileDict[file];
         if (src !== src0) {
             console.error(`update file ${file}`);
             fileModified = file;
@@ -650,14 +650,14 @@ import moduleAssert from "assert";
 import moduleFs from "fs";
 import moduleHttps from "https";
 (async function () {
-    let {
+    const {
         GITHUB_BRANCH0,
         GITHUB_GITHUB_IO,
         GITHUB_REPOSITORY,
         UPSTREAM_GITHUB_IO,
         UPSTREAM_REPOSITORY
     } = process.env;
-    let dict = {};
+    const dict = {};
     Array.from(
         await moduleFs.promises.readdir(".")
     ).forEach(async function (file) {
@@ -673,8 +673,8 @@ import moduleHttps from "https";
         data.replace((
             /\bhttps?:\/\/.+?([\s")\]]|\W?$)(<!--no-validate-->)?/gm
         ), function (url, removeLast, noValidate) {
+            const timeStart = Date.now();
             let req;
-            let timeStart = Date.now();
             if (removeLast && removeLast !== "/") {
                 url = url.slice(0, -1);
             }
@@ -1135,18 +1135,23 @@ shGithubPrCreate() {(set -e
 # This function will create-and-push a github-pull-commit to origin/alpha.
     node --input-type=module --eval '
 // init debugInline
-(function () {
-    let consoleError = console.error;
-    globalThis.debugInline = globalThis.debugInline || function (...argList) {
+const debugInline = (function () {
+    let consoleError = Object;
+    function debug(...argList) {
 
 // This function will print <argList> to stderr and then return <argList>[0].
 
         consoleError("\n\ndebugInline");
         consoleError(...argList);
         consoleError("\n");
+        if (consoleError === Object) {
+            consoleError = console.error;
+        }
         return argList[0];
-    };
+    }
+    return debug;
 }());
+debugInline(); // coverage-hack
 import moduleAssert from "assert";
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
@@ -1610,7 +1615,7 @@ import moduleRepl from "repl";
                     + "}).sort().join(\u0027\\n\u0027))\n"
                 );
                 break;
-            // syntax-sugar - print String(val)
+            // syntax-sugar - print String(value)
             case "print":
                 script = "console.error(String(" + match2 + "))\n";
                 break;
@@ -1706,11 +1711,11 @@ shJsonNormalize() {(set -e
 # 3. write normalized json-data back to file $1
     node --input-type=module --eval '
 import moduleFs from "fs";
-function noop(val) {
+function noop(value) {
 
-// This function will do nothing except return <val>.
+// This function will do nothing except return <value>.
 
-    return val;
+    return value;
 }
 function objectDeepCopyWithKeysSorted(obj) {
 
@@ -2514,13 +2519,13 @@ function v8CoverageListMerge(processCovs) {
   return bb.endOffset - aa.endOffset;
  }
 
- function dictKeyValueAppend(dict, key, val) {
+ function dictKeyValueAppend(dict, key, value) {
   let list = dict.get(key);
   if (list === undefined) {
    list = [];
    dict.set(key, list);
   }
-  list.push(val);
+  list.push(value);
  }
 
  function mergeTreeList(parentTrees) {
