@@ -1034,8 +1034,8 @@ aa();
             ],
             scope: [
                 "(function aa(bb = aa) {\n    aa(bb);\n}());",
+                "function aa(bb = aa) {\n    aa(bb);\n}\naa();",
                 (`
-/*jslint variable*/
 if (String) {
     let aa = 0;
     aa();
@@ -1044,7 +1044,6 @@ if (String) {
     aa();
 }
                 `),
-                "function aa(bb = aa) {\n    aa(bb);\n}\naa();",
                 (`
 if (String) {
     var aa = 0; //jslint-ignore-line

@@ -19,8 +19,8 @@ shCiArtifactUploadCustom() {(set -e
     node --input-type=module --eval '
 import moduleFs from "fs";
 (async function () {
-    let cacheKey = Math.random().toString(36).slice(-4);
-    let fileDict = {};
+    const cacheKey = Math.random().toString(36).slice(-4);
+    const fileDict = {};
     await Promise.all([
         "index.html"
     ].map(async function (file) {
@@ -49,7 +49,7 @@ import moduleFs from "fs";
 import moduleFs from "fs";
 import moduleChildProcess from "child_process";
 (async function () {
-    let fileDict = {};
+    const fileDict = {};
     let screenshotCurl;
     await Promise.all([
         "README.md"
@@ -130,7 +130,7 @@ echo "\
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
 (async function () {
-    let {
+    const {
         GITHUB_BRANCH0,
         GITHUB_GITHUB_IO
     } = process.env;
@@ -192,7 +192,7 @@ shCiBaseCustom() {(set -e
 import jslint from "./jslint.mjs";
 import moduleFs from "fs";
 (async function () {
-    let fileDict = {};
+    const fileDict = {};
     let fileModified;
     let versionBeta;
     let versionMaster;
@@ -244,8 +244,8 @@ import moduleFs from "fs";
             file: "jslint.mjs",
             // update version
             src: fileDict["jslint.mjs"].replace((
-                /^let jslint_edition = ".*?";$/m
-            ), `let jslint_edition = "v${versionBeta}";`)
+                /^const jslint_edition = ".*?";$/m
+            ), `const jslint_edition = "v${versionBeta}";`)
         }, {
             file: "jslint_ci.sh",
             // update coverage-code
@@ -286,7 +286,7 @@ import moduleFs from "fs";
         file,
         src
     }) {
-        let src0 = fileDict[file];
+        const src0 = fileDict[file];
         if (src !== src0) {
             console.error(`update file ${file}`);
             fileModified = file;
@@ -423,19 +423,18 @@ function objectDeepCopyWithKeysSorted(obj) {
     await Promise.all(promiseList);
     Object.entries(dictAll).forEach(function ([dictName, dict]) {
         Object.keys(dict).forEach(function (name) {
-            let val;
             if (dictName !== "ecma_auto" && dictAll.ecma_auto[name]) {
                 delete dict[name];
             }
             if (dictName === "node_auto") {
-                val = ["----", "----"];
+                const value = ["----", "----"];
                 if (dict[name]) {
-                    val[0] = "node";
+                    value[0] = "node";
                 }
                 if (dictAll.browser_auto_node[name]) {
-                    val[1] = "brow";
+                    value[1] = "brow";
                 }
-                dict[name] = val.join(" ");
+                dict[name] = value.join(" ");
             }
         });
     });
@@ -460,11 +459,11 @@ function objectDeepCopyWithKeysSorted(obj) {
                 .trim()
                 .replace((
                     /^( *?".*?": )(".*?")/gm
-                ), function (ignore, name, val) {
+                ), function (ignore, name, value) {
                     return (
                         name
                         + " ".repeat(Math.max(0, 40 - name.length))
-                        + val
+                        + value
                     );
                 })
             + "$2"
@@ -494,7 +493,7 @@ shCiVscePackageJslintWrapperVscode() {(set -e
     node --input-type=module --eval '
 import moduleFs from "fs";
 (async function () {
-    let fileDict = {};
+    const fileDict = {};
     await Promise.all([
         "README.md"
     ].map(async function (file) {
@@ -637,7 +636,7 @@ import moduleFs from "fs";
                     "type": "git",
                     "url": "https://github.com/jslint-org/jslint.git"
                 },
-                "version": "2026.7.1"
+                "version": "2026.7.30"
             }, undefined, 4)
         }
     ].map(async function ({

@@ -4,7 +4,6 @@
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration.
 - jslint-ecma - Add ES2015-feature iterators.
 - jslint - Audit token-property '.free'.
-- jslint - Add warning and tdz for function-declaration inside block-scope.
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
 - jslint - Add ability to auto-fix whitespace.
@@ -12,7 +11,7 @@
 - jslint - Add new warning requiring paren around plus-separated concatenations.
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
-# v2026.7.1-beta
+# v2026.7.30
 - jslint-ecma - Add ES2015-feature for..of.
 - jslint - Disable directive-option /*jslint for*/, replacing it with for-loop specific warnings.
 - jslint - Update scope-related warnings for variables, depending on whether they are let/const (scope_block) or var (scope_function).
