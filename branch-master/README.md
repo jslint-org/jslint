@@ -3,7 +3,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Status
-| Branch | [master<br>(v2026.6.30)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
+| Branch | [master<br>(v2026.7.30)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jslint-org/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/jslint-org/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/jslint-org/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/index.html) |
@@ -12,34 +12,44 @@ Douglas Crockford <douglas@crockford.com>
 
 
 <br><br>
+# Web Demo
+- https://www.jslint.com
+
+[![screenshot](https://jslint-org.github.io/jslint/branch-master/.artifact/screenshot_browser__2fjslint_2fbranch-master_2findex.html.png)](https://jslint-org.github.io/jslint/index.html)
+
+
+<br><br>
+# Web Demo Archived
+- [Web Demo 2020](https://www.jslint.com/branch-v2020.11.6/index.html)
+- [Web Demo 2014 (ES5 only)](https://www.jslint.com/branch-v2014.7.8/jslint.html)
+- [Web Demo 2013 (ES5, CSS, HTML)](https://www.jslint.com/branch-v2013.3.13/jslint.html)
+
+
+<br><br>
 # Table of Contents
 
-1. [Web Demo](#web-demo)
-
-2. [Web Demo Archived](#web-demo-archived)
-
-3. [Quickstart Install](#quickstart-install)
+1. [Quickstart Install](#quickstart-install)
     - [To install, just download and save https://www.jslint.com/jslint.mjs to file:](#to-install-just-download-and-save-httpswwwjslintcomjslintmjs-to-file)
     - [To run `jslint.mjs` in shell:](#to-run-jslintmjs-in-shell)
     - [To import `jslint.mjs` in ES Module environment:](#to-import-jslintmjs-in-es-module-environment)
     - [To import `jslint.mjs` in CommonJS environment:](#to-import-jslintmjs-in-commonjs-environment)
     - [To JSLint entire directory in shell:](#to-jslint-entire-directory-in-shell)
 
-4. [Quickstart JSLint Report](#quickstart-jslint-report)
+2. [Quickstart JSLint Report](#quickstart-jslint-report)
     - [To create a JSLint report in shell:](#to-create-a-jslint-report-in-shell)
     - [To create a JSLint report in javascript:](#to-create-a-jslint-report-in-javascript)
 
-5. [Quickstart V8 Coverage Report](#quickstart-v8-coverage-report)
+3. [Quickstart V8 Coverage Report](#quickstart-v8-coverage-report)
     - [To create V8 coverage report from Node.js / Npm program in shell:](#to-create-v8-coverage-report-from-nodejs--npm-program-in-shell)
     - [To create V8 coverage report from Node.js / Npm program in javascript:](#to-create-v8-coverage-report-from-nodejs--npm-program-in-javascript)
 
-6. [Quickstart JSLint in CodeMirror](#quickstart-jslint-in-codemirror)
+4. [Quickstart JSLint in CodeMirror](#quickstart-jslint-in-codemirror)
 
-7. [Quickstart JSLint in Vim](#quickstart-jslint-in-vim)
+5. [Quickstart JSLint in Vim](#quickstart-jslint-in-vim)
 
-8. [Quickstart JSLint in VSCode](#quickstart-jslint-in-vscode)
+6. [Quickstart JSLint in VSCode](#quickstart-jslint-in-vscode)
 
-9. [Documentation](#documentation)
+7. [Documentation](#documentation)
     - [API Doc](#api-doc)
     - [Directive](#directive)
         - [`/*jslint beta*/`](#jslint-beta)
@@ -50,7 +60,6 @@ Douglas Crockford <douglas@crockford.com>
         - [`/*jslint devel*/`](#jslint-devel)
         - [`/*jslint eval*/`](#jslint-eval)
         - [`/*jslint fart*/`](#jslint-fart)
-        - [`/*jslint for*/`](#jslint-for)
         - [`/*jslint getset*/`](#jslint-getset)
         - [`/*jslint indent2*/`](#jslint-indent2)
         - [`/*jslint long*/`](#jslint-long)
@@ -70,31 +79,17 @@ Douglas Crockford <douglas@crockford.com>
         - [`//coverage-ignore-line`](#coverage-ignore-line)
     - [ECMAScript Feature Support](#ecmascript-feature-support)
 
-10. [Package Listing](#package-listing)
+8. [Package Listing](#package-listing)
 
-11. [Changelog](#changelog)
+9. [Changelog](#changelog)
 
-12. [License](#license)
+10. [License](#license)
 
-13. [Devops Instruction](#devops-instruction)
+11. [Devops Instruction](#devops-instruction)
     - [pull-request merge](#pull-request-merge)
     - [branch-master commit](#branch-master-commit)
     - [branch-master publish](#branch-master-publish)
     - [vscode-jslint publish](#vscode-jslint-publish)
-
-
-<br><br>
-# Web Demo
-- https://www.jslint.com
-
-[![screenshot](https://jslint-org.github.io/jslint/branch-master/.artifact/screenshot_browser__2fjslint_2fbranch-master_2findex.html.png)](https://jslint-org.github.io/jslint/index.html)
-
-
-<br><br>
-# Web Demo Archived
-- [Web Demo 2020](https://www.jslint.com/branch-v2020.11.6/index.html)
-- [Web Demo 2014 (ES5 only)](https://www.jslint.com/branch-v2014.7.8/jslint.html)
-- [Web Demo 2013 (ES5, CSS, HTML)](https://www.jslint.com/branch-v2013.3.13/jslint.html)
 
 
 <br><br>
@@ -637,21 +632,6 @@ let foo = async ({bar, baz}) => {
 
 <br>
 
-##### `/*jslint for*/`
-```js
-/*jslint for*/
-// Allow for-loop.
-
-function foo() {
-    let ii;
-    for (ii = 0; ii < 10; ii += 1) {
-        foo();
-    }
-}
-```
-
-<br>
-
 ##### `/*jslint getset*/`
 ```js
 /*jslint getset, this, devel*/
@@ -969,7 +949,7 @@ if (false) {
 |  17. | ✅ | ES2015 | [`destructuring`](https://github.com/lukehoban/es6features#destructuring) |
 |  16. | ✅ | ES2015 | [`default + rest + spread`](https://github.com/lukehoban/es6features#default--rest--spread) |
 |  15. | ✅ | ES2015 | [`let + const`](https://github.com/lukehoban/es6features#let--const) |
-|  14. | ❌ | ES2015 | [`iterators + for..of`](https://github.com/lukehoban/es6features#iterators--forof) |
+|  14. | ⚠️ | ES2015 | [`iterators + for..of`](https://github.com/lukehoban/es6features#iterators--forof) |
 |  13. | ❌ | ES2015 | [`generators`](https://github.com/lukehoban/es6features#generators) |
 |  12. | ✅ | ES2015 | [`unicode`](https://github.com/lukehoban/es6features#unicode) |
 |  11. | ⚠️ | ES2015 | [`modules`](https://github.com/lukehoban/es6features#modules) |
@@ -1023,23 +1003,14 @@ if (false) {
         sh jslint_ci.sh shGithubPrUpdatePrxxx
 
         # re-run until version propagates
-        sh jslint_ci.sh shGithubPrCreate alpha beta # v20xx.xx.xx
-
-        # squash intermediary commits
-        sh jslint_ci.sh shGitSquashPop __pr_beta_pre "- ci - shGithubPrUpdatePrxxx."
-
-        # squash intermediary commits
-        sh jslint_ci.sh shGithubPrCreate alpha beta # v20xx.xx.xx
-
-        # squash intermediary commits
-        git push . __pr_beta_pre~:__pr_beta_pre -f
+        sh jslint_ci.sh shGithubPrCreate alpha beta # v20yy.mm.dd __pr_beta_pre
 
         git push upstream alpha -f
         ```
         - verify ci-success @ https://github.com/kaizhu256/jslint/actions
         - verify ci-success @ https://github.com/jslint-org/jslint/actions
 
-1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2026.7.1
+1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p2026.7.20
     - click `Create pull request`
     - input `Add a title *` with: `<CHANGELOG.md entry #1>`
     - input `Add a description` with:
@@ -1090,23 +1061,14 @@ if (false) {
         sh jslint_ci.sh shGithubPrUpdatePrxxx
 
         # re-run until version propagates
-        sh jslint_ci.sh shGithubPrCreate alpha master # v20xx.xx.xx
-
-        # squash intermediary commits
-        sh jslint_ci.sh shGitSquashPop __pr_master_pre "- ci - shGithubPrUpdatePrxxx."
-
-        # squash intermediary commits
-        sh jslint_ci.sh shGithubPrCreate alpha master # v20xx.xx.xx
-
-        # squash intermediary commits
-        git push . __pr_master_pre~:__pr_master_pre -f
+        sh jslint_ci.sh shGithubPrCreate alpha master # v20yy.mm.dd __pr_master_pre
 
         git push upstream alpha -f
         ```
         - verify ci-success @ https://github.com/kaizhu256/jslint/actions
         - verify ci-success @ https://github.com/jslint-org/jslint/actions
 
-1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v2026.6.30
+1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v2026.7.30
     - click `Create pull request`
     - input `Add a title *` with: `# v20yy.mm.dd`
     - input `Add a description` with:

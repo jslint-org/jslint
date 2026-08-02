@@ -1,3 +1,10 @@
+#!/bin/sh
+
+# sh one-liner
+: '
+sh jslint_ci.sh shCiJslintGlobalDictAllFetch
+'
+
 shCiArtifactUploadCustom() {(set -e
 # this function will run custom-code to upload build-artifacts
     # .github_cache - restore
@@ -12,8 +19,8 @@ shCiArtifactUploadCustom() {(set -e
     node --input-type=module --eval '
 import moduleFs from "fs";
 (async function () {
-    let cacheKey = Math.random().toString(36).slice(-4);
-    let fileDict = {};
+    const cacheKey = Math.random().toString(36).slice(-4);
+    const fileDict = {};
     await Promise.all([
         "index.html"
     ].map(async function (file) {
@@ -42,7 +49,7 @@ import moduleFs from "fs";
 import moduleFs from "fs";
 import moduleChildProcess from "child_process";
 (async function () {
-    let fileDict = {};
+    const fileDict = {};
     let screenshotCurl;
     await Promise.all([
         "README.md"
@@ -105,10 +112,11 @@ echo "\
                     "sh", file + ".sh"
                 ],
                 {
-                    env: Object.assign({
+                    env: {
                         // limit stdout to xxx lines
-                        SH_RUN_WITH_SCREENSHOT_TXT_MAX_LINES: 64
-                    }, process.env),
+                        SH_RUN_WITH_SCREENSHOT_TXT_MAX_LINES: 64,
+                        ...process.env
+                    },
                     stdio: ["ignore", 1, 2]
                 }
             ).on("exit", resolve);
@@ -122,7 +130,7 @@ echo "\
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
 (async function () {
-    let {
+    const {
         GITHUB_BRANCH0,
         GITHUB_GITHUB_IO
     } = process.env;
@@ -153,12 +161,12 @@ import moduleChildProcess from "child_process";
 }());
 ' "$@" # '
     # Rename arbitrary $GITHUB_REPO_BASENAME to "jslint" in screenshot file.
-    GITHUB_REPO_BASENAME="$(printf "$GITHUB_GITHUB_IO" | cut -d'/' -f2)"
+    GITHUB_REPO_BASENAME="$(printf "%s" "$GITHUB_GITHUB_IO" | cut -d'/' -f2)"
     if [ "$GITHUB_REPO_BASENAME" != jslint ]
     then
-        for FILE in $(ls .artifact/*_2f"${GITHUB_REPO_BASENAME}"_2f*)
+        for FILE in .artifact/*_2f"$GITHUB_REPO_BASENAME"_2f*
         do
-            mv "$FILE" "$(printf "$FILE" | \
+            mv "$FILE" "$(printf "%s" "$FILE" | \
                 sed -e "s|_2f${GITHUB_REPO_BASENAME}_2f|_2fjslint_2f|")"
         done
     fi
@@ -184,7 +192,7 @@ shCiBaseCustom() {(set -e
 import jslint from "./jslint.mjs";
 import moduleFs from "fs";
 (async function () {
-    let fileDict = {};
+    const fileDict = {};
     let fileModified;
     let versionBeta;
     let versionMaster;
@@ -236,8 +244,8 @@ import moduleFs from "fs";
             file: "jslint.mjs",
             // update version
             src: fileDict["jslint.mjs"].replace((
-                /^let jslint_edition = ".*?";$/m
-            ), `let jslint_edition = "v${versionBeta}";`)
+                /^const jslint_edition = ".*?";$/m
+            ), `const jslint_edition = "v${versionBeta}";`)
         }, {
             file: "jslint_ci.sh",
             // update coverage-code
@@ -278,7 +286,7 @@ import moduleFs from "fs";
         file,
         src
     }) {
-        let src0 = fileDict[file];
+        const src0 = fileDict[file];
         if (src !== src0) {
             console.error(`update file ${file}`);
             fileModified = file;
@@ -295,6 +303,178 @@ import moduleFs from "fs";
     npm run test
 )}
 
+shCiJslintGlobalDictAllFetch() {(set -e
+# this function will fetch list of common, javascript global-objects
+# from online-resources.
+    node --input-type=module --eval '
+import moduleFs from "fs";
+function nameOk(name, deprecatedText, minLength) {
+    const deprecatedList = [
+        "atob",
+        "btoa"
+    ];
+    return (
+        !deprecatedList.includes(name)
+        && !(
+            /(?:deprecated|experimental|non-standard)_inline/i
+        ).test(deprecatedText)
+        && !new RegExp(`^[a-z].{0,${minLength - 1}}$`).test(name)
+    );
+}
+function objectDeepCopyWithKeysSorted(obj) {
+
+// This function will recursively deep-copy <obj> with keys sorted.
+
+    let sorted;
+    if (typeof obj !== "object" || !obj) {
+        return obj;
+    }
+
+// Recursively deep-copy list with child-keys sorted.
+
+    if (Array.isArray(obj)) {
+        return obj.map(objectDeepCopyWithKeysSorted);
+    }
+
+// Recursively deep-copy obj with keys sorted.
+
+    sorted = Object.create(null);
+    Object.keys(obj).sort().forEach(function (key) {
+        sorted[key] = objectDeepCopyWithKeysSorted(obj[key]);
+    });
+    return sorted;
+}
+(async function () {
+    const dictAll = Object.create(null);
+    const promiseList = [];
+    let result;
+    promiseList.push(async function () {
+        const dict = Object.create(null);
+        let response;
+        dictAll.ecma_auto = dict;
+        response = await fetch(
+"https://raw.githubusercontent.com/mdn/content/main/files/en-us/web/javascript/reference/global_objects/index.md" //jslint-ignore-line
+        );
+        response = await response.text();
+        response.replace((
+            /^- \{\{jsxref\("(\w+?)["(](.*?)$/gm
+        ), function (ignore, name, deprecated) {
+            dict[name] = nameOk(name, deprecated, 0);
+            return "";
+        });
+    }());
+    promiseList.push(async function () {
+        const dict = Object.create(null);
+        const dictBrowserNode = Object.create(null);
+        let response;
+        dictAll.node_auto = dict;
+        dictAll.browser_auto_node = dictBrowserNode;
+        response = await fetch(
+"https://raw.githubusercontent.com/nodejs/node/v24.x/doc/api/globals.md" //jslint-ignore-line
+        );
+        response = await response.text();
+        response.replace((
+            /^## (?:Class: )?`(\w+?)\W/gm //`
+        ), function (ignore, name) {
+            dict[name] = (
+                nameOk(name, "", 4)
+                // && Object.hasOwn(globalThis, name)
+            );
+            return "";
+        });
+        response.replace((
+            /^\* \[`(\w+?)\W/gm //`
+        ), function (ignore, name) {
+            dict[name] = nameOk(name, "", 4);
+            return "";
+        });
+        response = await fetch(
+"https://api.github.com/repos/mdn/content/git/trees/main?recursive=1" //jslint-ignore-line
+        );
+        response = await response.json();
+        response = response.tree.map(function ({path}) {
+            return path;
+        });
+        response = JSON.stringify(response);
+        await Promise.all(Object.keys(dict).map(async function (name) {
+            let response2;
+            dictBrowserNode[name] = false;
+            if (!nameOk(name, "", 4)) {
+                return;
+            }
+            response2 = new RegExp(
+                `"files/en-us/web/api/(?:window/)?`
+                + name.toLowerCase()
+                + `/index.md"`
+            ).exec(response);
+            if (!response2) {
+                return;
+            }
+            response2 = await fetch(
+                "https://raw.githubusercontent.com/mdn/content/main/"
+                + response2[0].slice(1, -1)
+            );
+            response2 = await response2.text();
+            if (!(/\{\{deprecated_header\}\}/).test(response2)) {
+                dictBrowserNode[name] = true;
+            }
+        }));
+    }());
+    await Promise.all(promiseList);
+    Object.entries(dictAll).forEach(function ([dictName, dict]) {
+        Object.keys(dict).forEach(function (name) {
+            if (dictName !== "ecma_auto" && dictAll.ecma_auto[name]) {
+                delete dict[name];
+            }
+            if (dictName === "node_auto") {
+                const value = ["----", "----"];
+                if (dict[name]) {
+                    value[0] = "node";
+                }
+                if (dictAll.browser_auto_node[name]) {
+                    value[1] = "brow";
+                }
+                dict[name] = value.join(" ");
+            }
+        });
+    });
+    delete dictAll.browser_auto_node;
+    result = await moduleFs.promises.readFile("jslint.mjs", "utf8");
+    result = result.replace(
+        new RegExp(String(`
+(// jslint_global_dict_all - auto-generated - start.
+
+)[\\S\\s]*?(
+
+// jslint_global_dict_all - auto-generated - end.)
+        `).trim()),
+        (
+            "$1    "
+            + JSON.stringify(
+                objectDeepCopyWithKeysSorted(dictAll),
+                undefined,
+                4
+            )
+                .slice(1, -1)
+                .trim()
+                .replace((
+                    /^( *?".*?": )(".*?")/gm
+                ), function (ignore, name, value) {
+                    return (
+                        name
+                        + " ".repeat(Math.max(0, 40 - name.length))
+                        + value
+                    );
+                })
+            + "$2"
+        )
+    );
+    await moduleFs.promises.writeFile("jslint.mjs", result);
+}());
+' # '
+    git --no-pager diff
+)}
+
 shCiPublishNpmCustom() {(set -e
 # this function will run custom-code to npm-publish package
     npm publish --access public
@@ -306,14 +486,14 @@ shCiVscePackageJslintWrapperVscode() {(set -e
     (set -e
     cd .artifact/jslint_wrapper_vscode
     ln -f ../../.npmignore .vscodeignore
-    ln -f ../../LICENSE
-    ln -f ../../asset_image_logo_256.png
-    ln -f ../../jslint.mjs
-    ln -f ../../jslint_wrapper_vscode.js
+    ln -f ../../LICENSE .
+    ln -f ../../asset_image_logo_256.png .
+    ln -f ../../jslint.mjs .
+    ln -f ../../jslint_wrapper_vscode.js .
     node --input-type=module --eval '
 import moduleFs from "fs";
 (async function () {
-    let fileDict = {};
+    const fileDict = {};
     await Promise.all([
         "README.md"
     ].map(async function (file) {
@@ -456,7 +636,7 @@ import moduleFs from "fs";
                     "type": "git",
                     "url": "https://github.com/jslint-org/jslint.git"
                 },
-                "version": "2026.6.30"
+                "version": "2026.7.30"
             }, undefined, 4)
         }
     ].map(async function ({
@@ -466,7 +646,7 @@ import moduleFs from "fs";
         await moduleFs.promises.writeFile(file, src.trim() + "\n");
     }));
 }());
-' "$@" # '
+' # '
     npx @vscode/vsce package
     rm -rf node_modules
     )

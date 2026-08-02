@@ -1,14 +1,53 @@
 # Changelog
 
 # Todo
-- jslint-ci - Automate linting of shell-scripts with shellcheck.
+- jslint-ecma - Add ES2018-feature Asynchronous Iteration.
+- jslint-ecma - Add ES2015-feature iterators.
+- jslint - Audit token-property '.free'.
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
 - jslint - Add ability to auto-fix whitespace.
-- jslint - bugfix - Fix false-positive Unused-variable when variable is used in function argument-default.
 - jslint - Add html and css linting back into jslint.
 - jslint - Add new warning requiring paren around plus-separated concatenations.
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
+
+# v2026.7.30
+- jslint-ecma - Add ES2015-feature for..of.
+- jslint - Disable directive-option /*jslint for*/, replacing it with for-loop specific warnings.
+- jslint - Update scope-related warnings for variables, depending on whether they are let/const (scope_block) or var (scope_function).
+- jslint - Change warning 'out_of_scope_a' to 'temporal_dead_zone_a'.
+- jslint - Change warning 'uninitialized_a' to 'unassigned_var_a'.
+- jslint - Change scope from scope_function to scope_block:
+    - const-declaration
+    - let-declaration
+    - function-declaration
+- jslint - Add implicit scope_block for:
+    - do-while
+    - for-loop
+    - if-else
+    - while-loop
+- jslint - Add hidden scope_block for:
+    - catch-variable
+    - for-variable
+    - function-parameter
+    - label-name
+- jslint - Restrict scope from scope_function to its own function-body:
+    - named-function-expression
+- jslint - Rename internal scope-variables to imporove readability of scope-logic:
+    - 'blockage' to 'scope_block'
+    - 'functionage' to 'scope_function'
+- jslint - Add block-scope to internal-function jslint_phase3_parse().
+- jslint - Expand built-in-globals for browser, ecma, and node - auto-generated from online-sources.
+- jslint-ci - Add automated ci for shellcheck to lint shell-scripts.
+- jslint-regression - Cleanup indent for multiline-method-chaining.
+- jslint-regression - Fix jslint crashing before warning about dangling ')' or ']'.
+- jslint-parse - Fix jslint unable to continue parsing 'async aa => 0'.
+- jslint-parse - Fix jslint unable to continue parsing 'function aa(){}0'.
+- jslint-regression - Fix long-running regression where 'let x = x;' doesn't warn about temporal-dead-zone.
+- jslint-warning - Tighten warning of unused variables to be always on, regardless of module / nodejs mode.
+- jslint - Wrap all property-updates 'name.init = true/false' with calls to:
+    name_declare()      - 'let aa=0'
+    post_a_assignment() - 'aa=0'
 
 # v2026.6.30
 - jslint-ecma - Update README.md, documenting supported ES2015+ features.
