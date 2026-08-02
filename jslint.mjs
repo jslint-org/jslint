@@ -410,23 +410,23 @@
 
 // init debugInline
 const debugInline = (function () {
-    let __consoleError = function () {
-        return;
-    };
+    let consoleError = Object;
     function debug(...argList) {
 
 // This function will print <argList> to stderr and then return <argList>[0].
 
-        __consoleError("\n\ndebugInline");
-        __consoleError(...argList);
-        __consoleError("\n");
+        consoleError("\n\ndebugInline");
+        consoleError(...argList);
+        consoleError("\n");
+        if (consoleError === Object) {
+            consoleError = console.error;
+        }
         return argList[0];
     }
-    debug(); // Coverage-hack.
-    __consoleError = console.error; //jslint-ignore-line
     return debug;
 }());
-const jslint_charset_ascii = (
+debugInline(); // coverage-hack
+const jslint_charset_ascii = ( //jslint-ignore-line
     "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007"
     + "\b\t\n\u000b\f\r\u000e\u000f"
     + "\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017"
@@ -435,7 +435,7 @@ const jslint_charset_ascii = (
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-const jslint_edition = "v2026.7.1-beta";
+const jslint_edition = "v2026.7.30";
 const jslint_fudge = 1;                 // Fudge starting line and starting
                                         // ... column to 1.
 const jslint_global_dict_all = {
@@ -2980,7 +2980,7 @@ function jslint_phase2_lex(state) {
         body.replace(jslint_rgx_directive_part, function (
             match0,
             key,
-            val,
+            value,
             jj
         ) {
             if (ii !== jj) {
@@ -2996,12 +2996,12 @@ function jslint_phase2_lex(state) {
             ii += match0.length;
             switch (the_comment.directive) {
             case "global":
-                if (val) {
+                if (value) {
 
 // test_cause:
 // ["/*global aa:false*/", "lex_comment", "bad_option_a", "aa:false", 1]
 
-                    warn("bad_option_a", the_comment, key + ":" + val);
+                    warn("bad_option_a", the_comment, key + ":" + value);
                 }
                 global_dict[key] = "user-defined";
 
@@ -3011,7 +3011,7 @@ function jslint_phase2_lex(state) {
 
                 break;
             case "jslint":
-                if (!option_set_item(key, val !== "false")) {
+                if (!option_set_item(key, value !== "false")) {
 
 // test_cause:
 // ["/*jslint undefined*/", "lex_comment", "bad_option_a", "undefined", 1]
@@ -3873,7 +3873,7 @@ function jslint_phase2_lex(state) {
         return token_create(snippet);
     }
 
-    function option_set_item(key, val) {
+    function option_set_item(key, value) {
 
 // These are the options that are recognized in the option object or that may
 // appear in a /*jslint*/ directive. Most options will have a boolean value,
@@ -3910,25 +3910,25 @@ function jslint_phase2_lex(state) {
         case "variable":        // Allow unordered const and let declarations
                                 // ... that are not at top of scope_function.
         case "white":           // Allow messy whitespace.
-            option_dict[key] = val;
+            option_dict[key] = value;
             break;
 
 // PR-404 - Alias "evil" to jslint-directive "eval" for backwards-compat.
 
         case "evil":
-            return option_set_item("eval", val);
+            return option_set_item("eval", value);
 
 // PR-404 - Alias "nomen" to jslint-directive "name" for backwards-compat.
 
         case "name":
-            return option_set_item("nomen", val);
+            return option_set_item("nomen", value);
         default:
             return false;
         }
 
 // Initialize global-variables.
 
-        switch (val && key) {
+        switch (value && key) {
         case "browser":
         case "couch":
         case "devel":
@@ -4702,7 +4702,11 @@ function jslint_phase3_parse(state) {
                 test_cause("import");
                 break;
             default:
-                if (option_dict.beta && !option_dict.variable) {
+                if (
+                    (variable_prv.id !== "{" || the_variable.id === "var")
+                    && option_dict.beta
+                    && !option_dict.variable
+                ) {
 
 // test_cause:
 // ["String();const aa=0", "check", "var_on_top_a_b", "block", 10]
@@ -10794,11 +10798,11 @@ async function moduleFsInit() {
     }
 }
 
-function noop(val) {
+function noop(value) {
 
-// This function will do nothing except return <val>.
+// This function will do nothing except return <value>.
 
-    return val;
+    return value;
 }
 
 function objectDeepCopyWithKeysSorted(obj) {
@@ -10825,12 +10829,12 @@ function objectDeepCopyWithKeysSorted(obj) {
     return sorted;
 }
 
-function object_assign_from_list(dict, list, val) {
+function object_assign_from_list(dict, list, value) {
 
 // Assign each property-name from <list> to <dict>.
 
     list.forEach(function (key) {
-        dict[key] = val;
+        dict[key] = value;
     });
     return dict;
 }
@@ -10865,16 +10869,16 @@ function v8CoverageListMerge(processCovs) {
         return bb.endOffset - aa.endOffset;
     }
 
-    function dictKeyValueAppend(dict, key, val) {
+    function dictKeyValueAppend(dict, key, value) {
 
-// This function will append <val> to list <dict>[<key>].
+// This function will append <value> to list <dict>[<key>].
 
         let list = dict.get(key);
         if (list === undefined) {
             list = [];
             dict.set(key, list);
         }
-        list.push(val);
+        list.push(value);
     }
 
     function mergeTreeList(parentTrees) {
