@@ -95,13 +95,13 @@
     textLength="768"
     x="10"
     y="340"
->- jslint-editor - Update codemirror-editor to v5.65.21.                                          </tspan>
+>- jslint-ci - Update ci-shell-function shGitLsTree() to include sha256 hash of files.            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="362"
->- jslint-ci - Update ci-shell-function shGitLsTree() to include sha256 hash of files.            </tspan>
+>- jslint-editor - Update codemirror-editor to v5.65.21.                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
