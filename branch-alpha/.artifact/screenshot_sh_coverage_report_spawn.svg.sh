@@ -2,7 +2,7 @@
 printf '> #!/bin/sh
 > 
 > git clone https://github.com/tryghost/node-sqlite3 node-sqlite3-sh \\
->     --branch=v5.1.7 \\
+>     --branch=v5.0.11 \\
 >     --depth=1 \\
 >     --single-branch
 > 
@@ -37,7 +37,7 @@ printf '> #!/bin/sh
 #!/bin/sh
 
 git clone https://github.com/tryghost/node-sqlite3 node-sqlite3-sh \
-    --branch=v5.1.7 \
+    --branch=v5.0.11 \
     --depth=1 \
     --single-branch 2>/dev/null || true
 
