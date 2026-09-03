@@ -11,6 +11,10 @@
 - jslint - Add new warning requiring paren around plus-separated concatenations.
 - jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
+# v2026.8.31
+- jslint-ci - Update ci-shell-function shGitLsTree() to include sha256 hash of files.
+- jslint-editor - Update codemirror-editor to v5.65.21.
+
 # v2026.7.30
 - jslint-ecma - Add ES2015-feature for..of.
 - jslint - Disable directive-option /*jslint for*/, replacing it with for-loop specific warnings.
