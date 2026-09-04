@@ -435,7 +435,7 @@ const jslint_charset_ascii = ( //jslint-ignore-line
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-const jslint_edition = "v2026.7.30";
+const jslint_edition = "v2026.8.31";
 const jslint_fudge = 1;                 // Fudge starting line and starting
                                         // ... column to 1.
 const jslint_global_dict_all = {

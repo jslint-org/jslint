@@ -3,7 +3,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Status
-| Branch | [master<br>(v2026.7.30)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
+| Branch | [master<br>(v2026.8.31)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jslint-org/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/jslint-org/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/jslint-org/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/index.html) |
@@ -397,11 +397,11 @@ import jslint from "../jslint.mjs";
 
 <!-- Assets from codemirror. -->
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.10/codemirror.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.10/addon/lint/lint.css">
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.10/codemirror.js"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.10/mode/javascript/javascript.js"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.10/addon/lint/lint.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.21/codemirror.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.21/addon/lint/lint.css">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.21/codemirror.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.21/mode/javascript/javascript.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.21/addon/lint/lint.js"></script>
 
 <!-- Assets from jslint. -->
 
@@ -980,7 +980,7 @@ if (false) {
 <br><br>
 # License
 - JSLint is under [Unlicense License](LICENSE).
-- CodeMirror editor is under [MIT License](https://github.com/codemirror/codemirror5/blob/d0e3b2e727c41aa4fd89fbad0adfb3815339174c/LICENSE).
+- CodeMirror editor is under [MIT License](https://github.com/codemirror/codemirror5/blob/34b84359c4ce289086c82c203f66ef74614d8a0d/LICENSE).
 - Function `v8CoverageListMerge` is derived from [MIT Licensed v8-coverage](https://github.com/demurgos/v8-coverage/blob/73446087dc38f61b09832c9867122a23f8577099/ts/LICENSE.md).
 
 
@@ -1068,7 +1068,7 @@ if (false) {
         - verify ci-success @ https://github.com/kaizhu256/jslint/actions
         - verify ci-success @ https://github.com/jslint-org/jslint/actions
 
-1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v2026.7.30
+1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v2026.8.31
     - click `Create pull request`
     - input `Add a title *` with: `# v20yy.mm.dd`
     - input `Add a description` with:
