@@ -11,205 +11,205 @@
     textLength="768"
     x="10"
     y="32"
-> 0.  755  2026-08-02T19:43:54Z  1523 KB  .                                                       </tspan>
+> 0.  755  2026-09-03T06:22:31Z  1524 KB  sha256    .                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="54"
-> 1.  644  2026-08-02T19:43:54Z    22 KB  .ci.sh                                                  </tspan>
+> 1.  644  2026-09-03T04:42:42Z    22 KB  c2c3d7f6  .ci.sh                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="76"
-> 2.  644  2026-07-07T07:54:14Z     1 KB  .gitconfig                                              </tspan>
+> 2.  644  2026-07-07T07:54:14Z     1 KB  6efd350a  .gitconfig                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="98"
-> 3.  644  2021-10-02T19:55:12Z     1 KB  .github/ISSUE_TEMPLATE/bug_report.md                    </tspan>
+> 3.  644  2021-10-02T19:55:12Z     1 KB  7ed598bb  .github/ISSUE_TEMPLATE/bug_report.md          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="120"
-> 4.  644  2021-10-02T19:55:12Z     1 KB  .github/ISSUE_TEMPLATE/feature_request.md               </tspan>
+> 4.  644  2021-10-02T19:55:12Z     1 KB  75810a7b  .github/ISSUE_TEMPLATE/feature_request.md     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="142"
-> 5.  644  2021-10-02T19:55:12Z     1 KB  .github/ISSUE_TEMPLATE/website_issue.md                 </tspan>
+> 5.  644  2021-10-02T19:55:12Z     1 KB  2bac789d  .github/ISSUE_TEMPLATE/website_issue.md       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="164"
-> 6.  644  2026-06-22T21:41:10Z     3 KB  .github/workflows/ci.yml                                </tspan>
+> 6.  644  2026-06-22T21:41:10Z     3 KB  6c06dd4a  .github/workflows/ci.yml                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="186"
-> 7.  644  2026-05-04T04:20:30Z     2 KB  .github/workflows/publish.yml                           </tspan>
+> 7.  644  2026-05-04T04:20:30Z     2 KB  586c34fa  .github/workflows/publish.yml                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="208"
-> 8.  644  2023-10-27T03:54:48Z     1 KB  .gitignore                                              </tspan>
+> 8.  644  2023-10-27T03:54:48Z     1 KB  2aadf3c3  .gitignore                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="230"
-> 9.  644  2022-05-18T01:21:19Z     1 KB  .npmignore                                              </tspan>
+> 9.  644  2022-05-18T01:21:19Z     1 KB  6f317844  .npmignore                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="252"
->10.  644  2026-08-02T19:43:54Z    25 KB  CHANGELOG.md                                            </tspan>
+>10.  644  2026-09-03T04:42:42Z    25 KB  843e25b2  CHANGELOG.md                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="274"
->11.  644  2023-08-20T19:07:19Z     2 KB  LICENSE                                                 </tspan>
+>11.  644  2023-08-20T19:07:19Z     2 KB  e0e03ff7  LICENSE                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="296"
->12.  644  2026-08-02T19:43:54Z    42 KB  README.md                                               </tspan>
+>12.  644  2026-09-03T06:22:31Z    42 KB  c6c2458d  README.md                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="318"
->13.  644  2023-05-12T21:44:14Z   453 KB  asset_codemirror_rollup.js                              </tspan>
+>13.  644  2026-09-03T04:42:42Z   454 KB  0f0f26de  asset_codemirror_rollup.js                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="340"
->14.  644  2021-10-02T19:55:12Z     8 KB  asset_font_daley_bold.woff2                             </tspan>
+>14.  644  2021-10-02T19:55:12Z     8 KB  d3285ebd  asset_font_daley_bold.woff2                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="362"
->15.  644  2021-10-02T19:55:12Z     1 KB  asset_image_folder_open_solid.svg                       </tspan>
+>15.  644  2021-10-02T19:55:12Z     1 KB  159a0827  asset_image_folder_open_solid.svg             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="384"
->16.  644  2021-10-02T19:55:12Z     2 KB  asset_image_github_brands.svg                           </tspan>
+>16.  644  2021-10-02T19:55:12Z     2 KB  4ea99f48  asset_image_github_brands.svg                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="406"
->17.  644  2022-02-19T16:29:01Z    14 KB  asset_image_jslint_wrapper_vim.png                      </tspan>
+>17.  644  2022-02-19T16:29:01Z    14 KB  aae8a6af  asset_image_jslint_wrapper_vim.png            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="428"
->18.  644  2023-04-29T18:56:11Z    39 KB  asset_image_jslint_wrapper_vscode.png                   </tspan>
+>18.  644  2023-04-29T18:56:11Z    39 KB  f939946e  asset_image_jslint_wrapper_vscode.png         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="450"
->19.  644  2021-10-03T03:04:13Z     5 KB  asset_image_json_160.svg                                </tspan>
+>19.  644  2021-10-03T03:04:13Z     5 KB  25752b43  asset_image_json_160.svg                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="472"
->20.  644  2024-12-16T04:56:51Z    11 KB  asset_image_logo_256.html                               </tspan>
+>20.  644  2024-12-16T04:56:51Z    11 KB  b62b5c58  asset_image_logo_256.html                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="494"
->21.  644  2024-12-16T04:56:51Z     6 KB  asset_image_logo_256.png                                </tspan>
+>21.  644  2024-12-16T04:56:51Z     6 KB  7401b022  asset_image_logo_256.png                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="516"
->22.  644  2024-12-16T09:15:04Z     3 KB  asset_image_logo_256.svg                                </tspan>
+>22.  644  2024-12-16T09:15:04Z     3 KB  f7aa0005  asset_image_logo_256.svg                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="538"
->23.  644  2026-07-23T06:35:01Z    50 KB  index.html                                              </tspan>
+>23.  644  2026-09-03T04:42:42Z    50 KB  59bbd39a  index.html                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="560"
->24.  644  2026-08-02T19:43:54Z   351 KB  jslint.mjs                                              </tspan>
+>24.  644  2026-09-03T04:42:42Z   351 KB  80c6c2fb  jslint.mjs                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="582"
->25.  644  2026-08-02T19:43:54Z   103 KB  jslint_ci.sh                                            </tspan>
+>25.  644  2026-09-03T04:42:42Z   104 KB  354b7839  jslint_ci.sh                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="604"
->26.  644  2023-08-20T19:07:19Z     2 KB  jslint_wrapper_cjs.cjs                                  </tspan>
+>26.  644  2023-08-20T19:07:19Z     2 KB  ff601fd2  jslint_wrapper_cjs.cjs                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="626"
->27.  644  2024-11-24T20:59:25Z     3 KB  jslint_wrapper_codemirror.html                          </tspan>
+>27.  644  2026-09-03T04:42:42Z     3 KB  e656b3ce  jslint_wrapper_codemirror.html                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="648"
->28.  644  2023-08-20T19:07:19Z     5 KB  jslint_wrapper_codemirror.js                            </tspan>
+>28.  644  2023-08-20T19:07:19Z     5 KB  4f322c41  jslint_wrapper_codemirror.js                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="670"
->29.  644  2024-03-11T23:50:30Z     3 KB  jslint_wrapper_vim.vim                                  </tspan>
+>29.  644  2024-03-11T23:50:30Z     3 KB  694523bf  jslint_wrapper_vim.vim                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="692"
->30.  644  2023-08-20T19:07:19Z     8 KB  jslint_wrapper_vscode.js                                </tspan>
+>30.  644  2023-08-20T19:07:19Z     8 KB  a99ed65d  jslint_wrapper_vscode.js                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="714"
->31.  644  2026-08-02T19:43:54Z     1 KB  package.json                                            </tspan>
+>31.  644  2026-09-03T04:42:42Z     1 KB  d4853858  package.json                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="736"
->32.  644  2026-08-02T19:43:54Z    50 KB  test.mjs                                                </tspan>
+>32.  644  2026-08-02T19:43:54Z    50 KB  2f36071d  test.mjs                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="758"
->33.  644  2021-10-12T00:21:08Z   319 KB  test_coverage_merge_data.json                           </tspan>
+>33.  644  2021-10-12T00:21:08Z   319 KB  ee2aff09  test_coverage_merge_data.json                 </tspan>
 
 </text>
 </svg>

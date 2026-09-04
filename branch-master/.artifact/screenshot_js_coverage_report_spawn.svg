@@ -329,7 +329,7 @@
     textLength="768"
     x="10"
     y="1198"
->node-pre-gyp info using node@24.18.0 | linux | x64                                               </tspan>
+>node-pre-gyp info using node@24.20.0 | linux | x64                                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -365,7 +365,7 @@
     textLength="768"
     x="10"
     y="1330"
->up to date, audited 398 packages in 3s                                                           </tspan>
+>up to date in 5m                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -389,13 +389,13 @@
     textLength="768"
     x="10"
     y="1418"
->                                                                                                 </tspan>
+>wrote file /home/runner/work/jslint/jslint/.artifact/coverage_sqlite3_js//touch.txt              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1440"
->26 vulnerabilities (6 low, 7 moderate, 12 high, 1 critical)                                      </tspan>
+>                                                                                                 </tspan>
 
 </text>
 </svg>
