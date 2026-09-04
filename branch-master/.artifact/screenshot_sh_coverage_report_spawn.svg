@@ -293,7 +293,7 @@
     textLength="768"
     x="10"
     y="1066"
->up to date in 5m                                                                                 </tspan>
+>up to date, audited 398 packages in 3m                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -317,67 +317,67 @@
     textLength="768"
     x="10"
     y="1154"
->wrote file /home/runner/work/jslint/jslint/.artifact/coverage_sqlite3_sh//touch.txt              </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1176"
->                                                                                                 </tspan>
+>26 vulnerabilities (6 low, 7 moderate, 12 high, 1 critical)                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1198"
->&gt; sqlite3@5.0.11 pretest                                                                         </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1220"
->&gt; node test/support/createdb.js                                                                  </tspan>
+>To address all issues (including breaking changes), run:                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1242"
->                                                                                                 </tspan>
+>  npm audit fix --force                                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1264"
->okay: database already created (/home/runner/work/jslint/jslint/node-sqlite3-sh/test/support/big\</tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1286"
->  .db)                                                                                           </tspan>
+>Run `npm audit` for details.                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1308"
->                                                                                                 </tspan>
+>wrote file /home/runner/work/jslint/jslint/.artifact/coverage_sqlite3_sh//touch.txt              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1330"
->&gt; sqlite3@5.0.11 test                                                                            </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1352"
->&gt; mocha -R spec --timeout 480000                                                                 </tspan>
+>&gt; sqlite3@5.0.11 pretest                                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1374"
->                                                                                                 </tspan>
+>&gt; node test/support/createdb.js                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -389,19 +389,19 @@
     textLength="768"
     x="10"
     y="1418"
->                                                                                                 </tspan>
+>okay: database already created (/home/runner/work/jslint/jslint/node-sqlite3-sh/test/support/big\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1440"
->  query properties                                                                               </tspan>
+>  .db)                                                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1462"
->    ✓ should return the correct lastID (129ms)                                                   </tspan>
+>                                                                                                 </tspan>
 
 </text>
 </svg>
