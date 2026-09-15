@@ -179,9 +179,9 @@
     finally,
     flag,
     floor,
-    for,
     forEach,
     for_init,
+    for_loop,
     for_of,
     for_semicolon,
     formatted_message,
@@ -383,7 +383,6 @@
     tree,
     trim,
     trimEnd,
-    trimRight,
     try,
     type,
     unlink,
@@ -435,7 +434,7 @@ const jslint_charset_ascii = ( //jslint-ignore-line
     + "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
     + "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-const jslint_edition = "v2026.8.31";
+const jslint_edition = "v2026.9.29";
 const jslint_fudge = 1;                 // Fudge starting line and starting
                                         // ... column to 1.
 const jslint_global_dict_all = {
@@ -1897,7 +1896,7 @@ function jslint(
             + "\u001b[39m\n"
             + ("    " + line_source.trim()).slice(0, 72) + "\n"
             + stack_trace
-        ).trimRight();
+        ).trimEnd();
     });
 
     return {
@@ -4199,8 +4198,8 @@ function jslint_phase2_lex(state) {
             }
             break;
         case ";":
-            if (opener_stack[0]?.for) {
-                opener_stack[0].for.for_semicolon = [
+            if (opener_stack[0]?.for_loop) {
+                opener_stack[0].for_loop.for_semicolon = [
                     undefined,
                     undefined,
                     undefined
@@ -4223,8 +4222,21 @@ function jslint_phase2_lex(state) {
         case "] =":
             opener_popped.assignment = the_token;
             break;
+
+// PR-508 - Add ES2018-feature Asynchronous Iteration - for await...of.
+
+        case "await (":
+            if (token_prv_expr.for_loop) {
+                the_token.for_loop = token_prv_expr.for_loop;
+                delete token_prv_expr.for_loop;
+            }
+            break;
         case "for (":
-            the_token.for = token_prv_expr;
+
+// PR-508 - Add ES2018-feature Asynchronous Iteration - for await...of.
+
+        case "for await":
+            the_token.for_loop = token_prv_expr;
             break;
         }
 
@@ -6958,6 +6970,7 @@ function jslint_phase3_parse(state) {
     }
 
     function stmt_for() {
+        const for_await = token_nxt.id === "await";
         const the_for = token_now;
         let the_operator;
         let the_variable;
@@ -6968,6 +6981,29 @@ function jslint_phase3_parse(state) {
 // - for-variable
 
         scope_block = scope_block_push(the_for, true);
+
+// PR-508 - Add ES2018-feature Asynchronous Iteration - for await...of.
+
+        if (for_await) {
+            if (the_for.for_semicolon) {
+
+// test_cause:
+// ["for await(;;){}", "stmt_for", "expected_a", "for await...of", 1]
+
+                return stop("expected_a", the_for, "for await...of");
+            }
+            if (scope_function.async === 0 && scope_function !== token_global) {
+
+// test_cause:
+// ["()=>{for await(aa of aa){}}", "stmt_for", "unexpected_a", "await", 10]
+
+                warn("unexpected_a", token_nxt);
+            }
+            if (scope_function.async === 1) {
+                scope_function.async = 2;
+            }
+            advance("await");
+        }
         advance("(");
         the_for.free = true;
         if (the_for.for_semicolon) {
@@ -7071,6 +7107,13 @@ function jslint_phase3_parse(state) {
             the_variable.for_init = true;
             switch (the_operator.id) {
             case "in":
+                if (for_await) {
+
+// test_cause:
+// ["for await(aa in aa){}", "stmt_for", "expected_a_b", "in", 14]
+
+                    return stop("expected_a_b", the_operator, "of", "in");
+                }
 
 // test_cause:
 // ["for(aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
