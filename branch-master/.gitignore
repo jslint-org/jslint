@@ -1,0 +1,36 @@
+# base - .gitignore - beg
+"*
+'*
+*.[0123456789][0123456789]
+*.lock
+*.log
+*.tgz
+*~
+.*
+_*
+temp*
+tmp/
+undefined
+
+# nodejs
+build/
+node_modules/
+package-lock.json
+
+# python
+*.egg-info/
+*.py[cod]
+dist/
+htmlcov/
+wheelhouse/
+
+# vscode
+*.vsix
+
+# !
+!.gitconfig
+!.github
+!.gitignore
+!.npmignore
+!_*.py
+# base - .gitignore - end

@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta
+    name="description"
+    content="How to use JSLint to reduce the rate of error formation in
+JavaScript programs. JSLint recommends using only the good parts of The
+ECMAScript Programming Language Standard, Sixth Edition [ES6]."
+>
+<meta
+    name="author"
+    content="Douglas Crockford"
+>
+<meta name="date" content="2020-09-09"
+>
+<link
+    rel="stylesheet"
+    type="text/css"
+    href="https://fonts.googleapis.com/css?family=Patua+One"
+>
+<link
+    rel="icon"
+    type="image/png"
+    href="image-jslint-64x64.png"
+/>
+<title>JSLint: Help</title>
+<style>
+@font-face {
+    font-family: "Programma";
+    font-weight: bold;
+    src: url("font-programma-bold.woff2") format("woff2");
+}
+@font-face {
+    font-family: "Daley";
+    font-weight: bold;
+    src: url("font-daley-bold.woff2") format("woff2");
+}
+body {
+	background-color: seashell;
+	font-family: Palatino, serif;
+	font-size: 100%;
+	margin: 0;
+	padding: 0;
+}
+#JSLINT_TITLE {
+    color: darkslategray;
+    float: left;
+    font-family: "Daley", monospace;
+    font-size: 48pt;
+    margin-left: 12%;
+    padding: 0;
+}
+
+h1 {
+	background-color: darkslategray;
+	color: white;
+	font-family: "Daley", serif;
+	font-size: 100%;
+	font-style: normal;
+	font-weight: normal;
+	margin-bottom: 1em;
+	margin-left: 12%;
+	margin-right: 12%;
+	margin-top: 1em;
+	padding-bottom: 0.25em;
+	padding-left: 0;
+	padding-right: 0;
+	padding-top: 0.25em;
+	text-align: center;
+}
+th {
+	background-color: darkslategray;
+	color: white;
+}
+td {
+	background-color: white;
+}
+button {
+	background-color: lightsteelblue;
+	border: 0;
+	color: black;
+	cursor: pointer;
+	font-family: "Daley", serif;
+	font-size: 100%;
+	font-style: normal;
+	margin-bottom: 0;
+	margin-left: 0.25em;
+	margin-right: 0.25em;
+	margin-top: 0;
+	padding-left: 1em;
+	padding-right: 1em;
+	text-align: center;
+}
+s {
+	display: inline-block;
+    font-family: "Daley", cursive;
+	font-style: normal;
+	padding-left: 0.1em;
+	text-decoration: none;
+}
+big {
+	font-size: 50pt;
+	font-style: normal;
+	font-weight: normal;
+	margin-left: 0.125em;
+	margin-top: -0.2em;
+}
+code, pre {
+	font-family: Programma, monospace;
+	font-size: 100%;
+	font-style: normal;
+	font-weight: normal;
+}
+small {
+	font-style: italic;
+}
+p {
+	margin-bottom: 1em;
+	margin-left: 12%;
+	margin-right: 12%;
+	margin-top: 1em;
+	text-align: justify;
+}
+blockquote {
+	margin-bottom: 1em;
+	margin-left: 18%;
+	margin-right: 18%;
+	margin-top: 1em;
+}
+blockquote div {
+	margin-left: 2.2em;
+}
+pre {
+	margin-bottom: 1em;
+	margin-left: 18%;
+	margin-right: 12%;
+	margin-top: 1em;
+}
+table blockquote {
+	margin-left: 0;
+	margin-right: 6%;
+}
+ul {
+	list-style-type: square;
+	margin-left: 12%;
+	margin-right: 12%;
+}
+table {
+	margin: 1em;
+	border: 0;
+}
+th, td {
+	border: black solid 1pt;
+	padding-left: 10px;
+	padding-right: 10px;
+	vertical-align: top;
+}
+a:link {
+	color: darkblue;
+}
+a:visited {
+	color: purple;
+}
+a:hover {
+	color: blue;
+	text-decoration: underline;
+}
+a:active {
+	color: red;
+}
+#title {
+    color: gray;
+    font-family: "Trebuchet MS", sans-serif;
+    font-size: 200%;
+    font-weight: bold;
+    padding-top: 0.75em;
+    text-align: center;
+    text-decoration: none;
+}
+</style>
+</head>
+<body>
+<div id="JSLINT_TITLE">JSLint</div>
+<ul style="float: right; margin: 1em; padding-right: 12%;">
+    <li><a href="#try">Try it.</a></li>
+    <li><a href="https://www.amazon.com/dp/1949815005/wrrrldwideweb" target="_blank">
+<i>How JavaScript Works</i> by Douglas Crockford.
+  </a></li>
+</ul>
+<div id=title>Help</div>
+<br clear=all>
+<blockquote>Il semble que la perfection soit atteinte non quand il n&#8217;y a
+    plus rien &agrave; ajouter, mais quand il n&#8217;y a plus rien &agrave;
+    retrancher.</blockquote>
+<center>
+    Antoine de Saint-Exupéry
+</center>
+<center>
+    <i>Terre des Hommes</i> (1939)
+</center>
+<h1 id=good>Good Parts</h1>
+<p>The Principle of the Good Parts is</p>
+<blockquote> If a feature is sometimes useful and sometimes dangerous and if
+    there is a  better option then always use the better option. </blockquote>
+<p>JSLint is a JavaScript program that looks for problems in
+    JavaScript programs. It is a code quality tool.</p>
+<p>When <a href="https://en.wikipedia.org/wiki/C_programming_language">C</a> was
+    a young
+    programming language, there were several common programming errors that
+    were not caught by the primitive compilers, so an accessory program called
+    <code><a href="https://en.wikipedia.org/wiki/Lint_programming_tool">lint</a></code>
+    was developed that would scan a source file, looking for problems.</p>
+<p>As the language matured, the definition of the language was
+    strengthened to eliminate some insecurities, and compilers got better
+    at issuing warnings. <code>lint</code> is no longer needed.</p>
+<p><a href="https://www.crockford.com/javascript/">JavaScript</a> is a
+    young-for-its-age language. It was originally intended to do small tasks in
+    webpages, tasks for which Java was too heavy and clumsy. But JavaScript is
+    a surprisingly capable language, and it is now being used in larger
+    projects. Many of the features that were intended to make the language easy
+    to use are troublesome when projects become complicated. A <code>lint</code>
+    for JavaScript is needed: JSLint, a JavaScript syntax checker
+    and validator.</p>
+<p>JSLint takes a JavaScript source and scans it. If it finds a
+    problem, it returns a message describing the problem and an approximate
+    location within the source. The problem is not necessarily a syntax error,
+    although it often is. JSLint looks at some style conventions
+    as well as structural problems. It does not prove that your program is
+    correct. It just provides another set of eyes to help spot problems.</p>
+<p>JSLint defines a professional subset of JavaScript, a stricter
+    language than that defined by the <i>ECMAScript Programming Language
+    Standard</i> (the strangely named document that governs JavaScript).
+    JSLint will reject most legal programs. It is a higher
+    standard.</p>
+<p>JavaScript is a sloppy language, but hidden deep inside there is an elegant,
+    better language. JSLint helps you to program in that better
+    language and to avoid most of the slop. JSLint will reject
+    programs that browsers will accept because JSLint is concerned
+    with the quality of your code and browsers are not. You should gladly accept
+    all of JSLint's advice.</p>
+<p>JSLint can operate on JavaScript source
+    or <a href="https://www.JSON.org/">JSON</a> text.</p>
+<h1 id=es6>ECMAScript Sixth Edition</h1>
+<p>Some of
+    ES6&rsquo;s features are good, so JSLint will recognize the good
+    parts of ES6. </p>
+<p>Currently, these features are recognized:</p>
+<ul>
+    <li>The <code>...</code>&nbsp;<small>ellipsis</small> marker in parameter
+        lists and argument lists, replacing the <code>arguments</code> object
+        for variadic functions.</li>
+    <li>The <code>let</code> statement, which is like the <code>var</code>
+        statement except that it respects block scope.
+        You may use <code>let</code> or <code>var</code> but not both.</li>
+    <li>The <code>const</code> statement is like the <code>let</code> statement
+        except that it disallows the use of assignment on the variable, although
+        if the value of the variable is mutable, it can still be mutated.
+        <code>const</code> is preferred to <code>let</code>.
+    <li>Destructuring of arrays and objects is allowed in parameter lists and on
+        the left side of <code>let</code>, and <code>const</code>, but not
+        <code>var</code> or assignment statements, and  not deep destructuring
+        or eliding.</li>
+    <li>Enhanced object literals, providing shorter forms for function
+        declaration and properties that are initialized by variables with the
+        same name.</li>
+    <li>The fat arrow <code>=></code>&nbsp;<small>fart</small> functions.</li>
+    <li>The simplest forms of <code>import</code> and <code>export</code>.</li>
+    <li><code>`</code>Megastring<code>`</code> literals, but not nested
+        <code>`</code>megastring<code>`</code> literals.</li>
+    <li>New global functions, such as <code>Map</code>, <code>Set</code>,
+        <code>WeakMap</code>, and <code>WeakSet</code>.</li>
+    <li><code>0b</code>- and <code>0o</code>- number literals.</li>
+</ul>
+<p>The most important new feature of ES6 is proper tail calls. This has no
+    new syntax, so JSLint doesn&rsquo;t see it. But it makes recursion
+    much more attractive, which makes loops, particularly <code>for</code>
+    loops, much less attractive.</p>
+<h1 id="import"><code>import export</code></h1>
+<p>The ES6 module feature will be an important improvement over JavaScript&rsquo;s
+    global variables as a means of linking separate files together.
+    JSLint recognizes a small but essential subset of the module
+    syntax.</p>
+<blockquote>
+    <p><code>import </code><var>name</var><code> from </code><var>stringliteral</var><code>;</code></p>
+    <p><code>import {</code><var>name</var><code>} from </code><var>stringliteral</var><code>;</code></p>
+    <p><code>import(</code><var>string</var><code>).then(</code><var>function</var><code>);</code></p>
+<p><code>export default function () {};</code></p>
+<p><code>export default function <var>name</var>() {};</code></p>
+    <p><code>export default </code><var>expression</var><code>;</code></p>
+    <p><code>export  function <var>name</var>() {}</code></p>
+    <p><code>export  </code><var>name</var><code>; // </code> where <var>name</var> is <code>const</code></p>
+    <p><code>export {</code><var>name</var><code>}</code><code>;</code></p>
+</blockquote>
+<h1 id=directives>Directives</h1>
+<p>JSLint provides three directives that may be placed in a
+    file to manage JSLint&rsquo;s behavior. Use of these directives is
+    optional. If they are used, they should be placed in a source file before
+    the first statement. They are written in the form of a comment, where the
+    directive name is placed immediately after the opening of the comment before
+    any whitespace. The three directives are <code>global</code>,
+    <code>jslint</code>, and <code>property</code>. Directives in a file are
+    stronger than options selected from the UI or passed with the option object.</p>
+<h1 id=global><code>/*global*/</code></h1>
+<p>The <code>/*global*/</code> directive is used to specify a set of globals
+    (usually functions and objects containing functions) that are available to
+    this file. This was commonly used in browsers to link source files together
+    before ES6 modules appeared. Use of global variables is strongly
+    discouraged, but unfortunately web browsers require their use. The
+    <code>/*global*/</code> directive can only be used when the
+    <a href="#browser">Assume a browser</a> option is selected.
+<p>Each of the names listed will indicate a read-only global variable. The names
+    are separated by <code>,</code>&nbsp;<small>comma</small>. This directive
+    should not be used if <code>import</code> or <code>export</code> is used.
+    This directive inhibits warnings, but it does not declare the names in the
+    execution environment.
+<p>For example:
+<blockquote><code>/*global</code>
+<div><code>ADSAFE,  report, jslint</code></div>
+<code>*/</code></blockquote>
+<p>instructs JSLint to not give warnings about the global
+    variables <code>ADsafe</code>, <code>report</code>, and <code>jslint</code>.
+    However, if any of those names are expected to be supplied by other files
+    and those other files fail to do so, then execution errors will result. It
+    is usually better to use top-level variable declarations instead:
+<pre>    var ADSAFE;
+    var report;
+    var jslint; </pre>
+<p>Using <code>var</code> in this way allows comparing a global variable to the
+    <code>undefined</code> value to determine whether it is has been used in the global context.</p>
+<h1><code>/*jslint*/</code></h1>
+<p>The <code>/*jslint*/</code> directive allows for the control of several
+    options. These options can also be set from the
+    <a href="https://www.JSLint.com/index.html">JSLint.com</a> user interface.</p>
+<table>
+    <tbody>
+        <tr>
+            <th>Description</th>
+            <th><code>option</code></th>
+            <th>Meaning</th>
+        </tr>
+        <tr>
+            <td id="bitwise">Tolerate bitwise operators</td>
+            <td><code>bitwise</code></td>
+            <td><code>true</code> if bitwise operators should  be allowed. The
+                bitwise operators are rarely used in JavaScript programs, so it
+                is usually more likely that <code>&amp;</code> is a mistyping of
+                <code>&amp;&amp;</code> than that it indicates a bitwise <i>and</i>.
+                JSLint will give warnings on the bitwise operators
+                unless this option is selected.</td>
+        </tr>
+        <tr>
+            <td id="browser">Assume a browser </td>
+            <td><code>browser</code></td>
+            <td><code>true</code> if the standard browser globals should be
+                predefined. This option will reject the use of
+                <code>import</code> and <code>export</code>. This option also
+                disallows the file form of the <code>&quot;use
+                strict&quot;</code> pragma. It does not supply
+                <code>self</code>; you will have to request that unnecessary
+                alias of the dreaded global object yourself. It adds the same
+                globals as this directive:
+                <blockquote><code>/*global </code>
+                <div><code>
+                    clearInterval, clearTimeout, document, event, FileReader,
+                    FormData, history, localStorage, location, name, navigator,
+                    screen, sessionStorage, setInterval, setTimeout, Storage,
+                    URL, window, XMLHttpRequest
+                </code></div>
+                <code>*/</code></blockquote>
+            </td>
+        </tr>
+        <tr>
+            <td id="convert">Tolerate conversion operators</td>
+            <td><code>convert</code></td>
+            <td><code>true</code> if <code>!!</code>, <code>+</code> prefix,
+                and concatenation with <code>&quot;&quot;</code> are allowed.
+                The <code>Boolean</code>, <code>Number</code>, and
+                <code>String</code> functions are preferred</td>
+        </tr>
+        <tr>
+            <td id="couch">Assume <a href="https://couchdb.apache.org/">CouchDB</a></td>
+            <td><code>couch</code></td>
+            <td><code>true</code> if
+                <a href="https://couchdb.apache.org/">Couch DB</a>
+                globals should be predefined. It adds the same globals as this
+                directive:
+                <blockquote><code>/*global </code>
+    <div><code>emit, getRow, isArray, log, provides, registerType, require,
+        send, start, sum, toJSON </code></div>
+    <code> */</code></blockquote></td>
+        </tr>
+        <tr>
+            <td id="devel">Assume in development</td>
+            <td><code>devel</code></td>
+            <td><code>true</code> if browser globals that are useful in
+                development should be predefined, and if <code>debugger</code>
+                statements and <code>TODO</code> comments
+                should be allowed. It adds the
+                same globals as this directive:
+                <blockquote><code>/*global </code>
+    <div><code>alert, confirm, console, prompt</code></div>
+    <code> */</code></blockquote>Be sure to turn this option off before going
+        into production.</td>
+        </tr>
+        <tr>
+            <td id="eval">Tolerate <code>eval</code></td>
+            <td><code>eval</code></td>
+            <td><code>true</code> if <code>eval</code> should be allowed. In the
+                past, the <code>eval</code> function was the most misused
+                feature of the language.</td>
+        </tr>
+        <tr>
+            <td>Tolerate <code>for</code> statement</td>
+            <td><code>for</code></td>
+            <td><code>true</code> if the <code>for</code> statement should be
+                allowed. It is almost always better to use the array methods
+                instead.</td>
+        </tr>
+        <tr>
+            <td id="fudge">Fudge the line and column numbers</td>
+            <td><code>fudge</code></td>
+            <td><code>true</code> if the origin of a text file is line 1 column
+                1. Programmers know that number systems start at zero.
+                Unfortunately, most text editors start numbering lines and
+                columns at one. JSLint will by default start
+                numbering at zero. Use this option to start the numbering at one
+                in its reports.</td>
+        </tr>
+        <tr>
+            <td id="fudge">Tolerate <code>get</code> and <code>set</code></td>
+            <td><code>getset</code></td>
+            <td><code>true</code> if accessor properties are allowed in object literals.</td>
+        </tr>
+        <tr>
+            <td id="long">Tolerate long source lines</td>
+            <td><code>long</code></td>
+            <td><code>true</code> if a line can contain more than 80 characters.</td>
+        </tr>
+        <tr>
+            <td id="node">Assume <a href="https://nodejs.org/">Node.js</a></td>
+            <td><code>node</code></td>
+            <td><code>true</code> if Node.js globals should be predefined. It
+                will predefine globals that are used in the Node.js environment.
+                It adds the same globals as this directive:
+                <blockquote><code>/*global </code>
+    <div><code>
+        Buffer, clearImmediate, clearInterval, clearTimeout, console, exports,
+        module, process, require, setImmediate, setInterval, setTimeout, URL,
+        URLSearchParams, __dirname, __filename
+</code></div>
+    <code>*/</code></blockquote></td>
+        </tr>
+        <tr>
+            <td id="single">Tolerate single quote strings</td>
+            <td><code>single</code></td>
+            <td><code>true</code> if <code>'</code><small>single quote</small>
+                should be allowed to enclose string literals. </td>
+        </tr>
+        <tr>
+            <td>Tolerate <code>this</code><br></td>
+            <td><code>this</code></td>
+            <td><code>true</code> if <code>this</code> should be allowed. </td>
+        </tr>
+        <tr>
+            <td id="unordered">Tolerate unordered properties and params.</td>
+            <td><code>unordered</code></td>
+            <td><code>true</code> if objects and functions are allowed to declare properties and params in non-alphabetical order.</td>
+        </tr>
+        <tr>
+            <td id="white">Tolerate whitespace mess</td>
+            <td><code>white</code></td>
+            <td><code>true</code> if the whitespace rules should be ignored.</td>
+        </tr>
+    </tbody>
+</table>
+<p>For example:</p>
+<pre>/*jslint
+    bitwise, node
+*/</pre>
+
+<h1 id=property><code>/*property*/</code></h1>
+<p>The <code>/*property*/</code> directive is used to declare a list  of
+    property identifiers that are used in the file. Each property name in the
+    program is looked up in this list. If a name is not found, that indicates an
+    error, most likely a typing error.</p>
+<p>The list can also be used to evade some of JSLint&rsquo;s naming
+    rules.</p>
+<p>JSLint can build the <code>/*property*/</code> list for you. At
+    the bottom of its report, JSLint displays a
+    <code>/*property*/</code> directive. It contains all of the names that were
+    used with dot notation, subscript notation, and object literals to name the
+    properties of objects. You can look through the list for misspellings. You
+    can copy the <code>/*property*/</code></code> directive to the top of your
+    script file. JSLint will check the spelling of all property
+    names against the list. That way, you can have JSLint look for
+    misspellings for you.</p>
+<p>For example,</p>
+<blockquote><code>/*property
+    <div>charAt, slice, _$_</div>
+    */</code></blockquote>
+<h1 id=ignore><code>ignore</code></h1>
+<p>JSLint introduces a new reserved word: <code>ignore</code>. It
+    is used in parameter lists and in <code>catch</code> clauses to indicate a
+    parameter that will be ignored. Unused warnings will not be produced for
+    <code>ignore</code>.
+<pre>function handler(ignore, value) {
+    return do_something_useful(value);
+}</pre>
+<h1 id=var><code>var let const</code></h1>
+<p>JavaScript provides three statements for declaring variables:
+    <code>var</code>, <code>let</code>, and <code>const</code>. The
+    <code>var</code> statement suffers from a bad practice called hoisting. The
+    <code>let</code> statement does not do hoisting and respects block scope.
+    The <code>const</code> statement is like <code>let</code> except that it
+    marks the variable (but not its contents) as read only, making it an error
+    to attempt to assign to the variable. When given a choice,
+    <code>const</code> is the best, <code>var</code> is the worst. </p>
+<p>JSLint uses the intersection of the <code>var</code> rules and the
+    <code>let</code> rules, and by doing so avoids the errors related to either.
+    A name should be declared only once in a function. It should be declared
+    before it is used. It should not be used outside of the block in which it is
+    declared. A variable should not have the same name as a variable or
+    parameter in an outer function. Do not mix <code>var</code> and
+    <code>let</code>. Declare one name per statement.</p>
+<h1 id=eq><code>= == ===</code></h1>
+<p><span style="font-variant: small-caps;">Fortran</span> made a terrible
+    mistake in using the equality operator as its assignment operator. That
+    mistake has been replicated in most languages since then. C compounded that
+    mistake by making <code>==</code> its equality operator. The visual
+    similarity is a source of errors. JavaScript compounded this further by
+    making <code>==</code> a type coercing comparison operator that produces
+    false positive results. This was mitigated by adding the <code>===</code>
+    operator, leaving the broken <code>==</code> operator in place.</p>
+<p>JSLint attempts to minimize errors by the following rules:</p>
+<p><code>==</code> is not allowed. This avoids the false positives, and
+    increases the visual distance between <code>=</code> and <code>===</code>.
+    Assignments are not allowed in expression position, and comparisons are not
+    allowed in statement position. This also reduces confusion.&nbsp;</p>
+<h1 id=semicolon>Semicolon</h1>
+<p>JavaScript uses a C-like syntax that requires the use of semicolons to
+    delimit certain statements. JavaScript attempts to make those semicolons
+    optional with an automatic semicolon insertion mechanism, but it does not
+    work very well. Automatic semicolon insertion was added to make
+    things easier for beginners. Unfortunately, it sometimes fails. Do not rely
+    on it unless you are a beginner.</p>
+<p>JSLint expects that every statement will be followed by
+    <code>;</code> except for <code>for</code>, <code>function</code>,
+    <code>if</code>, <code>switch</code>, <code>try</code>, and
+    <code>while</code>. JSLint does not expect to see unnecessary
+    semicolons, the empty statement, or empty blocks.</p>
+<h1 id=function><code>function =></code></h1>
+<p>JavaScript has four syntactic forms for making function objects: function
+    statements, function expressions, enhanced object literals, and the
+    <code>=&gt;</code>&nbsp;<small>fart</small> operator.</p>
+<p>The function statement creates a variable and assigns the function object to
+    it. It should be used in a file or function body, but not inside of a block.</p>
+<blockquote> <code>function </code><var>name</var><code>(</code><var>parameters</var><code>) {</code>
+    <div><var>statements</var></div>
+    <code>}</code> </blockquote>
+<p>The function expression unfortunately looks like the function statement. It
+    may appear anywhere that an expression may appear, but not in statement
+    position and not in a loop. It produces a function object but does not
+    create a variable in which to store it.</p>
+<blockquote> <code>function (</code><var>parameters</var><code>) {</code>
+    <div><var>statements</var></div>
+    <code>}</code> </blockquote>
+<p>The enhanced object literal provides an ES6 shorthand for creating a property
+    whose value is a function, saving you from having to type
+    <code>:</code>&nbsp;<small>colon</small> and <code>function</code>.</p>
+<blockquote> <code>{</code>
+    <div><var>name</var><code>(</code><var>parameters</var><code>) {</code>
+        <div><var>statements</var></div>
+        <code>}</code></div>
+    <code>}</code> </blockquote>
+<p>Finally, ES6 provides an even shorter form of function expression that leaves
+    out the words <code>function</code> and <code>return</code>:</p>
+<blockquote> <code>(</code><var>parameters</var><code>) =>
+    </code><var>expression</var> </blockquote>
+<p>JSLint requires the parens around the parameters, and forbids a
+    <code>{</code>&nbsp;<small>left brace</small> after the
+    <code>=></code>&nbsp;<small>fart</small> to avoid syntactic ambiguity.</p>
+<h1 id=comma>Comma</h1>
+<p>The <code>,</code>&nbsp;<small>comma</small> operator is unnecessary and can
+    mask programming errors.</p>
+<p>JSLint expects to see the comma used as a separator, but not as
+    an operator. It does not expect to see elided elements in array literals.  A
+    comma should not appear after the last element of an array literal or object
+    literal.</p>
+<h1 id=blocks>Blocks</h1>
+<p>JSLint expects blocks with <code>function</code>,
+    <code>if</code>, <code>switch</code>, <code>while</code>, <code>for</code>,
+    <code>do</code>, and <code>try</code> statements and nowhere else.</p>
+<p>JSLint expects that <code>if</code>, <code>while</code>,
+    <code>do</code> and <code>for</code> statements will be made with blocks
+    <code>{</code>that is, with statements enclosed in braces<code>}</code>.</p>
+<p>JavaScript allows an <code>if</code> to be written like this:</p>
+<pre>if (<i>condition</i><code>)
+    </code><i>statement</i>;</pre>
+<p>That form is known to contribute to mistakes in projects where many
+    programmers are working on the same code. That is why JSLint
+    expects the use of a block:</p>
+<pre>if (<i>condition</i>) {
+    <i>statements</i>;
+}</pre>
+<p>Experience shows that this form is more resilient.</p>
+<h1 id=expression>Expression Statements</h1>
+<p>An expression statement is expected to be an assignment or a function/method
+    call. All other expression statements are considered
+    to be errors.</p>
+<h1 id=for><code>for</code></h1>
+<p>JSLint does not recommend use of the <code>for</code> statement.
+    Use array methods like <code>forEach</code> instead. The <code>for</code>
+    option will suppress some warnings. The forms of <code>for</code> that
+    JSLint accepts are restricted, excluding the new ES6 forms.</p>
+<h1 id=forin><code>for</code> <code>in</code></h1>
+<p>JSLint does not recommend use of the <code>for</code>
+    <code>in</code> statement. Use <code>Object.keys</code> instead.</p>
+<p>The <code>for</code> <code>in</code> statement allows for looping through
+    the names of all of the properties of an object. Unfortunately, it also
+    loops through all of the properties that were inherited through the
+    prototype chain. This has the bad side effect of serving up method
+    functions when the interest is in data properties. If a program is written
+    without awareness of this situation, then it can fail.</p>
+<p>The body of every <code>for</code> <code>in</code> statement should be
+    wrapped in an <code>if</code> statement that does filtering. It can select
+    for a particular type or range of values, or it can exclude functions,
+    or it can exclude properties from the prototype. For example,</p>
+<pre>for (name in object) {
+    if (object.hasOwnProperty(name)) {
+        ....
+    }
+}</pre>
+<p>Note that the above code will fail if the object contains a property
+    named <code>hasOwnProperty</code>. Use <code>Object.keys</code> instead.</p>
+<h1 id=switch><code>switch</code></h1>
+<p>A common error in <code>switch</code> statements is to forget to place a
+    <code>break</code> statement after each case, resulting in unintended
+    fall-through. JSLint expects that the statement before the next
+    <code>case</code> or <code>default</code> is one of these:
+    <code>break</code>, <code>return</code>, or <code>throw</code>.</p>
+<h1 id=with><code>with</code></h1>
+<p>The <code>with</code> statement was intended to provide a shorthand in
+    accessing properties in deeply nested objects. Unfortunately, it behaves
+    very badly when setting new properties. Never use the <code>with</code>
+    statement.</p>
+<p>JSLint does not expect to see a <code>with</code> statement.</p>
+<h1 id=labels>Labels</h1>
+<p>JavaScript allows any statement to have a label, and labels have a
+    separate name space. JSLint is more strict.</p>
+<p>JSLint expects labels only on statements that interact
+    with <code>break</code>: <code>switch</code>, <code>while</code>,
+    <code>do</code>, and <code>for</code>. JSLint expects that
+    labels will be distinct from vars and parameters.</p>
+<h1 id=unreachable>Unreachable Code</h1>
+<p>JSLint expects that a <code>return</code>, <code>break</code>,
+    or <code>throw</code> statement will be followed by a
+    <code>}</code>&nbsp;<small>right brace</small> or <code>case</code> or
+    <code>default</code>.</p>
+<h1 id=pluses>Confusing Pluses and Minuses</h1>
+<p>JSLint expects that <code>+</code> will not be followed by
+    <code>+</code> or <code>++</code>, and that <code>-</code> will not be
+    followed by <code>-</code> or <code>--</code>. A misplaced space can turn
+    <code>+ +</code> into <code>++</code>, an error that is difficult to see.
+    Use parens to avoid confusion.</p>
+<h1 id=inc><code>++</code> and <code>--</code></h1>
+<p>The <code>++</code>&nbsp;<small>increment</small> and
+    <code>--</code>&nbsp;<small>decrement</small> operators have been known to
+    contribute to bad code by encouraging excessive trickiness. They are second
+    only to faulty architecture in enabling to viruses and other security
+    menaces. Also, preincrement/postincrement confusion can produce off-by-one
+    errors that are extremely difficult to diagnose. Fortunately, they are also
+    complete unnecessary. There are better ways to add 1 to a variable.</p>
+<p>It is best to avoid these operators entirely and rely on <code>+=</code> and
+    <code>-=</code> instead.</p>
+<h1 id=void><code>void</code></h1>
+<p>In most C-like languages, <code>void</code> is a type. In
+    JavaScript, <code>void</code> is a prefix operator that always
+    returns <code>undefined</code>. JSLint does not expect to
+    see <code>void</code> because it is confusing and not very useful.</p>
+<h1 id=regexp>Regular Expressions</h1>
+<p>Regular expressions are written in a terse and cryptic notation.
+    JSLint looks for problems that may cause portability problems.
+    It also attempts to resolve visual ambiguities by recommending explicit
+    escapement.</p>
+<p>JavaScript&rsquo;s syntax for regular expression literals overloads the
+    <code>/</code>&nbsp;<small>slash</small> character. To avoid ambiguity,
+    JSLint expects that the character preceding a regular
+    expression literal is a <code>(</code>&nbsp;<small>left paren</small> or
+    <code>=</code>&nbsp;<small>equal</small> or
+    <code>:</code>&nbsp;<small>colon</small> or
+    <code>,</code>&nbsp;<small>comma</small> character.</p>
+<h1 id=this><code>this</code></h1>
+<blockquote>Having <code>this</code> in the language makes it harder to talk
+    about the language. It is like pair programming with Abbott and Costello.
+    </blockquote>
+<p>Avoid using <code>this</code>. Warnings about <code>this</code> can be
+    suppressed with <code>option.this</code>.</p>
+<h1 id=new>Constructors and <code>new</code></h1>
+<p>Constructors are functions that are designed to be used with the
+    <code>new</code> prefix. The <code>new</code> prefix creates a new object
+    based on the function's <code>prototype</code>, and binds that object to the
+    function's implied <code>this</code> parameter. If you neglect to use the
+    <code>new</code> prefix, no new object will be made and <code>this</code>
+    will be bound to the global object.</p>
+<p>JSLint enforces the convention that constructor functions be
+    given names with initial uppercase. JSLint does not expect to
+    see a function invocation with an initial uppercase name unless it has the
+    <code>new</code> prefix. JSLint does not expect to see the
+    <code>new</code> prefix used with functions whose names do not start with
+    initial uppercase.</p>
+<p>JSLint does not expect to see the wrapper forms
+    <code>new Number</code>, <code>new String</code>, <code>new Boolean</code>.</p>
+<p>JSLint does not expect to see <code>new Object</code>.
+    Use <code>Object.create(null)</code> instead.</p>
+<h1>Whitespace</h1>
+<p>JSLint has a specific set of rules about the use of whitespace.
+    Where possible, these rules are consistent with centuries of good practice
+    with literary style.</p>
+<p>The indentation increases by 4 spaces when the last token on a line is
+    <code>{</code>&nbsp;<small>left brace</small>,
+    <code>[</code>&nbsp;<small>left bracket</small>,
+    <code>(</code>&nbsp;<small>left paren</small>. The matching closing
+    token will be the first token on a line, restoring the previous
+    indentation.</p>
+<p>The ternary operator can be visually confusing, so
+    <code>?</code>&nbsp;<small>question mark</small> and
+    <code>:</code>&nbsp;<small>colon</small>  always begin a line and increase
+    the indentation by 4 spaces.</p>
+<pre>return (
+    (the_token.id === "(string)" || the_token.id === "(number)")
+    ? String(the_token.value)
+    : the_token.id
+);</pre>
+<p>The word <code>function</code> is always followed with one space.</p>
+<p>Clauses (<code>case</code>, <code>catch</code>, <code>default</code>,
+    <code>else</code>, <code>finally</code>) are not statements and so should
+    not be indented like statements.</p>
+<p>Spaces are used to make things that are not invocations look less like
+    invocations.</p>
+<p>Tabs and spaces should not be mixed. We should pick just one in order to
+    avoid the problems that come from having both. Personal preference is an
+    extremely unreliable criterion. Neither offers a powerful advantage over the
+    other. Fifty years ago, tab had the advantage of consuming less memory, but
+    Moore's Law has eliminated that advantage. Space has one clear advantage
+    over tab: there is no reliable standard for how many spaces a tab
+    represents, but it is universally accepted that a space occupies a space. So
+    use spaces. You can edit with tabs if you must, but make sure it is spaces
+    again before you commit. Maybe someday we will finally get a universal
+    standard for tabs, but until that day comes, the better choice is spaces.</p>
+<h1 id=report>Report</h1>
+<p>If JSLint is able to complete its scan, it generates a function
+    report. It lists for each function:</p>
+<ul>
+    <li>The line number on which it starts.</li>
+    <li>The function&rsquo;s name. In the case of anonymous functions,
+        JSLint will attempt to
+        <code>«</code>guess<code>»</code> the name.</li>
+    <li>The parameters.</li>
+    <li><i>Variables</i>: The variables that are declared in the function.</li>
+    <li><i>Closure</i>: The variables and parameters that are declared in
+        the function that are used by its inner functions.</li>
+    <li><i>Exceptions</i>: The variables that are declared by <code>catch</code>
+        clauses of <code>try</code> statements.</li>
+    <li><i>Outer</i>: Variables used by this function that are declared in
+        other functions.</li>
+    <li><i>Global</i>: Global variables that are used by this function. Keep
+        these to a minimum.</li>
+    <li><i>Label</i>: Statement labels that are used by this function.</li>
+</ul>
+<p>The report will also include a list of all of the property
+    names that were used.</p>
+<h1 id=feedback>Feedback</h1>
+<p>Please let me know if JSLint is useful for you. Is it too
+    strict? Is there a check or a report that could help you to improve the
+    quality of your programs?
+    <a href="mailto:douglas@crockford.com">douglas@crockford.com</a>.
+    But please don't ask me to dumb JSLint down or to make it more
+    forgiving of bad practices. You would only be disappointed.</p>
+<p>I intend to continue to adapt JSLint based on your comments.
+    Keep watching for improvements.</p>
+<h1 id=try>Try it</h1>
+<p><a href="https://www.JSLint.com/" target="_blank">Try it.</a> Paste your script
+    into the window and click the
+    <a href="https://www.JSLint.com/index.html" target=jslint><button>JSLint</button></a>
+    button. The analysis is done by a script running on your machine.
+    Your script is not sent over the network. You can set the options used.</p>
+<p>JSLint is written entirely in JavaScript, so it can run
+    anywhere that JavaScript (or even Java) can run.</p>
+<h1>Perfectly fine</h1>
+<p>JSLint was designed to reject code that some would consider to
+    be <b>perfectly fine</b>. The reason for this is that JSLint's
+    purpose is to help produce programs that are free of error. That is
+    difficult in any language and is especially hard in JavaScript.
+    JSLint attempts to help you increase the visual distance
+    between correct programs and incorrect programs, making the remaining errors
+    more obvious. JSLint will give warnings about things that are
+    not necessarily wrong in the current situation, but which have been observed
+    to mask or obscure errors. Avoid those things when there are better options
+    available. </p>
+<p>It is dangerous out there. JSLint is here to help.</p>
+<h1 id=warning>Warning</h1>
+<p>JSLint will hurt your feelings. Side effects may include
+    headache, irritability, dizziness, snarkiness, stomach pain, defensiveness,
+    dry mouth, cleaner code, and a reduced error rate.</p>
+<h1 id=reading>Further Reading</h1>
+<ul>
+    <li><a href="function.html">The <code>jslint</code> function.</a></li>
+</ul>
+<center>
+    <p><a href="https://www.crockford.com/javascript/code.html" target="_blank">
+        Code Conventions for the JavaScript Programming Language.</a></p>
+    <a href="https://www.JSLint.com/"><img src="image-jslint-64x64.png" height="20"></a>
+    <a href="https://github.com/jslint-org/jslint"><img src="image-github-brands.svg" height="20"></a>
+    <a href="https://www.JSON.org/"><img src="image-json160.gif" height="20"></a>
+</center>
+</body>
+</html>
