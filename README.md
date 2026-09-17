@@ -12,6 +12,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 <br><br>
+
 # Web Demo
 - https://www.jslint.com
 
@@ -19,6 +20,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 <br><br>
+
 # Web Demo Archived
 - [Web Demo 2020](https://www.jslint.com/branch-v2020.11.6/index.html)
 - [Web Demo 2014 (ES5 only)](https://www.jslint.com/branch-v2014.7.8/jslint.html)
@@ -26,6 +28,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 <br><br>
+
 # Table of Contents
 
 1. [Quickstart Install](#quickstart-install)
@@ -35,57 +38,43 @@ Douglas Crockford <douglas@crockford.com>
     - [To import `jslint.mjs` in CommonJS environment:](#to-import-jslintmjs-in-commonjs-environment)
     - [To JSLint entire directory in shell:](#to-jslint-entire-directory-in-shell)
 
-2. [Quickstart JSLint Report](#quickstart-jslint-report)
+2. [Quickstart Autofix Whitespace](#quickstart-autofix-whitespace)
+    - [To autofix whitespace in shell:](#to-autofix-whitespace-in-shell)
+    - [To autofix whitespace in javascript:](#to-autofix-whitespace-in-javascript)
+
+3. [Quickstart JSLint Report](#quickstart-jslint-report)
     - [To create a JSLint report in shell:](#to-create-a-jslint-report-in-shell)
     - [To create a JSLint report in javascript:](#to-create-a-jslint-report-in-javascript)
 
-3. [Quickstart V8 Coverage Report](#quickstart-v8-coverage-report)
+4. [Quickstart V8 Coverage Report](#quickstart-v8-coverage-report)
     - [To create V8 coverage report from Node.js / Npm program in shell:](#to-create-v8-coverage-report-from-nodejs--npm-program-in-shell)
     - [To create V8 coverage report from Node.js / Npm program in javascript:](#to-create-v8-coverage-report-from-nodejs--npm-program-in-javascript)
 
-4. [Quickstart JSLint in CodeMirror](#quickstart-jslint-in-codemirror)
+5. [Quickstart JSLint in CodeMirror](#quickstart-jslint-in-codemirror)
 
-5. [Quickstart JSLint in Vim](#quickstart-jslint-in-vim)
+6. [Quickstart JSLint in Vim](#quickstart-jslint-in-vim)
 
-6. [Quickstart JSLint in VSCode](#quickstart-jslint-in-vscode)
+7. [Quickstart JSLint in VSCode](#quickstart-jslint-in-vscode)
 
-7. [Documentation](#documentation)
+8. [Documentation](#documentation)
     - [API Doc](#api-doc)
     - [Directive](#directive)
-        - [`/*jslint beta*/`](#jslint-beta)
-        - [`/*jslint bitwise*/`](#jslint-bitwise)
-        - [`/*jslint browser*/`](#jslint-browser)
-        - [`/*jslint convert*/`](#jslint-convert)
-        - [`/*jslint couch*/`](#jslint-couch)
-        - [`/*jslint devel*/`](#jslint-devel)
-        - [`/*jslint eval*/`](#jslint-eval)
-        - [`/*jslint fart*/`](#jslint-fart)
-        - [`/*jslint getset*/`](#jslint-getset)
-        - [`/*jslint indent2*/`](#jslint-indent2)
-        - [`/*jslint long*/`](#jslint-long)
-        - [`/*jslint node*/`](#jslint-node)
-        - [`/*jslint nomen*/`](#jslint-nomen)
-        - [`/*jslint single*/`](#jslint-single)
-        - [`/*jslint subscript*/`](#jslint-subscript)
-        - [`/*jslint this*/`](#jslint-this)
-        - [`/*jslint trace*/`](#jslint-trace)
-        - [`/*jslint unordered*/`](#jslint-unordered)
-        - [`/*jslint white*/`](#jslint-white)
+        - [`/*jslint*/`](#jslint)
         - [`/*global*/`](#global)
         - [`/*property*/`](#property)
-        - [`/*jslint-disable*/.../*jslint-enable*/`](#jslint-disablejslint-enable)
+        - [`/*jslint-disable*/ ... /*jslint-enable*/`](#jslint-disable--jslint-enable)
         - [`//jslint-ignore-line`](#jslint-ignore-line)
-        - [`/*coverage-disable*/.../*coverage-enable*/`](#coverage-disablecoverage-enable)
+        - [`/*coverage-disable*/ ... /*coverage-enable*/`](#coverage-disable--coverage-enable)
         - [`//coverage-ignore-line`](#coverage-ignore-line)
     - [ECMAScript Feature Support](#ecmascript-feature-support)
 
-8. [Package Listing](#package-listing)
+9. [Package Listing](#package-listing)
 
-9. [Changelog](#changelog)
+10. [Changelog](#changelog)
 
-10. [License](#license)
+11. [License](#license)
 
-11. [Devops Instruction](#devops-instruction)
+12. [Devops Instruction](#devops-instruction)
     - [pull-request merge](#pull-request-merge)
     - [branch-master commit](#branch-master-commit)
     - [branch-master publish](#branch-master-publish)
@@ -93,10 +82,12 @@ Douglas Crockford <douglas@crockford.com>
 
 
 <br><br>
+
 # Quickstart Install
 
 
 <br><br>
+
 ### To install, just download and save https://www.jslint.com/jslint.mjs to file:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_install_download.svg -->
 #!/bin/sh
@@ -109,6 +100,7 @@ curl -L https://www.jslint.com/jslint.mjs > jslint.mjs
 
 
 <br><br>
+
 ### To run `jslint.mjs` in shell:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_jslint_file.svg -->
 #!/bin/sh
@@ -123,6 +115,7 @@ node jslint.mjs hello.js
 
 
 <br><br>
+
 ### To import `jslint.mjs` in ES Module environment:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_js_import_esm.svg -->
 #!/bin/sh
@@ -157,6 +150,7 @@ result.warnings.forEach(function ({
 
 
 <br><br>
+
 ### To import `jslint.mjs` in CommonJS environment:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_js_import_cjs.svg -->
 #!/bin/sh
@@ -194,6 +188,7 @@ node --eval '
 
 
 <br><br>
+
 ### To JSLint entire directory in shell:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_jslint_dir.svg -->
 #!/bin/sh
@@ -208,21 +203,76 @@ node jslint.mjs .
 
 
 <br><br>
+
+# Quickstart Autofix Whitespace
+
+
+<br><br>
+
+### To autofix whitespace in shell:
+```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_jslint_autofix_file.svg -->
+#!/bin/sh
+
+printf '
+/*jslint devel*/
+console.log(
+"hello world");
+' > hello_autofix.js
+
+node jslint.mjs jslint_autofix=hello_autofix.js
+
+cat hello_autofix.js
+```
+- shell output
+
+![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_sh_jslint_autofix_file.svg)
+
+
+<br><br>
+
+### To autofix whitespace in javascript:
+```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_js_jslint_autofix_file.svg -->
+#!/bin/sh
+
+node --input-type=module --eval '
+
+/*jslint devel*/
+import jslint from "./jslint.mjs";
+let result;
+let source = (`
+/*jslint devel*/
+console.log(
+"hello world");
+`);
+
+result = jslint.jslint(source, {autofix: true});
+console.log(result.autofixed);
+
+'
+```
+- shell output
+
+![screenshot](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_js_jslint_autofix_file.svg)
+
+
+<br><br>
+
 # Quickstart JSLint Report
 
 
 <br><br>
+
 ### To create a JSLint report in shell:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_jslint_report_file.svg -->
 #!/bin/sh
 
-printf "function foo() {console.log('hello world');}\n" > hello.js
+printf "function foo() {console.log('hello world');}\n" > hello_report.js
 
-# Create JSLint report from file 'hello.js' in shell.
+# Create JSLint report from file 'hello_report.js' in shell.
 
 node jslint.mjs \
     jslint_report=.artifact/jslint_report_hello.html \
-    hello.js
+    hello_report.js
 ```
 - shell output
 
@@ -234,6 +284,7 @@ node jslint.mjs \
 
 
 <br><br>
+
 ### To create a JSLint report in javascript:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_js_jslint_report_file.svg -->
 #!/bin/sh
@@ -270,10 +321,12 @@ import fs from "fs";
 
 
 <br><br>
+
 # Quickstart V8 Coverage Report
 
 
 <br><br>
+
 ### To create V8 coverage report from Node.js / Npm program in shell:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_sh_coverage_report_spawn.svg -->
 #!/bin/sh
@@ -323,6 +376,7 @@ node ../jslint.mjs \
 
 
 <br><br>
+
 ### To create V8 coverage report from Node.js / Npm program in javascript:
 ```shell <!-- shRunWithScreenshotTxt .artifact/screenshot_js_coverage_report_spawn.svg -->
 #!/bin/sh
@@ -384,6 +438,7 @@ import jslint from "../jslint.mjs";
 
 
 <br><br>
+
 # Quickstart JSLint in CodeMirror
 1. Download and save [`jslint.mjs`](https://www.jslint.com/jslint.mjs), [`jslint_wrapper_codemirror.js`](https://www.jslint.com/jslint_wrapper_codemirror.js) to file.
 
@@ -501,6 +556,7 @@ window.addEventListener("load", function () {
 
 
 <br><br>
+
 # Quickstart JSLint in Vim
 1. Download and save [`jslint.mjs`](https://www.jslint.com/jslint.mjs), [`jslint_wrapper_vim.vim`](https://www.jslint.com/jslint_wrapper_vim.vim) to directory `~/.vim/`
 2. Add vim-command `:source ~/.vim/jslint_wrapper_vim.vim` to file `~/.vimrc`
@@ -516,6 +572,7 @@ window.addEventListener("load", function () {
 
 
 <br><br>
+
 # Quickstart JSLint in VSCode
 1. In VSCode, search and install extension [`vscode-jslint`](https://marketplace.visualstudio.com/items?itemName=jslint.vscode-jslint)
 2. In VSCode, while editing a javascript file:
@@ -528,12 +585,14 @@ window.addEventListener("load", function () {
 
 
 <br><br>
+
 # Documentation
 - [jslint.mjs](jslint.mjs) contains the jslint function. It parses and analyzes a source file, returning an object with information about the file. It can also take an object that sets options.
 - [index.html](index.html) runs the jslint.mjs function in a web page.
 
 
 <br><br>
+
 ### API Doc
 - https://www.jslint.com/apidoc.html
 
@@ -541,11 +600,16 @@ window.addEventListener("load", function () {
 
 
 <br><br>
+
 ### Directive
 
 <br>
 
-##### `/*jslint beta*/`
+##### `/*jslint*/`
+
+<br>
+
+- `/*jslint beta*/`
 ```js
 /*jslint beta*/
 // Enable experimental warnings.
@@ -559,7 +623,7 @@ window.addEventListener("load", function () {
 
 <br>
 
-##### `/*jslint bitwise*/`
+- `/*jslint bitwise*/`
 ```js
 /*jslint bitwise*/
 // Allow bitwise operator.
@@ -569,7 +633,7 @@ let foo = 0 | 1;
 
 <br>
 
-##### `/*jslint browser*/`
+- `/*jslint browser*/`
 ```js
 /*jslint browser*/
 // Assume browser environment.
@@ -579,7 +643,7 @@ localStorage.getItem("foo");
 
 <br>
 
-##### `/*jslint convert*/`
+- `/*jslint convert*/`
 ```js
 /*jslint convert*/
 // Allow conversion operator.
@@ -590,7 +654,7 @@ let bar = !!0;
 
 <br>
 
-##### `/*jslint couch*/`
+- `/*jslint couch*/`
 ```js
 /*jslint couch*/
 // Assume CouchDb environment.
@@ -600,7 +664,7 @@ registerType("text-json", "text/json");
 
 <br>
 
-##### `/*jslint devel*/`
+- `/*jslint devel*/`
 ```js
 /*jslint devel*/
 // Allow console.log() and friends.
@@ -610,7 +674,7 @@ console.log("hello");
 
 <br>
 
-##### `/*jslint eval*/`
+- `/*jslint eval*/`
 ```js
 /*jslint eval*/
 // Allow eval().
@@ -620,7 +684,7 @@ eval("1");
 
 <br>
 
-##### `/*jslint fart*/`
+- `/*jslint fart*/`
 ```js
 /*jslint fart*/
 // Allow complex fat-arrow.
@@ -632,7 +696,7 @@ let foo = async ({bar, baz}) => {
 
 <br>
 
-##### `/*jslint getset*/`
+- `/*jslint getset*/`
 ```js
 /*jslint getset, this, devel*/
 // Allow get() and set().
@@ -653,7 +717,7 @@ console.log(foo.getBar); // 1
 
 <br>
 
-##### `/*jslint indent2*/`
+- `/*jslint indent2*/`
 ```js
 /*jslint indent2*/
 // Use 2-space indent.
@@ -665,7 +729,7 @@ function foo() {
 
 <br>
 
-##### `/*jslint long*/`
+- `/*jslint long*/`
 ```js
 /*jslint long*/
 // Allow long lines.
@@ -675,7 +739,7 @@ let foo = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 <br>
 
-##### `/*jslint node*/`
+- `/*jslint node*/`
 ```js
 /*jslint node*/
 // Assume Node.js environment.
@@ -685,7 +749,7 @@ require("fs");
 
 <br>
 
-##### `/*jslint nomen*/`
+- `/*jslint nomen*/`
 ```js
 /*jslint nomen*/
 // Allow weird property name.
@@ -696,7 +760,7 @@ foo._bar = 1;
 
 <br>
 
-##### `/*jslint single*/`
+- `/*jslint single*/`
 ```js
 /*jslint single*/
 // Allow single-quote strings.
@@ -706,7 +770,7 @@ let foo = '';
 
 <br>
 
-##### `/*jslint subscript*/`
+- `/*jslint subscript*/`
 ```js
 /*jslint subscript*/
 // Allow identifiers in subscript-notation.
@@ -717,7 +781,7 @@ foo["bar"] = 1;
 
 <br>
 
-##### `/*jslint this*/`
+- `/*jslint this*/`
 ```js
 /*jslint this*/
 // Allow 'this'.
@@ -729,7 +793,7 @@ function foo() {
 
 <br>
 
-##### `/*jslint trace*/`
+- `/*jslint trace*/`
 ```js
 /*jslint trace*/
 // Include jslint stack-trace in warnings.
@@ -758,7 +822,7 @@ Error
 
 <br>
 
-##### `/*jslint unordered*/`
+- `/*jslint unordered*/`
 ```js
 /*jslint unordered*/
 // Allow unordered cases, params, properties, variables, and exports.
@@ -780,7 +844,7 @@ export {
 
 <br>
 
-##### `/*jslint white*/`
+- `/*jslint white*/`
 ```js
 /*jslint white*/
 // Allow messy whitespace.
@@ -811,7 +875,7 @@ let aa = {bar: 1, foo: 2};
 
 <br>
 
-##### `/*jslint-disable*/.../*jslint-enable*/`
+##### `/*jslint-disable*/ ... /*jslint-enable*/`
 ```js
 /*jslint-disable*/
 
@@ -832,7 +896,7 @@ eval("1"); //jslint-ignore-line
 
 <br>
 
-##### `/*coverage-disable*/.../*coverage-enable*/`
+##### `/*coverage-disable*/ ... /*coverage-enable*/`
 ```js
 /*coverage-disable*/
 
@@ -858,6 +922,7 @@ if (false) {
 
 
 <br><br>
+
 ### ECMAScript Feature Support
 - https://github.com/tc39/proposals/blob/main/finished-proposals.md
 - https://github.com/lukehoban/es6features
@@ -966,11 +1031,13 @@ if (false) {
 
 
 <br><br>
+
 # Package Listing
 ![screenshot_package_listing.svg](https://jslint-org.github.io/jslint/branch-beta/.artifact/screenshot_package_listing.svg)
 
 
 <br><br>
+
 # Changelog
 - [Full CHANGELOG.md](CHANGELOG.md)
 
@@ -978,6 +1045,7 @@ if (false) {
 
 
 <br><br>
+
 # License
 - JSLint is under [Unlicense License](LICENSE).
 - CodeMirror editor is under [MIT License](https://github.com/codemirror/codemirror5/blob/34b84359c4ce289086c82c203f66ef74614d8a0d/LICENSE).
@@ -985,10 +1053,12 @@ if (false) {
 
 
 <br><br>
+
 # Devops Instruction
 
 
 <br><br>
+
 ### pull-request merge
 1. update `.github/workflows/ci.yml` `.github/workflows/publish.yml` to:
     - latest nodejs-lts version @ https://nodejs.org/en/about/previous-releases
@@ -1044,6 +1114,7 @@ if (false) {
 
 
 <br><br>
+
 ### branch-master commit
 1. update `.github/workflows/ci.yml` `.github/workflows/publish.yml` to:
     - latest nodejs-lts version @ https://nodejs.org/en/about/previous-releases
@@ -1100,6 +1171,7 @@ if (false) {
 
 
 <br><br>
+
 ### branch-master publish
 1. goto https://www.npmjs.com/package/@jslint-org/jslint/access <!--no-validate-->
     - click `Github Actions`
@@ -1136,6 +1208,7 @@ if (false) {
 
 
 <br><br>
+
 ### vscode-jslint publish
 1. goto https://github.com/jslint-org/jslint/tree/gh-pages/branch-beta/.artifact/jslint_wrapper_vscode
     - click `vscode-jslint-20yy.mm.dd.vsix`

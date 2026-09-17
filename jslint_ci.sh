@@ -497,11 +497,11 @@ import moduleFs from "fs";
             case "\n\n<br>\n\n#####":
                 toc += "        - [" + title + "](#";
                 break;
-            case "\n\n\n<br><br>\n#":
+            case "\n\n\n<br><br>\n\n#":
                 ii += 1;
                 toc += "\n" + ii + ". [" + title + "](#";
                 break;
-            case "\n\n\n<br><br>\n###":
+            case "\n\n\n<br><br>\n\n###":
                 toc += "    - [" + title + "](#";
                 break;
             default:
