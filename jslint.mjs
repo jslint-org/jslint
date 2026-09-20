@@ -4023,7 +4023,7 @@ function jslint_phase2_lex(state) {
         case "unordered":       // Allow unordered cases, params, properties,
                                 // ... variables, and exports.
         case "variable":        // Allow unordered const and let declarations
-                                // ... that are not at top of scope_function.
+                                // ... not at top of scope_function.
         case "white":           // Allow messy whitespace.
             option_dict[key] = value;
             break;

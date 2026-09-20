@@ -628,7 +628,7 @@ window.addEventListener("load", function () {
 /*jslint bitwise*/
 // Allow bitwise operator.
 
-let foo = 0 | 1;
+String(0 | 1);
 ```
 
 <br>
@@ -648,8 +648,8 @@ localStorage.getItem("foo");
 /*jslint convert*/
 // Allow conversion operator.
 
-let foo = new Date() + "";
-let bar = !!0;
+String(new Date() + "");
+String(!!0);
 ```
 
 <br>
@@ -689,9 +689,10 @@ eval("1");
 /*jslint fart*/
 // Allow complex fat-arrow.
 
-let foo = async ({bar, baz}) => {
+const foo = async ({bar, baz}) => {
     return await bar(baz);
 };
+await foo();
 ```
 
 <br>
@@ -722,9 +723,9 @@ console.log(foo.getBar); // 1
 /*jslint indent2*/
 // Use 2-space indent.
 
-function foo() {
-  return;
-}
+String(
+  "hello"
+);
 ```
 
 <br>
@@ -734,7 +735,7 @@ function foo() {
 /*jslint long*/
 // Allow long lines.
 
-let foo = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+String("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 ```
 
 <br>
@@ -765,7 +766,7 @@ foo._bar = 1;
 /*jslint single*/
 // Allow single-quote strings.
 
-let foo = '';
+String('hello');
 ```
 
 <br>
@@ -789,6 +790,7 @@ foo["bar"] = 1;
 function foo() {
     return this;
 }
+foo();
 ```
 
 <br>
@@ -844,12 +846,27 @@ export {
 
 <br>
 
+- `/*jslint variable*/`
+```js
+/*jslint variable*/
+// Allow unordered const and let declarations not at top of function-scope.
+
+let aa = "hello";
+String(aa);
+let bb = "goodbye";
+String(bb);
+```
+
+<br>
+
 - `/*jslint white*/`
 ```js
 /*jslint white*/
 // Allow messy whitespace.
 
-let foo = 1; let bar = 2;
+String(
+"hello"
+);
 ```
 
 <br>
@@ -870,7 +887,7 @@ bar();
 /*property foo, bar*/
 // Restrict property-access to only .foo, .bar.
 
-let aa = {bar: 1, foo: 2};
+String({bar: 1, foo: 2});
 ```
 
 <br>
