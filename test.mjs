@@ -1610,8 +1610,9 @@ aa();
             regexp: [
                 `RegExp.escape("");`,
                 `String(/(?!.)(?:.)(?=.)/);`,
-                `String(/(?ims-ims:.)/);`,
-                `String(/./dgimsuvy);`,
+                `String(/(?im-s:.)/);`,
+                `String(/./dgimsuy);`,
+                `String(/./dgimsvy);`,
                 `String(/[\\--\\-]/);`,
                 `function aa() {\n    return /./;\n}\naa();`
             ],
@@ -1883,7 +1884,22 @@ jstestDescribe((
                 tmp = jslint.jslint(cause[0], {
                     beta: true,
                     test_cause: true
-                }).causes;
+                });
+
+// Validate no internal-error. A crash mid-walk still records every cause
+// raised before it, so the cause-assertion below passes straight through one
+// - "0``" threw in post_b_binary for years with its cause declared and green.
+
+                assertOrThrow(
+                    tmp.warnings.every(function ({
+                        code
+                    }) {
+                        return code !== undefined;
+                    }),
+                    "\n" + JSON.stringify(cause[0]) + "\n\n"
+                    + JSON.stringify(tmp.warnings, undefined, 4)
+                );
+                tmp = tmp.causes;
                 // Validate cause.
                 assertOrThrow(
                     tmp[JSON.stringify(cause.slice(1))],
