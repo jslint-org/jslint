@@ -1471,7 +1471,8 @@ String
                 "/*jslint-disable*/\n0\n/*jslint-enable*/"
             ],
             jslint_ignore_line: [
-                "0 //jslint-ignore-line"
+                "0 //jslint-ignore-line",
+                "new aa //jslint-ignore-line"
             ],
             json: [
                 "{\"aa\":[[],-0,null]}"
