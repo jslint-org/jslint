@@ -1496,6 +1496,9 @@ function jslint(
         case "expected_a":
             mm = `Expected '${a}'.`;
             break;
+        case "expected_a_after_b":
+            mm = `Expected '${a}' after '${b}'.`;
+            break;
         case "expected_a_at_b_c":
             mm = (
                 `Expected '${a}' at column ${b + jslint_fudge},`
@@ -2865,19 +2868,30 @@ function jslint_phase2_lex(state) {
         if (match !== undefined && char !== match) {
 
 // test_cause:
-// ["aa=/[", "char_after", "expected_a", "]", 5]
+// ["aa=/", "char_after", "expected_a_after_b", "/", 4]
+// ["aa=/(?-", "char_after", "expected_a_after_b", "-", 7]
+// ["aa=/[", "char_after", "expected_a_after_b", "[", 5]
 // ["aa=/aa{/", "char_after", "expected_a_b", "/", 8]
+
+// At end of line <snippet> may have been reset or trimmed, so name the last
+// character of the whole line as <b>.
 
             return (
                 char === ""
-                ? stop_at("expected_a", line, column - 1, match)
+                ? stop_at(
+                    "expected_a_after_b",
+                    line,
+                    column - 1,
+                    match,
+                    line_list[line].line_source.slice(-1)
+                )
                 : stop_at("expected_a_b", line, column - 1, match, char)
             );
         }
         char = line_source.slice(0, 1);
-        snippet += char || " ";
-        column += 1;
-        line_source = line_source.slice(1);
+        snippet += char;
+        column += char.length;
+        line_source = line_source.slice(char.length);
         return char;
     }
 
@@ -2892,7 +2906,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["\"\\", "char_after_escape", "unclosed_string", "", 2]
 
-            return stop_at("unclosed_string", line, column - 1);
+            return stop_at("unclosed_string", line, column - 0);
         case "/":
             return char_after();
         case "\\":
@@ -2971,13 +2985,13 @@ function jslint_phase2_lex(state) {
 // Back up one character by moving a character from the end of the snippet to
 // the front of the line_source.
 
-        char = snippet.slice(-1);
         line_source = char + line_source;
         column -= char.length;
 
-// Remove last character from snippet.
+// Remove last character from snippet. At end of line <char> is "" and nothing
+// was consumed, so nothing comes off column or snippet.
 
-        snippet = snippet.slice(0, -1);
+        snippet = snippet.slice(0, snippet.length - char.length);
         return char;
     }
 
@@ -3060,7 +3074,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/*", "lex_comment", "unclosed_comment", "", 1]
 
-                    return stop_at("unclosed_comment", line, column - 1);
+                    return stop_at("unclosed_comment", line, column - 0);
                 }
             }
             jj = line_source.slice(0, ii).search(
@@ -3448,7 +3462,7 @@ function jslint_phase2_lex(state) {
 
             switch (char) {
             case "":
-                warn_at("expected_regexp_factor_a", line, column - 1, char);
+                warn_at("expected_regexp_factor_a", line, column - 0, char);
                 break;
             case ")":
                 warn_at("expected_regexp_factor_a", line, column - 1, char);
@@ -3547,6 +3561,12 @@ function jslint_phase2_lex(state) {
                                     char_after();
                                     break;
                                 default:
+
+// End of line inside (?flags - report the missing ":" the way char_after does.
+
+                                    if (char === "") {
+                                        return char_after(":");
+                                    }
 
 // test_cause:
 // ["aa=/(?-.", "lex_regexp_group", "unexpected_a_after_b", "(?-", 8]
@@ -3928,7 +3948,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["\"", "lex_string", "unclosed_string", "", 1]
 
-                return stop_at("unclosed_string", line, column - 1);
+                return stop_at("unclosed_string", line, column - 0);
             case "\\":
                 char_after_escape(quote);
                 break;
@@ -6871,14 +6891,14 @@ function jslint_phase3_parse(state) {
         } else {
 
 // test_cause:
-// ["0", "semicolon", "expected_a_b", "(end)", 1]
+// ["0", "semicolon", "expected_a_after_b", "0", 1]
 
             warn_at(
-                "expected_a_b",
+                "expected_a_after_b",
                 token_now.line,
                 token_now.thru,
                 ";",
-                artifact()
+                artifact(token_now)
             );
         }
         anon = "anonymous";
@@ -7041,7 +7061,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["
 // export default Object.freeze({})
-// ", "semicolon", "expected_a_b", "(end)", 32]
+// ", "semicolon", "expected_a_after_b", ")", 32]
 
                 semicolon();
             }
