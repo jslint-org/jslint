@@ -10,7 +10,6 @@
 - jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
 - jslint - Add html and css linting back into jslint.
 - jslint - Add new warning requiring paren around plus-separated concatenations.
-- jslint - Try to improve parser to be able to parse jquery.js without stopping.
 
 # v2026.9.29
 - jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add function jslint_phase6_autofix().
@@ -18,6 +17,8 @@
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
 - jslint - Move column-fudging into warn_at(); callers pass 0-based column.
 - jslint - Remove dead token-property 'free' from parser and whitage.
+- jslint - Improve parser to parse jquery.js without stopping - for-init comma, numeric object-key.
+- jslint-cli - Skip dotfiles when linting a directory.
 - jslint-ci - Merge ci-shell-function shGithubPrUpdatePrxxx() into shGithubPrCreate().
 
 # v2026.8.31

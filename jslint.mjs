@@ -2719,10 +2719,14 @@ async function jslint_cli({
                 let code;
                 let result_dir;
                 let time_start = Date.now();
+
+// PR-409 - Skip dotfile (e.g. .foo.js) when reading directory.
+
+                if ((/^\./).test(file2)) {
+                    return;
+                }
                 file2 = file + "/" + file2;
-                switch ((
-                    /\.\w+?$|$/m
-                ).exec(file2)[0]) {
+                switch ((/\.\w+?$|$/m).exec(file2)[0]) {
                 case ".cjs":
                 case ".html":
                 case ".js":
@@ -2740,9 +2744,7 @@ async function jslint_cli({
                     return;
                 }
                 if (
-                    (
-                        /(?:\b|_)(?:lock|min|raw|rollup)(?:\b|_)/
-                    ).test(file2)
+                    (/(?:\b|_)(?:lock|min|raw|rollup)(?:\b|_)/).test(file2)
                     || !(code && code.length < 1048576)
                 ) {
                     return;
@@ -7319,6 +7321,19 @@ function jslint_phase3_parse(state) {
             }
             token_nxt.for_init = true;
             the_for.for_semicolon[0] = parse_statement_single();
+
+// PR-409 - jquery - Tolerate comma-expression in for_init `for(ii=0,jj=0;;)`.
+
+            while (token_nxt.id === ",") {
+
+// test_cause:
+// ["for(aa=0,bb=0;;){}", "stmt_for", "for_init_comma", "", 0]
+
+                test_cause("for_init_comma");
+                advance(",");
+                parse_expression(0);
+                semicolon();
+            }
             token_nxt.for_init = true;
             if (token_nxt.id === ";") {
 
@@ -8250,6 +8265,16 @@ function jslint_phase3_parse(state) {
 // to the identifier rules.
 
         switch (id) {
+        case "(number)":
+
+// PR-409 - jquery - Tolerate numeric object-key `{0: 200}` - warn, do not stop.
+// Like a non-identifier string-key, it is not tallied for /*property*/.
+
+// test_cause:
+// ["String({0:0})", "survey", "unexpected_a", "0", 9]
+
+            warn("unexpected_a", name);
+            return name.value;
         case "(string)":
             id = name.value;
             if (!jslint_rgx_identifier.test(id)) {
@@ -8268,7 +8293,7 @@ function jslint_phase3_parse(state) {
             if (!name.identifier) {
 
 // test_cause:
-// ["let aa={0:0}", "survey", "expected_identifier_a", "0", 9]
+// ["String({+:0})", "survey", "expected_identifier_a", "+", 9]
 
                 return stop("expected_identifier_a", name);
             }

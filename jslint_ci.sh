@@ -542,6 +542,13 @@ import moduleFs from "fs";
         fi
     done
     JSLINT_BETA=1 node jslint.mjs .
+    for FILE in .ci.sh .ci2.sh
+    do
+        if [ -f "$FILE" ]
+        then
+            JSLINT_BETA=1 node jslint.mjs "$FILE"
+        fi
+    done
     if (command -v shCiLintCustom >/dev/null)
     then
         shCiLintCustom
