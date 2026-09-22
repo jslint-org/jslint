@@ -56,7 +56,6 @@ git clone https://github.com/tryghost/node-sqlite3 node-sqlite3-js \
 
 cd node-sqlite3-js
 
-git checkout 61194ec2aee4b56e8e17f757021434122772f145
 npm install
 
 node --input-type=module --eval '
