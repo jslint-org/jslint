@@ -1171,7 +1171,16 @@ function jslint(
 
         test_cause("");
 
-// Probably deadcode.
+// PR-510 - deadcode-confirmed - <aa> and <bb> are never the same object. Each
+// call below pairs a slot of <aa> with the same slot of <bb>, and the only
+// slot that can be undefined on both sides is <expression>[1] of a binary
+// token. Case "`" returns before that branch, and <aa>.id !== "(" skips it.
+//
+// deadcode-revive - delete case "`" below and a tagged template with no
+// substitution falls through to the binary branch again. Its <expression>
+// holds one element, so both sides read <expression>[1] as undefined. Any
+// token with fewer slots than its <arity> implies does the same.
+//
 // if (aa === bb) {
 //     return true;
 // }
@@ -1193,7 +1202,14 @@ function jslint(
             );
         }
 
-// Probably deadcode.
+// PR-510 - deadcode-confirmed - If <aa> is not an array then <bb> is not one
+// either. Arrays only reach <is_equal> from case "`" below, and only when
+// <aa>.id === <bb>.id, so they arrive in pairs and the branch above takes both.
+//
+// deadcode-revive - recurse on a slot that holds an array for some token ids
+// and a single token for others, or let the backtick case run when only one
+// side is a backtick.
+//
 // if (Array.isArray(bb)) {
 //     return false;
 // }
@@ -1203,15 +1219,24 @@ function jslint(
         case "(number)":
         case "(string)":
             return aa.value === bb.value;
-
-// PR-394 - Bugfix
-// Fix jslint falsely believing megastring literals `0` and `1` are similar.
-
         case "`":
-            if (!is_equal(aa.value, bb.value)) {
-                return false;
-            }
-            break;
+
+// test_cause:
+// ["aa=bb`${cc}${dd}`&&bb`${cc}${ee}`", "is_equal", "recurse_mega", "", 0]
+
+            test_cause("recurse_mega");
+            return (
+
+// PR-394 - Bugfix - Fix jslint treating megastrings bb`0` and bb`1` as equal.
+// The untagged form always warns, because <post_b_and> fires on any constant.
+
+                is_equal(aa.value, bb.value)
+
+// PR-510 - Bugfix - Fix jslint treating tagged templates as equal when they
+// differ past the first substitution, which is all the binary branch compared.
+
+                && is_equal(aa.expression, bb.expression)
+            );
         }
         if (is_weird(aa) || is_weird(bb)) {
 
@@ -1267,7 +1292,15 @@ function jslint(
                 );
             }
 
-// Probably deadcode.
+// PR-510 - deadcode-confirmed - Nothing in this file sets <arity> to "regexp",
+// and <arity> "function" is set in one place, on the "(" that opens a
+// parameter list in <prefix_function>. That token is never stored in an
+// <expression>, <name> or <value> slot, so <is_equal> never sees it.
+//
+// deadcode-revive - compare two function expressions by recursing into their
+// parameter lists, which puts that "(" on both sides. Giving any token
+// <arity> "regexp" would also do it.
+//
 // if (aa.arity === "function" || aa.arity === "regexp") {
 //     return false;
 // }
@@ -6136,7 +6169,7 @@ function jslint_phase3_parse(state) {
         the_await.expression = parse_expression(150);
         if (the_await.arity === "statement") {
 
-// PR-405 - Bugfix - fix expression after "await" mis-identified as statement.
+// PR-405 - Bugfix - Fix expression after "await" mis-identified as statement.
 
             semicolon();
         }
@@ -8699,14 +8732,23 @@ function jslint_phase4_walk(state) {
         const id = thing.id;
         let the_variable;
 
-// PR-504 - Probably deadcode.
+// PR-510 - deadcode-confirmed - Both callers pass a token already known to be
+// a variable. <pre_v_var> is registered as a preaction on arity "variable",
+// and <post_a_assignment> walks an assignment token's <name_list>, which only
+// <name_declare> calls with role "variable" fill. That role sets <arity>.
+//
+// deadcode-revive - <name_declare> pushes into the list it is given before
+// it checks the role, so a list built under another role holds names with no
+// <arity>. <the_function>.name_list collects "parameter" names that way. Pass
+// one here and the lookup below resolves the wrong name, with no error.
+//
 // if (thing.arity !== "variable") {
 //     return;
 // }
 
         jslint_assert(
-            thing.arity === "variable",
-            `Expected thing.arity === "variable".`
+            !(thing.arity !== "variable"),
+            `Expected !(thing.arity !== "variable").`
         );
 
 // Look up the variable, from current-scope, moving up the scope-chain.
@@ -8898,6 +8940,7 @@ function jslint_phase4_walk(state) {
 // ["aa=0&&0", "post_b_and", "weird_condition_a", "&&", 5]
 // ["aa=[]&&[]", "post_b_and", "weird_condition_a", "&&", 6]
 // ["aa=`${0}`&&`${0}`", "post_b_and", "weird_condition_a", "&&", 10]
+// ["aa=bb``&&bb``", "post_b_and", "weird_condition_a", "&&", 8]
 // ["
 // aa=function aa(){}&&function aa(){}
 // ", "post_b_and", "weird_condition_a", "&&", 19]
@@ -9646,7 +9689,7 @@ function jslint_phase4_walk(state) {
                 preamble(thing);
                 walk_expression(thing.expression);
 
-// PR-414 - Bugfix - fix fart-body not being walked.
+// PR-414 - Bugfix - Fix fart-body not being walked.
 
                 if (thing.id === "function" || thing.id === "=>") {
 
@@ -9908,7 +9951,14 @@ function jslint_phase5_whitage(state) {
 
     function expected_at(at) {
 
-// Probably deadcode.
+// PR-510 - deadcode-confirmed - <right> is always assigned first. The whitage
+// walk starts in one place, the <token_list>.forEach whose first statement is
+// <right> = <the_token>, and every route to <expected_at> runs inside it.
+//
+// deadcode-revive - call <expected_at>, or anything that reaches it, from
+// outside that forEach. A pre-pass or post-pass indent check would do it, and
+// <right> would hold whatever the last token left there, or undefined.
+//
 // if (right === undefined) {
 //     right = token_nxt;
 // }
@@ -10452,13 +10502,13 @@ function jslint_phase6_autofix(state) {
         switch (code) {
         case "expected_a_at_b_c":
 
-// expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. expected_at has FIVE
-// callers, not one: at_margin and two expected_at(margin) warn a token that
-// already belongs at a margin, so the target column belongs to the warned
-// line itself. The two expected_at(0) are LABEL placement and DO warn a
-// mid-line token - unreachable here only because a label always co-raises
-// weird_loop or unused_a, which blocks the pass. So do NOT read "always at a
-// margin" as licence to drop the mid-line branch below.
+// expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. expected_at has FOUR
+// callers, not one: at_margin and one_space warn a token that already belongs
+// at a margin, so the target column belongs to the warned line itself. The
+// other two pass 0, are LABEL placement, and DO warn a mid-line token -
+// unreachable here only because a label always co-raises weird_loop or
+// unused_a, which blocks the pass. So do NOT read "always at a margin" as
+// licence to drop the mid-line branch below.
 
             indentage_at = line_source.length - line_source.trimStart().length;
 
@@ -11050,7 +11100,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     html += "<div>\n";
     if (json) {
 
-// Bugfix - fix website crashing when linting pure json-object.
+// Bugfix - Fix website crashing when linting pure json-object.
 // return (
 
         html += (
@@ -11823,7 +11873,14 @@ function v8CoverageListMerge(processCovs) {
 
         let rangeToFuncDict = new Map();
 
-// Probably deadcode.
+// PR-510 - deadcode-confirmed - Every list in <urlToScriptDict> has at least
+// one element. <dictKeyValueAppend> is the only writer and pushes in the same
+// call that creates the list, and nothing pops, splices or filters it.
+//
+// deadcode-revive - restore <mergeScriptList>, whose signature is commented
+// out above. It took its list from any caller, which is why it needed this
+// guard. Adding a second writer or a filter to the map would also do it.
+//
 // if (scriptCovs.length === 0) {
 //     return undefined;
 // }
@@ -11876,7 +11933,13 @@ function v8CoverageListMerge(processCovs) {
             let ranges;
             let trees = [];
 
-// Probably deadcode.
+// PR-510 - deadcode-confirmed - Same as <scriptCovs> above, but with
+// <rangeToFuncDict>. <dictKeyValueAppend> is its only writer and pushes as it
+// creates each list.
+//
+// deadcode-revive - restore <mergeFuncList>, commented out above, or give the
+// map a second writer.
+//
 // if (funcCovs.length === 0) {
 //     return undefined;
 // }
@@ -12357,19 +12420,24 @@ body {
                     }) {
                         if (inHole !== isHole) {
                             lineHtml += htmlEscape(chunk);
-                            lineHtml += "</span><span";
+                            lineHtml += (
+                                (isHole && ignoreLine)
+                                ? "</span><span class=\"ignore\">"
+                                : isHole
+                                ? "</span><span class=\"uncovered\">"
 
-// Coverage-hack - Ugly-hack around possible deadcode where isHole is always
-// true.
+// PR-510 - deadcode-dispelled - the branch below is live: a hole ending before
+// end-of-line re-enters with <isHole> undefined, and that bare span closes it.
+// Line coverage hides this, the condition above running either way:
+//
+// function aa(bb) {
+//     return bb && bb.cc;
+//               ^^^^^^^^ this hole ends at the ";", not at end-of-line
+// }
+// aa(0);
 
-                            if (isHole) {
-                                lineHtml += (
-                                    ignoreLine
-                                    ? " class=\"ignore\""
-                                    : " class=\"uncovered\""
-                                );
-                            }
-                            lineHtml += ">";
+                                : "</span><span>"
+                            );
                             chunk = "";
                             inHole = isHole;
                         }
