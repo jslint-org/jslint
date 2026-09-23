@@ -429,6 +429,7 @@ const debugInline = (function () {
 debugInline(); // coverage-hack
 const jslint_autofix_warning_list = [ //jslint-ignore-line
     "expected_a_at_b_c",
+    "expected_a_at_end",
     "expected_line_break_a_b",
     "expected_space_a_b",
     "unexpected_space_a_b"
@@ -1539,6 +1540,9 @@ function jslint(
                 + ` not column ${c + jslint_fudge}.`
             );
             break;
+        case "expected_a_at_end":
+            mm = `Expected '${a}' at the end of its left operand's line.`;
+            break;
         case "expected_a_b":
             mm = `Expected '${a}' and instead saw '${b}'.`;
             break;
@@ -1795,9 +1799,9 @@ function jslint(
             break;
         case "wrap_immediate":
             mm = (
-                `Wrap an immediate function invocation in parentheses to assist`
-                + ` the reader in understanding that the expression is the`
-                + ` result of a function, and not the function itself.`
+                `Wrap an immediate function invocation in parentheses to`
+                + ` assist the reader in understanding that the expression is`
+                + ` the result of a function, and not the function itself.`
             );
             break;
         case "wrap_regexp":
@@ -10439,6 +10443,38 @@ function jslint_phase5_whitage(state) {
 // Commit 3903449a - Cleanup indent for multiline-method-chaining.
 
         if (left.line !== right.line) {
+
+// PR-xxx - Binary operators at end-of-line.
+
+// A tagged template is a binary "`" whose right side is the template itself.
+// Moving its backtick up would put the line break INSIDE the template and
+// change its value, so it is excluded.
+
+            if (
+                option_dict.beta &&
+                right.arity === "binary" &&
+                right.id !== "." &&
+                right.id !== "?." &&
+                right.id !== "`"
+            ) {
+
+// test_cause:
+// ["
+// let aa = [
+//     0
+//     + 0
+// ];
+// ", "jslint_phase5_whitage", "expected_a_at_end", "+", 5]
+
+                warn(
+                    "expected_a_at_end",
+                    right,
+                    artifact(right),
+                    undefined,
+                    left.line,
+                    left.thru
+                );
+            }
             dot_depth = 0;
             switch (right.id) {
             case ".":
@@ -10490,9 +10526,12 @@ function jslint_phase6_autofix(state) {
     warning_list.slice().sort(function (aa, bb) {
         return bb.line - aa.line || bb.column - aa.column;
     }).forEach(function ({
+        a,
         b,
+        c,
         code,
         column,
+        d,
         line
     }) {
         const ii = column - 1;
@@ -10527,6 +10566,27 @@ function jslint_phase6_autofix(state) {
                 return;
             }
             line_list[line] = " ".repeat(b) + line_source.trimStart();
+            return;
+        case "expected_a_at_end":
+
+// Move the line-leading operator to just after its left operand, which ends
+// at line <c>, column <d> - before any trailing comment there. A join past 80
+// columns is still made; its too_long is reported, not a reason to discard.
+
+            line_list[c] = (
+                line_list[c].slice(0, d) + " " + a +
+                line_list[c].slice(d).replace((/ +$/), "")
+            );
+            line_list[line] = (
+                line_source.slice(0, ii) +
+                line_source.slice(ii + a.length).replace((/^ /), "")
+            );
+
+// An operator left ALONE on its line would leave a blank line behind.
+
+            if (line_list[line].trim() === "") {
+                line_list.splice(line, 1);
+            }
             return;
         case "expected_line_break_a_b":
 
