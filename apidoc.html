@@ -218,8 +218,16 @@ function jslint_phase5_whitage<span class="apidocSignatureSpan">(state)</span>
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_report">17.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase6_autofix">17.
+function jslint_phase6_autofix<span class="apidocSignatureSpan">(state)</span>
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_report">18.
 function jslint_report<span class="apidocSignatureSpan">({
+    autofix,
     exports,
     froms,
     functions,
@@ -235,56 +243,56 @@ function jslint_report<span class="apidocSignatureSpan">({
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestDescribe">18.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestDescribe">19.
 function jstestDescribe<span class="apidocSignatureSpan">(description, testFunction)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestIt">19.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestIt">20.
 function jstestIt<span class="apidocSignatureSpan">(description, testFunction, mode)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestOnExit">20.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jstestOnExit">21.
 function jstestOnExit<span class="apidocSignatureSpan">(exitCode, mode)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.moduleFsInit">21.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.moduleFsInit">22.
 function moduleFsInit<span class="apidocSignatureSpan">()</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.noop">22.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.noop">23.
 function noop<span class="apidocSignatureSpan">(value)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.objectDeepCopyWithKeysSorted">23.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.objectDeepCopyWithKeysSorted">24.
 function objectDeepCopyWithKeysSorted<span class="apidocSignatureSpan">(obj)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.v8CoverageListMerge">24.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.v8CoverageListMerge">25.
 function v8CoverageListMerge<span class="apidocSignatureSpan">(processCovs)</span>
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.v8CoverageReportCreate">25.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.v8CoverageReportCreate">26.
 function v8CoverageReportCreate<span class="apidocSignatureSpan">({
     consoleError,
     coverageDir,
@@ -295,14 +303,21 @@ function v8CoverageReportCreate<span class="apidocSignatureSpan">({
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_charset_ascii">26.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_autofix_warning_list">27.
+object jslint_autofix_warning_list
+</a>
+
+</li>
+<li>
+
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_charset_ascii">28.
 string jslint_charset_ascii
 </a>
 
 </li>
 <li>
 
-<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_edition">27.
+<a class="apidocElementLiA" href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_edition">29.
 string jslint_edition
 </a>
 
@@ -459,21 +474,21 @@ jstestIt((
     return argList[0];
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-    if (consoleError === Object) {
-        consoleError = console.error;
+        if (consoleError === Object) {
+            consoleError = console.error;
+        }
+        return argList[0];
     }
-    return argList[0];
-}
-return debug;
+    return debug;
 }());
 <span class="apidocCodeKeywordSpan">debugInline</span>(); // coverage-hack
-const jslint_charset_ascii = ( //jslint-ignore-line
-"\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007"
-+ "\b\t\n\u000b\f\r\u000e\u000f"
-+ "\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017"
-+ "\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f"
-+ " !\"#$%&amp;'()*+,-./0123456789:;&lt;=&gt;?"
-+ "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
+const jslint_autofix_warning_list = [ //jslint-ignore-line
+    "expected_a_at_b_c",
+    "expected_line_break_a_b",
+    "expected_space_a_b",
+    "unexpected_space_a_b"
+];
+const jslint_charset_ascii = (
 ...</pre></li>
 
 <li>
@@ -701,6 +716,11 @@ await jslint.jslint_cli({
             line_source
         };
     });
+    const mode_autofix = (
+        option_dict.autofix === true
+        ? 256
+        : Math.max(0, Number(option_dict.autofix) || 0)
+    );
     const property_dict = empty();      // The object containing the tallied
                                         // ... property names.
                                 // jslint functions.
@@ -710,13 +730,7 @@ await jslint.jslint_cli({
     const token_global = {      // The global object; the outermost context.
         async: 0,
         context: empty(),
-        finally: 0,
-        from: 0,
-        function_body: true,
-        id: "(global)",
-        level: 0,
-        line: jslint_fudge,
-      ...
+ ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -837,7 +851,7 @@ ${name}
         });
         return;
 
-// PR-363 - Add command jslint_report.
+// PR-509 - Add command jslint_autofix.
 ...</pre></li>
 
 <li>
@@ -872,21 +886,20 @@ ${String(message).slice(0, 2000)}`
     throw error;
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-    delete left.assigned;
-    delete left.calls;
-    delete left.free;
-    delete left.open;
-    delete left.used;
-    left = right;
-});
-<span class="apidocCodeKeywordSpan">jslint_assert</span>(
-    indent_stack.length === 0,
-    `indent_stack.length=${indent_stack.length}.`
-);
+        delete left.alive;
+        delete left.assigned;
+        delete left.calls;
+        delete left.open;
+        delete left.used;
+        left = right;
+    });
+    <span class="apidocCodeKeywordSpan">jslint_assert</span>(
+        indent_stack.length === 0,
+        `indent_stack.length=${indent_stack.length}.`
+    );
 }
 
-function jslint_report({
-exports,
+// PR-509 - Add function jslint_phase6_autofix.
 ...</pre></li>
 
 <li>
@@ -927,74 +940,61 @@ exports,
 </span>    let command;
     let data;
     let exit_code = 0;
+    let mode_autofix;
     let mode_report;
     let mode_wrapper_vim;
     let result;
 
-    function jslint_from_file({
+// PR-509 - Add command jslint_autofix.
+
+    function autofix_embedded({
         code,
         file,
-        line_offset = 0,
         mode_conditional,
-        option = empty()
+        option,
+        rgx,
+        suffix,
+        suffix_file
     }) {
-        let result_from_file;
-        if (
-            mode_conditional
-            &amp;&amp; !(
-                /^\/\*jslint\b/m
-            ).test(code.slice(0, 65536))
-        ) {
-            return;
-        }
-        option = {
-            ...option,
-            file
-        };
-        switch ((
-            /\.\w+?$|$/m
-        ).exec(file)[0]) {
-        case ".html":
 
-// Recursively jslint embedded "&lt;script&gt;\n...\n&lt;/script&gt;".
+// This function will jslint each embedded block &lt;rgx&gt; matches, and return
+// &lt;code&gt; with every autofixed block spliced back between the SAME delimiters
+// - or undefined if no block was autofixed. &lt;suffix&gt; is the closing
+// delimiter, which the capture deliberately excludes.
+//
+// A BLOCKED BLOCK IS LEFT AS IT WAS AND THE REST ARE STILL REPAIRED, unlike a
+// blocked whole-file, which is not written at all.
 
-            code.replace((
-                /^&lt;script\b[^&gt;]*?&gt;\n([\S\s]*?\n)&lt;\/script&gt;$/gm
-            ), function (ignore, match1, ii) {
-                jslint_from_file({
-                    code: match1,
-                    file: file + ".&lt;script&gt;.js",
-                    line_offset: string_line_count(code.slice(0, ii)) + 1,
-                    option: {
-                        browser: true,
-                        ...option
-                    }
-                });
-                return "";
-            });
-            return;
-        case ".md":
+        const code_fixed = code.replace(rgx, function (match0, match1, ii) {
+            const result_embedded = jslint_from_file({
+                code: match1,
+                file: file + suffix_file,
+                line_offset: (
+                    jslint_fudge +
 
-// Recursively jslint embedded "node --eval '\n...\n'".
+// Count line-terminators the way &lt;jslint_rgx_crlf&gt; splits them, without
+// materialising every preceding line.
 
-            jslint_node_eval({
-                code,
-                file,
-                mode_conditional: true,
+                    (
+                        code
+                            .slice(0, ii)
+                            .match(new RegExp(jslint_rgx_crlf, "g"))
+                            ?.length ||
+                        0
+                    )
+                ),
+                mode_conditional,
                 option
             });
-            return;
-        case ".sh":
-
-// Recursively jslint embedded "node --eval '\n...\n'".
-
-            jslint_node_eval({
-                code,
-                file,
-                option
-            });
-            return;
-        defau...
+            if (
+                result_embedded === undefined ||
+                result_embedded.autofixed === undefined
+            ) {
+                return match0;
+            }
+            return (
+                match0.slice(
+          ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1337,28 +1337,6 @@ if (!state.mode_json &amp;&amp; warning_list.length === 0) {
     const indent_stack = [];
     let closer = "(end)";
     let dot_depth = 0;
-
-// free = false
-
-// cause:
-// "()=&gt;0"
-// "aa()"
-// "aa(0,0)"
-// "function(){}"
-
-// free = true
-
-// cause:
-// "(0)"
-// "(aa)"
-// "aa(0)"
-// "do{}while()"
-// "for(){}"
-// "if(){}"
-// "switch(){}"
-// "while(){}"
-
-    let free = false;
     let indentage;
     let left = token_global;
     let margin = 0;
@@ -1412,7 +1390,15 @@ if (!state.mode_json &amp;&amp; warning_list.length === 0) {
                 if (!name.used) {
 
 // test_cause:
-// ["function aa(bb){return;}", "delve", "unused_a", "...
+// ["function aa(bb){return;}", "delve", "unused_a", "bb", 13]
+// ["let aa;", "delve", "unused_a", "aa", 5]
+// ["let aa=0;try{aa();}catch(bb){aa();}", "delve", "unused_a", "bb", 26]
+
+                    warn("unused_a", name);
+                } else if (!name.assigned) {
+
+// test_cause:
+//...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1425,18 +1411,99 @@ if (!state.mode_json) {
 if (!state.mode_json &amp;&amp; warning_list.length === 0) {
     <span class="apidocCodeKeywordSpan">jslint_phase5_whitage</span>(state);
 }
-if (option_dict.test_internal_error) {
-    jslint_assert(undefined, "test_internal_error");
+
+// PHASE 6. Autofix whitespace-warnings in &lt;source&gt;, and re-lint the result.
+
+if (mode_autofix) {
+    autofixed = jslint_phase6_autofix(state) || state.source;
+    if (autofixed !== state.source) {
+...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase6_autofix" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_phase6_autofix">
+    function jslint_phase6_autofix<span class="apidocSignatureSpan">(state)</span>
+    </a>
+    </h2>
+</li>
+<li>Description and source-code:<pre class="apidocCodePre">function jslint_phase6_autofix(state) {
+<span class="apidocCodeCommentSpan">
+// PHASE 6. Autofix whitespace-warnings in &lt;source&gt;, and return the result.
+
+</span>    const line_crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
+    const line_list = state.line_list.map(function ({
+        line_source
+    }) {
+        return line_source;
+    });
+    const warning_list = state.warning_list;
+    if (warning_list.length === 0) {
+        return;
+    }
+    for (const {code} of warning_list) {
+        if (!jslint_autofix_warning_list.includes(code)) {
+            return;
+        }
+    }
+
+// Apply each fix RIGHT-TO-LEFT within a line, so an earlier fix cannot
+// invalidate a later fix's column, and BOTTOM-UP across lines, so every line
+// a splice shifts has already been visited.
+
+    warning_list.slice().sort(function (aa, bb) {
+        return bb.line - aa.line || bb.column - aa.column;
+    }).forEach(function ({
+        b,
+        code,
+        column,
+        line
+    }) {
+        const ii = column - 1;
+        const line_source = line_list[line];
+        let indentage_at;
+        let jj = ii;
+        switch (code) {
+        case "expected_a_at_b_c":
+
+// expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. expected_at has FIVE
+// callers, not one: at_margin and two expected_at(margin) warn a token that
+// already belongs at a margin, so the target column belongs to the warned
+// line itself. The two expected_at(0) are LABEL placement and DO warn a
+// mid-line token - unreachable here only because a label always co-raises
+// weird_loop or unused_a, which blocks the pass. So do NOT read "always at a
+// margin" as licence to drop the mid-line branch below.
+
+            indentage_at = line_source.length - line_source.trimStart().length;
+
+// A MID-LINE token cannot be re-indented, but it does not need to be skipped:
+// at_margin fires for tokens that belong AT a margin and therefore on their
+// OWN line. So split first and indent the remainder, which also lands a
+// trailing closer correctly, and is what line-breaks a...
 }
-if (option_dict.test_unknown_warning_code) {
-    warn_at("test_unknown_warning_code");
-}
+</pre></li>
+<li>Example usage:<pre class="apidocCodePre">...
+        if (!state.mode_json &amp;&amp; warning_list.length === 0) {
+            jslint_phase5_whitage(state);
+        }
+
+// PHASE 6. Autofix whitespace-warnings in &lt;source&gt;, and re-lint the result.
+
+        if (mode_autofix) {
+            autofixed = <span class="apidocCodeKeywordSpan">jslint_phase6_autofix</span>(state) || state.source;
+            if (autofixed !== state.source) {
+
+// Recurse jslint.
+
+result_autofix = jslint(
+    autofixed,
+    {
 ...</pre></li>
 
 <li>
     <h2>
     <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_report" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_report">
     function jslint_report<span class="apidocSignatureSpan">({
+    autofix,
     exports,
     froms,
     functions,
@@ -1451,6 +1518,7 @@ if (option_dict.test_unknown_warning_code) {
     </h2>
 </li>
 <li>Description and source-code:<pre class="apidocCodePre">function jslint_report({
+    autofix,
     exports,
     froms,
     functions,
@@ -1469,7 +1537,12 @@ if (option_dict.test_unknown_warning_code) {
 //  let result = jslint("console.log('hello world')");
 //  let html = jslint_report(result);
 
-</span>    let html = "";
+</span>    const autofix_blocked = autofix &amp;&amp; warnings.some(function ({
+        code
+    }) {
+        return !jslint_autofix_warning_list.includes(code);
+    });
+    let html = "";
     let length_80 = 1111;
 
     function address(line = 1, column = 1) {
@@ -1510,10 +1583,7 @@ if (option_dict.test_unknown_warning_code) {
 AAAAAAAAAAAAAAAABmAAgiQINAmcDBEICuc41DEBNgIkA4R2C4I+AAQgBYkuByAMgScfYUIF\
 7NgjsHGAbcDVFkXZ5Jwd+P96IGPc9rl9ETBEaCzCJkvY2UpziRZ7zftZWk8052U9+NqX6vXL\
 KDflSQnlJ0bP+QnPQAy744n9mup6H9PaCDFwM5zjf8exB89bZ1cdrYOP0NgnuRDRWlk9u/fE\
-llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOtz\
-7sIKEGgLdDNl/IrfqWVZG/wr42ekomEm91VA1p4LhHBuFzHF8//u7vvbREHMQqGtNLmiOOD/\
-X7WWiwqyCE98qt0jk5JJmgR5WJJElBmzRb1F7a66MmSLTNWZ2XSHfKBSKHoVteSEJ6EOdvVw\
-fNZOtXKDe39jXdRlkmMnOWIOF...
+llkxqmfH8lmRQ/DAmER9opk9wR6suc1LvTiXNEe1vbhUCH2USgnEwH3vUm05JQqejGvZvOt...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -2075,6 +2145,14 @@ await jslint.<span class="apidocCodeKeywordSpan">v8CoverageReportCreate</span>({
         "--exclude=tes[^0-9A-Z_a-z-]/",
         "--exclude=test/**/*.js",
 ...</pre></li>
+
+<li>
+    <h2>
+    <a href="#apidoc.elem.%22.%2Fjslint.mjs%22.jslint_autofix_warning_list" id="apidoc.elem.%22.%2Fjslint.mjs%22.jslint_autofix_warning_list">
+    object jslint_autofix_warning_list
+    </a>
+    </h2>
+</li>
 
 <li>
     <h2>

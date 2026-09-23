@@ -13,9 +13,9 @@
     <meta name="author" content="Douglas Crockford">
     <link rel="icon" type="image/png" href="asset_image_logo_256.svg">
     <title>JSLint: The JavaScript Code Quality and Coverage Tool</title>
-    <script defer src="./asset_codemirror_rollup.js?cc=8hd8"></script>
-    <script type="module" src="./jslint.mjs?cc=8hd8?window_jslint=1"></script>
-    <script defer src="./jslint_wrapper_codemirror.js?cc=8hd8"></script>
+    <script defer src="./asset_codemirror_rollup.js?cc=anlh"></script>
+    <script type="module" src="./jslint.mjs?cc=anlh?window_jslint=1"></script>
+    <script defer src="./jslint_wrapper_codemirror.js?cc=anlh"></script>
 <style>
 /*jslint-disable*/
 /*
@@ -728,6 +728,15 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     width: 100%;
     word-wrap: break-word;
 }
+.JSLINT_ #JSLINT_REPORT_AUTOFIX > div {
+    background: honeydew;
+}
+.JSLINT_ #JSLINT_REPORT_AUTOFIX.blocked > div {
+    background: pink;
+}
+.JSLINT_ #JSLINT_REPORT_AUTOFIX.blocked > legend {
+    background: #b44;
+}
 .JSLINT_ #JSLINT_REPORT_FUNCTIONS .level {
     background: cornsilk;
     padding: 8px 16px;
@@ -1082,7 +1091,8 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     <textarea></textarea>
 </fieldset>
 <div id="JSLINT_BUTTONS">
-    <button name="JSLint" title="Ctrl + Enter">JSLint</button>
+    <button name="jslint">JSLint</button>
+    <button name="autofix">Autofix Whitespace</button>
     <button name="clear_source">Clear Source</button>
     <button name="clear_options">Clear Options</button>
 </div>
@@ -1154,7 +1164,7 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         <div title="Allow unordered cases, params, properties, variables, and exports.">
         <label><input type="checkbox" value="unordered">unordered</label>
         </div>
-        <div title="Allow unordered const and let declarations that are not at top of function-scope.">
+        <div title="Allow unordered const and let declarations not at top of function-scope.">
         <label><input type="checkbox" value="variable">variable</label>
         </div>
         <div title="Allow messy whitespace.">
@@ -1202,10 +1212,10 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 
 /*jslint beta, browser*/
 /*property
-    CodeMirror, Tab, addEventListener, ch, checked, clear, click, closest,
-    ctrlKey, display, dom_style_report_unmatched, editor, error, extraKeys,
-    focus, forEach, from, fromTextArea, getItem, getValue, globals, gutters,
-    indentSelection, indentUnit, innerHTML, jslint, jslint_edition,
+    CodeMirror, Tab, addEventListener, autofix, autofixed, ch, checked, clear,
+    click, closest, ctrlKey, display, dom_style_report_unmatched, editor, error,
+    extraKeys, focus, forEach, from, fromTextArea, getItem, getValue, globals,
+    gutters, indentSelection, indentUnit, innerHTML, jslint, jslint_edition,
     jslint_report, key, length, line, lineNumbers, lineWrapping, lint,
     lintOnChange, matchBrackets, metaKey, mode, name, offsetWidth, on, options,
     parse, performLint, preventDefault, push, querySelector, querySelectorAll,
@@ -1257,9 +1267,11 @@ function dom_style_report_unmatched() {
     });
 }
 
-async function jslint_run() {
+async function jslint_run(mode) {
 
 // This function will run jslint in browser and create html-reports.
+
+    let result;
 
 // Show ui-loader-animation.
 
@@ -1286,6 +1298,22 @@ async function jslint_run() {
             /[\s,;'"]+/
         );
 
+// PR-509 - Autofix.
+
+        if (mode === "autofix") {
+            result = jslint.jslint(
+                editor.getValue(),
+                {
+                    ...jslint_option_dict,
+                    autofix: true
+                },
+                jslint_option_dict.globals
+            );
+            if (result.autofixed !== undefined) {
+                editor.setValue(result.autofixed);
+            }
+        }
+
 // Execute linter.
 
         editor.performLint();
@@ -1293,9 +1321,13 @@ async function jslint_run() {
 // Generate the reports.
 // Display the reports.
 
+        result = jslint_option_dict.result;
+        if (mode === "autofix") {
+            result.autofix = true;
+        }
         document.querySelector(
             ".JSLINT_REPORT_"
-        ).innerHTML = jslint.jslint_report(jslint_option_dict.result);
+        ).innerHTML = jslint.jslint_report(result);
         listener_window_onresize();
     } catch (err) {
         console.error(err); //jslint-ignore-line
@@ -1433,8 +1465,9 @@ document.querySelector(
     target
 }) {
     switch (target.name) {
-    case "JSLint":
-        jslint_run();
+    case "autofix":
+    case "jslint":
+        jslint_run(target.name);
         break;
     case "clear_options":
         document.querySelectorAll(
@@ -1521,7 +1554,7 @@ window.addEventListener("load", function () {
 
 // JSLint current source code.
 
-    document.querySelector("button[name='JSLint']").click();
+    document.querySelector("button[name='jslint']").click();
 });
 
 // Init event-handling for window.onresize.
@@ -1625,6 +1658,8 @@ await (async function () {
 // .... /*jslint trace*/ ......... Include jslint stack-trace in warnings.
 // .... /*jslint unordered*/ ..... Allow unordered cases, params, properties,
 // ................................... variables, and exports.
+// .... /*jslint variable*/ ...... Allow unordered const and let declarations
+// ................................... not at top of function-scope.
 // .... /*jslint white*/ ......... Allow messy whitespace.
     `).trim() + "\n");
 }

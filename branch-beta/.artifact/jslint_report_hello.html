@@ -111,6 +111,15 @@
     width: 100%;
     word-wrap: break-word;
 }
+.JSLINT_ #JSLINT_REPORT_AUTOFIX > div {
+    background: honeydew;
+}
+.JSLINT_ #JSLINT_REPORT_AUTOFIX.blocked > div {
+    background: pink;
+}
+.JSLINT_ #JSLINT_REPORT_AUTOFIX.blocked > legend {
+    background: #b44;
+}
 .JSLINT_ #JSLINT_REPORT_FUNCTIONS .level {
     background: cornsilk;
     padding: 8px 16px;
@@ -217,6 +226,17 @@
 <div class="center" id="JSLINT_REPORT_TITLE">
 JSLint Report
 </div>
+<fieldset
+    class="
+    
+    "
+    id="JSLINT_REPORT_AUTOFIX"
+>
+<legend>Report: Autofix</legend>
+<div class="center">
+    
+</div>
+</fieldset>
 <fieldset id="JSLINT_REPORT_WARNINGS">
 <legend>Report: Warnings (2)</legend>
 <div>

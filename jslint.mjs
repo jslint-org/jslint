@@ -94,7 +94,6 @@
 /*property
     JSLINT_BETA,
     NODE_V8_COVERAGE,
-    a,
     alive,
     all,
     argv,
@@ -107,14 +106,14 @@
     assigned,
     assignment,
     async,
-    b,
+    autofix,
+    autofixed,
     beta,
     bitwise,
     block,
     block_list,
     block_stack,
     browser,
-    c,
     calls,
     catch,
     causes,
@@ -136,7 +135,6 @@
     coverageDir,
     create,
     cwd,
-    d,
     debugInline,
     default,
     delta,
@@ -185,7 +183,6 @@
     for_of,
     for_semicolon,
     formatted_message,
-    free,
     freeze,
     from,
     froms,
@@ -226,6 +223,7 @@
     jslint,
     jslint_apidoc,
     jslint_assert,
+    jslint_autofix_warning_list,
     jslint_charset_ascii,
     jslint_cli,
     jslint_edition,
@@ -234,6 +232,7 @@
     jslint_phase3_parse,
     jslint_phase4_walk,
     jslint_phase5_whitage,
+    jslint_phase6_autofix,
     jslint_report,
     json,
     jstestDescribe,
@@ -257,7 +256,6 @@
     log,
     long,
     loop,
-    m,
     map,
     margin,
     match,
@@ -328,6 +326,7 @@
     resolve,
     result,
     reverse,
+    rgx,
     role,
     round,
     scope_block,
@@ -362,6 +361,8 @@
     stop_at,
     stringify,
     subscript,
+    suffix,
+    suffix_file,
     switch,
     syntax_dict,
     tenure,
@@ -383,6 +384,7 @@
     tree,
     trim,
     trimEnd,
+    trimStart,
     try,
     type,
     unlink,
@@ -425,7 +427,13 @@ const debugInline = (function () {
     return debug;
 }());
 debugInline(); // coverage-hack
-const jslint_charset_ascii = ( //jslint-ignore-line
+const jslint_autofix_warning_list = [ //jslint-ignore-line
+    "expected_a_at_b_c",
+    "expected_line_break_a_b",
+    "expected_space_a_b",
+    "unexpected_space_a_b"
+];
+const jslint_charset_ascii = (
     "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007"
     + "\b\t\n\u000b\f\r\u000e\u000f"
     + "\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017"
@@ -1111,6 +1119,11 @@ function jslint(
             line_source
         };
     });
+    const mode_autofix = (
+        option_dict.autofix === true
+        ? 256
+        : Math.max(0, Number(option_dict.autofix) || 0)
+    );
     const property_dict = empty();      // The object containing the tallied
                                         // ... property names.
                                 // jslint functions.
@@ -1133,7 +1146,9 @@ function jslint(
     };
     const token_list = [];      // The array of tokens.
     const warning_list = [];    // The array collecting all generated warnings.
+    let autofixed;              // The <source> after one autofix pass.
     let mode_stop = false;      // true if JSLint cannot finish.
+    let result_autofix;         // The re-lint of <autofixed>.
 
 // Error reportage functions:
 
@@ -1385,7 +1400,7 @@ function jslint(
         the_warning = warn_at(
             code,
             the_token.line,
-            (the_token.from || 0) + jslint_fudge,
+            the_token.from,
             a || artifact(the_token),
             b,
             c,
@@ -1415,25 +1430,32 @@ function jslint(
 // Report an error at some line and column of the program. The warning object
 // resembles an exception.
 
-        let mm;
-        let warning = {
-            a,
-            b,
-            c,
+        const warning = {
+            a, //jslint-ignore-line
+            b, //jslint-ignore-line
+            c, //jslint-ignore-line
             code,
-
-// Fudge column numbers in warning message.
-
-            column: column || jslint_fudge,
-            d,
+            d, //jslint-ignore-line
             line,
             line_source: "",
             name: "JSLintError",
-            ...line_list[line]
+            ...line_list[Math.min(line, line_list.length - 1)]
         };
-        warning.column = Math.max(
-            Math.min(warning.column, warning.line_source.length),
-            jslint_fudge
+        let mm;
+        jslint_assert(typeof column === "number", `column=${column}`);
+        if (line >= line_list.length) {
+
+// Handle premature EOF.
+
+            warning.line = line_list.length - 1;
+            column = warning.line_source.length - 1;
+        }
+        warning.column = (
+
+// Fudge column numbers in warning message.
+
+            jslint_fudge +
+            Math.max(0, Math.min(column, warning.line_source.length - 1))
         );
         test_cause(code, b || a, warning.column);
         switch (code) {
@@ -1475,8 +1497,14 @@ function jslint(
         case "expected_a":
             mm = `Expected '${a}'.`;
             break;
+        case "expected_a_after_b":
+            mm = `Expected '${a}' after '${b}'.`;
+            break;
         case "expected_a_at_b_c":
-            mm = `Expected '${a}' at column ${b}, not column ${c}.`;
+            mm = (
+                `Expected '${a}' at column ${b + jslint_fudge},`
+                + ` not column ${c + jslint_fudge}.`
+            );
             break;
         case "expected_a_b":
             mm = `Expected '${a}' and instead saw '${b}'.`;
@@ -1535,7 +1563,7 @@ function jslint(
 // PR-390 - Add numeric-separator check.
 
         case "illegal_num_separator":
-            mm = `Illegal numeric separator '_' at column ${column}.`;
+            mm = `Illegal numeric separator '_' at column ${warning.column}.`;
             break;
         case "infix_in":
             mm = (
@@ -1850,11 +1878,56 @@ function jslint(
         if (!state.mode_json && warning_list.length === 0) {
             jslint_phase5_whitage(state);
         }
+
+// PHASE 6. Autofix whitespace-warnings in <source>, and re-lint the result.
+
+        if (mode_autofix) {
+            autofixed = jslint_phase6_autofix(state) || state.source;
+            if (autofixed !== state.source) {
+
+// Recurse jslint.
+
+                result_autofix = jslint(
+                    autofixed,
+                    {
+                        ...option_dict,
+                        autofix: mode_autofix - 1
+                    },
+                    global_list
+                );
+
+// A stop in the re-lint can only be the fix's own doing - this pass parsed to
+// the end, or phase 6 would have had a non-whitespace warning to block on - so
+// discard the fix and report on <source> as-is, unfixed.
+
+                if (!result_autofix.stop) {
+                    return {
+                        autofixed,
+                        ...result_autofix
+                    };
+                }
+
+// Name the discarded fix in this pass's own report, or a fixer defect would
+// look exactly like an ordinary blocked file.
+
+                result_autofix.warnings.forEach(function (warning) {
+                    if (warning.mode_stop) {
+                        warning_list.push({
+                            ...warning,
+                            message: (
+                                "[autofix discarded - line and column refer"
+                                + " to the autofixed text] " + warning.message
+                            )
+                        });
+                    }
+                });
+            }
+        }
         if (option_dict.test_internal_error) {
             jslint_assert(undefined, "test_internal_error");
         }
         if (option_dict.test_unknown_warning_code) {
-            warn_at("test_unknown_warning_code");
+            warn_at("test_unknown_warning_code", jslint_fudge, 0);
         }
     } catch (err) {
         mode_stop = true;
@@ -2299,9 +2372,73 @@ async function jslint_cli({
     let command;
     let data;
     let exit_code = 0;
+    let mode_autofix;
     let mode_report;
     let mode_wrapper_vim;
     let result;
+
+// PR-509 - Add command jslint_autofix.
+
+    function autofix_embedded({
+        code,
+        file,
+        mode_conditional,
+        option,
+        rgx,
+        suffix,
+        suffix_file
+    }) {
+
+// This function will jslint each embedded block <rgx> matches, and return
+// <code> with every autofixed block spliced back between the SAME delimiters
+// - or undefined if no block was autofixed. <suffix> is the closing
+// delimiter, which the capture deliberately excludes.
+//
+// A BLOCKED BLOCK IS LEFT AS IT WAS AND THE REST ARE STILL REPAIRED, unlike a
+// blocked whole-file, which is not written at all.
+
+        const code_fixed = code.replace(rgx, function (match0, match1, ii) {
+            const result_embedded = jslint_from_file({
+                code: match1,
+                file: file + suffix_file,
+                line_offset: (
+                    jslint_fudge +
+
+// Count line-terminators the way <jslint_rgx_crlf> splits them, without
+// materialising every preceding line.
+
+                    (
+                        code
+                            .slice(0, ii)
+                            .match(new RegExp(jslint_rgx_crlf, "g"))
+                            ?.length ||
+                        0
+                    )
+                ),
+                mode_conditional,
+                option
+            });
+            if (
+                result_embedded === undefined ||
+                result_embedded.autofixed === undefined
+            ) {
+                return match0;
+            }
+            return (
+                match0.slice(
+                    0,
+                    match0.length - match1.length - suffix.length
+                ) +
+                result_embedded.autofixed +
+                suffix
+            );
+        });
+        return (
+            code_fixed === code
+            ? undefined
+            : code_fixed
+        );
+    }
 
     function jslint_from_file({
         code,
@@ -2330,44 +2467,50 @@ async function jslint_cli({
 
 // Recursively jslint embedded "<script>\n...\n</script>".
 
-            code.replace((
-                /^<script\b[^>]*?>\n([\S\s]*?\n)<\/script>$/gm
-            ), function (ignore, match1, ii) {
-                jslint_from_file({
-                    code: match1,
-                    file: file + ".<script>.js",
-                    line_offset: string_line_count(code.slice(0, ii)) + 1,
+            return {
+                autofixed: autofix_embedded({
+                    code,
+                    file,
                     option: {
                         browser: true,
                         ...option
-                    }
-                });
-                return "";
-            });
-            return;
+                    },
+                    rgx: (/^<script\b[^>]*?>\n([\S\s]*?\n)<\/script>$/gm),
+                    suffix: "</script>",
+                    suffix_file: ".<script>.js"
+                })
+            };
         case ".md":
 
 // Recursively jslint embedded "node --eval '\n...\n'".
 
-            jslint_node_eval({
+            return jslint_node_eval({
                 code,
                 file,
                 mode_conditional: true,
                 option
             });
-            return;
         case ".sh":
 
 // Recursively jslint embedded "node --eval '\n...\n'".
 
-            jslint_node_eval({
+            return jslint_node_eval({
                 code,
                 file,
                 option
             });
-            return;
         default:
             result_from_file = jslint("\n".repeat(line_offset) + code, option);
+
+// The <line_offset> newlines prefixed above make the warnings absolute, and
+// they ride along in <autofixed> too. Strip exactly them back off, so the
+// caller splices the block back between its OWN delimiters.
+
+            if (line_offset > 0 && result_from_file.autofixed !== undefined) {
+                result_from_file.autofixed = (
+                    result_from_file.autofixed.slice(line_offset)
+                );
+            }
         }
 
 // Print only first 10 warnings to stderr.
@@ -2412,13 +2555,10 @@ async function jslint_cli({
         mode_conditional,
         option = empty()
     }) {
-        code.replace((
-            /\bnode\b.*? (?:--eval|-e) '\n([\S\s]*?\n)'/gm
-        ), function (ignore, match1, ii) {
-            jslint_from_file({
-                code: match1,
-                file: file + ".<node -e>.js",
-                line_offset: string_line_count(code.slice(0, ii)) + 1,
+        return {
+            autofixed: autofix_embedded({
+                code,
+                file,
                 mode_conditional,
                 option: {
                     beta: Boolean(
@@ -2429,31 +2569,12 @@ async function jslint_cli({
                     ),
                     node: true,
                     ...option
-                }
-            });
-            return "";
-        });
-    }
-
-    function string_line_count(code) {
-
-// This function will count number of newlines in <code>.
-
-        let count;
-        let ii;
-
-// https://jsperf.com/regexp-counting-2/8
-
-        count = 0;
-        ii = 0;
-        while (true) {
-            ii = code.indexOf("\n", ii) + 1;
-            if (ii === 0) {
-                break;
-            }
-            count += 1;
-        }
-        return count;
+                },
+                rgx: (/\bnode\b.*? (?:--eval|-e) '\n([\S\s]*?\n)'/gm),
+                suffix: "'",
+                suffix_file: ".<node -e>.js"
+            })
+        };
     }
 
 // PR-396 - window.jslint
@@ -2528,6 +2649,17 @@ async function jslint_cli({
         });
         return;
 
+// PR-509 - Add command jslint_autofix.
+
+    case "jslint_autofix":
+        file = command[1];
+        mode_autofix = true;
+        option = {
+            ...option,
+            autofix: true
+        };
+        break;
+
 // PR-363 - Add command jslint_report.
 
     case "jslint_report":
@@ -2585,11 +2717,16 @@ async function jslint_cli({
         if (data) {
             await Promise.all(data.map(async function (file2) {
                 let code;
+                let result_dir;
                 let time_start = Date.now();
+
+// PR-409 - Skip dotfile (e.g. .foo.js) when reading directory.
+
+                if ((/^\./).test(file2)) {
+                    return;
+                }
                 file2 = file + "/" + file2;
-                switch ((
-                    /\.\w+?$|$/m
-                ).exec(file2)[0]) {
+                switch ((/\.\w+?$|$/m).exec(file2)[0]) {
                 case ".cjs":
                 case ".html":
                 case ".js":
@@ -2607,18 +2744,19 @@ async function jslint_cli({
                     return;
                 }
                 if (
-                    (
-                        /(?:\b|_)(?:lock|min|raw|rollup)(?:\b|_)/
-                    ).test(file2)
+                    (/(?:\b|_)(?:lock|min|raw|rollup)(?:\b|_)/).test(file2)
                     || !(code && code.length < 1048576)
                 ) {
                     return;
                 }
-                jslint_from_file({
+                result_dir = jslint_from_file({
                     code,
                     file: file2,
                     option
                 });
+                if (mode_autofix && result_dir.autofixed !== undefined) {
+                    await fsWriteFileWithParents(file2, result_dir.autofixed);
+                }
                 console_error(
                     "jslint - " + (Date.now() - time_start) + "ms - " + file2
                 );
@@ -2643,7 +2781,20 @@ async function jslint_cli({
         file,
         option
     });
+    if (mode_autofix && result.autofixed !== undefined) {
+        await fsWriteFileWithParents(file, result.autofixed);
+    }
     if (mode_report) {
+
+// A container-file - .html, .md, .sh - lints its embedded blocks one by one
+// and returns no single lint-result, so there is nothing to report on.
+
+        if (result.warnings === undefined) {
+            console_error(`jslint_report - ${file} - not javascript file`);
+            exit_code = 1;
+            process_exit(exit_code);
+            return exit_code;
+        }
         result = jslint.jslint_report(result);
         result = `<body class="JSLINT_ JSLINT_REPORT_">\n${result}</body>\n`;
         await fsWriteFileWithParents(mode_report, result);
@@ -2720,19 +2871,31 @@ function jslint_phase2_lex(state) {
         if (match !== undefined && char !== match) {
 
 // test_cause:
-// ["aa=/[", "char_after", "expected_a", "]", 5]
+// ["aa=/", "char_after", "expected_a_after_b", "/", 4]
+// ["aa=/(?-", "char_after", "expected_a_after_b", "-", 7]
+// ["aa=/[", "char_after", "expected_a_after_b", "[", 5]
 // ["aa=/aa{/", "char_after", "expected_a_b", "/", 8]
+// ["aa=/aa{/;", "char_after", "expected_a_b", "/", 8]
 
             return (
                 char === ""
-                ? stop_at("expected_a", line, column - 1, match)
-                : stop_at("expected_a_b", line, column, match, char)
+                ? stop_at(
+                    "expected_a_after_b",
+                    line,
+                    column - 1,
+                    match,
+
+// At EOL, <snippet> may have been reset or trimmed, so use <line_list[line]>.
+
+                    line_list[line].line_source.slice(-1)
+                )
+                : stop_at("expected_a_b", line, column - 1, match, char)
             );
         }
         char = line_source.slice(0, 1);
-        line_source = line_source.slice(1);
-        snippet += char || " ";
-        column += 1;
+        snippet += char;
+        column += char.length;
+        line_source = line_source.slice(char.length);
         return char;
     }
 
@@ -2747,7 +2910,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["\"\\", "char_after_escape", "unclosed_string", "", 2]
 
-            return stop_at("unclosed_string", line, column);
+            return stop_at("unclosed_string", line, column - 0);
         case "/":
             return char_after();
         case "\\":
@@ -2776,24 +2939,25 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["[\"\\u{12345}\"]", "char_after_escape", "unexpected_a", "{", 5]
 
-                    warn_at("unexpected_a", line, column, char);
+                    warn_at("unexpected_a", line, column - 1, char);
                 }
                 if (read_digits("x", undefined) > 5) {
 
 // test_cause:
 // ["\"\\u{123456}\"", "char_after_escape", "too_many_digits", "", 11]
 
-                    warn_at("too_many_digits", line, column);
+                    warn_at("too_many_digits", line, column - 1);
                 }
                 if (char !== "}") {
 
 // test_cause:
 // ["\"\\u{12345\"", "char_after_escape", "expected_a_before_b", "\"", 10]
+// ["\"\\u{12345\";", "char_after_escape", "expected_a_before_b", "\"", 10]
 
                     return stop_at(
                         "expected_a_before_b",
                         line,
-                        column,
+                        column - 1,
                         "}",
                         char
                     );
@@ -2805,8 +2969,9 @@ function jslint_phase2_lex(state) {
 
 // test_cause:
 // ["\"\\u0\"", "char_after_escape", "expected_four_digits", "", 5]
+// ["\"\\u0\";", "char_after_escape", "expected_four_digits", "", 5]
 
-                warn_at("expected_four_digits", line, column);
+                warn_at("expected_four_digits", line, column - 1);
             }
             return;
         default:
@@ -2817,7 +2982,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["\"\\0\"", "char_after_escape", "unexpected_a_before_b", "0", 3]
 
-            warn_at("unexpected_a_before_b", line, column, "\\", char);
+            warn_at("unexpected_a_before_b", line, column - 1, "\\", char);
         }
     }
 
@@ -2826,13 +2991,13 @@ function jslint_phase2_lex(state) {
 // Back up one character by moving a character from the end of the snippet to
 // the front of the line_source.
 
-        char = snippet.slice(-1);
         line_source = char + line_source;
         column -= char.length;
 
-// Remove last character from snippet.
+// Remove last character from snippet. At end of line <char> is "" and nothing
+// was consumed, so nothing comes off column or snippet.
 
-        snippet = snippet.slice(0, -1);
+        snippet = snippet.slice(0, snippet.length - char.length);
         return char;
     }
 
@@ -2851,7 +3016,7 @@ function jslint_phase2_lex(state) {
 // ["aa=1_2__3", "check_numeric_separator", "illegal_num_separator", "", 7]
 // ["aa=1_2_n", "check_numeric_separator", "illegal_num_separator", "", 7]
 
-            warn_at("illegal_num_separator", line, column + ii + 1);
+            warn_at("illegal_num_separator", line, column - 0 + ii);
             return "";
         });
     }
@@ -2886,9 +3051,10 @@ function jslint_phase2_lex(state) {
             if (line_source[0] === "/") {
 
 // test_cause:
-// ["/*/", "lex_comment", "unexpected_a", "/", 2]
+// ["/*/", "lex_comment", "unexpected_a", "/", 3]
+// ["/*/*", "lex_comment", "unexpected_a", "/", 3]
 
-                warn_at("unexpected_a", line, column + ii, "/");
+                warn_at("unexpected_a", line, column - 0, "/");
             }
 
 // Lex/loop through each line until "*/".
@@ -2904,18 +3070,18 @@ function jslint_phase2_lex(state) {
                 if (ii >= 0) {
 
 // test_cause:
-// ["/*/*", "lex_comment", "nested_comment", "", 2]
+// ["/*/*", "lex_comment", "nested_comment", "", 3]
 
-                    warn_at("nested_comment", line, column + ii);
+                    warn_at("nested_comment", line, column - 0 + ii);
                 }
                 snippet.push(line_source);
                 line_source = read_line();
                 if (line_source === undefined) {
 
 // test_cause:
-// ["/*", "lex_comment", "unclosed_comment", "", 1]
+// ["/*", "lex_comment", "unclosed_comment", "", 2]
 
-                    return stop_at("unclosed_comment", line, column);
+                    return stop_at("unclosed_comment", line, column - 0);
                 }
             }
             jj = line_source.slice(0, ii).search(
@@ -2924,9 +3090,9 @@ function jslint_phase2_lex(state) {
             if (jj >= 0) {
 
 // test_cause:
-// ["/*/**/", "lex_comment", "nested_comment", "", 2]
+// ["/*/**/", "lex_comment", "nested_comment", "", 3]
 
-                warn_at("nested_comment", line, column + jj);
+                warn_at("nested_comment", line, column - 0 + jj);
             }
             snippet.push(line_source.slice(0, ii));
             snippet = snippet.join(" ");
@@ -2940,6 +3106,7 @@ function jslint_phase2_lex(state) {
         if (!option_dict.devel && jslint_rgx_todo.test(snippet)) {
 
 // test_cause:
+// [" //todo", "lex_comment", "todo_comment", "(comment)", 2] //jslint-ignore-line
 // ["//todo", "lex_comment", "todo_comment", "(comment)", 1] //jslint-ignore-line
 
             warn("todo_comment", the_comment);
@@ -2962,6 +3129,7 @@ function jslint_phase2_lex(state) {
         if (!mode_directive) {
 
 // test_cause:
+// ["0; /*global aa*/", "lex_comment", "misplaced_directive_a", "global", 4]
 // ["0\n/*global aa*/", "lex_comment", "misplaced_directive_a", "global", 1]
 
             warn_at("misplaced_directive_a", line, from, the_comment.directive);
@@ -2985,6 +3153,7 @@ function jslint_phase2_lex(state) {
             if (ii !== jj) {
 
 // test_cause:
+// [" /*jslint !*/", "lex_comment", "bad_directive_a", "!", 2]
 // ["/*jslint !*/", "lex_comment", "bad_directive_a", "!", 1]
 
                 return stop("bad_directive_a", the_comment, body.slice(ii));
@@ -2998,6 +3167,7 @@ function jslint_phase2_lex(state) {
                 if (value) {
 
 // test_cause:
+// [" /*global aa:false*/", "lex_comment", "bad_option_a", "aa:false", 2]
 // ["/*global aa:false*/", "lex_comment", "bad_option_a", "aa:false", 1]
 
                     warn("bad_option_a", the_comment, key + ":" + value);
@@ -3038,8 +3208,9 @@ function jslint_phase2_lex(state) {
 
 // test_cause:
 // ["`${`", "lex_megastring", "expected_a_b", "`", 4]
+// ["`${`;", "lex_megastring", "expected_a_b", "`", 4]
 
-            return stop_at("expected_a_b", line, column, "}", "`");
+            return stop_at("expected_a_b", line, column - 1, "}", "`");
         }
         from_mega = from;
         line_mega = line;
@@ -3077,8 +3248,8 @@ function jslint_phase2_lex(state) {
 // a } token is made.
 
                 column += 2;
-                token_create("${");
                 line_source = line_source.slice(2);
+                token_create("${");
 
 // Lex/loop through each token inside megastring-expression `${...}`.
 
@@ -3089,7 +3260,13 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["`${{", "lex_megastring", "expected_a_b", "{", 4]
 
-                        return stop_at("expected_a_b", line, column, "}", "{");
+                        return stop_at(
+                            "expected_a_b",
+                            line,
+                            column - 1,
+                            "}",
+                            "{"
+                        );
                     }
                     if (id === "}") {
                         break;
@@ -3098,8 +3275,8 @@ function jslint_phase2_lex(state) {
                 break;
             case "\\":
                 snippet += line_source.slice(0, 2);
-                line_source = line_source.slice(2);
                 column += 2;
+                line_source = line_source.slice(2);
                 break;
             case "`":
 
@@ -3111,8 +3288,8 @@ function jslint_phase2_lex(state) {
 
 // Terminate megastring with `.
 
-                line_source = line_source.slice(1);
                 column += 1;
+                line_source = line_source.slice(1);
                 mode_mega = false;
                 return token_create("`");
             default:
@@ -3123,6 +3300,7 @@ function jslint_phase2_lex(state) {
                 if (read_line() === undefined) {
 
 // test_cause:
+// [" `0", "lex_megastring", "unclosed_mega", "", 2]
 // ["`", "lex_megastring", "unclosed_mega", "", 1]
 
                     return stop_at("unclosed_mega", line_mega, from_mega);
@@ -3173,12 +3351,13 @@ function jslint_phase2_lex(state) {
         ) {
 
 // test_cause:
-// ["0a", "lex_number", "unexpected_a_after_b", "0", 2]
+// [" 0a", "lex_number", "unexpected_a_after_b", "0", 3]
+// [" 0a;", "lex_number", "unexpected_a_after_b", "0", 3]
 
             return stop_at(
                 "unexpected_a_after_b",
                 line,
-                column,
+                column - 1,
                 snippet.slice(-1),
                 snippet.slice(0, -1)
             );
@@ -3227,7 +3406,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["aa=/[0-]/", "lex_regexp_bracketed", "unexpected_a", "-", 7]
 
-                        warn_at("unexpected_a", line, column - 1, "-");
+                        warn_at("unexpected_a", line, column - 2, "-");
                     }
                     return char_after("]");
 
@@ -3253,7 +3432,13 @@ function jslint_phase2_lex(state) {
 // ["aa=/[\\\\/]/", "lex_regexp_bracketed", "expected_a_before_b", "/", 8]
 // ["aa=/[\\\\[]/", "lex_regexp_bracketed", "expected_a_before_b", "[", 8]
 
-                    warn_at("expected_a_before_b", line, column, "\\", char);
+                    warn_at(
+                        "expected_a_before_b",
+                        line,
+                        column - 1,
+                        "\\",
+                        char
+                    );
                     break;
                 case "\\":
                     char_after_escape("BbDdSsWw-[]^");
@@ -3265,7 +3450,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["`${/[`]/}`", "lex_regexp_bracketed", "unexpected_a", "`", 6]
 
-                        warn_at("unexpected_a", line, column, "`");
+                        warn_at("unexpected_a", line, column - 1, "`");
                     }
                     break;
                 }
@@ -3287,21 +3472,23 @@ function jslint_phase2_lex(state) {
 // RegExp
 // Lex sequence of characters in regexp.
 
+            let modifier_seen = "";
             switch (char) {
             case "":
-                warn_at("expected_regexp_factor_a", line, column, char);
+                warn_at("expected_regexp_factor_a", line, column - 0, char);
                 break;
             case ")":
-                warn_at("expected_regexp_factor_a", line, column, char);
+                warn_at("expected_regexp_factor_a", line, column - 1, char);
                 break;
             case "]":
 
 // test_cause:
 // ["/ /", "lex_regexp_group", "expected_regexp_factor_a", "", 3]
 // ["aa=/)", "lex_regexp_group", "expected_regexp_factor_a", ")", 5]
+// ["aa=/);", "lex_regexp_group", "expected_regexp_factor_a", ")", 5]
 // ["aa=/]", "lex_regexp_group", "expected_regexp_factor_a", "]", 5]
 
-                warn_at("expected_regexp_factor_a", line, column, char);
+                warn_at("expected_regexp_factor_a", line, column - 1, char);
                 break;
             }
             while (true) {
@@ -3342,7 +3529,13 @@ function jslint_phase2_lex(state) {
 // ["aa=/(:)/", "lex_regexp_group", "expected_a_before_b", ":", 6]
 // ["aa=/?/", "lex_regexp_group", "expected_a_before_b", "?", 5]
 
-                        warn_at("expected_a_before_b", line, column, "?", ":");
+                        warn_at(
+                            "expected_a_before_b",
+                            line,
+                            column - 1,
+                            "?",
+                            ":"
+                        );
                         break;
                     case "?":
                         char_after("?");
@@ -3368,9 +3561,13 @@ function jslint_phase2_lex(state) {
                         case "i":
                         case "m":
                         case "s":
+                            modifier_seen = char;
                             char_after();
                             while (true) {
-                                if (char === ":" && snippet.slice(-1) !== "-") {
+
+// A lone "-" adds and removes nothing, which v8 rejects - unlike "(?i-:".
+
+                                if (char === ":" && modifier_seen !== "-") {
                                     char_after();
                                     break;
                                 }
@@ -3379,17 +3576,40 @@ function jslint_phase2_lex(state) {
                                 case "i":
                                 case "m":
                                 case "s":
+
+// test_cause:
+// ["aa=/(?--:x)/", "lex_regexp_group", "unexpected_a_after_b", "(?-", 8]
+// ["aa=/(?ii:x)/", "lex_regexp_group", "unexpected_a_after_b", "(?i", 8]
+
+                                    if (modifier_seen.includes(char)) {
+                                        return stop_at(
+                                            "unexpected_a_after_b",
+                                            line,
+                                            column - 1,
+                                            snippet.slice(-1),
+                                            snippet.slice(0, -1)
+                                        );
+                                    }
+                                    modifier_seen += char;
                                     char_after();
                                     break;
                                 default:
 
+// End of line inside (?flags - report the missing ":" the way char_after does.
+
+                                    if (char === "") {
+                                        return char_after(":");
+                                    }
+
 // test_cause:
 // ["aa=/(?-.", "lex_regexp_group", "unexpected_a_after_b", "(?-", 8]
+// ["aa=/(?-.)/", "lex_regexp_group", "unexpected_a_after_b", "(?-", 8]
+// ["aa=/(?-:x)/", "lex_regexp_group", "unexpected_a_after_b", "(?-", 8]
 
                                     return stop_at(
                                         "unexpected_a_after_b",
                                         line,
-                                        column,
+                                        column - 1,
                                         snippet.slice(-1),
                                         snippet.slice(0, -1)
                                     );
@@ -3403,7 +3623,7 @@ function jslint_phase2_lex(state) {
                     }
 
 // RegExp
-// Recurse lex_regexp_group().
+// Recurse lex_regexp_group.
 
                     lex_regexp_group();
                     char_after(")");
@@ -3421,7 +3641,12 @@ function jslint_phase2_lex(state) {
 // ["aa=/{/", "lex_regexp_group", "expected_a_before_b", "{", 5]
 // ["aa=/}/", "lex_regexp_group", "expected_a_before_b", "}", 5]
 
-                    warn_at("expected_a_before_b", line, column, "\\", char);
+                    warn_at(
+                        "expected_a_before_b",
+                        line, column - 1,
+                        "\\",
+                        char
+                    );
                     char_after();
                     break;
                 case "[":
@@ -3450,7 +3675,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["`${/`/}`", "lex_regexp_group", "unexpected_a", "`", 5]
 
-                        warn_at("unexpected_a", line, column, "`");
+                        warn_at("unexpected_a", line, column - 1, "`");
                     }
                     char_after();
                     break;
@@ -3480,7 +3705,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["aa=/.??/", "lex_regexp_group", "unexpected_a", "?", 7]
 
-                        warn_at("unexpected_a", line, column, char);
+                        warn_at("unexpected_a", line, column - 1, char);
                         char_after("?");
                     }
                     break;
@@ -3490,7 +3715,13 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["aa=/aa{/", "lex_regexp_group", "expected_a_before_b", ",", 8]
 
-                        warn_at("expected_a_before_b", line, column, "0", ",");
+                        warn_at(
+                            "expected_a_before_b",
+                            line,
+                            column - 1,
+                            "0",
+                            ","
+                        );
                     }
                     if (char === ",") {
 
@@ -3505,7 +3736,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["aa=/.{0}?/", "lex_regexp_group", "unexpected_a", "?", 9]
 
-                        warn_at("unexpected_a", line, column, char);
+                        warn_at("unexpected_a", line, column - 1, char);
                         char_after("?");
                     }
                     break;
@@ -3524,7 +3755,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["aa=/=/", "lex_regexp", "expected_a_before_b", "=", 5]
 
-            warn_at("expected_a_before_b", line, column, "\\", "=");
+            warn_at("expected_a_before_b", line, column - 1, "\\", "=");
         }
         lex_regexp_group();
 
@@ -3573,11 +3804,32 @@ function jslint_phase2_lex(state) {
             case "s":
                 break;
             case "u":
+
+// test_cause:
+// ["aa=/./vu", "lex_regexp", "unexpected_a", "u", 8]
+// ["aa=/./vu;", "lex_regexp", "unexpected_a", "u", 8]
+
+                if (
+                    flag.v //jslint-ignore-line
+                ) {
+                    warn_at("unexpected_a", line, column - 1, char);
+                }
                 break;
 
 // PR-499 - Add ES2024-feature RegExp v flag with set-notation + str-properties.
 
             case "v":
+
+// "u" and "v" select different grammars, so v8 rejects the pair.
+
+// test_cause:
+// ["aa=/./uv", "lex_regexp", "unexpected_a", "v", 8]
+
+                if (
+                    flag.u //jslint-ignore-line
+                ) {
+                    warn_at("unexpected_a", line, column - 1, char);
+                }
                 break;
             case "y":
 
@@ -3592,7 +3844,7 @@ function jslint_phase2_lex(state) {
 // ["aa=/./gg", "lex_regexp", "unexpected_a", "g", 8]
 // ["aa=/./z", "lex_regexp", "unexpected_a", "z", 7]
 
-                warn_at("unexpected_a", line, column, char);
+                warn_at("unexpected_a", line, column - 1, char);
             }
             flag[char] = true;
             char_after();
@@ -3601,19 +3853,23 @@ function jslint_phase2_lex(state) {
         if (char === "/" || char === "*") {
 
 // test_cause:
-// ["aa=/.//", "lex_regexp", "unexpected_a", "/", 3]
+// ["aa=/.//", "lex_regexp", "unexpected_a", "/", 7]
 
-            return stop_at("unexpected_a", line, from, char);
+            return stop_at("unexpected_a", line, column - 0, char);
         }
         result = token_create("(regexp)", char);
         result.flag = flag;
         result.value = value;
-        if (mode_regexp_multiline && !flag.m) {
+        if (
+            mode_regexp_multiline &&
+            !flag.m //jslint-ignore-line
+        ) {
 
 // test_cause:
 // ["aa=/$^/", "lex_regexp", "missing_m", "", 7]
+// ["aa=/$^/;", "lex_regexp", "missing_m", "", 7]
 
-            warn_at("missing_m", line, column);
+            warn_at("missing_m", line, column - 1);
         }
         return result;
     }
@@ -3715,10 +3971,14 @@ function jslint_phase2_lex(state) {
             return lex_regexp();
         }
         if (line_source[0] === "=") {
+            snippet = "/=";
             column += 1;
             line_source = line_source.slice(1);
-            snippet = "/=";
-            warn_at("unexpected_a", line, column, "/=");
+
+// test_cause:
+// ["0/=0", "lex_slash_or_regexp", "unexpected_a", "/=", 2]
+
+            warn_at("unexpected_a", line, column - 2, "/=");
         }
         return token_create(snippet);
     }
@@ -3731,9 +3991,10 @@ function jslint_phase2_lex(state) {
         if (!option_dict.single && quote === "'") {
 
 // test_cause:
+// [" ''", "lex_string", "use_double", "", 2]
 // ["''", "lex_string", "use_double", "", 1]
 
-            warn_at("use_double", line, column);
+            warn_at("use_double", line, column - 1);
         }
         snippet = "";
         char_after();
@@ -3747,7 +4008,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["\"", "lex_string", "unclosed_string", "", 1]
 
-                return stop_at("unclosed_string", line, column);
+                return stop_at("unclosed_string", line, column - 0);
             case "\\":
                 char_after_escape(quote);
                 break;
@@ -3757,7 +4018,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["`${\"`\"}`", "lex_string", "unexpected_a", "`", 5]
 
-                    warn_at("unexpected_a", line, column, "`");
+                    warn_at("unexpected_a", line, column - 1, "`");
                 }
                 char_after("`");
                 break;
@@ -3792,6 +4053,7 @@ function jslint_phase2_lex(state) {
                         mode_mega
 
 // test_cause:
+// [" `${//}`", "lex_token", "unclosed_mega", "", 2]
 // ["`${//}`", "lex_token", "unclosed_mega", "", 1]
 
                         ? stop_at("unclosed_mega", line_mega, from_mega)
@@ -3800,7 +4062,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/*jslint-disable*/", "lex_token", "unclosed_disable", "", 1]
 
-                        ? stop_at("unclosed_disable", line_disable)
+                        ? stop_at("unclosed_disable", line_disable, column - 0)
                         : token_create("(end)")
                     );
                 }
@@ -3818,17 +4080,18 @@ function jslint_phase2_lex(state) {
 
 // test_cause:
 // ["#", "lex_token", "unexpected_char_a", "#", 1]
+// ["aa=#0", "lex_token", "unexpected_char_a", "#", 4]
 
                 return stop_at(
                     "unexpected_char_a",
                     line,
-                    column,
+                    column - 0,
                     line_source[0]
                 );
             }
             snippet = match[1];
             column += snippet.length;
-            line_source = match[5];
+            line_source = line_source.slice(snippet.length);
             if (!match[2]) {
                 break;
             }
@@ -3889,7 +4152,7 @@ function jslint_phase2_lex(state) {
         case "ecma":            // Assume ECMAScript environment.
         case "eval":            // Allow eval().
         case "fart":            // Allow complex fat-arrow.
-        case "for":             // Allow for-statement.
+        case "for":             // Allow for-statement (deprecated).
         case "getset":          // Allow get() and set().
         case "indent2":         // Use 2-space indent.
         case "long":            // Allow long lines.
@@ -3907,17 +4170,17 @@ function jslint_phase2_lex(state) {
         case "unordered":       // Allow unordered cases, params, properties,
                                 // ... variables, and exports.
         case "variable":        // Allow unordered const and let declarations
-                                // ... that are not at top of scope_function.
+                                // ... not at top of function-scope.
         case "white":           // Allow messy whitespace.
             option_dict[key] = value;
             break;
 
-// PR-404 - Alias "evil" to jslint-directive "eval" for backwards-compat.
+// PR-404 - Alias "evil" to sub-directive "eval" for backwards-compat.
 
         case "evil":
             return option_set_item("eval", value);
 
-// PR-404 - Alias "nomen" to jslint-directive "name" for backwards-compat.
+// PR-404 - Alias "nomen" to sub-directive "name" for backwards-compat.
 
         case "name":
             return option_set_item("nomen", value);
@@ -3996,7 +4259,7 @@ function jslint_phase2_lex(state) {
 // ["0x", "read_digits", "expected_digits_after_a", "0x", 2]
 // ["0x_", "read_digits", "expected_digits_after_a", "0x", 2]
 
-            warn_at("expected_digits_after_a", line, column, snippet);
+            warn_at("expected_digits_after_a", line, column - 1, snippet);
         }
 
 // PR-390 - Add numeric-separator check.
@@ -4011,12 +4274,12 @@ function jslint_phase2_lex(state) {
             warn_at(
                 "illegal_num_separator",
                 line,
-                column + digits.indexOf("_") + 1
+                column + digits.indexOf("_")
             );
         }
+        snippet += digits;
         column += digits.length;
         line_source = line_source.slice(digits.length);
-        snippet += digits;
         char_after();
         return digits.length;
     }
@@ -4039,7 +4302,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/////////////////////////////////////////////////////////////////////////////////", "read_line", "too_long", "", 1] //jslint-ignore-line
 
-            warn_at("too_long", line);
+            warn_at("too_long", line, 0);
         }
         column = 0;
         line += 1;
@@ -4070,7 +4333,7 @@ function jslint_phase2_lex(state) {
 // test_cause:
 // ["/*jslint-enable*/", "read_line", "unopened_enable", "", 1]
 
-                return stop_at("unopened_enable", line);
+                return stop_at("unopened_enable", line, column - 0);
             }
             line_disable = undefined;
         } else if (
@@ -4097,9 +4360,10 @@ function jslint_phase2_lex(state) {
             if (!option_dict.white) {
 
 // test_cause:
+// [" \t0", "read_line", "use_spaces", "", 2]
 // ["\t", "read_line", "use_spaces", "", 1]
 
-                warn_at("use_spaces", line, line_source.indexOf("\t") + 1);
+                warn_at("use_spaces", line, line_source.indexOf("\t"));
             }
             line_source = line_source.replace(jslint_rgx_tab, " ");
         }
@@ -4107,6 +4371,7 @@ function jslint_phase2_lex(state) {
 
 // test_cause:
 // [" ", "read_line", "unexpected_trailing_space", "", 1]
+// ["0 ", "read_line", "unexpected_trailing_space", "", 2]
 
             warn_at("unexpected_trailing_space", line, line_source.length - 1);
         }
@@ -4159,6 +4424,7 @@ function jslint_phase2_lex(state) {
         if (token_prv.id === "." && id === "(number)") {
 
 // test_cause:
+// [" .0", "token_create", "expected_a_before_b", ".", 2]
 // [".0", "token_create", "expected_a_before_b", ".", 1]
 
             warn("expected_a_before_b", token_prv, "0", ".");
@@ -4189,6 +4455,7 @@ function jslint_phase2_lex(state) {
             ) {
 
 // test_cause:
+// [" );", "token_create", "unexpected_a", ")", 2]
 // [")", "token_create", "unexpected_a", ")", 1]
 // [";(]", "token_create", "unexpected_a", "]", 3]
 // [";[)", "token_create", "unexpected_a", ")", 3]
@@ -4365,7 +4632,7 @@ function jslint_phase3_parse(state) {
                 ? stop("expected_a_b", token_nxt, id, artifact())
 
 // test_cause:
-// ["{\"aa\":0", "advance", "expected_a_b_from_c_d", "{", 1]
+// ["{\"aa\":0", "advance", "expected_a_b_from_c_d", "{", 7]
 
                 : stop(
                     "expected_a_b_from_c_d",
@@ -4565,6 +4832,7 @@ function jslint_phase3_parse(state) {
         ) {
 
 // test_cause:
+// [" 0=0", "check_mutation", "bad_assignment_a", "0", 2]
 // ["0=0", "check_mutation", "bad_assignment_a", "0", 1]
 
             warn("bad_assignment_a", the_thing);
@@ -4580,6 +4848,7 @@ function jslint_phase3_parse(state) {
         if (scope_function === token_global) {
 
 // test_cause:
+// [" for(;;){}", "check_not_top_level", "unexpected_at_top_level_a", "for", 2]
 // ["
 // while(0){}
 // ", "check_not_top_level", "unexpected_at_top_level_a", "while", 1]
@@ -4760,7 +5029,6 @@ function jslint_phase3_parse(state) {
 // ["while(){}", "condition", "", "", 0]
 
         test_cause("");
-        the_paren.free = true;
         advance("(");
         the_value = parse_expression(0);
         advance(")");
@@ -4872,6 +5140,7 @@ function jslint_phase3_parse(state) {
         if (!option_dict.eval) {
 
 // test_cause:
+// [" Function", "constant_Function", "unexpected_a", "Function", 2]
 // ["Function", "constant_Function", "unexpected_a", "Function", 1]
 
             warn("unexpected_a", token_now);
@@ -4881,7 +5150,7 @@ function jslint_phase3_parse(state) {
 // ["
 // /*jslint eval*/
 // Function
-// ", "constant_Function", "expected_a_before_b", "(end)", 1]
+// ", "constant_Function", "expected_a_before_b", "(end)", 8]
 
             warn("expected_a_before_b", token_nxt, "(", artifact());
         }
@@ -4891,6 +5160,7 @@ function jslint_phase3_parse(state) {
     function constant_arguments() {
 
 // test_cause:
+// [" arguments", "constant_arguments", "unexpected_a", "arguments", 2]
 // ["arguments", "constant_arguments", "unexpected_a", "arguments", 1]
 
         warn("unexpected_a", token_now);
@@ -4901,13 +5171,14 @@ function jslint_phase3_parse(state) {
         if (!option_dict.eval) {
 
 // test_cause:
+// [" eval", "constant_eval", "unexpected_a", "eval", 2]
 // ["eval", "constant_eval", "unexpected_a", "eval", 1]
 
             warn("unexpected_a", token_now);
         } else if (token_nxt.id !== "(") {
 
 // test_cause:
-// ["/*jslint eval*/\neval", "constant_eval", "expected_a_before_b", "(end)", 1]
+// ["/*jslint eval*/\neval", "constant_eval", "expected_a_before_b", "(end)", 4]
 
             warn("expected_a_before_b", token_nxt, "(", artifact());
         }
@@ -4917,6 +5188,7 @@ function jslint_phase3_parse(state) {
     function constant_ignore() {
 
 // test_cause:
+// [" ignore", "constant_ignore", "unexpected_a", "ignore", 2]
 // ["ignore", "constant_ignore", "unexpected_a", "ignore", 1]
 
         warn("unexpected_a", token_now);
@@ -4926,6 +5198,7 @@ function jslint_phase3_parse(state) {
     function constant_isInfinite() {
 
 // test_cause:
+// [" isFinite", "constant_isInfinite", "expected_a_b", "isFinite", 2]
 // ["isFinite", "constant_isInfinite", "expected_a_b", "isFinite", 1]
 
         warn("expected_a_b", token_now, "Number.isFinite", "isFinite");
@@ -4935,6 +5208,7 @@ function jslint_phase3_parse(state) {
     function constant_isNaN() {
 
 // test_cause:
+// [" isNaN(0)", "constant_isNaN", "number_isNaN", "isNaN", 2]
 // ["isNaN(0)", "constant_isNaN", "number_isNaN", "isNaN", 1]
 
         warn("number_isNaN", token_now);
@@ -4945,6 +5219,7 @@ function jslint_phase3_parse(state) {
         if (!option_dict.this) {
 
 // test_cause:
+// [" this", "constant_this", "unexpected_a", "this", 2]
 // ["this", "constant_this", "unexpected_a", "this", 1]
 
             warn("unexpected_a", token_now);
@@ -5044,6 +5319,7 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["(0+0)?.0", "infix_dot", "expected_identifier_a", "0", 8]
+// ["(0+0)?.0;", "infix_dot", "expected_identifier_a", "0", 8]
 // ["aa.0", "infix_dot", "expected_identifier_a", "0", 4]
 // ["aa?.0", "infix_dot", "expected_identifier_a", "0", 5]
 
@@ -5063,6 +5339,7 @@ function jslint_phase3_parse(state) {
         if (!token_prv.identifier) {
 
 // test_cause:
+// [" 0=>0", "infix_fart_unwrapped", "expected_identifier_a", "0", 2]
 // ["0=>0", "infix_fart_unwrapped", "expected_identifier_a", "0", 1]
 
             return stop("expected_identifier_a", token_prv);
@@ -5092,7 +5369,7 @@ function jslint_phase3_parse(state) {
         if (the_subscript.id === "(string)" || the_subscript.id === "`") {
             name = survey(the_subscript);
 
-// PR-404 - Add new directive "subscript" to play nice with Google Closure.
+// PR-404 - Add new sub-directive "subscript" to play nice with Google Closure.
 
             if (!option_dict.subscript && jslint_rgx_identifier.test(name)) {
 
@@ -5151,12 +5428,6 @@ function jslint_phase3_parse(state) {
         }
         advance(")", the_paren);
         if (the_paren.expression.length === 2) {
-
-// test_cause:
-// ["aa(0)", "infix_lparen", "free", "", 0]
-
-            test_cause("free");
-            the_paren.free = true;
             if (
                 the_argument.wrapped === true
 
@@ -5173,14 +5444,6 @@ function jslint_phase3_parse(state) {
             if (the_argument.id === "(") {
                 the_argument.wrapped = true;
             }
-        } else {
-
-// test_cause:
-// ["aa()", "infix_lparen", "not_free", "", 0]
-// ["aa(0,0)", "infix_lparen", "not_free", "", 0]
-
-            test_cause("not_free");
-            the_paren.free = false;
         }
         return the_paren;
     }
@@ -5291,6 +5554,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["let aa;(function aa(){})", "name_declare", "scope_current", "aa", 0]
 // ["let aa;function aa(){}", "name_declare", "scope_current", "aa", 0]
+// ["let aa;let aa", "name_declare", "redefinition_a_b", "1", 12]
 // ["let aa;let aa", "name_declare", "scope_current", "aa", 0]
 
             test_cause("scope_current", id);
@@ -5542,7 +5806,7 @@ function jslint_phase3_parse(state) {
             negative.arity = "unary";
             advance("-");
 
-// Recurse parse_json().
+// Recurse parse_json.
 
             negative.expression = parse_json();
             return negative;
@@ -5558,7 +5822,7 @@ function jslint_phase3_parse(state) {
             if (token_nxt.id !== "]") {
                 while (true) {
 
-// Recurse parse_json().
+// Recurse parse_json.
 
                     container.expression.push(parse_json());
                     if (token_nxt.id !== ",") {
@@ -5630,10 +5894,10 @@ function jslint_phase3_parse(state) {
                     }
                     advance(":");
                     container.expression.push(
-
-// Recurse parse_json().
-
                         Object.assign(
+
+// Recurse parse_json.
+
                             parse_json(),
                             {
                                 name_alias: name
@@ -5745,6 +6009,7 @@ function jslint_phase3_parse(state) {
             if (the_statement.wrapped && the_statement.id !== "(") {
 
 // test_cause:
+// [" (0)", "parse_statement_single", "unexpected_a", "(", 2]
 // ["(0)", "parse_statement_single", "unexpected_a", "(", 1]
 
                 warn("unexpected_a", first);
@@ -5804,6 +6069,7 @@ function jslint_phase3_parse(state) {
     function prefix_assign_divide() {
 
 // test_cause:
+// [" /=", "prefix_assign_divide", "expected_a_b", "/=", 2]
 // ["/=", "prefix_assign_divide", "expected_a_b", "/=", 1]
 
         return stop("expected_a_b", token_now, "/\\=", "/=");
@@ -6114,6 +6380,7 @@ function jslint_phase3_parse(state) {
     function prefix_fart() {
 
 // test_cause:
+// [" =>0", "prefix_fart", "expected_a_before_b", "=>", 2]
 // ["=>0", "prefix_fart", "expected_a_before_b", "=>", 1]
 
         return stop("expected_a_before_b", token_now, "()", "=>");
@@ -6228,6 +6495,7 @@ function jslint_phase3_parse(state) {
         if (mode_fart_unwrapped) {
 
 // test_cause:
+// [" aa=>0", "prefix_function", "wrap_fart_parameter", "aa", 2]
 // ["aa=>0", "prefix_function", "wrap_fart_parameter", "aa", 1]
 
             warn("wrap_fart_parameter", token_prv);
@@ -6246,7 +6514,6 @@ function jslint_phase3_parse(state) {
                 true                    // assigned
             );
         } else {
-            token_now.free = false;
             if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
 
 // PR-500 - Unify ES2015-destructure-logic. - function ([aa]) {...}
@@ -6315,6 +6582,7 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["function aa(){}0", "prefix_function", "expected_line_break_a_b", "0", 16]
+// ["function aa(){}0;", "prefix_function", "expected_line_break_a_b", "0", 16]
 
                 warn(
                     "expected_line_break_a_b",
@@ -6333,6 +6601,7 @@ function jslint_phase3_parse(state) {
             ) {
 
 // test_cause:
+// [" function aa(){}\n .aa", "prefix_function", "unexpected_a", ".", 2]
 // ["function aa(){}\n.aa", "prefix_function", "unexpected_a", ".", 1]
 // ["function aa(){}\n?.aa", "prefix_function", "unexpected_a", "?.", 1]
 
@@ -6611,11 +6880,11 @@ function jslint_phase3_parse(state) {
 // ["(0)", "prefix_lparen", "expr", "", 0]
 
         test_cause("expr");
-        the_paren.free = true;
         the_value = parse_expression(0);
         if (the_value.wrapped === true) {
 
 // test_cause:
+// [" ((0))", "prefix_lparen", "unexpected_a", "(", 2]
 // ["((0))", "prefix_lparen", "unexpected_a", "(", 1]
 
             warn("unexpected_a", the_paren);
@@ -6632,7 +6901,7 @@ function jslint_phase3_parse(state) {
         if (token_nxt.id !== "(") {
 
 // test_cause:
-// ["new aa", "prefix_new", "expected_a_before_b", "(end)", 1]
+// ["new aa", "prefix_new", "expected_a_before_b", "(end)", 6]
 
             warn("expected_a_before_b", token_nxt, "()", artifact());
         }
@@ -6672,6 +6941,7 @@ function jslint_phase3_parse(state) {
         const the_void = token_now;
 
 // test_cause:
+// [" void 0", "prefix_void", "unexpected_a", "void", 2]
 // ["void 0", "prefix_void", "unexpected_a", "void", 1]
 // ["void", "prefix_void", "unexpected_a", "void", 1]
 
@@ -6689,14 +6959,21 @@ function jslint_phase3_parse(state) {
         } else {
 
 // test_cause:
-// ["0", "semicolon", "expected_a_b", "(end)", 1]
+// [" 0//c", "semicolon", "expected_a_after_b", "0", 2]
+// ["0", "semicolon", "expected_a_after_b", "0", 1]
 
             warn_at(
-                "expected_a_b",
+                "expected_a_after_b",
                 token_now.line,
-                token_now.thru + 1,
+
+// <thru> is EXCLUSIVE - one past the token's last char - so it marked the
+// character AFTER <b>. At end of line the clamp pulled it back onto <b> and
+// hid that; off end of line it did not. <expected_a_after_b> exists so the
+// message names the character the marker covers, so mark <b> itself.
+
+                token_now.thru - 1,
                 ";",
-                artifact()
+                artifact(token_now)
             );
         }
         anon = "anonymous";
@@ -6720,6 +6997,7 @@ function jslint_phase3_parse(state) {
         ) {
 
 // test_cause:
+// [" break", "stmt_break", "unexpected_a", "break", 2]
 // ["break", "stmt_break", "unexpected_a", "break", 1]
 
             warn("unexpected_a", the_break);
@@ -6775,6 +7053,7 @@ function jslint_phase3_parse(state) {
         if (!option_dict.devel) {
 
 // test_cause:
+// [" debugger", "stmt_debugger", "unexpected_a", "debugger", 2]
 // ["debugger", "stmt_debugger", "unexpected_a", "debugger", 1]
 
             warn("unexpected_a", the_debug);
@@ -6793,6 +7072,7 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["delete 0", "stmt_delete", "expected_a_b", "0", 8]
+// ["delete 0;", "stmt_delete", "expected_a_b", "0", 8]
 
             return stop("expected_a_b", the_value, ".", artifact(the_value));
         }
@@ -6812,6 +7092,7 @@ function jslint_phase3_parse(state) {
         if (the_do.block.disrupt === true) {
 
 // test_cause:
+// [" do{break}while(0)", "stmt_do", "weird_loop", "do", 2]
 // ["do{break}while(0)", "stmt_do", "weird_loop", "do", 1]
 
             warn("weird_loop", the_do);
@@ -6859,7 +7140,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["
 // export default Object.freeze({})
-// ", "semicolon", "expected_a_b", "(end)", 32]
+// ", "semicolon", "expected_a_after_b", ")", 32]
 
                 semicolon();
             }
@@ -6918,6 +7199,7 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["export {}", "stmt_export", "expected_identifier_a", "}", 9]
+// ["export {};", "stmt_export", "expected_identifier_a", "}", 9]
 
                         return stop("expected_identifier_a", token_nxt);
                     }
@@ -6960,7 +7242,7 @@ function jslint_phase3_parse(state) {
             } else {
 
 // test_cause:
-// ["export", "stmt_export", "unexpected_a", "(end)", 1]
+// ["export", "stmt_export", "unexpected_a", "(end)", 6]
 
                 return stop("unexpected_a");
             }
@@ -7005,7 +7287,6 @@ function jslint_phase3_parse(state) {
             advance("await");
         }
         advance("(");
-        the_for.free = true;
         if (the_for.for_semicolon) {
             switch (token_nxt.id) {
             case ";":
@@ -7040,6 +7321,19 @@ function jslint_phase3_parse(state) {
             }
             token_nxt.for_init = true;
             the_for.for_semicolon[0] = parse_statement_single();
+
+// PR-409 - jquery - Tolerate comma-expression in for_init `for(ii=0,jj=0;;)`.
+
+            while (token_nxt.id === ",") {
+
+// test_cause:
+// ["for(aa=0,bb=0;;){}", "stmt_for", "for_init_comma", "", 0]
+
+                test_cause("for_init_comma");
+                advance(",");
+                parse_expression(0);
+                semicolon();
+            }
             token_nxt.for_init = true;
             if (token_nxt.id === ";") {
 
@@ -7235,7 +7529,7 @@ function jslint_phase3_parse(state) {
                 if (!token_nxt.identifier) {
 
 // test_cause:
-// ["import * as", "stmt_import", "expected_identifier_a", "(end)", 1]
+// ["import * as", "stmt_import", "expected_identifier_a", "(end)", 11]
 
                     return stop("expected_identifier_a", token_nxt);
                 }
@@ -7271,7 +7565,7 @@ function jslint_phase3_parse(state) {
                         if (!token_nxt.identifier) {
 
 // test_cause:
-// ["import {", "stmt_import", "expected_identifier_a", "(end)", 1]
+// ["import {", "stmt_import", "expected_identifier_a", "(end)", 8]
 
                             return stop("expected_identifier_a", token_nxt);
                         }
@@ -7363,6 +7657,7 @@ function jslint_phase3_parse(state) {
         if (the_label.id === "ignore") {
 
 // test_cause:
+// [" ignore:", "stmt_label", "unexpected_a", "ignore", 2]
 // ["ignore:", "stmt_label", "unexpected_a", "ignore", 1]
 
             warn("unexpected_a", the_label);
@@ -7459,6 +7754,7 @@ function jslint_phase3_parse(state) {
     function stmt_semicolon() {
 
 // test_cause:
+// [" ;0", "stmt_semicolon", "unexpected_a", ";", 2]
 // [";", "stmt_semicolon", "unexpected_a", ";", 1]
 
         warn("unexpected_a", token_now);
@@ -7491,7 +7787,6 @@ function jslint_phase3_parse(state) {
         }
         scope_function.switch += 1;
         advance("(");
-        token_now.free = true;
         the_switch.expression = parse_expression(0);
         the_switch.block = the_cases;
         advance(")");
@@ -7568,6 +7863,10 @@ function jslint_phase3_parse(state) {
                     the_disrupt = false;
                 }
             } else {
+
+// test_cause:
+// ["switch(0){case 0:;}", "stmt_switch", "expected_a_before_b", "}", 19]
+
                 warn("expected_a_before_b", token_nxt, "break;", artifact());
             }
             if (token_nxt.id !== "case") {
@@ -7669,6 +7968,13 @@ function jslint_phase3_parse(state) {
             warn("unexpected_a", the_try);
         }
         scope_function.try += 1;
+        if (token_nxt.id !== "{") {
+
+// test_cause:
+// ["try", "stmt_try", "expected_a_b", "(end)", 3]
+
+            return stop("expected_a_b", token_nxt, "{", artifact());
+        }
         the_try.block = block();
         the_disrupt = the_try.block.disrupt;
         if (token_nxt.id === "catch") {
@@ -7715,6 +8021,14 @@ function jslint_phase3_parse(state) {
                 advance();
                 advance(")");
             }
+
+// test_cause:
+// ["try{}catch(aa);", "stmt_try", "expected_a_b", ";", 15]
+// ["try{}catch(aa);;", "stmt_try", "expected_a_b", ";", 15]
+
+            if (token_nxt.id !== "{") {
+                return stop("expected_a_b", token_nxt, "{", artifact());
+            }
             the_catch.block = block(ignored);
             if (the_catch.block.disrupt !== true) {
                 the_disrupt = false;
@@ -7737,6 +8051,13 @@ function jslint_phase3_parse(state) {
         if (token_nxt.id === "finally") {
             scope_function.finally += 1;
             advance("finally");
+
+// test_cause:
+// ["try{}finally;", "stmt_try", "expected_a_b", ";", 13]
+
+            if (token_nxt.id !== "{") {
+                return stop("expected_a_b", token_nxt, "{", artifact());
+            }
             the_try.else = block();
             the_disrupt = the_try.else.disrupt;
             scope_function.finally -= 1;
@@ -7890,6 +8211,7 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["let 0", "stmt_var", "expected_identifier_a", "0", 5]
+// ["let 0;", "stmt_var", "expected_identifier_a", "0", 5]
 
                 return stop("expected_identifier_a", token_nxt);
             }
@@ -7918,6 +8240,7 @@ function jslint_phase3_parse(state) {
         if (the_while.block.disrupt === true) {
 
 // test_cause:
+// [" while(0){break}", "stmt_while", "weird_loop", "while", 2]
 // ["while(0){break}", "stmt_while", "weird_loop", "while", 1]
 
             warn("weird_loop", the_while);
@@ -7929,6 +8252,7 @@ function jslint_phase3_parse(state) {
     function stmt_with() {
 
 // test_cause:
+// [" with", "stmt_with", "unexpected_a", "with", 2]
 // ["with", "stmt_with", "unexpected_a", "with", 1]
 
         return stop("unexpected_a", token_now);
@@ -7941,6 +8265,16 @@ function jslint_phase3_parse(state) {
 // to the identifier rules.
 
         switch (id) {
+        case "(number)":
+
+// PR-409 - jquery - Tolerate numeric object-key `{0: 200}` - warn, do not stop.
+// Like a non-identifier string-key, it is not tallied for /*property*/.
+
+// test_cause:
+// ["String({0:0})", "survey", "unexpected_a", "0", 9]
+
+            warn("unexpected_a", name);
+            return name.value;
         case "(string)":
             id = name.value;
             if (!jslint_rgx_identifier.test(id)) {
@@ -7959,7 +8293,7 @@ function jslint_phase3_parse(state) {
             if (!name.identifier) {
 
 // test_cause:
-// ["let aa={0:0}", "survey", "expected_identifier_a", "0", 9]
+// ["String({+:0})", "survey", "expected_identifier_a", "+", 9]
 
                 return stop("expected_identifier_a", name);
             }
@@ -8525,6 +8859,7 @@ function jslint_phase4_walk(state) {
         if (lvalue.id === "." && thing.expression[1].id === "undefined") {
 
 // test_cause:
+// [" aa.aa=undefined", "post_a_assignment", "expected_a_b", "undefined", 2]
 // ["aa.aa=undefined", "post_a_assignment", "expected_a_b", "undefined", 1]
 
             warn("expected_a_b", lvalue.expression, "delete", "undefined");
@@ -8591,7 +8926,16 @@ function jslint_phase4_walk(state) {
                 warn("weird_relation_a", thing);
             }
         }
-        if (thing.id === "+") {
+        switch (thing.id) {
+        case "(":
+        case "=>":
+
+// Tagged-template is infix at same binding-power as "(" and is a call,
+// not binary-operator.
+
+        case "`":
+            break;
+        case "+":
             if (!option_dict.convert) {
                 if (thing.expression[0].value === "") {
 
@@ -8607,7 +8951,23 @@ function jslint_phase4_walk(state) {
                     warn("expected_a_b", thing, "String(...)", "+ \"\"");
                 }
             }
-        } else if (thing.id === "[") {
+            break;
+        case ".":
+        case "?.":
+            if (thing.expression.id === "RegExp") {
+
+// PR-499 - Relax warning for ES2025-feature RegExp.escape().
+
+                if (!thing.name || thing.name.id !== "escape") {
+
+// test_cause:
+// ["aa=RegExp.aa", "post_b_binary", "weird_expression_a", ".", 10]
+
+                    warn("weird_expression_a", thing);
+                }
+            }
+            break;
+        case "[":
             if (thing.expression[0].id === "window") {
 
 // test_cause:
@@ -8622,20 +8982,8 @@ function jslint_phase4_walk(state) {
 
                 warn("weird_expression_a", thing, "self[...]");
             }
-        } else if (thing.id === "." || thing.id === "?.") {
-            if (thing.expression.id === "RegExp") {
-
-// PR-499 - Relax warning for ES2025-feature RegExp.escape().
-
-                if (!thing.name || thing.name.id !== "escape") {
-
-// test_cause:
-// ["aa=RegExp.aa", "post_b_binary", "weird_expression_a", ".", 10]
-
-                    warn("weird_expression_a", thing);
-                }
-            }
-        } else if (thing.id !== "=>" && thing.id !== "(") {
+            break;
+        default:
             right = thing.expression[1];
             if (
                 (thing.id === "+" || thing.id === "-")
@@ -8850,10 +9198,10 @@ function jslint_phase4_walk(state) {
     }
 
     function post_s_for(thing) {
-
-// Recurse walk_statement().
-
         if (thing.for_semicolon) {
+
+// Recurse walk_statement.
+
             walk_statement(thing.for_semicolon[2]);
         }
         scope_block = scope_block_pop();
@@ -8892,7 +9240,7 @@ function jslint_phase4_walk(state) {
 
             scope_block = scope_block_push(thing.catch, false);
 
-// Recurse walk_statement().
+// Recurse walk_statement.
 
             walk_statement(thing.catch.block);
 
@@ -9020,6 +9368,7 @@ function jslint_phase4_walk(state) {
             if (!option_dict.convert) {
 
 // test_cause:
+// [" !!0", "post_u_unary", "expected_a_b", "!!", 2]
 // ["!!0", "post_u_unary", "expected_a_b", "!!", 1]
 
                 warn("expected_a_b", thing, "Boolean(...)", "!!");
@@ -9112,6 +9461,7 @@ function jslint_phase4_walk(state) {
 
 // test_cause:
 // ["typeof 0===0", "pre_b_binary", "expected_string_a", "0", 12]
+// ["typeof 0===0;", "pre_b_binary", "expected_string_a", "0", 12]
 
                         warn("expected_string_a", right);
                     }
@@ -9306,7 +9656,7 @@ function jslint_phase4_walk(state) {
 
                     test_cause("function", thing.id);
 
-// Recurse walk_statement().
+// Recurse walk_statement.
 
                     walk_statement(thing.block);
                 }
@@ -9352,7 +9702,7 @@ function jslint_phase4_walk(state) {
 
             test_cause("isArray");
 
-// Recurse walk_statement().
+// Recurse walk_statement.
 
             thing.forEach(walk_statement);
             return;
@@ -9393,7 +9743,7 @@ function jslint_phase4_walk(state) {
             warn("unexpected_expression_a", thing);
         }
 
-// Recurse walk_statement().
+// Recurse walk_statement.
 
         walk_statement(thing.block);
         walk_statement(thing.else);
@@ -9487,28 +9837,6 @@ function jslint_phase5_whitage(state) {
     const indent_stack = [];
     let closer = "(end)";
     let dot_depth = 0;
-
-// free = false
-
-// cause:
-// "()=>0"
-// "aa()"
-// "aa(0,0)"
-// "function(){}"
-
-// free = true
-
-// cause:
-// "(0)"
-// "(aa)"
-// "aa(0)"
-// "do{}while()"
-// "for(){}"
-// "if(){}"
-// "switch(){}"
-// "while(){}"
-
-    let free = false;
     let indentage;
     let left = token_global;
     let margin = 0;
@@ -9593,11 +9921,8 @@ function jslint_phase5_whitage(state) {
             "expected_a_at_b_c",
             right,
             artifact(right),
-
-// Fudge column numbers in warning message.
-
-            at + jslint_fudge,
-            right.from + jslint_fudge
+            at,
+            right.from
         );
     }
 
@@ -9669,7 +9994,6 @@ function jslint_phase5_whitage(state) {
 
         indentage = indent_stack.pop();
         closer = indentage.closer;
-        free = indentage.free;
         margin = indentage.margin;
         open = indentage.open;
         opening = indentage.opening;
@@ -9769,10 +10093,7 @@ function jslint_phase5_whitage(state) {
         if (left.id === ",") {
             if (
                 !open
-                || (
-                    (free || closer === "]")
-                    && left.line === right.line
-                )
+                || (closer === "]" && left.line === right.line)
             ) {
 
 // test_cause:
@@ -9808,29 +10129,6 @@ function jslint_phase5_whitage(state) {
 
             test_cause("(0?0:0", right.id);
             warn("use_open", right);
-            return;
-        }
-        if (
-            right.arity === "binary"
-            && right.id === "("
-            && free
-        ) {
-
-// test_cause:
-// ["String(\nString()\n);", "whitage_default", "aa(0", "(", 0]
-
-            test_cause("aa(0", right.id);
-
-// Commit 3903449a - Inline internal-function no_space() into whitage_default().
-
-            if (right.from < margin) {
-
-// test_cause:
-// ["String(\nString\n()\n);", "whitage_default", "expected_at(margin)", "(", 0]
-
-                test_cause("expected_at(margin)", right.id);
-                expected_at(margin);
-            }
             return;
         }
         if (
@@ -9974,7 +10272,6 @@ function jslint_phase5_whitage(state) {
         indentage = {
             closer,
             dot_depth,
-            free,
             margin,
             open,
             opening
@@ -10013,7 +10310,6 @@ function jslint_phase5_whitage(state) {
 // ["String(\n0);", "whitage_opener", "(\n0)", "0", 0]
 
             test_cause("(\n0)", right.value);
-            free = closer === ")" && left.free;
             open = true;
             margin += mode_indent;
             if (right.role === "label") {
@@ -10051,7 +10347,6 @@ function jslint_phase5_whitage(state) {
                 artifact(right)
             );
         }
-        free = false;
         open = false;
 
 // test_cause:
@@ -10106,7 +10401,6 @@ function jslint_phase5_whitage(state) {
         delete left.alive;
         delete left.assigned;
         delete left.calls;
-        delete left.free;
         delete left.open;
         delete left.used;
         left = right;
@@ -10117,7 +10411,120 @@ function jslint_phase5_whitage(state) {
     );
 }
 
+// PR-509 - Add function jslint_phase6_autofix.
+
+function jslint_phase6_autofix(state) {
+
+// PHASE 6. Autofix whitespace-warnings in <source>, and return the result.
+
+    const line_crlf = jslint_rgx_crlf.exec(state.source)?.[0] || "\n";
+    const line_list = state.line_list.map(function ({
+        line_source
+    }) {
+        return line_source;
+    });
+    const warning_list = state.warning_list;
+    if (warning_list.length === 0) {
+        return;
+    }
+    for (const {code} of warning_list) {
+        if (!jslint_autofix_warning_list.includes(code)) {
+            return;
+        }
+    }
+
+// Apply each fix RIGHT-TO-LEFT within a line, so an earlier fix cannot
+// invalidate a later fix's column, and BOTTOM-UP across lines, so every line
+// a splice shifts has already been visited.
+
+    warning_list.slice().sort(function (aa, bb) {
+        return bb.line - aa.line || bb.column - aa.column;
+    }).forEach(function ({
+        b,
+        code,
+        column,
+        line
+    }) {
+        const ii = column - 1;
+        const line_source = line_list[line];
+        let indentage_at;
+        let jj = ii;
+        switch (code) {
+        case "expected_a_at_b_c":
+
+// expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. expected_at has FIVE
+// callers, not one: at_margin and two expected_at(margin) warn a token that
+// already belongs at a margin, so the target column belongs to the warned
+// line itself. The two expected_at(0) are LABEL placement and DO warn a
+// mid-line token - unreachable here only because a label always co-raises
+// weird_loop or unused_a, which blocks the pass. So do NOT read "always at a
+// margin" as licence to drop the mid-line branch below.
+
+            indentage_at = line_source.length - line_source.trimStart().length;
+
+// A MID-LINE token cannot be re-indented, but it does not need to be skipped:
+// at_margin fires for tokens that belong AT a margin and therefore on their
+// OWN line. So split first and indent the remainder, which also lands a
+// trailing closer correctly, and is what line-breaks a single-line ternary.
+
+            if (ii !== indentage_at) {
+                line_list.splice(
+                    line,
+                    1,
+                    line_source.slice(0, ii).replace((/ +$/), ""),
+                    " ".repeat(b) + line_source.slice(ii)
+                );
+                return;
+            }
+            line_list[line] = " ".repeat(b) + line_source.trimStart();
+            return;
+        case "expected_line_break_a_b":
+
+// Split the line at the token. The new line lands unindented and the
+// expected_a_at_b_c pass re-indents it on the NEXT recursion - that division
+// of labour is why autofix iterates rather than trying to be complete in one
+// pass.
+
+            line_list.splice(
+                line,
+                1,
+                line_source.slice(0, ii).replace((/ +$/), ""),
+                line_source.slice(ii)
+            );
+            return;
+        }
+
+// Walk back over the whitespace-run immediately before the token.
+
+        while (
+            jj > 0 &&
+            (line_source[jj - 1] === " " || line_source[jj - 1] === "\t")
+        ) {
+            jj -= 1;
+        }
+
+// A run reaching column 0 is INDENTATION or a line-join, not a gap between
+// two tokens on one line. Leave it to a future jslint_autofix_warning_list
+// entry.
+
+        if (jj === 0) {
+            return;
+        }
+        line_list[line] = (
+            line_source.slice(0, jj) +
+            (
+                code === "expected_space_a_b"
+                ? " "
+                : ""
+            ) +
+            line_source.slice(ii)
+        );
+    });
+    return line_list.slice(jslint_fudge).join(line_crlf);
+}
+
 function jslint_report({
+    autofix,
     exports,
     froms,
     functions,
@@ -10136,6 +10543,11 @@ function jslint_report({
 //  let result = jslint("console.log('hello world')");
 //  let html = jslint_report(result);
 
+    const autofix_blocked = autofix && warnings.some(function ({
+        code
+    }) {
+        return !jslint_autofix_warning_list.includes(code);
+    });
     let html = "";
     let length_80 = 1111;
 
@@ -10413,6 +10825,15 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     width: 100%;
     word-wrap: break-word;
 }
+.JSLINT_ #JSLINT_REPORT_AUTOFIX > div {
+    background: honeydew;
+}
+.JSLINT_ #JSLINT_REPORT_AUTOFIX.blocked > div {
+    background: pink;
+}
+.JSLINT_ #JSLINT_REPORT_AUTOFIX.blocked > legend {
+    background: #b44;
+}
 .JSLINT_ #JSLINT_REPORT_FUNCTIONS .level {
     background: cornsilk;
     padding: 8px 16px;
@@ -10516,13 +10937,39 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
     background: #b44;
 }
 </style>
-            `).trim() + "\n";
+    `).trim() + "\n";
 
 // Produce the Title.
 
     html += "<div class=\"center\" id=\"JSLINT_REPORT_TITLE\">\n";
     html += "JSLint Report\n";
     html += "</div>\n";
+
+// PR-509 - Produce the Autofix Report.
+
+    html += String(`
+<fieldset
+    class="
+    ${(
+        autofix_blocked
+        ? "blocked"
+        : ""
+    )}
+    "
+    id="JSLINT_REPORT_AUTOFIX"
+>
+<legend>Report: Autofix</legend>
+<div class="center">
+    ${(
+        autofix_blocked
+        ? "Autofix blocked. Fix non-whitespace warnings below."
+        : autofix
+        ? "Autofix successful."
+        : ""
+    )}
+</div>
+</fieldset>
+    `).trim() + "\n";
 
 // Produce the HTML Error Report.
 // <cite>
@@ -11080,7 +11527,7 @@ function v8CoverageListMerge(processCovs) {
             });
             parentToChildDict.clear();
 
-// Recurse mergeTreeList().
+// Recurse mergeTreeList.
 
             resultChildren.push(mergeTreeList(treesMatching));
         }
@@ -11103,7 +11550,7 @@ function v8CoverageListMerge(processCovs) {
                 child = tree.children[ii];
                 if (child.start < offset && offset < child.end) {
 
-// Recurse treeSplit().
+// Recurse treeSplit.
 
                     mid = treeSplit(child, offset);
                     leftChildLen = ii + 1;
@@ -11283,7 +11730,7 @@ function v8CoverageListMerge(processCovs) {
                     tail.length = 0;
                 }
 
-// Recurse normalizeRange().
+// Recurse normalizeRange.
 
                 normalizeRange(head);
                 children.push(head);
@@ -12322,6 +12769,7 @@ jslint_export = Object.freeze(
             jslint,
             jslint_apidoc,
             jslint_assert,
+            jslint_autofix_warning_list,
             jslint_charset_ascii,
             jslint_cli,
             jslint_edition,
@@ -12330,6 +12778,7 @@ jslint_export = Object.freeze(
             jslint_phase3_parse,
             jslint_phase4_walk,
             jslint_phase5_whitage,
+            jslint_phase6_autofix,
             jslint_report,
             jstestDescribe,
             jstestIt,

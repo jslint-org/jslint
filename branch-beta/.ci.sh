@@ -86,7 +86,6 @@ echo "\
         ), (
             " 2>/dev/null || true\n"
             + "$&\n"
-            + "git checkout 61194ec2aee4b56e8e17f757021434122772f145\n"
         ));
         // printf script
         script = (
