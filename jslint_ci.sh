@@ -3324,15 +3324,13 @@ body {
      }) {
       if (inHole !== isHole) {
        lineHtml += htmlEscape(chunk);
-       lineHtml += "</span><span";
-       if (isHole) {
-        lineHtml += (
-         ignoreLine
-         ? " class=\"ignore\""
-         : " class=\"uncovered\""
-        );
-       }
-       lineHtml += ">";
+       lineHtml += (
+        (isHole && ignoreLine)
+        ? "</span><span class=\"ignore\">"
+        : isHole
+        ? "</span><span class=\"uncovered\">"
+        : "</span><span>"
+       );
        chunk = "";
        inHole = isHole;
       }
