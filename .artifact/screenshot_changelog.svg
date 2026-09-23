@@ -1,5 +1,5 @@
-<svg height="1240" width="800" xmlns="http://www.w3.org/2000/svg">
-<rect height="1240" fill="#222" width="800"></rect>
+<svg height="1262" width="800" xmlns="http://www.w3.org/2000/svg">
+<rect height="1262" fill="#222" width="800"></rect>
 <text
     fill="#7f7"
     font-family="consolas, menlo, monospace"
@@ -161,181 +161,187 @@
     textLength="768"
     x="10"
     y="582"
->                                                                                                 </tspan>
+>- jslint - Reviewed probable-deadcode-sections and confirmed 7 of 8 were real-deadcode.          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="604"
-># v2026.8.31                                                                                     </tspan>
+>- jslint - inline-document each deadcode-guard with its proof and revive-note.                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="626"
->- jslint-ci - Update ci-shell-function shGitLsTree() to include sha256 hash of files.            </tspan>
+>- jslint - bugfix - Fix jslint treating tagged templates as equal.                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="648"
->- jslint-editor - Update codemirror-editor to v5.65.21.                                          </tspan>
+>- coverage - Restore the span-class ternary in v8CoverageReportCreate(), removing an ugly-hack t\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="670"
->                                                                                                 </tspan>
+>  hat hid a live branch from line-coverage.                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="692"
-># v2026.7.30                                                                                     </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="714"
->- jslint-ecma - Add ES2015-feature for..of.                                                      </tspan>
+># v2026.8.31                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="736"
->- jslint - Disable directive-option /*jslint for*/, replacing it with for-loop specific warnings\</tspan>
+>- jslint-ci - Update ci-shell-function shGitLsTree() to include sha256 hash of files.            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="758"
->  .                                                                                              </tspan>
+>- jslint-editor - Update codemirror-editor to v5.65.21.                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="780"
->- jslint - Update scope-related warnings for variables, depending on whether they are let/const \</tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="802"
->  (scope_block) or var (scope_function).                                                         </tspan>
+># v2026.7.30                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="824"
->- jslint - Change warning 'out_of_scope_a' to 'temporal_dead_zone_a'.                            </tspan>
+>- jslint-ecma - Add ES2015-feature for..of.                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="846"
->- jslint - Change warning 'uninitialized_a' to 'unassigned_var_a'.                               </tspan>
+>- jslint - Disable directive-option /*jslint for*/, replacing it with for-loop specific warnings\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="868"
->- jslint - Change scope from scope_function to scope_block:                                      </tspan>
+>  .                                                                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="890"
->    - const-declaration                                                                          </tspan>
+>- jslint - Update scope-related warnings for variables, depending on whether they are let/const \</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="912"
->    - let-declaration                                                                            </tspan>
+>  (scope_block) or var (scope_function).                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="934"
->    - function-declaration                                                                       </tspan>
+>- jslint - Change warning 'out_of_scope_a' to 'temporal_dead_zone_a'.                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="956"
->- jslint - Add implicit scope_block for:                                                         </tspan>
+>- jslint - Change warning 'uninitialized_a' to 'unassigned_var_a'.                               </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="978"
->    - do-while                                                                                   </tspan>
+>- jslint - Change scope from scope_function to scope_block:                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1000"
->    - for-loop                                                                                   </tspan>
+>    - const-declaration                                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1022"
->    - if-else                                                                                    </tspan>
+>    - let-declaration                                                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1044"
->    - while-loop                                                                                 </tspan>
+>    - function-declaration                                                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1066"
->- jslint - Add hidden scope_block for:                                                           </tspan>
+>- jslint - Add implicit scope_block for:                                                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1088"
->    - catch-variable                                                                             </tspan>
+>    - do-while                                                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1110"
->    - for-variable                                                                               </tspan>
+>    - for-loop                                                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1132"
->    - function-parameter                                                                         </tspan>
+>    - if-else                                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1154"
->    - label-name                                                                                 </tspan>
+>    - while-loop                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1176"
->- jslint - Restrict scope from scope_function to its own function-body:                          </tspan>
+>- jslint - Add hidden scope_block for:                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1198"
->    - named-function-expression                                                                  </tspan>
+>    - catch-variable                                                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1220"
->- jslint - Rename internal scope-variables to imporove readability of scope-logic:               </tspan>
+>    - for-variable                                                                               </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1242"
+>    - function-parameter                                                                         </tspan>
 
 </text>
 </svg>

@@ -1661,6 +1661,14 @@ String(
     ? \`0\`
     : \`1\`
 );
+
+// PR-510 - Bugfix - Fix jslint treating tagged templates as equal.
+
+String(
+    String()
+    ? String\`$\{0}$\{0}\`
+    : String\`$\{0}$\{1}\`
+);
                 `)
             ],
             try_catch_finally: [
@@ -2267,6 +2275,48 @@ jstestDescribe((
                 ]
             });
         });
+    });
+    jstestIt((
+        "test coverage-hole-closing-midline handling-behavior"
+    ), async function () {
+
+// Pin two branches of <v8CoverageReportCreate> that line coverage cannot see.
+// A hole ending before end-of-line must close with a bare span, the
+// deadcode-dispelled case, and a hole on an ignored line must render "ignore".
+// Passing 0 makes each "&& ..." a hole, while the ";" after it is covered.
+
+        const dir = ".tmp/coverage_hole/";
+        const file = dir + "coverage_hole.js";
+        await fsWriteFileWithParents(file, (
+            "function aa(bb) {\n"
+            + "    return bb && bb.cc;\n"
+            + "}\n"
+            + "function dd(ee) {\n"
+            + "    return ee && ee.ff; //coverage-ignore-line\n"
+            + "}\n"
+            + "aa(0);\n"
+            + "dd(0);\n"
+        ));
+        await jslint.jslint_cli({
+            console_error: noop, // comment to debug
+            mode_cli: true,
+            process_argv: [
+                "node", "jslint.mjs",
+                "v8_coverage_report=" + dir,
+                "node",
+                file
+            ]
+        });
+        assertOrThrow((
+            await moduleFs.promises.readFile(dir + file + ".html", "utf8")
+        ).includes(
+            "<span class=\"uncovered\">&amp;&amp; bb.cc</span><span>;</span>"
+        ), "expected a hole closing mid-line in " + dir + file + ".html");
+        assertOrThrow((
+            await moduleFs.promises.readFile(dir + file + ".html", "utf8")
+        ).includes(
+            "<span class=\"ignore\">&amp;&amp; ee.ff</span><span>;"
+        ), "expected an ignored hole in " + dir + file + ".html");
     });
     jstestIt((
         "test coverage-ignore handling-behavior"

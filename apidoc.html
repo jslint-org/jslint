@@ -438,20 +438,21 @@ jstestIt((
     }
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-            assertJsonEqual(1, 2, "undefined");
-        });
-        await assertErrorThrownAsync(function () {
-            assertJsonEqual(1, 2, {});
-        });
-        // test assertOrThrow error handling-behavior
-        await assertErrorThrownAsync(function () {
-            <span class="apidocCodeKeywordSpan">assertOrThrow</span>(undefined, "undefined");
-        });
-        await assertErrorThrownAsync(function () {
-            assertOrThrow(undefined, new Error());
-        });
-    });
+    process_argv: [
+        "node", "jslint.mjs",
+        "v8_coverage_report=" + dir,
+        "node",
+        file
+    ]
 });
+<span class="apidocCodeKeywordSpan">assertOrThrow</span>((
+    await moduleFs.promises.readFile(dir + file + ".html", "utf8")
+).includes(
+    "&lt;span class=\"uncovered\"&gt;&amp;amp;&amp;amp; bb.cc&lt;/span&gt;&lt;span&gt;;&lt;/span&gt;"
+), "expected a hole closing mid-line in " + dir + file + ".html");
+assertOrThrow((
+    await moduleFs.promises.readFile(dir + file + ".html", "utf8")
+).includes(
 ...</pre></li>
 
 <li>
@@ -660,8 +661,8 @@ await jslint.jslint_cli({
         .replace((/&gt;/g), "&amp;gt;");
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-                            }
-                            lineHtml += "&gt;";
+                                : "&lt;/span&gt;&lt;span&gt;"
+                            );
                             chunk = "";
                             inHole = isHole;
                         }
@@ -1465,20 +1466,20 @@ if (mode_autofix) {
         switch (code) {
         case "expected_a_at_b_c":
 
-// expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. expected_at has FIVE
-// callers, not one: at_margin and two expected_at(margin) warn a token that
-// already belongs at a margin, so the target column belongs to the warned
-// line itself. The two expected_at(0) are LABEL placement and DO warn a
-// mid-line token - unreachable here only because a label always co-raises
-// weird_loop or unused_a, which blocks the pass. So do NOT read "always at a
-// margin" as licence to drop the mid-line branch below.
+// expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. expected_at has FOUR
+// callers, not one: at_margin and one_space warn a token that already belongs
+// at a margin, so the target column belongs to the warned line itself. The
+// other two pass 0, are LABEL placement, and DO warn a mid-line token -
+// unreachable here only because a label always co-raises weird_loop or
+// unused_a, which blocks the pass. So do NOT read "always at a margin" as
+// licence to drop the mid-line branch below.
 
             indentage_at = line_source.length - line_source.trimStart().length;
 
 // A MID-LINE token cannot be re-indented, but it does not need to be skipped:
 // at_margin fires for tokens that belong AT a margin and therefore on their
 // OWN line. So split first and indent the remainder, which also lands a
-// trailing closer correctly, and is what line-breaks a...
+// trailing closer correctly, and is what line-breaks a single-line t...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1857,9 +1858,9 @@ await moduleFs.promises.rm(".tmp", {
 </span>    return value;
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
-        ]
-    });
-});
+).includes(
+    "&lt;span class=\"ignore\"&gt;&amp;amp;&amp;amp; ee.ff&lt;/span&gt;&lt;span&gt;;"
+), "expected an ignored hole in " + dir + file + ".html");
     });
     jstestIt((
 "test coverage-ignore handling-behavior"
