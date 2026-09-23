@@ -84,23 +84,23 @@ echo "\
         script = script.replace((
             /\n\ncd node-sqlite3-\w*?\n/g
         ), (
-            " 2>/dev/null || true\n"
-            + "$&\n"
+            " 2>/dev/null || true\n" +
+            "$&\n"
         ));
         // printf script
         script = (
-            "(set -e\n"
-            + "printf \u0027"
-            + script0.trim().replace((
+            "(set -e\n" +
+            "printf \u0027" +
+            script0.trim().replace((
                 /[%\\]/gm
             ), "$&$&").replace((
                 /\u0027/g
             ), "\u0027\"\u0027\"\u0027").replace((
                 /^/gm
-            ), "> ")
-            + "\n\n\n\u0027\n"
-            + script
-            + ")\n"
+            ), "> ") +
+            "\n\n\n\u0027\n" +
+            script +
+            ")\n"
         );
         await moduleFs.promises.writeFile(file + ".sh", script);
         await new Promise(function (resolve) {
@@ -135,12 +135,12 @@ import moduleChildProcess from "child_process";
     } = process.env;
     await Promise.all([
         (
-            `https://${GITHUB_GITHUB_IO}/branch-${GITHUB_BRANCH0}`
-            + `/jslint_wrapper_codemirror.html`
+            `https://${GITHUB_GITHUB_IO}/branch-${GITHUB_BRANCH0}` +
+            `/jslint_wrapper_codemirror.html`
         ),
         (
-            `https://${GITHUB_GITHUB_IO}/branch-${GITHUB_BRANCH0}`
-            + `/index.html`
+            `https://${GITHUB_GITHUB_IO}/branch-${GITHUB_BRANCH0}` +
+            `/index.html`
         ),
         ".artifact/apidoc.html",
         ".artifact/coverage_sqlite3_js/index.html",
@@ -226,9 +226,9 @@ import moduleFs from "fs";
             src: fileDict["README.md"].replace((
                 /\n```html <!-- jslint_wrapper_codemirror.html -->\n[\S\s]*?\n```\n/
             ), (
-                "\n```html <!-- jslint_wrapper_codemirror.html -->\n"
-                + fileDict["jslint_wrapper_codemirror.html"]
-                + "```\n"
+                "\n```html <!-- jslint_wrapper_codemirror.html -->\n" +
+                fileDict["jslint_wrapper_codemirror.html"] +
+                "```\n"
             ))
         }, {
             file: "index.html",
@@ -252,8 +252,8 @@ import moduleFs from "fs";
                 /(\nshRunWithCoverage[\S\s]*?\nlet moduleUrl;\n)[\S\s]*?\nv8CoverageReportCreate\(/m
             ), function (ignore, match1) {
                 return (
-                    match1
-                    + (
+                    match1 +
+                    (
                         [
                             jslint.assertOrThrow,
                             jslint.fsWriteFileWithParents,
@@ -276,8 +276,8 @@ import moduleFs from "fs";
                     ).replace(
                         (/    /g),
                         " "
-                    )
-                    + "\nv8CoverageReportCreate("
+                    ) +
+                    "\nv8CoverageReportCreate("
                 );
             })
         }
@@ -313,11 +313,11 @@ function nameOk(name, deprecatedText, minLength) {
         "btoa"
     ];
     return (
-        !deprecatedList.includes(name)
-        && !(
+        !deprecatedList.includes(name) &&
+        !(
             /(?:deprecated|experimental|non-standard)_inline/i
-        ).test(deprecatedText)
-        && !new RegExp(`^[a-z].{0,${minLength - 1}}$`).test(name)
+        ).test(deprecatedText) &&
+        !new RegExp(`^[a-z].{0,${minLength - 1}}$`).test(name)
     );
 }
 function objectDeepCopyWithKeysSorted(obj) {
@@ -402,16 +402,16 @@ function objectDeepCopyWithKeysSorted(obj) {
                 return;
             }
             response2 = new RegExp(
-                `"files/en-us/web/api/(?:window/)?`
-                + name.toLowerCase()
-                + `/index.md"`
+                `"files/en-us/web/api/(?:window/)?` +
+                name.toLowerCase() +
+                `/index.md"`
             ).exec(response);
             if (!response2) {
                 return;
             }
             response2 = await fetch(
-                "https://raw.githubusercontent.com/mdn/content/main/"
-                + response2[0].slice(1, -1)
+                "https://raw.githubusercontent.com/mdn/content/main/" +
+                response2[0].slice(1, -1)
             );
             response2 = await response2.text();
             if (!(/\{\{deprecated_header\}\}/).test(response2)) {
@@ -448,8 +448,8 @@ function objectDeepCopyWithKeysSorted(obj) {
 // jslint_global_dict_all - auto-generated - end.)
         `).trim()),
         (
-            "$1    "
-            + JSON.stringify(
+            "$1    " +
+            JSON.stringify(
                 objectDeepCopyWithKeysSorted(dictAll),
                 undefined,
                 4
@@ -460,12 +460,12 @@ function objectDeepCopyWithKeysSorted(obj) {
                     /^( *?".*?": )(".*?")/gm
                 ), function (ignore, name, value) {
                     return (
-                        name
-                        + " ".repeat(Math.max(0, 40 - name.length))
-                        + value
+                        name +
+                        " ".repeat(Math.max(0, 40 - name.length)) +
+                        value
                     );
-                })
-            + "$2"
+                }) +
+            "$2"
         )
     );
     await moduleFs.promises.writeFile("jslint.mjs", result);
