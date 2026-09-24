@@ -1,7 +1,6 @@
 # Changelog
 
 # Todo
-- jslint - Warn on line break before arrow '=>', which is a SyntaxError that jslint currently accepts.
 - jslint - Add new warning requiring paren around plus-separated concatenations.
 - jslint - Revisit autofix of top-level whitespace, e.g. warning expected_space_a_b on line break inside closed-form expression.
 - jslint - Review binding-power of operators.

@@ -4531,6 +4531,18 @@ function jslint_phase2_lex(state) {
 // PR-503 - Fix jslint unable to continue parsing 'async aa => 0'.
 
         case "=>":
+
+// PR-511 - Stop on line-break before '=>', which is a SyntaxError.
+
+            if (token_prv_expr.line !== the_token.line) {
+
+// test_cause:
+// ["()//\n =>0", "token_create", "unexpected_a", "=>", 2]
+// ["()\n =>0", "token_create", "unexpected_a", "=>", 2]
+// ["aa\n =>0", "token_create", "unexpected_a", "=>", 2]
+
+                return stop("unexpected_a", the_token);
+            }
             if (token_prv_expr.identifier) {
                 token_prv_expr.fart = the_token;
             }
