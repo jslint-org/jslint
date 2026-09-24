@@ -457,6 +457,38 @@ jstestDescribe((
         ));
         assertOrThrow(!result.ok, "expected warnings");
 
+// Under beta, expected_a_at_end moves a line-leading operator to just after
+// its left operand - past a template's `// x` line, before a trailing
+// comment - and an operator alone on its line takes the line with it.
+
+        result = jslint.jslint((
+            "const aa = [\n    `\n// x`\n    + 1 // c\n    +\n    2\n];\n" +
+            "export default Object.freeze(aa);\n"
+        ), {
+            autofix: true,
+            beta: true
+        });
+        assertOrThrow(result.autofixed === (
+            "const aa = [\n    `\n// x` +\n    1 + // c\n    2\n];\n" +
+            "export default Object.freeze(aa);\n"
+        ), result.autofixed);
+
+// A tagged template's backtick is NOT an operator to move - moving it would
+// put the line break inside the template and change its value.
+
+        source = (
+            "function aa() {\n    return String.raw\n    `x${0}`;\n}\n" +
+            "export default Object.freeze(aa);\n"
+        );
+        result = jslint.jslint(source, {
+            autofix: true,
+            beta: true
+        });
+        assertOrThrow(
+            result.autofixed === undefined && result.ok,
+            JSON.stringify([result.autofixed, result.warnings])
+        );
+
 // THE FIXER'S LINE MODEL MUST BE THE LINTER'S (jslint_rgx_crlf). A CRLF file
 // must come back CRLF - line_list carries NO terminators and the rejoin uses
 // the file's OWN first one - and a lone \r, which the linter counts as a line
@@ -535,14 +567,19 @@ jstestDescribe((
         );
 
 // A ONE-LINE source carries NO terminator at all, so jslint_rgx_crlf.exec()
-// returns null and the rejoin falls back to "\n". The result has no trailing
-// newline either - the fixer adds terminators BETWEEN lines, never after the
-// last one.
+// returns null and the rejoin falls back to '\n' - which is also appended,
+// since the fixed code is missing a trailing one.
 
         result = assertAutofix((
-            "function aa(bb) {\n    return bb;\n}\naa();"
+            "function aa(bb) {\n    return bb;\n}\naa();\n"
         ), "function aa(bb) { return bb; } aa();");
         assertOrThrow(result.ok, JSON.stringify(result.warnings));
+
+// The appended terminator is the file's own, here '\r\n'.
+
+        assertAutofix((
+            "function aa(bb) {\r\n    return bb;\r\n}\r\naa();\r\n"
+        ), "function aa(bb) { return bb; }\r\naa();");
 
 // A whitespace-run reaching column 0 is INDENTATION or a line-join, not a gap
 // between two tokens on one line, so the fix is DECLINED and the warning is
@@ -557,6 +594,27 @@ jstestDescribe((
             result.warnings[0].code === "unexpected_space_a_b" &&
             result.warnings[0].line === 3 &&
             result.warnings[0].column === 9,
+            JSON.stringify(result.warnings)
+        );
+
+// A too_long ALREADY in the source does not block autofix - the fix is made,
+// and too_long is still reported.
+
+        result = assertAutofix(
+            String(`
+function aa(bb) {
+    return bb;
+}
+aa("${"a".repeat(80)}");
+            `).trim() + "\n",
+            String(`
+function aa(bb) { return bb; }
+aa("${"a".repeat(80)}");
+            `).trim() + "\n"
+        );
+        assertOrThrow(
+            result.warnings.length === 1 &&
+            result.warnings[0].code === "too_long",
             JSON.stringify(result.warnings)
         );
     });
@@ -724,7 +782,7 @@ jstestDescribe((
 
         await autofixFile({
             expect: (
-                "shAa() {\n    node --eval '\nconsole.log(\n    0\n    + 0\n" +
+                "shAa() {\n    node --eval '\nconsole.log(\n    0 +\n    0\n" +
                 ");\n'\n}\n"
             ),
             name: "autofix_embedded.sh",
@@ -737,22 +795,47 @@ jstestDescribe((
             )
         });
 
-// A fix that SURFACES a warning it cannot fix must KEEP its work, not throw
-// it away. Re-indenting this string to column 13 makes the line 82 columns,
-// so too_long blocks the next pass - and the indent must still be written.
+// An embedded block with a too_long ALREADY in it is still fixed, and the
+// residual too_long still exits nonzero.
 
-        source = (
-            "function aa(bb) {\n    if (bb) {\n        return (\n" +
-            JSON.stringify("a".repeat(68)) + "\n        );\n    }\n" +
-            "    return 0;\n}\nexport default Object.freeze(aa);\n"
-        );
+        source = String(`
+shAa() {
+    node --eval '
+console.log("${"a".repeat(80)}");
+console.log( 0);
+'
+}
+        `).trim() + "\n";
+        await autofixFile({
+            exit: processExit1,
+            expect: source.replace("( 0)", "(0)"),
+            name: "autofix_embedded_long.sh",
+            source
+        });
+
+// A too_long that a fix SURFACES keeps the fix and blocks none after it. The
+// join makes line 3 82 columns, and the closed-form block below still needs
+// two more passes - its split, then its re-indent.
+
+        source = String(`
+/*jslint beta*/
+function aa(bb, cc) {
+    return bb.${"a".repeat(66)}
+    + cc;
+}
+function dd(ee) { return ee; }
+aa(dd(0), 0);
+        `).trim() + "\n";
         await autofixFile({
             exit: processExit1,
             expect: source.replace(
-                "\n" + JSON.stringify("a".repeat(68)),
-                "\n            " + JSON.stringify("a".repeat(68))
+                "\n    + cc;",
+                " +\n    cc;"
+            ).replace(
+                "{ return ee; }",
+                "{\n    return ee;\n}"
             ),
-            name: "autofix_long.mjs",
+            name: "autofix_long_join.mjs",
             source
         });
 
@@ -778,7 +861,7 @@ jstestDescribe((
         await autofixFile({
             expect: (
                 "# aa\n\nnode --eval '\n/*jslint node*/\nconsole.log(\n" +
-                "    0\n    + 0\n);\n'\n\nnode --eval '\nconsole.log(\n" +
+                "    0 +\n    0\n);\n'\n\nnode --eval '\nconsole.log(\n" +
                 "    0\n  + 0\n);\n'\n"
             ),
             name: "autofix_embedded.md",
@@ -872,11 +955,11 @@ jstestDescribe((
 
         function reportAutofixExpect(klass, body) {
             return (
-                "<fieldset\n    class=\"\n    " + klass + "\n    \"\n"
-                + "    id=\"JSLINT_REPORT_AUTOFIX\"\n>\n"
-                + "<legend>Report: Autofix</legend>\n"
-                + "<div class=\"center\">\n    " + body + "\n</div>\n"
-                + "</fieldset>\n"
+                "<fieldset\n    class=\"\n    " + klass + "\n    \"\n" +
+                "    id=\"JSLINT_REPORT_AUTOFIX\"\n>\n" +
+                "<legend>Report: Autofix</legend>\n" +
+                "<div class=\"center\">\n    " + body + "\n</div>\n" +
+                "</fieldset>\n"
             );
         }
 
@@ -897,6 +980,19 @@ jstestDescribe((
         result = reportAutofix((
             "function aa(bb) {\n    return String( bb);\n}\naa();\n"
         ), true);
+        assertOrThrow(
+            result === reportAutofixExpect("", "Autofix successful."),
+            result
+        );
+
+// A residual too_long is not a blocker either - autofix fixes around it.
+
+        result = reportAutofix(String(`
+function aa(bb) {
+    return bb;
+}
+aa("${"a".repeat(80)}");
+        `).trim() + "\n", true);
         assertOrThrow(
             result === reportAutofixExpect("", "Autofix successful."),
             result
@@ -1798,8 +1894,8 @@ function aa() {
             const elemNow = JSON.stringify([option_dict, source]);
             const warningsLength = (
                 (
-                    option_dict.test_internal_error
-                    || option_dict.test_unknown_warning_code
+                    option_dict.test_internal_error ||
+                    option_dict.test_unknown_warning_code
                 )
                 ? 1
                 : 0
@@ -1831,13 +1927,13 @@ function aa() {
                 );
                 // test jslint's directive handling-behavior
                 source = (
-                    "/*jslint "
-                    + JSON
+                    "/*jslint " +
+                    JSON
                         .stringify(option_dict)
                         .slice(1, -1)
-                        .replace((/"/g), "")
-                    + "*/\n"
-                    + source.replace((/^#!/), "//")
+                        .replace((/"/g), "") +
+                    "*/\n" +
+                    source.replace((/^#!/), "//")
                 );
                 warnings = jslint(source).warnings;
                 assertOrThrow(
@@ -1881,11 +1977,11 @@ jstestDescribe((
             ), "");
             tmp = causeList.split("\n").map(function (cause) {
                 return (
-                    "["
-                    + JSON.parse(cause).map(function (elem) {
+                    "[" +
+                    JSON.parse(cause).map(function (elem) {
                         return JSON.stringify(elem);
-                    }).join(", ")
-                    + "]"
+                    }).join(", ") +
+                    "]"
                 );
             }).sort().join("\n");
             assertOrThrow(
@@ -1909,16 +2005,16 @@ jstestDescribe((
                     }) {
                         return code !== undefined;
                     }),
-                    "\n" + JSON.stringify(cause[0]) + "\n\n"
-                    + JSON.stringify(tmp.warnings, undefined, 4)
+                    "\n" + JSON.stringify(cause[0]) + "\n\n" +
+                    JSON.stringify(tmp.warnings, undefined, 4)
                 );
                 tmp = tmp.causes;
                 // Validate cause.
                 assertOrThrow(
                     tmp[JSON.stringify(cause.slice(1))],
                     (
-                        "\n" + JSON.stringify(cause) + "\n\n"
-                        + Object.keys(tmp).sort().join("\n")
+                        "\n" + JSON.stringify(cause) + "\n\n" +
+                        Object.keys(tmp).sort().join("\n")
                     )
                 );
             });
@@ -2103,8 +2199,8 @@ jstestDescribe((
         });
     });
     jstestIt((
-        "accepts arrays with two identical items for"
-        + " `v8CoverageListMerge`"
+        "accepts arrays with two identical items for" +
+        " `v8CoverageListMerge`"
     ), function () {
         assertJsonEqual(v8CoverageListMerge([
             {
@@ -2224,37 +2320,37 @@ jstestDescribe((
     [
         [
             "v8CoverageReportCreate_high.js", (
-                "switch(0){\n"
-                + "case 0:break;\n"
-                + "}\n"
+                "switch(0){\n" +
+                "case 0:break;\n" +
+                "}\n"
             )
         ], [
             "v8CoverageReportCreate_ignore.js", (
-                "/*coverage-ignore-file*/\n"
-                + "switch(0){\n"
-                + "case 0:break;\n"
-                + "case 1:break;//coverage-ignore-line\n"
-                + "/*coverage-disable*/\n"
-                + "case 2:break;\n"
-                + "/*coverage-enable*/\n"
-                + "}\n"
+                "/*coverage-ignore-file*/\n" +
+                "switch(0){\n" +
+                "case 0:break;\n" +
+                "case 1:break;//coverage-ignore-line\n" +
+                "/*coverage-disable*/\n" +
+                "case 2:break;\n" +
+                "/*coverage-enable*/\n" +
+                "}\n"
             )
         ], [
             "v8CoverageReportCreate_low.js", (
-                "switch(0){\n"
-                + "case 1:break;\n"
-                + "case 2:break;\n"
-                + "case 3:break;\n"
-                + "case 4:break;\n"
-                + "}\n"
+                "switch(0){\n" +
+                "case 1:break;\n" +
+                "case 2:break;\n" +
+                "case 3:break;\n" +
+                "case 4:break;\n" +
+                "}\n"
             )
         ], [
             "v8CoverageReportCreate_medium.js", (
-                "switch(0){\n"
-                + "case 0:break;\n"
-                + "case 1:break;\n"
-                + "case 2:break;\n"
-                + "}\n"
+                "switch(0){\n" +
+                "case 0:break;\n" +
+                "case 1:break;\n" +
+                "case 2:break;\n" +
+                "}\n"
             )
         ]
     ].forEach(function ([
@@ -2288,14 +2384,14 @@ jstestDescribe((
         const dir = ".tmp/coverage_hole/";
         const file = dir + "coverage_hole.js";
         await fsWriteFileWithParents(file, (
-            "function aa(bb) {\n"
-            + "    return bb && bb.cc;\n"
-            + "}\n"
-            + "function dd(ee) {\n"
-            + "    return ee && ee.ff; //coverage-ignore-line\n"
-            + "}\n"
-            + "aa(0);\n"
-            + "dd(0);\n"
+            "function aa(bb) {\n" +
+            "    return bb && bb.cc;\n" +
+            "}\n" +
+            "function dd(ee) {\n" +
+            "    return ee && ee.ff; //coverage-ignore-line\n" +
+            "}\n" +
+            "aa(0);\n" +
+            "dd(0);\n"
         ));
         await jslint.jslint_cli({
             console_error: noop, // comment to debug
