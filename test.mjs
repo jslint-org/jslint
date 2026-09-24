@@ -567,14 +567,19 @@ jstestDescribe((
         );
 
 // A ONE-LINE source carries NO terminator at all, so jslint_rgx_crlf.exec()
-// returns null and the rejoin falls back to "\n". The result has no trailing
-// newline either - the fixer adds terminators BETWEEN lines, never after the
-// last one.
+// returns null and the rejoin falls back to '\n' - which is also appended,
+// since the fixed code is missing a trailing one.
 
         result = assertAutofix((
-            "function aa(bb) {\n    return bb;\n}\naa();"
+            "function aa(bb) {\n    return bb;\n}\naa();\n"
         ), "function aa(bb) { return bb; } aa();");
         assertOrThrow(result.ok, JSON.stringify(result.warnings));
+
+// The appended terminator is the file's own, here '\r\n'.
+
+        assertAutofix((
+            "function aa(bb) {\r\n    return bb;\r\n}\r\naa();\r\n"
+        ), "function aa(bb) { return bb; }\r\naa();");
 
 // A whitespace-run reaching column 0 is INDENTATION or a line-join, not a gap
 // between two tokens on one line, so the fix is DECLINED and the warning is
@@ -589,6 +594,27 @@ jstestDescribe((
             result.warnings[0].code === "unexpected_space_a_b" &&
             result.warnings[0].line === 3 &&
             result.warnings[0].column === 9,
+            JSON.stringify(result.warnings)
+        );
+
+// A too_long ALREADY in the source does not block autofix - the fix is made,
+// and too_long is still reported.
+
+        result = assertAutofix(
+            String(`
+function aa(bb) {
+    return bb;
+}
+aa("${"a".repeat(80)}");
+            `).trim() + "\n",
+            String(`
+function aa(bb) { return bb; }
+aa("${"a".repeat(80)}");
+            `).trim() + "\n"
+        );
+        assertOrThrow(
+            result.warnings.length === 1 &&
+            result.warnings[0].code === "too_long",
             JSON.stringify(result.warnings)
         );
     });
@@ -769,22 +795,47 @@ jstestDescribe((
             )
         });
 
-// A fix that SURFACES a warning it cannot fix must KEEP its work, not throw
-// it away. Re-indenting this string to column 13 makes the line 82 columns,
-// so too_long blocks the next pass - and the indent must still be written.
+// An embedded block with a too_long ALREADY in it is still fixed, and the
+// residual too_long still exits nonzero.
 
-        source = (
-            "function aa(bb) {\n    if (bb) {\n        return (\n" +
-            JSON.stringify("a".repeat(68)) + "\n        );\n    }\n" +
-            "    return 0;\n}\nexport default Object.freeze(aa);\n"
-        );
+        source = String(`
+shAa() {
+    node --eval '
+console.log("${"a".repeat(80)}");
+console.log( 0);
+'
+}
+        `).trim() + "\n";
+        await autofixFile({
+            exit: processExit1,
+            expect: source.replace("( 0)", "(0)"),
+            name: "autofix_embedded_long.sh",
+            source
+        });
+
+// A too_long that a fix SURFACES keeps the fix and blocks none after it. The
+// join makes line 3 82 columns, and the closed-form block below still needs
+// two more passes - its split, then its re-indent.
+
+        source = String(`
+/*jslint beta*/
+function aa(bb, cc) {
+    return bb.${"a".repeat(66)}
+    + cc;
+}
+function dd(ee) { return ee; }
+aa(dd(0), 0);
+        `).trim() + "\n";
         await autofixFile({
             exit: processExit1,
             expect: source.replace(
-                "\n" + JSON.stringify("a".repeat(68)),
-                "\n            " + JSON.stringify("a".repeat(68))
+                "\n    + cc;",
+                " +\n    cc;"
+            ).replace(
+                "{ return ee; }",
+                "{\n    return ee;\n}"
             ),
-            name: "autofix_long.mjs",
+            name: "autofix_long_join.mjs",
             source
         });
 
@@ -929,6 +980,19 @@ jstestDescribe((
         result = reportAutofix((
             "function aa(bb) {\n    return String( bb);\n}\naa();\n"
         ), true);
+        assertOrThrow(
+            result === reportAutofixExpect("", "Autofix successful."),
+            result
+        );
+
+// A residual too_long is not a blocker either - autofix fixes around it.
+
+        result = reportAutofix(String(`
+function aa(bb) {
+    return bb;
+}
+aa("${"a".repeat(80)}");
+        `).trim() + "\n", true);
         assertOrThrow(
             result === reportAutofixExpect("", "Autofix successful."),
             result

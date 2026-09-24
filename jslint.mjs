@@ -427,12 +427,17 @@ const debugInline = (function () {
     return debug;
 }());
 debugInline(); // coverage-hack
+
 const jslint_autofix_warning_list = [ //jslint-ignore-line
     "expected_a_at_b_c",
     "expected_a_at_end",
     "expected_line_break_a_b",
     "expected_space_a_b",
-    "unexpected_space_a_b"
+    "unexpected_space_a_b",
+
+// PR-511 - jslint-autofix - Warning 'too_long' no longer blocks autofix.
+
+    "too_long"
 ];
 const jslint_charset_ascii = (
     "\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007" +
@@ -1177,7 +1182,7 @@ function jslint(
 // slot that can be undefined on both sides is <expression>[1] of a binary
 // token. Case "`" returns before that branch, and <aa>.id !== "(" skips it.
 //
-// deadcode-revive - delete case "`" below and a tagged template with no
+// deadcode-revive - Delete case '`' below and a tagged template with no
 // substitution falls through to the binary branch again. Its <expression>
 // holds one element, so both sides read <expression>[1] as undefined. Any
 // token with fewer slots than its <arity> implies does the same.
@@ -1207,7 +1212,7 @@ function jslint(
 // either. Arrays only reach <is_equal> from case "`" below, and only when
 // <aa>.id === <bb>.id, so they arrive in pairs and the branch above takes both.
 //
-// deadcode-revive - recurse on a slot that holds an array for some token ids
+// deadcode-revive - Recurse on a slot that holds an array for some token ids
 // and a single token for others, or let the backtick case run when only one
 // side is a backtick.
 //
@@ -1298,7 +1303,7 @@ function jslint(
 // parameter list in <prefix_function>. That token is never stored in an
 // <expression>, <name> or <value> slot, so <is_equal> never sees it.
 //
-// deadcode-revive - compare two function expressions by recursing into their
+// deadcode-revive - Compare two function expressions by recursing into their
 // parameter lists, which puts that "(" on both sides. Giving any token
 // <arity> "regexp" would also do it.
 //
@@ -1912,7 +1917,20 @@ function jslint(
 
 // PHASE 5. Check whitespace between tokens in <token_list>.
 
-        if (!state.mode_json && warning_list.length === 0) {
+        if (
+            !state.mode_json &&
+            !warning_list.some(function ({
+                code
+            }) {
+                if (mode_autofix) {
+
+// PR-511 - jslint-autofix - Warning 'too_long' no longer blocks autofix.
+
+                    return !jslint_autofix_warning_list.includes(code);
+                }
+                return true;
+            })
+        ) {
             jslint_phase5_whitage(state);
         }
 
@@ -9958,7 +9976,7 @@ function jslint_phase5_whitage(state) {
 // walk starts in one place, the <token_list>.forEach whose first statement is
 // <right> = <the_token>, and every route to <expected_at> runs inside it.
 //
-// deadcode-revive - call <expected_at>, or anything that reaches it, from
+// deadcode-revive - Call <expected_at>, or anything that reaches it, from
 // outside that forEach. A pre-pass or post-pass indent check would do it, and
 // <right> would hold whatever the last token left there, or undefined.
 //
@@ -10413,7 +10431,7 @@ function jslint_phase5_whitage(state) {
 // Delve into the functions looking for variables that were not assigned or
 // used. If the file imports or exports, then its global object is also delved.
 
-// PR-502 - tighten warning of unused variables to be always on.
+// PR-502 - Tighten warning of unused variables to be always on.
 
     block_list.forEach(delve);
     if (option_dict.white) {
@@ -10443,11 +10461,9 @@ function jslint_phase5_whitage(state) {
 
         if (left.line !== right.line) {
 
-// PR-xxx - Binary operators at end-of-line.
-
-// A tagged template is a binary "`" whose right side is the template itself.
-// Moving its backtick up would put the line break INSIDE the template and
-// change its value, so it is excluded.
+// PR-511 - Binary operators at end-of-line - A tagged template is a binary '`'
+// whose right side is the template. Moving its backtick up would put the line
+// break INSIDE the template and change its value, so it is excluded.
 
             if (
                 option_dict.beta &&
@@ -10568,9 +10584,8 @@ function jslint_phase6_autofix(state) {
             return;
         case "expected_a_at_end":
 
-// Move the line-leading operator to just after its left operand, which ends
-// at line <c>, column <d> - before any trailing comment there. A join past 80
-// columns is still made; its too_long is reported, not a reason to discard.
+// PR-511 - Move the line-leading operator to just after its left operand, which
+// ends at line <c>, column <d>, and before any trailing comment there.
 
             line_list[c] = (
                 line_list[c].slice(0, d) + " " + a +
@@ -10629,6 +10644,12 @@ function jslint_phase6_autofix(state) {
             line_source.slice(ii)
         );
     });
+
+// PR-511 - jslint-autofix - Append <line_crlf> to end of code, if missing.
+
+    if (line_list[line_list.length - 1] !== "") {
+        line_list.push("");
+    }
     return line_list.slice(jslint_fudge).join(line_crlf);
 }
 
@@ -11936,7 +11957,7 @@ function v8CoverageListMerge(processCovs) {
 // one element. <dictKeyValueAppend> is the only writer and pushes in the same
 // call that creates the list, and nothing pops, splices or filters it.
 //
-// deadcode-revive - restore <mergeScriptList>, whose signature is commented
+// deadcode-revive - Restore <mergeScriptList>, whose signature is commented
 // out above. It took its list from any caller, which is why it needed this
 // guard. Adding a second writer or a filter to the map would also do it.
 //
@@ -11996,7 +12017,7 @@ function v8CoverageListMerge(processCovs) {
 // <rangeToFuncDict>. <dictKeyValueAppend> is its only writer and pushes as it
 // creates each list.
 //
-// deadcode-revive - restore <mergeFuncList>, commented out above, or give the
+// deadcode-revive - Restore <mergeFuncList>, commented out above, or give the
 // map a second writer.
 //
 // if (funcCovs.length === 0) {
@@ -12485,7 +12506,7 @@ body {
                                 : isHole
                                 ? "</span><span class=\"uncovered\">"
 
-// PR-510 - deadcode-dispelled - the branch below is live: a hole ending before
+// PR-510 - deadcode-dispelled - The branch below is live: a hole ending before
 // end-of-line re-enters with <isHole> undefined, and that bare span closes it.
 // Line coverage hides this, the condition above running either way:
 //

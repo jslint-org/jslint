@@ -1,7 +1,6 @@
 # Changelog
 
 # Todo
-- jslint - Fix autofix leaving later fixes undone when a join passes 80 columns - either do over-80 joins last, or ignore too_long during autofix and re-lint after.
 - jslint - Warn on line break before arrow '=>', which is a SyntaxError that jslint currently accepts.
 - jslint - Add new warning requiring paren around plus-separated concatenations.
 - jslint - Revisit autofix of top-level whitespace, e.g. warning expected_space_a_b on line break inside closed-form expression.
@@ -17,6 +16,7 @@
 - jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-line, except dot-operators '.', '?.' and tagged-template backtick, and update function jslint_phase6_autofix() to autofix it.
 - jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add function jslint_phase6_autofix().
 - jslint-website - Add button 'Autofix Whitespace' and section 'Report: Autofix'.
+- jslint-autofix - Warning 'too_long' no longer blocks autofix.
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
 - jslint - Move column-fudging into warn_at(); callers pass 0-based column.
 - jslint - Remove dead token-property 'free' from parser and whitage.
@@ -121,7 +121,7 @@
 - ci - Upgrade nodejs used in ci to v22.
 - ubuntu-ci - bugfix - Fix out-of-date apt-list when installing graphicsmagick.
 - jslint - Cleanup ci-shell-function shRollupFetch().
-- jslint - Update ci-shell-function shDirHttplinkValidate() with pragma <\!!--novalidate--\>.
+- jslint - Update ci-shell-function shDirHttplinkValidate() with pragma \<\!!--novalidate--\>.
 - ci - Upgrade python used in ci to v3.12.
 - ci - Auto-create asset_image_logo_256.png from asset_image_logo_256.html.
 - ci - Fix shell-function shRollupFetch() from making excessive github-api-request.
