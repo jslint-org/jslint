@@ -30,8 +30,8 @@
 */
 require("vm").runInNewContext(
     (
-        "\"use strict\";"
-        + require("fs").readFileSync(
+        "\"use strict\";" +
+        require("fs").readFileSync(
             __dirname + "/jslint.mjs",
             "utf8"
         ).replace(
