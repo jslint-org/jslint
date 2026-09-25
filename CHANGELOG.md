@@ -1,19 +1,21 @@
 # Changelog
 
 # Todo
+- jslint - Add new warning requiring paren around plus-separated concatenations.
+- jslint - Revisit autofix of top-level whitespace, e.g. warning expected_space_a_b on line break inside closed-form expression.
 - jslint - Review binding-power of operators.
-- jslint-vscode - Add extra contextmenu command "JSLint - Autofix Whitespace".
+- jslint-vscode - Add extra contextmenu command "JSLint - Autofix Whitespace", with keybinding ctrl+shift+j a if no collision.
 - jslint-directive - Add new directive 'tab' to support tab-indent.
-- jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-line, except dot-operators '.', '?.'.
 - jslint-ecma - Add ES2015-feature iterators.
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Relax warning expected_line_break_a_b for ternary-operator inside template-literal.
 - jslint - Add html and css linting back into jslint.
-- jslint - Add new warning requiring paren around plus-separated concatenations.
 
 # v2026.9.29
+- jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-line, except dot-operators '.', '?.' and tagged-template backtick, and update function jslint_phase6_autofix() to autofix it.
 - jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add function jslint_phase6_autofix().
 - jslint-website - Add button 'Autofix Whitespace' and section 'Report: Autofix'.
+- jslint-autofix - Warning 'too_long' no longer blocks autofix.
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
 - jslint - Move column-fudging into warn_at(); callers pass 0-based column.
 - jslint - Remove dead token-property 'free' from parser and whitage.
@@ -23,7 +25,6 @@
 - jslint - Reviewed probable-deadcode-sections and confirmed 7 of 8 were real-deadcode.
 - jslint - inline-document each deadcode-guard with its proof and revive-note.
 - jslint - bugfix - Fix jslint treating tagged templates as equal.
-- coverage - Restore the span-class ternary in v8CoverageReportCreate(), removing an ugly-hack that hid a live branch from line-coverage.
 
 # v2026.8.31
 - jslint-ci - Update ci-shell-function shGitLsTree() to include sha256 hash of files.
@@ -119,7 +120,7 @@
 - ci - Upgrade nodejs used in ci to v22.
 - ubuntu-ci - bugfix - Fix out-of-date apt-list when installing graphicsmagick.
 - jslint - Cleanup ci-shell-function shRollupFetch().
-- jslint - Update ci-shell-function shDirHttplinkValidate() with pragma <\!!--novalidate--\>.
+- jslint - Update ci-shell-function shDirHttplinkValidate() with pragma \<\!!--novalidate--\>.
 - ci - Upgrade python used in ci to v3.12.
 - ci - Auto-create asset_image_logo_256.png from asset_image_logo_256.html.
 - ci - Fix shell-function shRollupFetch() from making excessive github-api-request.

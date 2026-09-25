@@ -251,11 +251,11 @@ import modulePath from "path";
     });
     await moduleFs.promises.rm(tmpdir, {recursive: true});
     console.error(
-        "shBrowserScreenshot"
-        + "\n  - url - " + url
-        + "\n  - wrote - " + file
-        + "\n  - timeElapsed - " + (Date.now() - timeStart) + " ms"
-        + "\n  - EXIT_CODE=" + exitCode
+        "shBrowserScreenshot" +
+        "\n  - url - " + url +
+        "\n  - wrote - " + file +
+        "\n  - timeElapsed - " + (Date.now() - timeStart) + " ms" +
+        "\n  - EXIT_CODE=" + exitCode
     );
 }());
 ' "$@" # '
@@ -732,8 +732,8 @@ import moduleHttps from "https";
                 }
             }, function (res) {
                 console.error(
-                    `shDirHttplinkValidate - ${res.statusCode}`
-                    + ` - ${file} - ${url} - ${Date.now() - timeStart}ms`
+                    `shDirHttplinkValidate - ${res.statusCode}` +
+                    ` - ${file} - ${url} - ${Date.now() - timeStart}ms`
                 );
                 moduleAssert.ok(res.statusCode < 400);
                 req.destroy();
@@ -741,8 +741,8 @@ import moduleHttps from "https";
             });
             req.on("error", function (err) {
                 console.error(
-                    `shDirHttplinkValidate - error`
-                    + ` - ${file} - ${url} - ${Date.now() - timeStart}ms`
+                    `shDirHttplinkValidate - error` +
+                    ` - ${file} - ${url} - ${Date.now() - timeStart}ms`
                 );
                 throw err;
             });
@@ -771,8 +771,8 @@ import moduleHttps from "https";
             ).test(url)) {
                 moduleFs.stat(url.split("?")[0], function (ignore, exists) {
                     console.error(
-                        `shDirHttplinkValidate - ${Boolean(exists)}`
-                        + ` - ${file} - ${url}`
+                        `shDirHttplinkValidate - ${Boolean(exists)}` +
+                        ` - ${file} - ${url}`
                     );
                     moduleAssert.ok(exists);
                 });
@@ -984,15 +984,15 @@ import moduleFs from "fs";
         sizePad = String(Math.ceil(result[0].size / 1024)).length;
         process.stdout.write(result.map(function (elem, ii) {
             return (
-                String(ii + ".").padStart(iiPad, " ")
-                + "  " + elem.mode
-                + "  " + elem.date
-                + "  " + String(
+                String(ii + ".").padStart(iiPad, " ") +
+                "  " + elem.mode +
+                "  " + elem.date +
+                "  " + String(
                     Math.ceil(elem.size / 1024)
-                ).padStart(sizePad, " ") + " KB"
-                + "  " + elem.hash
-                + "  " + elem.file
-                + "\n"
+                ).padStart(sizePad, " ") + " KB" +
+                "  " + elem.hash +
+                "  " + elem.file +
+                "\n"
             );
         }).join(""));
     });
@@ -1108,13 +1108,13 @@ import modulePath from "path";
                     responseBuf = Buffer.concat(responseBuf);
                     moduleAssert.ok(
                         (
-                            res.statusCode < 400
-                            || (res.statusCode === 404 && mode === "upload")
+                            res.statusCode < 400 ||
+                            (res.statusCode === 404 && mode === "upload")
                         ),
                         (
-                            `shGithubFileUpload - ${res.statusCode}`
-                            + ` - failed to download/upload file ${url} - `
-                            + responseBuf.slice(0, 1024).toString()
+                            `shGithubFileUpload - ${res.statusCode}` +
+                            ` - failed to download/upload file ${url} - ` +
+                            responseBuf.slice(0, 1024).toString()
                         )
                     );
                     resolve();
@@ -1488,10 +1488,10 @@ import moduleRepl from "repl";
                 return;
             }
             console.error(
-                "serverLog - "
-                + new Date(timeStart).toISOString() + " - "
-                + (Date.now() - timeStart) + "ms - "
-                + (res.statusCode || 0) + " " + req.method + " " + pathname
+                "serverLog - " +
+                new Date(timeStart).toISOString() + " - " +
+                (Date.now() - timeStart) + "ms - " +
+                (res.statusCode || 0) + " " + req.method + " " + pathname
             );
         });
         // debug - echo request
@@ -1601,8 +1601,8 @@ import moduleRepl from "repl";
                 console.error(
                     match2.split("").map(function (chr) {
                         return (
-                            "\\u"
-                            + chr.charCodeAt(0).toString(16).padStart(4, 0)
+                            "\\u" +
+                            chr.charCodeAt(0).toString(16).padStart(4, 0)
                         );
                     }).join("")
                 );
@@ -1617,15 +1617,15 @@ import moduleRepl from "repl";
             // console.error(Object.keys(global).map(function(key){return(typeof global[key]===\u0027object\u0027&&global[key]&&global[key]===global[key]?\u0027global\u0027:typeof global[key])+\u0027 \u0027+key;}).sort().join(\u0027\n\u0027)) //jslint-ignore-line
             case "keys":
                 script = (
-                    "console.error(Object.keys(" + match2
-                    + ").map(function(key){return("
-                    + "typeof " + match2 + "[key]===\u0027object\u0027&&"
-                    + match2 + "[key]&&"
-                    + match2 + "[key]===global[key]"
-                    + "?\u0027global\u0027"
-                    + ":typeof " + match2 + "[key]"
-                    + ")+\u0027 \u0027+key;"
-                    + "}).sort().join(\u0027\\n\u0027))\n"
+                    "console.error(Object.keys(" + match2 +
+                    ").map(function(key){return(" +
+                    "typeof " + match2 + "[key]===\u0027object\u0027&&" +
+                    match2 + "[key]&&" +
+                    match2 + "[key]===global[key]" +
+                    "?\u0027global\u0027" +
+                    ":typeof " + match2 + "[key]" +
+                    ")+\u0027 \u0027+key;" +
+                    "}).sort().join(\u0027\\n\u0027))\n"
                 );
                 break;
             // syntax-sugar - print String(value)
@@ -2016,8 +2016,8 @@ function replaceListReplace(replaceList, data) {
         });
         if (data0 === data) {
             throw new Error(
-                "shRollupFetch - cannot find-and-replace snippet "
-                + JSON.stringify(aa)
+                "shRollupFetch - cannot find-and-replace snippet " +
+                JSON.stringify(aa)
             );
         }
     });
@@ -2143,9 +2143,9 @@ function replaceListReplace(replaceList, data) {
                     ), "_").replace((
                         /(_)_+|_+$/g
                     ), "$1")
-                )
-                + "_"
-                + (
+                ) +
+                "_" +
+                (
                     modulePath.basename(
                         url
                     ).replace((
@@ -2161,15 +2161,15 @@ function replaceListReplace(replaceList, data) {
             }
             if (dateCommitted && dateCommitted.toString()) {
                 rollupBody += (
-                    "\n\n\n/*\n"
-                    + "repo " + prefix.replace("/blob/", "/tree/") + "\n"
-                    + "committed " + new Date(
+                    "\n\n\n/*\n" +
+                    "repo " + prefix.replace("/blob/", "/tree/") + "\n" +
+                    "committed " + new Date(
                         (
                             /"(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d[^"]*?)"/
-                        ).exec(dateCommitted.toString())?.[1]
-                        || "1970-01-01T00:00:00Z"
-                    ).toISOString().replace((/\.\d*?Z/), "Z") + "\n"
-                    + "*/"
+                        ).exec(dateCommitted.toString())?.[1] ||
+                        "1970-01-01T00:00:00Z"
+                    ).toISOString().replace((/\.\d*?Z/), "Z") + "\n" +
+                    "*/"
                 );
             }
             data = data.toString();
@@ -2184,15 +2184,15 @@ function replaceListReplace(replaceList, data) {
             data = replaceListReplace(replaceList, data);
             // init header and footer
             rollupBody += (
-                "\n\n\n/*\nfile " + url + "\n*/\n"
-                + header
-                + data.trim()
-                + footer
+                "\n\n\n/*\nfile " + url + "\n*/\n" +
+                header +
+                data.trim() +
+                footer
             );
         });
         rollupBody = (
-            "\n" + rollupBody.trim()
-            + "\n\n\n/*\nfile none\n*/\n/*jslint-enable*/\n"
+            "\n" + rollupBody.trim() +
+            "\n\n\n/*\nfile none\n*/\n/*jslint-enable*/\n"
         );
         // comment #!
         rollupBody = rollupBody.replace((
@@ -2219,14 +2219,14 @@ function replaceListReplace(replaceList, data) {
         rollupBody = replaceListReplace(matchObj[1].replaceList, rollupBody);
         // init rollupHeader
         rollupHeader = (
-            matchObj.input.slice(0, matchObj.index)
-            + "/*jslint-disable*/\n/*\nshRollupFetch\n"
-            + JSON.stringify(
+            matchObj.input.slice(0, matchObj.index) +
+            "/*jslint-disable*/\n/*\nshRollupFetch\n" +
+            JSON.stringify(
                 objectDeepCopyWithKeysSorted(matchObj[1]),
                 undefined,
                 4
-            ) + "\n"
-            + matchObj[2].split("\n\n").filter(function (elem) {
+            ) + "\n" +
+            matchObj[2].split("\n\n").filter(function (elem) {
                 return elem.trim();
             }).map(function (elem) {
                 return elem.trim().replace((
@@ -2261,8 +2261,8 @@ function replaceListReplace(replaceList, data) {
             });
             if (rollupBody0 === rollupBody) {
                 throw new Error(
-                    "shRollupFetch - cannot find-and-replace snippet "
-                    + JSON.stringify(aa)
+                    "shRollupFetch - cannot find-and-replace snippet " +
+                    JSON.stringify(aa)
                 );
             }
             return "";
@@ -2277,8 +2277,8 @@ function replaceListReplace(replaceList, data) {
                 return;
             }
             data = (
-                "data:" + dataUriType + ";base64,"
-                + data.toString("base64")
+                "data:" + dataUriType + ";base64," +
+                data.toString("base64")
             );
             rollupBody0 = rollupBody;
             rollupBody = rollupBody.replace(
@@ -2290,8 +2290,8 @@ function replaceListReplace(replaceList, data) {
             );
             if (rollupBody0 === rollupBody) {
                 throw new Error(
-                    "shRollupFetch - cannot find-and-replace snippet "
-                    + JSON.stringify(exports)
+                    "shRollupFetch - cannot find-and-replace snippet " +
+                    JSON.stringify(exports)
                 );
             }
         });
@@ -2366,10 +2366,10 @@ function globExclude({
   ]) {
    list.join(separator).replace(rgx, function (match0, char) {
     throw new Error(
-     "Weird character "
-     + JSON.stringify(char)
-     + " found in " + name + " "
-     + JSON.stringify(match0)
+     "Weird character " +
+     JSON.stringify(char) +
+     " found in " + name + " " +
+     JSON.stringify(match0)
     );
    });
   });
@@ -2632,9 +2632,9 @@ function v8CoverageListMerge(processCovs) {
    let treesMatching = [];
    parentToChildDict.forEach(function (nested) {
     if (
-     nested.length === 1
-     && nested[0].start === openRange.start
-     && nested[0].end === openRange.end
+     nested.length === 1 &&
+     nested[0].start === openRange.start &&
+     nested[0].end === openRange.end
     ) {
      treesMatching.push(nested[0]);
     } else {
@@ -2813,8 +2813,8 @@ function v8CoverageListMerge(processCovs) {
    }
    if (children.length === 1) {
     if (
-     children[0].start === tree.start
-     && children[0].end === tree.end
+     children[0].start === tree.start &&
+     children[0].end === tree.end
     ) {
      tree.delta += children[0].delta;
      tree.children = children[0].children;
@@ -2872,8 +2872,8 @@ function v8CoverageListMerge(processCovs) {
     dictKeyValueAppend(
      rangeToFuncDict,
      (
-      funcCov.ranges[0].startOffset
-      + ";" + funcCov.ranges[0].endOffset
+      funcCov.ranges[0].startOffset +
+      ";" + funcCov.ranges[0].endOffset
      ),
      funcCov
     );
@@ -3143,17 +3143,17 @@ body {
    });
   }
   txtBorder = (
-   "+" + "-".repeat(padPathname + 2) + "+"
-   + "-".repeat(padLines + 2) + "+"
-   + "-".repeat(padLines + 2) + "+\n"
+   "+" + "-".repeat(padPathname + 2) + "+" +
+   "-".repeat(padLines + 2) + "+" +
+   "-".repeat(padLines + 2) + "+\n"
   );
   txt = "";
   txt += "V8 Coverage Report\n";
   txt += txtBorder;
   txt += (
-   "| " + String("Files covered").padEnd(padPathname, " ") + " | "
-   + String("Lines").padStart(padLines, " ") + " | "
-   + String("Remaining").padStart(padLines, " ") + " |\n"
+   "| " + String("Files covered").padEnd(padPathname, " ") + " | " +
+   String("Lines").padStart(padLines, " ") + " | " +
+   String("Remaining").padStart(padLines, " ") + " |\n"
   );
   txt += txtBorder;
   fileList.forEach(function ({
@@ -3186,11 +3186,11 @@ body {
     fill = (
      "#" + Math.round(
       (100 - Number(coveragePct)) * 2.21
-     ).toString(16).padStart(2, "0")
-     + Math.round(
+     ).toString(16).padStart(2, "0") +
+     Math.round(
       Number(coveragePct) * 2.21
-     ).toString(16).padStart(2, "0")
-     + "00"
+     ).toString(16).padStart(2, "0") +
+     "00"
     );
     str1 = "coverage";
     str2 = coveragePct + " %";
@@ -3217,21 +3217,21 @@ body {
     pathname = "";
    }
    txt += (
-    "| "
-    + String("./" + pathname).padEnd(padPathname, " ") + " | "
-    + String(
+    "| " +
+    String("./" + pathname).padEnd(padPathname, " ") + " | " +
+    String(
      modeCoverageIgnoreFile + " " + coveragePct + " %"
-    ).padStart(padLines, " ") + " | "
-    + " ".repeat(padLines) + " |\n"
+    ).padStart(padLines, " ") + " | " +
+    " ".repeat(padLines) + " |\n"
    );
    txt += (
     "| " + "*".repeat(
      Math.round(0.01 * coveragePct * padPathname)
-    ).padEnd(padPathname, "_") + " | "
-    + String(
+    ).padEnd(padPathname, "_") + " | " +
+    String(
      linesCovered + " / " + linesTotal
-    ).padStart(padLines, " ") + " | "
-    + String(
+    ).padStart(padLines, " ") + " | " +
+    String(
      (linesTotal - linesCovered) + " / " + linesTotal
     ).padStart(padLines, " ") + " |\n"
    );
@@ -3243,14 +3243,14 @@ body {
    ${(
     modeIndex
     ? (
-     "<a href=\"" + (pathname || "index") + ".html\">. / "
-     + pathname + "</a><br>"
+     "<a href=\"" + (pathname || "index") + ".html\">. / " +
+     pathname + "</a><br>"
     )
     : (
-     "<a href=\""
-     + "../".repeat(pathname.split("/").length - 1)
-     + "index.html\">. / </a>"
-     + pathname + "<br>"
+     "<a href=\"" +
+     "../".repeat(pathname.split("/").length - 1) +
+     "index.html\">. / </a>" +
+     pathname + "<br>"
     )
    )}
   <div class="percentbar">
@@ -3448,8 +3448,8 @@ function sentinel() {}
       NODE_V8_COVERAGE: coverageDir
      },
      shell: (
-      processArgv0.endsWith(".bat")
-      || processArgv0.endsWith(".cmd")
+      processArgv0.endsWith(".bat") ||
+      processArgv0.endsWith(".cmd")
      ),
      stdio: ["ignore", 1, 2]
     }
@@ -3552,14 +3552,14 @@ function sentinel() {}
     lineList.forEach(function (elem) {
      if (!(
       (
-       elem.startOffset <= startOffset
-       && startOffset <= elem.endOffset
+       elem.startOffset <= startOffset &&
+       startOffset <= elem.endOffset
       ) || (
-       elem.startOffset <= endOffset
-       && endOffset <= elem.endOffset
+       elem.startOffset <= endOffset &&
+       endOffset <= elem.endOffset
       ) || (
-       startOffset <= elem.startOffset
-       && elem.endOffset <= endOffset
+       startOffset <= elem.startOffset &&
+       elem.endOffset <= endOffset
       )
      )) {
       return;
