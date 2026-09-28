@@ -3,6 +3,7 @@ import jslint from "./jslint.mjs";
 import jslintCjs from "./jslint_wrapper_cjs.cjs";
 import moduleFs from "fs";
 import modulePath from "path";
+import moduleVm from "vm";
 
 let {
     assertErrorThrownAsync,
@@ -875,6 +876,35 @@ aa(dd(0), 0);
             )
         });
 
+// A CRLF or CR container is fixed the same way, and its line terminators
+// survive, inside the embedded block too.
+
+        await autofixFile({
+            expect: String(
+                "shAa() {\n    node --eval '\nconsole.log(\n    0 +\n    0\n" +
+                ");\n'\n}\n"
+            ).replace((/\n/g), "\r\n"),
+            name: "autofix_embedded_crlf.sh",
+            process_env: {
+                JSLINT_BETA: "1"
+            },
+            source: String(
+                "shAa() {\n    node --eval '\nconsole.log(\n    0\n  + 0\n" +
+                ");\n'\n}\n"
+            ).replace((/\n/g), "\r\n")
+        });
+        await autofixFile({
+            expect: String(
+                "<body>\n<script>\n/*jslint browser*/\nwindow.console.log(\n" +
+                "    0\n    + 0\n);\n</script>\n</body>\n"
+            ).replace((/\n/g), "\r"),
+            name: "autofix_embedded_cr.html",
+            source: String(
+                "<body>\n<script>\n/*jslint browser*/\nwindow.console.log(\n" +
+                "    0\n  + 0\n);\n</script>\n</body>\n"
+            ).replace((/\n/g), "\r")
+        });
+
 // A missing file exits 1 with the error printed, like a plain lint - not an
 // unhandled rejection that never reaches process_exit.
 
@@ -1084,6 +1114,31 @@ jstestDescribe((
                 process_exit: processExit0
             });
         });
+    });
+    jstestIt((
+        "test cli-cjs-lint-file handling-behavior"
+    ), async function () {
+
+// Through the cjs wrapper, <jslint_cli> must lint, not resolve 0 unseen: in
+// its old new-context sandbox there was no process, so the cli returned early.
+
+        await fsWriteFileWithParents(
+            ".tmp/cli_cjs_lint_file/aa.js",
+            "let aa = 1;\n"
+        );
+        assertJsonEqual(
+            await jslintCjs.jslint_cli({
+                console_error: noop,
+                mode_cli: true,
+                process_argv: [
+                    "node",
+                    "jslint.mjs",
+                    ".tmp/cli_cjs_lint_file/aa.js"
+                ],
+                process_exit: processExit1
+            }),
+            1
+        );
     });
     jstestIt((
         "test cli-apidoc handling-behavior"
@@ -1630,7 +1685,12 @@ aa();
             ],
             literal: [
                 "String(\"\".at());",
-                "String([].at());"
+                "String(\"\\u{000041}\");",
+                "String(\"\\u{10FFFF}\");",
+                "String(String.raw`\\u{110000}${0}\\u0`);",
+                "String([].at());",
+                "String(`\\u{000041}`);",
+                "String(`\\u{10FFFF}`);"
             ],
             logical_assignment: [
                 "let aa = 0;\naa &&= 0;",
@@ -2020,6 +2080,331 @@ jstestDescribe((
             });
             return "";
         });
+    });
+});
+
+jstestDescribe((
+    "test jslint_wrapper_vscode handling-behavior"
+), function testBehaviorJslintWrapperVscode() {
+    jstestIt((
+        "test jslint_wrapper_vscode commands handling-behavior"
+    ), async function () {
+
+// Load the extension against a stub vscode api, then drive every command.
+// Like vscode, the stub's <registerTextEditorCommand> runs its callback inside
+// <edit>, and <edit> applies the builder's edits once the callback returns.
+
+        const commandDict = {};
+        const moduleStub = {
+            exports: {}
+        };
+        const sourceWrapper = await moduleFs.promises.readFile(
+            "jslint_wrapper_vscode.js",
+            "utf8"
+        );
+        const state = {};
+        const subscriptions = [];
+        const vscode = {
+            Diagnostic: function (ignore, message) {
+                return {
+                    message
+                };
+            },
+            DiagnosticSeverity: {},
+            ProgressLocation: {},
+            Range: noop,
+            commands: {
+                registerCommand: function (id, callback) {
+                    commandDict[id] = callback;
+                    return [id, "registerCommand"];
+                },
+                registerTextEditorCommand: function (id, callback) {
+                    commandDict[id] = function () {
+                        return state.editor.edit(function (edit) {
+                            callback(state.editor, edit);
+                        });
+                    };
+                    return [id, "registerTextEditorCommand"];
+                }
+            },
+            languages: {
+                createDiagnosticCollection: function () {
+                    return {
+                        clear: function () {
+                            delete state.diagnosticList;
+                        },
+                        set: function (ignore, list) {
+                            state.diagnosticList = list.map(function ({
+                                message
+                            }) {
+                                return message;
+                            });
+                        }
+                    };
+                }
+            },
+            window: {
+                withProgress: function (ignore, callback) {
+                    return callback({
+                        report: noop
+                    });
+                }
+            }
+        };
+        function editorCreate(text, selection) {
+            state.source = text;
+            state.editor = {
+                document: {
+                    getText: function (range) {
+                        return (
+                            range
+                            ? state.source.slice(
+                                offsetAt(range.start),
+                                offsetAt(range.end)
+                            )
+                            : state.source
+                        );
+                    },
+                    lineAt: function ({
+                        line
+                    }) {
+                        const lineList = state.source.split("\n");
+                        return {
+                            range: {
+                                end: {
+                                    character: lineList[line].length,
+                                    line
+                                },
+                                start: {
+                                    character: 0,
+                                    line
+                                }
+                            },
+                            rangeIncludingLineBreak: {
+                                end: (
+                                    line + 1 < lineList.length
+                                    ? {
+                                        character: 0,
+                                        line: line + 1
+                                    }
+                                    : {
+                                        character: lineList[line].length,
+                                        line
+                                    }
+                                ),
+                                start: {
+                                    character: 0,
+                                    line
+                                }
+                            }
+                        };
+                    },
+                    save: function () {
+
+// Stand in for a format-on-save that rewrites the text.
+
+                        state.source = "let cc = 3;\n";
+                        return Promise.resolve(true);
+                    },
+                    validateRange: noop
+                },
+                edit: function (callback) {
+                    const editList = [];
+                    callback({
+                        insert: function (position, text) {
+                            editList.push([position, position, text]);
+                        },
+                        replace: function (range, text) {
+
+// An undefined range, from the stub <validateRange>, is the whole document.
+
+                            editList.push([range?.start, range?.end, text]);
+                        }
+                    });
+
+// Resolve offsets against the text before any edit, then apply right to left.
+// On a tie the later edit goes first, so an insert lands before a replace.
+
+                    editList.map(function ([start, end, text], ii) {
+                        return [
+                            (
+                                start
+                                ? offsetAt(start)
+                                : 0
+                            ),
+                            (
+                                end
+                                ? offsetAt(end)
+                                : state.source.length
+                            ),
+                            text,
+                            ii
+                        ];
+                    }).sort(function (aa, bb) {
+                        return bb[0] - aa[0] || bb[3] - aa[3];
+                    }).forEach(function ([start, end, text]) {
+                        state.source = (
+                            state.source.slice(0, start) +
+                            text +
+                            state.source.slice(end)
+                        );
+                    });
+                    return Promise.resolve(true);
+                },
+                selection
+            };
+            vscode.window.activeTextEditor = state.editor;
+        }
+        function offsetAt({
+            character,
+            line
+        }) {
+            return state.source.split("\n").slice(0, line).reduce(function (
+                sum,
+                text
+            ) {
+                return sum + text.length + 1;
+            }, character);
+        }
+        moduleVm.runInThisContext(String(`
+(function (__dirname, exports, module, require) {
+${sourceWrapper}
+})
+        `).trim() + "\n")(
+            modulePath.resolve("."),
+            moduleStub.exports,
+            moduleStub,
+            function (id) {
+                return (
+                    id === "vscode"
+                    ? vscode
+                    : id === "vm"
+                    ? moduleVm
+                    : moduleFs
+                );
+            }
+        );
+
+// Activation reuses moduleStub to load jslint, so read activate first.
+
+        moduleStub.exports.activate({
+            subscriptions
+        });
+        assertJsonEqual(subscriptions, [
+            ["jslint.autofix", "registerCommand"],
+            ["jslint.clear", "registerCommand"],
+            ["jslint.disableRegion", "registerTextEditorCommand"],
+            ["jslint.ignoreLine", "registerTextEditorCommand"],
+            ["jslint.lint", "registerCommand"],
+            ["jslint.lintAndSave", "registerCommand"]
+        ]);
+
+// With no active editor, clear still clears and the rest return quietly.
+
+        state.diagnosticList = ["aa"];
+        await commandDict["jslint.clear"]();
+        assertJsonEqual(state.diagnosticList, undefined);
+        await commandDict["jslint.autofix"]();
+        await commandDict["jslint.lint"]();
+        await commandDict["jslint.lintAndSave"]();
+        assertJsonEqual(state.diagnosticList, undefined);
+
+// Lint ignores the context menu's uri argument, and resolves only after the
+// warnings are set.
+
+        editorCreate("let aa = 1;\n");
+        await commandDict["jslint.lint"]("file:///aa.js");
+        assertJsonEqual(state.diagnosticList, ["JSLint - Unused 'aa'."]);
+
+// Lint-and-save lints the text as saved.
+
+        editorCreate("let bb = 2;\n");
+        await commandDict["jslint.lintAndSave"]();
+        assertJsonEqual(state.diagnosticList, ["JSLint - Unused 'cc'."]);
+
+// Autofix rewrites the text, then re-lints it.
+
+        editorCreate("function aa() {\n  return 1;\n}\naa();\n");
+        await commandDict["jslint.autofix"]();
+        assertJsonEqual(
+            state.source,
+            "function aa() {\n    return 1;\n}\naa();\n"
+        );
+        assertJsonEqual(state.diagnosticList, []);
+
+// Disable-region, with a cursor: wrap the cursor's line.
+
+        editorCreate("aa();\nbb();\n", {
+            end: {
+                character: 2,
+                line: 0
+            },
+            isEmpty: true,
+            start: {
+                character: 2,
+                line: 0
+            }
+        });
+        await commandDict["jslint.disableRegion"]();
+        assertJsonEqual(
+            state.source,
+            "/*jslint-disable*/\naa();\n/*jslint-enable*/\nbb();\n"
+        );
+
+// Disable-region, with a selection ending at the start of a line: the enable
+// directive goes before that line, not after it.
+
+        editorCreate("aa();\nbb();\ncc();\n", {
+            end: {
+                character: 0,
+                line: 2
+            },
+            isEmpty: false,
+            start: {
+                character: 0,
+                line: 0
+            }
+        });
+        await commandDict["jslint.disableRegion"]();
+        assertJsonEqual(
+            state.source,
+            "/*jslint-disable*/\naa();\nbb();\n/*jslint-enable*/\ncc();\n"
+        );
+
+// Disable-region, on a last line with no line break: add one first.
+
+        editorCreate("aa();", {
+            end: {
+                character: 0,
+                line: 0
+            },
+            isEmpty: true,
+            start: {
+                character: 0,
+                line: 0
+            }
+        });
+        await commandDict["jslint.disableRegion"]();
+        assertJsonEqual(
+            state.source,
+            "/*jslint-disable*/\naa();\n/*jslint-enable*/"
+        );
+
+// Ignore-line: append the directive to the end of the selection's last line.
+
+        editorCreate("aa();\nbb();\n", {
+            end: {
+                character: 2,
+                line: 1
+            },
+            isEmpty: true,
+            start: {
+                character: 2,
+                line: 1
+            }
+        });
+        await commandDict["jslint.ignoreLine"]();
+        assertJsonEqual(state.source, "aa();\nbb(); //jslint-ignore-line\n");
     });
 });
 

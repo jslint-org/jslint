@@ -1,5 +1,6 @@
 {
     "activationEvents": [
+        "onCommand:jslint.autofix",
         "onCommand:jslint.clear",
         "onCommand:jslint.disableRegion",
         "onCommand:jslint.ignoreLine",
@@ -14,6 +15,11 @@
     ],
     "contributes": {
         "commands": [
+            {
+                "category": "jslint",
+                "command": "jslint.autofix",
+                "title": "JSLint - Autofix Whitespace"
+            },
             {
                 "category": "jslint",
                 "command": "jslint.clear",
@@ -41,6 +47,12 @@
             }
         ],
         "keybindings": [
+            {
+                "command": "jslint.autofix",
+                "key": "ctrl+shift+j a",
+                "mac": "cmd+shift+j a",
+                "when": "editorTextFocus && editorLangId == javascript"
+            },
             {
                 "command": "jslint.clear",
                 "key": "ctrl+shift+j c",
@@ -85,6 +97,11 @@
                 {
                     "command": "jslint.ignoreLine",
                     "group": "7_modification@5",
+                    "when": "resourceLangId == javascript"
+                },
+                {
+                    "command": "jslint.autofix",
+                    "group": "7_modification@6",
                     "when": "resourceLangId == javascript"
                 }
             ]

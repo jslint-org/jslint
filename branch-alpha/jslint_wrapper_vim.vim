@@ -41,13 +41,16 @@ function! SaveAndJslint(bang)
     "" save file
     if a:bang == "!" | write! | else | write | endif
     "" jslint file (via nodejs)
+    "" embedded js reports as "<file>.<node -e>.js" or "<file>.<script>.js"
     let &l:errorformat =
         \ "%f.<node -e>.js:%n:%l:%c:%m," .
+        \ "%f.<script>.js:%n:%l:%c:%m," .
         \ "%f:%n:%l:%c:%m"
+    "" shellescape(..., 1) also escapes "%" and "#", which :make expands
     let &l:makeprg = "node"
-        \ . " \"" . s:dir . "/jslint.mjs\""
+        \ . " " . shellescape(s:dir . "/jslint.mjs", 1)
         \ . " jslint_wrapper_vim"
-        \ . " \"" . fnamemodify(bufname("%"), ":p") . "\""
+        \ . " " . shellescape(fnamemodify(bufname("%"), ":p"), 1)
     silent make! | cwindow | redraw!
 endfunction
 

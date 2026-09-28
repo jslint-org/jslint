@@ -452,11 +452,11 @@ import jslint from "../jslint.mjs";
 
 <!-- Assets from codemirror. -->
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.21/codemirror.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.21/addon/lint/lint.css">
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.21/codemirror.js"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.21/mode/javascript/javascript.js"></script>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.21/addon/lint/lint.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.21/codemirror.css" integrity="sha512-7vaQ4LLdaXd2IuMd4MUQ6LRFIGbEwJI1aq6KYqL3RjbdQyUkRFhwZKmqmkBXurTFdGlx687lTN8FSJfX6Df8Gw==" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.21/addon/lint/lint.css" integrity="sha512-rx8Dv9UY+C/6Qsech6A5L2ka9ugVuQfdGlNitUbYtbuEMjfo5JapbOyUOwRAwvl7GmZfYiP5t4qOE5+d8aKgbA==" crossorigin="anonymous">
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.21/codemirror.js" integrity="sha512-ksE4KDA1cKB0p1MTQsoUZ5lpj+KvHOreU76sE+4RsG92LiyIE7gUrnT3Dt+O7CrC2aJzG17UsOh7apakp7lyJw==" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.21/mode/javascript/javascript.js" integrity="sha512-VgqsGo4zxSK9KBf4c3RWpFWkRfBEeIUb2p5VqKtDj7sXdTyTyx38jVVJSriVU12pS5hG5J69FDi/LDsQ5Y1Ldw==" crossorigin="anonymous"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.21/addon/lint/lint.js" integrity="sha512-HzWWmsisNY6OUHWrNyo4yiHkGs6CUGEwI8Pu+q9tCWkmeWtvWa7D1gHTx9Oj0LQdldSKd4yffFA4PObCeKi9ew==" crossorigin="anonymous"></script>
 
 <!-- Assets from jslint. -->
 
@@ -578,7 +578,11 @@ window.addEventListener("load", function () {
 2. In VSCode, while editing a javascript file:
     - right-click context-menu and select `[JSLint - Lint File]`
     - or use key-binding `[Ctrl + Shift + J], [L]`
-    - or use key-binding `[ Cmd + Shift + J], [L]` for Mac
+    - or use key-binding `[Cmd + Shift + J], [L]` for Mac
+3. In VSCode, to autofix whitespace in file:
+    - right-click context-menu and select `[JSLint - Autofix Whitespace]`
+    - or use key-binding `[Ctrl + Shift + J], [A]`
+    - or use key-binding `[Cmd + Shift + J], [A]` for Mac
 - screenshot
 
 [![screenshot](https://jslint-org.github.io/jslint/asset_image_jslint_wrapper_vscode.png)](https://marketplace.visualstudio.com/items?itemName=jslint.vscode-jslint)
