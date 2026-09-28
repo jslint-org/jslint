@@ -14,7 +14,7 @@
 # v2026.9.29
 - jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add function jslint_phase6_autofix().
 - jslint-website - Add button 'Autofix Whitespace' and section 'Report: Autofix'.
-- jslint-vscode - Add extra contextmenu command "JSLint - Autofix Whitespace", with keybinding ctrl+shift+j a if no collision.
+- jslint-vscode - Add command 'JSLint - Autofix Whitespace', CTRL+SHIFT+J A.
 - jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-line, except dot-operators '.', '?.' and tagged-template backtick, and update function jslint_phase6_autofix() to autofix it.
 - jslint-autofix - Warning 'too_long' no longer blocks autofix.
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
