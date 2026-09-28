@@ -78,6 +78,7 @@ Douglas Crockford <douglas@crockford.com>
     - [pull-request merge](#pull-request-merge)
     - [branch-master commit](#branch-master-commit)
     - [branch-master publish](#branch-master-publish)
+    - [vscode-jslint qa](#vscode-jslint-qa)
     - [vscode-jslint publish](#vscode-jslint-publish)
 
 
@@ -1226,6 +1227,22 @@ if (false) {
     - click `Publish release`
         - verify ci-success @ https://github.com/jslint-org/jslint/actions
         - verify email-notification `Successfully published @jslint-org/jslint@20yy.mm.dd`
+
+
+<br><br>
+
+### vscode-jslint qa
+```shell
+
+# build vscode-jslint
+sh jslint_ci.sh shCiVscePackageJslintWrapperVscode
+
+# open vscode and debug
+code \
+    --disable-extensions \
+    --extensionDevelopmentPath=\
+'C:\Users\<username>\Documents\jslint\.artifact\jslint_wrapper_vscode'
+```
 
 
 <br><br>

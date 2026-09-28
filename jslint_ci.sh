@@ -195,19 +195,21 @@ import modulePath from "path";
     const tmpdir = await moduleFs.promises.mkdtemp(
         moduleOs.tmpdir() + "/shBrowserScreenshot-"
     );
-    const url = (
-        (/^\w+?:/).test(process.argv[1])
-        ? process.argv[1]
-        : modulePath.resolve(process.argv[1])
-    ).replace((/\\/g), "/");
     let child;
     let exitCode;
     let file;
-    file = (
-        url === process.argv[1]
-        ? new URL(url, "http://localhost").pathname
-        : url
-    );
+    let url = process.argv[1];
+    // A scheme has 2+ chars, so a windows drive "C:" is a local path. Decode
+    // a url, or encodeURIComponent below encodes its "%" a second time. A
+    // "file:///C:/" pathname is "/C:/", so drop that "/" to match cwd.
+    if ((/^\w{2,}:/).test(url)) {
+        file = decodeURIComponent(new URL(url).pathname).replace((
+            /^\/(?=[A-Za-z]:)/
+        ), "");
+    } else {
+        url = modulePath.resolve(url).replace((/\\/g), "/");
+        file = url;
+    }
     // Remove prefix $PWD from file.
     if (String(file + "/").startsWith(cwd + "/")) {
         file = file.replace(cwd, "");
@@ -1510,6 +1512,12 @@ import moduleRepl from "repl";
         try {
             pathname = decodeURIComponent(pathname);
         } catch (ignore) {
+            res.statusCode = 400;
+            res.end();
+            return;
+        }
+        // A NUL would make fs throw outside any handler and crash the server.
+        if (pathname.includes(String.fromCharCode(0))) {
             res.statusCode = 400;
             res.end();
             return;
@@ -3226,9 +3234,7 @@ body {
     ? "coverageMedium"
     : "coverageLow"
    );
-   coveragePct = String(coveragePct).replace((
-    /..$/m
-   ), ".$&");
+   coveragePct = Number(coveragePct / 100).toFixed(2);
    if (modeIndex && ii === 0) {
     fill = (
      "#" + Math.round(

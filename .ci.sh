@@ -481,9 +481,8 @@ shCiPublishNpmCustom() {(set -e
 
 shCiVscePackageJslintWrapperVscode() {(set -e
 # This function will vsce-package jslint_wrapper_vscode.
-    # Start empty, or vsce packs files left over from an earlier build.
-    # Empty the dir, not remove it: an open dev-host window locks it on windows.
     mkdir -p .artifact/jslint_wrapper_vscode
+    # Empty the dir, not remove it: an open dev-host window locks it on windows.
     find .artifact/jslint_wrapper_vscode -mindepth 1 -delete
     mkdir -p .artifact/jslint_wrapper_vscode/.vscode
     (set -e

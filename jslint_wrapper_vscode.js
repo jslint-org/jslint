@@ -56,7 +56,7 @@ function activate({
     let jslint;
     let vscode;
 
-// PR-xxx - Add command "JSLint - Autofix Whitespace".
+// PR-513 - Add command "JSLint - Autofix Whitespace".
 
     async function jslintAutofix() {
         const editor = vscode.window.activeTextEditor;
