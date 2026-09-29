@@ -1,6 +1,8 @@
 # Changelog
 
 # Todo
+- jslint - Warn arrow-function 'aa || bb => cc' as a SyntaxError, not with warning wrap_fart_parameter, whose fix is still invalid.
+- jslint - Check the target of a for-of or for-in head without const or let, e.g. 'for (aa + bb of cc)'.
 - jslint - Relax warning use_open for one-line ternary-operator inside template-literal substitution '${...}'.
 - jslint - Add new warning requiring paren around plus-separated concatenations.
 - jslint - Revisit autofix of top-level whitespace, e.g. warning expected_space_a_b on line break inside closed-form expression.
@@ -19,6 +21,7 @@
 - jslint - Check escapes in untagged megastrings via \<char_after_escape>.
 - jslint-autofix - Warning 'too_long' no longer blocks autofix.
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
+- jslint-ecma - Add Exponentiation-assignment-operator '**=' support.
 - jslint - Move column-fudging into warn_at(); callers pass 0-based column.
 - jslint - Remove dead token-property 'free' from parser and whitage.
 - jslint - Improve parser to parse jquery.js without stopping - for-init comma, numeric object-key.

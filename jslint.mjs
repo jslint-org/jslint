@@ -747,7 +747,10 @@ const jslint_rgx_token = new RegExp(
     "|\\?[?.]?" +
     "|=(?:==?|>)?" +
     "|\\.+" +
-    "|\\*[*\\/=]?" +
+
+// PR-xxx - Add Exponentiation-assignment-operator '**=' support.
+
+    "|\\*(?:\\*=?|[\\/=])?" +
     "|\\/[*\\/]?" +
     "|\\+[=+]?" +
     "|-[=\\-]?" +
@@ -1509,9 +1512,6 @@ function jslint(
 // wound the inner child. But if you accept it as sound advice rather than as
 // personal criticism, it can make your programs better.
 
-        case "and":
-            mm = `The '&&' subexpression should be wrapped in parens.`;
-            break;
         case "bad_assignment_a":
             mm = `Bad assignment to '${a}'.`;
             break;
@@ -1796,9 +1796,6 @@ function jslint(
         case "weird_relation_a":
             mm = `Weird relation '${a}'.`;
             break;
-        case "wrap_condition":
-            mm = `Wrap the condition in parens.`;
-            break;
 
 // PR-386 - Fix issue #382 - Make fart-related warnings more readable.
 
@@ -1815,8 +1812,8 @@ function jslint(
         case "wrap_regexp":
             mm = `Wrap this regexp in parens to avoid confusion.`;
             break;
-        case "wrap_unary":
-            mm = `Wrap the unary expression in parens.`;
+        case "wrap_subexpression_a_b":
+            mm = `Wrap the '${a}' subexpression beside '${b}' in parens.`;
             break;
         default:
             jslint_assert(undefined, `unknown_warning_code=${code}`);
@@ -2902,7 +2899,7 @@ function jslint_phase2_lex(state) {
     const mode_digits_numeric_separator = 1;
     const mode_digits_regexp_quantifier = 2;
     const mode_digits_unicode_escape = 3;
-    const opener_stack = [];    // Stack of opener tokens: (, [.
+    const opener_stack = [];    // Stack of opener tokens: (, [, {, ${.
     let char;                   // The current character being lexed.
     let column = 0;             // The column number of the next character.
     let from;                   // The starting column number of the token.
@@ -4565,8 +4562,15 @@ function jslint_phase2_lex(state) {
 // current depth is marked as a fart.
 
         switch (id) {
+
+// PR-xxx - Bugfix - Also push '{' and '${', so a ';' in a function-body inside
+// a for-loop-head 'for (const aa of function () {...}())' is not mistaken for
+// a for-loop-semicolon.
+
+        case "${":
         case "(":
         case "[":
+        case "{":
             opener_stack.unshift(the_token);
             break;
         case ")":
@@ -4617,6 +4621,11 @@ function jslint_phase2_lex(state) {
             }
             if (token_prv_expr.identifier) {
                 token_prv_expr.fart = the_token;
+            }
+            break;
+        case "}":
+            if (opener_stack[0]?.id === "{" || opener_stack[0]?.id === "${") {
+                opener_stack.shift();
             }
             break;
         }
@@ -5903,6 +5912,22 @@ function jslint_phase3_parse(state) {
             ) {
                 break;
             }
+
+// PR-xxx - Bugfix - A line break before a postfix '++' or '--' ends the
+// expression, since the spec forbids one there and inserts a ';'. So 'aa' then
+// '++bb' on the next line is 'aa; ++bb', not 'aa++; bb'.
+
+            if (
+                (token_nxt.id === "++" || token_nxt.id === "--") &&
+                token_nxt.line !== token_now.line
+            ) {
+
+// test_cause:
+// ["aa\n++aa", "parse_expression", "postfix_line_break", "", 0]
+
+                test_cause("postfix_line_break");
+                break;
+            }
             advance();
             left = the_symbol.led_infix(left);
         }
@@ -6163,7 +6188,7 @@ function jslint_phase3_parse(state) {
 
 // Create one of the postassign operators.
 
-        const the_symbol = symbol(id, 150);
+        const the_symbol = symbol(id, 155);
         the_symbol.led_infix = function (left) {
             token_now.expression = left;
             token_now.arity = "postassign";
@@ -7088,7 +7113,12 @@ function jslint_phase3_parse(state) {
 // ["void", "prefix_void", "unexpected_a", "void", 1]
 
         warn("unexpected_a", the_void);
-        the_void.expression = parse_expression(0);
+
+// PR-xxx - Bugfix - Parse the operand at rbp 150, like every unary operator,
+// since the spec reads 'void UnaryExpression'. At rbp 0, 'void aa ** 2', a
+// SyntaxError, parsed as 'void (aa ** 2)'.
+
+        the_void.expression = parse_expression(150);
         return the_void;
     }
 
@@ -7536,9 +7566,31 @@ function jslint_phase3_parse(state) {
                 the_operator = the_variable.operator;
                 break;
             default:
-                the_variable = parse_expression(0);
+
+// PR-xxx - Bugfix - Parse the target at rbp 110, which stops before 'in' and
+// 'of', then their right side at rbp 0, as the spec does. Parsing the whole
+// head at rbp 0 let a looser operator like '||' in 'for (aa in bb || cc)'
+// wrap the 'in' node, and the lint stopped.
+
+                the_variable = parse_expression(110);
+                if (token_nxt.id !== "in" && token_nxt.id !== "of") {
+
+// test_cause:
+// ["for(aa 0){}", "stmt_for", "expected_a_b", "0", 8]
+
+                    return stop(
+                        "expected_a_b",
+                        token_nxt,
+                        "of",
+                        artifact(token_nxt)
+                    );
+                }
+                advance();
+                the_operator = token_now;
+                the_operator.arity = "binary";
+                the_operator.expression = [the_variable, parse_expression(0)];
+                the_variable = the_operator;
                 the_for.for_of = the_variable;
-                the_operator = the_variable;
             }
             the_variable.for_init = true;
             switch (the_operator.id) {
@@ -7566,6 +7618,7 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["for(aa of aa){}", "stmt_for", "of", "of", 0]
+// ["for(aa of aa||aa){}", "stmt_for", "of", "of", 0]
 // ["for(const aa of aa){}", "stmt_for", "of", "of", 0]
 // ["for(let aa of aa){}", "stmt_for", "of", "of", 0]
 // ["for(var aa of aa){}", "stmt_for", "of", "of", 0]
@@ -8503,7 +8556,11 @@ function jslint_phase3_parse(state) {
         the_symbol.led_infix = function parse_ternary_led(left) {
             const the_token = token_now;
             let second;
-            second = parse_expression(20);
+
+// PR-xxx - Bugfix - Both branches are an AssignmentExpression in the spec, so
+// parse the second like the third. 'aa ? bb = 0 : cc' used to stop at '='.
+
+            second = parse_expression(10);
             advance(id2);
             token_now.arity = "ternary";
             the_token.arity = "ternary";
@@ -8512,6 +8569,7 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["0?0:0", "parse_ternary_led", "use_open", "?", 2]
+// ["aa=0?aa=0:0", "parse_ternary_led", "use_open", "?", 5]
 
                 warn("use_open", the_token);
             }
@@ -8526,6 +8584,10 @@ function jslint_phase3_parse(state) {
     assignment("%=");
     assignment("&&=");
     assignment("&=");
+
+// PR-xxx - Add Exponentiation-assignment-operator '**=' support.
+
+    assignment("**=");
     assignment("*=");
     assignment("+=");
     assignment("-=");
@@ -9144,9 +9206,53 @@ function jslint_phase4_walk(state) {
             ) {
 
 // test_cause:
-// ["0- -0", "post_b_binary", "wrap_unary", "-", 4]
+// ["0- -0", "post_b_binary", "wrap_subexpression_a_b", "-", 4]
 
-                warn("wrap_unary", right);
+                warn("wrap_subexpression_a_b", right, right.id, thing.id);
+            }
+
+// PR-xxx - Bugfix - A unary operator before '**' is a SyntaxError, since the
+// spec's ExponentiationExpression takes an UpdateExpression on its left. So
+// '-aa ** 2' needs parens, while '[aa] ** 2' and '++aa ** 2' do not.
+
+            if (
+                thing.id === "**" &&
+                thing.expression[0].arity === "unary" &&
+                !thing.expression[0].wrapped &&
+                [
+                    "!", "!!", "+", "-", "await", "typeof", "void", "~"
+                ].includes(thing.expression[0].id)
+            ) {
+
+// test_cause:
+// ["aa=-0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
+
+                warn(
+                    "wrap_subexpression_a_b",
+                    thing.expression[0],
+                    thing.expression[0].id,
+                    "**"
+                );
+            }
+
+// PR-xxx - Bugfix - An unwrapped '&&' or '||' operand of '??' is a SyntaxError,
+// since the spec's CoalesceExpression takes a BitwiseORExpression on each side.
+// '??' binds loosest of the three, so only a '??' node can hold one.
+
+            if (thing.id === "??") {
+                thing.expression.forEach(function (thang) {
+                    if (
+                        (thang.id === "&&" || thang.id === "||") &&
+                        !thang.wrapped
+                    ) {
+
+// test_cause:
+// ["0&&0??0", "post_b_binary", "wrap_subexpression_a_b", "??", 2]
+// ["0??0||0", "post_b_binary", "wrap_subexpression_a_b", "??", 5]
+
+                        warn("wrap_subexpression_a_b", thang, thang.id, "??");
+                    }
+                });
             }
             if (
                 thing.expression[0].constant === true &&
@@ -9478,9 +9584,14 @@ function jslint_phase4_walk(state) {
         ) {
 
 // test_cause:
-// ["(aa&&!aa?0:1)", "post_t_ternary", "wrap_condition", "&&", 4]
+// ["(aa&&!aa?0:1)", "post_t_ternary", "wrap_subexpression_a_b", "?", 4]
 
-            warn("wrap_condition", thing.expression[0]);
+            warn(
+                "wrap_subexpression_a_b",
+                thing.expression[0],
+                thing.expression[0].id,
+                "?"
+            );
         }
     }
 
@@ -9573,11 +9684,16 @@ function jslint_phase4_walk(state) {
             warn("unexpected_a", thing);
             break;
         }
+
+// PR-xxx - Bugfix - Skip the 'of' or 'in' node of a for-loop-head, so
+// 'for (aa of bb < cc)' does not warn on its own 'of', like the const form.
+
         if (
             thing.id !== "(" &&
             thing.id !== "&&" &&
             thing.id !== "||" &&
             thing.id !== "=" &&
+            thing.for_init !== true &&
             Array.isArray(thing.expression) &&
             thing.expression.length === 2 &&
             (
@@ -9695,9 +9811,9 @@ function jslint_phase4_walk(state) {
             if (thang.id === "&&" && !thang.wrapped) {
 
 // test_cause:
-// ["0&&0||0", "pre_b_or", "and", "&&", 2]
+// ["0&&0||0", "pre_b_or", "wrap_subexpression_a_b", "||", 2]
 
-                warn("and", thang);
+                warn("wrap_subexpression_a_b", thang, "&&", "||");
             }
         });
     }
@@ -10010,7 +10126,11 @@ function jslint_phase5_whitage(state) {
         "!=", "!==",
         "%", "%=",
         "&", "&&", "&&=", "&=",
-        "*", "*=",
+
+// PR-xxx - Add Exponentiation-assignment-operator '**=' support, and space
+// '**' like '*'.
+
+        "*", "**", "**=", "*=",
         "+=",
         "-=",
         "/", "/=",

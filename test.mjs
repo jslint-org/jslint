@@ -962,6 +962,96 @@ aa(dd(0), 0);
         );
     });
     jstestIt((
+        "test binding-power handling-behavior"
+    ), function () {
+
+// PR-xxx - Bugfix - Binding-powers follow the spec's grammar, as tabled in
+// MDN Operator precedence. Each source returns the expression beside the
+// parameters, so none is unused, and lists the warning codes it must raise.
+
+        for (const [expression, expect] of [
+            ["(-aa) ** 2", []],
+            ["-aa ** 2", ["wrap_subexpression_a_b"]],
+            ["-aa++", ["unexpected_a"]],
+            ["[aa] ** 2", []],
+            ["aa ** -2", []],
+            ["aa ?? (bb || cc)", []],
+            ["aa ?? bb && cc", ["wrap_subexpression_a_b"]],
+            ["aa ?? bb ?? cc", []],
+            ["aa || bb ?? cc", ["wrap_subexpression_a_b"]],
+            ["typeof aa ** 2", ["wrap_subexpression_a_b"]]
+        ]) {
+            const result = jslint.jslint(String(`
+function ff(aa, bb, cc) {
+    return [aa, bb, cc, ${expression}];
+}
+ff();
+            `).trim() + "\n");
+            assertJsonEqual(result.warnings.map(function ({code}) {
+                return code;
+            }), expect, expression);
+        }
+
+// PR-xxx - Bugfix - The operand of 'void' is parsed at rbp 150, like every
+// unary operator, so 'void 0 + 0' is '(void 0) + 0'.
+
+        assertOrThrow(
+            jslint.jslint("String(void 0 + 0);\n").tokens.find(function ({
+                id
+            }) {
+                return id === "+";
+            }).expression[0].id === "void",
+            "void 0 + 0"
+        );
+
+// PR-xxx - Bugfix - A relational right side of a for-loop-head 'of' or 'in'
+// does not warn on the head's own 'of' or 'in'.
+
+        for (const [operator, expect] of [
+            ["in", ["expected_a_b", "expected_a"]],
+            ["of", ["expected_a"]]
+        ]) {
+            assertJsonEqual(jslint.jslint(String(`
+function ff(aa, bb) {
+    for (aa ${operator} bb < aa) {
+        bb();
+    }
+}
+ff();
+            `).trim() + "\n").warnings.map(function ({code}) {
+                return code;
+            }), expect, operator);
+        }
+
+// PR-xxx - Bugfix - '**=' is one assignment token, '**' takes a space on each
+// side like '*', and a line break before a postfix '++' ends the expression.
+
+        for (const [source, expect] of [
+            ["let aa = 2;\naa **= 2;\n", []],
+            [
+                "let aa = 2;\naa = aa**2;\n",
+                ["expected_space_a_b", "expected_space_a_b"]
+            ],
+            [
+                "let aa = 0;\nlet bb = 0;\naa\n++bb;\n",
+                [
+                    "unexpected_expression_a",
+                    "expected_a_after_b",
+                    "unexpected_expression_a"
+                ]
+            ]
+        ]) {
+            assertJsonEqual(jslint.jslint(source).warnings.map(function ({
+                code
+            }) {
+                return code;
+            }), expect, source);
+        }
+        assertJsonEqual(jslint.jslint("let aa = 2;\naa = aa**2;\n", {
+            autofix: true
+        }).autofixed, "let aa = 2;\naa = aa ** 2;\n");
+    });
+    jstestIt((
         "test autofix-report handling-behavior"
     ), function () {
         let result;
@@ -1583,6 +1673,22 @@ async function aa(bb, cc) {
     }
     for (const ii of await (bb())) {
         bb(cc, ii);
+    }
+}
+aa();
+                `),
+
+// PR-xxx - Bugfix - A ';' in a method-body inside a for-loop-head is not a
+// for-loop-semicolon.
+
+                (`
+function aa(bb) {
+    for (const cc in { //jslint-ignore-line
+        dd() {
+            return;
+        }
+    }) {
+        bb(cc);
     }
 }
 aa();
