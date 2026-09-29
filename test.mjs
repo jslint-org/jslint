@@ -1892,6 +1892,14 @@ aa();
                 "(function aa(bb = aa) {\n    aa(bb);\n}());",
                 "function aa(bb = aa) {\n    aa(bb);\n}\naa();",
                 (`
+function bb(cc) {
+    return cc;
+}
+bb(function aa() {
+    return;
+});
+                `),
+                (`
 if (String) {
     let aa = 0;
     aa();
@@ -1946,6 +1954,15 @@ try {
     err();
 } finally {
     String();
+}
+                `),
+                (`
+try {
+    String();
+} catch (err) {
+    var aa = err; //jslint-ignore-line
+} finally {
+    String(aa);
 }
                 `)
             ],

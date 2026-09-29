@@ -114,7 +114,6 @@
     block_list,
     block_stack,
     browser,
-    calls,
     catch,
     causes,
     char,
@@ -5580,9 +5579,6 @@ function jslint_phase3_parse(state) {
 
             check_left(left, the_paren);
         }
-        if (scope_function.arity === "statement" && left.identifier) {
-            scope_function.name.calls[left.id] = left;
-        }
         the_paren.expression = [left];
         if (token_nxt.id !== ")") {
 
@@ -5659,11 +5655,11 @@ function jslint_phase3_parse(state) {
     ) {
 
 // This function will:
-// 1. Push variable or function-parameter <name> to <name_list>.
-// 2. Set <name>.assigned = true, if its an assigned-variable,
-//    a function-parameter, or existing variable assigned new value.
-// 3. Declare <name> in <scope_declared>.context, if its a declared-variable,
-//    or function-parameter.
+// 1. Push <name> to <name_list>.
+// 2. Set <name>.assigned, <name>.readonly and <name>.role from the arguments.
+//    An existing variable given a new value is marked by <post_a_assignment>.
+// 3. Declare <name> in <scope_declared>.context, unless <scope_declared> is
+//    undefined, as for the plain assignment 'aa = 0'.
 //
 // Most calls to name_declare() are commented regarding thing being declared,
 // and its lifecycle. Below is a copy of all such comments.
@@ -5671,32 +5667,66 @@ function jslint_phase3_parse(state) {
 // 1.imp.1 - Mark 'declared', the import-name, during import-statement.
 // 1.imp.2 - Mark 'alive', the import-name, after import-statement.
 // 1.imp.3 - Mark 'assigned', the import-name, during import-statement.
+// 1.imp.4 - Mark 'readonly', the import-name, during import-statement.
 //
 // 2.fun.1 - Mark 'declared', the function-name, during function-declaration.
 // 2.fun.2 - Mark 'alive', the function-name, during function-declaration.
 // 2.fun.3 - Mark 'assigned', the function-name, during function-declaration.
+// 2.fun.4 - Mark 'readonly', the function-name, during function-declaration.
 //
 // 3.cat.1 - Mark 'declared', the catch-variable, before catch-block.
 // 3.cat.2 - Mark 'alive', the catch-variable, before catch-block.
 // 3.cat.3 - Mark 'assigned', the catch-variable, before catch-block.
+// 3.cat.4 - Mark 'readonly', the catch-variable, before catch-block.
 //
 // 3.glo.1 - Mark 'declared', the global-variable, immediately.
 // 3.glo.2 - Mark 'alive', the global-variable, immediately.
 // 3.glo.3 - Mark 'assigned', the global-variable, immediately.
+// 3.glo.4 - Mark 'readonly', the global-variable, immediately.
 //
 // 3.var.1 - Mark 'declared', the variable, during variable-declaration.
 // 3.var.2 - Mark 'alive', the variable, after variable-declaration.
 // 3.var.3 - Mark 'assigned', the variable, after assignment.
+// 3.var.3 - Mark 'assigned', the variable, during destructuring.
 // 3.var.3 - Mark 'assigned', the variable, during variable-declaration.
+// 3.var.4 - Mark 'readonly', the variable, if const.
 //
 // 4.par.1 - Mark 'declared', the function-parameter, during destructuring.
 // 4.par.1 - Mark 'declared', the function-parameter, if unwrapped.
 // 4.par.2 - Mark 'alive', the function-parameter, after destructuring.
+// 4.par.3 - Mark 'assigned', the function-parameter, during destructuring.
 // 4.par.3 - Mark 'assigned', the function-parameter, if unwrapped.
 //
 // 5.lab.1 - Mark 'declared', the label-name, before control-flow-block.
 // 5.lab.2 - Mark 'alive', the label-name, before control-flow-block.
 // 5.lab.3 - Mark 'assigned', the label-name, before control-flow-block.
+// 5.lab.4 - Mark 'readonly', the label-name, before control-flow-block.
+//
+// The 2.fun tags also cover a named function-expression, whose name is
+// declared in its own function-body.
+//
+// PR-xxx - Deviations from the spec, reviewed 2026-09-29, each kept. A fixed
+// one is commented at its site, and a Todo is in CHANGELOG.md.
+//
+// - 1.imp.2 - Kept. An import used above its import-statement warns
+//   temporal_dead_zone_a, though imports are hoisted.
+// - 2.fun.1 - Kept. 'let aa;(function aa(){})' warns redefinition_a_b, but
+//   the reverse order does not. ESLint no-shadow is off by default.
+// - 2.fun.4 - Kept. Reassigning a function warns, as ESLint no-func-assign.
+// - 3.cat.4 - Kept. Reassigning a catch-variable warns, as ESLint no-ex-assign.
+// - 3.glo.4 - Kept. Reassigning a global warns, as ESLint no-global-assign.
+// - 3.var.1 - Kept. A switch has no block scope, so a 'let' in a case is seen
+//   after the switch. It is moot, since var_switch warns that 'let'.
+// - 3.var.2 - Kept. A 'var' read above its declaration warns
+//   temporal_dead_zone_a, though its hoisted value 'undefined' is valid.
+// - 3.var.2 - Kept. A function reading a 'let' declared below it warns, see
+//   the note in <name_lookup>.
+// - 4.par.1 - Kept. A parameter-default reading a body 'var' warns
+//   temporal_dead_zone_a, where the spec makes it undeclared. It still warns,
+//   and ESLint no-use-before-define likely does the same.
+// - 5.lab.1 - Kept. A label shares the variable namespace, so a same-named
+//   variable warns redefinition_a_b, as ESLint no-label-var.
+// - 5.lab.1 - Kept. A label is allowed only on do, for, switch and while.
 
         const id = name.id;
         let earlier;
@@ -5712,7 +5742,7 @@ function jslint_phase3_parse(state) {
         }
 
 // Declare a name into the current scope_declared's context. The role can be
-// exception, function, label, parameter, or variable. We look for variable
+// exception, label, parameter, or variable. We look for variable
 // redefinition because it causes confusion.
 
 // Reserved words may not be declared.
@@ -5794,7 +5824,7 @@ function jslint_phase3_parse(state) {
         }
         if (
             earlier &&
-            role !== "parameter" && role !== "function" &&
+            role !== "parameter" &&
             (role !== "exception" || earlier.role !== "exception")
         ) {
 
@@ -6508,6 +6538,10 @@ function jslint_phase3_parse(state) {
                     readonly,           // readonly
                     sub_list,           // name_list
                     name,               // name
+
+// 3.var.3 - Mark 'assigned', the variable, during destructuring.
+// 4.par.3 - Mark 'assigned', the function-parameter, during destructuring.
+
                     true                // assigned
                 );
                 advance_and_signature_push(token_nxt.id);
@@ -6519,6 +6553,10 @@ function jslint_phase3_parse(state) {
                 readonly,               // readonly
                 sub_list,               // name_list
                 name,                   // name
+
+// 3.var.3 - Mark 'assigned', the variable, during destructuring.
+// 4.par.3 - Mark 'assigned', the function-parameter, during destructuring.
+
                 true                    // assigned
             );
             if (token_nxt.id === "=") {
@@ -6617,7 +6655,6 @@ function jslint_phase3_parse(state) {
 
     function prefix_function(the_function, mode_fart, mode_fart_unwrapped) {
         const name = !mode_fart && token_nxt.identifier && token_nxt;
-        let role = "variable";
 
 // PR-504 - Change scope from scope_function to scope_block:
 // - function-declaration
@@ -6638,7 +6675,20 @@ function jslint_phase3_parse(state) {
 
                 return stop("expected_identifier_a", token_nxt);
             }
-            name.calls = empty();
+
+// PR-xxx - Warn a function-declaration directly in a case, as ESLint
+// no-case-declarations does. One nested in a block of the case already warns
+// unexpected_a in <pre_s_function>.
+
+            if (scope_function.switch > 0 && scope_block.function_body) {
+
+// test_cause:
+// ["
+// switch(0){case 0:function aa(){}}
+// ", "prefix_function", "var_switch", "function", 18]
+
+                warn("var_switch", the_function);
+            }
         } else if (name) {
 
 // A function expression may have an optional name.
@@ -6655,11 +6705,14 @@ function jslint_phase3_parse(state) {
             name_declare(
 
 // 2.fun.1 - Mark 'declared', the function-name, during function-declaration.
+
+                scope_declared,         // scope_declared
+                "variable",             // role
+
+// 2.fun.4 - Mark 'readonly', the function-name, during function-declaration.
 // PR-xxx - Bugfix - Mark it readonly, so reassigning a function warns, as
 // ESLint no-func-assign does.
 
-                scope_declared,         // scope_declared
-                role,                   // role
                 true,                   // readonly
                 [],                     // name_list
                 name,                   // name
@@ -6838,23 +6891,36 @@ function jslint_phase3_parse(state) {
 
                 warn("unexpected_a");
             }
+        }
 
 // Check functions are ordered.
 
-            check_ordered(
-                "function",
-                function_list.slice(
-                    function_list.indexOf(the_function) + 1
-                ).map(function ({
-                    level,
+// PR-xxx - Bugfix - Check only function-declarations, since a named
+// function-expression is not hoisted. Check an arrow-function's block-body too.
+
+// test_cause:
+// ["
+// ()=>{function bb(){}function aa(){}}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 30]
+
+        check_ordered(
+            "function",
+            function_list.slice(
+                function_list.indexOf(the_function) + 1
+            ).map(function ({
+                arity,
+                level,
+                name
+            }) {
+                return (
+                    arity === "statement" &&
+                    level === the_function.level + 1 &&
                     name
-                }) {
-                    return (level === the_function.level + 1) && name;
-                }).filter(function (name) {
-                    return option_dict.beta && name && name.id;
-                })
-            );
-        }
+                );
+            }).filter(function (name) {
+                return option_dict.beta && name && name.id;
+            })
+        );
 
 // Restore the previous context.
 
@@ -7267,6 +7333,13 @@ function jslint_phase3_parse(state) {
         the_break.disrupt = true;
         if (token_nxt.identifier && token_now.line === token_nxt.line) {
             block_stack.some(function (scope_block) {
+
+// PR-xxx - Bugfix - Stop at the function boundary, since a label is not
+// visible inside a nested function.
+
+                if (scope_block === scope_function) {
+                    return true;
+                }
                 the_label = scope_block.context[token_nxt.id];
                 if (the_label?.role !== "label") {
                     the_label = undefined;
@@ -7279,6 +7352,9 @@ function jslint_phase3_parse(state) {
             if (!the_label) {
 
 // test_cause:
+// ["
+// aa:while(0){(function(){while(0){break aa;}}());}
+// ", "stmt_break", "not_label_a", "aa", 40]
 // ["aa:while(0){}break aa", "stmt_break", "not_label_a", "aa", 20]
 // ["break aa", "stmt_break", "not_label_a", "aa", 7]
 
@@ -7858,6 +7934,9 @@ function jslint_phase3_parse(state) {
 
                     scope_function,     // scope_declared
                     "variable",         // role
+
+// 1.imp.4 - Mark 'readonly', the import-name, during import-statement.
+
                     true,               // readonly
                     the_import.name_list,       // name_list
                     name,               // name
@@ -7881,6 +7960,13 @@ function jslint_phase3_parse(state) {
                         advance();
                         if (token_nxt.id === "as") {
                             advance("as");
+                            if (!token_nxt.identifier) {
+
+// test_cause:
+// ["import {aa as 0}", "stmt_import", "expected_identifier_a", "0", 15]
+
+                                return stop("expected_identifier_a", token_nxt);
+                            }
                             name = token_nxt;
                             advance();
                         }
@@ -7897,6 +7983,9 @@ function jslint_phase3_parse(state) {
 
                             scope_function,     // scope_declared
                             "variable", // role
+
+// 1.imp.4 - Mark 'readonly', the import-name, during import-statement.
+
                             true,       // readonly
                             the_import.name_list,       // name_list
                             name,       // name
@@ -8010,6 +8099,9 @@ function jslint_phase3_parse(state) {
 
             scope_block,        // scope_declared
             "label",            // role
+
+// 5.lab.4 - Mark 'readonly', the label-name, before control-flow-block.
+
             true,               // readonly
             [],                 // name_list
             the_label,          // name
@@ -8313,6 +8405,9 @@ function jslint_phase3_parse(state) {
 
                         scope_block,    // scope_declared
                         "exception",    // role
+
+// 3.cat.4 - Mark 'readonly', the catch-variable, before catch-block.
+
                         true,           // readonly
                         [],             // name_list
                         token_nxt,      // name
@@ -8366,8 +8461,8 @@ function jslint_phase3_parse(state) {
             if (token_nxt.id !== "{") {
                 return stop("expected_a_b", token_nxt, "{", artifact());
             }
-            the_try.else = block();
-            the_disrupt = the_try.else.disrupt;
+            the_try.finally = block();
+            the_disrupt = the_try.finally.disrupt;
             scope_function.finally -= 1;
         }
         the_try.disrupt = the_disrupt;
@@ -8448,6 +8543,10 @@ function jslint_phase3_parse(state) {
 
 // We don't expect to see variables created in switch statements.
 
+// PR-xxx - Kept 2026-09-29, broader than ESLint no-case-declarations. This
+// also warns a 'var', a braced 'case 0: {let aa}' and a 'let' nested in a
+// block of the case, all of which ESLint allows.
+
         if (scope_function.switch > 0) {
 
 // test_cause:
@@ -8507,6 +8606,9 @@ function jslint_phase3_parse(state) {
 
                     scope_declared,     // scope_declared
                     "variable",         // role
+
+// 3.var.4 - Mark 'readonly', the variable, if const.
+
                     readonly,           // readonly
                     the_variable.name_list,     // name_list
                     name,               // name
@@ -8875,10 +8977,11 @@ function jslint_phase3_parse(state) {
     check_ordered(
         "function",
         function_list.map(function ({
+            arity,
             level,
             name
         }) {
-            return (level === 1) && name;
+            return arity === "statement" && level === 1 && name;
         }).filter(function (name) {
             return option_dict.beta && name && name.id;
         })
@@ -9035,6 +9138,7 @@ function jslint_phase4_walk(state) {
 // <the_variable> in current context from given <thing>.id.
 
         const id = thing.id;
+        let the_label;
         let the_variable;
 
 // PR-510 - deadcode-confirmed - Both callers pass a token already known to be
@@ -9060,6 +9164,22 @@ function jslint_phase4_walk(state) {
 
         block_stack.some(function (scope_block, ii) {
             the_variable = scope_block.context[id];
+
+// PR-xxx - Bugfix - Skip a label, so a same-named variable, function or global
+// in an outer scope is still found.
+
+            if (the_variable?.role === "label") {
+
+// test_cause:
+// ["aa:while(0){aa}", "name_lookup", "skip_label", "aa", 0]
+// ["
+// function aa(){aa:while(aa){break aa;}}
+// ", "name_lookup", "skip_label", "aa", 0]
+
+                test_cause("skip_label", id);
+                the_label = the_variable;
+                the_variable = undefined;
+            }
             if (the_variable && ii > 0) {
 
 // If found outside current-scope, mark as closure.
@@ -9069,6 +9189,14 @@ function jslint_phase4_walk(state) {
             return the_variable;
         });
         if (!the_variable && global_dict[id] === undefined) {
+            if (the_label) {
+
+// test_cause:
+// ["aa:while(0){aa}", "name_lookup", "label_a", "aa", 13]
+
+                warn("label_a", thing);
+                return the_label;
+            }
 
 // test_cause:
 // ["(function aa(){})aa", "name_lookup", "undeclared_a", "aa", 18]
@@ -9099,6 +9227,9 @@ function jslint_phase4_walk(state) {
 
                 assigned: true,
                 id,
+
+// 3.glo.4 - Mark 'readonly', the global-variable, immediately.
+
                 readonly: true,
                 role: "variable",
                 scope_declared: token_global
@@ -9108,22 +9239,14 @@ function jslint_phase4_walk(state) {
 
             token_global.context[id] = the_variable;
         }
-        if (the_variable.role === "label") {
-
-// test_cause:
-// ["aa:while(0){aa}", "name_lookup", "label_a", "aa", 13]
-
-            warn("label_a", thing);
-        } else if (
-            (
-                !the_variable.calls ||
-                !scope_function.name ||
-                !the_variable.calls[scope_function.name.id]
-            ) &&
-            !the_variable.alive
-        ) {
+        if (!the_variable.alive) {
 
 // Warn variable is 'out-of-scope'.
+
+// PR-xxx - Deviation kept 2026-09-29. A function reading a 'let' declared
+// below it warns, though valid when called later. This matches ESLint
+// no-use-before-define. The removed <calls> exemption never fired, since a
+// function-statement name is alive from parse.
 
 // test_cause:
 // ["(aa=aa)=>0", "name_lookup", "temporal_dead_zone_a", "aa", 5]
@@ -9629,6 +9752,13 @@ function jslint_phase4_walk(state) {
 
             scope_block = scope_block_pop();
         }
+
+// PR-xxx - Bugfix - Walk the finally-block after the catch-block, as parsed.
+// Else a 'var' from the catch-block warned temporal_dead_zone_a in it.
+
+// Recurse walk_statement.
+
+        walk_statement(thing.finally);
     }
 
     function post_s_var(thing) {
@@ -10275,10 +10405,10 @@ function jslint_phase5_whitage(state) {
         }
     }
 
-    function delve(the_function) {
-        Object.keys(the_function.context).forEach(function (id) {
-            const name = the_function.context[id];
-            if (id !== "ignore" && name.scope_declared === the_function) {
+    function delve(the_block) {
+        Object.keys(the_block.context).forEach(function (id) {
+            const name = the_block.context[id];
+            if (id !== "ignore" && name.scope_declared === the_block) {
 
 // test_cause:
 // ["function aa(aa) {return aa;}", "delve", "id", "", 0]
@@ -10834,7 +10964,6 @@ function jslint_phase5_whitage(state) {
         nr_comments_skipped = 0;
         delete left.alive;
         delete left.assigned;
-        delete left.calls;
         delete left.open;
         delete left.used;
         left = right;
