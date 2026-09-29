@@ -292,6 +292,7 @@
     on,
     open,
     opening,
+    optional,
     operator,
     option,
     option_dict,
@@ -4972,6 +4973,7 @@ function jslint_phase3_parse(state) {
 //      [destructure]
 //      {destructure}
 
+        const the_optional = optional_chain(the_thing);
         if (
             the_thing.arity !== "variable" &&
             the_thing.id !== "." &&
@@ -4984,6 +4986,19 @@ function jslint_phase3_parse(state) {
 // ["0=0", "check_mutation", "bad_assignment_a", "0", 1]
 
             warn("bad_assignment_a", the_thing);
+            return false;
+        }
+
+// PR-xxx - Bugfix - An optional-chain is never an assignment target, so
+// 'aa?.bb.cc = 0' and 'aa?.[bb] = 0' are SyntaxErrors too.
+
+        if (the_optional) {
+
+// test_cause:
+// ["aa?.[aa]=0", "check_mutation", "bad_assignment_a", "?.", 5]
+// ["aa?.aa.aa=0", "check_mutation", "bad_assignment_a", "?.", 3]
+
+            warn("bad_assignment_a", the_optional, "?.");
             return false;
         }
         return true;
@@ -5445,6 +5460,7 @@ function jslint_phase3_parse(state) {
 // ["\"\".aa", "check_left", "unexpected_a", ".", 3]
 // ["\"aa\"?.0", "check_left", "unexpected_a", "?.", 5]
 // ["aa=[]?.aa", "check_left", "unexpected_a", "?.", 6]
+// ["new aa``.aa()", "check_left", "unexpected_a", ".", 9]
 
             check_left(left, the_token);
         }
@@ -5461,6 +5477,11 @@ function jslint_phase3_parse(state) {
 // ["aa?.[bb]", "infix_dot", "dyn_prop_or_call", "", 0]
 
             test_cause("dyn_prop_or_call");
+
+// PR-xxx - Bugfix - The '?.' token leaves the tree here, so mark the '[' or '('
+// that follows it, for <optional_chain>.
+
+            name.optional = true;
             return left;
         }
         if (!name.identifier) {
@@ -5500,7 +5521,18 @@ function jslint_phase3_parse(state) {
     }
 
     function infix_grave(left) {
+        const the_optional = optional_chain(left);
         const the_tick = prefix_tick(true);
+        if (the_optional) {
+
+// PR-xxx - Bugfix - A tagged-megastring cannot follow an optional-chain, a
+// SyntaxError.
+
+// test_cause:
+// ["aa?.aa``", "infix_grave", "unexpected_a", "?.", 3]
+
+            warn("unexpected_a", the_optional, "?.");
+        }
 
 // test_cause:
 // ["0``", "check_left", "unexpected_a", "`", 2]
@@ -5795,6 +5827,39 @@ function jslint_phase3_parse(state) {
 
             warn("redefinition_global_a_b", name, global_dict[id], id);
             return;
+        }
+    }
+
+    function optional_chain(thing) {
+
+// PR-xxx - This function will return the '?.' token, or the '[' or '(' token
+// marked <optional> after a '?.', of an unwrapped optional-chain ending at
+// <thing>. The spec forbids such a chain as an assignment target, the callee
+// of 'new' and the tag of a template.
+
+        while (thing && !thing.wrapped) {
+            if (thing.id === "?." || thing.optional === true) {
+                return thing;
+            }
+            if (thing.arity !== "binary") {
+                return;
+            }
+            switch (thing.id) {
+            case "(":
+            case "[":
+                thing = thing.expression[0];
+                break;
+            case ".":
+                thing = thing.expression;
+                break;
+            default:
+
+// test_cause:
+// ["aa+aa=0", "optional_chain", "default", "", 0]
+
+                test_cause("default");
+                return;
+            }
         }
     }
 
@@ -6590,10 +6655,12 @@ function jslint_phase3_parse(state) {
             name_declare(
 
 // 2.fun.1 - Mark 'declared', the function-name, during function-declaration.
+// PR-xxx - Bugfix - Mark it readonly, so reassigning a function warns, as
+// ESLint no-func-assign does.
 
                 scope_declared,         // scope_declared
                 role,                   // role
-                false,                  // readonly
+                true,                   // readonly
                 [],                     // name_list
                 name,                   // name
 
@@ -7062,6 +7129,29 @@ function jslint_phase3_parse(state) {
         const the_new = token_now;
         let right;
         right = parse_expression(160);
+
+// PR-xxx - Bugfix - In 'new aa`bb`()' the tagged-megastring belongs to the
+// callee, 'new (aa`bb`)()', but '`' shares lbp 160 with the call's '(', so rbp
+// 160 stops before it. Parse it, and any member after it, into the callee.
+
+        while (token_nxt.id === "`") {
+            advance("`");
+            right = infix_grave(right);
+            while ([".", "?.", "["].includes(token_nxt.id)) {
+                advance();
+                right = syntax_dict[token_now.id].led_infix(right);
+            }
+        }
+        if (optional_chain(right)) {
+
+// PR-xxx - Bugfix - The callee of 'new' cannot be an optional-chain, a
+// SyntaxError that rbp 160 let in, since '?.' binds at 170.
+
+// test_cause:
+// ["new aa?.aa()", "prefix_new", "unexpected_a", "?.", 7]
+
+            warn("unexpected_a", optional_chain(right), "?.");
+        }
         if (token_nxt.id !== "(") {
 
 // test_cause:
@@ -7237,8 +7327,28 @@ function jslint_phase3_parse(state) {
     function stmt_delete() {
         const the_token = token_now;
         const the_value = parse_expression(0);
+
+// PR-xxx - Bugfix - Allow 'delete aa?.bb', a valid optional-chain operand.
+// PR-xxx - Bugfix - In 'delete aa[bb] || cc', the parse at rbp 0 swallows the
+// '||'. Warn on the operator, not on a missing '.'. Rbp 150 would stop the
+// lint on the leftover '|| cc'.
+
         if (
-            (the_value.id !== "." && the_value.id !== "[") ||
+            ["&&", "??", "||"].includes(the_value.id) &&
+            [".", "?.", "["].includes(the_value.expression[0].id) &&
+            the_value.expression[0].arity === "binary"
+        ) {
+
+// test_cause:
+// ["delete aa[aa]||aa", "stmt_delete", "unexpected_a", "||", 14]
+
+            warn("unexpected_a", the_value);
+        } else if (
+            (
+                the_value.id !== "." &&
+                the_value.id !== "?." &&
+                the_value.id !== "["
+            ) ||
             the_value.arity !== "binary"
         ) {
 
@@ -7609,7 +7719,10 @@ function jslint_phase3_parse(state) {
 // ["for(let aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
 // ["for(var aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
 
-                warn("expected_a_b", the_for, "Object.keys", "for in");
+// PR-xxx - Suggest 'for...of Object.keys', since a plain object is not
+// iterable, so a bare 'for...of' would throw a TypeError.
+
+                warn("expected_a_b", the_for, "for...of Object.keys", "for in");
                 break;
 
 // PR-504 - Add ES2015-feature for..of.
@@ -8894,6 +9007,28 @@ function jslint_phase4_walk(state) {
         };
     }
 
+    function check_assignable(name, the_variable) {
+
+// PR-xxx - This function will warn bad_assignment_a when <name> has no binding,
+// or a readonly one such as a const, an import, a catch variable or a
+// function name. The '=', compound, '++' and '--' forms all call it.
+
+        if (!the_variable || the_variable.readonly) {
+
+// test_cause:
+// ["aa+=0", "check_assignable", "bad_assignment_a", "aa", 1]
+// ["aa=0", "check_assignable", "bad_assignment_a", "aa", 1]
+// ["const aa=0;aa++", "check_assignable", "bad_assignment_a", "aa", 12]
+// ["const aa=0;aa+=0", "check_assignable", "bad_assignment_a", "aa", 12]
+// ["const aa=0;aa=0", "check_assignable", "bad_assignment_a", "aa", 12]
+// ["function aa(){}aa=0", "check_assignable", "bad_assignment_a", "aa", 16]
+
+            warn("bad_assignment_a", name);
+            return false;
+        }
+        return true;
+    }
+
     function name_lookup(thing) {
 
 // This function will lookup and return variable or function-parameter
@@ -9011,19 +9146,8 @@ function jslint_phase4_walk(state) {
         const lvalue = thing.expression[0];
         let right;
         if (thing.id !== "=") {
-            if (
-                lvalue.arity === "variable" &&
-                (!lvalue.variable || lvalue.variable.readonly)
-            ) {
-
-// test_cause:
-// ["aa+=0", "post_a_assignment", "+=", "aa", 0]
-// ["aa+=0", "post_a_assignment", "bad_assignment_a", "aa", 1]
-// ["const aa=0;aa+=0", "post_a_assignment", "+=", "aa", 0]
-// ["const aa=0;aa+=0", "post_a_assignment", "bad_assignment_a", "aa", 12]
-
-                test_cause("+=", lvalue.id);
-                warn("bad_assignment_a", lvalue);
+            if (lvalue.arity === "variable") {
+                check_assignable(lvalue, lvalue.variable);
             }
             right = syntax_dict[thing.expression[1].id];
             if (
@@ -9047,25 +9171,15 @@ function jslint_phase4_walk(state) {
             return;
         }
         if (thing.name_list) {
-            thing.name_list.forEach(function (name) {
+            for (const name of thing.name_list) {
                 const the_variable = name_lookup(name);
-                if (the_variable && !the_variable.readonly) {
+                if (check_assignable(name, the_variable)) {
 
 // 3.var.3 - Mark 'assigned', the variable, after assignment.
 
                     the_variable.assigned = true;
-                    return;
                 }
-
-// test_cause:
-// ["aa=0", "post_a_assignment", "=", "aa", 0]
-// ["aa=0", "post_a_assignment", "bad_assignment_a", "aa", 1]
-// ["const aa=0;aa=0", "post_a_assignment", "=", "aa", 0]
-// ["const aa=0;aa=0", "post_a_assignment", "bad_assignment_a", "aa", 12]
-
-                test_cause("=", name.id);
-                warn("bad_assignment_a", name);
-            });
+            }
             return;
         }
         if (lvalue.id === "." && thing.expression[1].id === "undefined") {
@@ -9436,6 +9550,16 @@ function jslint_phase4_walk(state) {
 // ["aa=0||0", "post_b_or", "weird_condition_a", "||", 5]
 
             warn("weird_condition_a", thing);
+        }
+    }
+
+    function post_p_update(thing) {
+
+// PR-xxx - Bugfix - A '++' or '--' assigns too, so a const, an import or an
+// undeclared operand warns like 'aa += 1' does.
+
+        if (thing.expression.arity === "variable") {
+            check_assignable(thing.expression, thing.expression.variable);
         }
     }
 
@@ -10035,6 +10159,8 @@ function jslint_phase4_walk(state) {
     postaction("binary", "=>", post_s_function);
     postaction("binary", "[", post_b_lbracket);
     postaction("binary", "||", post_b_or);
+    postaction("postassign", "(all)", post_p_update);
+    postaction("preassign", "(all)", post_p_update);
     postaction("statement", "const", post_s_var);
     postaction("statement", "export", post_s_export_toplevel);
     postaction("statement", "for", post_s_for);

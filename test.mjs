@@ -1843,6 +1843,9 @@ export default Object.freeze(async function () {
                 `import aa, {aa as bb, cc} from "aa";\naa(bb, cc);`,
                 `import {} from "aa";`
             ],
+            new: [
+                "new String`aa`();"
+            ],
             number: [
                 "String(0.0e0);",
                 "String(0b0);",
@@ -1860,7 +1863,9 @@ export default Object.freeze(async function () {
                 "String(1_234_234.1_234_234E1_234_234);"
             ],
             optional_chaining: [
-                "String().aa?.bb?.cc();"
+                "String().aa?.bb?.cc();",
+                "delete String?.[0];",
+                "delete String?.aa;"
             ],
             param: [
                 "function aa({aa, bb}) {\n    return {aa, bb};\n}\naa();",

@@ -1,6 +1,7 @@
 # Changelog
 
 # Todo
+- jslint - Add warning for 'aa.hasOwnProperty(bb)' and 'Object.prototype.hasOwnProperty.call(aa, bb)', suggesting 'Object.hasOwn(aa, bb)'.
 - jslint - Warn arrow-function 'aa || bb => cc' as a SyntaxError, not with warning wrap_fart_parameter, whose fix is still invalid.
 - jslint - Check the target of a for-of or for-in head without const or let, e.g. 'for (aa + bb of cc)'.
 - jslint - Relax warning use_open for one-line ternary-operator inside template-literal substitution '${...}'.
