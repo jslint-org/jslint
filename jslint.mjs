@@ -94,7 +94,6 @@
 /*property
     JSLINT_BETA,
     NODE_V8_COVERAGE,
-    accessor,
     alive,
     all,
     argv,
@@ -337,6 +336,7 @@
     scope_declared,
     scope_function_pop,
     scope_function_push,
+    scope_name,
     scriptId,
     search,
     set,
@@ -398,6 +398,7 @@
     v8CoverageListMerge,
     v8CoverageReportCreate,
     value,
+    values,
     variable,
     variable_prv,
     version,
@@ -5704,7 +5705,7 @@ function jslint_phase3_parse(state) {
 // 5.lab.4 - Mark 'readonly', the label-name, before control-flow-block.
 //
 // The 2.fun tags also cover a named function-expression, whose name is
-// declared in its own function-body.
+// declared in <scope_name>, a scope outside its function.
 //
 // PR-xxx - Deviations from the spec, reviewed 2026-09-29, each kept. A fixed
 // one is commented at its site, and a Todo is in CHANGELOG.md.
@@ -5722,12 +5723,17 @@ function jslint_phase3_parse(state) {
 //   temporal_dead_zone_a, though its hoisted value 'undefined' is valid.
 // - 3.var.2 - Kept. A function reading a 'let' declared below it warns, see
 //   the note in <name_lookup>.
+// - 3.var.3 - Kept. '&&=' and '+=' do not assign an unassigned variable, which
+//   stays undefined or becomes NaN, so it warns unassigned_var_a. ESLint
+//   no-unassigned-vars counts every compound assignment as a write.
 // - 4.par.1 - Kept. A parameter-default reading a body 'var' warns
 //   temporal_dead_zone_a, where the spec makes it undeclared. It still warns,
 //   and ESLint no-use-before-define likely does the same.
 // - 5.lab.1 - Kept. A label shares the variable namespace, so a same-named
 //   variable warns redefinition_a_b, as ESLint no-label-var.
 // - 5.lab.1 - Kept. A label is allowed only on do, for, switch and while.
+// - 5.lab.1 - Kept. A label read as a variable warns label_a and counts as a
+//   use of the label, so it warns no unused_a as well.
 
         const id = name.id;
         let earlier;
@@ -5759,10 +5765,9 @@ function jslint_phase3_parse(state) {
 
 // Has the name been declared in this context?
 
-// PR-xxx - Bugfix - Also check <scope_declared>, which differs from
-// <scope_block> for a var in a nested block. Else 'var bb' in an if-block
-// replaced an earlier 'var bb', and a use between them warned
-// temporal_dead_zone_a.
+// PR-xxx - Bugfix - Check <scope_declared>, which differs from <scope_block>
+// for a var in a nested block. Else 'var bb' in an if-block replaced an
+// earlier 'var bb', and a use between them warned temporal_dead_zone_a.
 
         earlier = scope_block.context[id] || scope_declared.context[id];
         if (earlier) {
@@ -6682,6 +6687,9 @@ function jslint_phase3_parse(state) {
 
         let scope_declared = scope_block;
         the_function = the_function || token_now;
+        the_function.scope_name = {
+            context: empty()
+        };
         if (mode_fart) {
             the_function.arity = "binary";
         }
@@ -6710,16 +6718,14 @@ function jslint_phase3_parse(state) {
 
                 warn("var_switch", the_function);
             }
-        } else if (name) {
+        } else {
 
 // A function expression may have an optional name.
 
-// PR-504 - Restrict scope from scope_function to its own function_body:
-// - named-function-expression
+// PR-xxx - Bugfix - Declare the name in <scope_name>, outside the function as
+// in the spec, so a 'var' of that name in the body is a new binding.
 
-            scope_declared = the_function;
-            name.used = true;
-            the_function.context = empty();
+            scope_declared = the_function.scope_name;
         }
         if (name) {
             advance();
@@ -6787,6 +6793,7 @@ function jslint_phase3_parse(state) {
 
 // Push the current function context and establish a new one.
 
+        scope_block = scope_block_push(the_function.scope_name, false);
         scope_block = scope_block_push(the_function, true);
         scope_function = scope_function_push(the_function, true);
 
@@ -6946,6 +6953,7 @@ function jslint_phase3_parse(state) {
 // Restore the previous context.
 
         scope_block = scope_block_pop();
+        scope_block = scope_block_pop();
         scope_function = scope_function_pop();
         return the_function;
     }
@@ -6954,10 +6962,10 @@ function jslint_phase3_parse(state) {
 
 // PR-xxx - Bugfix - <seen> maps a property-name to true, or to false if only
 // an accessor has it. Accessor-keys like 'get aa' live apart in
-// <seen_accessor>, so a string-key named get aa cannot collide with them.
+// <seen_getset>, so a string-key named get aa cannot collide with them.
 
         const seen = empty();
-        const seen_accessor = empty();
+        const seen_getset = empty();
         const the_brace = token_now;
         function property_parse() {
             let extra;
@@ -6999,11 +7007,11 @@ function jslint_phase3_parse(state) {
                 }
                 extra = name.id;
                 full = extra + " " + token_nxt.id;
-                name.accessor = true;
+                name.getset = true;
                 name = token_nxt;
                 advance();
                 id = survey(name);
-                if (seen_accessor[full] === true || seen[id] === true) {
+                if (seen_getset[full] === true || seen[id] === true) {
 
 // test_cause:
 // ["aa={get aa(){},get aa(){}}", "property_parse", "duplicate_a", "aa", 20]
@@ -7011,7 +7019,7 @@ function jslint_phase3_parse(state) {
                     warn("duplicate_a", name);
                 }
                 seen[id] = false;
-                seen_accessor[full] = true;
+                seen_getset[full] = true;
             } else {
                 id = survey(name);
                 if (typeof seen[id] === "boolean") {
@@ -9012,14 +9020,36 @@ function jslint_phase3_parse(state) {
 
 // Check global functions are ordered.
 
+// PR-xxx - Bugfix - Also check an exported function-declaration, which is
+// hoisted too, though <stmt_export> resets its arity to 'unary'.
+
+// test_cause:
+// ["
+// export async function bb(){}export async function aa(){}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 51]
+// ["
+// export function bb(){}export default function aa(){}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 47]
+// ["
+// export function bb(){}export function aa(){}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 39]
+
     check_ordered(
         "function",
-        function_list.map(function ({
-            arity,
-            level,
-            name
-        }) {
-            return arity === "statement" && level === 1 && name;
+        function_list.map(function (the_function) {
+            const {
+                arity,
+                level,
+                name
+            } = the_function;
+            return (
+                (
+                    arity === "statement" ||
+                    Object.values(export_dict).includes(the_function)
+                ) &&
+                level === 1 &&
+                name
+            );
         }).filter(function (name) {
             return option_dict.beta && name && name.id;
         })
@@ -9150,15 +9180,27 @@ function jslint_phase4_walk(state) {
 
     function check_assignable(name, the_variable) {
 
-// PR-xxx - This function will warn bad_assignment_a when <name> has no binding,
-// or a readonly one such as a const, an import, a catch variable or a
-// function name. The '=', compound, '++' and '--' forms all call it.
+// PR-xxx - This function will warn bad_assignment_a when <name> has a readonly
+// binding, such as a const, an import, a catch variable or a function name,
+// and return false for that or for no binding. The '=', compound, '++' and
+// '--' forms all call it.
 
-        if (!the_variable || the_variable.readonly) {
+        if (!the_variable) {
+
+// PR-xxx - An undeclared <name> returns false with no warning, since
+// <name_lookup> already warned undeclared_a on this token, and <warn> keeps
+// only the first warning of a token.
 
 // test_cause:
-// ["aa+=0", "check_assignable", "bad_assignment_a", "aa", 1]
-// ["aa=0", "check_assignable", "bad_assignment_a", "aa", 1]
+// ["aa+=0", "check_assignable", "undeclared", "", 0]
+// ["aa=0", "check_assignable", "undeclared", "", 0]
+
+            test_cause("undeclared");
+            return false;
+        }
+        if (the_variable.readonly) {
+
+// test_cause:
 // ["const aa=0;aa++", "check_assignable", "bad_assignment_a", "aa", 12]
 // ["const aa=0;aa+=0", "check_assignable", "bad_assignment_a", "aa", 12]
 // ["const aa=0;aa=0", "check_assignable", "bad_assignment_a", "aa", 12]
@@ -9172,8 +9214,8 @@ function jslint_phase4_walk(state) {
 
     function name_lookup(thing) {
 
-// This function will lookup and return variable or function-parameter
-// <the_variable> in current context from given <thing>.id.
+// This function will look up <thing>.id from the current scope outward, and
+// return its variable, parameter, label or global, or undefined if undeclared.
 
         const id = thing.id;
         let the_label;
@@ -9279,7 +9321,7 @@ function jslint_phase4_walk(state) {
         }
         if (!the_variable.alive) {
 
-// Warn variable is 'out-of-scope'.
+// Warn variable is in its temporal-dead-zone.
 
 // PR-xxx - Deviation kept 2026-09-29. A function reading a 'let' declared
 // below it warns, though valid when called later. This matches ESLint
@@ -9288,6 +9330,9 @@ function jslint_phase4_walk(state) {
 
 // test_cause:
 // ["(aa=aa)=>0", "name_lookup", "temporal_dead_zone_a", "aa", 5]
+// ["
+// (function aa(){aa();var aa})
+// ", "name_lookup", "temporal_dead_zone_a", "aa", 16]
 // ["for(const [aa] of aa){}", "name_lookup", "temporal_dead_zone_a", "aa", 19]
 // ["let [aa]=aa", "name_lookup", "temporal_dead_zone_a", "aa", 10]
 // ["let aa=()=>aa", "name_lookup", "temporal_dead_zone_a", "aa", 12]
@@ -9301,15 +9346,24 @@ function jslint_phase4_walk(state) {
 
     function post_a_assignment(thing) {
 
-// Assignment using = sets the assigned property of a variable. No other
-// assignment operator can do this. A = token keeps that variable (or array of
-// variables in case of destructuring) in its name property.
+// Assignment using = sets the assigned property of a variable, and so do '??='
+// and '||=' below. A = token keeps that variable, or the variables of a
+// destructuring, in its name_list property.
 
         const lvalue = thing.expression[0];
         let right;
         if (thing.id !== "=") {
-            if (lvalue.arity === "variable") {
-                check_assignable(lvalue, lvalue.variable);
+            if (
+                lvalue.arity === "variable" &&
+                check_assignable(lvalue, lvalue.variable) &&
+                (thing.id === "??=" || thing.id === "||=")
+            ) {
+
+// PR-xxx - Bugfix - '??=' and '||=' assign an unassigned variable, since its
+// 'undefined' is nullish and falsy, so it counts as assigned. '&&=' does not
+// assign it, and still warns unassigned_var_a.
+
+                lvalue.variable.assigned = true;
             }
             right = syntax_dict[thing.expression[1].id];
             if (
@@ -9764,6 +9818,7 @@ function jslint_phase4_walk(state) {
             warn("unexpected_parens", thing);
         }
         scope_block = scope_block_pop();
+        scope_block = scope_block_pop();
         scope_function = scope_function_pop();
     }
 
@@ -10159,6 +10214,7 @@ function jslint_phase4_walk(state) {
 // PR-504 - Add hidden scope_block for:
 // - function-parameter
 
+        scope_block = scope_block_push(thing.scope_name, false);
         scope_block = scope_block_push(thing, false);
         scope_function = scope_function_push(thing, false);
         if (thing.extra === "get") {
@@ -10482,6 +10538,7 @@ function jslint_phase5_whitage(state) {
                 } else if (!name.assigned) {
 
 // test_cause:
+// ["let aa;aa&&=0;aa();", "delve", "unassigned_var_a", "aa", 5]
 // ["let aa;aa();", "delve", "unassigned_var_a", "aa", 5]
 
                     warn("unassigned_var_a", name);
@@ -10780,7 +10837,7 @@ function jslint_phase5_whitage(state) {
             }
             return;
         }
-        if (left.accessor === true) {
+        if (left.getset === true) {
 
 // PR-xxx - Bugfix - The 'get' or 'set' of an accessor takes one space before
 // its name, and no line break. On one line, <one_space> still lets a comment
@@ -10801,9 +10858,9 @@ function jslint_phase5_whitage(state) {
 // String({get aa() {
 //     return;
 // }});
-// ", "whitage_default", "accessor", "", 0]
+// ", "whitage_default", "getset", "", 0]
 
-            test_cause("accessor");
+            test_cause("getset");
             if (left.line === right.line) {
                 one_space();
             } else {
