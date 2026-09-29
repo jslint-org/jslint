@@ -1579,6 +1579,20 @@ function cc() {
 }
 [aa, bb] = cc();
 aa(bb, cc);
+                `),
+
+// PR-xxx - Bugfix - Walk a default in destructuring-assignment, so 'cc' is
+// used.
+
+                (`
+let aa;
+let cc = 0;
+[
+    [
+        aa = cc
+    ]
+] = [];
+aa();
                 `)
             ],
             directive: [
@@ -1678,6 +1692,20 @@ async function aa(bb, cc) {
 aa();
                 `),
 
+// PR-xxx - Bugfix - Walk the iterable of destructured for..of.
+
+                (`
+function aa(bb) {
+    for (const [cc, dd] of bb) {
+        cc(dd);
+    }
+    for (const {ee} of bb) {
+        ee();
+    }
+}
+aa();
+                `),
+
 // PR-xxx - Bugfix - A ';' in a method-body inside a for-loop-head is not a
 // for-loop-semicolon.
 
@@ -1688,6 +1716,20 @@ function aa(bb) {
             return;
         }
     }) {
+        bb(cc);
+    }
+}
+aa();
+                `),
+
+// PR-xxx - Bugfix - The '}' of a '${' does not pop the '{' of a function-body
+// in a for-loop-head, since '${' is pushed too.
+
+                (`
+function aa(bb) {
+    for (const cc of function () {
+        return \`\${bb}\`;
+    }()) { //jslint-ignore-line
         bb(cc);
     }
 }
@@ -1890,6 +1932,21 @@ aa();
             ],
             scope: [
                 "(function aa(bb = aa) {\n    aa(bb);\n}());",
+
+// PR-xxx - Bugfix - A 'var' redeclared in a nested block keeps the first one,
+// so a use between the two does not warn temporal_dead_zone_a.
+
+                (`
+function aa() {
+    var bb = 0;
+    bb();
+    if (aa) {
+        var bb = 1; //jslint-ignore-line
+        bb();
+    }
+}
+aa();
+                `),
                 "function aa(bb = aa) {\n    aa(bb);\n}\naa();",
                 (`
 function bb(cc) {
@@ -2026,6 +2083,17 @@ jstestDescribe((
 // PR-404 - Alias "evil" to jslint-directive "eval" for backwards-compat.
 
         [{eval: true, evil: true}, "new Function();\neval();"],
+
+// PR-xxx - Bugfix - A string-key named get aa does not duplicate an accessor.
+
+        [{getset: true}, String(`
+String({
+    get aa() {
+        return;
+    },
+    "get aa": 0
+});
+        `).trim()],
         [{getset: true}, "String({get aa() {\n    return;\n}});"],
         [{getset: true}, "String({set aa(aa) {\n    return aa;\n}});"],
         [{indent2: true}, sourceJslintMjs.replace((/    /g), "  ")],

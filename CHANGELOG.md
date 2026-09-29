@@ -1,14 +1,16 @@
 # Changelog
 
 # Todo
+- jslint - Allow a quoted accessor-name 'get "aa"() {}', valid ES2015 but a stop now.
 - jslint - Report - Stop naming an anonymous function after a keyword, e.g. '«return»' for 'return function () {}'.
 - jslint - Destructuring - Allow catch-variable 'catch ({aa})', valid ES2015 but a stop now, and maybe warn a const reassigned by '({aa} = {})'.
+- jslint - Destructuring - Allow a default in object destructuring-assignment '({aa = bb} = cc)', and a member-target '[aa.cc = bb] = cc', valid but stops now.
 - jslint - Add warning for 'aa.hasOwnProperty(bb)' and 'Object.prototype.hasOwnProperty.call(aa, bb)', suggesting 'Object.hasOwn(aa, bb)'.
 - jslint - Warn arrow-function 'aa || bb => cc' as a SyntaxError, not with warning wrap_fart_parameter, whose fix is still invalid.
 - jslint - Check the target of a for-of or for-in head without const or let, e.g. 'for (aa + bb of cc)'.
 - jslint - Relax warning use_open for one-line ternary-operator inside template-literal substitution '${...}'.
 - jslint - Add new warning requiring paren around plus-separated concatenations.
-- jslint - Revisit autofix of top-level whitespace, e.g. warning expected_space_a_b on line break inside closed-form expression.
+- jslint - Revisit autofix of top-level whitespace, e.g. warning expected_space_a_b on line break inside closed-form expression, and on line break between an accessor's 'get' and its name.
 - jslint-directive - Add new directive 'tab' to support tab-indent.
 - jslint-ecma - Add ES2015-feature iterators.
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.

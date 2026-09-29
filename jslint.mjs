@@ -94,6 +94,7 @@
 /*property
     JSLINT_BETA,
     NODE_V8_COVERAGE,
+    accessor,
     alive,
     all,
     argv,
@@ -5758,7 +5759,12 @@ function jslint_phase3_parse(state) {
 
 // Has the name been declared in this context?
 
-        earlier = scope_block.context[id];
+// PR-xxx - Bugfix - Also check <scope_declared>, which differs from
+// <scope_block> for a var in a nested block. Else 'var bb' in an if-block
+// replaced an earlier 'var bb', and a use between them warned
+// temporal_dead_zone_a.
+
+        earlier = scope_block.context[id] || scope_declared.context[id];
         if (earlier) {
 
 // test_cause:
@@ -5766,6 +5772,8 @@ function jslint_phase3_parse(state) {
 // ["let aa;function aa(){}", "name_declare", "scope_current", "aa", 0]
 // ["let aa;let aa", "name_declare", "redefinition_a_b", "1", 12]
 // ["let aa;let aa", "name_declare", "scope_current", "aa", 0]
+// ["var aa;if(0){var aa}", "name_declare", "redefinition_a_b", "1", 18]
+// ["var aa;if(0){var aa}", "name_declare", "scope_current", "aa", 0]
 
             test_cause("scope_current", id);
             warn("redefinition_a_b", name, id, earlier.line);
@@ -6566,6 +6574,19 @@ function jslint_phase3_parse(state) {
                     the_destructure.open = true;
                 }
                 name.expression = parse_expression(0);
+                if (scope_declared === undefined) {
+
+// PR-xxx - Bugfix - Walk a default in destructuring-assignment
+// '[aa = bb] = ...', which no <post_s_var> walks, so 'bb' was never used. It
+// is pushed wrapped in an array, which has no <arity>, so <prefix_lbracket>
+// walks it and never looks it up as a target.
+
+// test_cause:
+// [";[aa=0]=0", "name_parse", "default", "", 0]
+
+                    test_cause("default");
+                    name_list.push([name.expression]);
+                }
 
 // test_cause:
 // ["function aa([aa=aa]){}", "name_lookup", "temporal_dead_zone_a", "aa", 17]
@@ -6930,7 +6951,13 @@ function jslint_phase3_parse(state) {
     }
 
     function prefix_lbrace() {
+
+// PR-xxx - Bugfix - <seen> maps a property-name to true, or to false if only
+// an accessor has it. Accessor-keys like 'get aa' live apart in
+// <seen_accessor>, so a string-key named get aa cannot collide with them.
+
         const seen = empty();
+        const seen_accessor = empty();
         const the_brace = token_now;
         function property_parse() {
             let extra;
@@ -6972,10 +6999,11 @@ function jslint_phase3_parse(state) {
                 }
                 extra = name.id;
                 full = extra + " " + token_nxt.id;
+                name.accessor = true;
                 name = token_nxt;
                 advance();
                 id = survey(name);
-                if (seen[full] === true || seen[id] === true) {
+                if (seen_accessor[full] === true || seen[id] === true) {
 
 // test_cause:
 // ["aa={get aa(){},get aa(){}}", "property_parse", "duplicate_a", "aa", 20]
@@ -6983,7 +7011,7 @@ function jslint_phase3_parse(state) {
                     warn("duplicate_a", name);
                 }
                 seen[id] = false;
-                seen[full] = true;
+                seen_accessor[full] = true;
             } else {
                 id = survey(name);
                 if (typeof seen[id] === "boolean") {
@@ -7123,6 +7151,16 @@ function jslint_phase3_parse(state) {
                 undefined,              // the_function
                 false                   // the_function_toplevel
             );
+
+// PR-xxx - Walk defaults as expressions, and leave only variables in
+// <name_list> for <post_a_assignment> to look up.
+
+            element.expression = the_token.name_list.filter(function (name) {
+                return name.arity !== "variable";
+            });
+            the_token.name_list = the_token.name_list.filter(function (name) {
+                return name.arity === "variable";
+            });
             advance("=");
             symbol("=").led_infix(element);
             return the_token;
@@ -7334,8 +7372,8 @@ function jslint_phase3_parse(state) {
         if (token_nxt.identifier && token_now.line === token_nxt.line) {
             block_stack.some(function (scope_block) {
 
-// PR-xxx - Bugfix - Stop at the function boundary, since a label is not
-// visible inside a nested function.
+// PR-xxx - Bugfix - Stop at the function boundary, since 'break aa' cannot
+// reach a label in an enclosing function, which is a SyntaxError.
 
                 if (scope_block === scope_function) {
                     return true;
@@ -7353,7 +7391,7 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["
-// aa:while(0){(function(){while(0){break aa;}}());}
+// aa:while(0){(function(){while(0){break aa}}())}
 // ", "stmt_break", "not_label_a", "aa", 40]
 // ["aa:while(0){}break aa", "stmt_break", "not_label_a", "aa", 20]
 // ["break aa", "stmt_break", "not_label_a", "aa", 7]
@@ -9250,6 +9288,7 @@ function jslint_phase4_walk(state) {
 
 // test_cause:
 // ["(aa=aa)=>0", "name_lookup", "temporal_dead_zone_a", "aa", 5]
+// ["for(const [aa] of aa){}", "name_lookup", "temporal_dead_zone_a", "aa", 19]
 // ["let [aa]=aa", "name_lookup", "temporal_dead_zone_a", "aa", 10]
 // ["let aa=()=>aa", "name_lookup", "temporal_dead_zone_a", "aa", 12]
 // ["let aa=aa", "name_lookup", "temporal_dead_zone_a", "aa", 8]
@@ -10087,6 +10126,12 @@ function jslint_phase4_walk(state) {
             case "const":
             case "let":
             case "var":
+
+// PR-xxx - Bugfix - Walk the iterable of destructured 'for (const [aa] of bb)',
+// which <stmt_var> keeps in <expression>, and <post_s_var> does not walk. Walk
+// it before <post_s_var> marks the names alive, to catch temporal_dead_zone_a.
+
+                walk_expression(thing.for_of.expression);
                 post_s_var(thing.for_of);
                 break;
             default:
@@ -10128,12 +10173,24 @@ function jslint_phase4_walk(state) {
                 warn("bad_get", thing);
             }
         } else if (thing.extra === "set") {
-            if (thing.parameter_count !== 1) {
+
+// PR-xxx - Bugfix - A setter's one parameter cannot be a rest-parameter, a
+// SyntaxError. Read <signature>, since <name_list> flattens destructuring and
+// cannot tell a rest-parameter from a valid rest-element inside a destructure.
+
+            if (
+                thing.parameter_count !== 1 ||
+                thing.signature.startsWith("(...")
+            ) {
 
 // test_cause:
 // ["
 // /*jslint getset*/
 // aa={set aa(){}}
+// ", "pre_s_function", "bad_set", "function", 9]
+// ["
+// /*jslint getset*/
+// aa={set aa(...aa){}}
 // ", "pre_s_function", "bad_set", "function", 9]
 
                 warn("bad_set", thing);
@@ -10720,6 +10777,37 @@ function jslint_phase5_whitage(state) {
 
                 test_cause("for(;;)", left.id);
                 at_margin(0);
+            }
+            return;
+        }
+        if (left.accessor === true) {
+
+// PR-xxx - Bugfix - The 'get' or 'set' of an accessor takes one space before
+// its name, and no line break. On one line, <one_space> still lets a comment
+// sit between them.
+
+// test_cause:
+// ["
+// /*jslint getset*/
+// String({
+//     get
+//     aa() {
+//         return;
+//     }
+// });
+// ", "one_space_only", "expected_space_a_b", "aa", 5]
+// ["
+// /*jslint getset*/
+// String({get aa() {
+//     return;
+// }});
+// ", "whitage_default", "accessor", "", 0]
+
+            test_cause("accessor");
+            if (left.line === right.line) {
+                one_space();
+            } else {
+                one_space_only();
             }
             return;
         }
