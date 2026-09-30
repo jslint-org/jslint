@@ -1071,8 +1071,12 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
         token_global,
         token_list,
         warn,
-        warn_at
+        warn_at,
+        warning_list
     } = state;
+    const mode_digits_numeric_separator = 1;
+    const mode_digits_regexp_quantifier = 2;
+    const mode_digits_unicode_escape = 3;
     const opener_stack = [];    // Stack of opener tokens: (, [.
     let char;                   // The current character being lexed.
     let column = 0;             // The column number of the next character.
@@ -1083,8 +1087,6 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
     let line_mega;              // The starting line of megastring.
     let line_source = "";       // The remaining line source string.
     let line_whole = "";        // The whole line source string.
-    let mode_digits_empty_string = 1;
-    let mode_digits_numeric_separator = 2;
     let mode_directive = true;  // true if directives are still allowed.
     let mode_mega = false;      // true if currently parsing a megastring
                                 // ... literal.
@@ -1096,9 +1098,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
     let token_prv = token_global;       // The previous token including
                                         // ... comments.
     let token_prv_expr = token_global;  // The previous token excluding
-                                        // ... comments.
-
-// Most tokens, including the identifiers, operators, and ...
+                                        // ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1166,7 +1166,8 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
         token_global,
         token_list,
         warn,
-        warn_at
+        warn_at,
+        warning_list
     } = state;
     let anon = "anonymous";     // The guessed name for anonymous functions.
     let mode_var;               // "var" if using var; "let" if using let.
@@ -1188,8 +1189,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
         if (
             token_now.identifier &amp;&amp;
             token_now.id !== "function" &amp;&amp;
-            token_now.id !== "async"
-      ...
+            token_now...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1235,7 +1235,6 @@ if (!state.mode_json) {
         scope_block_push,
         scope_function_pop,
         scope_function_push,
-        stop,
         syntax_dict,
         test_cause,
         token_global,
@@ -1294,7 +1293,9 @@ if (!state.mode_json) {
 // Produce a function that will act on the tasks registered by an action
 // function while walking the tree.
 
-        return function (t...
+        return function (the_token) {
+
+/...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
