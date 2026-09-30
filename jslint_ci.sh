@@ -696,7 +696,11 @@ import moduleFs from "fs";
         await moduleFs.promises.readdir(".")
     ).forEach(async function (file) {
         let data;
-        if (file === "CHANGELOG.md" || !(/.\.html$|.\.md$/m).test(file)) {
+        if (
+            file === "CHANGELOG.md" ||
+            file.startsWith(".") ||
+            !(/.\.html$|.\.md$/m).test(file)
+        ) {
             return;
         }
         data = await moduleFs.promises.readFile(file, "utf8");
@@ -1254,6 +1258,8 @@ import moduleFs from "fs";
         branchSquash = "HEAD"
     ] = process.argv;
     let branchPull;
+    let changelogNew;
+    let changelogOld;
     let commitMessage;
     let data;
     version = version.replace((/-0?/g), ".").replace((/^v/), "");
@@ -1282,10 +1288,31 @@ import moduleFs from "fs";
         break;
     default:
         version = `p${version}`;
+        // Diff from <changelogOld> to <changelogNew>.
+        changelogNew = (
+            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n([\S\s]+?)\n\n/
+        ).exec(data)[1].split(/\n(?=- )/);
+        changelogOld = await new Promise(function (resolve) {
+            moduleChildProcess.execFile(
+                "git",
+                ["show", `${branchMerge}:CHANGELOG.md`],
+                {encoding: "utf8"},
+                function (ignore, stdout) {
+                    resolve(stdout?.split("\n") || []);
+                }
+            );
+        });
         commitMessage = (
-            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)(?:\n- |\n\n)/
-        ).exec(data)[1];
-        commitMessage = `- shGithubPrCreate ${commitMessage}`;
+            `- shGithubPrCreate ` +
+            (
+                changelogNew
+                    .filter(function (item) {
+                        return !changelogOld.includes(item.split("\n")[0]);
+                    })
+                    .join("\n") ||
+                changelogNew[0]
+            )
+        );
     }
     branchPull = `branch-${version}`;
     // security - sanitize commitMessage
@@ -1298,13 +1325,13 @@ import moduleFs from "fs";
 (set -e
     . ./jslint_ci.sh
     npm run test2
+    shDirHttplinkValidate
     git reset "${branchSquash}"
     git push . HEAD:__pr_"${branchMerge}"_pre -f
     shGitSquashPop "${branchCheckpoint}" \u0027${commitMessage}\u0027
     git --no-pager diff origin/"${branchPull}" || true
     git push origin alpha:"${branchPull}" -f
     git push origin alpha -f
-    shDirHttplinkValidate
     git push . HEAD:__pr_"${branchMerge}" -f
     printf "\n\n\n\n"
     git --no-pager log -n 4
