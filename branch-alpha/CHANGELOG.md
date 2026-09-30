@@ -16,6 +16,7 @@
 - jslint-website - Add button 'Autofix Whitespace' and section 'Report: Autofix'.
 - jslint-vscode - Add command 'JSLint - Autofix Whitespace', CTRL+SHIFT+J A.
 - jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-line, except dot-operators '.', '?.' and tagged-template backtick, and update function jslint_phase6_autofix() to autofix it.
+- jslint - Check escapes in untagged megastrings via \<char_after_escape>.
 - jslint-autofix - Warning 'too_long' no longer blocks autofix.
 - jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.
 - jslint - Move column-fudging into warn_at(); callers pass 0-based column.
