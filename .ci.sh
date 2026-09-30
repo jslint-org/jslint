@@ -6,7 +6,7 @@ sh jslint_ci.sh shCiJslintGlobalDictAllFetch
 '
 
 shCiArtifactUploadCustom() {(set -e
-# this function will run custom-code to upload build-artifacts
+# This function will run custom-code to upload build-artifacts.
     # .github_cache - restore
     if [ "$GITHUB_ACTION" ] && [ -d .github_cache ]
     then
@@ -183,7 +183,7 @@ import moduleChildProcess from "child_process";
 )}
 
 shCiBaseCustom() {(set -e
-# this function will run custom-code for base-ci
+# This function will run custom-code for base-ci.
     # update files
     if [ "$(git branch --show-current)" = alpha ]
     then
@@ -219,8 +219,8 @@ import moduleFs from "fs";
             file: ".ci.sh",
             // update version
             src: fileDict[".ci.sh"].replace((
-                /    "version": "\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
-            ), `    "version": "${versionBeta.split("-")[0]}"`)
+                / {4}"version": "\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
+            ), `${" ".repeat(4)}"version": "${versionBeta.split("-")[0]}"`)
         }, {
             file: "README.md",
             src: fileDict["README.md"].replace((
@@ -303,7 +303,7 @@ import moduleFs from "fs";
 )}
 
 shCiJslintGlobalDictAllFetch() {(set -e
-# this function will fetch list of common, javascript global-objects
+# This function will fetch list of common, javascript global-objects
 # from online-resources.
     node --input-type=module --eval '
 import moduleFs from "fs";
@@ -448,7 +448,7 @@ function objectDeepCopyWithKeysSorted(obj) {
 // jslint_global_dict_all - auto-generated - end.)
         `).trim()),
         (
-            "$1    " +
+            "$1" + " ".repeat(4) +
             JSON.stringify(
                 objectDeepCopyWithKeysSorted(dictAll),
                 undefined,
@@ -475,12 +475,15 @@ function objectDeepCopyWithKeysSorted(obj) {
 )}
 
 shCiPublishNpmCustom() {(set -e
-# this function will run custom-code to npm-publish package
+# This function will run custom-code to npm-publish package.
     npm publish --access public
 )}
 
 shCiVscePackageJslintWrapperVscode() {(set -e
-# this function will vsce-package jslint_wrapper_vscode
+# This function will vsce-package jslint_wrapper_vscode.
+    mkdir -p .artifact/jslint_wrapper_vscode
+    # Empty the dir, not remove it: an open dev-host window locks it on windows.
+    find .artifact/jslint_wrapper_vscode -mindepth 1 -delete
     mkdir -p .artifact/jslint_wrapper_vscode/.vscode
     (set -e
     cd .artifact/jslint_wrapper_vscode
@@ -526,6 +529,7 @@ import moduleFs from "fs";
             file: "package.json",
             src: JSON.stringify({
                 "activationEvents": [
+                    "onCommand:jslint.autofix",
                     "onCommand:jslint.clear",
                     "onCommand:jslint.disableRegion",
                     "onCommand:jslint.ignoreLine",
@@ -540,6 +544,11 @@ import moduleFs from "fs";
                 ],
                 "contributes": {
                     "commands": [
+                        {
+                            "category": "jslint",
+                            "command": "jslint.autofix",
+                            "title": "JSLint - Autofix Whitespace"
+                        },
                         {
                             "category": "jslint",
                             "command": "jslint.clear",
@@ -567,6 +576,15 @@ import moduleFs from "fs";
                         }
                     ],
                     "keybindings": [
+                        {
+                            "command": "jslint.autofix",
+                            "key": "ctrl+shift+j a",
+                            "mac": "cmd+shift+j a",
+                            "when": (
+                                "editorTextFocus && " +
+                                "editorLangId == javascript"
+                            )
+                        },
                         {
                             "command": "jslint.clear",
                             "key": "ctrl+shift+j c",
@@ -611,6 +629,11 @@ import moduleFs from "fs";
                             {
                                 "command": "jslint.ignoreLine",
                                 "group": "7_modification@5",
+                                "when": "resourceLangId == javascript"
+                            },
+                            {
+                                "command": "jslint.autofix",
+                                "group": "7_modification@6",
                                 "when": "resourceLangId == javascript"
                             }
                         ]
