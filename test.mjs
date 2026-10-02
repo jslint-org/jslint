@@ -582,6 +582,36 @@ jstestDescribe((
             "function aa(bb) {\r\n    return bb;\r\n}\r\naa();\r\n"
         ), "function aa(bb) { return bb; }\r\naa();");
 
+// A used label warns only its placement, so a mid-line label reaches phase 6,
+// which splits it onto its own line at column 1.
+
+        assertAutofix(
+            String(`
+function aa(bb) {
+    bb();
+cc:
+    while (bb) {
+        if (bb()) {
+            break cc;
+        }
+        bb();
+    }
+}
+aa();
+            `).trim() + "\n",
+            String(`
+function aa(bb) {
+    bb(); cc: while (bb) {
+        if (bb()) {
+            break cc;
+        }
+        bb();
+    }
+}
+aa();
+            `).trim() + "\n"
+        );
+
 // A whitespace-run reaching column 0 is INDENTATION or a line-join, not a gap
 // between two tokens on one line, so the fix is DECLINED and the warning is
 // reported against a byte-identical file. Here the run is the whole indent of
@@ -960,6 +990,109 @@ aa(dd(0), 0);
             ) === "String(0);\n",
             ".tmp/autofix_dir/bb.mjs"
         );
+    });
+    jstestIt((
+        "test binding-power handling-behavior"
+    ), function () {
+
+// PR-514 - Bugfix - Binding-powers follow the spec's grammar, as tabled in
+// MDN Operator precedence. Each source returns the expression beside the
+// parameters, so none is unused, and lists the warning codes it must raise.
+
+        for (const [expression, expect] of [
+            ["(-aa) ** 2", []],
+            ["-aa ** 2", ["wrap_subexpression_a_b"]],
+            ["-aa++", ["unexpected_a"]],
+            ["[aa] ** 2", []],
+            ["aa ** -2", []],
+            ["aa ?? (bb || cc)", []],
+            ["aa ?? bb && cc", ["wrap_subexpression_a_b"]],
+            ["aa ?? bb ?? cc", []],
+            ["aa || bb ?? cc", ["wrap_subexpression_a_b"]],
+            ["typeof aa ** 2", ["wrap_subexpression_a_b"]]
+        ]) {
+            const result = jslint.jslint(String(`
+function ff(aa, bb, cc) {
+    return [aa, bb, cc, ${expression}];
+}
+ff();
+            `).trim() + "\n");
+            assertJsonEqual(result.warnings.map(function ({code}) {
+                return code;
+            }), expect, expression);
+        }
+
+// PR-514 - Bugfix - The operand of 'void' is parsed at rbp 150, like every
+// unary operator, so 'void 0 + 0' is '(void 0) + 0'.
+
+        assertOrThrow(
+            jslint.jslint("String(void 0 + 0);\n").tokens.find(function ({
+                id
+            }) {
+                return id === "+";
+            }).expression[0].id === "void",
+            "void 0 + 0"
+        );
+
+// PR-514 - Bugfix - A relational right side of a for-loop-head 'of' or 'in'
+// does not warn on the head's own 'of' or 'in'.
+
+        for (const [operator, expect] of [
+            ["in", ["expected_a_b", "expected_a"]],
+            ["of", ["expected_a"]]
+        ]) {
+            assertJsonEqual(jslint.jslint(String(`
+function ff(aa, bb) {
+    for (aa ${operator} bb < aa) {
+        bb();
+    }
+}
+ff();
+            `).trim() + "\n").warnings.map(function ({code}) {
+                return code;
+            }), expect, operator);
+        }
+
+// PR-514 - A 'for in' suggests 'for...of Object.keys', not 'Object.keys'.
+
+        assertJsonEqual(jslint.jslint(String(`
+function ff(aa) {
+    for (const bb in aa) {
+        aa(bb);
+    }
+}
+ff();
+        `).trim() + "\n").warnings.map(function ({message}) {
+            return message;
+        }), ["Expected 'for...of Object.keys' and instead saw 'for in'."]);
+
+// PR-514 - Bugfix - '**=' is one assignment token, '**' takes a space on each
+// side like '*', and a line break before a postfix '++' ends the expression.
+
+        for (const [source, expect] of [
+            ["let aa = 2;\naa **= 2;\n", []],
+            [
+                "let aa = 2;\naa = aa**2;\n",
+                ["expected_space_a_b", "expected_space_a_b"]
+            ],
+            [
+                "let aa = 0;\nlet bb = 0;\naa\n++bb;\n",
+                [
+                    "unexpected_expression_a",
+                    "expected_a_after_b",
+                    "unexpected_expression_a"
+                ]
+            ]
+        ]) {
+            assertJsonEqual(jslint.jslint(source).warnings.map(function ({
+                code
+            }) {
+                return code;
+            }), expect, source);
+        }
+        assertJsonEqual(jslint.jslint("let aa = 2;\naa = aa**2;\n", {
+            autofix: true
+        }).autofixed, "let aa = 2;\naa = aa ** 2;\n");
     });
     jstestIt((
         "test autofix-report handling-behavior"
@@ -1489,6 +1622,20 @@ function cc() {
 }
 [aa, bb] = cc();
 aa(bb, cc);
+                `),
+
+// PR-514 - Bugfix - Walk a default in destructuring-assignment, so 'cc' is
+// used.
+
+                (`
+let aa;
+let cc = 0;
+[
+    [
+        aa = cc
+    ]
+] = [];
+aa();
                 `)
             ],
             directive: [
@@ -1583,6 +1730,50 @@ async function aa(bb, cc) {
     }
     for (const ii of await (bb())) {
         bb(cc, ii);
+    }
+}
+aa();
+                `),
+
+// PR-514 - Bugfix - Walk the iterable of destructured for..of.
+
+                (`
+function aa(bb) {
+    for (const [cc, dd] of bb) {
+        cc(dd);
+    }
+    for (const {ee} of bb) {
+        ee();
+    }
+}
+aa();
+                `),
+
+// PR-514 - Bugfix - A ';' in a method-body inside a for-loop-head is not a
+// for-loop-semicolon.
+
+                (`
+function aa(bb) {
+    for (const cc in { //jslint-ignore-line
+        dd() {
+            return;
+        }
+    }) {
+        bb(cc);
+    }
+}
+aa();
+                `),
+
+// PR-514 - Bugfix - The '}' of a '${' does not pop the '{' of a function-body
+// in a for-loop-head, since '${' is pushed too.
+
+                (`
+function aa(bb) {
+    for (const cc of function () {
+        return \`\${bb}\`;
+    }()) { //jslint-ignore-line
+        bb(cc);
     }
 }
 aa();
@@ -1693,6 +1884,25 @@ aa();
                 "String(`\\u{10FFFF}`);"
             ],
             logical_assignment: [
+
+// PR-514 - Bugfix - '??=' and '||=' assign an unassigned variable.
+
+                (`
+function aa(bb) {
+    let cc;
+    cc ??= bb;
+    return cc;
+}
+aa();
+                `),
+                (`
+function aa(bb) {
+    let cc;
+    cc ||= bb;
+    return cc;
+}
+aa();
+                `),
                 "let aa = 0;\naa &&= 0;",
                 "let aa = 0;\naa ??= 0;",
                 "let aa = 0;\naa ||= 0;"
@@ -1737,6 +1947,9 @@ export default Object.freeze(async function () {
                 `import aa, {aa as bb, cc} from "aa";\naa(bb, cc);`,
                 `import {} from "aa";`
             ],
+            new: [
+                "new String`aa`();"
+            ],
             number: [
                 "String(0.0e0);",
                 "String(0b0);",
@@ -1754,7 +1967,9 @@ export default Object.freeze(async function () {
                 "String(1_234_234.1_234_234E1_234_234);"
             ],
             optional_chaining: [
-                "String().aa?.bb?.cc();"
+                "String().aa?.bb?.cc();",
+                "delete String?.[0];",
+                "delete String?.aa;"
             ],
             param: [
                 "function aa({aa, bb}) {\n    return {aa, bb};\n}\naa();",
@@ -1779,7 +1994,46 @@ aa();
             ],
             scope: [
                 "(function aa(bb = aa) {\n    aa(bb);\n}());",
+
+// PR-514 - Bugfix - A 'var' named after its named function expression is a new
+// writable binding, so assigning it does not warn bad_assignment_a.
+
+                (`
+String(function aa() {
+    var aa = 0; //jslint-ignore-line
+    aa = 1;
+    return aa;
+});
+                `),
+
+// PR-514 - A parameter named after its named function expression shadows the
+// name, like any parameter shadowing an outer name, so it does not warn.
+
+                "String(function aa(aa) {\n    return aa;\n});",
+
+// PR-514 - Bugfix - A 'var' redeclared in a nested block keeps the first one,
+// so a use between the two does not warn temporal_dead_zone_a.
+
+                (`
+function aa() {
+    var bb = 0;
+    bb();
+    if (aa) {
+        var bb = 1; //jslint-ignore-line
+        bb();
+    }
+}
+aa();
+                `),
                 "function aa(bb = aa) {\n    aa(bb);\n}\naa();",
+                (`
+function bb(cc) {
+    return cc;
+}
+bb(function aa() {
+    return;
+});
+                `),
                 (`
 if (String) {
     let aa = 0;
@@ -1835,6 +2089,15 @@ try {
     err();
 } finally {
     String();
+}
+                `),
+                (`
+try {
+    String();
+} catch (err) {
+    var aa = err; //jslint-ignore-line
+} finally {
+    String(aa);
 }
                 `)
             ],
@@ -1898,6 +2161,17 @@ jstestDescribe((
 // PR-404 - Alias "evil" to jslint-directive "eval" for backwards-compat.
 
         [{eval: true, evil: true}, "new Function();\neval();"],
+
+// PR-514 - Bugfix - A string-key named get aa does not duplicate an accessor.
+
+        [{getset: true}, String(`
+String({
+    get aa() {
+        return;
+    },
+    "get aa": 0
+});
+        `).trim()],
         [{getset: true}, "String({get aa() {\n    return;\n}});"],
         [{getset: true}, "String({set aa(aa) {\n    return aa;\n}});"],
         [{indent2: true}, sourceJslintMjs.replace((/    /g), "  ")],
