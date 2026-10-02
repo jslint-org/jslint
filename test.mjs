@@ -582,6 +582,36 @@ jstestDescribe((
             "function aa(bb) {\r\n    return bb;\r\n}\r\naa();\r\n"
         ), "function aa(bb) { return bb; }\r\naa();");
 
+// A used label warns only its placement, so a mid-line label reaches phase 6,
+// which splits it onto its own line at column 1.
+
+        assertAutofix(
+            String(`
+function aa(bb) {
+    bb();
+cc:
+    while (bb) {
+        if (bb()) {
+            break cc;
+        }
+        bb();
+    }
+}
+aa();
+            `).trim() + "\n",
+            String(`
+function aa(bb) {
+    bb(); cc: while (bb) {
+        if (bb()) {
+            break cc;
+        }
+        bb();
+    }
+}
+aa();
+            `).trim() + "\n"
+        );
+
 // A whitespace-run reaching column 0 is INDENTATION or a line-join, not a gap
 // between two tokens on one line, so the fix is DECLINED and the warning is
 // reported against a byte-identical file. Here the run is the whole indent of
@@ -1022,6 +1052,19 @@ ff();
                 return code;
             }), expect, operator);
         }
+
+// PR-xxx - A 'for in' suggests 'for...of Object.keys', not 'Object.keys'.
+
+        assertJsonEqual(jslint.jslint(String(`
+function ff(aa) {
+    for (const bb in aa) {
+        aa(bb);
+    }
+}
+ff();
+        `).trim() + "\n").warnings.map(function ({message}) {
+            return message;
+        }), ["Expected 'for...of Object.keys' and instead saw 'for in'."]);
 
 // PR-xxx - Bugfix - '**=' is one assignment token, '**' takes a space on each
 // side like '*', and a line break before a postfix '++' ends the expression.

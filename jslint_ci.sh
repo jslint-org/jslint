@@ -1288,7 +1288,8 @@ import moduleFs from "fs";
         break;
     default:
         version = `p${version}`;
-        // Diff from <changelogOld> to <changelogNew>.
+        // Name only the items this pull-request adds, those missing from the
+        // CHANGELOG of <branchMerge>, so the message repeats no released item.
         changelogNew = (
             /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n([\S\s]+?)\n\n/
         ).exec(data)[1].split(/\n(?=- )/);
