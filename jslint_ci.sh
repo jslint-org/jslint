@@ -1189,45 +1189,42 @@ shGithubPrCleanup() {(set -e
 
 shGithubPrCreate() {(set -e
 # This function will create-and-push a github-pull-commit to origin/alpha.
-    # Update 'PR-xxx' placeholder in codebase.
-    if git grep -Ei -e '^ *?(//|#) pr-xxx'
+    # init $UPSTREAM_XXX
+    export UPSTREAM_REPOSITORY="$(sed -En \
+        -e 's|.*"git\+https://github\.com/([^"]+)\.git".*|\1|p' \
+        package.json
+    )"
+    if [ ! "$UPSTREAM_REPOSITORY" ]
     then
-        # init $UPSTREAM_XXX
-        export UPSTREAM_REPOSITORY="$(sed -En \
-            -e 's|.*"git\+https://github\.com/([^"]+)\.git".*|\1|p' \
-            package.json
-        )"
-        if [ ! "$UPSTREAM_REPOSITORY" ]
-        then
-            printf "shGithubPrCreate - missing UPSTREAM_REPOSITORY\n" >&2
-            exit 1
-        fi
-        PR_XXX="$(curl -fs --ssl-no-revoke \
-"https://api.github.com/repos/$UPSTREAM_REPOSITORY/issues?per_page=1&state=all"
-        )"
-        # First match only - a milestone nests its own "number" further down
-        PR_XXX="$(
-            printf "%s" "$PR_XXX" |
-                sed -En -e 's/.*"number": ([0-9]+).*/\1/p' |
-                head -n 1
-        )"
-        if [ ! "$PR_XXX" ]
-        then
-            return
-        fi
-        PR_XXX="PR-$((PR_XXX + 1))"
-        FILE_LIST="$(
-git grep -Ei -e '^ *?(//|#) pr-xxx - ' | sed -E -e 's/:.*//' | sort -u
-        )"
-        for FILE in $FILE_LIST
-        do
-            sed -Ei.bak \
-                -e "s/^ *?(\/\/|#) pr-xxx - /\1 $PR_XXX - /gi" \
-                "$FILE" && \
-                rm -f "$FILE".bak
-        done
+        printf "shGithubPrCreate - missing UPSTREAM_REPOSITORY\n" >&2
+        exit 1
     fi
-    node --input-type=module --eval '
+    # Update 'PR-xxx' placeholder in codebase.
+    PR_XXX="$(curl -fs --ssl-no-revoke \
+"https://api.github.com/repos/$UPSTREAM_REPOSITORY/issues?per_page=1&state=all"
+    )"
+    # First match only - a milestone nests its own "number" further down
+    PR_XXX="$(
+        printf "%s" "$PR_XXX" |
+            sed -En -e 's/.*"number": ([0-9]+).*/\1/p' |
+            head -n 1
+    )"
+    if [ ! "$PR_XXX" ]
+    then
+        return
+    fi
+    PR_XXX="PR-$((PR_XXX + 1))"
+    FILE_LIST="$(
+git grep -Ei -e '^ *?(//|#) pr-xxx - ' | sed -E -e 's/:.*//' | sort -u
+    )"
+    for FILE in $FILE_LIST
+    do
+        sed -Ei.bak \
+            -e "s/^ *?(\/\/|#) pr-xxx - /\1 $PR_XXX - /gi" \
+            "$FILE" && \
+            rm -f "$FILE".bak
+    done
+    PR_XXX="$PR_XXX" node --input-type=module --eval '
 // init debugInline
 const debugInline = (function () {
     let consoleError = Object;
@@ -1303,8 +1300,8 @@ import moduleFs from "fs";
                 }
             );
         });
-        commitMessage = (
-            `- shGithubPrCreate ` +
+        commitMessage = String(
+            `- ${process.env.PR_XXX} ` +
             (
                 changelogNew
                     .filter(function (item) {
@@ -1313,7 +1310,7 @@ import moduleFs from "fs";
                     .join("\n") ||
                 changelogNew[0]
             )
-        );
+        ).replace("\n", "\n\n");
     }
     branchPull = `branch-${version}`;
     // security - sanitize commitMessage
