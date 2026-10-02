@@ -114,7 +114,6 @@
     block_list,
     block_stack,
     browser,
-    calls,
     catch,
     causes,
     char,
@@ -295,6 +294,7 @@
     operator,
     option,
     option_dict,
+    optional,
     order,
     package_name,
     padEnd,
@@ -336,6 +336,7 @@
     scope_declared,
     scope_function_pop,
     scope_function_push,
+    scope_name,
     scriptId,
     search,
     set,
@@ -397,6 +398,7 @@
     v8CoverageListMerge,
     v8CoverageReportCreate,
     value,
+    values,
     variable,
     variable_prv,
     version,
@@ -747,7 +749,10 @@ const jslint_rgx_token = new RegExp(
     "|\\?[?.]?" +
     "|=(?:==?|>)?" +
     "|\\.+" +
-    "|\\*[*\\/=]?" +
+
+// PR-514 - Add Exponentiation-assignment-operator '**=' support.
+
+    "|\\*(?:\\*=?|[\\/=])?" +
     "|\\/[*\\/]?" +
     "|\\+[=+]?" +
     "|-[=\\-]?" +
@@ -1250,9 +1255,9 @@ function jslint(
         if (is_weird(aa) || is_weird(bb)) {
 
 // test_cause:
-// ["aa(/./)||{}", "is_equal", "false", "", 0]
+// ["aa(/./)||{}", "is_equal", "weird", "", 0]
 
-            test_cause("false");
+            test_cause("weird");
             return false;
         }
         if (aa.arity === bb.arity && aa.id === bb.id) {
@@ -1509,9 +1514,6 @@ function jslint(
 // wound the inner child. But if you accept it as sound advice rather than as
 // personal criticism, it can make your programs better.
 
-        case "and":
-            mm = `The '&&' subexpression should be wrapped in parens.`;
-            break;
         case "bad_assignment_a":
             mm = `Bad assignment to '${a}'.`;
             break;
@@ -1796,9 +1798,6 @@ function jslint(
         case "weird_relation_a":
             mm = `Weird relation '${a}'.`;
             break;
-        case "wrap_condition":
-            mm = `Wrap the condition in parens.`;
-            break;
 
 // PR-386 - Fix issue #382 - Make fart-related warnings more readable.
 
@@ -1815,8 +1814,8 @@ function jslint(
         case "wrap_regexp":
             mm = `Wrap this regexp in parens to avoid confusion.`;
             break;
-        case "wrap_unary":
-            mm = `Wrap the unary expression in parens.`;
+        case "wrap_subexpression_a_b":
+            mm = `Wrap the '${a}' subexpression beside '${b}' in parens.`;
             break;
         default:
             jslint_assert(undefined, `unknown_warning_code=${code}`);
@@ -2902,7 +2901,7 @@ function jslint_phase2_lex(state) {
     const mode_digits_numeric_separator = 1;
     const mode_digits_regexp_quantifier = 2;
     const mode_digits_unicode_escape = 3;
-    const opener_stack = [];    // Stack of opener tokens: (, [.
+    const opener_stack = [];    // Stack of opener tokens: (, [, {, ${.
     let char;                   // The current character being lexed.
     let column = 0;             // The column number of the next character.
     let from;                   // The starting column number of the token.
@@ -4565,8 +4564,15 @@ function jslint_phase2_lex(state) {
 // current depth is marked as a fart.
 
         switch (id) {
+
+// PR-514 - Bugfix - Push '{' and '${', so a ';' in a function-body inside
+// a for-loop-head 'for (const aa of function () {...}())' is not mistaken for
+// a for-loop-semicolon.
+
+        case "${":
         case "(":
         case "[":
+        case "{":
             opener_stack.unshift(the_token);
             break;
         case ")":
@@ -4617,6 +4623,11 @@ function jslint_phase2_lex(state) {
             }
             if (token_prv_expr.identifier) {
                 token_prv_expr.fart = the_token;
+            }
+            break;
+        case "}":
+            if (opener_stack[0]?.id === "{" || opener_stack[0]?.id === "${") {
+                opener_stack.shift();
             }
             break;
         }
@@ -4963,6 +4974,7 @@ function jslint_phase3_parse(state) {
 //      [destructure]
 //      {destructure}
 
+        const the_optional = optional_chain(the_thing);
         if (
             the_thing.arity !== "variable" &&
             the_thing.id !== "." &&
@@ -4975,6 +4987,18 @@ function jslint_phase3_parse(state) {
 // ["0=0", "check_mutation", "bad_assignment_a", "0", 1]
 
             warn("bad_assignment_a", the_thing);
+            return false;
+        }
+        if (the_optional) {
+
+// PR-514 - Bugfix - An optional-chain is never an assignment target, so
+// 'aa?.bb.cc = 0' and 'aa?.[bb] = 0' are SyntaxErrors too.
+
+// test_cause:
+// ["aa?.[aa]=0", "check_mutation", "bad_assignment_a", "?.", 5]
+// ["aa?.aa.aa=0", "check_mutation", "bad_assignment_a", "?.", 3]
+
+            warn("bad_assignment_a", the_optional, "?.");
             return false;
         }
         return true;
@@ -5436,6 +5460,7 @@ function jslint_phase3_parse(state) {
 // ["\"\".aa", "check_left", "unexpected_a", ".", 3]
 // ["\"aa\"?.0", "check_left", "unexpected_a", "?.", 5]
 // ["aa=[]?.aa", "check_left", "unexpected_a", "?.", 6]
+// ["new aa``.aa()", "check_left", "unexpected_a", ".", 9]
 
             check_left(left, the_token);
         }
@@ -5452,6 +5477,11 @@ function jslint_phase3_parse(state) {
 // ["aa?.[bb]", "infix_dot", "dyn_prop_or_call", "", 0]
 
             test_cause("dyn_prop_or_call");
+
+// PR-514 - Bugfix - The '?.' token leaves the tree here, so mark the '[' or '('
+// that follows it, for <optional_chain>.
+
+            name.optional = true;
             return left;
         }
         if (!name.identifier) {
@@ -5491,7 +5521,15 @@ function jslint_phase3_parse(state) {
     }
 
     function infix_grave(left) {
+        const the_optional = optional_chain(left);
         const the_tick = prefix_tick(true);
+        if (the_optional) {
+
+// test_cause:
+// ["aa?.aa``", "infix_grave", "unexpected_a", "?.", 3]
+
+            warn("unexpected_a", the_optional, "?.");
+        }
 
 // test_cause:
 // ["0``", "check_left", "unexpected_a", "`", 2]
@@ -5538,9 +5576,6 @@ function jslint_phase3_parse(state) {
 // ["0()", "check_left", "unexpected_a", "(", 2]
 
             check_left(left, the_paren);
-        }
-        if (scope_function.arity === "statement" && left.identifier) {
-            scope_function.name.calls[left.id] = left;
         }
         the_paren.expression = [left];
         if (token_nxt.id !== ")") {
@@ -5618,11 +5653,11 @@ function jslint_phase3_parse(state) {
     ) {
 
 // This function will:
-// 1. Push variable or function-parameter <name> to <name_list>.
-// 2. Set <name>.assigned = true, if its an assigned-variable,
-//    a function-parameter, or existing variable assigned new value.
-// 3. Declare <name> in <scope_declared>.context, if its a declared-variable,
-//    or function-parameter.
+// 1. Push <name> to <name_list>.
+// 2. Set <name>.assigned, <name>.readonly and <name>.role from the arguments.
+//    An existing variable given a new value is marked by <post_a_assignment>.
+// 3. Declare <name> in <scope_declared>.context, unless <scope_declared> is
+//    undefined, as for the plain assignment 'aa = 0'.
 //
 // Most calls to name_declare() are commented regarding thing being declared,
 // and its lifecycle. Below is a copy of all such comments.
@@ -5630,32 +5665,72 @@ function jslint_phase3_parse(state) {
 // 1.imp.1 - Mark 'declared', the import-name, during import-statement.
 // 1.imp.2 - Mark 'alive', the import-name, after import-statement.
 // 1.imp.3 - Mark 'assigned', the import-name, during import-statement.
+// 1.imp.4 - Mark 'readonly', the import-name, during import-statement.
 //
 // 2.fun.1 - Mark 'declared', the function-name, during function-declaration.
 // 2.fun.2 - Mark 'alive', the function-name, during function-declaration.
 // 2.fun.3 - Mark 'assigned', the function-name, during function-declaration.
+// 2.fun.4 - Mark 'readonly', the function-name, during function-declaration.
 //
 // 3.cat.1 - Mark 'declared', the catch-variable, before catch-block.
 // 3.cat.2 - Mark 'alive', the catch-variable, before catch-block.
 // 3.cat.3 - Mark 'assigned', the catch-variable, before catch-block.
+// 3.cat.4 - Mark 'readonly', the catch-variable, before catch-block.
 //
 // 3.glo.1 - Mark 'declared', the global-variable, immediately.
 // 3.glo.2 - Mark 'alive', the global-variable, immediately.
 // 3.glo.3 - Mark 'assigned', the global-variable, immediately.
+// 3.glo.4 - Mark 'readonly', the global-variable, immediately.
 //
 // 3.var.1 - Mark 'declared', the variable, during variable-declaration.
 // 3.var.2 - Mark 'alive', the variable, after variable-declaration.
 // 3.var.3 - Mark 'assigned', the variable, after assignment.
+// 3.var.3 - Mark 'assigned', the variable, during destructuring.
 // 3.var.3 - Mark 'assigned', the variable, during variable-declaration.
+// 3.var.4 - Mark 'readonly', the variable, if const.
 //
 // 4.par.1 - Mark 'declared', the function-parameter, during destructuring.
 // 4.par.1 - Mark 'declared', the function-parameter, if unwrapped.
 // 4.par.2 - Mark 'alive', the function-parameter, after destructuring.
+// 4.par.3 - Mark 'assigned', the function-parameter, during destructuring.
 // 4.par.3 - Mark 'assigned', the function-parameter, if unwrapped.
 //
 // 5.lab.1 - Mark 'declared', the label-name, before control-flow-block.
 // 5.lab.2 - Mark 'alive', the label-name, before control-flow-block.
 // 5.lab.3 - Mark 'assigned', the label-name, before control-flow-block.
+// 5.lab.4 - Mark 'readonly', the label-name, before control-flow-block.
+//
+// The 2.fun tags also cover a named function-expression, whose name is
+// declared in <scope_name>, a scope outside its function.
+//
+// PR-514 - Deviations from the spec, reviewed 2026-09-29, each kept. A fixed
+// one is commented at its site, and a Todo is in CHANGELOG.md.
+//
+// - 1.imp.2 - Kept. An import used above its import-statement warns
+//   temporal_dead_zone_a, though imports are hoisted.
+// - 2.fun.1 - Kept. 'let aa;(function aa(){})' warns redefinition_a_b, but
+//   the reverse order does not. ESLint no-shadow is off by default.
+// - 2.fun.4 - Kept. Reassigning a function warns, as ESLint no-func-assign.
+// - 3.cat.4 - Kept. Reassigning a catch-variable warns, as ESLint no-ex-assign.
+// - 3.glo.4 - Kept. Reassigning a global warns, as ESLint no-global-assign.
+// - 3.var.1 - Kept. Unlike the spec, jslint gives a switch no block scope, so a
+//   'let' in a case is seen after the switch. It is moot, since var_switch
+//   warns that 'let'.
+// - 3.var.2 - Kept. A 'var' read above its declaration warns
+//   temporal_dead_zone_a, though its hoisted value 'undefined' is valid.
+// - 3.var.2 - Kept. A function reading a 'let' declared below it warns. See
+//   the note in <name_lookup>.
+// - 3.var.3 - Kept. '&&=' and '+=' do not assign an unassigned variable, which
+//   stays undefined or becomes NaN, so it warns unassigned_var_a. ESLint
+//   no-unassigned-vars counts every compound assignment as a write.
+// - 4.par.1 - Kept. A parameter-default reading a body 'var' warns
+//   temporal_dead_zone_a, where the spec makes it undeclared. It still warns,
+//   and ESLint no-use-before-define likely does the same.
+// - 5.lab.1 - Kept. A label shares the variable namespace, so a same-named
+//   variable warns redefinition_a_b, as ESLint no-label-var.
+// - 5.lab.1 - Kept. A label is allowed only on do, for, switch and while.
+// - 5.lab.1 - Kept. A label read as a variable warns label_a and counts as a
+//   use of the label, so it warns no unused_a as well.
 
         const id = name.id;
         let earlier;
@@ -5671,7 +5746,7 @@ function jslint_phase3_parse(state) {
         }
 
 // Declare a name into the current scope_declared's context. The role can be
-// exception, function, label, parameter, or variable. We look for variable
+// exception, label, parameter, or variable. We look for variable
 // redefinition because it causes confusion.
 
 // Reserved words may not be declared.
@@ -5687,7 +5762,11 @@ function jslint_phase3_parse(state) {
 
 // Has the name been declared in this context?
 
-        earlier = scope_block.context[id];
+// PR-514 - Bugfix - Check <scope_declared>, which differs from <scope_block>
+// for a var in a nested block. Else 'var bb' in an if-block replaced an
+// earlier 'var bb', and a use between them warned temporal_dead_zone_a.
+
+        earlier = scope_block.context[id] || scope_declared.context[id];
         if (earlier) {
 
 // test_cause:
@@ -5695,6 +5774,8 @@ function jslint_phase3_parse(state) {
 // ["let aa;function aa(){}", "name_declare", "scope_current", "aa", 0]
 // ["let aa;let aa", "name_declare", "redefinition_a_b", "1", 12]
 // ["let aa;let aa", "name_declare", "scope_current", "aa", 0]
+// ["var aa;if(0){var aa}", "name_declare", "redefinition_a_b", "1", 18]
+// ["var aa;if(0){var aa}", "name_declare", "scope_current", "aa", 0]
 
             test_cause("scope_current", id);
             warn("redefinition_a_b", name, id, earlier.line);
@@ -5753,7 +5834,7 @@ function jslint_phase3_parse(state) {
         }
         if (
             earlier &&
-            role !== "parameter" && role !== "function" &&
+            role !== "parameter" &&
             (role !== "exception" || earlier.role !== "exception")
         ) {
 
@@ -5786,6 +5867,39 @@ function jslint_phase3_parse(state) {
 
             warn("redefinition_global_a_b", name, global_dict[id], id);
             return;
+        }
+    }
+
+    function optional_chain(thing) {
+
+// PR-514 - This function will return the '?.' token, or the '[' or '(' token
+// marked <optional> after a '?.', of an unwrapped optional-chain ending at
+// <thing>. The spec forbids such a chain as an assignment target, the callee
+// of 'new' and the tag of a template.
+
+        while (thing && !thing.wrapped) {
+            if (thing.id === "?." || thing.optional === true) {
+                return thing;
+            }
+            if (thing.arity !== "binary") {
+                return;
+            }
+            switch (thing.id) {
+            case "(":
+            case "[":
+                thing = thing.expression[0];
+                break;
+            case ".":
+                thing = thing.expression;
+                break;
+            default:
+
+// test_cause:
+// ["aa+aa=0", "optional_chain", "default", "", 0]
+
+                test_cause("default");
+                return;
+            }
         }
     }
 
@@ -5901,6 +6015,22 @@ function jslint_phase3_parse(state) {
                 the_symbol.led_infix === undefined ||
                 the_symbol.lbp <= rbp
             ) {
+                break;
+            }
+
+// PR-514 - Bugfix - A line break before a postfix '++' or '--' ends the
+// expression, since the spec forbids one there and inserts a ';'. So 'aa' then
+// '++bb' on the next line is 'aa; ++bb', not 'aa++; bb'.
+
+            if (
+                (token_nxt.id === "++" || token_nxt.id === "--") &&
+                token_nxt.line !== token_now.line
+            ) {
+
+// test_cause:
+// ["aa\n++aa", "parse_expression", "postfix_line_break", "", 0]
+
+                test_cause("postfix_line_break");
                 break;
             }
             advance();
@@ -6163,7 +6293,7 @@ function jslint_phase3_parse(state) {
 
 // Create one of the postassign operators.
 
-        const the_symbol = symbol(id, 150);
+        const the_symbol = symbol(id, 155);
         the_symbol.led_infix = function (left) {
             token_now.expression = left;
             token_now.arity = "postassign";
@@ -6290,6 +6420,7 @@ function jslint_phase3_parse(state) {
         the_function,
         the_function_toplevel
     ) {
+        const is_assignment = scope_declared === undefined;
         const is_lbrace = token_now.id === "{";
         const sub_list = [];
         const the_destructure = token_now;
@@ -6418,6 +6549,10 @@ function jslint_phase3_parse(state) {
                     readonly,           // readonly
                     sub_list,           // name_list
                     name,               // name
+
+// 3.var.3 - Mark 'assigned', the variable, during destructuring.
+// 4.par.3 - Mark 'assigned', the function-parameter, during destructuring.
+
                     true                // assigned
                 );
                 advance_and_signature_push(token_nxt.id);
@@ -6429,6 +6564,10 @@ function jslint_phase3_parse(state) {
                 readonly,               // readonly
                 sub_list,               // name_list
                 name,                   // name
+
+// 3.var.3 - Mark 'assigned', the variable, during destructuring.
+// 4.par.3 - Mark 'assigned', the function-parameter, during destructuring.
+
                 true                    // assigned
             );
             if (token_nxt.id === "=") {
@@ -6438,6 +6577,18 @@ function jslint_phase3_parse(state) {
                     the_destructure.open = true;
                 }
                 name.expression = parse_expression(0);
+                if (is_assignment) {
+
+// PR-514 - Bugfix - No <post_s_var> walks a default in '[aa = bb] = ...', so
+// 'bb' was never used. It is pushed wrapped in an array, which has no <arity>,
+// so <prefix_lbracket> walks it and never looks it up as a target.
+
+// test_cause:
+// [";[aa=0]=0", "name_parse", "default", "", 0]
+
+                    test_cause("default");
+                    name_list.push([name.expression]);
+                }
 
 // test_cause:
 // ["function aa([aa=aa]){}", "name_lookup", "temporal_dead_zone_a", "aa", 17]
@@ -6527,13 +6678,15 @@ function jslint_phase3_parse(state) {
 
     function prefix_function(the_function, mode_fart, mode_fart_unwrapped) {
         const name = !mode_fart && token_nxt.identifier && token_nxt;
-        let role = "variable";
 
 // PR-504 - Change scope from scope_function to scope_block:
 // - function-declaration
 
         let scope_declared = scope_block;
         the_function = the_function || token_now;
+        the_function.scope_name = {
+            context: empty()
+        };
         if (mode_fart) {
             the_function.arity = "binary";
         }
@@ -6548,17 +6701,28 @@ function jslint_phase3_parse(state) {
 
                 return stop("expected_identifier_a", token_nxt);
             }
-            name.calls = empty();
-        } else if (name) {
+
+            if (scope_function.switch > 0 && scope_block.function_body) {
+
+// PR-514 - Warn a function-declaration directly in a case, as ESLint
+// no-case-declarations does. One nested in a block of the case already warns
+// unexpected_a in <pre_s_function>.
+
+// test_cause:
+// ["
+// switch(0){case 0:function aa(){}}
+// ", "prefix_function", "var_switch", "function", 18]
+
+                warn("var_switch", the_function);
+            }
+        } else {
 
 // A function expression may have an optional name.
 
-// PR-504 - Restrict scope from scope_function to its own function_body:
-// - named-function-expression
+// PR-514 - Bugfix - Declare the name in <scope_name>, outside the function as
+// in the spec, so a 'var' of that name in the body is a new binding.
 
-            scope_declared = the_function;
-            name.used = true;
-            the_function.context = empty();
+            scope_declared = the_function.scope_name;
         }
         if (name) {
             advance();
@@ -6567,8 +6731,11 @@ function jslint_phase3_parse(state) {
 // 2.fun.1 - Mark 'declared', the function-name, during function-declaration.
 
                 scope_declared,         // scope_declared
-                role,                   // role
-                false,                  // readonly
+                "variable",             // role
+
+// 2.fun.4 - Mark 'readonly', the function-name, during function-declaration.
+
+                true,                   // readonly
                 [],                     // name_list
                 name,                   // name
 
@@ -6621,6 +6788,7 @@ function jslint_phase3_parse(state) {
 
 // Push the current function context and establish a new one.
 
+        scope_block = scope_block_push(the_function.scope_name, false);
         scope_block = scope_block_push(the_function, true);
         scope_function = scope_function_push(the_function, true);
 
@@ -6746,33 +6914,53 @@ function jslint_phase3_parse(state) {
 
                 warn("unexpected_a");
             }
+        }
 
 // Check functions are ordered.
 
-            check_ordered(
-                "function",
-                function_list.slice(
-                    function_list.indexOf(the_function) + 1
-                ).map(function ({
-                    level,
+// PR-514 - Bugfix - Check only function-declarations, since a named
+// function-expression is not hoisted. Check an arrow-function's block-body too.
+
+// test_cause:
+// ["
+// ()=>{function bb(){}function aa(){}}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 30]
+
+        check_ordered(
+            "function",
+            function_list.slice(
+                function_list.indexOf(the_function) + 1
+            ).map(function ({
+                arity,
+                level,
+                name
+            }) {
+                return (
+                    arity === "statement" &&
+                    level === the_function.level + 1 &&
                     name
-                }) {
-                    return (level === the_function.level + 1) && name;
-                }).filter(function (name) {
-                    return option_dict.beta && name && name.id;
-                })
-            );
-        }
+                );
+            }).filter(function (name) {
+                return option_dict.beta && name && name.id;
+            })
+        );
 
 // Restore the previous context.
 
+        scope_block = scope_block_pop();
         scope_block = scope_block_pop();
         scope_function = scope_function_pop();
         return the_function;
     }
 
     function prefix_lbrace() {
+
+// PR-514 - Bugfix - <seen> maps a property-name to true, or to false if only
+// an accessor has it. Accessor-keys like 'get aa' live apart in
+// <seen_getset>, so a string-key named get aa cannot collide with them.
+
         const seen = empty();
+        const seen_getset = empty();
         const the_brace = token_now;
         function property_parse() {
             let extra;
@@ -6814,10 +7002,11 @@ function jslint_phase3_parse(state) {
                 }
                 extra = name.id;
                 full = extra + " " + token_nxt.id;
+                name.getset = true;
                 name = token_nxt;
                 advance();
                 id = survey(name);
-                if (seen[full] === true || seen[id] === true) {
+                if (seen_getset[full] === true || seen[id] === true) {
 
 // test_cause:
 // ["aa={get aa(){},get aa(){}}", "property_parse", "duplicate_a", "aa", 20]
@@ -6825,7 +7014,7 @@ function jslint_phase3_parse(state) {
                     warn("duplicate_a", name);
                 }
                 seen[id] = false;
-                seen[full] = true;
+                seen_getset[full] = true;
             } else {
                 id = survey(name);
                 if (typeof seen[id] === "boolean") {
@@ -6885,9 +7074,9 @@ function jslint_phase3_parse(state) {
                 if (typeof extra === "string") {
 
 // test_cause:
-// ["aa={get aa.aa}", "property_parse", "paren", "", 0]
+// ["aa={get aa.aa}", "property_parse", "getset_no_paren", "", 0]
 
-                    test_cause("paren");
+                    test_cause("getset_no_paren");
                     advance("(");
                 }
                 the_colon = token_nxt;
@@ -6965,6 +7154,16 @@ function jslint_phase3_parse(state) {
                 undefined,              // the_function
                 false                   // the_function_toplevel
             );
+
+// PR-514 - Walk defaults as expressions, and leave only variables in
+// <name_list> for <post_a_assignment> to look up.
+
+            element.expression = the_token.name_list.filter(function (name) {
+                return name.arity !== "variable";
+            });
+            the_token.name_list = the_token.name_list.filter(function (name) {
+                return name.arity === "variable";
+            });
             advance("=");
             symbol("=").led_infix(element);
             return the_token;
@@ -7037,6 +7236,30 @@ function jslint_phase3_parse(state) {
         const the_new = token_now;
         let right;
         right = parse_expression(160);
+
+// PR-514 - Bugfix - In 'new aa`bb`()' the tagged-megastring belongs to the
+// callee, 'new (aa`bb`)()', but '`' shares lbp 160 with the call's '(', so rbp
+// 160 stops before it. Parse it, and any member after it, into the callee.
+
+        while (token_nxt.id === "`") {
+            advance("`");
+            right = infix_grave(right);
+            while ([".", "?.", "["].includes(token_nxt.id)) {
+                advance();
+                right = syntax_dict[token_now.id].led_infix(right);
+            }
+        }
+        if (optional_chain(right)) {
+
+// PR-514 - Bugfix - Rbp 160 lets an optional-chain into the callee, since '?.'
+// binds at 170.
+
+// test_cause:
+// ["new aa?.aa()", "prefix_new", "unexpected_a", "?.", 7]
+// ["new aa``?.aa()", "prefix_new", "unexpected_a", "?.", 9]
+
+            warn("unexpected_a", optional_chain(right), "?.");
+        }
         if (token_nxt.id !== "(") {
 
 // test_cause:
@@ -7088,7 +7311,12 @@ function jslint_phase3_parse(state) {
 // ["void", "prefix_void", "unexpected_a", "void", 1]
 
         warn("unexpected_a", the_void);
-        the_void.expression = parse_expression(0);
+
+// PR-514 - Bugfix - Parse the operand at rbp 150, like every unary operator,
+// since the spec reads 'void UnaryExpression'. At rbp 0, 'void aa ** 2', a
+// SyntaxError, parsed as 'void (aa ** 2)'.
+
+        the_void.expression = parse_expression(150);
         return the_void;
     }
 
@@ -7147,6 +7375,13 @@ function jslint_phase3_parse(state) {
         the_break.disrupt = true;
         if (token_nxt.identifier && token_now.line === token_nxt.line) {
             block_stack.some(function (scope_block) {
+
+// PR-514 - Bugfix - Stop at the function boundary, since 'break aa' cannot
+// reach a label in an enclosing function, which is a SyntaxError.
+
+                if (scope_block === scope_function) {
+                    return true;
+                }
                 the_label = scope_block.context[token_nxt.id];
                 if (the_label?.role !== "label") {
                     the_label = undefined;
@@ -7159,6 +7394,9 @@ function jslint_phase3_parse(state) {
             if (!the_label) {
 
 // test_cause:
+// ["
+// aa:while(0){(function(){while(0){break aa}}())}
+// ", "stmt_break", "not_label_a", "aa", 40]
 // ["aa:while(0){}break aa", "stmt_break", "not_label_a", "aa", 20]
 // ["break aa", "stmt_break", "not_label_a", "aa", 7]
 
@@ -7207,8 +7445,25 @@ function jslint_phase3_parse(state) {
     function stmt_delete() {
         const the_token = token_now;
         const the_value = parse_expression(0);
+
+// PR-514 - Bugfix - In 'delete aa[bb] || cc', the parse at rbp 0 swallows the
+// '||'. Warn on the operator, not on a missing '.'. Rbp 150 would stop the
+// lint on the leftover '|| cc'.
+
         if (
-            (the_value.id !== "." && the_value.id !== "[") ||
+            ["&&", "??", "||"].includes(the_value.id) &&
+            [".", "?.", "["].includes(the_value.expression[0].id) &&
+            the_value.expression[0].arity === "binary"
+        ) {
+
+// test_cause:
+// ["delete aa[aa]&&aa", "stmt_delete", "unexpected_a", "&&", 14]
+// ["delete aa[aa]??aa", "stmt_delete", "unexpected_a", "??", 14]
+// ["delete aa[aa]||aa", "stmt_delete", "unexpected_a", "||", 14]
+
+            warn("unexpected_a", the_value);
+        } else if (
+            ![".", "?.", "["].includes(the_value.id) ||
             the_value.arity !== "binary"
         ) {
 
@@ -7536,9 +7791,31 @@ function jslint_phase3_parse(state) {
                 the_operator = the_variable.operator;
                 break;
             default:
-                the_variable = parse_expression(0);
+
+// PR-514 - Bugfix - Parse the target at rbp 110, which stops before 'in' and
+// 'of', then their right side at rbp 0, as the spec does. Parsing the whole
+// head at rbp 0 let a looser operator like '||' in 'for (aa in bb || cc)'
+// wrap the 'in' node, and the lint stopped.
+
+                the_variable = parse_expression(110);
+                if (token_nxt.id !== "in" && token_nxt.id !== "of") {
+
+// test_cause:
+// ["for(aa 0){}", "stmt_for", "expected_a_b", "0", 8]
+
+                    return stop(
+                        "expected_a_b",
+                        token_nxt,
+                        "of",
+                        artifact(token_nxt)
+                    );
+                }
+                advance();
+                the_operator = token_now;
+                the_operator.arity = "binary";
+                the_operator.expression = [the_variable, parse_expression(0)];
+                the_variable = the_operator;
                 the_for.for_of = the_variable;
-                the_operator = the_variable;
             }
             the_variable.for_init = true;
             switch (the_operator.id) {
@@ -7551,13 +7828,16 @@ function jslint_phase3_parse(state) {
                     warn("expected_a_b", the_operator, "of", "in");
                 }
 
+// PR-514 - Suggest 'for...of Object.keys', since a plain object is not
+// iterable, so a bare 'for...of' would throw a TypeError.
+
 // test_cause:
 // ["for(aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
 // ["for(const aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
 // ["for(let aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
 // ["for(var aa in aa){}", "stmt_for", "expected_a_b", "for in", 1]
 
-                warn("expected_a_b", the_for, "Object.keys", "for in");
+                warn("expected_a_b", the_for, "for...of Object.keys", "for in");
                 break;
 
 // PR-504 - Add ES2015-feature for..of.
@@ -7566,6 +7846,7 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["for(aa of aa){}", "stmt_for", "of", "of", 0]
+// ["for(aa of aa||aa){}", "stmt_for", "of", "of", 0]
 // ["for(const aa of aa){}", "stmt_for", "of", "of", 0]
 // ["for(let aa of aa){}", "stmt_for", "of", "of", 0]
 // ["for(var aa of aa){}", "stmt_for", "of", "of", 0]
@@ -7692,6 +7973,9 @@ function jslint_phase3_parse(state) {
 
                     scope_function,     // scope_declared
                     "variable",         // role
+
+// 1.imp.4 - Mark 'readonly', the import-name, during import-statement.
+
                     true,               // readonly
                     the_import.name_list,       // name_list
                     name,               // name
@@ -7715,6 +7999,13 @@ function jslint_phase3_parse(state) {
                         advance();
                         if (token_nxt.id === "as") {
                             advance("as");
+                            if (!token_nxt.identifier) {
+
+// test_cause:
+// ["import {aa as 0}", "stmt_import", "expected_identifier_a", "0", 15]
+
+                                return stop("expected_identifier_a", token_nxt);
+                            }
                             name = token_nxt;
                             advance();
                         }
@@ -7731,6 +8022,9 @@ function jslint_phase3_parse(state) {
 
                             scope_function,     // scope_declared
                             "variable", // role
+
+// 1.imp.4 - Mark 'readonly', the import-name, during import-statement.
+
                             true,       // readonly
                             the_import.name_list,       // name_list
                             name,       // name
@@ -7844,6 +8138,9 @@ function jslint_phase3_parse(state) {
 
             scope_block,        // scope_declared
             "label",            // role
+
+// 5.lab.4 - Mark 'readonly', the label-name, before control-flow-block.
+
             true,               // readonly
             [],                 // name_list
             the_label,          // name
@@ -8147,6 +8444,9 @@ function jslint_phase3_parse(state) {
 
                         scope_block,    // scope_declared
                         "exception",    // role
+
+// 3.cat.4 - Mark 'readonly', the catch-variable, before catch-block.
+
                         true,           // readonly
                         [],             // name_list
                         token_nxt,      // name
@@ -8200,8 +8500,8 @@ function jslint_phase3_parse(state) {
             if (token_nxt.id !== "{") {
                 return stop("expected_a_b", token_nxt, "{", artifact());
             }
-            the_try.else = block();
-            the_disrupt = the_try.else.disrupt;
+            the_try.finally = block();
+            the_disrupt = the_try.finally.disrupt;
             scope_function.finally -= 1;
         }
         the_try.disrupt = the_disrupt;
@@ -8282,6 +8582,10 @@ function jslint_phase3_parse(state) {
 
 // We don't expect to see variables created in switch statements.
 
+// PR-514 - Kept 2026-09-29, broader than ESLint no-case-declarations. This
+// also warns a 'var', a braced 'case 0: {let aa}' and a 'let' nested in a
+// block of the case, all of which ESLint allows.
+
         if (scope_function.switch > 0) {
 
 // test_cause:
@@ -8341,6 +8645,9 @@ function jslint_phase3_parse(state) {
 
                     scope_declared,     // scope_declared
                     "variable",         // role
+
+// 3.var.4 - Mark 'readonly', the variable, if const.
+
                     readonly,           // readonly
                     the_variable.name_list,     // name_list
                     name,               // name
@@ -8503,7 +8810,11 @@ function jslint_phase3_parse(state) {
         the_symbol.led_infix = function parse_ternary_led(left) {
             const the_token = token_now;
             let second;
-            second = parse_expression(20);
+
+// PR-514 - Bugfix - Both branches are an AssignmentExpression in the spec, so
+// parse the second like the third. 'aa ? bb = 0 : cc' used to stop at '='.
+
+            second = parse_expression(10);
             advance(id2);
             token_now.arity = "ternary";
             the_token.arity = "ternary";
@@ -8512,6 +8823,7 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["0?0:0", "parse_ternary_led", "use_open", "?", 2]
+// ["aa=0?aa=0:0", "parse_ternary_led", "use_open", "?", 5]
 
                 warn("use_open", the_token);
             }
@@ -8526,6 +8838,7 @@ function jslint_phase3_parse(state) {
     assignment("%=");
     assignment("&&=");
     assignment("&=");
+    assignment("**=");
     assignment("*=");
     assignment("+=");
     assignment("-=");
@@ -8695,15 +9008,38 @@ function jslint_phase3_parse(state) {
     state.token_tree = parse_statement_block();
     advance("(end)");
 
-// Check global functions are ordered.
+// Check top-level functions are ordered.
+
+// PR-514 - Bugfix - Also check an exported function-declaration, which is
+// hoisted too, though <stmt_export> resets its arity to 'unary'.
+
+// test_cause:
+// ["
+// export async function bb(){}export async function aa(){}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 51]
+// ["
+// export function bb(){}export default function aa(){}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 47]
+// ["
+// export function bb(){}export function aa(){}
+// ", "check_ordered", "expected_a_b_before_c_d", "aa", 39]
 
     check_ordered(
         "function",
-        function_list.map(function ({
-            level,
-            name
-        }) {
-            return (level === 1) && name;
+        function_list.map(function (the_function) {
+            const {
+                arity,
+                level,
+                name
+            } = the_function;
+            return (
+                (
+                    arity === "statement" ||
+                    Object.values(export_dict).includes(the_function)
+                ) &&
+                level === 1 &&
+                name
+            );
         }).filter(function (name) {
             return option_dict.beta && name && name.id;
         })
@@ -8832,12 +9168,47 @@ function jslint_phase4_walk(state) {
         };
     }
 
+    function check_assignable(name, the_variable) {
+
+// PR-514 - This function will warn bad_assignment_a when <name> has a readonly
+// binding, such as a const, an import, a catch variable or a function name,
+// and return false for that or for no binding.
+
+        if (!the_variable) {
+
+// PR-514 - An undeclared <name> returns false with no warning, since
+// <name_lookup> already warned undeclared_a on this token, and <warn> keeps
+// only the first warning of a token.
+
+// test_cause:
+// ["aa+=0", "check_assignable", "undeclared", "", 0]
+// ["aa=0", "check_assignable", "undeclared", "", 0]
+
+            test_cause("undeclared");
+            return false;
+        }
+        if (the_variable.readonly) {
+
+// test_cause:
+// ["const aa=0;++aa", "check_assignable", "bad_assignment_a", "aa", 14]
+// ["const aa=0;aa++", "check_assignable", "bad_assignment_a", "aa", 12]
+// ["const aa=0;aa+=0", "check_assignable", "bad_assignment_a", "aa", 12]
+// ["const aa=0;aa=0", "check_assignable", "bad_assignment_a", "aa", 12]
+// ["function aa(){}aa=0", "check_assignable", "bad_assignment_a", "aa", 16]
+
+            warn("bad_assignment_a", name);
+            return false;
+        }
+        return true;
+    }
+
     function name_lookup(thing) {
 
-// This function will lookup and return variable or function-parameter
-// <the_variable> in current context from given <thing>.id.
+// This function will look up <thing>.id from the current scope outward, and
+// return its variable, parameter, label or global, or undefined if undeclared.
 
         const id = thing.id;
+        let the_label;
         let the_variable;
 
 // PR-510 - deadcode-confirmed - Both callers pass a token already known to be
@@ -8863,6 +9234,22 @@ function jslint_phase4_walk(state) {
 
         block_stack.some(function (scope_block, ii) {
             the_variable = scope_block.context[id];
+
+// PR-514 - Bugfix - Skip a label, so a same-named variable, function or global
+// in an outer scope is still found.
+
+            if (the_variable?.role === "label") {
+
+// test_cause:
+// ["aa:while(0){aa}", "name_lookup", "skip_label", "aa", 0]
+// ["
+// function aa(){aa:while(aa){break aa;}}
+// ", "name_lookup", "skip_label", "aa", 0]
+
+                test_cause("skip_label", id);
+                the_label = the_variable;
+                the_variable = undefined;
+            }
             if (the_variable && ii > 0) {
 
 // If found outside current-scope, mark as closure.
@@ -8872,6 +9259,14 @@ function jslint_phase4_walk(state) {
             return the_variable;
         });
         if (!the_variable && global_dict[id] === undefined) {
+            if (the_label) {
+
+// test_cause:
+// ["aa:while(0){aa}", "name_lookup", "label_a", "aa", 13]
+
+                warn("label_a", thing);
+                return the_label;
+            }
 
 // test_cause:
 // ["(function aa(){})aa", "name_lookup", "undeclared_a", "aa", 18]
@@ -8883,6 +9278,7 @@ function jslint_phase4_walk(state) {
 // ["if(0){function aa(){}}aa", "name_lookup", "undeclared_a", "aa", 23]
 // ["if(0){let aa}aa", "name_lookup", "undeclared_a", "aa", 14]
 // ["try{}catch(aa){}aa", "name_lookup", "undeclared_a", "aa", 17]
+// ["try{}finally{aa}", "name_lookup", "undeclared_a", "aa", 14]
 
             warn("undeclared_a", thing);
             return;
@@ -8902,6 +9298,9 @@ function jslint_phase4_walk(state) {
 
                 assigned: true,
                 id,
+
+// 3.glo.4 - Mark 'readonly', the global-variable, immediately.
+
                 readonly: true,
                 role: "variable",
                 scope_declared: token_global
@@ -8911,25 +9310,18 @@ function jslint_phase4_walk(state) {
 
             token_global.context[id] = the_variable;
         }
-        if (the_variable.role === "label") {
+        if (!the_variable.alive) {
 
-// test_cause:
-// ["aa:while(0){aa}", "name_lookup", "label_a", "aa", 13]
-
-            warn("label_a", thing);
-        } else if (
-            (
-                !the_variable.calls ||
-                !scope_function.name ||
-                !the_variable.calls[scope_function.name.id]
-            ) &&
-            !the_variable.alive
-        ) {
-
-// Warn variable is 'out-of-scope'.
+// PR-514 - Deviation kept 2026-09-29. A function reading a 'let' declared
+// below it warns, though valid when called later. This matches ESLint
+// no-use-before-define.
 
 // test_cause:
 // ["(aa=aa)=>0", "name_lookup", "temporal_dead_zone_a", "aa", 5]
+// ["
+// (function aa(){aa();var aa})
+// ", "name_lookup", "temporal_dead_zone_a", "aa", 16]
+// ["for(const [aa] of aa){}", "name_lookup", "temporal_dead_zone_a", "aa", 19]
 // ["let [aa]=aa", "name_lookup", "temporal_dead_zone_a", "aa", 10]
 // ["let aa=()=>aa", "name_lookup", "temporal_dead_zone_a", "aa", 12]
 // ["let aa=aa", "name_lookup", "temporal_dead_zone_a", "aa", 8]
@@ -8942,26 +9334,24 @@ function jslint_phase4_walk(state) {
 
     function post_a_assignment(thing) {
 
-// Assignment using = sets the assigned property of a variable. No other
-// assignment operator can do this. A = token keeps that variable (or array of
-// variables in case of destructuring) in its name property.
+// Assignment using = sets the assigned property of a variable, and so do '??='
+// and '||=' below. A = token keeps that variable, or the variables of a
+// destructuring, in its name_list property.
 
         const lvalue = thing.expression[0];
         let right;
         if (thing.id !== "=") {
             if (
                 lvalue.arity === "variable" &&
-                (!lvalue.variable || lvalue.variable.readonly)
+                check_assignable(lvalue, lvalue.variable) &&
+                (thing.id === "??=" || thing.id === "||=")
             ) {
 
-// test_cause:
-// ["aa+=0", "post_a_assignment", "+=", "aa", 0]
-// ["aa+=0", "post_a_assignment", "bad_assignment_a", "aa", 1]
-// ["const aa=0;aa+=0", "post_a_assignment", "+=", "aa", 0]
-// ["const aa=0;aa+=0", "post_a_assignment", "bad_assignment_a", "aa", 12]
+// PR-514 - Bugfix - '??=' and '||=' assign an unassigned variable, since its
+// 'undefined' is nullish and falsy, so it counts as assigned. '&&=' does not
+// assign it, and still warns unassigned_var_a.
 
-                test_cause("+=", lvalue.id);
-                warn("bad_assignment_a", lvalue);
+                lvalue.variable.assigned = true;
             }
             right = syntax_dict[thing.expression[1].id];
             if (
@@ -8985,25 +9375,15 @@ function jslint_phase4_walk(state) {
             return;
         }
         if (thing.name_list) {
-            thing.name_list.forEach(function (name) {
+            for (const name of thing.name_list) {
                 const the_variable = name_lookup(name);
-                if (the_variable && !the_variable.readonly) {
+                if (check_assignable(name, the_variable)) {
 
 // 3.var.3 - Mark 'assigned', the variable, after assignment.
 
                     the_variable.assigned = true;
-                    return;
                 }
-
-// test_cause:
-// ["aa=0", "post_a_assignment", "=", "aa", 0]
-// ["aa=0", "post_a_assignment", "bad_assignment_a", "aa", 1]
-// ["const aa=0;aa=0", "post_a_assignment", "=", "aa", 0]
-// ["const aa=0;aa=0", "post_a_assignment", "bad_assignment_a", "aa", 12]
-
-                test_cause("=", name.id);
-                warn("bad_assignment_a", name);
-            });
+            }
             return;
         }
         if (lvalue.id === "." && thing.expression[1].id === "undefined") {
@@ -9144,9 +9524,62 @@ function jslint_phase4_walk(state) {
             ) {
 
 // test_cause:
-// ["0- -0", "post_b_binary", "wrap_unary", "-", 4]
+// ["0- -0", "post_b_binary", "wrap_subexpression_a_b", "-", 4]
 
-                warn("wrap_unary", right);
+                warn("wrap_subexpression_a_b", right, right.id, thing.id);
+            }
+
+            if (
+                thing.id === "**" &&
+                thing.expression[0].arity === "unary" &&
+                !thing.expression[0].wrapped &&
+                [
+                    "!", "!!", "+", "-", "await", "typeof", "void", "~"
+                ].includes(thing.expression[0].id)
+            ) {
+
+// PR-514 - Bugfix - A unary operator before '**' is a SyntaxError, since the
+// spec's ExponentiationExpression takes an UpdateExpression on its left. So
+// '-aa ** 2' needs parens, while '[aa] ** 2' and '++aa ** 2' do not.
+
+// test_cause:
+// ["aa=!!0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
+// ["aa=!0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
+// ["aa=+0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
+// ["aa=-0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
+// ["aa=void 0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
+// ["aa=~0**0", "post_b_binary", "wrap_subexpression_a_b", "**", 4]
+// ["
+// async function aa(){return await aa**0;}
+// ", "post_b_binary", "wrap_subexpression_a_b", "**", 28]
+
+                warn(
+                    "wrap_subexpression_a_b",
+                    thing.expression[0],
+                    thing.expression[0].id,
+                    "**"
+                );
+            }
+
+            if (thing.id === "??") {
+
+// PR-514 - Bugfix - An unwrapped '&&' or '||' operand of '??' is a SyntaxError,
+// since the spec's CoalesceExpression takes a BitwiseORExpression on each side.
+// '??' binds loosest of the three, so only a '??' node can hold one.
+
+                thing.expression.forEach(function (thang) {
+                    if (
+                        (thang.id === "&&" || thang.id === "||") &&
+                        !thang.wrapped
+                    ) {
+
+// test_cause:
+// ["0&&0??0", "post_b_binary", "wrap_subexpression_a_b", "??", 2]
+// ["0??0||0", "post_b_binary", "wrap_subexpression_a_b", "??", 5]
+
+                        warn("wrap_subexpression_a_b", thang, thang.id, "??");
+                    }
+                });
             }
             if (
                 thing.expression[0].constant === true &&
@@ -9333,6 +9766,12 @@ function jslint_phase4_walk(state) {
         }
     }
 
+    function post_p_update(thing) {
+        if (thing.expression.arity === "variable") {
+            check_assignable(thing.expression, thing.expression.variable);
+        }
+    }
+
     function post_s_export_toplevel(the_thing) {
 
 // Some features must be at the most outermost level.
@@ -9372,6 +9811,7 @@ function jslint_phase4_walk(state) {
             warn("unexpected_parens", thing);
         }
         scope_block = scope_block_pop();
+        scope_block = scope_block_pop();
         scope_function = scope_function_pop();
     }
 
@@ -9399,6 +9839,13 @@ function jslint_phase4_walk(state) {
 
             scope_block = scope_block_pop();
         }
+
+// PR-514 - Bugfix - Walk the finally-block after the catch-block, as parsed.
+// Else a 'var' from the catch-block warned temporal_dead_zone_a in it.
+
+// Recurse walk_statement.
+
+        walk_statement(thing.finally);
     }
 
     function post_s_var(thing) {
@@ -9478,9 +9925,14 @@ function jslint_phase4_walk(state) {
         ) {
 
 // test_cause:
-// ["(aa&&!aa?0:1)", "post_t_ternary", "wrap_condition", "&&", 4]
+// ["(aa&&!aa?0:1)", "post_t_ternary", "wrap_subexpression_a_b", "?", 4]
 
-            warn("wrap_condition", thing.expression[0]);
+            warn(
+                "wrap_subexpression_a_b",
+                thing.expression[0],
+                thing.expression[0].id,
+                "?"
+            );
         }
     }
 
@@ -9578,6 +10030,11 @@ function jslint_phase4_walk(state) {
             thing.id !== "&&" &&
             thing.id !== "||" &&
             thing.id !== "=" &&
+
+// PR-514 - Bugfix - Skip the 'of' or 'in' node of a for-loop-head, so
+// 'for (aa of bb < cc)' does not warn on its own 'of', like the const form.
+
+            thing.for_init !== true &&
             Array.isArray(thing.expression) &&
             thing.expression.length === 2 &&
             (
@@ -9695,9 +10152,9 @@ function jslint_phase4_walk(state) {
             if (thang.id === "&&" && !thang.wrapped) {
 
 // test_cause:
-// ["0&&0||0", "pre_b_or", "and", "&&", 2]
+// ["0&&0||0", "pre_b_or", "wrap_subexpression_a_b", "||", 2]
 
-                warn("and", thang);
+                warn("wrap_subexpression_a_b", thang, "&&", "||");
             }
         });
     }
@@ -9717,6 +10174,12 @@ function jslint_phase4_walk(state) {
             case "const":
             case "let":
             case "var":
+
+// PR-514 - Bugfix - Walk the iterable of destructured 'for (const [aa] of bb)',
+// which <stmt_var> keeps in <expression>, and <post_s_var> does not walk. Walk
+// it before <post_s_var> marks the names alive, to catch temporal_dead_zone_a.
+
+                walk_expression(thing.for_of.expression);
                 post_s_var(thing.for_of);
                 break;
             default:
@@ -9744,6 +10207,7 @@ function jslint_phase4_walk(state) {
 // PR-504 - Add hidden scope_block for:
 // - function-parameter
 
+        scope_block = scope_block_push(thing.scope_name, false);
         scope_block = scope_block_push(thing, false);
         scope_function = scope_function_push(thing, false);
         if (thing.extra === "get") {
@@ -9758,12 +10222,24 @@ function jslint_phase4_walk(state) {
                 warn("bad_get", thing);
             }
         } else if (thing.extra === "set") {
-            if (thing.parameter_count !== 1) {
+
+// PR-514 - Bugfix - A setter's one parameter cannot be a rest-parameter, a
+// SyntaxError. Read <signature>, since <name_list> flattens destructuring and
+// cannot tell a rest-parameter from a valid rest-element inside a destructure.
+
+            if (
+                thing.parameter_count !== 1 ||
+                thing.signature.startsWith("(...")
+            ) {
 
 // test_cause:
 // ["
 // /*jslint getset*/
 // aa={set aa(){}}
+// ", "pre_s_function", "bad_set", "function", 9]
+// ["
+// /*jslint getset*/
+// aa={set aa(...aa){}}
 // ", "pre_s_function", "bad_set", "function", 9]
 
                 warn("bad_set", thing);
@@ -9919,6 +10395,8 @@ function jslint_phase4_walk(state) {
     postaction("binary", "=>", post_s_function);
     postaction("binary", "[", post_b_lbracket);
     postaction("binary", "||", post_b_or);
+    postaction("postassign", "(all)", post_p_update);
+    postaction("preassign", "(all)", post_p_update);
     postaction("statement", "const", post_s_var);
     postaction("statement", "export", post_s_export_toplevel);
     postaction("statement", "for", post_s_for);
@@ -10010,7 +10488,7 @@ function jslint_phase5_whitage(state) {
         "!=", "!==",
         "%", "%=",
         "&", "&&", "&&=", "&=",
-        "*", "*=",
+        "*", "**", "**=", "*=",
         "+=",
         "-=",
         "/", "/=",
@@ -10029,10 +10507,10 @@ function jslint_phase5_whitage(state) {
         }
     }
 
-    function delve(the_function) {
-        Object.keys(the_function.context).forEach(function (id) {
-            const name = the_function.context[id];
-            if (id !== "ignore" && name.scope_declared === the_function) {
+    function delve(the_block) {
+        Object.keys(the_block.context).forEach(function (id) {
+            const name = the_block.context[id];
+            if (id !== "ignore" && name.scope_declared === the_block) {
 
 // test_cause:
 // ["function aa(aa) {return aa;}", "delve", "id", "", 0]
@@ -10041,6 +10519,7 @@ function jslint_phase5_whitage(state) {
                 if (!name.used) {
 
 // test_cause:
+// ["function aa(){bb:while(aa){aa();}}", "delve", "unused_a", "bb", 15]
 // ["function aa(bb){return;}", "delve", "unused_a", "bb", 13]
 // ["let aa;", "delve", "unused_a", "aa", 5]
 // ["let aa=0;try{aa();}catch(bb){aa();}", "delve", "unused_a", "bb", 26]
@@ -10049,6 +10528,7 @@ function jslint_phase5_whitage(state) {
                 } else if (!name.assigned) {
 
 // test_cause:
+// ["let aa;aa&&=0;aa();", "delve", "unassigned_var_a", "aa", 5]
 // ["let aa;aa();", "delve", "unassigned_var_a", "aa", 5]
 
                     warn("unassigned_var_a", name);
@@ -10347,6 +10827,36 @@ function jslint_phase5_whitage(state) {
             }
             return;
         }
+        if (left.getset === true) {
+
+// PR-514 - Bugfix - On one line, <one_space> still lets a comment sit between
+// the 'get' or 'set' and its name.
+
+// test_cause:
+// ["
+// /*jslint getset*/
+// String({
+//     get
+//     aa() {
+//         return;
+//     }
+// });
+// ", "one_space_only", "expected_space_a_b", "aa", 5]
+// ["
+// /*jslint getset*/
+// String({get aa() {
+//     return;
+// }});
+// ", "whitage_default", "getset", "", 0]
+
+            test_cause("getset");
+            if (left.line === right.line) {
+                one_space();
+            } else {
+                one_space_only();
+            }
+            return;
+        }
         if (
             left.arity === "ternary" ||
             left.id === "case" ||
@@ -10588,7 +11098,6 @@ function jslint_phase5_whitage(state) {
         nr_comments_skipped = 0;
         delete left.alive;
         delete left.assigned;
-        delete left.calls;
         delete left.open;
         delete left.used;
         left = right;
@@ -10643,19 +11152,16 @@ function jslint_phase6_autofix(state) {
         switch (code) {
         case "expected_a_at_b_c":
 
-// expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. expected_at has FOUR
-// callers, not one: at_margin and one_space warn a token that already belongs
-// at a margin, so the target column belongs to the warned line itself. The
-// other two pass 0, are LABEL placement, and DO warn a mid-line token -
-// unreachable here only because a label always co-raises weird_loop or
-// unused_a, which blocks the pass. So do NOT read "always at a margin" as
-// licence to drop the mid-line branch below.
+// expected_a_at_b_c is indentation. <at_margin>, <one_space> and the two label
+// callers of <expected_at> warn a token that belongs at a margin, and a label
+// can be mid-line, such as 'cc:' after 'bb();'. Unless a warning such as
+// weird_loop blocks autofix, that reaches here, so keep the mid-line branch.
 
             indentage_at = line_source.length - line_source.trimStart().length;
 
-// A MID-LINE token cannot be re-indented, but it does not need to be skipped:
-// at_margin fires for tokens that belong AT a margin and therefore on their
-// OWN line. So split first and indent the remainder, which also lands a
+// A MID-LINE token cannot be re-indented, but it does not need to be skipped,
+// since all four callers warn a token that belongs AT a margin and therefore
+// on its OWN line. So split first and indent the remainder, which also lands a
 // trailing closer correctly, and is what line-breaks a single-line ternary.
 
             if (ii !== indentage_at) {
