@@ -696,7 +696,11 @@ import moduleFs from "fs";
         await moduleFs.promises.readdir(".")
     ).forEach(async function (file) {
         let data;
-        if (file === "CHANGELOG.md" || !(/.\.html$|.\.md$/m).test(file)) {
+        if (
+            file === "CHANGELOG.md" ||
+            file.startsWith(".") ||
+            !(/.\.html$|.\.md$/m).test(file)
+        ) {
             return;
         }
         data = await moduleFs.promises.readFile(file, "utf8");
@@ -1185,45 +1189,42 @@ shGithubPrCleanup() {(set -e
 
 shGithubPrCreate() {(set -e
 # This function will create-and-push a github-pull-commit to origin/alpha.
-    # Update 'PR-xxx' placeholder in codebase.
-    if git grep -Ei -e '^ *?(//|#) pr-xxx'
+    # init $UPSTREAM_XXX
+    export UPSTREAM_REPOSITORY="$(sed -En \
+        -e 's|.*"git\+https://github\.com/([^"]+)\.git".*|\1|p' \
+        package.json
+    )"
+    if [ ! "$UPSTREAM_REPOSITORY" ]
     then
-        # init $UPSTREAM_XXX
-        export UPSTREAM_REPOSITORY="$(sed -En \
-            -e 's|.*"git\+https://github\.com/([^"]+)\.git".*|\1|p' \
-            package.json
-        )"
-        if [ ! "$UPSTREAM_REPOSITORY" ]
-        then
-            printf "shGithubPrCreate - missing UPSTREAM_REPOSITORY\n" >&2
-            exit 1
-        fi
-        PR_XXX="$(curl -fs --ssl-no-revoke \
-"https://api.github.com/repos/$UPSTREAM_REPOSITORY/issues?per_page=1&state=all"
-        )"
-        # First match only - a milestone nests its own "number" further down
-        PR_XXX="$(
-            printf "%s" "$PR_XXX" |
-                sed -En -e 's/.*"number": ([0-9]+).*/\1/p' |
-                head -n 1
-        )"
-        if [ ! "$PR_XXX" ]
-        then
-            return
-        fi
-        PR_XXX="PR-$((PR_XXX + 1))"
-        FILE_LIST="$(
-git grep -Ei -e '^ *?(//|#) pr-xxx - ' | sed -E -e 's/:.*//' | sort -u
-        )"
-        for FILE in $FILE_LIST
-        do
-            sed -Ei.bak \
-                -e "s/^ *?(\/\/|#) pr-xxx - /\1 $PR_XXX - /gi" \
-                "$FILE" && \
-                rm -f "$FILE".bak
-        done
+        printf "shGithubPrCreate - missing UPSTREAM_REPOSITORY\n" >&2
+        exit 1
     fi
-    node --input-type=module --eval '
+    # Update 'PR-xxx' placeholder in codebase.
+    PR_XXX="$(curl -fs --ssl-no-revoke \
+"https://api.github.com/repos/$UPSTREAM_REPOSITORY/issues?per_page=1&state=all"
+    )"
+    # First match only - a milestone nests its own "number" further down
+    PR_XXX="$(
+        printf "%s" "$PR_XXX" |
+            sed -En -e 's/.*"number": ([0-9]+).*/\1/p' |
+            head -n 1
+    )"
+    if [ ! "$PR_XXX" ]
+    then
+        return
+    fi
+    PR_XXX="PR-$((PR_XXX + 1))"
+    FILE_LIST="$(
+git grep -Ei -e '^ *?(//|#) pr-xxx - ' | sed -E -e 's/:.*//' | sort -u
+    )"
+    for FILE in $FILE_LIST
+    do
+        sed -Ei.bak \
+            -e "s/^ *?(\/\/|#) pr-xxx - /\1 $PR_XXX - /gi" \
+            "$FILE" && \
+            rm -f "$FILE".bak
+    done
+    PR_XXX="$PR_XXX" node --input-type=module --eval '
 // init debugInline
 const debugInline = (function () {
     let consoleError = Object;
@@ -1254,6 +1255,8 @@ import moduleFs from "fs";
         branchSquash = "HEAD"
     ] = process.argv;
     let branchPull;
+    let changelogNew;
+    let changelogOld;
     let commitMessage;
     let data;
     version = version.replace((/-0?/g), ".").replace((/^v/), "");
@@ -1282,10 +1285,32 @@ import moduleFs from "fs";
         break;
     default:
         version = `p${version}`;
-        commitMessage = (
-            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)(?:\n- |\n\n)/
-        ).exec(data)[1];
-        commitMessage = `- shGithubPrCreate ${commitMessage}`;
+        // Name only the items this pull-request adds, those missing from the
+        // CHANGELOG of <branchMerge>, so the message repeats no released item.
+        changelogNew = (
+            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n([\S\s]+?)\n\n/
+        ).exec(data)[1].split(/\n(?=- )/);
+        changelogOld = await new Promise(function (resolve) {
+            moduleChildProcess.execFile(
+                "git",
+                ["show", `${branchMerge}:CHANGELOG.md`],
+                {encoding: "utf8"},
+                function (ignore, stdout) {
+                    resolve(stdout?.split("\n") || []);
+                }
+            );
+        });
+        commitMessage = String(
+            `- ${process.env.PR_XXX} ` +
+            (
+                changelogNew
+                    .filter(function (item) {
+                        return !changelogOld.includes(item.split("\n")[0]);
+                    })
+                    .join("\n") ||
+                changelogNew[0]
+            )
+        ).replace("\n", "\n\n");
     }
     branchPull = `branch-${version}`;
     // security - sanitize commitMessage
@@ -1298,13 +1323,13 @@ import moduleFs from "fs";
 (set -e
     . ./jslint_ci.sh
     npm run test2
+    shDirHttplinkValidate
     git reset "${branchSquash}"
     git push . HEAD:__pr_"${branchMerge}"_pre -f
     shGitSquashPop "${branchCheckpoint}" \u0027${commitMessage}\u0027
     git --no-pager diff origin/"${branchPull}" || true
     git push origin alpha:"${branchPull}" -f
     git push origin alpha -f
-    shDirHttplinkValidate
     git push . HEAD:__pr_"${branchMerge}" -f
     printf "\n\n\n\n"
     git --no-pager log -n 4
