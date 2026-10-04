@@ -887,9 +887,9 @@ ${String(message).slice(0, 2000)}`
     throw error;
 }</pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
+        nr_comments_skipped = 0;
         delete left.alive;
         delete left.assigned;
-        delete left.calls;
         delete left.open;
         delete left.used;
         left = right;
@@ -1077,7 +1077,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
     const mode_digits_numeric_separator = 1;
     const mode_digits_regexp_quantifier = 2;
     const mode_digits_unicode_escape = 3;
-    const opener_stack = [];    // Stack of opener tokens: (, [.
+    const opener_stack = [];    // Stack of opener tokens: (, [, {, ${.
     let char;                   // The current character being lexed.
     let column = 0;             // The column number of the next character.
     let from;                   // The starting column number of the token.
@@ -1098,7 +1098,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
     let token_prv = token_global;       // The previous token including
                                         // ... comments.
     let token_prv_expr = token_global;  // The previous token excluding
-                                        // ...
+                                    ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1361,7 +1361,7 @@ if (
         "!=", "!==",
         "%", "%=",
         "&amp;", "&amp;&amp;", "&amp;&amp;=", "&amp;=",
-        "*", "*=",
+        "*", "**", "**=", "*=",
         "+=",
         "-=",
         "/", "/=",
@@ -1380,10 +1380,10 @@ if (
         }
     }
 
-    function delve(the_function) {
-        Object.keys(the_function.context).forEach(function (id) {
-            const name = the_function.context[id];
-            if (id !== "ignore" &amp;&amp; name.scope_declared === the_function) {
+    function delve(the_block) {
+        Object.keys(the_block.context).forEach(function (id) {
+            const name = the_block.context[id];
+            if (id !== "ignore" &amp;&amp; name.scope_declared === the_block) {
 
 // test_cause:
 // ["function aa(aa) {return aa;}", "delve", "id", "", 0]
@@ -1392,15 +1392,12 @@ if (
                 if (!name.used) {
 
 // test_cause:
+// ["function aa(){bb:while(aa){aa();}}", "delve", "unused_a", "bb", 15]
 // ["function aa(bb){return;}", "delve", "unused_a", "bb", 13]
 // ["let aa;", "delve", "unused_a", "aa", 5]
 // ["let aa=0;try{aa();}catch(bb){aa();}", "delve", "unused_a", "bb", 26]
 
-                    warn("unused_a", name);
-                } else if (!name.assigned) {
-
-// test_cause:
-//...
+                    warn("unused_...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1470,20 +1467,22 @@ if (mode_autofix) {
         switch (code) {
         case "expected_a_at_b_c":
 
-// expected_a_at_b_c IS UNAMBIGUOUSLY INDENTATION. expected_at has FOUR
-// callers, not one: at_margin and one_space warn a token that already belongs
-// at a margin, so the target column belongs to the warned line itself. The
-// other two pass 0, are LABEL placement, and DO warn a mid-line token -
-// unreachable here only because a label always co-raises weird_loop or
-// unused_a, which blocks the pass. So do NOT read "always at a margin" as
-// licence to drop the mid-line branch below.
+// expected_a_at_b_c is indentation. &lt;at_margin&gt;, &lt;one_space&gt; and the two label
+// callers of &lt;expected_at&gt; warn a token that belongs at a margin, and a label
+// can be mid-line, such as 'cc:' after 'bb();'. Unless a warning such as
+// weird_loop blocks autofix, that reaches here, so keep the mid-line branch.
 
             indentage_at = line_source.length - line_source.trimStart().length;
 
-// A MID-LINE token cannot be re-indented, but it does not need to be skipped:
-// at_margin fires for tokens that belong AT a margin and therefore on their
-// OWN line. So split first and indent the remainder, which also lands a
-// trailing closer correctly, and is...
+// A MID-LINE token cannot be re-indented, but it does not need to be skipped,
+// since all four callers warn a token that belongs AT a margin and therefore
+// on its OWN line. So split first and indent the remainder, which also lands a
+// trailing closer correctly, and is what line-breaks a single-line ternary.
+
+            if (ii !== indentage_at) {
+                line_list.splice(
+                    line,
+               ...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
