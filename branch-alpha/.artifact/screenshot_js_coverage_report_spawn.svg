@@ -1,5 +1,5 @@
-<svg height="1614" width="800" xmlns="http://www.w3.org/2000/svg">
-<rect height="1614" fill="#222" width="800"></rect>
+<svg height="1438" width="800" xmlns="http://www.w3.org/2000/svg">
+<rect height="1438" fill="#222" width="800"></rect>
 <text
     fill="#7f7"
     font-family="consolas, menlo, monospace"
@@ -287,157 +287,109 @@
     textLength="768"
     x="10"
     y="1044"
->npm warn deprecated har-validator@5.1.5: this library is no longer supported                     </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1066"
->npm warn deprecated uuid@3.4.0: uuid@10 and below is no longer supported.  For ESM codebases, up\</tspan>
+>&gt; sqlite3@6.0.1 install                                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1088"
->  date to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will like\</tspan>
+>&gt; prebuild-install -r napi || node-gyp rebuild                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1110"
->  ly be deprecated in 2028).                                                                     </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1132"
->npm warn deprecated osenv@0.1.5: This package is no longer supported.                            </tspan>
+>(node:3882) [DEP0176] DeprecationWarning: fs.R_OK is deprecated, use fs.constants.R_OK instead   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1154"
->npm warn deprecated are-we-there-yet@4.0.2: This package is no longer supported.                 </tspan>
+>(Use `node --trace-deprecation ...` to show where the warning was created)                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1176"
->npm warn deprecated gauge@5.0.2: This package is no longer supported.                            </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1198"
->npm warn deprecated npmlog@7.0.1: This package is no longer supported.                           </tspan>
+>up to date, audited 487 packages in 3s                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1220"
->npm warn deprecated request@2.88.2: request has been deprecated, see https://github.com/request/\</tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1242"
->  request/issues/3142                                                                            </tspan>
+>70 packages are looking for funding                                                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1264"
->npm warn deprecated fstream@1.0.12: This package is no longer supported.                         </tspan>
+>  run `npm fund` for details                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1286"
->npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use i\</tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1308"
->  t. Check out lru-cache if you want a good and tested way to coalesce async requests by a key v\</tspan>
+>29 vulnerabilities (1 low, 4 moderate, 21 high, 3 critical)                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1330"
->  alue, which is much more comprehensive and powerful.                                           </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1352"
->npm warn deprecated glob@7.2.0: Old versions of glob are not supported, and contain widely publi\</tspan>
+>To address issues that do not require attention, run:                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1374"
->  cized security vulnerabilities, which have been fixed in the current version. Please update. S\</tspan>
+>  npm audit fix                                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1396"
->  upport for old versions may be purchased (at exorbitant rates) by contacting i@izs.me          </tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1418"
->npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported            </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1440"
->npm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead        </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1462"
->npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of t\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1484"
->  he relevant native addon; alternatives are available.                                          </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1506"
->npm warn deprecated @humanwhocodes/config-array@0.11.14: Use @eslint/config-array instead        </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1528"
->npm warn deprecated prebuild@13.0.1: No longer maintained (alternatives available)               </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1550"
->npm warn deprecated @ungap/structured-clone@1.3.0: Potential CWE-502 - Update to 1.3.1 or higher </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1572"
->npm warn deprecated are-we-there-yet@1.1.7: This package is no longer supported.                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1594"
->npm warn deprecated rimraf@2.7.1: Rimraf versions prior to v4 are no longer supported            </tspan>
+>To address all issues (including breaking changes), run:                                         </tspan>
 
 </text>
 </svg>

@@ -2947,13 +2947,13 @@ body {
 <pre><span class="lineno"><a href="#line_2782" id="line_2782"> 2782.</a></span><span class="count                ">     22</span><span>            data = await moduleFs.promises.readdir(file, "utf8");</span></pre>
 <pre><span class="lineno"><a href="#line_2783" id="line_2783"> 2783.</a></span><span class="count                ">     22</span><span>        } catch (ignore) {}</span></pre>
 <pre><span class="lineno"><a href="#line_2784" id="line_2784"> 2784.</a></span><span class="count                ">     22</span><span>        if (data) {</span></pre>
-<pre><span class="lineno"><a href="#line_2785" id="line_2785"> 2785.</a></span><span class="count                ">     35</span><span>            await Promise.all(data.map(async function (file2) {</span></pre>
-<pre><span class="lineno"><a href="#line_2786" id="line_2786"> 2786.</a></span><span class="count                ">     35</span><span>                let code;</span></pre>
-<pre><span class="lineno"><a href="#line_2787" id="line_2787"> 2787.</a></span><span class="count                ">     35</span><span>                let result_dir;</span></pre>
-<pre><span class="lineno"><a href="#line_2788" id="line_2788"> 2788.</a></span><span class="count                ">     35</span><span>                let time_start = Date.now();</span></pre>
-<pre><span class="lineno"><a href="#line_2789" id="line_2789"> 2789.</a></span><span class="count                ">     35</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_2790" id="line_2790"> 2790.</a></span><span class="count                ">     35</span><span>// PR-409 - Skip dotfile (e.g. .foo.js) when reading directory.</span></pre>
-<pre><span class="lineno"><a href="#line_2791" id="line_2791"> 2791.</a></span><span class="count                ">     35</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2785" id="line_2785"> 2785.</a></span><span class="count                ">     36</span><span>            await Promise.all(data.map(async function (file2) {</span></pre>
+<pre><span class="lineno"><a href="#line_2786" id="line_2786"> 2786.</a></span><span class="count                ">     36</span><span>                let code;</span></pre>
+<pre><span class="lineno"><a href="#line_2787" id="line_2787"> 2787.</a></span><span class="count                ">     36</span><span>                let result_dir;</span></pre>
+<pre><span class="lineno"><a href="#line_2788" id="line_2788"> 2788.</a></span><span class="count                ">     36</span><span>                let time_start = Date.now();</span></pre>
+<pre><span class="lineno"><a href="#line_2789" id="line_2789"> 2789.</a></span><span class="count                ">     36</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_2790" id="line_2790"> 2790.</a></span><span class="count                ">     36</span><span>// PR-409 - Skip dotfile (e.g. .foo.js) when reading directory.</span></pre>
+<pre><span class="lineno"><a href="#line_2791" id="line_2791"> 2791.</a></span><span class="count                ">     36</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_2792" id="line_2792"> 2792.</a></span><span class="count                ">     22</span><span>                if ((/^\./).test(file2)) {</span></pre>
 <pre><span class="lineno"><a href="#line_2793" id="line_2793"> 2793.</a></span><span class="count                ">     22</span><span>                    return;</span></pre>
 <pre><span class="lineno"><a href="#line_2794" id="line_2794"> 2794.</a></span><span class="count                ">     27</span><span>                }</span></pre>
