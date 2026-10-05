@@ -150,11 +150,11 @@ body {
     </td>
     <td style="text-align: right;">
          100.00 %<br>
-        6 / 6
+        2 / 2
     </td>
     <td style="text-align: right;">
         <br>
-        0 / 6
+        0 / 2
     </td>
     </tr>
 </tbody>
@@ -163,12 +163,8 @@ body {
 <!-- header end -->
 <!-- content start -->
 <div class="content">
-<pre><span class="lineno"><a href="#line_1" id="line_1">    1.</a></span><span class="count                ">      2</span><span>const binary = require('@mapbox/node-pre-gyp');</span></pre>
-<pre><span class="lineno"><a href="#line_2" id="line_2">    2.</a></span><span class="count                ">      2</span><span>const path = require('path');</span></pre>
-<pre><span class="lineno"><a href="#line_3" id="line_3">    3.</a></span><span class="count                ">      2</span><span>const binding_path = binary.find(path.resolve(path.join(__dirname,'../package.json')));</span></pre>
-<pre><span class="lineno"><a href="#line_4" id="line_4">    4.</a></span><span class="count                ">      2</span><span>const binding = require(binding_path);</span></pre>
-<pre><span class="lineno"><a href="#line_5" id="line_5">    5.</a></span><span class="count                ">      2</span><span>module.exports = exports = binding;</span></pre>
-<pre><span class="lineno"><a href="#line_6" id="line_6">    6.</a></span><span class="count                ">      2</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_1" id="line_1">    1.</a></span><span class="count                ">      2</span><span>module.exports = require('bindings')('node_sqlite3.node');</span></pre>
+<pre><span class="lineno"><a href="#line_2" id="line_2">    2.</a></span><span class="count                ">      2</span><span></span></pre>
 </div>
 <!-- content end -->
 <div class="footer">
