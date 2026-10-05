@@ -2,7 +2,7 @@
 printf '> #!/bin/sh
 > 
 > git clone https://github.com/tryghost/node-sqlite3 node-sqlite3-sh \\
->     --branch=v5.0.11 \\
+>     --branch=v6.0.1 \\
 >     --depth=1 \\
 >     --single-branch
 > 
@@ -37,14 +37,13 @@ printf '> #!/bin/sh
 #!/bin/sh
 
 git clone https://github.com/tryghost/node-sqlite3 node-sqlite3-sh \
-    --branch=v5.0.11 \
+    --branch=v6.0.1 \
     --depth=1 \
     --single-branch 2>/dev/null || true
 
 
 cd node-sqlite3-sh
 
-git checkout 61194ec2aee4b56e8e17f757021434122772f145
 npm install
 
 # Create V8 coverage report from program `npm run test` in shell.

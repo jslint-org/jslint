@@ -25,7 +25,6 @@
 ## ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 ## OTHER DEALINGS IN THE SOFTWARE.
 
-
 # POSIX reference
 # http://pubs.opengroup.org/onlinepubs/9699919799/utilities/test.html
 # http://www.gnu.org/software/bash/manual/html_node/Shell-Parameter-Expansion.html
@@ -191,30 +190,33 @@ import moduleFs from "fs";
 import moduleOs from "os";
 import modulePath from "path";
 (async function () {
+    const cwd = process.cwd().replace((/\\/g), "/");
+    const timeStart = Date.now();
+    const tmpdir = await moduleFs.promises.mkdtemp(
+        moduleOs.tmpdir() + "/shBrowserScreenshot-"
+    );
     let child;
     let exitCode;
     let file;
-    let timeStart;
-    let tmpdir;
-    let url;
-    timeStart = Date.now();
-    url = process.argv[1];
-    if (!(
-        /^\w+?:/
-    ).test(url)) {
-        url = modulePath.resolve(url);
+    let url = process.argv[1];
+    // A scheme has 2+ chars, so a windows drive "C:" is a local path. Decode
+    // a url, or encodeURIComponent below encodes its "%" a second time. A
+    // "file:///C:/" pathname is "/C:/", so drop that "/" to match cwd.
+    if ((/^\w{2,}:/).test(url)) {
+        file = decodeURIComponent(new URL(url).pathname).replace((
+            /^\/(?=[A-Za-z]:)/
+        ), "");
+    } else {
+        url = modulePath.resolve(url).replace((/\\/g), "/");
+        file = url;
     }
-    file = new URL(url, "http://localhost").pathname;
-    // remove prefix $PWD from file
-    if (String(file + "/").startsWith(process.cwd() + "/")) {
-        file = file.replace(process.cwd(), "");
+    // Remove prefix $PWD from file.
+    if (String(file + "/").startsWith(cwd + "/")) {
+        file = file.replace(cwd, "");
     }
     file = ".artifact/screenshot_browser_" + encodeURIComponent(file).replace((
         /%/g
     ), "_").toLowerCase() + ".png";
-    tmpdir = await moduleFs.promises.mkdtemp(
-        moduleOs.tmpdir() + "/shBrowserScreenshot-"
-    );
     child = moduleChildProcess.spawn(
         (
             process.platform === "darwin"
@@ -251,11 +253,11 @@ import modulePath from "path";
     });
     await moduleFs.promises.rm(tmpdir, {recursive: true});
     console.error(
-        "shBrowserScreenshot"
-        + "\n  - url - " + url
-        + "\n  - wrote - " + file
-        + "\n  - timeElapsed - " + (Date.now() - timeStart) + " ms"
-        + "\n  - EXIT_CODE=" + exitCode
+        "shBrowserScreenshot" +
+        "\n  - url - " + url +
+        "\n  - wrote - " + file +
+        "\n  - timeElapsed - " + (Date.now() - timeStart) + " ms" +
+        "\n  - EXIT_CODE=" + exitCode
     );
 }());
 ' "$@" # '
@@ -263,13 +265,14 @@ import modulePath from "path";
 
 shCiArtifactUpload() {(set -e
 # This function will upload build-artifacts to branch-gh-pages.
+#
 # shCiArtifactUploadCustom() {(set -e
 # # This function will run custom-code to upload build-artifacts.
 #     return
 # )}
     if ! shCiMatrixIsmainName || \
         [ ! -f package.json ] || \
-        ! grep -q '^    "shCiArtifactUpload": 1,$' package.json
+        ! grep -Eq '^ {4}"shCiArtifactUpload": 1,$' package.json
     then
         return
     fi
@@ -289,9 +292,14 @@ shCiArtifactUpload() {(set -e
     git pull --unshallow origin "$GITHUB_BRANCH0"
     # init $UPSTREAM_XXX
     export UPSTREAM_REPOSITORY="$(sed -En \
-        -e 's|.*"git\+https://github\.com/([^.]+)\.git".*|\1|p' \
+        -e 's|.*"git\+https://github\.com/([^"]+)\.git".*|\1|p' \
         package.json
     )"
+    if [ ! "$UPSTREAM_REPOSITORY" ]
+    then
+        printf "shCiArtifactUpload - missing UPSTREAM_REPOSITORY\n" >&2
+        exit 1
+    fi
     export UPSTREAM_GITHUB_IO="$(
         printf "%s" "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
@@ -373,10 +381,12 @@ shCiArtifactUpload() {(set -e
 
 shCiBase() {(set -e
 # This function will run base-ci.
+#
 # shCiBaseCustom() {(set -e
 # # This function will run custom-code for base-ci.
 #     return
 # )}
+#
 # shCiLintCustom() {(set -e
 # # This function will run custom-code to lint files.
 # )}
@@ -441,8 +451,8 @@ import moduleFs from "fs";
         }, {
             file: "package.json",
             src: fileDict["package.json"].replace((
-                /    "version": "\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
-            ), `    "version": "${versionBeta}"`)
+                / {4}"version": "\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
+            ), `${" ".repeat(4)}"version": "${versionBeta}"`)
         }, {
             file: fileMain,
             // update version
@@ -497,11 +507,11 @@ import moduleFs from "fs";
             case "\n\n<br>\n\n#####":
                 toc += "        - [" + title + "](#";
                 break;
-            case "\n\n\n<br><br>\n#":
+            case "\n\n\n<br><br>\n\n#":
                 ii += 1;
                 toc += "\n" + ii + ". [" + title + "](#";
                 break;
-            case "\n\n\n<br><br>\n###":
+            case "\n\n\n<br><br>\n\n###":
                 toc += "    - [" + title + "](#";
                 break;
             default:
@@ -531,7 +541,24 @@ import moduleFs from "fs";
     done
     # shellcheck disable=SC2086
     shLintShell $FILE_LIST
+    # check shell-functions in ascii-order
+    for FILE in $FILE_LIST
+    do
+        if ! grep -o "^[A-Za-z_][A-Za-z0-9_]*() {" "$FILE" | sed "s/() {//" |
+            LC_ALL=C sort -c
+        then
+            printf "%s - shell-functions not in ascii-order\n" "$FILE" >&2
+            exit 1
+        fi
+    done
     JSLINT_BETA=1 node jslint.mjs .
+    for FILE in .ci.sh .ci2.sh
+    do
+        if [ -f "$FILE" ]
+        then
+            JSLINT_BETA=1 node jslint.mjs "$FILE"
+        fi
+    done
     if (command -v shCiLintCustom >/dev/null)
     then
         shCiLintCustom
@@ -565,6 +592,7 @@ shCiMatrixIsmainNodeversion() {(set -e
 
 shCiPre() {(set -e
 # This function will run pre-ci.
+#
 # shCiPreCustom() {(set -e
 # # This function will run custom-code for pre-ci.
 #     return
@@ -586,12 +614,13 @@ shCiPre() {(set -e
 
 shCiPublishNpm() {(set -e
 # This function will publish npm-package.
+#
 # shCiPublishNpmCustom() {(set -e
 # # This function will run custom-code to publish npm-package.
 #     # npm publish --access public
 # )}
     if [ ! -f package.json ] || \
-        ! grep -q '^    "shCiPublishNpm": 1,$' package.json
+        ! grep -Eq '^ {4}"shCiPublishNpm": 1,$' package.json
     then
         return
     fi
@@ -613,6 +642,7 @@ shCiPublishNpm() {(set -e
 
 shCiPublishPypi() {(set -e
 # This function will publish pypi-package.
+#
 # shCiPublishPypiCustom() {(set -e
 # # This function will run custom-code to publish pypi-package.
 #     # npm publish --access public
@@ -634,9 +664,14 @@ shDirHttplinkValidate() {(set -e
     export GITHUB_BRANCH0="${GITHUB_BRANCH0:-alpha}"
     # init $UPSTREAM_XXX
     export UPSTREAM_REPOSITORY="$(sed -En \
-        -e 's|.*"git\+https://github\.com/([^.]+)\.git".*|\1|p' \
+        -e 's|.*"git\+https://github\.com/([^"]+)\.git".*|\1|p' \
         package.json
     )"
+    if [ ! "$UPSTREAM_REPOSITORY" ]
+    then
+        printf "shDirHttplinkValidate - missing UPSTREAM_REPOSITORY\n" >&2
+        exit 1
+    fi
     export UPSTREAM_GITHUB_IO="$(
         printf "%s" "$UPSTREAM_REPOSITORY" | sed -e "s|/|.github.io/|"
     )"
@@ -648,7 +683,6 @@ shDirHttplinkValidate() {(set -e
     node --input-type=module --eval '
 import moduleAssert from "assert";
 import moduleFs from "fs";
-import moduleHttps from "https";
 (async function () {
     const {
         GITHUB_BRANCH0,
@@ -662,7 +696,11 @@ import moduleHttps from "https";
         await moduleFs.promises.readdir(".")
     ).forEach(async function (file) {
         let data;
-        if (file === "CHANGELOG.md" || !(/.\.html$|.\.md$/m).test(file)) {
+        if (
+            file === "CHANGELOG.md" ||
+            file.startsWith(".") ||
+            !(/.\.html$|.\.md$/m).test(file)
+        ) {
             return;
         }
         data = await moduleFs.promises.readFile(file, "utf8");
@@ -674,7 +712,6 @@ import moduleHttps from "https";
             /\bhttps?:\/\/.+?([\s")\]]|\W?$)(<!--no-validate-->)?/gm
         ), function (url, removeLast, noValidate) {
             const timeStart = Date.now();
-            let req;
             if (removeLast && removeLast !== "/") {
                 url = url.slice(0, -1);
             }
@@ -709,28 +746,26 @@ import moduleHttps from "https";
                 return "";
             }
             dict[url] = true;
-            req = moduleHttps.request(url, {
+            fetch(url, {
                 headers: {
                     "user-agent": "undefined"
-                }
-            }, function (res) {
+                },
+                redirect: "manual",
+                signal: AbortSignal.timeout(60000)
+            }).then(function (res) {
                 console.error(
-                    `shDirHttplinkValidate - ${res.statusCode}`
-                    + ` - ${file} - ${url} - ${Date.now() - timeStart}ms`
+                    `shDirHttplinkValidate - ${res.status}` +
+                    ` - ${file} - ${url} - ${Date.now() - timeStart}ms`
                 );
-                moduleAssert.ok(res.statusCode < 400);
-                req.destroy();
-                res.destroy();
-            });
-            req.on("error", function (err) {
+                moduleAssert.ok(res.status < 400);
+                res.body?.cancel();
+            }, function (err) {
                 console.error(
-                    `shDirHttplinkValidate - error`
-                    + ` - ${file} - ${url} - ${Date.now() - timeStart}ms`
+                    `shDirHttplinkValidate - error` +
+                    ` - ${file} - ${url} - ${Date.now() - timeStart}ms`
                 );
                 throw err;
             });
-            req.setTimeout(60000);
-            req.end();
             return "";
         });
         data.replace((
@@ -754,8 +789,8 @@ import moduleHttps from "https";
             ).test(url)) {
                 moduleFs.stat(url.split("?")[0], function (ignore, exists) {
                     console.error(
-                        `shDirHttplinkValidate - ${Boolean(exists)}`
-                        + ` - ${file} - ${url}`
+                        `shDirHttplinkValidate - ${Boolean(exists)}` +
+                        ` - ${file} - ${url}`
                     );
                     moduleAssert.ok(exists);
                 });
@@ -893,6 +928,7 @@ shGitLsTree() {(set -e
 # The sha256 column hashes the WORKING-TREE file, not the git blob,
 # so it can be compared against a copy sent elsewhere with
 # `sha256sum <file> | cut -c1-8`.
+#
 # example usage:
 # shGitLsTree | sort -rk3 # sort by date
 # shGitLsTree | sort -rk4 # sort by size
@@ -916,7 +952,7 @@ import moduleFs from "fs";
         }).setEncoding("utf8");
     });
     result = Array.from(result.matchAll(
-        /^(\S+?) +?\S+? +?\S+? +?(\S+?)\t(\S+?)$/gm
+        /^(\S+?) +?\S+? +?\S+? +?(\S+?)\t(.+?)$/gm
     )).map(function ([
         ignore, mode, size, file
     ]) {
@@ -952,7 +988,7 @@ import moduleFs from "fs";
         }
         moduleChildProcess.spawn(
             "git",
-            ["log", "--max-count=1", "--format=%at", elem.file],
+            ["log", "--max-count=1", "--format=%at", "--", elem.file],
             {stdio: ["ignore", "overlapped", 2]}
         ).stdout.on("data", function (chunk) {
             elem.date = new Date(
@@ -967,15 +1003,15 @@ import moduleFs from "fs";
         sizePad = String(Math.ceil(result[0].size / 1024)).length;
         process.stdout.write(result.map(function (elem, ii) {
             return (
-                String(ii + ".").padStart(iiPad, " ")
-                + "  " + elem.mode
-                + "  " + elem.date
-                + "  " + String(
+                String(ii + ".").padStart(iiPad, " ") +
+                "  " + elem.mode +
+                "  " + elem.date +
+                "  " + String(
                     Math.ceil(elem.size / 1024)
-                ).padStart(sizePad, " ") + " KB"
-                + "  " + elem.hash
-                + "  " + elem.file
-                + "\n"
+                ).padStart(sizePad, " ") + " KB" +
+                "  " + elem.hash +
+                "  " + elem.file +
+                "\n"
             );
         }).join(""));
     });
@@ -1058,7 +1094,6 @@ shGithubFileDownloadUpload() {(set -e
     node --input-type=module --eval '
 import moduleAssert from "assert";
 import moduleFs from "fs";
-import moduleHttps from "https";
 import modulePath from "path";
 (async function () {
     let branch;
@@ -1066,44 +1101,32 @@ import modulePath from "path";
     let repo;
     let responseBuf;
     let url;
-    function httpRequest({
+    async function httpRequest({
         method,
         payload
     }) {
-        return new Promise(function (resolve) {
-            moduleHttps.request(`${url}?ref=${branch}`, {
-                headers: {
-                    accept: (
-                        mode === "download"
-                        ? "application/vnd.github.v3.raw"
-                        : "application/vnd.github.v3+json"
-                    ),
-                    authorization: `Bearer ${process.env.MY_GITHUB_TOKEN}`,
-                    "user-agent": "undefined"
-                },
-                method
-            }, function (res) {
-                responseBuf = [];
-                res.on("data", function (chunk) {
-                    responseBuf.push(chunk);
-                });
-                res.on("end", function () {
-                    responseBuf = Buffer.concat(responseBuf);
-                    moduleAssert.ok(
-                        (
-                            res.statusCode < 400
-                            || (res.statusCode === 404 && mode === "upload")
-                        ),
-                        (
-                            `shGithubFileUpload - ${res.statusCode}`
-                            + ` - failed to download/upload file ${url} - `
-                            + responseBuf.slice(0, 1024).toString()
-                        )
-                    );
-                    resolve();
-                });
-            }).end(payload);
+        const res = await fetch(`${url}?ref=${branch}`, {
+            body: payload,
+            headers: {
+                accept: (
+                    mode === "download"
+                    ? "application/vnd.github.v3.raw"
+                    : "application/vnd.github.v3+json"
+                ),
+                authorization: `Bearer ${process.env.MY_GITHUB_TOKEN}`,
+                "user-agent": "undefined"
+            },
+            method
         });
+        responseBuf = Buffer.from(await res.arrayBuffer());
+        moduleAssert.ok(
+            (res.status < 400 || (res.status === 404 && mode === "upload")),
+            (
+                `shGithubFileUpload - ${res.status}` +
+                ` - failed to download/upload file ${url} - ` +
+                responseBuf.slice(0, 1024).toString()
+            )
+        );
     }
     console.error(
         mode === "download"
@@ -1166,7 +1189,42 @@ shGithubPrCleanup() {(set -e
 
 shGithubPrCreate() {(set -e
 # This function will create-and-push a github-pull-commit to origin/alpha.
-    node --input-type=module --eval '
+    # init $UPSTREAM_XXX
+    export UPSTREAM_REPOSITORY="$(sed -En \
+        -e 's|.*"git\+https://github\.com/([^"]+)\.git".*|\1|p' \
+        package.json
+    )"
+    if [ ! "$UPSTREAM_REPOSITORY" ]
+    then
+        printf "shGithubPrCreate - missing UPSTREAM_REPOSITORY\n" >&2
+        exit 1
+    fi
+    # Update 'PR-xxx' placeholder in codebase.
+    PR_XXX="$(curl -fs --ssl-no-revoke \
+"https://api.github.com/repos/$UPSTREAM_REPOSITORY/issues?per_page=1&state=all"
+    )"
+    # First match only - a milestone nests its own "number" further down
+    PR_XXX="$(
+        printf "%s" "$PR_XXX" |
+            sed -En -e 's/.*"number": ([0-9]+).*/\1/p' |
+            head -n 1
+    )"
+    if [ ! "$PR_XXX" ]
+    then
+        return
+    fi
+    PR_XXX="PR-$((PR_XXX + 1))"
+    FILE_LIST="$(
+git grep -Ei -e '^ *?(//|#) pr-xxx - ' | sed -E -e 's/:.*//' | sort -u
+    )"
+    for FILE in $FILE_LIST
+    do
+        sed -Ei.bak \
+            -e "s/^ *?(\/\/|#) pr-xxx - /\1 $PR_XXX - /gi" \
+            "$FILE" && \
+            rm -f "$FILE".bak
+    done
+    PR_XXX="$PR_XXX" node --input-type=module --eval '
 // init debugInline
 const debugInline = (function () {
     let consoleError = Object;
@@ -1197,6 +1255,8 @@ import moduleFs from "fs";
         branchSquash = "HEAD"
     ] = process.argv;
     let branchPull;
+    let changelogNew;
+    let changelogOld;
     let commitMessage;
     let data;
     version = version.replace((/-0?/g), ".").replace((/^v/), "");
@@ -1225,27 +1285,34 @@ import moduleFs from "fs";
         break;
     default:
         version = `p${version}`;
-        commitMessage = (
-            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n(- [\S\s]+?)(?:\n- |\n\n)/
-        ).exec(data)[1];
-        commitMessage = `- shGithubPrCreate ${commitMessage}`;
+        // Name only the items this pull-request adds, those missing from the
+        // CHANGELOG of <branchMerge>, so the message repeats no released item.
+        changelogNew = (
+            /\n\n# v\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?\n([\S\s]+?)\n\n/
+        ).exec(data)[1].split(/\n(?=- )/);
+        changelogOld = await new Promise(function (resolve) {
+            moduleChildProcess.execFile(
+                "git",
+                ["show", `${branchMerge}:CHANGELOG.md`],
+                {encoding: "utf8"},
+                function (ignore, stdout) {
+                    resolve(stdout?.split("\n") || []);
+                }
+            );
+        });
+        commitMessage = String(
+            `- ${process.env.PR_XXX} ` +
+            (
+                changelogNew
+                    .filter(function (item) {
+                        return !changelogOld.includes(item.split("\n")[0]);
+                    })
+                    .join("\n") ||
+                changelogNew[0]
+            )
+        ).replace("\n", "\n\n");
     }
     branchPull = `branch-${version}`;
-    // update README.md
-    data = await moduleFs.promises.readFile("README.md", "utf8");
-    data = data.replace(
-        new RegExp(
-            (
-                "(\\bhttps:\\/\\/github\\.com\\/[\\w.\\-\\/]+?"
-                + "\\/compare"
-                + "\\/[\\w.\\-\\/]+?\\.\\.\\.[\\w.:\\-\\/]+?)"
-                + `:branch-${version[0]}\\d\\d\\d\\d\\.\\d\\d?\\.\\d\\d?\\b`
-            ),
-            "g"
-        ),
-        `$1:${branchPull}`
-    );
-    await moduleFs.promises.writeFile("README.md", data);
     // security - sanitize commitMessage
     commitMessage = commitMessage.trim().replace((/\u0027/g), "$&\"$&\"$&");
     moduleChildProcess.spawn(
@@ -1256,13 +1323,13 @@ import moduleFs from "fs";
 (set -e
     . ./jslint_ci.sh
     npm run test2
+    shDirHttplinkValidate
     git reset "${branchSquash}"
     git push . HEAD:__pr_"${branchMerge}"_pre -f
     shGitSquashPop "${branchCheckpoint}" \u0027${commitMessage}\u0027
     git --no-pager diff origin/"${branchPull}" || true
     git push origin alpha:"${branchPull}" -f
     git push origin alpha -f
-    shDirHttplinkValidate
     git push . HEAD:__pr_"${branchMerge}" -f
     printf "\n\n\n\n"
     git --no-pager log -n 4
@@ -1278,45 +1345,6 @@ import moduleFs from "fs";
     });
 }());
 ' "$@" # '
-)}
-
-shGithubPrUpdatePrxxx() {(set -e
-# This function will update 'PR-xxx' placeholder in codebase
-# to next sequential github issue/pull number.
-    if ! git grep -Ei -e '^ *?(//|#) pr-xxx'
-    then
-        return
-    fi
-    export UPSTREAM_REPOSITORY="$(sed -En \
-        -e 's|.*"git\+https://github\.com/([^.]+)\.git".*|\1|p' \
-        package.json
-    )"
-    PR_XXX="$(curl -fs --ssl-no-revoke \
-"https://api.github.com/repos/$UPSTREAM_REPOSITORY/issues?per_page=1&state=all"
-    )"
-    PR_XXX="$(
-        printf "%s" "$PR_XXX" | sed -En -e 's/.*"number": ([0-9]+).*/\1/p'
-    )"
-    if [ ! "$PR_XXX" ]
-    then
-        return
-    fi
-    PR_XXX="PR-$((PR_XXX + 1))"
-    FILE_LIST="$(
-        git grep -Ei -e '^ *?(//|#) pr-xxx - ' | sed -E -e 's/:.*//' | sort -u
-    )"
-    for FILE in $FILE_LIST
-    do
-        sed -Ei.bak \
-            -e "s/^ *?(\/\/|#) pr-xxx - /\1 $PR_XXX - /gi" \
-            "$FILE" && \
-            rm -f "$FILE".bak
-    done
-    git --no-pager diff
-    git grep -Ei -e '^ *?(//|#) pr-xxx' || true
-    git commit -am "- ci - Update 'PR-xxx' placeholder to '${PR_XXX}'."
-    printf "\n\n\n\n"
-    git --no-pager log -n 4
 )}
 
 shGithubTokenExport() {
@@ -1355,7 +1383,7 @@ shGrep() {(set -e
     REGEXP="$1"
     shift
     FILE_FILTER="\
-/\\.|~$|/(obj|release)/|(\\b|_)(\\.\\d|\
+/\\.|~$|/(obj|release)/|(\\b|_)(\\.[0-9]|\
 archive|artifact|\
 bower_component|build|\
 coverage|\
@@ -1368,7 +1396,7 @@ log|\
 min|misc|mock|\
 node_module|\
 old|\
-raw|\rollup|\
+raw|rollup|\
 swp|\
 tmp|\
 vendor)s{0,1}(\\b|_)\
@@ -1377,11 +1405,13 @@ vendor)s{0,1}(\\b|_)\
         grep -v -E "$FILE_FILTER" |
         tr "\n" "\000" |
         xargs -0 grep -HIin -E "$REGEXP" "$@" |
-        tee /tmp/shGrep.txt || true
+        tee "$(
+            node --eval 'process.stdout.write(require("os").tmpdir())'
+        )/shGrep.txt" || true
 )}
 
 shGrepReplace() {(set -e
-# This function will inline grep-and-replace /tmp/shGrep.txt.
+# This function will inline grep-and-replace shGrep.txt in node's os.tmpdir.
     node --input-type=module --eval '
 import moduleFs from "fs";
 import moduleOs from "os";
@@ -1390,17 +1420,29 @@ import modulePath from "path";
     "use strict";
     let data;
     let dict = {};
-    data = await moduleFs.promises.readFile((
-        moduleOs.tmpdir() + "/shGrep.txt"
-    ), "utf8");
+    data = await moduleFs.promises.readFile(
+        `${moduleOs.tmpdir()}/shGrep.txt`,
+        "utf8"
+    );
     data = data.replace((
-        /^(.+?):(\d+?):(.*?)$/gm
+        /^(.+?):(\d+?):([^\n]*)/gm
     ), function (ignore, file, lineno, str) {
         dict[file] = dict[file] || moduleFs.readFileSync( //jslint-ignore-line
             modulePath.resolve(file),
             "utf8"
         ).split("\n");
-        dict[file][lineno - 1] = str;
+        if (dict[file][lineno - 1] === undefined) {
+            throw new Error(
+                `shGrepReplace - ${file} has no line ${lineno}, grep is stale`
+            );
+        }
+        // Keep the "\r" of a crlf line, which only windows grep strips.
+        // Grep splits on "\n" alone, so <str> runs to it past any lone "\r".
+        dict[file][lineno - 1] = (
+            (dict[file][lineno - 1].endsWith("\r") && !str.endsWith("\r"))
+            ? str + "\r"
+            : str
+        );
         return "";
     });
     Object.entries(dict).forEach(function ([
@@ -1416,13 +1458,14 @@ shHttpFileServer() {(set -e
 # This function will run simple node http-file-server on port $PORT.
     if [ ! "$npm_config_mode_auto_restart" ]
     then
-        EXIT_CODE=0
         export npm_config_mode_auto_restart=1
         while true
         do
             printf "\n"
             git --no-pager diff 2>/dev/null | cat || true
             printf "\nshHttpFileServer - (re)starting %s\n" "$*"
+            # Reset per run, or one 77 restarts every later clean exit too
+            EXIT_CODE=0
             (shHttpFileServer "$@") || EXIT_CODE="$?"
             printf "\nshHttpFileServer - EXIT_CODE=%s\n" "$EXIT_CODE"
             # if $EXIT_CODE != 77, then exit process
@@ -1434,7 +1477,7 @@ shHttpFileServer() {(set -e
             # else restart process after 1 second
             sleep 1
         done
-        return
+        return "$EXIT_CODE"
     fi
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
@@ -1488,18 +1531,32 @@ import moduleRepl from "repl";
         let timeStart;
         // init timeStart
         timeStart = Date.now();
-        // init pathname
+        // Init pathname, decoded so "%20" finds "a b.html"; the
+        // parent-directory check below runs on the decoded path
         pathname = new URL(req.url, "http://localhost").pathname;
+        try {
+            pathname = decodeURIComponent(pathname);
+        } catch (ignore) {
+            res.statusCode = 400;
+            res.end();
+            return;
+        }
+        // A NUL would make fs throw outside any handler and crash the server.
+        if (pathname.includes(String.fromCharCode(0))) {
+            res.statusCode = 400;
+            res.end();
+            return;
+        }
         // debug - serverLog
         res.on("close", function () {
             if (pathname === "/favicon.ico") {
                 return;
             }
             console.error(
-                "serverLog - "
-                + new Date(timeStart).toISOString() + " - "
-                + (Date.now() - timeStart) + "ms - "
-                + (res.statusCode || 0) + " " + req.method + " " + pathname
+                "serverLog - " +
+                new Date(timeStart).toISOString() + " - " +
+                (Date.now() - timeStart) + "ms - " +
+                (res.statusCode || 0) + " " + req.method + " " + pathname
             );
         });
         // debug - echo request
@@ -1508,10 +1565,10 @@ import moduleRepl from "repl";
             req.pipe(res);
             return;
         }
-        // replace trailing "/" with "/index.html"
+        // Replace trailing "/" with "/index.html".
         file = pathname.slice(1).replace((
             /\/$|^$/m
-        ), "./index.html");
+        ), "$&index.html");
         // resolve file
         file = modulePath.resolve(file);
         // security - disable parent-directory lookup
@@ -1609,8 +1666,8 @@ import moduleRepl from "repl";
                 console.error(
                     match2.split("").map(function (chr) {
                         return (
-                            "\\u"
-                            + chr.charCodeAt(0).toString(16).padStart(4, 0)
+                            "\\u" +
+                            chr.charCodeAt(0).toString(16).padStart(4, 0)
                         );
                     }).join("")
                 );
@@ -1625,15 +1682,15 @@ import moduleRepl from "repl";
             // console.error(Object.keys(global).map(function(key){return(typeof global[key]===\u0027object\u0027&&global[key]&&global[key]===global[key]?\u0027global\u0027:typeof global[key])+\u0027 \u0027+key;}).sort().join(\u0027\n\u0027)) //jslint-ignore-line
             case "keys":
                 script = (
-                    "console.error(Object.keys(" + match2
-                    + ").map(function(key){return("
-                    + "typeof " + match2 + "[key]===\u0027object\u0027&&"
-                    + match2 + "[key]&&"
-                    + match2 + "[key]===global[key]"
-                    + "?\u0027global\u0027"
-                    + ":typeof " + match2 + "[key]"
-                    + ")+\u0027 \u0027+key;"
-                    + "}).sort().join(\u0027\\n\u0027))\n"
+                    "console.error(Object.keys(" + match2 +
+                    ").map(function(key){return(" +
+                    "typeof " + match2 + "[key]===\u0027object\u0027&&" +
+                    match2 + "[key]&&" +
+                    match2 + "[key]===global[key]" +
+                    "?\u0027global\u0027" +
+                    ":typeof " + match2 + "[key]" +
+                    ")+\u0027 \u0027+key;" +
+                    "}).sort().join(\u0027\\n\u0027))\n"
                 );
                 break;
             // syntax-sugar - print String(value)
@@ -1691,35 +1748,33 @@ shImageToDataUri() {(set -e
 # This function will convert image $1 to data-uri string.
     node --input-type=module --eval '
 import moduleFs from "fs";
-import moduleHttps from "https";
 (async function () {
     let file;
+    let mime;
     let result;
     file = process.argv[1];
-    if ((
-        /^https:\/\//
-    ).test(file)) {
-        result = await new Promise(function (resolve) {
-            moduleHttps.get(file, function (res) {
-                let chunkList;
-                chunkList = [];
-                res.on("data", function (chunk) {
-                    chunkList.push(chunk);
-                }).on("end", function () {
-                    resolve(Buffer.concat(chunkList));
-                });
-            });
-        });
+    if ((/^https:\/\//).test(file)) {
+        result = await fetch(file);
+        if (!result.ok) {
+            console.error(`shImageToDataUri - http ${result.status} ${file}`);
+            process.exitCode = 1;
+            return;
+        }
+        result = Buffer.from(await result.arrayBuffer());
     } else {
         result = await moduleFs.promises.readFile(file);
     }
-    result = String(
-        "data:image/" + file.match(
-            /\.[^.]*?$|$/m
-        )[0].slice(1) + ";base64," + result.toString("base64")
-    ).replace((
-        /.{72}/g
-    ), "$&\\\n");
+    // MIME subtype from the extension; "svg" and "jpg" are not subtypes
+    mime = file.match(/\.[^.]*?$|$/m)[0].slice(1).toLowerCase();
+    mime = (
+        mime === "jpg"
+        ? "jpeg"
+        : mime === "svg"
+        ? "svg+xml"
+        : mime
+    );
+    result = `data:image/${mime};base64,${result.toString("base64")}`;
+    result = result.replace((/.{72}/g), "$&\\\n");
     console.log(result);
 }());
 ' "$@" # '
@@ -1882,8 +1937,11 @@ shLintPython() {(set -e
 )}
 
 shLintShell() {(set -e
+# This function will shellcheck shell-files $@.
     if (! shellcheck --version >/dev/null 2>&1)
     then
+        # Say so, or a skipped lint prints the same nothing as a clean one
+        printf "shLintShell - shellcheck not installed, SKIPPED %s\n" "$*" >&2
         return
     fi
     FILE_LIST="$*"
@@ -1954,7 +2012,6 @@ shRollupFetch() {(set -e
     node --input-type=module --eval '
 import moduleChildProcess from "child_process";
 import moduleFs from "fs";
-import moduleHttps from "https";
 import modulePath from "path";
 function objectDeepCopyWithKeysSorted(obj) {
 
@@ -2024,8 +2081,8 @@ function replaceListReplace(replaceList, data) {
         });
         if (data0 === data) {
             throw new Error(
-                "shRollupFetch - cannot find-and-replace snippet "
-                + JSON.stringify(aa)
+                "shRollupFetch - cannot find-and-replace snippet " +
+                JSON.stringify(aa)
             );
         }
     });
@@ -2063,6 +2120,9 @@ function replaceListReplace(replaceList, data) {
     // init repoDict, fetchList
     repoDict = {};
     fetchList.forEach(async function (elem) {
+        let child;
+        let res;
+        let url;
         if (!elem.url) {
             return;
         }
@@ -2070,59 +2130,71 @@ function replaceListReplace(replaceList, data) {
         // fetch dateCommitted
         if (!repoDict.hasOwnProperty(elem.prefix)) {
             repoDict[elem.prefix] = true;
-            promiseList.push(new Promise(function (resolve) {
-                moduleHttps.request(elem.prefix.replace(
-                    "/blob/",
-                    "/commits/"
-                ), function (res) {
-                    pipeToBuffer(res, elem, "dateCommitted");
-                    res.on("end", resolve);
-                }).end();
+            promiseList.push(fetch(elem.prefix.replace(
+                "/blob/",
+                "/commits/"
+            )).then(async function (res) {
+                elem.dateCommitted = Buffer.from(await res.arrayBuffer());
             }));
         }
-        // fetch file
-        if (elem.node) {
-            pipeToBuffer(moduleChildProcess.spawn(
-                "node",
-                ["-e", elem.node],
+        // Fetch file; a failed sub-command throws, or its empty output would
+        // be saved as the file
+        if (elem.node || elem.sh) {
+            child = moduleChildProcess.spawn(
+                (
+                    elem.node
+                    ? "node"
+                    : "sh"
+                ),
+                [
+                    (
+                        elem.node
+                        ? "-e"
+                        : "-c"
+                    ),
+                    elem.node || elem.sh
+                ],
                 {stdio: ["ignore", "overlapped", 2]}
-            ).stdout, elem, "data");
-            return;
-        }
-        if (elem.sh) {
-            pipeToBuffer(moduleChildProcess.spawn(
-                "sh",
-                ["-c", elem.sh],
-                {stdio: ["ignore", "overlapped", 2]}
-            ).stdout, elem, "data");
+            );
+            pipeToBuffer(child.stdout, elem, "data");
+            child.on("exit", function (exitCode) {
+                if (exitCode !== 0) {
+                    throw new Error(
+                        "shRollupFetch - exitCode " + exitCode + " " +
+                        (elem.node || elem.sh)
+                    );
+                }
+            });
             return;
         }
         fetchCount += 1;
         await new Promise(function (resolve) {
             setTimeout(resolve, fetchCount * 50);
         });
-        moduleHttps.get(elem.url2 || elem.url.replace(
+        url = elem.url2 || elem.url.replace(
             "https://github.com/",
             "https://raw.githubusercontent.com/"
-        ).replace("/blob/", "/"), function (res) {
-            fetchCount -= 1;
-            console.error(`shRollupFetch - ${fetchCount} remaining fetches`);
-            // http-redirect
-            if (res.statusCode === 302) {
-                moduleHttps.get(res.headers.location, function (res) {
-                    pipeToBuffer(res, elem, "data");
-                });
-                return;
-            }
-            pipeToBuffer(res, elem, "data");
-        });
+        ).replace("/blob/", "/");
+        res = await fetch(url);
+        fetchCount -= 1;
+        console.error(`shRollupFetch - ${fetchCount} remaining fetches`);
+        if (!res.ok) {
+            console.error(`shRollupFetch - http ${res.status} ${url}`);
+            process.exitCode = 1;
+            return;
+        }
+        elem.data = Buffer.from(await res.arrayBuffer());
     });
     await Promise.all(promiseList);
-    // parse fetched data
-    process.on("exit", function () {
+    // Parse fetched data; write nothing if a fetch failed, or the rollup
+    // would be written with pieces missing
+    process.on("exit", function (exitCode) {
         let rollupBody;
         let rollupBody0;
         let rollupHeader;
+        if (exitCode !== 0) {
+            return;
+        }
         rollupBody = "";
         fetchList.forEach(function (elem) {
             let {
@@ -2151,9 +2223,9 @@ function replaceListReplace(replaceList, data) {
                     ), "_").replace((
                         /(_)_+|_+$/g
                     ), "$1")
-                )
-                + "_"
-                + (
+                ) +
+                "_" +
+                (
                     modulePath.basename(
                         url
                     ).replace((
@@ -2169,15 +2241,15 @@ function replaceListReplace(replaceList, data) {
             }
             if (dateCommitted && dateCommitted.toString()) {
                 rollupBody += (
-                    "\n\n\n/*\n"
-                    + "repo " + prefix.replace("/blob/", "/tree/") + "\n"
-                    + "committed " + new Date(
+                    "\n\n\n/*\n" +
+                    "repo " + prefix.replace("/blob/", "/tree/") + "\n" +
+                    "committed " + new Date(
                         (
                             /"(\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d[^"]*?)"/
-                        ).exec(dateCommitted.toString())?.[1]
-                        || "1970-01-01T00:00:00Z"
-                    ).toISOString().replace((/\.\d*?Z/), "Z") + "\n"
-                    + "*/"
+                        ).exec(dateCommitted.toString())?.[1] ||
+                        "1970-01-01T00:00:00Z"
+                    ).toISOString().replace((/\.\d*?Z/), "Z") + "\n" +
+                    "*/"
                 );
             }
             data = data.toString();
@@ -2192,15 +2264,15 @@ function replaceListReplace(replaceList, data) {
             data = replaceListReplace(replaceList, data);
             // init header and footer
             rollupBody += (
-                "\n\n\n/*\nfile " + url + "\n*/\n"
-                + header
-                + data.trim()
-                + footer
+                "\n\n\n/*\nfile " + url + "\n*/\n" +
+                header +
+                data.trim() +
+                footer
             );
         });
         rollupBody = (
-            "\n" + rollupBody.trim()
-            + "\n\n\n/*\nfile none\n*/\n/*jslint-enable*/\n"
+            "\n" + rollupBody.trim() +
+            "\n\n\n/*\nfile none\n*/\n/*jslint-enable*/\n"
         );
         // comment #!
         rollupBody = rollupBody.replace((
@@ -2227,14 +2299,14 @@ function replaceListReplace(replaceList, data) {
         rollupBody = replaceListReplace(matchObj[1].replaceList, rollupBody);
         // init rollupHeader
         rollupHeader = (
-            matchObj.input.slice(0, matchObj.index)
-            + "/*jslint-disable*/\n/*\nshRollupFetch\n"
-            + JSON.stringify(
+            matchObj.input.slice(0, matchObj.index) +
+            "/*jslint-disable*/\n/*\nshRollupFetch\n" +
+            JSON.stringify(
                 objectDeepCopyWithKeysSorted(matchObj[1]),
                 undefined,
                 4
-            ) + "\n"
-            + matchObj[2].split("\n\n").filter(function (elem) {
+            ) + "\n" +
+            matchObj[2].split("\n\n").filter(function (elem) {
                 return elem.trim();
             }).map(function (elem) {
                 return elem.trim().replace((
@@ -2269,8 +2341,8 @@ function replaceListReplace(replaceList, data) {
             });
             if (rollupBody0 === rollupBody) {
                 throw new Error(
-                    "shRollupFetch - cannot find-and-replace snippet "
-                    + JSON.stringify(aa)
+                    "shRollupFetch - cannot find-and-replace snippet " +
+                    JSON.stringify(aa)
                 );
             }
             return "";
@@ -2285,8 +2357,8 @@ function replaceListReplace(replaceList, data) {
                 return;
             }
             data = (
-                "data:" + dataUriType + ";base64,"
-                + data.toString("base64")
+                "data:" + dataUriType + ";base64," +
+                data.toString("base64")
             );
             rollupBody0 = rollupBody;
             rollupBody = rollupBody.replace(
@@ -2298,8 +2370,8 @@ function replaceListReplace(replaceList, data) {
             );
             if (rollupBody0 === rollupBody) {
                 throw new Error(
-                    "shRollupFetch - cannot find-and-replace snippet "
-                    + JSON.stringify(exports)
+                    "shRollupFetch - cannot find-and-replace snippet " +
+                    JSON.stringify(exports)
                 );
             }
         });
@@ -2374,10 +2446,10 @@ function globExclude({
   ]) {
    list.join(separator).replace(rgx, function (match0, char) {
     throw new Error(
-     "Weird character "
-     + JSON.stringify(char)
-     + " found in " + name + " "
-     + JSON.stringify(match0)
+     "Weird character " +
+     JSON.stringify(char) +
+     " found in " + name + " " +
+     JSON.stringify(match0)
     );
    });
   });
@@ -2640,9 +2712,9 @@ function v8CoverageListMerge(processCovs) {
    let treesMatching = [];
    parentToChildDict.forEach(function (nested) {
     if (
-     nested.length === 1
-     && nested[0].start === openRange.start
-     && nested[0].end === openRange.end
+     nested.length === 1 &&
+     nested[0].start === openRange.start &&
+     nested[0].end === openRange.end
     ) {
      treesMatching.push(nested[0]);
     } else {
@@ -2821,8 +2893,8 @@ function v8CoverageListMerge(processCovs) {
    }
    if (children.length === 1) {
     if (
-     children[0].start === tree.start
-     && children[0].end === tree.end
+     children[0].start === tree.start &&
+     children[0].end === tree.end
     ) {
      tree.delta += children[0].delta;
      tree.children = children[0].children;
@@ -2880,8 +2952,8 @@ function v8CoverageListMerge(processCovs) {
     dictKeyValueAppend(
      rangeToFuncDict,
      (
-      funcCov.ranges[0].startOffset
-      + ";" + funcCov.ranges[0].endOffset
+      funcCov.ranges[0].startOffset +
+      ";" + funcCov.ranges[0].endOffset
      ),
      funcCov
     );
@@ -3151,17 +3223,17 @@ body {
    });
   }
   txtBorder = (
-   "+" + "-".repeat(padPathname + 2) + "+"
-   + "-".repeat(padLines + 2) + "+"
-   + "-".repeat(padLines + 2) + "+\n"
+   "+" + "-".repeat(padPathname + 2) + "+" +
+   "-".repeat(padLines + 2) + "+" +
+   "-".repeat(padLines + 2) + "+\n"
   );
   txt = "";
   txt += "V8 Coverage Report\n";
   txt += txtBorder;
   txt += (
-   "| " + String("Files covered").padEnd(padPathname, " ") + " | "
-   + String("Lines").padStart(padLines, " ") + " | "
-   + String("Remaining").padStart(padLines, " ") + " |\n"
+   "| " + String("Files covered").padEnd(padPathname, " ") + " | " +
+   String("Lines").padStart(padLines, " ") + " | " +
+   String("Remaining").padStart(padLines, " ") + " |\n"
   );
   txt += txtBorder;
   fileList.forEach(function ({
@@ -3187,18 +3259,16 @@ body {
     ? "coverageMedium"
     : "coverageLow"
    );
-   coveragePct = String(coveragePct).replace((
-    /..$/m
-   ), ".$&");
+   coveragePct = Number(coveragePct / 100).toFixed(2);
    if (modeIndex && ii === 0) {
     fill = (
      "#" + Math.round(
       (100 - Number(coveragePct)) * 2.21
-     ).toString(16).padStart(2, "0")
-     + Math.round(
+     ).toString(16).padStart(2, "0") +
+     Math.round(
       Number(coveragePct) * 2.21
-     ).toString(16).padStart(2, "0")
-     + "00"
+     ).toString(16).padStart(2, "0") +
+     "00"
     );
     str1 = "coverage";
     str2 = coveragePct + " %";
@@ -3225,21 +3295,21 @@ body {
     pathname = "";
    }
    txt += (
-    "| "
-    + String("./" + pathname).padEnd(padPathname, " ") + " | "
-    + String(
+    "| " +
+    String("./" + pathname).padEnd(padPathname, " ") + " | " +
+    String(
      modeCoverageIgnoreFile + " " + coveragePct + " %"
-    ).padStart(padLines, " ") + " | "
-    + " ".repeat(padLines) + " |\n"
+    ).padStart(padLines, " ") + " | " +
+    " ".repeat(padLines) + " |\n"
    );
    txt += (
     "| " + "*".repeat(
      Math.round(0.01 * coveragePct * padPathname)
-    ).padEnd(padPathname, "_") + " | "
-    + String(
+    ).padEnd(padPathname, "_") + " | " +
+    String(
      linesCovered + " / " + linesTotal
-    ).padStart(padLines, " ") + " | "
-    + String(
+    ).padStart(padLines, " ") + " | " +
+    String(
      (linesTotal - linesCovered) + " / " + linesTotal
     ).padStart(padLines, " ") + " |\n"
    );
@@ -3251,14 +3321,14 @@ body {
    ${(
     modeIndex
     ? (
-     "<a href=\"" + (pathname || "index") + ".html\">. / "
-     + pathname + "</a><br>"
+     "<a href=\"" + (pathname || "index") + ".html\">. / " +
+     pathname + "</a><br>"
     )
     : (
-     "<a href=\""
-     + "../".repeat(pathname.split("/").length - 1)
-     + "index.html\">. / </a>"
-     + pathname + "<br>"
+     "<a href=\"" +
+     "../".repeat(pathname.split("/").length - 1) +
+     "index.html\">. / </a>" +
+     pathname + "<br>"
     )
    )}
   <div class="percentbar">
@@ -3332,15 +3402,13 @@ body {
      }) {
       if (inHole !== isHole) {
        lineHtml += htmlEscape(chunk);
-       lineHtml += "</span><span";
-       if (isHole) {
-        lineHtml += (
-         ignoreLine
-         ? " class=\"ignore\""
-         : " class=\"uncovered\""
-        );
-       }
-       lineHtml += ">";
+       lineHtml += (
+        (isHole && ignoreLine)
+        ? "</span><span class=\"ignore\">"
+        : isHole
+        ? "</span><span class=\"uncovered\">"
+        : "</span><span>"
+       );
        chunk = "";
        inHole = isHole;
       }
@@ -3458,8 +3526,8 @@ function sentinel() {}
       NODE_V8_COVERAGE: coverageDir
      },
      shell: (
-      processArgv0.endsWith(".bat")
-      || processArgv0.endsWith(".cmd")
+      processArgv0.endsWith(".bat") ||
+      processArgv0.endsWith(".cmd")
      ),
      stdio: ["ignore", 1, 2]
     }
@@ -3528,7 +3596,7 @@ function sentinel() {}
   source = await moduleFs.promises.readFile(pathname, "utf8");
   lineList = [{}];
   source.replace((
-   /^.*$/gm
+   /(?<![^\n\r])(?!(?<=\r)\n)[^\n\r]*/g
   ), function (line, startOffset) {
    if (line === "/*coverage-disable*/") {
     ignoreBlock = true;
@@ -3562,14 +3630,14 @@ function sentinel() {}
     lineList.forEach(function (elem) {
      if (!(
       (
-       elem.startOffset <= startOffset
-       && startOffset <= elem.endOffset
+       elem.startOffset <= startOffset &&
+       startOffset <= elem.endOffset
       ) || (
-       elem.startOffset <= endOffset
-       && endOffset <= elem.endOffset
+       elem.startOffset <= endOffset &&
+       endOffset <= elem.endOffset
       ) || (
-       startOffset <= elem.startOffset
-       && elem.endOffset <= endOffset
+       startOffset <= elem.startOffset &&
+       elem.endOffset <= endOffset
       )
      )) {
       return;
@@ -3685,7 +3753,7 @@ import moduleFs from "fs";
     */
     // normalize "\r\n"
     result = result.replace((
-        /\r\n?/
+        /\r\n?/g
     ), "\n").trimEnd();
     // limit number-of-lines
     result = result.split("\n").slice(
@@ -3760,15 +3828,15 @@ fi
     then
         exit
     fi
-    unset shCiArtifactUploadCustom
-    unset shCiBaseCustom
-    unset shCiBaseCustom2
-    unset shCiLintCustom
-    unset shCiLintCustom2
-    unset shCiPreCustom
-    unset shCiPreCustom2
-    unset shCiPublishNpmCustom
-    unset shCiPublishPypiCustom
+    unset -f shCiArtifactUploadCustom
+    unset -f shCiBaseCustom
+    unset -f shCiBaseCustom2
+    unset -f shCiLintCustom
+    unset -f shCiLintCustom2
+    unset -f shCiPreCustom
+    unset -f shCiPreCustom2
+    unset -f shCiPublishNpmCustom
+    unset -f shCiPublishPypiCustom
     if [ -f ./myci2.sh ]
     then
         . ./myci2.sh

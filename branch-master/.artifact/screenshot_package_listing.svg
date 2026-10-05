@@ -11,13 +11,13 @@
     textLength="768"
     x="10"
     y="32"
-> 0.  755  2026-09-03T06:22:31Z  1524 KB  sha256    .                                             </tspan>
+> 0.  755  2026-10-05T05:11:28Z  1627 KB  sha256    .                                             </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="54"
-> 1.  644  2026-09-03T04:42:42Z    22 KB  c2c3d7f6  .ci.sh                                        </tspan>
+> 1.  644  2026-09-28T03:35:15Z    23 KB  0485c80c  .ci.sh                                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -47,7 +47,7 @@
     textLength="768"
     x="10"
     y="164"
-> 6.  644  2026-06-22T21:41:10Z     3 KB  6c06dd4a  .github/workflows/ci.yml                      </tspan>
+> 6.  644  2026-10-05T05:11:28Z     3 KB  630ed012  .github/workflows/ci.yml                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -59,19 +59,19 @@
     textLength="768"
     x="10"
     y="208"
-> 8.  644  2023-10-27T03:54:48Z     1 KB  2aadf3c3  .gitignore                                    </tspan>
+> 8.  644  2026-10-05T05:11:28Z     1 KB  abdd627d  .gitignore                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="230"
-> 9.  644  2022-05-18T01:21:19Z     1 KB  6f317844  .npmignore                                    </tspan>
+> 9.  644  2026-09-26T16:25:00Z     1 KB  a54ad3eb  .npmignore                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="252"
->10.  644  2026-09-03T04:42:42Z    25 KB  843e25b2  CHANGELOG.md                                  </tspan>
+>10.  644  2026-10-02T03:17:15Z    28 KB  2e35c0f9  CHANGELOG.md                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -83,7 +83,7 @@
     textLength="768"
     x="10"
     y="296"
->12.  644  2026-09-03T06:22:31Z    42 KB  c6c2458d  README.md                                     </tspan>
+>12.  644  2026-10-05T05:11:28Z    43 KB  81523290  README.md                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -149,31 +149,31 @@
     textLength="768"
     x="10"
     y="538"
->23.  644  2026-09-03T04:42:42Z    50 KB  59bbd39a  index.html                                    </tspan>
+>23.  644  2026-09-28T03:35:15Z    51 KB  788b2be6  index.html                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="560"
->24.  644  2026-09-03T04:42:42Z   351 KB  80c6c2fb  jslint.mjs                                    </tspan>
+>24.  644  2026-10-02T03:38:17Z   397 KB  27bb9179  jslint.mjs                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="582"
->25.  644  2026-09-03T04:42:42Z   104 KB  354b7839  jslint_ci.sh                                  </tspan>
+>25.  644  2026-10-02T03:38:17Z   107 KB  c3689acd  jslint_ci.sh                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="604"
->26.  644  2023-08-20T19:07:19Z     2 KB  ff601fd2  jslint_wrapper_cjs.cjs                        </tspan>
+>26.  644  2026-09-28T03:35:15Z     3 KB  3ffe2966  jslint_wrapper_cjs.cjs                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="626"
->27.  644  2026-09-03T04:42:42Z     3 KB  e656b3ce  jslint_wrapper_codemirror.html                </tspan>
+>27.  644  2026-09-26T16:25:00Z     4 KB  69739a92  jslint_wrapper_codemirror.html                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -185,25 +185,25 @@
     textLength="768"
     x="10"
     y="670"
->29.  644  2024-03-11T23:50:30Z     3 KB  694523bf  jslint_wrapper_vim.vim                        </tspan>
+>29.  644  2026-09-26T16:25:00Z     3 KB  1ddc1751  jslint_wrapper_vim.vim                        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="692"
->30.  644  2023-08-20T19:07:19Z     8 KB  a99ed65d  jslint_wrapper_vscode.js                      </tspan>
+>30.  644  2026-09-28T03:35:15Z     9 KB  8599c40f  jslint_wrapper_vscode.js                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="714"
->31.  644  2026-09-03T04:42:42Z     1 KB  d4853858  package.json                                  </tspan>
+>31.  644  2026-10-05T05:11:28Z     1 KB  29d8e71d  package.json                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="736"
->32.  644  2026-08-02T19:43:54Z    50 KB  2f36071d  test.mjs                                      </tspan>
+>32.  644  2026-10-02T03:38:17Z    95 KB  cf26f267  test.mjs                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

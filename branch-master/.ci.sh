@@ -6,7 +6,7 @@ sh jslint_ci.sh shCiJslintGlobalDictAllFetch
 '
 
 shCiArtifactUploadCustom() {(set -e
-# this function will run custom-code to upload build-artifacts
+# This function will run custom-code to upload build-artifacts.
     # .github_cache - restore
     if [ "$GITHUB_ACTION" ] && [ -d .github_cache ]
     then
@@ -84,24 +84,23 @@ echo "\
         script = script.replace((
             /\n\ncd node-sqlite3-\w*?\n/g
         ), (
-            " 2>/dev/null || true\n"
-            + "$&\n"
-            + "git checkout 61194ec2aee4b56e8e17f757021434122772f145\n"
+            " 2>/dev/null || true\n" +
+            "$&\n"
         ));
         // printf script
         script = (
-            "(set -e\n"
-            + "printf \u0027"
-            + script0.trim().replace((
+            "(set -e\n" +
+            "printf \u0027" +
+            script0.trim().replace((
                 /[%\\]/gm
             ), "$&$&").replace((
                 /\u0027/g
             ), "\u0027\"\u0027\"\u0027").replace((
                 /^/gm
-            ), "> ")
-            + "\n\n\n\u0027\n"
-            + script
-            + ")\n"
+            ), "> ") +
+            "\n\n\n\u0027\n" +
+            script +
+            ")\n"
         );
         await moduleFs.promises.writeFile(file + ".sh", script);
         await new Promise(function (resolve) {
@@ -136,12 +135,12 @@ import moduleChildProcess from "child_process";
     } = process.env;
     await Promise.all([
         (
-            `https://${GITHUB_GITHUB_IO}/branch-${GITHUB_BRANCH0}`
-            + `/jslint_wrapper_codemirror.html`
+            `https://${GITHUB_GITHUB_IO}/branch-${GITHUB_BRANCH0}` +
+            `/jslint_wrapper_codemirror.html`
         ),
         (
-            `https://${GITHUB_GITHUB_IO}/branch-${GITHUB_BRANCH0}`
-            + `/index.html`
+            `https://${GITHUB_GITHUB_IO}/branch-${GITHUB_BRANCH0}` +
+            `/index.html`
         ),
         ".artifact/apidoc.html",
         ".artifact/coverage_sqlite3_js/index.html",
@@ -184,7 +183,7 @@ import moduleChildProcess from "child_process";
 )}
 
 shCiBaseCustom() {(set -e
-# this function will run custom-code for base-ci
+# This function will run custom-code for base-ci.
     # update files
     if [ "$(git branch --show-current)" = alpha ]
     then
@@ -220,16 +219,16 @@ import moduleFs from "fs";
             file: ".ci.sh",
             // update version
             src: fileDict[".ci.sh"].replace((
-                /    "version": "\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
-            ), `    "version": "${versionBeta.split("-")[0]}"`)
+                / {4}"version": "\d\d\d\d\.\d\d?\.\d\d?(?:-.*?)?"/
+            ), `${" ".repeat(4)}"version": "${versionBeta.split("-")[0]}"`)
         }, {
             file: "README.md",
             src: fileDict["README.md"].replace((
                 /\n```html <!-- jslint_wrapper_codemirror.html -->\n[\S\s]*?\n```\n/
             ), (
-                "\n```html <!-- jslint_wrapper_codemirror.html -->\n"
-                + fileDict["jslint_wrapper_codemirror.html"]
-                + "```\n"
+                "\n```html <!-- jslint_wrapper_codemirror.html -->\n" +
+                fileDict["jslint_wrapper_codemirror.html"] +
+                "```\n"
             ))
         }, {
             file: "index.html",
@@ -253,8 +252,8 @@ import moduleFs from "fs";
                 /(\nshRunWithCoverage[\S\s]*?\nlet moduleUrl;\n)[\S\s]*?\nv8CoverageReportCreate\(/m
             ), function (ignore, match1) {
                 return (
-                    match1
-                    + (
+                    match1 +
+                    (
                         [
                             jslint.assertOrThrow,
                             jslint.fsWriteFileWithParents,
@@ -277,8 +276,8 @@ import moduleFs from "fs";
                     ).replace(
                         (/    /g),
                         " "
-                    )
-                    + "\nv8CoverageReportCreate("
+                    ) +
+                    "\nv8CoverageReportCreate("
                 );
             })
         }
@@ -304,7 +303,7 @@ import moduleFs from "fs";
 )}
 
 shCiJslintGlobalDictAllFetch() {(set -e
-# this function will fetch list of common, javascript global-objects
+# This function will fetch list of common, javascript global-objects
 # from online-resources.
     node --input-type=module --eval '
 import moduleFs from "fs";
@@ -314,11 +313,11 @@ function nameOk(name, deprecatedText, minLength) {
         "btoa"
     ];
     return (
-        !deprecatedList.includes(name)
-        && !(
+        !deprecatedList.includes(name) &&
+        !(
             /(?:deprecated|experimental|non-standard)_inline/i
-        ).test(deprecatedText)
-        && !new RegExp(`^[a-z].{0,${minLength - 1}}$`).test(name)
+        ).test(deprecatedText) &&
+        !new RegExp(`^[a-z].{0,${minLength - 1}}$`).test(name)
     );
 }
 function objectDeepCopyWithKeysSorted(obj) {
@@ -403,16 +402,16 @@ function objectDeepCopyWithKeysSorted(obj) {
                 return;
             }
             response2 = new RegExp(
-                `"files/en-us/web/api/(?:window/)?`
-                + name.toLowerCase()
-                + `/index.md"`
+                `"files/en-us/web/api/(?:window/)?` +
+                name.toLowerCase() +
+                `/index.md"`
             ).exec(response);
             if (!response2) {
                 return;
             }
             response2 = await fetch(
-                "https://raw.githubusercontent.com/mdn/content/main/"
-                + response2[0].slice(1, -1)
+                "https://raw.githubusercontent.com/mdn/content/main/" +
+                response2[0].slice(1, -1)
             );
             response2 = await response2.text();
             if (!(/\{\{deprecated_header\}\}/).test(response2)) {
@@ -449,8 +448,8 @@ function objectDeepCopyWithKeysSorted(obj) {
 // jslint_global_dict_all - auto-generated - end.)
         `).trim()),
         (
-            "$1    "
-            + JSON.stringify(
+            "$1" + " ".repeat(4) +
+            JSON.stringify(
                 objectDeepCopyWithKeysSorted(dictAll),
                 undefined,
                 4
@@ -461,12 +460,12 @@ function objectDeepCopyWithKeysSorted(obj) {
                     /^( *?".*?": )(".*?")/gm
                 ), function (ignore, name, value) {
                     return (
-                        name
-                        + " ".repeat(Math.max(0, 40 - name.length))
-                        + value
+                        name +
+                        " ".repeat(Math.max(0, 40 - name.length)) +
+                        value
                     );
-                })
-            + "$2"
+                }) +
+            "$2"
         )
     );
     await moduleFs.promises.writeFile("jslint.mjs", result);
@@ -476,12 +475,15 @@ function objectDeepCopyWithKeysSorted(obj) {
 )}
 
 shCiPublishNpmCustom() {(set -e
-# this function will run custom-code to npm-publish package
+# This function will run custom-code to npm-publish package.
     npm publish --access public
 )}
 
 shCiVscePackageJslintWrapperVscode() {(set -e
-# this function will vsce-package jslint_wrapper_vscode
+# This function will vsce-package jslint_wrapper_vscode.
+    mkdir -p .artifact/jslint_wrapper_vscode
+    # Empty the dir, not remove it: an open dev-host window locks it on windows.
+    find .artifact/jslint_wrapper_vscode -mindepth 1 -delete
     mkdir -p .artifact/jslint_wrapper_vscode/.vscode
     (set -e
     cd .artifact/jslint_wrapper_vscode
@@ -527,6 +529,7 @@ import moduleFs from "fs";
             file: "package.json",
             src: JSON.stringify({
                 "activationEvents": [
+                    "onCommand:jslint.autofix",
                     "onCommand:jslint.clear",
                     "onCommand:jslint.disableRegion",
                     "onCommand:jslint.ignoreLine",
@@ -541,6 +544,11 @@ import moduleFs from "fs";
                 ],
                 "contributes": {
                     "commands": [
+                        {
+                            "category": "jslint",
+                            "command": "jslint.autofix",
+                            "title": "JSLint - Autofix Whitespace"
+                        },
                         {
                             "category": "jslint",
                             "command": "jslint.clear",
@@ -568,6 +576,15 @@ import moduleFs from "fs";
                         }
                     ],
                     "keybindings": [
+                        {
+                            "command": "jslint.autofix",
+                            "key": "ctrl+shift+j a",
+                            "mac": "cmd+shift+j a",
+                            "when": (
+                                "editorTextFocus && " +
+                                "editorLangId == javascript"
+                            )
+                        },
                         {
                             "command": "jslint.clear",
                             "key": "ctrl+shift+j c",
@@ -613,6 +630,11 @@ import moduleFs from "fs";
                                 "command": "jslint.ignoreLine",
                                 "group": "7_modification@5",
                                 "when": "resourceLangId == javascript"
+                            },
+                            {
+                                "command": "jslint.autofix",
+                                "group": "7_modification@6",
+                                "when": "resourceLangId == javascript"
                             }
                         ]
                     }
@@ -636,7 +658,7 @@ import moduleFs from "fs";
                     "type": "git",
                     "url": "https://github.com/jslint-org/jslint.git"
                 },
-                "version": "2026.8.31"
+                "version": "2026.9.29"
             }, undefined, 4)
         }
     ].map(async function ({

@@ -5,7 +5,7 @@
     "bugs": {
         "url": "https://github.com/jslint-org/jslint/issues"
     },
-    "counter": 0,
+    "counter": 4,
     "description": "JSLint, The JavaScript Code Quality and Coverage Tool",
     "exports": {
         "default": "./jslint_wrapper_cjs.cjs",
@@ -35,5 +35,5 @@
     "shCiArtifactUpload": 1,
     "shCiPublishNpm": 1,
     "type": "module",
-    "version": "2026.8.31"
+    "version": "2026.9.29"
 }
