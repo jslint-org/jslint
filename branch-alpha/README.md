@@ -333,7 +333,7 @@ import fs from "fs";
 #!/bin/sh
 
 git clone https://github.com/tryghost/node-sqlite3 node-sqlite3-sh \
-    --branch=v5.0.11 \
+    --branch=v6.0.1 \
     --depth=1 \
     --single-branch
 
@@ -383,7 +383,7 @@ node ../jslint.mjs \
 #!/bin/sh
 
 git clone https://github.com/tryghost/node-sqlite3 node-sqlite3-js \
-    --branch=v5.0.11 \
+    --branch=v6.0.1 \
     --depth=1 \
     --single-branch
 

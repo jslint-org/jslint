@@ -169,21 +169,21 @@ body {
 <pre><span class="lineno"><a href="#line_4" id="line_4">    4.</a></span><span class="count                ">      2</span><span>module.exports = exports = sqlite3;</span></pre>
 <pre><span class="lineno"><a href="#line_5" id="line_5">    5.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_6" id="line_6">    6.</a></span><span class="count                ">     12</span><span>function normalizeMethod (fn) {</span></pre>
-<pre><span class="lineno"><a href="#line_7" id="line_7">    7.</a></span><span class="count                ">   3875</span><span>    return function (sql) {</span></pre>
-<pre><span class="lineno"><a href="#line_8" id="line_8">    8.</a></span><span class="count                ">   3875</span><span>        let errBack;</span></pre>
-<pre><span class="lineno"><a href="#line_9" id="line_9">    9.</a></span><span class="count                ">   3875</span><span>        const args = Array.prototype.slice.call(arguments, 1);</span></pre>
-<pre><span class="lineno"><a href="#line_10" id="line_10">   10.</a></span><span class="count                ">   3875</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_11" id="line_11">   11.</a></span><span class="count                ">   1119</span><span>        if (typeof args[args.length - 1] === 'function') {</span></pre>
-<pre><span class="lineno"><a href="#line_12" id="line_12">   12.</a></span><span class="count                ">   1119</span><span>            const callback = args[args.length - 1];</span></pre>
-<pre><span class="lineno"><a href="#line_13" id="line_13">   13.</a></span><span class="count                ">   1119</span><span>            errBack = function(err) {</span></pre>
-<pre><span class="lineno"><a href="#line_14" id="line_14">   14.</a></span><span class="count                ">   1119</span><span>                if (err) {</span></pre>
-<pre><span class="lineno"><a href="#line_15" id="line_15">   15.</a></span><span class="count                ">   1119</span><span>                    callback(err);</span></pre>
-<pre><span class="lineno"><a href="#line_16" id="line_16">   16.</a></span><span class="count                ">   1119</span><span>                }</span></pre>
-<pre><span class="lineno"><a href="#line_17" id="line_17">   17.</a></span><span class="count                ">   1119</span><span>            };</span></pre>
-<pre><span class="lineno"><a href="#line_18" id="line_18">   18.</a></span><span class="count                ">   1119</span><span>        }</span></pre>
-<pre><span class="lineno"><a href="#line_19" id="line_19">   19.</a></span><span class="count                ">   3875</span><span>        const statement = new Statement(this, sql, errBack);</span></pre>
-<pre><span class="lineno"><a href="#line_20" id="line_20">   20.</a></span><span class="count                ">   3875</span><span>        return fn.call(this, statement, args);</span></pre>
-<pre><span class="lineno"><a href="#line_21" id="line_21">   21.</a></span><span class="count                ">   3875</span><span>    };</span></pre>
+<pre><span class="lineno"><a href="#line_7" id="line_7">    7.</a></span><span class="count                ">   4124</span><span>    return function (sql) {</span></pre>
+<pre><span class="lineno"><a href="#line_8" id="line_8">    8.</a></span><span class="count                ">   4124</span><span>        let errBack;</span></pre>
+<pre><span class="lineno"><a href="#line_9" id="line_9">    9.</a></span><span class="count                ">   4124</span><span>        const args = Array.prototype.slice.call(arguments, 1);</span></pre>
+<pre><span class="lineno"><a href="#line_10" id="line_10">   10.</a></span><span class="count                ">   4124</span><span></span></pre>
+<pre><span class="lineno"><a href="#line_11" id="line_11">   11.</a></span><span class="count                ">   1131</span><span>        if (typeof args[args.length - 1] === 'function') {</span></pre>
+<pre><span class="lineno"><a href="#line_12" id="line_12">   12.</a></span><span class="count                ">   1131</span><span>            const callback = args[args.length - 1];</span></pre>
+<pre><span class="lineno"><a href="#line_13" id="line_13">   13.</a></span><span class="count                ">   1131</span><span>            errBack = function(err) {</span></pre>
+<pre><span class="lineno"><a href="#line_14" id="line_14">   14.</a></span><span class="count                ">   1131</span><span>                if (err) {</span></pre>
+<pre><span class="lineno"><a href="#line_15" id="line_15">   15.</a></span><span class="count                ">   1131</span><span>                    callback(err);</span></pre>
+<pre><span class="lineno"><a href="#line_16" id="line_16">   16.</a></span><span class="count                ">   1131</span><span>                }</span></pre>
+<pre><span class="lineno"><a href="#line_17" id="line_17">   17.</a></span><span class="count                ">   1131</span><span>            };</span></pre>
+<pre><span class="lineno"><a href="#line_18" id="line_18">   18.</a></span><span class="count                ">   1131</span><span>        }</span></pre>
+<pre><span class="lineno"><a href="#line_19" id="line_19">   19.</a></span><span class="count                ">   4124</span><span>        const statement = new Statement(this, sql, errBack);</span></pre>
+<pre><span class="lineno"><a href="#line_20" id="line_20">   20.</a></span><span class="count                ">   4124</span><span>        return fn.call(this, statement, args);</span></pre>
+<pre><span class="lineno"><a href="#line_21" id="line_21">   21.</a></span><span class="count                ">   4124</span><span>    };</span></pre>
 <pre><span class="lineno"><a href="#line_22" id="line_22">   22.</a></span><span class="count                ">     12</span><span>}</span></pre>
 <pre><span class="lineno"><a href="#line_23" id="line_23">   23.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_24" id="line_24">   24.</a></span><span class="count                ">      6</span><span>function inherits(target, source) {</span></pre>
@@ -230,17 +230,17 @@ body {
 <pre><span class="lineno"><a href="#line_65" id="line_65">   65.</a></span><span class="count                ">      2</span><span>inherits(Backup, EventEmitter);</span></pre>
 <pre><span class="lineno"><a href="#line_66" id="line_66">   66.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_67" id="line_67">   67.</a></span><span class="count                ">      2</span><span>// Database#prepare(sql, [bind1, bind2, ...], [callback])</span></pre>
-<pre><span class="lineno"><a href="#line_68" id="line_68">   68.</a></span><span class="count                ">   1748</span><span>Database.prototype.prepare = normalizeMethod(function(statement, params) {</span></pre>
-<pre><span class="lineno"><a href="#line_69" id="line_69">   69.</a></span><span class="count                ">   1748</span><span>    return params.length</span></pre>
+<pre><span class="lineno"><a href="#line_68" id="line_68">   68.</a></span><span class="count                ">   1983</span><span>Database.prototype.prepare = normalizeMethod(function(statement, params) {</span></pre>
+<pre><span class="lineno"><a href="#line_69" id="line_69">   69.</a></span><span class="count                ">   1983</span><span>    return params.length</span></pre>
 <pre><span class="lineno"><a href="#line_70" id="line_70">   70.</a></span><span class="count                ">      7</span><span>        ? statement.bind.apply(statement, params)</span></pre>
-<pre><span class="lineno"><a href="#line_71" id="line_71">   71.</a></span><span class="count                ">   1741</span><span>        : statement;</span></pre>
-<pre><span class="lineno"><a href="#line_72" id="line_72">   72.</a></span><span class="count                ">   1748</span><span>});</span></pre>
+<pre><span class="lineno"><a href="#line_71" id="line_71">   71.</a></span><span class="count                ">   1976</span><span>        : statement;</span></pre>
+<pre><span class="lineno"><a href="#line_72" id="line_72">   72.</a></span><span class="count                ">   1983</span><span>});</span></pre>
 <pre><span class="lineno"><a href="#line_73" id="line_73">   73.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_74" id="line_74">   74.</a></span><span class="count                ">      2</span><span>// Database#run(sql, [bind1, bind2, ...], [callback])</span></pre>
-<pre><span class="lineno"><a href="#line_75" id="line_75">   75.</a></span><span class="count                ">   2074</span><span>Database.prototype.run = normalizeMethod(function(statement, params) {</span></pre>
-<pre><span class="lineno"><a href="#line_76" id="line_76">   76.</a></span><span class="count                ">   2074</span><span>    statement.run.apply(statement, params).finalize();</span></pre>
-<pre><span class="lineno"><a href="#line_77" id="line_77">   77.</a></span><span class="count                ">   2074</span><span>    return this;</span></pre>
-<pre><span class="lineno"><a href="#line_78" id="line_78">   78.</a></span><span class="count                ">   2074</span><span>});</span></pre>
+<pre><span class="lineno"><a href="#line_75" id="line_75">   75.</a></span><span class="count                ">   2085</span><span>Database.prototype.run = normalizeMethod(function(statement, params) {</span></pre>
+<pre><span class="lineno"><a href="#line_76" id="line_76">   76.</a></span><span class="count                ">   2085</span><span>    statement.run.apply(statement, params).finalize();</span></pre>
+<pre><span class="lineno"><a href="#line_77" id="line_77">   77.</a></span><span class="count                ">   2085</span><span>    return this;</span></pre>
+<pre><span class="lineno"><a href="#line_78" id="line_78">   78.</a></span><span class="count                ">   2085</span><span>});</span></pre>
 <pre><span class="lineno"><a href="#line_79" id="line_79">   79.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_80" id="line_80">   80.</a></span><span class="count                ">      2</span><span>// Database#get(sql, [bind1, bind2, ...], [callback])</span></pre>
 <pre><span class="lineno"><a href="#line_81" id="line_81">   81.</a></span><span class="count                ">     35</span><span>Database.prototype.get = normalizeMethod(function(statement, params) {</span></pre>
@@ -249,10 +249,10 @@ body {
 <pre><span class="lineno"><a href="#line_84" id="line_84">   84.</a></span><span class="count                ">     35</span><span>});</span></pre>
 <pre><span class="lineno"><a href="#line_85" id="line_85">   85.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_86" id="line_86">   86.</a></span><span class="count                ">      2</span><span>// Database#all(sql, [bind1, bind2, ...], [callback])</span></pre>
-<pre><span class="lineno"><a href="#line_87" id="line_87">   87.</a></span><span class="count                ">      9</span><span>Database.prototype.all = normalizeMethod(function(statement, params) {</span></pre>
-<pre><span class="lineno"><a href="#line_88" id="line_88">   88.</a></span><span class="count                ">      9</span><span>    statement.all.apply(statement, params).finalize();</span></pre>
-<pre><span class="lineno"><a href="#line_89" id="line_89">   89.</a></span><span class="count                ">      9</span><span>    return this;</span></pre>
-<pre><span class="lineno"><a href="#line_90" id="line_90">   90.</a></span><span class="count                ">      9</span><span>});</span></pre>
+<pre><span class="lineno"><a href="#line_87" id="line_87">   87.</a></span><span class="count                ">     12</span><span>Database.prototype.all = normalizeMethod(function(statement, params) {</span></pre>
+<pre><span class="lineno"><a href="#line_88" id="line_88">   88.</a></span><span class="count                ">     12</span><span>    statement.all.apply(statement, params).finalize();</span></pre>
+<pre><span class="lineno"><a href="#line_89" id="line_89">   89.</a></span><span class="count                ">     12</span><span>    return this;</span></pre>
+<pre><span class="lineno"><a href="#line_90" id="line_90">   90.</a></span><span class="count                ">     12</span><span>});</span></pre>
 <pre><span class="lineno"><a href="#line_91" id="line_91">   91.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_92" id="line_92">   92.</a></span><span class="count                ">      2</span><span>// Database#each(sql, [bind1, bind2, ...], [callback], [complete])</span></pre>
 <pre><span class="lineno"><a href="#line_93" id="line_93">   93.</a></span><span class="count                ">      7</span><span>Database.prototype.each = normalizeMethod(function(statement, params) {</span></pre>
@@ -267,20 +267,20 @@ body {
 <pre><span class="lineno"><a href="#line_102" id="line_102">  102.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_103" id="line_103">  103.</a></span><span class="count                ">      2</span><span>// Database#backup(filename, [callback])</span></pre>
 <pre><span class="lineno"><a href="#line_104" id="line_104">  104.</a></span><span class="count                ">      2</span><span>// Database#backup(filename, destName, sourceName, filenameIsDest, [callback])</span></pre>
-<pre><span class="lineno"><a href="#line_105" id="line_105">  105.</a></span><span class="count                ">     15</span><span>Database.prototype.backup = function() {</span></pre>
-<pre><span class="lineno"><a href="#line_106" id="line_106">  106.</a></span><span class="count                ">     15</span><span>    let backup;</span></pre>
-<pre><span class="lineno"><a href="#line_107" id="line_107">  107.</a></span><span class="count                ">     13</span><span>    if (arguments.length &lt;= 2) {</span></pre>
-<pre><span class="lineno"><a href="#line_108" id="line_108">  108.</a></span><span class="count                ">     13</span><span>        // By default, we write the main database out to the main database of the named file.</span></pre>
-<pre><span class="lineno"><a href="#line_109" id="line_109">  109.</a></span><span class="count                ">     13</span><span>        // This is the most likely use of the backup api.</span></pre>
-<pre><span class="lineno"><a href="#line_110" id="line_110">  110.</a></span><span class="count                ">     13</span><span>        backup = new Backup(this, arguments[0], 'main', 'main', true, arguments[1]);</span></pre>
-<pre><span class="lineno"><a href="#line_111" id="line_111">  111.</a></span><span class="count                ">     13</span><span>    } else {</span></pre>
+<pre><span class="lineno"><a href="#line_105" id="line_105">  105.</a></span><span class="count                ">     16</span><span>Database.prototype.backup = function() {</span></pre>
+<pre><span class="lineno"><a href="#line_106" id="line_106">  106.</a></span><span class="count                ">     16</span><span>    let backup;</span></pre>
+<pre><span class="lineno"><a href="#line_107" id="line_107">  107.</a></span><span class="count                ">     14</span><span>    if (arguments.length &lt;= 2) {</span></pre>
+<pre><span class="lineno"><a href="#line_108" id="line_108">  108.</a></span><span class="count                ">     14</span><span>        // By default, we write the main database out to the main database of the named file.</span></pre>
+<pre><span class="lineno"><a href="#line_109" id="line_109">  109.</a></span><span class="count                ">     14</span><span>        // This is the most likely use of the backup api.</span></pre>
+<pre><span class="lineno"><a href="#line_110" id="line_110">  110.</a></span><span class="count                ">     14</span><span>        backup = new Backup(this, arguments[0], 'main', 'main', true, arguments[1]);</span></pre>
+<pre><span class="lineno"><a href="#line_111" id="line_111">  111.</a></span><span class="count                ">     14</span><span>    } else {</span></pre>
 <pre><span class="lineno"><a href="#line_112" id="line_112">  112.</a></span><span class="count                ">      2</span><span>        // Otherwise, give the user full control over the sqlite3_backup_init arguments.</span></pre>
 <pre><span class="lineno"><a href="#line_113" id="line_113">  113.</a></span><span class="count                ">      2</span><span>        backup = new Backup(this, arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);</span></pre>
 <pre><span class="lineno"><a href="#line_114" id="line_114">  114.</a></span><span class="count                ">      2</span><span>    }</span></pre>
-<pre><span class="lineno"><a href="#line_115" id="line_115">  115.</a></span><span class="count                ">     15</span><span>    // Per the sqlite docs, exclude the following errors as non-fatal by default.</span></pre>
-<pre><span class="lineno"><a href="#line_116" id="line_116">  116.</a></span><span class="count                ">     15</span><span>    backup.retryErrors = [sqlite3.BUSY, sqlite3.LOCKED];</span></pre>
-<pre><span class="lineno"><a href="#line_117" id="line_117">  117.</a></span><span class="count                ">     15</span><span>    return backup;</span></pre>
-<pre><span class="lineno"><a href="#line_118" id="line_118">  118.</a></span><span class="count                ">     15</span><span>};</span></pre>
+<pre><span class="lineno"><a href="#line_115" id="line_115">  115.</a></span><span class="count                ">     16</span><span>    // Per the sqlite docs, exclude the following errors as non-fatal by default.</span></pre>
+<pre><span class="lineno"><a href="#line_116" id="line_116">  116.</a></span><span class="count                ">     16</span><span>    backup.retryErrors = [sqlite3.BUSY, sqlite3.LOCKED];</span></pre>
+<pre><span class="lineno"><a href="#line_117" id="line_117">  117.</a></span><span class="count                ">     16</span><span>    return backup;</span></pre>
+<pre><span class="lineno"><a href="#line_118" id="line_118">  118.</a></span><span class="count                ">     16</span><span>};</span></pre>
 <pre><span class="lineno"><a href="#line_119" id="line_119">  119.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_120" id="line_120">  120.</a></span><span class="count                ">      2</span><span>Statement.prototype.map = function() {</span></pre>
 <pre><span class="lineno"><a href="#line_121" id="line_121">  121.</a></span><span class="count                ">      2</span><span>    const params = Array.prototype.slice.call(arguments);</span></pre>
@@ -311,15 +311,15 @@ body {
 <pre><span class="lineno"><a href="#line_146" id="line_146">  146.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_147" id="line_147">  147.</a></span><span class="count                ">      2</span><span>let isVerbose = false;</span></pre>
 <pre><span class="lineno"><a href="#line_148" id="line_148">  148.</a></span><span class="count                ">      2</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_149" id="line_149">  149.</a></span><span class="count                ">      2</span><span>const supportedEvents = [ 'trace', 'profile', 'insert', 'update', 'delete' ];</span></pre>
+<pre><span class="lineno"><a href="#line_149" id="line_149">  149.</a></span><span class="count                ">      2</span><span>const supportedEvents = [ 'trace', 'profile', 'change' ];</span></pre>
 <pre><span class="lineno"><a href="#line_150" id="line_150">  150.</a></span><span class="count                ">      2</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_151" id="line_151">  151.</a></span><span class="count                ">      7</span><span>Database.prototype.addListener = Database.prototype.on = function(type) {</span></pre>
-<pre><span class="lineno"><a href="#line_152" id="line_152">  152.</a></span><span class="count                ">      7</span><span>    const val = EventEmitter.prototype.addListener.apply(this, arguments);</span></pre>
-<pre><span class="lineno"><a href="#line_153" id="line_153">  153.</a></span><span class="count                ">      4</span><span>    if (supportedEvents.indexOf(type) &gt;= 0) {</span></pre>
-<pre><span class="lineno"><a href="#line_154" id="line_154">  154.</a></span><span class="count                ">      4</span><span>        this.configure(type, true);</span></pre>
-<pre><span class="lineno"><a href="#line_155" id="line_155">  155.</a></span><span class="count                ">      4</span><span>    }</span></pre>
-<pre><span class="lineno"><a href="#line_156" id="line_156">  156.</a></span><span class="count                ">      7</span><span>    return val;</span></pre>
-<pre><span class="lineno"><a href="#line_157" id="line_157">  157.</a></span><span class="count                ">      7</span><span>};</span></pre>
+<pre><span class="lineno"><a href="#line_151" id="line_151">  151.</a></span><span class="count                ">     10</span><span>Database.prototype.addListener = Database.prototype.on = function(type) {</span></pre>
+<pre><span class="lineno"><a href="#line_152" id="line_152">  152.</a></span><span class="count                ">     10</span><span>    const val = EventEmitter.prototype.addListener.apply(this, arguments);</span></pre>
+<pre><span class="lineno"><a href="#line_153" id="line_153">  153.</a></span><span class="count                ">      7</span><span>    if (supportedEvents.indexOf(type) &gt;= 0) {</span></pre>
+<pre><span class="lineno"><a href="#line_154" id="line_154">  154.</a></span><span class="count                ">      7</span><span>        this.configure(type, true);</span></pre>
+<pre><span class="lineno"><a href="#line_155" id="line_155">  155.</a></span><span class="count                ">      7</span><span>    }</span></pre>
+<pre><span class="lineno"><a href="#line_156" id="line_156">  156.</a></span><span class="count                ">     10</span><span>    return val;</span></pre>
+<pre><span class="lineno"><a href="#line_157" id="line_157">  157.</a></span><span class="count                ">     10</span><span>};</span></pre>
 <pre><span class="lineno"><a href="#line_158" id="line_158">  158.</a></span><span class="count                ">      2</span><span></span></pre>
 <pre><span class="lineno"><a href="#line_159" id="line_159">  159.</a></span><span class="count                ">      2</span><span>Database.prototype.removeListener = function(type) {</span></pre>
 <pre><span class="lineno"><a href="#line_160" id="line_160">  160.</a></span><span class="count                ">      2</span><span>    const val = EventEmitter.prototype.removeListener.apply(this, arguments);</span></pre>
@@ -368,7 +368,7 @@ body {
 <pre><span class="lineno"><a href="#line_203" id="line_203">  203.</a></span><span class="count                ">      1</span><span>        isVerbose = true;</span></pre>
 <pre><span class="lineno"><a href="#line_204" id="line_204">  204.</a></span><span class="count                ">      1</span><span>    }</span></pre>
 <pre><span class="lineno"><a href="#line_205" id="line_205">  205.</a></span><span class="count                ">      1</span><span></span></pre>
-<pre><span class="lineno"><a href="#line_206" id="line_206">  206.</a></span><span class="count                ">      1</span><span>    return this;</span></pre>
+<pre><span class="lineno"><a href="#line_206" id="line_206">  206.</a></span><span class="count                ">      1</span><span>    return sqlite3;</span></pre>
 <pre><span class="lineno"><a href="#line_207" id="line_207">  207.</a></span><span class="count                ">      1</span><span>};</span></pre>
 <pre><span class="lineno"><a href="#line_208" id="line_208">  208.</a></span><span class="count                ">      2</span><span></span></pre>
 </div>

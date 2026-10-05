@@ -11,6 +11,7 @@ _*
 temp*
 tmp/
 undefined
+~*
 
 # nodejs
 build/
