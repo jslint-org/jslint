@@ -1095,6 +1095,226 @@ ff();
         }).autofixed, "let aa = 2;\naa = aa ** 2;\n");
     });
     jstestIt((
+        "test report-function handling-behavior"
+    ), function () {
+        let result;
+
+// This function will return the function details in the report of <source>,
+// each <dl> on its own line.
+
+        function reportFunction(source) {
+            const html = jslint.jslint_report(jslint.jslint(source, {}));
+            return html.slice(
+                html.indexOf("<div class=\"level level1\">"),
+                html.lastIndexOf("</div>\n</fieldset>")
+            ).replace((/<dl>/g), "\n<dl>");
+        }
+
+// PR-516 - Bugfix - The report's function details list block-scoped names and
+// catch-variables, and mark closure only across a function boundary.
+
+        result = reportFunction(String(`
+let ee = 0;
+function aa(gg) {
+    let bb = 0;
+    let ff = 0;
+    if (aa) {
+        let cc = 1;
+        aa(bb, cc, ee, gg);
+    }
+    try {
+        aa(String);
+    } catch (err) {
+        aa(function () {
+            return err;
+        });
+    }
+    return function () {
+        return ff;
+    };
+}
+aa();
+        `).trim() + "\n");
+        assertOrThrow(result === String(`
+<div class="level level1"><address>2: 1</address><dfn>aa(gg)</dfn>
+<dl><dt>parameter</dt><dd>gg</dd></dl>
+<dl><dt>variable</dt><dd>bb, cc, ff</dd></dl>
+<dl><dt>exception</dt><dd>err</dd></dl>
+<dl><dt>closure</dt><dd>err, ff</dd></dl>
+<dl><dt>global</dt><dd>String, aa, ee</dd></dl></div>
+<div class="level level2"><address>12: 12</address><dfn>«aa»()</dfn>
+<dl><dt>outer</dt><dd>err</dd></dl></div>
+<div class="level level2"><address>16: 12</address><dfn>«anonymous»()</dfn>
+<dl><dt>outer</dt><dd>ff</dd></dl></div>
+        `).trim() + "\n", result);
+
+// PR-516 - Bugfix - A named function expression's name is outer only in a
+// nested function, and a function lists an outer 'bb' even beside its own
+// block-scoped 'bb'.
+
+        result = reportFunction(String(`
+function aa() {
+    let bb = 0;
+    function cc() {
+        if (cc) {
+            cc(bb);
+        }
+        if (cc) {
+            let bb = 1;
+            cc(bb);
+        }
+    }
+    return function dd() {
+        return dd(cc, function () {
+            return dd;
+        });
+    };
+}
+aa();
+        `).trim() + "\n");
+        assertOrThrow(result === String(`
+<div class="level level1"><address>1: 1</address><dfn>aa()</dfn>
+<dl><dt>variable</dt><dd>bb, cc</dd></dl>
+<dl><dt>closure</dt><dd>bb, cc</dd></dl></div>
+<div class="level level2"><address>3: 5</address><dfn>cc()</dfn>
+<dl><dt>variable</dt><dd>bb</dd></dl>
+<dl><dt>outer</dt><dd>bb, cc</dd></dl></div>
+<div class="level level2"><address>12: 12</address><dfn>dd()</dfn>
+<dl><dt>outer</dt><dd>cc</dd></dl></div>
+<div class="level level3"><address>13: 23</address><dfn>«cc»()</dfn>
+<dl><dt>outer</dt><dd>dd</dd></dl></div>
+        `).trim() + "\n", result);
+    });
+    jstestIt((
+        "test report-function-name handling-behavior"
+    ), function () {
+
+// PR-516 - Bugfix - A method or accessor is named after its property, not
+// after the identifier before it.
+
+        assertJsonEqual(jslint.jslint(String(`
+/*jslint getset*/
+String({
+    aa() {
+        return;
+    },
+    get bb() {
+        return;
+    },
+    cc: 0,
+    dd() {
+        return;
+    }
+});
+        `).trim() + "\n").functions.map(function ({name}) {
+            return name;
+        }), ["aa", "get bb", "dd"]);
+
+// PR-516 - Bugfix - A function after a keyword is anonymous, except after
+// 'default', the name the spec gives it.
+
+        assertJsonEqual(jslint.jslint(String(`
+String(function () {
+    return function () {
+        return;
+    };
+}, typeof function () {
+    return;
+});
+export default function () {
+    return;
+}
+        `).trim() + "\n").functions.map(function ({name}) {
+            return name;
+        }), ["String", "anonymous", "anonymous", "default"]);
+
+// PR-516 - Bugfix - A keyword used as a property name still names a function.
+
+        assertJsonEqual(jslint.jslint(String(`
+const aa = {
+    delete: function () {
+        return;
+    }
+};
+aa.catch = function () {
+    return;
+};
+String(aa?.finally || function () {
+    return;
+});
+String(aa
+? null
+: function () {
+    return;
+});
+        `).trim() + "\n").functions.map(function ({name}) {
+            return name;
+        }), ["delete", "catch", "finally", "anonymous"]);
+    });
+    jstestIt((
+        "test report-function-signature handling-behavior"
+    ), function () {
+        const a38 = "a".repeat(38);
+
+// PR-516 - Bugfix - A signature keeps default values and drops comments, and a
+// multi-line destructure joins with no space inside its brackets. A default
+// value longer than 40 characters, or holding a megastring, shows as an
+// ellipsis, but a backtick inside a string or regexp does not count.
+
+        assertJsonEqual(jslint.jslint(String(`
+function aa(bb, cc = 1, ...dd) {
+    return [bb, cc, dd];
+}
+function ee({
+    ff,
+    gg = "" // Comment.
+}, hh) {
+    return [ff, gg, hh];
+}
+function ii(jj = function () {
+    return "a default value longer than forty characters";
+}, kk = [0, 1], ll = \`\${kk}\`) {
+    return [jj, kk, ll];
+}
+function mm(
+    nn /* Comment. */,
+    oo = [
+        1
+    ],
+    pp = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    qq = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    rr = [\`a\`, 1]
+) {
+    return [nn, oo, pp, qq, rr];
+}
+function ss(tt = "\`", uu = /\`/) {
+    return [tt, uu];
+}
+function vv(ww = (xx = 1) => "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") {
+    return ww;
+}
+        `).trim() + "\n").functions.map(function ({signature}) {
+            return signature;
+        }), [
+            "(bb, cc = 1, ...dd)",
+            "({ff, gg = \"\"}, hh)",
+            "(jj = \u2026, kk = [0, 1], ll = \u2026)",
+            "()",
+            `(nn, oo = [1], pp = "${a38}", qq = \u2026, rr = \u2026)`,
+            "(tt = \"`\", uu = /`/)",
+            "(ww = \u2026)",
+            "(xx = 1)"
+        ]);
+
+// A parse that stops inside a parameter list leaves the signature '('.
+
+        assertJsonEqual(jslint.jslint(
+            "function aa(bb, 0) {}\n"
+        ).functions.map(function ({signature}) {
+            return signature;
+        }), ["("]);
+    });
+    jstestIt((
         "test autofix-report handling-behavior"
     ), function () {
         let result;

@@ -129,6 +129,7 @@
     console_log,
     constant,
     context,
+    context_report,
     convert,
     count,
     coverageDir,
@@ -280,6 +281,7 @@
     name,
     name_alias,
     name_list,
+    name_only,
     node,
     nomen,
     noop,
@@ -300,6 +302,7 @@
     padEnd,
     padStart,
     parameter_count,
+    parameter_rest,
     parentIi,
     parse,
     parseInt,
@@ -334,9 +337,11 @@
     scope_block_pop,
     scope_block_push,
     scope_declared,
+    scope_function,
     scope_function_pop,
     scope_function_push,
     scope_name,
+    scope_report_push,
     scriptId,
     search,
     set,
@@ -453,7 +458,7 @@ const jslint_charset_ascii = (
     "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_" +
     "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-const jslint_edition = "v2026.9.29";
+const jslint_edition = "v2026.10.30";
 const jslint_fudge = 1;                 // Fudge starting line and starting
                                         // ... column to 1.
 const jslint_global_dict_all = {
@@ -1392,6 +1397,23 @@ function jslint(
         return value;
     }
 
+    function scope_report_push(the_function, name) {
+
+// PR-516 - Bugfix - This function will push <name> to what <jslint_report>
+// lists for <the_function>, which are the names it declares and the outer
+// names it uses. An own 'bb' and an outer 'bb' are two entries.
+
+        if (the_function.scope_name === name.scope_declared) {
+
+// PR-516 - A function using its own name from <scope_name> lists it nowhere,
+// though a nested function using it lists it as outer.
+
+            return;
+        }
+        the_function.context_report ??= [];
+        the_function.context_report.push(name);
+    }
+
     function stop(code, the_token, a, b, c, d) {
 
 // Similar to warn and stop_at. If the token already had a warning, that
@@ -1882,6 +1904,7 @@ function jslint(
                 scope_block_push,
                 scope_function_pop,
                 scope_function_push,
+                scope_report_push,
                 source,
                 stop,
                 stop_at,
@@ -4724,12 +4747,14 @@ function jslint_phase3_parse(state) {
         global_dict,
         import_list,
         is_equal,
+        line_list,
         option_dict,
         property_dict,
         scope_block_pop,
         scope_block_push,
         scope_function_pop,
         scope_function_push,
+        scope_report_push,
         stop,
         syntax_dict,
         tenure,
@@ -4762,7 +4787,26 @@ function jslint_phase3_parse(state) {
             token_now.id !== "function" &&
             token_now.id !== "async"
         ) {
-            anon = token_now.id;
+
+// PR-516 - Bugfix - A keyword such as 'return' names no function, so reset
+// <anon>, else it would keep an earlier identifier. Keep 'default', the name
+// the spec gives 'export default function () {}', and a property name such as
+// 'catch' in 'aa.catch' or '{catch: ...}', but not 'null' in 'aa ? null : ...'.
+
+            anon = (
+                (
+                    syntax_dict[token_now.id] === undefined ||
+                    token_now.id === "default" ||
+                    token_prv.id === "." ||
+                    token_prv.id === "?." ||
+                    (
+                        token_nxt.id === ":" &&
+                        (token_prv.id === "{" || token_prv.id === ",")
+                    )
+                )
+                ? token_now.id
+                : "anonymous"
+            );
         } else if (
             token_now.id === "(string)" &&
             jslint_rgx_identifier.test(token_now.value)
@@ -5819,6 +5863,18 @@ function jslint_phase3_parse(state) {
         scope_declared.context[id] = name;
         name.scope_declared = scope_declared;
 
+// PR-516 - Bugfix - Record the function that owns <name>, since a let/const
+// <scope_declared> may be a block inside it.
+
+        name.scope_function = scope_function;
+        if (!scope_declared.name_only) {
+
+// PR-516 - Omit a named function expression's name from its declaring
+// function. It sits in <scope_name>, a scope outside its own function.
+
+            scope_report_push(scope_function, name);
+        }
+
 // Warn about variable redefinition.
 
         if (earlier && id === "ignore") {
@@ -6425,23 +6481,11 @@ function jslint_phase3_parse(state) {
         const sub_list = [];
         const the_destructure = token_now;
         let optional;
-        function advance_and_signature_push(id) {
-            advance(id);
-            if (the_function?.signature) {
-                the_function.signature.push(id);
-                switch (id) {
-                case ",":
-                case ":":
-                    the_function.signature.push(" ");
-                    break;
-                }
-            }
-        }
         function name_parse() {
             let name = token_nxt;
             switch (name.id) {
             case "...":
-                advance_and_signature_push("...");
+                advance("...");
                 name = token_nxt;
                 name.ellipsis = true;
                 if (name.id === "...") {
@@ -6490,7 +6534,7 @@ function jslint_phase3_parse(state) {
 // ["let[{aa}]=0", "name_parse", "recurse_element", "", 0]
 
                 test_cause("recurse_element");
-                advance_and_signature_push(token_nxt.id);
+                advance(token_nxt.id);
                 prefix_destructure(
                     scope_declared,     // scope_declared
                     role,               // role
@@ -6518,9 +6562,9 @@ function jslint_phase3_parse(state) {
             if (is_lbrace) {
                 survey(name);
             }
-            advance_and_signature_push(token_nxt.id);
+            advance(token_nxt.id);
             if (is_lbrace && token_nxt.id === ":") {
-                advance_and_signature_push(":");
+                advance(":");
                 if (!the_function_toplevel) {
                     the_destructure.open = true;
                 }
@@ -6555,7 +6599,7 @@ function jslint_phase3_parse(state) {
 
                     true                // assigned
                 );
-                advance_and_signature_push(token_nxt.id);
+                advance(token_nxt.id);
                 return;
             }
             name_declare(
@@ -6572,7 +6616,7 @@ function jslint_phase3_parse(state) {
             );
             if (token_nxt.id === "=") {
                 optional = the_function_toplevel && token_now;
-                advance_and_signature_push("=");
+                advance("=");
                 if (!the_function_toplevel) {
                     the_destructure.open = true;
                 }
@@ -6621,7 +6665,7 @@ function jslint_phase3_parse(state) {
 // ["let[,aa]=0", "prefix_destructure", "ignore", "", 0]
 
                 test_cause("ignore");
-                advance_and_signature_push(",");
+                advance(",");
             }
             if (the_function_toplevel) {
                 the_function.parameter_count += 1;
@@ -6630,12 +6674,15 @@ function jslint_phase3_parse(state) {
 
 // Break early from ellipsis.
 
+                if (the_function_toplevel) {
+                    the_function.parameter_rest = true;
+                }
                 break;
             }
             if (token_nxt.id !== ",") {
                 break;
             }
-            advance_and_signature_push(",");
+            advance(",");
         }
         name_list.push(...sub_list);
         if (the_function_toplevel) {
@@ -6652,10 +6699,10 @@ function jslint_phase3_parse(state) {
 // PR-501 - Fix false-warning about ordering in nested-object-destructuring.
 
             check_ordered(role, sub_list);
-            advance_and_signature_push("}");
+            advance("}");
             return the_destructure;
         }
-        advance_and_signature_push("]");
+        advance("]");
         return the_destructure;
     }
 
@@ -6685,7 +6732,8 @@ function jslint_phase3_parse(state) {
         let scope_declared = scope_block;
         the_function = the_function || token_now;
         the_function.scope_name = {
-            context: empty()
+            context: empty(),
+            name_only: true
         };
         if (mode_fart) {
             the_function.arity = "binary";
@@ -6756,8 +6804,13 @@ function jslint_phase3_parse(state) {
         the_function.finally = 0;
         the_function.level = scope_function.level + 1;
         the_function.loop = 0;
+
+// PR-516 - Bugfix - Keep the name <property_parse> gives a method or accessor,
+// 'aa' or 'get aa'. Else <anon> named it after the previous identifier.
+
         the_function.name = (
             name ||
+            the_function.name ||
             (
                 mode_fart_unwrapped
                 ? "anonymous"
@@ -6768,7 +6821,7 @@ function jslint_phase3_parse(state) {
         the_function.signature = (
             mode_fart_unwrapped
             ? token_prv.id
-            : ["("]
+            : "("
         );
         the_function.switch = 0;
         the_function.try = 0;
@@ -6821,6 +6874,13 @@ function jslint_phase3_parse(state) {
                 true                    // assigned
             );
         } else {
+            const lparen = token_now;
+            let default_depth;
+            let default_from;
+            let default_megastring = false;
+            let depth = 0;
+            let signature = "";
+            let token_before;
             if (token_nxt.id !== ")" && token_nxt.id !== "(end)") {
 
 // PR-500 - Unify ES2015-destructure-logic. - function ([aa]) {...}
@@ -6838,7 +6898,70 @@ function jslint_phase3_parse(state) {
                 );
             }
             advance(")");
-            the_function.signature = the_function.signature.join("") + ")";
+
+// PR-516 - Bugfix - Copy <signature> from the source text of each token but
+// comments, so it keeps default values. A space joins tokens apart in the
+// source, except after an opener or before a comma or closer. A default value
+// over 40 characters shows as an ellipsis, and so does one holding a
+// megastring, whose tokens carry columns that do not match the source.
+
+            for (const token of token_list.slice(lparen.nr, token_now.nr + 1)) {
+                if (token.id !== "(comment)") {
+                    const piece = (
+                        (
+                            token_before !== undefined &&
+                            (
+                                token_before.line !== token.line ||
+                                token_before.thru < token.from
+                            ) &&
+                            !["(", "[", "{"].includes(token_before.id) &&
+                            ![")", ",", "]", "}"].includes(token.id)
+                        )
+                        ? " "
+                        : ""
+                    ) + line_list[token.line].line_source.slice(
+                        token.from,
+                        token.thru
+                    );
+                    if ([")", "]", "}"].includes(token.id)) {
+                        depth -= 1;
+                    }
+
+// A default value ends at a comma or a closer of its own depth.
+
+                    if (
+                        default_from !== undefined &&
+                        (
+                            depth < default_depth ||
+                            (depth === default_depth && token.id === ",")
+                        )
+                    ) {
+                        if (
+                            default_megastring ||
+                            signature.slice(default_from).trim().length > 40
+                        ) {
+                            signature = (
+                                signature.slice(0, default_from) + " \u2026"
+                            );
+                        }
+                        default_from = undefined;
+                        default_megastring = false;
+                    }
+                    signature += piece;
+                    if (token.id === "=" && default_from === undefined) {
+                        default_depth = depth;
+                        default_from = signature.length;
+                    }
+                    if (token.id === "`" && default_from !== undefined) {
+                        default_megastring = true;
+                    }
+                    if (["${", "(", "[", "{"].includes(token.id)) {
+                        depth += 1;
+                    }
+                    token_before = token;
+                }
+            }
+            the_function.signature = signature;
         }
         if (mode_fart && !mode_fart_unwrapped) {
             advance("=>");
@@ -7054,6 +7177,9 @@ function jslint_phase3_parse(state) {
 // ["aa={get aa(){}}", "property_parse", "paren", "", 0]
 
                 test_cause("paren");
+
+// PR-516 - Bugfix - Name an accessor 'get aa' in the report, not 'get'.
+
                 value = prefix_function(
                     {
                         arity: "unary",
@@ -7062,7 +7188,7 @@ function jslint_phase3_parse(state) {
                         line: name.line,
                         name: (
                             typeof extra === "string"
-                            ? extra
+                            ? full
                             : id
                         ),
                         thru: name.from
@@ -9077,6 +9203,7 @@ function jslint_phase4_walk(state) {
         scope_block_push,
         scope_function_pop,
         scope_function_push,
+        scope_report_push,
         syntax_dict,
         test_cause,
         token_global,
@@ -9208,6 +9335,7 @@ function jslint_phase4_walk(state) {
 // return its variable, parameter, label or global, or undefined if undeclared.
 
         const id = thing.id;
+        const ii_function = block_stack.indexOf(scope_function);
         let the_label;
         let the_variable;
 
@@ -9250,11 +9378,13 @@ function jslint_phase4_walk(state) {
                 the_label = the_variable;
                 the_variable = undefined;
             }
-            if (the_variable && ii > 0) {
+            if (the_variable && ii > ii_function) {
 
-// If found outside current-scope, mark as closure.
+// PR-516 - Bugfix - Mark closure only if found outside the current function,
+// not merely outside the current scope_block, and record it for the report.
 
                 the_variable.closure = true;
+                scope_report_push(scope_function, the_variable);
             }
             return the_variable;
         });
@@ -9309,6 +9439,7 @@ function jslint_phase4_walk(state) {
 // 3.glo.1 - Mark 'declared', the global-variable, immediately.
 
             token_global.context[id] = the_variable;
+            scope_report_push(scope_function, the_variable);
         }
         if (!the_variable.alive) {
 
@@ -10224,13 +10355,10 @@ function jslint_phase4_walk(state) {
         } else if (thing.extra === "set") {
 
 // PR-514 - Bugfix - A setter's one parameter cannot be a rest-parameter, a
-// SyntaxError. Read <signature>, since <name_list> flattens destructuring and
-// cannot tell a rest-parameter from a valid rest-element inside a destructure.
+// SyntaxError. Read <parameter_rest>, since <name_list> flattens destructuring
+// and cannot tell a rest-parameter from a valid rest-element inside one.
 
-            if (
-                thing.parameter_count !== 1 ||
-                thing.signature.startsWith("(...")
-            ) {
+            if (thing.parameter_count !== 1 || thing.parameter_rest) {
 
 // test_cause:
 // ["
@@ -11768,6 +11896,10 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
 //     </dl>
 // </div>
 
+// A function's name is a best guess, since most functions have none in the
+// source. A wrong name in an odd case goes in the CHANGELOG Todo list, and is
+// fixed only when a user reports it [owner 2026-10-22].
+
     html += "<fieldset id=\"JSLINT_REPORT_FUNCTIONS\">\n";
     html += "<legend>Report: Functions (" + functions.length + ")</legend>\n";
     html += "<div>\n";
@@ -11803,8 +11935,8 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         html += "</div>\n";
     }
     functions.forEach(function (the_function) {
-        let {
-            context,
+        const {
+            context_report = [],
             from,
             id,
             level,
@@ -11813,7 +11945,20 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
             name_list = [],
             signature
         } = the_function;
-        let list = Object.keys(context);
+
+// PR-516 - Bugfix - <context_report> mixes own and outer names, so each row
+// checks <scope_function>.
+
+        function id_list(filter) {
+            return Array.from(
+                new Set(context_report.filter(filter).map(function ({id}) {
+                    return id;
+                }))
+            ).sort();
+        }
+        function is_own({scope_function}) {
+            return scope_function === the_function;
+        }
         html += (
             "<div class=\"level level" + htmlEscape(level) + "\">" +
             address(line, from + 1) +
@@ -11836,30 +11981,23 @@ pyNj+JctcQLXenBOCms46aMkenIx45WpXqxxVJQLz/vgpmAVa0fmDv6Pue9xVTBPfVxCUGfj\
         html += detail("parameter", name_list.map(function ({id}) {
             return id;
         }).sort());
-        list.sort();
-        html += detail("variable", list.filter(function (id) {
-            return context[id].role === "variable";
+        html += detail("variable", id_list(function (entry) {
+            return is_own(entry) && entry.role === "variable";
         }));
-        html += detail("exception", list.filter(function (id) {
-            return context[id].role === "exception";
+        html += detail("exception", id_list(function (entry) {
+            return is_own(entry) && entry.role === "exception";
         }));
-        html += detail("closure", list.filter(function (id) {
-            return (
-                context[id].closure === true &&
-                context[id].scope_declared === the_function
-            );
+        html += detail("closure", id_list(function (entry) {
+            return is_own(entry) && entry.closure === true;
         }));
-        html += detail("outer", list.filter(function (id) {
-            return (
-                context[id].scope_declared.id !== "(global)" &&
-                context[id].scope_declared !== the_function
-            );
+        html += detail("outer", id_list(function (entry) {
+            return !is_own(entry) && entry.scope_declared.id !== "(global)";
         }));
-        html += detail(module, list.filter(function (id) {
-            return context[id].scope_declared.id === "(global)";
+        html += detail(module, id_list(function (entry) {
+            return !is_own(entry) && entry.scope_declared.id === "(global)";
         }));
-        html += detail("label", list.filter(function (id) {
-            return context[id].role === "label";
+        html += detail("label", id_list(function (entry) {
+            return is_own(entry) && entry.role === "label";
         }));
         html += "</div>\n";
     });
