@@ -1,8 +1,10 @@
 # Changelog
 
 # Todo
+- jslint-cli - Lint every file argument, as 'node jslint.mjs aa.mjs bb.mjs' now lints 'aa.mjs' and silently skips 'bb.mjs'.
+- jslint - Add warning for jstestIt() descriptions not in ASCII order within each jstestDescribe().
+- jslint - Destructuring - Allow a default on a destructured parameter 'function aa({bb} = {})', valid ES2015 but a stop now.
 - jslint - Allow a quoted accessor-name 'get "aa"() {}', valid ES2015 but a stop now.
-- jslint - Report - Stop naming an anonymous function after a keyword, e.g. '«return»' for 'return function () {}'.
 - jslint - Destructuring - Allow catch-variable 'catch ({aa})', valid ES2015 but a stop now.
 - jslint - Destructuring - Allow a default in object destructuring-assignment '({aa = bb} = cc)', and a member-target '[aa.cc = bb] = cc', valid but stops now, and then warn a const reassigned by '({aa} = {})'.
 - jslint - Add warning for 'aa.hasOwnProperty(bb)' and 'Object.prototype.hasOwnProperty.call(aa, bb)', suggesting 'Object.hasOwn(aa, bb)'.
@@ -14,6 +16,10 @@
 - jslint-ecma - Add ES2015-feature generators 'function*'.
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Add html and css linting back into jslint.
+
+# v2026.10.30
+- jslint - Report: Functions - Copy each signature from its source text, keeping default values.
+- jslint - Report: Functions - List block-scoped names, catch-variables and outer names, and mark closure only across functions.
 
 # v2026.9.29
 - jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add function jslint_phase6_autofix().
