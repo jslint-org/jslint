@@ -18,7 +18,8 @@
 - jslint - Add html and css linting back into jslint.
 
 # v2026.10.30
-- jslint - Report: Functions - List block-scoped names, catch-variables and outer names, mark closure only across functions, and keep default values in signatures.
+- jslint - Report: Functions - Copy each signature from its source text, keeping default values.
+- jslint - Report: Functions - List block-scoped names, catch-variables and outer names, and mark closure only across functions.
 
 # v2026.9.29
 - jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add function jslint_phase6_autofix().
