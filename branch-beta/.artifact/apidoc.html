@@ -67,7 +67,7 @@ body {
 </head>
 <body>
 <div class="apidocDiv">
-<h1>API Doc for <a href="https://github.com/jslint-org/jslint">JSLint (v2026.9.29)</a></h1>
+<h1>API Doc for <a href="https://github.com/jslint-org/jslint">JSLint (v2026.10.30)</a></h1>
 <div class="apidocSectionDiv">
     <a href="#apidocTableOfContents1" id="apidocTableOfContents1">
         <h1>Table of Contents</h1>
@@ -1153,12 +1153,14 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
         global_dict,
         import_list,
         is_equal,
+        line_list,
         option_dict,
         property_dict,
         scope_block_pop,
         scope_block_push,
         scope_function_pop,
         scope_function_push,
+        scope_report_push,
         stop,
         syntax_dict,
         tenure,
@@ -1188,8 +1190,7 @@ await jslint.<span class="apidocCodeKeywordSpan">jslint_cli</span>({
 
         if (
             token_now.identifier &amp;&amp;
-            token_now.id !== "function" &amp;&amp;
-            token_now...
+            token_now.id !...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...
@@ -1235,6 +1236,7 @@ if (!state.mode_json) {
         scope_block_push,
         scope_function_pop,
         scope_function_push,
+        scope_report_push,
         syntax_dict,
         test_cause,
         token_global,
@@ -1293,9 +1295,7 @@ if (!state.mode_json) {
 // Produce a function that will act on the tasks registered by an action
 // function while walking the tree.
 
-        return function (the_token) {
-
-/...
+        retur...
 }
 </pre></li>
 <li>Example usage:<pre class="apidocCodePre">...

@@ -3,7 +3,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Status
-| Branch | [master<br>(v2026.9.29)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
+| Branch | [master<br>(v2026.10.30)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jslint-org/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/jslint-org/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/jslint-org/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/index.html) |
@@ -1119,7 +1119,7 @@ if (false) {
         - base respository: `jslint-org/jslint`
         - base: `beta`
     - click `Create pull request`
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 
 1. wait awhile before continuing ...
     - click `Squash and merge`
@@ -1168,7 +1168,7 @@ if (false) {
         - base respository: `jslint-org/jslint`
         - base: `beta`
     - click `Create pull request`
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions/workflows/on_pull_request.yml
+        - verify ci-success @ https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 
 1. wait awhile before continuing ...
     - click `Squash and merge`
