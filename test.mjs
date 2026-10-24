@@ -15,6 +15,7 @@ let {
     jstestDescribe,
     jstestIt,
     jstestOnExit,
+    jstestOrderCheck,
     moduleFsInit,
     noop,
     v8CoverageListMerge,
@@ -1996,8 +1997,10 @@ aa();
 jstestDescribe((
     "test jslint's option handling-behavior"
 ), function testBehaviorJslintOption() {
-    let elemPrv = "";
-    [
+
+// Samples group by option, so each option is one test with a unique name.
+
+    const sampleDict = Object.groupBy([
         [{bitwise: true}, "String(String | 0);"],
         [{browser: true}, ";\nString(new XMLHttpRequest());"],
         [{convert: true}, "String(\"aa\" + 0);"],
@@ -2064,65 +2067,68 @@ function aa() {
         ],
         [{variable: true}, "let bb = 0;\nlet aa = 0;\naa(bb);"],
         [{white: true}, "\t"]
-    ].forEach(function ([
-        option_dict, source
+    ], function ([
+        option_dict
     ]) {
-        source = source.trim();
-        jstestIt((
-            `test option=${JSON.stringify(option_dict)} handling-behavior`
-        ), function () {
-            const elemNow = JSON.stringify([option_dict, source]);
-            const warningsLength = (
-                (
-                    option_dict.test_internal_error ||
-                    option_dict.test_unknown_warning_code
-                )
-                ? 1
-                : 0
-            );
-            // Assert list is sorted.
-            assertOrThrow(
-                elemPrv < elemNow,
-                JSON.stringify(
-                    [elemPrv, elemNow],
-                    undefined,
-                    4
-                )
-            );
-            elemPrv = elemNow;
-            option_dict.beta = true;
-            [
-                jslint.jslint,
-                jslintCjs.jslint
-            ].forEach(function (jslint) {
-                // test jslint's option handling-behavior
-                let warnings;
-                warnings = jslint(
-                    source,
-                    option_dict
-                ).warnings;
-                assertOrThrow(
-                    warnings.length === warningsLength,
-                    `\n\n${source}\n\n${JSON.stringify(warnings, undefined, 4)}`
-                );
-                // test jslint's directive handling-behavior
-                source = (
-                    "/*jslint " +
-                    JSON
-                        .stringify(option_dict)
-                        .slice(1, -1)
-                        .replace((/"/g), "") +
-                    "*/\n" +
-                    source.replace((/^#!/), "//")
-                );
-                warnings = jslint(source).warnings;
-                assertOrThrow(
-                    warnings.length === warningsLength,
-                    `\n\n${source}\n\n${JSON.stringify(warnings, undefined, 4)}`
-                );
-            });
-        });
+        return JSON.stringify(option_dict);
     });
+    let elemPrv = "";
+    for (const [key, sampleList] of Object.entries(sampleDict)) {
+        jstestIt((
+            `test option=${key} handling-behavior`
+        ), function () {
+            for (const [option_dict, sample] of sampleList) {
+                const elemNow = JSON.stringify([option_dict, sample.trim()]);
+                const warningsLength = (
+                    (
+                        option_dict.test_internal_error ||
+                        option_dict.test_unknown_warning_code
+                    )
+                    ? 1
+                    : 0
+                );
+                let source = sample.trim();
+                // Assert list is sorted.
+                assertOrThrow(
+                    elemPrv < elemNow,
+                    JSON.stringify(
+                        [elemPrv, elemNow],
+                        undefined,
+                        4
+                    )
+                );
+                elemPrv = elemNow;
+                option_dict.beta = true;
+                for (const lint of [jslint.jslint, jslintCjs.jslint]) {
+                    // test jslint's option handling-behavior
+                    let warnings;
+                    warnings = lint(
+                        source,
+                        option_dict
+                    ).warnings;
+                    assertOrThrow(
+                        warnings.length === warningsLength,
+                        JSON.stringify([source, warnings], undefined, 4)
+                    );
+                    // test jslint's directive handling-behavior
+                    source = (
+                        "/*jslint " +
+                        JSON
+                            .stringify(option_dict)
+                            .slice(1, -1)
+                            .replace((/"/g), "") +
+                        "*/\n" +
+                        source.replace((/^#!/), "//")
+                    );
+                    warnings = lint(source).warnings;
+                    assertOrThrow(
+                        warnings.length === warningsLength,
+                        JSON.stringify([source, warnings], undefined, 4)
+                    );
+                }
+            }
+        });
+    }
 });
 
 jstestDescribe((
@@ -2951,6 +2957,31 @@ jstestDescribe((
         "test jstestOnExit tests-failed handling-behavior"
     ), function () {
         jstestOnExit(undefined, "testsFailed");
+    });
+    jstestIt((
+        "test jstestOrderCheck handling-behavior"
+    ), function () {
+
+// A sorted list returns nothing. An unsorted pair or a duplicate returns one
+// failed result, for the first bad pair only.
+
+        assertJsonEqual([
+            ["", "aa", "bb"],
+            ["aa", "cc", "bb", "aa"],
+            ["aa", "aa"]
+        ].map(function (descriptionList) {
+            const failure = jstestOrderCheck(descriptionList);
+            return failure && [failure[0].message, failure[1]];
+        }), [
+            undefined,
+            [
+                "\"bb\" must sort before \"cc\"",
+                "jstestDescribe and jstestIt descriptions in ASCII order"
+            ], [
+                "duplicate description \"aa\"",
+                "jstestDescribe and jstestIt descriptions in ASCII order"
+            ]
+        ]);
     });
 });
 
