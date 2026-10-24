@@ -15,6 +15,7 @@ let {
     jstestDescribe,
     jstestIt,
     jstestOnExit,
+    jstestOrderCheck,
     moduleFsInit,
     noop,
     v8CoverageListMerge,
@@ -57,6 +58,38 @@ function processExit0(exitCode) {
 function processExit1(exitCode) {
     assertOrThrow(exitCode === 1, exitCode);
 }
+
+jstestDescribe((
+    "test assertXxx handling-behavior"
+), function testBehaviorAssertXxx() {
+    jstestIt((
+        "test assertXxx-error handling-behavior"
+    ), async function () {
+        // test debugInline handling-behavior
+        noop(debugInline);
+        // test assertErrorThrownAsync error handling-behavior
+        await assertErrorThrownAsync(function () {
+            return assertErrorThrownAsync(noop);
+        });
+        // test assertJsonEqual error handling-behavior
+        await assertErrorThrownAsync(function () {
+            assertJsonEqual(1, 2);
+        });
+        await assertErrorThrownAsync(function () {
+            assertJsonEqual(1, 2, "undefined");
+        });
+        await assertErrorThrownAsync(function () {
+            assertJsonEqual(1, 2, {});
+        });
+        // test assertOrThrow error handling-behavior
+        await assertErrorThrownAsync(function () {
+            assertOrThrow(undefined, "undefined");
+        });
+        await assertErrorThrownAsync(function () {
+            assertOrThrow(undefined, new Error());
+        });
+    });
+});
 
 jstestDescribe((
     "test fsXxx handling-behavior"
@@ -991,508 +1024,11 @@ aa(dd(0), 0);
             ".tmp/autofix_dir/bb.mjs"
         );
     });
-    jstestIt((
-        "test binding-power handling-behavior"
-    ), function () {
-
-// PR-514 - Bugfix - Binding-powers follow the spec's grammar, as tabled in
-// MDN Operator precedence. Each source returns the expression beside the
-// parameters, so none is unused, and lists the warning codes it must raise.
-
-        for (const [expression, expect] of [
-            ["(-aa) ** 2", []],
-            ["-aa ** 2", ["wrap_subexpression_a_b"]],
-            ["-aa++", ["unexpected_a"]],
-            ["[aa] ** 2", []],
-            ["aa ** -2", []],
-            ["aa ?? (bb || cc)", []],
-            ["aa ?? bb && cc", ["wrap_subexpression_a_b"]],
-            ["aa ?? bb ?? cc", []],
-            ["aa || bb ?? cc", ["wrap_subexpression_a_b"]],
-            ["typeof aa ** 2", ["wrap_subexpression_a_b"]]
-        ]) {
-            const result = jslint.jslint(String(`
-function ff(aa, bb, cc) {
-    return [aa, bb, cc, ${expression}];
-}
-ff();
-            `).trim() + "\n");
-            assertJsonEqual(result.warnings.map(function ({code}) {
-                return code;
-            }), expect, expression);
-        }
-
-// PR-514 - Bugfix - The operand of 'void' is parsed at rbp 150, like every
-// unary operator, so 'void 0 + 0' is '(void 0) + 0'.
-
-        assertOrThrow(
-            jslint.jslint("String(void 0 + 0);\n").tokens.find(function ({
-                id
-            }) {
-                return id === "+";
-            }).expression[0].id === "void",
-            "void 0 + 0"
-        );
-
-// PR-514 - Bugfix - A relational right side of a for-loop-head 'of' or 'in'
-// does not warn on the head's own 'of' or 'in'.
-
-        for (const [operator, expect] of [
-            ["in", ["expected_a_b", "expected_a"]],
-            ["of", ["expected_a"]]
-        ]) {
-            assertJsonEqual(jslint.jslint(String(`
-function ff(aa, bb) {
-    for (aa ${operator} bb < aa) {
-        bb();
-    }
-}
-ff();
-            `).trim() + "\n").warnings.map(function ({code}) {
-                return code;
-            }), expect, operator);
-        }
-
-// PR-514 - A 'for in' suggests 'for...of Object.keys', not 'Object.keys'.
-
-        assertJsonEqual(jslint.jslint(String(`
-function ff(aa) {
-    for (const bb in aa) {
-        aa(bb);
-    }
-}
-ff();
-        `).trim() + "\n").warnings.map(function ({message}) {
-            return message;
-        }), ["Expected 'for...of Object.keys' and instead saw 'for in'."]);
-
-// PR-514 - Bugfix - '**=' is one assignment token, '**' takes a space on each
-// side like '*', and a line break before a postfix '++' ends the expression.
-
-        for (const [source, expect] of [
-            ["let aa = 2;\naa **= 2;\n", []],
-            [
-                "let aa = 2;\naa = aa**2;\n",
-                ["expected_space_a_b", "expected_space_a_b"]
-            ],
-            [
-                "let aa = 0;\nlet bb = 0;\naa\n++bb;\n",
-                [
-                    "unexpected_expression_a",
-                    "expected_a_after_b",
-                    "unexpected_expression_a"
-                ]
-            ]
-        ]) {
-            assertJsonEqual(jslint.jslint(source).warnings.map(function ({
-                code
-            }) {
-                return code;
-            }), expect, source);
-        }
-        assertJsonEqual(jslint.jslint("let aa = 2;\naa = aa**2;\n", {
-            autofix: true
-        }).autofixed, "let aa = 2;\naa = aa ** 2;\n");
-    });
-    jstestIt((
-        "test report-function handling-behavior"
-    ), function () {
-        let result;
-
-// This function will return the function details in the report of <source>,
-// each <dl> on its own line.
-
-        function reportFunction(source) {
-            const html = jslint.jslint_report(jslint.jslint(source, {}));
-            return html.slice(
-                html.indexOf("<div class=\"level level1\">"),
-                html.lastIndexOf("</div>\n</fieldset>")
-            ).replace((/<dl>/g), "\n<dl>");
-        }
-
-// PR-516 - Bugfix - The report's function details list block-scoped names and
-// catch-variables, and mark closure only across a function boundary.
-
-        result = reportFunction(String(`
-let ee = 0;
-function aa(gg) {
-    let bb = 0;
-    let ff = 0;
-    if (aa) {
-        let cc = 1;
-        aa(bb, cc, ee, gg);
-    }
-    try {
-        aa(String);
-    } catch (err) {
-        aa(function () {
-            return err;
-        });
-    }
-    return function () {
-        return ff;
-    };
-}
-aa();
-        `).trim() + "\n");
-        assertOrThrow(result === String(`
-<div class="level level1"><address>2: 1</address><dfn>aa(gg)</dfn>
-<dl><dt>parameter</dt><dd>gg</dd></dl>
-<dl><dt>variable</dt><dd>bb, cc, ff</dd></dl>
-<dl><dt>exception</dt><dd>err</dd></dl>
-<dl><dt>closure</dt><dd>err, ff</dd></dl>
-<dl><dt>global</dt><dd>String, aa, ee</dd></dl></div>
-<div class="level level2"><address>12: 12</address><dfn>«aa»()</dfn>
-<dl><dt>outer</dt><dd>err</dd></dl></div>
-<div class="level level2"><address>16: 12</address><dfn>«anonymous»()</dfn>
-<dl><dt>outer</dt><dd>ff</dd></dl></div>
-        `).trim() + "\n", result);
-
-// PR-516 - Bugfix - A named function expression's name is outer only in a
-// nested function, and a function lists an outer 'bb' even beside its own
-// block-scoped 'bb'.
-
-        result = reportFunction(String(`
-function aa() {
-    let bb = 0;
-    function cc() {
-        if (cc) {
-            cc(bb);
-        }
-        if (cc) {
-            let bb = 1;
-            cc(bb);
-        }
-    }
-    return function dd() {
-        return dd(cc, function () {
-            return dd;
-        });
-    };
-}
-aa();
-        `).trim() + "\n");
-        assertOrThrow(result === String(`
-<div class="level level1"><address>1: 1</address><dfn>aa()</dfn>
-<dl><dt>variable</dt><dd>bb, cc</dd></dl>
-<dl><dt>closure</dt><dd>bb, cc</dd></dl></div>
-<div class="level level2"><address>3: 5</address><dfn>cc()</dfn>
-<dl><dt>variable</dt><dd>bb</dd></dl>
-<dl><dt>outer</dt><dd>bb, cc</dd></dl></div>
-<div class="level level2"><address>12: 12</address><dfn>dd()</dfn>
-<dl><dt>outer</dt><dd>cc</dd></dl></div>
-<div class="level level3"><address>13: 23</address><dfn>«cc»()</dfn>
-<dl><dt>outer</dt><dd>dd</dd></dl></div>
-        `).trim() + "\n", result);
-    });
-    jstestIt((
-        "test report-function-name handling-behavior"
-    ), function () {
-
-// PR-516 - Bugfix - A method or accessor is named after its property, not
-// after the identifier before it.
-
-        assertJsonEqual(jslint.jslint(String(`
-/*jslint getset*/
-String({
-    aa() {
-        return;
-    },
-    get bb() {
-        return;
-    },
-    cc: 0,
-    dd() {
-        return;
-    }
-});
-        `).trim() + "\n").functions.map(function ({name}) {
-            return name;
-        }), ["aa", "get bb", "dd"]);
-
-// PR-516 - Bugfix - A function after a keyword is anonymous, except after
-// 'default', the name the spec gives it.
-
-        assertJsonEqual(jslint.jslint(String(`
-String(function () {
-    return function () {
-        return;
-    };
-}, typeof function () {
-    return;
-});
-export default function () {
-    return;
-}
-        `).trim() + "\n").functions.map(function ({name}) {
-            return name;
-        }), ["String", "anonymous", "anonymous", "default"]);
-
-// PR-516 - Bugfix - A keyword used as a property name still names a function.
-
-        assertJsonEqual(jslint.jslint(String(`
-const aa = {
-    delete: function () {
-        return;
-    }
-};
-aa.catch = function () {
-    return;
-};
-String(aa?.finally || function () {
-    return;
-});
-String(aa
-? null
-: function () {
-    return;
-});
-        `).trim() + "\n").functions.map(function ({name}) {
-            return name;
-        }), ["delete", "catch", "finally", "anonymous"]);
-    });
-    jstestIt((
-        "test report-function-signature handling-behavior"
-    ), function () {
-        const a38 = "a".repeat(38);
-
-// PR-516 - Bugfix - A signature keeps default values and drops comments, and a
-// multi-line destructure joins with no space inside its brackets. A default
-// value longer than 40 characters, or holding a megastring, shows as an
-// ellipsis, but a backtick inside a string or regexp does not count.
-
-        assertJsonEqual(jslint.jslint(String(`
-function aa(bb, cc = 1, ...dd) {
-    return [bb, cc, dd];
-}
-function ee({
-    ff,
-    gg = "" // Comment.
-}, hh) {
-    return [ff, gg, hh];
-}
-function ii(jj = function () {
-    return "a default value longer than forty characters";
-}, kk = [0, 1], ll = \`\${kk}\`) {
-    return [jj, kk, ll];
-}
-function mm(
-    nn /* Comment. */,
-    oo = [
-        1
-    ],
-    pp = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    qq = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    rr = [\`a\`, 1]
-) {
-    return [nn, oo, pp, qq, rr];
-}
-function ss(tt = "\`", uu = /\`/) {
-    return [tt, uu];
-}
-function vv(ww = (xx = 1) => "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") {
-    return ww;
-}
-        `).trim() + "\n").functions.map(function ({signature}) {
-            return signature;
-        }), [
-            "(bb, cc = 1, ...dd)",
-            "({ff, gg = \"\"}, hh)",
-            "(jj = \u2026, kk = [0, 1], ll = \u2026)",
-            "()",
-            `(nn, oo = [1], pp = "${a38}", qq = \u2026, rr = \u2026)`,
-            "(tt = \"`\", uu = /`/)",
-            "(ww = \u2026)",
-            "(xx = 1)"
-        ]);
-
-// A parse that stops inside a parameter list leaves the signature '('.
-
-        assertJsonEqual(jslint.jslint(
-            "function aa(bb, 0) {}\n"
-        ).functions.map(function ({signature}) {
-            return signature;
-        }), ["("]);
-    });
-    jstestIt((
-        "test autofix-report handling-behavior"
-    ), function () {
-        let result;
-
-// The report's Autofix section SPEAKS ONLY AFTER THE BUTTON - index.html sets
-// <autofix> on the button's own lint-result, so a plain JSLint renders an
-// empty, default-coloured body. Blocked - a residual warning outside
-// jslint_autofix_warning_list - is the ONLY state that goes red, and a fixable
-// residual still reads as success.
-
-        function reportAutofix(source, autofix) {
-            let html = jslint.jslint_report({
-                ...jslint.jslint(source, {}),
-                autofix
-            });
-            return html.slice(
-                html.indexOf("<fieldset\n    class="),
-                html.indexOf("<fieldset id=\"JSLINT_REPORT_WARNINGS\"")
-            );
-        }
-
-        function reportAutofixExpect(klass, body) {
-            return (
-                "<fieldset\n    class=\"\n    " + klass + "\n    \"\n" +
-                "    id=\"JSLINT_REPORT_AUTOFIX\"\n>\n" +
-                "<legend>Report: Autofix</legend>\n" +
-                "<div class=\"center\">\n    " + body + "\n</div>\n" +
-                "</fieldset>\n"
-            );
-        }
-
-// A clean source autofixes to itself, and the click is STILL a success - an
-// empty body would read to the clicker as a missing success message.
-
-        result = reportAutofix((
-            "function aa(bb) {\n    return bb;\n}\naa();\n"
-        ), true);
-        assertOrThrow(
-            result === reportAutofixExpect("", "Autofix successful."),
-            result
-        );
-
-// A residual warning INSIDE the fixable set is not a blocker, so every
-// jslint_autofix_warning_list member must survive the <some> callback.
-
-        result = reportAutofix((
-            "function aa(bb) {\n    return String( bb);\n}\naa();\n"
-        ), true);
-        assertOrThrow(
-            result === reportAutofixExpect("", "Autofix successful."),
-            result
-        );
-
-// A residual too_long is not a blocker either - autofix fixes around it.
-
-        result = reportAutofix(String(`
-function aa(bb) {
-    return bb;
-}
-aa("${"a".repeat(80)}");
-        `).trim() + "\n", true);
-        assertOrThrow(
-            result === reportAutofixExpect("", "Autofix successful."),
-            result
-        );
-
-// A warning outside the set blocks, and the class is what paints it red.
-
-        result = reportAutofix("console.log(1);\n", true);
-        assertOrThrow(
-            result === reportAutofixExpect("blocked", (
-                "Autofix blocked. Fix non-whitespace warnings below."
-            )),
-            result
-        );
-
-// A plain JSLint is ALWAYS empty and default-coloured, even on a source that
-// WOULD block - <autofix> is undefined, so <some> never runs.
-
-        result = reportAutofix("console.log(1);\n", undefined);
-        assertOrThrow(result === reportAutofixExpect("", ""), result);
-    });
 });
 
 jstestDescribe((
     "test jslint's cli handling-behavior"
 ), function testBehaviorJslintCli() {
-    jstestIt((
-        "test cli-null-case handling-behavior"
-    ), function () {
-        jslint.jslint_cli({
-            mode_noop: true,
-            process_exit: processExit0
-        });
-    });
-    jstestIt((
-        "test cli-window-jslint handling-behavior"
-    ), function () {
-        [
-            "&window_jslint=",
-            "&window_jslint=12",
-            "&window_jslint=1?",
-            "&window_jslint=?",
-            "?window_jslint=",
-            "?window_jslint=12",
-            "?window_jslint=1?",
-            "?window_jslint=?",
-            "window_jslint=1",
-            "window_jslint=1&",
-            "window_jslint=12",
-            "window_jslint=1?"
-        ].forEach(function (import_meta_url) {
-            jslint.jslint_cli({
-                import_meta_url
-            });
-            assertOrThrow(globalThis.jslint === undefined);
-        });
-        [
-            "&window_jslint=1",
-            "&window_jslint=1&",
-            "?window_jslint=1",
-            "?window_jslint=1&"
-        ].forEach(function (import_meta_url) {
-            jslint.jslint_cli({
-                import_meta_url
-            });
-            assertOrThrow(globalThis.jslint === jslint);
-            delete globalThis.jslint;
-        });
-    });
-    jstestIt((
-        "test cli-cjs-and-invalid-file handling-behavior"
-    ), async function () {
-        await moduleFs.promises.mkdir(
-            ".tmp/invalid_file/invalid_file.js",
-            {recursive: true}
-        );
-        [
-            ".",                // test dir handling-behavior
-            ".tmp/invalid_file",// test invalid-file handling-behavior
-            "jslint.mjs",       // test file handling-behavior
-            undefined           // test file-undefined handling-behavior
-        ].forEach(function (file) {
-            jslint.jslint_cli({
-                file,
-                mode_cli: true,
-                process_env: {
-                    JSLINT_BETA: "1"
-                },
-                process_exit: processExit0
-            });
-        });
-    });
-    jstestIt((
-        "test cli-cjs-lint-file handling-behavior"
-    ), async function () {
-
-// Through the cjs wrapper, <jslint_cli> must lint, not resolve 0 unseen: in
-// its old new-context sandbox there was no process, so the cli returned early.
-
-        await fsWriteFileWithParents(
-            ".tmp/cli_cjs_lint_file/aa.js",
-            "let aa = 1;\n"
-        );
-        assertJsonEqual(
-            await jslintCjs.jslint_cli({
-                console_error: noop,
-                mode_cli: true,
-                process_argv: [
-                    "node",
-                    "jslint.mjs",
-                    ".tmp/cli_cjs_lint_file/aa.js"
-                ],
-                process_exit: processExit1
-            }),
-            1
-        );
-    });
     jstestIt((
         "test cli-apidoc handling-behavior"
     ), function () {
@@ -1522,6 +1058,64 @@ jstestDescribe((
         });
     });
     jstestIt((
+        "test cli-cjs-lint-file handling-behavior"
+    ), async function () {
+
+// Through the cjs wrapper, <jslint_cli> must lint, not resolve 0 unseen: in
+// its old new-context sandbox there was no process, so the cli returned early.
+
+        await fsWriteFileWithParents(
+            ".tmp/cli_cjs_lint_file/aa.js",
+            "let aa = 1;\n"
+        );
+        assertJsonEqual(
+            await jslintCjs.jslint_cli({
+                console_error: noop,
+                mode_cli: true,
+                process_argv: [
+                    "node",
+                    "jslint.mjs",
+                    ".tmp/cli_cjs_lint_file/aa.js"
+                ],
+                process_exit: processExit1
+            }),
+            1
+        );
+    });
+    jstestIt((
+        "test cli-embedded-line-offset handling-behavior"
+    ), async function () {
+
+// An embedded block whose opening tag is LINE 1 of its container has no line
+// terminator before it, so the offset arithmetic must still yield 1 - a
+// precedence slip once made it 0, and every warning in the block reported one
+// line too high. <foo> sits on file-line 3 and must be reported there.
+
+        const stderr_list = [];
+        await fsWriteFileWithParents(
+            ".tmp/embedded_line1.html",
+            "<script>\n/*jslint browser*/\nfoo;\n</script>\n"
+        );
+        await jslint.jslint_cli({
+            console_error: function (msg) {
+                stderr_list.push(String(msg));
+            },
+            mode_cli: true,
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                ".tmp/embedded_line1.html"
+            ],
+            process_exit: processExit1
+        });
+        assertOrThrow(
+            stderr_list.some(function (msg) {
+                return msg.includes("line 3, column 1");
+            }),
+            JSON.stringify(stderr_list)
+        );
+    });
+    jstestIt((
         "test cli-file-error handling-behavior"
     ), function () {
         jslint.jslint_cli({
@@ -1533,18 +1127,51 @@ jstestDescribe((
         });
     });
     jstestIt((
-        "test cli-syntax-error handling-behavior"
+        "test cli-file-kinds handling-behavior"
+    ), async function () {
+        await moduleFs.promises.mkdir(
+            ".tmp/invalid_file/invalid_file.js",
+            {recursive: true}
+        );
+        [
+            ".",                // test dir handling-behavior
+            ".tmp/invalid_file",// test invalid-file handling-behavior
+            "jslint.mjs",       // test file handling-behavior
+            undefined           // test file-undefined handling-behavior
+        ].forEach(function (file) {
+            jslint.jslint_cli({
+                file,
+                mode_cli: true,
+                process_env: {
+                    JSLINT_BETA: "1"
+                },
+                process_exit: processExit0
+            });
+        });
+    });
+    jstestIt((
+        "test cli-jslint-wrapper-vim handling-behavior"
     ), function () {
         jslint.jslint_cli({
             // suppress error
             console_error: noop,
-            file: "syntax-error.js",
             mode_cli: true,
-            option: {
-                trace: true
-            },
+            process_argv: [
+                "node",
+                "jslint.mjs",
+                "jslint_wrapper_vim",
+                "syntax-error.js"
+            ],
             process_exit: processExit1,
             source: "syntax error"
+        });
+    });
+    jstestIt((
+        "test cli-null-case handling-behavior"
+    ), function () {
+        jslint.jslint_cli({
+            mode_noop: true,
+            process_exit: processExit0
         });
     });
     jstestIt((
@@ -1583,39 +1210,6 @@ jstestDescribe((
             ],
             process_exit: processExit1
         });
-    });
-    jstestIt((
-        "test cli-embedded-line-offset handling-behavior"
-    ), async function () {
-
-// An embedded block whose opening tag is LINE 1 of its container has no line
-// terminator before it, so the offset arithmetic must still yield 1 - a
-// precedence slip once made it 0, and every warning in the block reported one
-// line too high. <foo> sits on file-line 3 and must be reported there.
-
-        const stderr_list = [];
-        await fsWriteFileWithParents(
-            ".tmp/embedded_line1.html",
-            "<script>\n/*jslint browser*/\nfoo;\n</script>\n"
-        );
-        await jslint.jslint_cli({
-            console_error: function (msg) {
-                stderr_list.push(String(msg));
-            },
-            mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                ".tmp/embedded_line1.html"
-            ],
-            process_exit: processExit1
-        });
-        assertOrThrow(
-            stderr_list.some(function (msg) {
-                return msg.includes("line 3, column 1");
-            }),
-            JSON.stringify(stderr_list)
-        );
     });
     jstestIt((
         "test cli-report-error handling-behavior"
@@ -1699,20 +1293,53 @@ jstestDescribe((
         });
     });
     jstestIt((
-        "test cli-jslint-wrapper-vim handling-behavior"
+        "test cli-syntax-error handling-behavior"
     ), function () {
         jslint.jslint_cli({
             // suppress error
             console_error: noop,
+            file: "syntax-error.js",
             mode_cli: true,
-            process_argv: [
-                "node",
-                "jslint.mjs",
-                "jslint_wrapper_vim",
-                "syntax-error.js"
-            ],
+            option: {
+                trace: true
+            },
             process_exit: processExit1,
             source: "syntax error"
+        });
+    });
+    jstestIt((
+        "test cli-window-jslint handling-behavior"
+    ), function () {
+        [
+            "&window_jslint=",
+            "&window_jslint=12",
+            "&window_jslint=1?",
+            "&window_jslint=?",
+            "?window_jslint=",
+            "?window_jslint=12",
+            "?window_jslint=1?",
+            "?window_jslint=?",
+            "window_jslint=1",
+            "window_jslint=1&",
+            "window_jslint=12",
+            "window_jslint=1?"
+        ].forEach(function (import_meta_url) {
+            jslint.jslint_cli({
+                import_meta_url
+            });
+            assertOrThrow(globalThis.jslint === undefined);
+        });
+        [
+            "&window_jslint=1",
+            "&window_jslint=1&",
+            "?window_jslint=1",
+            "?window_jslint=1&"
+        ].forEach(function (import_meta_url) {
+            jslint.jslint_cli({
+                import_meta_url
+            });
+            assertOrThrow(globalThis.jslint === jslint);
+            delete globalThis.jslint;
         });
     });
 });
@@ -2370,8 +1997,10 @@ aa();
 jstestDescribe((
     "test jslint's option handling-behavior"
 ), function testBehaviorJslintOption() {
-    let elemPrv = "";
-    [
+
+// Samples group by option, so each option is one test with a unique name.
+
+    const sampleDict = Object.groupBy([
         [{bitwise: true}, "String(String | 0);"],
         [{browser: true}, ";\nString(new XMLHttpRequest());"],
         [{convert: true}, "String(\"aa\" + 0);"],
@@ -2438,64 +2067,375 @@ function aa() {
         ],
         [{variable: true}, "let bb = 0;\nlet aa = 0;\naa(bb);"],
         [{white: true}, "\t"]
-    ].forEach(function ([
-        option_dict, source
+    ], function ([
+        option_dict
     ]) {
-        source = source.trim();
+        return JSON.stringify(option_dict);
+    });
+    let elemPrv = "";
+    for (const [key, sampleList] of Object.entries(sampleDict)) {
         jstestIt((
-            `test option=${JSON.stringify(option_dict)} handling-behavior`
+            `test option=${key} handling-behavior`
         ), function () {
-            const elemNow = JSON.stringify([option_dict, source]);
-            const warningsLength = (
-                (
-                    option_dict.test_internal_error ||
-                    option_dict.test_unknown_warning_code
-                )
-                ? 1
-                : 0
-            );
-            // Assert list is sorted.
-            assertOrThrow(
-                elemPrv < elemNow,
-                JSON.stringify(
-                    [elemPrv, elemNow],
-                    undefined,
-                    4
-                )
-            );
-            elemPrv = elemNow;
-            option_dict.beta = true;
-            [
-                jslint.jslint,
-                jslintCjs.jslint
-            ].forEach(function (jslint) {
-                // test jslint's option handling-behavior
-                let warnings;
-                warnings = jslint(
-                    source,
-                    option_dict
-                ).warnings;
+            for (const [option_dict, sample] of sampleList) {
+                const elemNow = JSON.stringify([option_dict, sample.trim()]);
+                const warningsLength = (
+                    (
+                        option_dict.test_internal_error ||
+                        option_dict.test_unknown_warning_code
+                    )
+                    ? 1
+                    : 0
+                );
+                let source = sample.trim();
+                // Assert list is sorted.
                 assertOrThrow(
-                    warnings.length === warningsLength,
-                    `\n\n${source}\n\n${JSON.stringify(warnings, undefined, 4)}`
+                    elemPrv < elemNow,
+                    JSON.stringify(
+                        [elemPrv, elemNow],
+                        undefined,
+                        4
+                    )
                 );
-                // test jslint's directive handling-behavior
-                source = (
-                    "/*jslint " +
-                    JSON
-                        .stringify(option_dict)
-                        .slice(1, -1)
-                        .replace((/"/g), "") +
-                    "*/\n" +
-                    source.replace((/^#!/), "//")
-                );
-                warnings = jslint(source).warnings;
-                assertOrThrow(
-                    warnings.length === warningsLength,
-                    `\n\n${source}\n\n${JSON.stringify(warnings, undefined, 4)}`
-                );
-            });
+                elemPrv = elemNow;
+                option_dict.beta = true;
+                for (const lint of [jslint.jslint, jslintCjs.jslint]) {
+                    // test jslint's option handling-behavior
+                    let warnings;
+                    warnings = lint(
+                        source,
+                        option_dict
+                    ).warnings;
+                    assertOrThrow(
+                        warnings.length === warningsLength,
+                        JSON.stringify([source, warnings], undefined, 4)
+                    );
+                    // test jslint's directive handling-behavior
+                    source = (
+                        "/*jslint " +
+                        JSON
+                            .stringify(option_dict)
+                            .slice(1, -1)
+                            .replace((/"/g), "") +
+                        "*/\n" +
+                        source.replace((/^#!/), "//")
+                    );
+                    warnings = lint(source).warnings;
+                    assertOrThrow(
+                        warnings.length === warningsLength,
+                        JSON.stringify([source, warnings], undefined, 4)
+                    );
+                }
+            }
         });
+    }
+});
+
+jstestDescribe((
+    "test jslint's report handling-behavior"
+), function testBehaviorJslintReport() {
+    jstestIt((
+        "test report-autofix handling-behavior"
+    ), function () {
+        let result;
+
+// The report's Autofix section SPEAKS ONLY AFTER THE BUTTON - index.html sets
+// <autofix> on the button's own lint-result, so a plain JSLint renders an
+// empty, default-coloured body. Blocked - a residual warning outside
+// jslint_autofix_warning_list - is the ONLY state that goes red, and a fixable
+// residual still reads as success.
+
+        function reportAutofix(source, autofix) {
+            let html = jslint.jslint_report({
+                ...jslint.jslint(source, {}),
+                autofix
+            });
+            return html.slice(
+                html.indexOf("<fieldset\n    class="),
+                html.indexOf("<fieldset id=\"JSLINT_REPORT_WARNINGS\"")
+            );
+        }
+
+        function reportAutofixExpect(klass, body) {
+            return (
+                "<fieldset\n    class=\"\n    " + klass + "\n    \"\n" +
+                "    id=\"JSLINT_REPORT_AUTOFIX\"\n>\n" +
+                "<legend>Report: Autofix</legend>\n" +
+                "<div class=\"center\">\n    " + body + "\n</div>\n" +
+                "</fieldset>\n"
+            );
+        }
+
+// A clean source autofixes to itself, and the click is STILL a success - an
+// empty body would read to the clicker as a missing success message.
+
+        result = reportAutofix((
+            "function aa(bb) {\n    return bb;\n}\naa();\n"
+        ), true);
+        assertOrThrow(
+            result === reportAutofixExpect("", "Autofix successful."),
+            result
+        );
+
+// A residual warning INSIDE the fixable set is not a blocker, so every
+// jslint_autofix_warning_list member must survive the <some> callback.
+
+        result = reportAutofix((
+            "function aa(bb) {\n    return String( bb);\n}\naa();\n"
+        ), true);
+        assertOrThrow(
+            result === reportAutofixExpect("", "Autofix successful."),
+            result
+        );
+
+// A residual too_long is not a blocker either - autofix fixes around it.
+
+        result = reportAutofix(String(`
+function aa(bb) {
+    return bb;
+}
+aa("${"a".repeat(80)}");
+        `).trim() + "\n", true);
+        assertOrThrow(
+            result === reportAutofixExpect("", "Autofix successful."),
+            result
+        );
+
+// A warning outside the set blocks, and the class is what paints it red.
+
+        result = reportAutofix("console.log(1);\n", true);
+        assertOrThrow(
+            result === reportAutofixExpect("blocked", (
+                "Autofix blocked. Fix non-whitespace warnings below."
+            )),
+            result
+        );
+
+// A plain JSLint is ALWAYS empty and default-coloured, even on a source that
+// WOULD block - <autofix> is undefined, so <some> never runs.
+
+        result = reportAutofix("console.log(1);\n", undefined);
+        assertOrThrow(result === reportAutofixExpect("", ""), result);
+    });
+    jstestIt((
+        "test report-function-detail handling-behavior"
+    ), function () {
+        let result;
+
+// This function will return the function details in the report of <source>,
+// each <dl> on its own line.
+
+        function reportFunction(source) {
+            const html = jslint.jslint_report(jslint.jslint(source, {}));
+            return html.slice(
+                html.indexOf("<div class=\"level level1\">"),
+                html.lastIndexOf("</div>\n</fieldset>")
+            ).replace((/<dl>/g), "\n<dl>");
+        }
+
+// PR-516 - Bugfix - The report's function details list block-scoped names and
+// catch-variables, and mark closure only across a function boundary.
+
+        result = reportFunction(String(`
+let ee = 0;
+function aa(gg) {
+    let bb = 0;
+    let ff = 0;
+    if (aa) {
+        let cc = 1;
+        aa(bb, cc, ee, gg);
+    }
+    try {
+        aa(String);
+    } catch (err) {
+        aa(function () {
+            return err;
+        });
+    }
+    return function () {
+        return ff;
+    };
+}
+aa();
+        `).trim() + "\n");
+        assertOrThrow(result === String(`
+<div class="level level1"><address>2: 1</address><dfn>aa(gg)</dfn>
+<dl><dt>parameter</dt><dd>gg</dd></dl>
+<dl><dt>variable</dt><dd>bb, cc, ff</dd></dl>
+<dl><dt>exception</dt><dd>err</dd></dl>
+<dl><dt>closure</dt><dd>err, ff</dd></dl>
+<dl><dt>global</dt><dd>String, aa, ee</dd></dl></div>
+<div class="level level2"><address>12: 12</address><dfn>«aa»()</dfn>
+<dl><dt>outer</dt><dd>err</dd></dl></div>
+<div class="level level2"><address>16: 12</address><dfn>«anonymous»()</dfn>
+<dl><dt>outer</dt><dd>ff</dd></dl></div>
+        `).trim() + "\n", result);
+
+// PR-516 - Bugfix - A named function expression's name is outer only in a
+// nested function, and a function lists an outer 'bb' even beside its own
+// block-scoped 'bb'.
+
+        result = reportFunction(String(`
+function aa() {
+    let bb = 0;
+    function cc() {
+        if (cc) {
+            cc(bb);
+        }
+        if (cc) {
+            let bb = 1;
+            cc(bb);
+        }
+    }
+    return function dd() {
+        return dd(cc, function () {
+            return dd;
+        });
+    };
+}
+aa();
+        `).trim() + "\n");
+        assertOrThrow(result === String(`
+<div class="level level1"><address>1: 1</address><dfn>aa()</dfn>
+<dl><dt>variable</dt><dd>bb, cc</dd></dl>
+<dl><dt>closure</dt><dd>bb, cc</dd></dl></div>
+<div class="level level2"><address>3: 5</address><dfn>cc()</dfn>
+<dl><dt>variable</dt><dd>bb</dd></dl>
+<dl><dt>outer</dt><dd>bb, cc</dd></dl></div>
+<div class="level level2"><address>12: 12</address><dfn>dd()</dfn>
+<dl><dt>outer</dt><dd>cc</dd></dl></div>
+<div class="level level3"><address>13: 23</address><dfn>«cc»()</dfn>
+<dl><dt>outer</dt><dd>dd</dd></dl></div>
+        `).trim() + "\n", result);
+    });
+    jstestIt((
+        "test report-function-name handling-behavior"
+    ), function () {
+
+// PR-516 - Bugfix - A method or accessor is named after its property, not
+// after the identifier before it.
+
+        assertJsonEqual(jslint.jslint(String(`
+/*jslint getset*/
+String({
+    aa() {
+        return;
+    },
+    get bb() {
+        return;
+    },
+    cc: 0,
+    dd() {
+        return;
+    }
+});
+        `).trim() + "\n").functions.map(function ({name}) {
+            return name;
+        }), ["aa", "get bb", "dd"]);
+
+// PR-516 - Bugfix - A function after a keyword is anonymous, except after
+// 'default', the name the spec gives it.
+
+        assertJsonEqual(jslint.jslint(String(`
+String(function () {
+    return function () {
+        return;
+    };
+}, typeof function () {
+    return;
+});
+export default function () {
+    return;
+}
+        `).trim() + "\n").functions.map(function ({name}) {
+            return name;
+        }), ["String", "anonymous", "anonymous", "default"]);
+
+// PR-516 - Bugfix - A keyword used as a property name still names a function.
+
+        assertJsonEqual(jslint.jslint(String(`
+const aa = {
+    delete: function () {
+        return;
+    }
+};
+aa.catch = function () {
+    return;
+};
+String(aa?.finally || function () {
+    return;
+});
+String(aa
+? null
+: function () {
+    return;
+});
+        `).trim() + "\n").functions.map(function ({name}) {
+            return name;
+        }), ["delete", "catch", "finally", "anonymous"]);
+    });
+    jstestIt((
+        "test report-function-signature handling-behavior"
+    ), function () {
+        const a38 = "a".repeat(38);
+
+// PR-516 - Bugfix - A signature keeps default values and drops comments, and a
+// multi-line destructure joins with no space inside its brackets. A default
+// value longer than 40 characters, or holding a megastring, shows as an
+// ellipsis, but a backtick inside a string or regexp does not count.
+
+        assertJsonEqual(jslint.jslint(String(`
+function aa(bb, cc = 1, ...dd) {
+    return [bb, cc, dd];
+}
+function ee({
+    ff,
+    gg = "" // Comment.
+}, hh) {
+    return [ff, gg, hh];
+}
+function ii(jj = function () {
+    return "a default value longer than forty characters";
+}, kk = [0, 1], ll = \`\${kk}\`) {
+    return [jj, kk, ll];
+}
+function mm(
+    nn /* Comment. */,
+    oo = [
+        1
+    ],
+    pp = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    qq = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    rr = [\`a\`, 1]
+) {
+    return [nn, oo, pp, qq, rr];
+}
+function ss(tt = "\`", uu = /\`/) {
+    return [tt, uu];
+}
+function vv(ww = (xx = 1) => "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") {
+    return ww;
+}
+        `).trim() + "\n").functions.map(function ({signature}) {
+            return signature;
+        }), [
+            "(bb, cc = 1, ...dd)",
+            "({ff, gg = \"\"}, hh)",
+            "(jj = \u2026, kk = [0, 1], ll = \u2026)",
+            "()",
+            `(nn, oo = [1], pp = "${a38}", qq = \u2026, rr = \u2026)`,
+            "(tt = \"`\", uu = /`/)",
+            "(ww = \u2026)",
+            "(xx = 1)"
+        ]);
+
+// A parse that stops inside a parameter list leaves the signature '('.
+
+        assertJsonEqual(jslint.jslint(
+            "function aa(bb, 0) {}\n"
+        ).functions.map(function ({signature}) {
+            return signature;
+        }), ["("]);
     });
 });
 
@@ -2503,7 +2443,110 @@ jstestDescribe((
     "test jslint's warnings handling-behavior"
 ), function testBehaviorJslintWarnings() {
     jstestIt((
-        "test jslint's warning handling-behavior"
+        "test binding-power handling-behavior"
+    ), function () {
+
+// PR-514 - Bugfix - Binding-powers follow the spec's grammar, as tabled in
+// MDN Operator precedence. Each source returns the expression beside the
+// parameters, so none is unused, and lists the warning codes it must raise.
+
+        for (const [expression, expect] of [
+            ["(-aa) ** 2", []],
+            ["-aa ** 2", ["wrap_subexpression_a_b"]],
+            ["-aa++", ["unexpected_a"]],
+            ["[aa] ** 2", []],
+            ["aa ** -2", []],
+            ["aa ?? (bb || cc)", []],
+            ["aa ?? bb && cc", ["wrap_subexpression_a_b"]],
+            ["aa ?? bb ?? cc", []],
+            ["aa || bb ?? cc", ["wrap_subexpression_a_b"]],
+            ["typeof aa ** 2", ["wrap_subexpression_a_b"]]
+        ]) {
+            const result = jslint.jslint(String(`
+function ff(aa, bb, cc) {
+    return [aa, bb, cc, ${expression}];
+}
+ff();
+            `).trim() + "\n");
+            assertJsonEqual(result.warnings.map(function ({code}) {
+                return code;
+            }), expect, expression);
+        }
+
+// PR-514 - Bugfix - The operand of 'void' is parsed at rbp 150, like every
+// unary operator, so 'void 0 + 0' is '(void 0) + 0'.
+
+        assertOrThrow(
+            jslint.jslint("String(void 0 + 0);\n").tokens.find(function ({
+                id
+            }) {
+                return id === "+";
+            }).expression[0].id === "void",
+            "void 0 + 0"
+        );
+
+// PR-514 - Bugfix - A relational right side of a for-loop-head 'of' or 'in'
+// does not warn on the head's own 'of' or 'in'.
+
+        for (const [operator, expect] of [
+            ["in", ["expected_a_b", "expected_a"]],
+            ["of", ["expected_a"]]
+        ]) {
+            assertJsonEqual(jslint.jslint(String(`
+function ff(aa, bb) {
+    for (aa ${operator} bb < aa) {
+        bb();
+    }
+}
+ff();
+            `).trim() + "\n").warnings.map(function ({code}) {
+                return code;
+            }), expect, operator);
+        }
+
+// PR-514 - A 'for in' suggests 'for...of Object.keys', not 'Object.keys'.
+
+        assertJsonEqual(jslint.jslint(String(`
+function ff(aa) {
+    for (const bb in aa) {
+        aa(bb);
+    }
+}
+ff();
+        `).trim() + "\n").warnings.map(function ({message}) {
+            return message;
+        }), ["Expected 'for...of Object.keys' and instead saw 'for in'."]);
+
+// PR-514 - Bugfix - '**=' is one assignment token, '**' takes a space on each
+// side like '*', and a line break before a postfix '++' ends the expression.
+
+        for (const [source, expect] of [
+            ["let aa = 2;\naa **= 2;\n", []],
+            [
+                "let aa = 2;\naa = aa**2;\n",
+                ["expected_space_a_b", "expected_space_a_b"]
+            ],
+            [
+                "let aa = 0;\nlet bb = 0;\naa\n++bb;\n",
+                [
+                    "unexpected_expression_a",
+                    "expected_a_after_b",
+                    "unexpected_expression_a"
+                ]
+            ]
+        ]) {
+            assertJsonEqual(jslint.jslint(source).warnings.map(function ({
+                code
+            }) {
+                return code;
+            }), expect, source);
+        }
+        assertJsonEqual(jslint.jslint("let aa = 2;\naa = aa**2;\n", {
+            autofix: true
+        }).autofixed, "let aa = 2;\naa = aa ** 2;\n");
+    });
+    jstestIt((
+        "test warning-test-cause handling-behavior"
     ), function () {
 
 // this function will validate each jslint <warning> is raised with given
@@ -2906,7 +2949,7 @@ jstestDescribe((
     "test jstestXxx handling-behavior"
 ), function testBehaviorJstestXxx() {
     jstestIt((
-        "test jstestDescribe error handling-behavior"
+        "test jstestIt-mode-pass handling-behavior"
     ), function () {
         throw new Error();
     }, "pass");
@@ -2915,37 +2958,30 @@ jstestDescribe((
     ), function () {
         jstestOnExit(undefined, "testsFailed");
     });
-});
-
-jstestDescribe((
-    "test misc handling-behavior"
-), function testBehaviorMisc() {
     jstestIt((
-        "test misc handling-behavior"
-    ), async function () {
-        // test debugInline handling-behavior
-        noop(debugInline);
-        // test assertErrorThrownAsync error handling-behavior
-        await assertErrorThrownAsync(function () {
-            return assertErrorThrownAsync(noop);
-        });
-        // test assertJsonEqual error handling-behavior
-        await assertErrorThrownAsync(function () {
-            assertJsonEqual(1, 2);
-        });
-        await assertErrorThrownAsync(function () {
-            assertJsonEqual(1, 2, "undefined");
-        });
-        await assertErrorThrownAsync(function () {
-            assertJsonEqual(1, 2, {});
-        });
-        // test assertOrThrow error handling-behavior
-        await assertErrorThrownAsync(function () {
-            assertOrThrow(undefined, "undefined");
-        });
-        await assertErrorThrownAsync(function () {
-            assertOrThrow(undefined, new Error());
-        });
+        "test jstestOrderCheck handling-behavior"
+    ), function () {
+
+// A sorted list returns nothing. An unsorted pair or a duplicate returns one
+// failed result, for the first bad pair only.
+
+        assertJsonEqual([
+            ["", "aa", "bb"],
+            ["aa", "cc", "bb", "aa"],
+            ["aa", "aa"]
+        ].map(function (descriptionList) {
+            const failure = jstestOrderCheck(descriptionList);
+            return failure && [failure[0].message, failure[1]];
+        }), [
+            undefined,
+            [
+                "\"bb\" must sort before \"cc\"",
+                "jstestDescribe and jstestIt descriptions in ASCII order"
+            ], [
+                "duplicate description \"aa\"",
+                "jstestDescribe and jstestIt descriptions in ASCII order"
+            ]
+        ]);
     });
 });
 
@@ -2976,14 +3012,139 @@ jstestDescribe((
         }
     ]);
     jstestIt((
-        "accepts empty arrays for `v8CoverageListMerge`"
+        "test merge-empty-list handling-behavior"
     ), function () {
         assertJsonEqual(v8CoverageListMerge([]), {
             result: []
         });
     });
+    [
+        "test_coverage_merge_is_block_coverage_test.json",
+        "test_coverage_merge_issue_2_mixed_is_block_coverage_test.json",
+        "test_coverage_merge_node_10_internal_errors_one_of_test.json",
+        "test_coverage_merge_reduced_test.json",
+        "test_coverage_merge_simple_test.json",
+        "test_coverage_merge_various_test.json"
+    ].forEach(function (file) {
+        jstestIt(`test merge-fixture-${file} handling-behavior`, function () {
+            file = testCoverageMergeData[file];
+            file.forEach(function ({
+                expected,
+                inputs
+            }) {
+                assertJsonEqual(v8CoverageListMerge(inputs), expected);
+            });
+        });
+    });
     jstestIt((
-        "funcCovs.length === 1"
+        "test merge-node-sqlite-files handling-behavior"
+    ), function () {
+        let data1 = [
+            "test_v8_coverage_node_sqlite_9884_1633662346346_0.json",
+            "test_v8_coverage_node_sqlite_13216_1633662333140_0.json"
+        ].map(function (file) {
+            return testCoverageMergeData[file];
+        });
+        let data2 = testCoverageMergeData[
+            "test_v8_coverage_node_sqlite_merged.json"
+        ];
+        data1 = v8CoverageListMerge(data1);
+        data1 = v8CoverageListMerge([data1]);
+
+// Debug data1.
+// await moduleFs.promises.writeFile(
+//     ".test_v8_coverage_node_sqlite_merged.json",
+//     JSON.stringify(objectDeepCopyWithKeysSorted(data1), undefined, 4) + "\n"
+// );
+
+        assertJsonEqual(data1, data2);
+    });
+    jstestIt((
+        "test merge-one-list handling-behavior"
+    ), function () {
+        assertJsonEqual(v8CoverageListMerge([
+            {
+                result: [
+                    {
+                        functions: JSON.parse(functionsInput),
+                        moduleUrl: "/lib.js",
+                        scriptId: "123"
+                    }
+                ]
+            }
+        ]), {
+            result: [
+                {
+                    functions: [
+                        {
+                            functionName: "test",
+                            isBlockCoverage: true,
+                            ranges: [
+                                {
+                                    count: 2,
+                                    endOffset: 4,
+                                    startOffset: 0
+                                },
+                                {
+                                    count: 1,
+                                    endOffset: 3,
+                                    startOffset: 1
+                                }
+                            ]
+                        }
+                    ],
+                    moduleUrl: "/lib.js",
+                    scriptId: "0"
+                }
+            ]
+        });
+    });
+    jstestIt((
+        "test merge-two-identical-lists handling-behavior"
+    ), function () {
+        assertJsonEqual(v8CoverageListMerge([
+            {
+                result: [
+                    {
+                        functions: JSON.parse(functionsInput),
+                        scriptId: "123",
+                        url: "/lib.js"
+                    }, {
+                        functions: JSON.parse(functionsInput),
+                        scriptId: "123",
+                        url: "/lib.js"
+                    }
+                ]
+            }
+        ]), {
+            result: [
+                {
+                    functions: [
+                        {
+                            functionName: "test",
+                            isBlockCoverage: true,
+                            ranges: [
+                                {
+                                    count: 4,
+                                    endOffset: 4,
+                                    startOffset: 0
+                                },
+                                {
+                                    count: 2,
+                                    endOffset: 3,
+                                    startOffset: 1
+                                }
+                            ]
+                        }
+                    ],
+                    scriptId: "0",
+                    url: "/lib.js"
+                }
+            ]
+        });
+    });
+    jstestIt((
+        "test merge-unshared-function handling-behavior"
     ), function () {
         assertJsonEqual(v8CoverageListMerge([
             {
@@ -3037,220 +3198,11 @@ jstestDescribe((
             ]
         });
     });
-    jstestIt((
-        "accepts arrays with a single item for `v8CoverageListMerge`"
-    ), function () {
-        assertJsonEqual(v8CoverageListMerge([
-            {
-                result: [
-                    {
-                        functions: JSON.parse(functionsInput),
-                        moduleUrl: "/lib.js",
-                        scriptId: "123"
-                    }
-                ]
-            }
-        ]), {
-            result: [
-                {
-                    functions: [
-                        {
-                            functionName: "test",
-                            isBlockCoverage: true,
-                            ranges: [
-                                {
-                                    count: 2,
-                                    endOffset: 4,
-                                    startOffset: 0
-                                },
-                                {
-                                    count: 1,
-                                    endOffset: 3,
-                                    startOffset: 1
-                                }
-                            ]
-                        }
-                    ],
-                    moduleUrl: "/lib.js",
-                    scriptId: "0"
-                }
-            ]
-        });
-    });
-    jstestIt((
-        "accepts arrays with two identical items for" +
-        " `v8CoverageListMerge`"
-    ), function () {
-        assertJsonEqual(v8CoverageListMerge([
-            {
-                result: [
-                    {
-                        functions: JSON.parse(functionsInput),
-                        scriptId: "123",
-                        url: "/lib.js"
-                    }, {
-                        functions: JSON.parse(functionsInput),
-                        scriptId: "123",
-                        url: "/lib.js"
-                    }
-                ]
-            }
-        ]), {
-            result: [
-                {
-                    functions: [
-                        {
-                            functionName: "test",
-                            isBlockCoverage: true,
-                            ranges: [
-                                {
-                                    count: 4,
-                                    endOffset: 4,
-                                    startOffset: 0
-                                },
-                                {
-                                    count: 2,
-                                    endOffset: 3,
-                                    startOffset: 1
-                                }
-                            ]
-                        }
-                    ],
-                    scriptId: "0",
-                    url: "/lib.js"
-                }
-            ]
-        });
-    });
-    [
-        "test_coverage_merge_is_block_coverage_test.json",
-        "test_coverage_merge_issue_2_mixed_is_block_coverage_test.json",
-        "test_coverage_merge_node_10_internal_errors_one_of_test.json",
-        "test_coverage_merge_reduced_test.json",
-        "test_coverage_merge_simple_test.json",
-        "test_coverage_merge_various_test.json"
-    ].forEach(function (file) {
-        jstestIt(file, function () {
-            file = testCoverageMergeData[file];
-            file.forEach(function ({
-                expected,
-                inputs
-            }) {
-                assertJsonEqual(v8CoverageListMerge(inputs), expected);
-            });
-        });
-    });
-    jstestIt((
-        "merge multiple node-sqlite coverage files"
-    ), function () {
-        let data1 = [
-            "test_v8_coverage_node_sqlite_9884_1633662346346_0.json",
-            "test_v8_coverage_node_sqlite_13216_1633662333140_0.json"
-        ].map(function (file) {
-            return testCoverageMergeData[file];
-        });
-        let data2 = testCoverageMergeData[
-            "test_v8_coverage_node_sqlite_merged.json"
-        ];
-        data1 = v8CoverageListMerge(data1);
-        data1 = v8CoverageListMerge([data1]);
-
-// Debug data1.
-// await moduleFs.promises.writeFile(
-//     ".test_v8_coverage_node_sqlite_merged.json",
-//     JSON.stringify(objectDeepCopyWithKeysSorted(data1), undefined, 4) + "\n"
-// );
-
-        assertJsonEqual(data1, data2);
-    });
 });
 
 jstestDescribe((
     "test v8CoverageReportCreate handling-behavior"
 ), function testBehaviorV8CoverageReportCreate() {
-    jstestIt((
-        "test null-case handling-behavior"
-    ), async function () {
-        await assertErrorThrownAsync(function () {
-            return v8CoverageReportCreate({});
-        }, "invalid coverageDir");
-    });
-    jstestIt((
-        "test coverage-report jslint.mjs handling-behavior"
-    ), async function () {
-        // test remove-old-coverage handling-behavior
-        await fsWriteFileWithParents(
-            ".tmp/coverage_jslint/coverage-0-0-0.json",
-            ""
-        );
-        await jslint.jslint_cli({
-            console_error: noop, // comment to debug
-            mode_cli: true,
-            process_argv: [
-                "node", "jslint.mjs",
-                "v8_coverage_report=.tmp/coverage_jslint",
-                "--exclude=aa.js",
-                "--include-node-modules=1",
-                "--include=jslint.mjs",
-                "node", "jslint.mjs"
-            ]
-        });
-    });
-    [
-        [
-            "v8CoverageReportCreate_high.js", (
-                "switch(0){\n" +
-                "case 0:break;\n" +
-                "}\n"
-            )
-        ], [
-            "v8CoverageReportCreate_ignore.js", (
-                "/*coverage-ignore-file*/\n" +
-                "switch(0){\n" +
-                "case 0:break;\n" +
-                "case 1:break;//coverage-ignore-line\n" +
-                "/*coverage-disable*/\n" +
-                "case 2:break;\n" +
-                "/*coverage-enable*/\n" +
-                "}\n"
-            )
-        ], [
-            "v8CoverageReportCreate_low.js", (
-                "switch(0){\n" +
-                "case 1:break;\n" +
-                "case 2:break;\n" +
-                "case 3:break;\n" +
-                "case 4:break;\n" +
-                "}\n"
-            )
-        ], [
-            "v8CoverageReportCreate_medium.js", (
-                "switch(0){\n" +
-                "case 0:break;\n" +
-                "case 1:break;\n" +
-                "case 2:break;\n" +
-                "}\n"
-            )
-        ]
-    ].forEach(function ([
-        file, data
-    ], ii) {
-        jstestIt(file, async function () {
-            let dir = ".tmp/coverage_" + ii + "/";
-            file = dir + file;
-            await fsWriteFileWithParents(file, data);
-            await jslint.jslint_cli({
-                console_error: noop, // comment to debug
-                mode_cli: true,
-                process_argv: [
-                    "node", "jslint.mjs",
-                    "v8_coverage_report=" + dir,
-                    "node",
-                    file
-                ]
-            });
-        });
-    });
     jstestIt((
         "test coverage-hole-closing-midline handling-behavior"
     ), async function () {
@@ -3308,15 +3260,23 @@ jstestDescribe((
         }
     });
     jstestIt((
-        "test npm handling-behavior"
+        "test coverage-report-jslint-mjs handling-behavior"
     ), async function () {
+        // test remove-old-coverage handling-behavior
+        await fsWriteFileWithParents(
+            ".tmp/coverage_jslint/coverage-0-0-0.json",
+            ""
+        );
         await jslint.jslint_cli({
             console_error: noop, // comment to debug
             mode_cli: true,
             process_argv: [
                 "node", "jslint.mjs",
-                "v8_coverage_report=.tmp/coverage_npm",
-                "npm", "--version"
+                "v8_coverage_report=.tmp/coverage_jslint",
+                "--exclude=aa.js",
+                "--include-node-modules=1",
+                "--include=jslint.mjs",
+                "node", "jslint.mjs"
             ]
         });
     });
@@ -3384,6 +3344,81 @@ jstestDescribe((
                 "v8_coverage_report=.tmp/coverage_misc"
                 // "node", ".tmp/coverage_misc/aa.js"
             ]
+        });
+    });
+    jstestIt((
+        "test npm handling-behavior"
+    ), async function () {
+        await jslint.jslint_cli({
+            console_error: noop, // comment to debug
+            mode_cli: true,
+            process_argv: [
+                "node", "jslint.mjs",
+                "v8_coverage_report=.tmp/coverage_npm",
+                "npm", "--version"
+            ]
+        });
+    });
+    jstestIt((
+        "test null-case handling-behavior"
+    ), async function () {
+        await assertErrorThrownAsync(function () {
+            return v8CoverageReportCreate({});
+        }, "invalid coverageDir");
+    });
+    [
+        [
+            "v8CoverageReportCreate_high.js", (
+                "switch(0){\n" +
+                "case 0:break;\n" +
+                "}\n"
+            )
+        ], [
+            "v8CoverageReportCreate_ignore.js", (
+                "/*coverage-ignore-file*/\n" +
+                "switch(0){\n" +
+                "case 0:break;\n" +
+                "case 1:break;//coverage-ignore-line\n" +
+                "/*coverage-disable*/\n" +
+                "case 2:break;\n" +
+                "/*coverage-enable*/\n" +
+                "}\n"
+            )
+        ], [
+            "v8CoverageReportCreate_low.js", (
+                "switch(0){\n" +
+                "case 1:break;\n" +
+                "case 2:break;\n" +
+                "case 3:break;\n" +
+                "case 4:break;\n" +
+                "}\n"
+            )
+        ], [
+            "v8CoverageReportCreate_medium.js", (
+                "switch(0){\n" +
+                "case 0:break;\n" +
+                "case 1:break;\n" +
+                "case 2:break;\n" +
+                "}\n"
+            )
+        ]
+    ].forEach(function ([
+        file, data
+    ], ii) {
+        jstestIt(file, async function () {
+            let dir = ".tmp/coverage_" + ii + "/";
+            file = dir + file;
+            await fsWriteFileWithParents(file, data);
+            await jslint.jslint_cli({
+                console_error: noop, // comment to debug
+                mode_cli: true,
+                process_argv: [
+                    "node", "jslint.mjs",
+                    "v8_coverage_report=" + dir,
+                    "node",
+                    file
+                ]
+            });
         });
     });
 });

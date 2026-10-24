@@ -239,7 +239,7 @@
     textLength="768"
     x="10"
     y="868"
->(node:3891) [DEP0176] DeprecationWarning: fs.R_OK is deprecated, use fs.constants.R_OK instead   </tspan>
+>(node:3659) [DEP0176] DeprecationWarning: fs.R_OK is deprecated, use fs.constants.R_OK instead   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -257,7 +257,7 @@
     textLength="768"
     x="10"
     y="934"
->up to date, audited 487 packages in 3s                                                           </tspan>
+>up to date, audited 487 packages in 2s                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -287,7 +287,7 @@
     textLength="768"
     x="10"
     y="1044"
->29 vulnerabilities (1 low, 4 moderate, 21 high, 3 critical)                                      </tspan>
+>27 vulnerabilities (1 low, 4 moderate, 19 high, 3 critical)                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"

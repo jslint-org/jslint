@@ -2,7 +2,6 @@
 
 # Todo
 - jslint-cli - Lint every file argument, as 'node jslint.mjs aa.mjs bb.mjs' now lints 'aa.mjs' and silently skips 'bb.mjs'.
-- jslint - Add warning for jstestIt() descriptions not in ASCII order within each jstestDescribe().
 - jslint - Destructuring - Allow a default on a destructured parameter 'function aa({bb} = {})', valid ES2015 but a stop now.
 - jslint - Allow a quoted accessor-name 'get "aa"() {}', valid ES2015 but a stop now.
 - jslint - Destructuring - Allow catch-variable 'catch ({aa})', valid ES2015 but a stop now.
@@ -18,6 +17,7 @@
 - jslint - Add html and css linting back into jslint.
 
 # v2026.10.30
+- jstest - Fail any describe or jstestIt name not in ASCII order.
 - jslint - Report: Functions - Copy each signature from its source text, keeping default values.
 - jslint - Report: Functions - List block-scoped names, catch-variables and outer names, and mark closure only across functions.
 
