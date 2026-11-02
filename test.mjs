@@ -15,8 +15,6 @@ let {
     globExclude,
     jstestDescribe,
     jstestIt,
-    jstestOrderCheck,
-    jstestReport,
     moduleFsInit,
     noop,
     v8CoverageListMerge,
@@ -123,7 +121,7 @@ function processExit1(exitCode) {
 
 jstestDescribe((
     "test assertXxx handling-behavior"
-), function testBehaviorAssertXxx() {
+), function () {
     jstestIt((
         "test assertXxx-error handling-behavior"
     ), async function () {
@@ -155,7 +153,7 @@ jstestDescribe((
 
 jstestDescribe((
     "test fsXxx handling-behavior"
-), function testBehaviorFsXxx() {
+), function () {
     jstestIt((
         "test fsWriteFileWithParents handling-behavior"
     ), async function () {
@@ -179,7 +177,7 @@ jstestDescribe((
 
 jstestDescribe((
     "test globXxx handling-behavior"
-), function testBehaviorGlobXxx() {
+), function () {
     jstestIt((
         "test globAssertNotWeird-error handling-behavior"
     ), async function () {
@@ -500,7 +498,7 @@ jstestDescribe((
 
 jstestDescribe((
     "test jslint's autofix handling-behavior"
-), function testBehaviorJslintAutofix() {
+), function () {
     jstestIt((
         "test autofix-api handling-behavior"
     ), function () {
@@ -1090,7 +1088,7 @@ aa(dd(0), 0);
 
 jstestDescribe((
     "test jslint's cli handling-behavior"
-), function testBehaviorJslintCli() {
+), function () {
     jstestIt((
         "test cli-apidoc handling-behavior"
     ), function () {
@@ -1408,7 +1406,7 @@ jstestDescribe((
 
 jstestDescribe((
     "test jslint's no-warnings handling-behavior"
-), function testBehaviorJslintNoWarnings() {
+), function () {
     jstestIt((
         "test jslint's no-warnings handling-behavior"
     ), function () {
@@ -2058,7 +2056,7 @@ aa();
 
 jstestDescribe((
     "test jslint's option handling-behavior"
-), function testBehaviorJslintOption() {
+), function () {
 
 // Samples group by option, so each option is one test with a unique name.
 
@@ -2195,7 +2193,7 @@ function aa() {
 
 jstestDescribe((
     "test jslint's report handling-behavior"
-), function testBehaviorJslintReport() {
+), function () {
     jstestIt((
         "test report-autofix handling-behavior"
     ), function () {
@@ -2503,7 +2501,7 @@ function vv(ww = (xx = 1) => "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa") {
 
 jstestDescribe((
     "test jslint's warnings handling-behavior"
-), function testBehaviorJslintWarnings() {
+), function () {
     jstestIt((
         "test binding-power handling-behavior"
     ), function () {
@@ -2618,8 +2616,12 @@ ff();
 // up the stack, and that each raise site in jslint.mjs has a fixture.
 
         const controlList = [];
+        const fixtureLineList = [];
         const fixtureList = [];
         const raiserList = ["stop", "stop_at", "warn", "warn_at"];
+        const rgxFixtureLine = (
+            /^\/\/ (?!\/\/).*, \d+\](?: \/\/jslint-ignore-line)?$/gm
+        );
         const rgxFrame = (
             /^ {4}at (?:(?:Object\.)?([\w.]+).*? \()?.*?jslint\.mjs:(\d+):/gm
         );
@@ -2633,10 +2635,7 @@ ff();
                 sourceJslintMjs.slice(0, anchor).match(/\n/g).length + 1
             );
             const [source, fn, code, aa, column] = cause;
-            const {warnings} = jslint.jslint(source, {
-                beta: true,
-                trace: true
-            });
+            const warnings = jslintTrace(source);
 
 // List each warning with its frames in jslint.mjs, by the stack that option
 // trace records, as [name, line] innermost first, and the frames above the
@@ -2725,11 +2724,22 @@ ff();
                 via: code === "(live)" || warningsVia.length > 0
             });
         }
+        function jslintTrace(source) {
 
-// Keep every frame, since a fixture filed up the stack can sit past V8's
-// default of 10.
+// This function will lint <source> with option trace, keeping every frame,
+// since a fixture filed up the stack can sit past V8's default of 10. Restore
+// the limit even if jslint throws, so no other test inherits it.
 
-        Error.stackTraceLimit = Infinity;
+            Error.stackTraceLimit = Infinity;
+            try {
+                return jslint.jslint(source, {
+                    beta: true,
+                    trace: true
+                }).warnings;
+            } finally {
+                Error.stackTraceLimit = stackTraceLimit;
+            }
+        }
 
         sourceJslintMjs.replace((
             /(\n\s*?\/\/\s*?test_cause:\s*?)(\S[\S\s]*?\S)(\n\n\s*?) *?\S/g
@@ -2741,6 +2751,7 @@ ff();
             assertOrThrow(header === "\n\n// test_cause:\n", match0);
             // Validate footer.
             assertOrThrow(footer === "\n\n", match0);
+            fixtureLineList.push(...match0.match(rgxFixtureLine));
             // Validate causeList.
             causeList = causeList.replace((
                 /^\/\/ /gm
@@ -2784,12 +2795,19 @@ ff();
         });
 
 // Validate each fixture's last line was parsed in a block, so a misspelled
-// header fails, instead of hiding its block. Commented-out code keeps its
+// header fails, naming the lines it hid, instead of hiding its block. The
+// count catches a line that two blocks share. Commented-out code keeps its
 // blocks as '// // test_cause:', unchecked.
 
-        assertJsonEqual(sourceJslintMjs.match(
-            /^\/\/ (?!\/\/).*, \d+\](?: \/\/jslint-ignore-line)?$/gm
-        ).length, fixtureList.length);
+        assertJsonEqual(sourceJslintMjs.match(rgxFixtureLine).filter(
+            function (line) {
+                return !fixtureLineList.includes(line);
+            }
+        ), []);
+        assertJsonEqual(
+            sourceJslintMjs.match(rgxFixtureLine).length,
+            fixtureLineList.length
+        );
 
 // Negative controls: each bad fixture, filed in the block of a good one, must
 // fail exactly the named check, so a weakened checker turns this test red.
@@ -2884,7 +2902,6 @@ ff();
             fixturePush(controlList, bad, found.anchor);
             controlList.at(-1).expect = expect;
         }
-        Error.stackTraceLimit = stackTraceLimit;
 
 // Measure each fixture's coverage in a child, since taking precise coverage
 // resets the counters that NODE_V8_COVERAGE dumps at exit.
@@ -2960,12 +2977,10 @@ process.stdout.write(JSON.stringify(resultList));
                     raiseDict[raise?.[1]] = true;
 
 // A fixture filed up the stack pairs the function holding its block with the
-// one that raised it; count the fixtures of each pair.
+// one that raised it.
 
                     if (name !== fn) {
-                        hostDict[name + " <- " + fn] = (
-                            hostDict[name + " <- " + fn] || 0
-                        ) + 1;
+                        hostDict[name + " <- " + fn] = true;
                     }
                 }
                 check = {
@@ -3001,26 +3016,27 @@ process.stdout.write(JSON.stringify(resultList));
                 return String(fail) !== String(expect);
             }), []);
 
-// Validate the roster of fixtures filed up the stack, as "host <- raiser" with
-// its fixture count, so one moved down to its raise site, or filed far up the
-// stack, fails. A rename of either function shows as one pair missing and one
-// extra, with the same count.
+// Validate the roster of fixtures filed up the stack, as "host <- raiser"
+// pairs, so each new pair is a reviewed decision and a filing far up the stack
+// fails, which <via> alone accepts from any frame. A rename of either function
+// shows as one pair missing and one extra. No counts: a fixture added or moved
+// within a known pair is not a review.
 
-            assertJsonEqual(Object.entries(hostDict).sort(), [
-                ["infix_dot <- check_left", 6],
-                ["infix_grave <- check_left", 1],
-                ["infix_lbracket <- check_left", 1],
-                ["infix_lparen <- check_left", 2],
-                ["jslint_phase3_parse <- check_ordered", 3],
-                ["post_s_var <- name_lookup", 4],
-                ["prefix_destructure <- check_ordered", 2],
-                ["prefix_destructure <- name_parse", 1],
-                ["prefix_function <- check_ordered", 1],
-                ["prefix_lbrace <- check_ordered", 1],
-                ["stmt_export <- check_ordered", 1],
-                ["stmt_export <- semicolon", 1],
-                ["stmt_switch <- check_ordered_case", 10],
-                ["whitage_default <- one_space_only", 1]
+            assertJsonEqual(Object.keys(hostDict).sort(), [
+                "infix_dot <- check_left",
+                "infix_grave <- check_left",
+                "infix_lbracket <- check_left",
+                "infix_lparen <- check_left",
+                "jslint_phase3_parse <- check_ordered",
+                "post_s_var <- name_lookup",
+                "prefix_destructure <- check_ordered",
+                "prefix_destructure <- name_parse",
+                "prefix_function <- check_ordered",
+                "prefix_lbrace <- check_ordered",
+                "stmt_export <- check_ordered",
+                "stmt_export <- semicolon",
+                "stmt_switch <- check_ordered_case",
+                "whitage_default <- one_space_only"
             ]);
 
 // Validate each raise site in jslint.mjs raises the warning of some fixture,
@@ -3046,7 +3062,7 @@ process.stdout.write(JSON.stringify(resultList));
 
 jstestDescribe((
     "test jslint_wrapper_vscode handling-behavior"
-), function testBehaviorJslintWrapperVscode() {
+), function () {
     jstestIt((
         "test jslint_wrapper_vscode commands handling-behavior"
     ), async function () {
@@ -3371,20 +3387,36 @@ ${sourceWrapper}
 
 jstestDescribe((
     "test jstestXxx handling-behavior"
-), function testBehaviorJstestXxx() {
+), function () {
+    jstestIt((
+        "test jstestDescribe-body-hang handling-behavior"
+    ), async function () {
+
+// An async body that hangs before registering any test fails at exit as a
+// pending body, instead of passing with 0 tests. With nothing alive, the hang
+// exits at once.
+
+        const [exitCode, stderr] = await childRun({}, String(`
+jslint.jstestDescribe("aa", async function () {
+    await new Promise(jslint.noop);
+    jslint.jstestIt("bb", jslint.noop);
+});
+        `));
+        assertJsonEqual(exitCode, 1);
+        assertMatch(stderr, /1\. test it pending - aa - jstestDescribe body\n {2}tests total {2}- 1\n {2}tests failed - 1\n/);
+    });
     jstestIt((
         "test jstestDescribe-body-throw handling-behavior"
     ), async function () {
 
-// A describe body that throws fails as one more test, after the tests it did
-// register; an invalid filter regexp throws from that body too. A falsy throw
-// fails the same, and a hung sibling cannot hide the body's error at exit.
+// A describe body that throws crashes node, and the exit report lists the body
+// and the tests it did register as pending; an invalid filter regexp throws
+// from that body too. A falsy throw fails the same.
 
         const [
             [exitCode, stderr],
             [exitCode2, stderr2],
-            [exitCode3, stderr3],
-            [exitCode4, stderr4]
+            [exitCode3, stderr3]
         ] = await Promise.all([
             childRun({}, String(`
 jslint.jstestDescribe("aa", function () {
@@ -3404,27 +3436,12 @@ jslint.jstestDescribe("aa", function () {
     jslint.jstestIt("bb", jslint.noop);
     throw undefined;
 });
-            `)),
-            childRun({}, String(`
-jslint.jstestDescribe("aa", function () {
-    jslint.jstestIt("bb", function () {
-        setTimeout(process.exit, 100);
-        return new Promise(jslint.noop);
-    });
-    throw new Error("aa body broke");
-});
             `))
         ]);
-        assertJsonEqual(
-            [exitCode, exitCode2, exitCode3, exitCode4],
-            [1, 1, 1, 2]
-        );
-        assertMatch(stderr, /1\. test it - bb\b[\s\S]*2\. test it - jstestDescribe body\nError: aa body broke\n[\s\S]*tests total {2}- 2\n {2}tests failed - 1\n/);
-        assertOrThrow(stderr2.includes(
-            "test it - jstestDescribe body\nSyntaxError: Invalid regular"
-        ), stderr2);
-        assertMatch(stderr3, /2\. test it - jstestDescribe body\nundefined\b[\s\S]*tests failed - 1\n/);
-        assertMatch(stderr4, /test it pending - aa - bb\n[\s\S]*test it failed - aa - jstestDescribe body\nError: aa body broke\n/);
+        assertJsonEqual([exitCode, exitCode2, exitCode3], [1, 1, 1]);
+        assertMatch(stderr, /1\. test it pending - aa - jstestDescribe body\n[\s\S]*2\. test it pending - aa - bb\n[\s\S]*tests failed - 2\n[\s\S]*Error: aa body broke\b/);
+        assertMatch(stderr2, /1\. test it pending - aa - jstestDescribe body\n[\s\S]*SyntaxError: Invalid regular/);
+        assertMatch(stderr3, /1\. test it pending - aa - jstestDescribe body\n[\s\S]*tests failed - 2\n[\s\S]*ERR_UNHANDLED_REJECTION/);
     });
     jstestIt((
         "test jstestDescribe-concurrent handling-behavior"
@@ -3466,7 +3483,8 @@ jslint.jstestDescribe("aa", function () {
     jslint.jstestIt("dd", jslint.noop);
 });
         `));
-        assertJsonEqual(exitCode, 2);
+        assertJsonEqual(exitCode, 1);
+        assertMatch(stderr, /tests failed - 2\n/);
         assertOrThrow(stderr.includes(
             "\"aa\" must sort before \"bb\""
         ), stderr);
@@ -3477,6 +3495,34 @@ jslint.jstestDescribe("aa", function () {
 // A failure its describe printed is not listed again at exit.
 
         assertOrThrow(!stderr.includes("test it failed"), stderr);
+    });
+    jstestIt((
+        "test jstestDescribe-order-edge handling-behavior"
+    ), async function () {
+
+// Only a describe's first bad pair fails. A duplicate fails, and so does a
+// non-string name, since '>=' would be false for it and let it pass.
+
+        const resultList = await Promise.all([
+            ["aa", "cc", "bb", "aa"],
+            ["aa", "aa"],
+            [undefined, "bb"]
+        ].map(function (descriptionList) {
+            return childRun({}, String(`
+jslint.jstestDescribe("aa", function () {
+    for (const description of ${JSON.stringify(descriptionList)}) {
+        jslint.jstestIt(description ?? undefined, jslint.noop);
+    }
+});
+            `));
+        }));
+        assertJsonEqual(resultList.map(function ([exitCode, stderr]) {
+            return [exitCode, stderr.match(/\S+ must sort before .*|duplicate description .*/g)];
+        }), [
+            [1, ["\"bb\" must sort before \"cc\""]],
+            [1, ["duplicate description \"aa\""]],
+            [1, ["\"bb\" must sort before undefined"]]
+        ]);
     });
     jstestIt((
         "test jstestIt-filter handling-behavior"
@@ -3504,11 +3550,29 @@ jslint.jstestDescribe("cc", function () {
         assertOrThrow(!stderr.includes("test it - ee"), stderr);
     });
     jstestIt((
+        "test jstestIt-filter-empty handling-behavior"
+    ), async function () {
+
+// A filter that matches no test fails the run, so a stray or mistyped filter
+// cannot skip the whole suite and pass.
+
+        const [exitCode, stderr] = await childRun({
+            npm_config_mode_test_filter: "^zz$"
+        }, String(`
+jslint.jstestDescribe("aa", function () {
+    jslint.jstestIt("bb", jslint.noop);
+});
+        `));
+        assertJsonEqual(exitCode, 1);
+        assertMatch(stderr, /no test matched npm_config_mode_test_filter="\^zz\$"\n {2}tests total {2}- 0\n/);
+    });
+    jstestIt((
         "test jstestIt-late handling-behavior"
     ), async function () {
 
-// An async describe body registers tests after an await, and they run. A
-// jstestIt after the body settled, or before any describe, throws.
+// A jstestIt after an await in an async describe body, from a timer after the
+// body settled, or before any describe, throws: only the body's synchronous
+// part registers. The first crashes the body, leaving it and bb pending.
 
         const resultList = await Promise.all([
             String(`
@@ -3538,12 +3602,12 @@ jslint.jstestIt("cc", jslint.noop);
         }));
         assertJsonEqual(resultList.map(function ([exitCode]) {
             return exitCode;
-        }), [0, 1, 1]);
-        assertMatch(resultList[0][1], /1\. test it - bb\b[\s\S]*2\. test it - cc\b[\s\S]*tests total {2}- 2\n {2}tests failed - 0\n/);
-        resultList.slice(1).forEach(function ([ignore, stderr]) {
+        }), [1, 1, 1]);
+        assertMatch(resultList[0][1], /1\. test it pending - aa - jstestDescribe body\n[\s\S]*2\. test it pending - aa - bb\n[\s\S]*tests failed - 2\n/);
+        resultList.forEach(function ([ignore, stderr]) {
             assertOrThrow(stderr.includes(
                 "jstestIt \"cc\" called outside a jstestDescribe body, or" +
-                " after it settled"
+                " after an await"
             ), stderr);
         });
     });
@@ -3571,7 +3635,7 @@ jslint.jstestDescribe("aa", function () {
         assertJsonEqual(exitCode, 1);
         assertOrThrow(stderr.includes(
             "jstestIt \"cc\" called outside a jstestDescribe body, or after" +
-            " it settled"
+            " an await"
         ), stderr);
     });
     jstestIt((
@@ -3614,108 +3678,31 @@ jslint.jstestDescribe("aa", function () {
 });
             `))
         ]);
-        assertJsonEqual([exitCode, exitCode2], [4, 3]);
+        assertJsonEqual([exitCode, exitCode2], [1, 1]);
         assertMatch(stderr, /1\. test it - bb\nundefined\b[\s\S]*2\. test it - cc\nundefined\b[\s\S]*3\. test it - dd\ndd string\b[\s\S]*4\. test it - ee\n\[object\][\s\S]*tests failed - 4\n/);
         assertOrThrow(!stderr.includes("TypeError"), stderr);
-        assertMatch(stderr2, /test it failed - aa - bb\nbb string\n[\s\S]*test it failed - aa - bc\n0\n/);
+        assertMatch(stderr2, /test it failed - aa - bb\nbb string\n[\s\S]*test it failed - aa - bc\n0\n[\s\S]*tests failed - 3\n/);
     });
     jstestIt((
-        "test jstestOnExit-crash handling-behavior"
+        "test jstestOnExit-exit-code handling-behavior"
     ), async function () {
 
-// An error escaping a test, from a timer or an un-awaited rejection, still
-// crashes, and the exit report names that test as crashed, its slow sibling as
-// pending. A crash from outside any test names none.
-
-        const resultList = await Promise.all([
-            String(`
-jslint.jstestDescribe("aa", function () {
-    jslint.jstestIt("bb", function () {
-        setTimeout(function () {
-            throw new Error("bb timer boom");
-        }, 10);
-        return new Promise(function (resolve) {
-            setTimeout(resolve, 50);
-        });
-    });
-    jslint.jstestIt("cc", function () {
-        return new Promise(function (resolve) {
-            setTimeout(resolve, 200);
-        });
-    });
-});
-            `),
-            String(`
-jslint.jstestDescribe("aa", function () {
-    jslint.jstestIt("bb", function () {
-        Promise.reject(new Error("bb unawaited"));
-        return new Promise(function (resolve) {
-            setTimeout(resolve, 50);
-        });
-    });
-});
-            `),
-            String(`
-jslint.jstestDescribe("aa", function () {
-    jslint.jstestIt("bb", function () {
-        setTimeout(function () {
-            throw new Error("bb late boom");
-        }, 100);
-    });
-});
-            `),
-            String(`
-setTimeout(function () {
-    throw new Error("outside boom");
-}, 20);
-jslint.jstestDescribe("aa", function () {
-    jslint.jstestIt("bb", function () {
-        return new Promise(function (resolve) {
-            setTimeout(resolve, 200);
-        });
-    });
-});
-            `)
-        ].map(function (source) {
-            return childRun({}, source);
-        }));
-        assertJsonEqual(resultList.map(function ([exitCode]) {
-            return exitCode;
-        }), [1, 1, 1, 1]);
-        assertMatch(resultList[0][1], /test it crashed - aa - bb\nError: bb timer boom\n[\s\S]*test it pending - aa - cc\n/);
-        assertMatch(resultList[1][1], /test it crashed - aa - bb\nError: bb unawaited\n/);
-
-// A test that passed and printed, then crashed late, is listed again.
-
-        assertMatch(resultList[2][1], /1\. test it - bb\b[\s\S]*test it crashed - aa - bb\nError: bb late boom\n/);
-        assertMatch(resultList[3][1], /test it pending - aa - bb\n/);
-        assertOrThrow(
-            !resultList[3][1].includes("crashed"),
-            resultList[3][1]
-        );
-    });
-    jstestIt((
-        "test jstestOnExit-crash-handled handling-behavior"
-    ), async function () {
-
-// A user's own uncaughtException handler lets a test that crashed mid-run
-// finish, and it still fails, since a test settles once.
+// 256 failed tests exit 1, not their count, which an 8-bit exit status would
+// wrap to a passing 0.
 
         const [exitCode, stderr] = await childRun({}, String(`
-process.on("uncaughtException", jslint.noop);
 jslint.jstestDescribe("aa", function () {
-    jslint.jstestIt("bb", function () {
-        setTimeout(function () {
-            throw new Error("bb handled boom");
-        }, 10);
-        return new Promise(function (resolve) {
-            setTimeout(resolve, 50);
+    let ii = 0;
+    while (ii < 256) {
+        jslint.jstestIt(String(1000 + ii), function () {
+            throw new Error();
         });
-    });
+        ii += 1;
+    }
 });
         `));
         assertJsonEqual(exitCode, 1);
-        assertMatch(stderr, /1\. test it - bb\nError: bb handled boom\n[\s\S]*tests failed - 1\n/);
+        assertMatch(stderr, /tests total {2}- 256\n {2}tests failed - 256\n/);
     });
     jstestIt((
         "test jstestOnExit-pending handling-behavior"
@@ -3759,51 +3746,8 @@ jslint.jstestDescribe("aa", function () {
     });
 });
         `));
-        assertJsonEqual(exitCode, 2);
+        assertJsonEqual(exitCode, 1);
         assertMatch(stderr, /1\. test it failed - aa - bb\nError: bb real error\n[\s\S]*2\. test it pending - aa - cc\n {2}tests total {2}- 2\n {2}tests failed - 2\n/);
-    });
-    jstestIt((
-        "test jstestOrderCheck handling-behavior"
-    ), function () {
-
-// A sorted list returns nothing. An unsorted pair or a duplicate returns one
-// failed result, for the first bad pair only. A non-string name fails too.
-
-        assertJsonEqual([
-            ["", "aa", "bb"],
-            ["aa", "cc", "bb", "aa"],
-            ["aa", "aa"],
-            [undefined, "bb"]
-        ].map(function (descriptionList) {
-            const failure = jstestOrderCheck(descriptionList);
-            return failure && [failure[0].message, failure[1]];
-        }), [
-            undefined,
-            [
-                "\"bb\" must sort before \"cc\"",
-                "jstestDescribe and jstestIt descriptions in ASCII order"
-            ], [
-                "duplicate description \"aa\"",
-                "jstestDescribe and jstestIt descriptions in ASCII order"
-            ], [
-                "\"bb\" must sort before undefined",
-                "jstestDescribe and jstestIt descriptions in ASCII order"
-            ]
-        ]);
-    });
-    jstestIt((
-        "test jstestReport handling-behavior"
-    ), function () {
-        const exitCode = process.exitCode;
-
-// The report lists this test, still running, as pending, and changes nothing,
-// since mid-run every running test is pending.
-
-        assertOrThrow(jstestReport().text.includes(
-            ". test it pending - test jstestXxx handling-behavior" +
-            " - test jstestReport handling-behavior\n"
-        ));
-        assertJsonEqual(process.exitCode, exitCode);
     });
     jstestIt((
         "test jstestReport-numbering handling-behavior"
@@ -3832,7 +3776,7 @@ jslint.jstestDescribe("cc", function () {
 
 jstestDescribe((
     "test v8CoverageListMerge handling-behavior"
-), function testBehaviorV8CoverageListMerge() {
+), function () {
     let functionsInput = JSON.stringify([
         {
             functionName: "test",
@@ -4045,7 +3989,7 @@ jstestDescribe((
 
 jstestDescribe((
     "test v8CoverageReportCreate handling-behavior"
-), function testBehaviorV8CoverageReportCreate() {
+), function () {
     jstestIt((
         "test coverage-hole-closing-midline handling-behavior"
     ), async function () {
