@@ -7760,7 +7760,7 @@ function jslint_phase3_parse(state) {
                 the_id = the_name.id;
                 the_name.used = true;
 
-// PR-xxx - deadcode-confirmed - This duplicate is never shown. An earlier
+// PR-517 - deadcode-confirmed - This duplicate is never shown. An earlier
 // export of <the_id> needs it declared at top level, so declaring it again
 // above warns redefinition_a_b on the same token first, and <warn> drops a
 // second warning on one token.
@@ -9777,7 +9777,7 @@ function jslint_phase4_walk(state) {
                 thing.expression[0].arity === "unary" &&
                 !thing.expression[0].wrapped &&
 
-// PR-xxx - deadcode-confirmed - A 'void' here never showed its warning, since
+// PR-517 - deadcode-confirmed - A 'void' here never showed its warning, since
 // <prefix_void> has already warned on the same token, and <warn> drops a
 // second warning on one token.
 //
@@ -9888,7 +9888,7 @@ function jslint_phase4_walk(state) {
         } else if (left.identifier) {
             if (the_new !== undefined) {
 
-// PR-xxx - deadcode-confirmed - A branch for 'new Function' never showed its
+// PR-517 - deadcode-confirmed - A branch for 'new Function' never showed its
 // warning. Without option eval, <constant_Function> has already warned on the
 // same 'Function' token, and <warn> drops a second warning on one token.
 //
@@ -12175,7 +12175,7 @@ async function jstestDescribe(description, testFunction) {
         process.on("exit", jstestOnExit);
     }
 
-// PR-xxx - Collect, then run. Record the body as pending, then await it, so a
+// PR-517 - Collect, then run. Record the body as pending, then await it, so a
 // body that hangs before registering fails at exit instead of passing with 0
 // tests. A body that throws crashes node as an unhandled rejection, leaving its
 // record pending. A body that settles clean leaves no record.
@@ -12184,7 +12184,7 @@ async function jstestDescribe(description, testFunction) {
     await jstestDescribeRun(describe, testFunction);
     jstestItRecordList.splice(jstestItRecordList.indexOf(recordBody), 1);
 
-// PR-xxx - Assert this describe's tests, then this describe, are in ASCII
+// PR-517 - Assert this describe's tests, then this describe, are in ASCII
 // order. Record them before any test runs, so a hung sibling cannot hide them
 // at exit.
 
@@ -12213,7 +12213,7 @@ async function jstestDescribe(description, testFunction) {
     }));
     result.unshift(...describe.itList);
 
-// PR-xxx - Print nothing for a describe whose tests the filter all skipped.
+// PR-517 - Print nothing for a describe whose tests the filter all skipped.
 
     if (result.length === 0) {
         return;
@@ -12277,7 +12277,7 @@ function jstestIt(description, testFunction) {
 
     const describe = jstestDescribeNow;
 
-// PR-xxx - Throw outside a describe body's synchronous part, since no describe
+// PR-517 - Throw outside a describe body's synchronous part, since no describe
 // would run or report this test.
 
     if (!describe) {
@@ -12287,7 +12287,7 @@ function jstestIt(description, testFunction) {
         );
     }
 
-// PR-xxx - Run only a test whose "<describe> - <it>" matches opt-in regexp
+// PR-517 - Run only a test whose "<describe> - <it>" matches opt-in regexp
 // npm_config_mode_test_filter, e.g.
 // npm_config_mode_test_filter="jstestXxx.*pending" npm test
 // Prefer the env form, since npm 11 warns the flag form --mode-test-filter
@@ -12299,7 +12299,7 @@ function jstestIt(description, testFunction) {
         return;
     }
 
-// PR-xxx - Record this test as pending from registration, so <jstestReport>
+// PR-517 - Record this test as pending from registration, so <jstestReport>
 // sees it even if its describe never runs or prints.
 
     jstestItRecordList.push({
@@ -12350,7 +12350,7 @@ function jstestReport() {
 // This function will return the test-report <text> and its <exitCode>,
 // without side effects.
 
-// PR-xxx - List and count as failed each test its describe never printed: one
+// PR-517 - List and count as failed each test its describe never printed: one
 // still pending, e.g. hung until a watchdog ended the process, or one that
 // failed while a sibling hung, whose error was otherwise never shown.
 
@@ -12359,7 +12359,7 @@ function jstestReport() {
     }).length;
     const filter = process.env.npm_config_mode_test_filter;
 
-// PR-xxx - Fail a run whose filter matched no test, so a stray or mistyped
+// PR-517 - Fail a run whose filter matched no test, so a stray or mistyped
 // filter, e.g. a mode_test_filter line left in .npmrc, cannot skip the whole
 // suite and pass green.
 
@@ -12369,7 +12369,7 @@ function jstestReport() {
     });
     return {
 
-// PR-xxx - Exit 1, not the failed count, since an exit status keeps only 8
+// PR-517 - Exit 1, not the failed count, since an exit status keeps only 8
 // bits, so 256 failed tests would exit 0.
 
         exitCode: Number(countFailed > 0 || filterEmpty),
