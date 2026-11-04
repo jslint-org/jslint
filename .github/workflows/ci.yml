@@ -26,7 +26,7 @@ jobs:
           - x64
           # - x86
         node_version:
-          - "24"
+          - "26"
         os:
           - macos-latest
           - ubuntu-26.04
@@ -40,9 +40,9 @@ jobs:
         v${{ matrix.node_version }}
         ${{ matrix.architecture }}
         ${{ matrix.os }}
-      CI_MATRIX_NAME_MAIN: "node v24 x64 ubuntu-26.04"
+      CI_MATRIX_NAME_MAIN: "node v26 x64 ubuntu-26.04"
       CI_MATRIX_NODE_VERSION: ${{ matrix.node_version }}
-      CI_MATRIX_NODE_VERSION_MAIN: "24"
+      CI_MATRIX_NODE_VERSION_MAIN: "26"
       CI_WORKFLOW_NAME: >
         ${{ github.workflow }}
         - ${{ github.event_name }}
