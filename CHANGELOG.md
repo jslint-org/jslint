@@ -2,7 +2,6 @@
 
 # Todo
 - jslint-cli - Lint every file argument, as 'node jslint.mjs aa.mjs bb.mjs' now lints 'aa.mjs' and silently skips 'bb.mjs'.
-- jslint - Add warning for jstestIt() descriptions not in ASCII order within each jstestDescribe().
 - jslint - Destructuring - Allow a default on a destructured parameter 'function aa({bb} = {})', valid ES2015 but a stop now.
 - jslint - Allow a quoted accessor-name 'get "aa"() {}', valid ES2015 but a stop now.
 - jslint - Destructuring - Allow catch-variable 'catch ({aa})', valid ES2015 but a stop now.
@@ -18,8 +17,13 @@
 - jslint - Add html and css linting back into jslint.
 
 # v2026.10.30
+- jstest - Collect each describe's tests from its body's synchronous part, so a jstestIt after an await throws, then report every failed or unfinished test at exit, and exit 1 on any.
+- jstest - Fail any describe or jstestIt name not in ASCII order.
+- jstest - Add opt-in test filter 'npm_config_mode_test_filter=<regexp>' on '<describe> - <it>'.
+- jslint - Revamp cause-based testing on option trace and V8 block coverage, replacing the runtime hook and option test_cause.
 - jslint - Report: Functions - Copy each signature from its source text, keeping default values.
 - jslint - Report: Functions - List block-scoped names, catch-variables and outer names, and mark closure only across functions.
+- ci - Bump to node_version 24 to 26.
 
 # v2026.9.29
 - jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add function jslint_phase6_autofix().

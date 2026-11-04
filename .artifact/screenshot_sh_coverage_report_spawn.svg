@@ -275,37 +275,37 @@
     textLength="768"
     x="10"
     y="1000"
->npm warn deprecated uuid@3.4.0: uuid@10 and below is no longer supported.  For ESM codebases, up\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1022"
->  date to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will like\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1044"
->  ly be deprecated in 2028).                                                                     </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1066"
 >npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
+    y="1022"
+>npm warn deprecated uuid@3.4.0: uuid@10 and below is no longer supported.  For ESM codebases, up\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1044"
+>  date to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will like\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1066"
+>  ly be deprecated in 2028).                                                                     </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
     y="1088"
->npm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead        </tspan>
+>npm warn deprecated @humanwhocodes/config-array@0.11.14: Use @eslint/config-array instead        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1110"
->npm warn deprecated @humanwhocodes/config-array@0.11.14: Use @eslint/config-array instead        </tspan>
+>npm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead        </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -317,31 +317,31 @@
     textLength="768"
     x="10"
     y="1154"
->npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of t\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1176"
->  he relevant native addon; alternatives are available.                                          </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1198"
->npm warn deprecated are-we-there-yet@1.1.7: This package is no longer supported.                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1220"
 >npm warn deprecated npmlog@4.1.2: This package is no longer supported.                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="1242"
+    y="1176"
+>npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of t\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1198"
+>  he relevant native addon; alternatives are available.                                          </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1220"
 >npm warn deprecated are-we-there-yet@1.1.7: This package is no longer supported.                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1242"
+>npm warn deprecated rimraf@2.7.1: Rimraf versions prior to v4 are no longer supported            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -353,7 +353,7 @@
     textLength="768"
     x="10"
     y="1286"
->npm warn deprecated rimraf@2.7.1: Rimraf versions prior to v4 are no longer supported            </tspan>
+>npm warn deprecated are-we-there-yet@1.1.7: This package is no longer supported.                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -365,13 +365,13 @@
     textLength="768"
     x="10"
     y="1330"
->npm warn deprecated gauge@1.2.7: This package is no longer supported.                            </tspan>
+>npm warn deprecated gauge@5.0.2: This package is no longer supported.                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1352"
->npm warn deprecated gauge@5.0.2: This package is no longer supported.                            </tspan>
+>npm warn deprecated gauge@1.2.7: This package is no longer supported.                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -401,19 +401,19 @@
     textLength="768"
     x="10"
     y="1462"
->npm warn deprecated request@2.88.2: request has been deprecated, see https://github.com/request/\</tspan>
+>npm warn deprecated fstream@1.0.12: This package is no longer supported.                         </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1484"
->  request/issues/3142                                                                            </tspan>
+>npm warn deprecated request@2.88.2: request has been deprecated, see https://github.com/request/\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1506"
->npm warn deprecated fstream@1.0.12: This package is no longer supported.                         </tspan>
+>  request/issues/3142                                                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
