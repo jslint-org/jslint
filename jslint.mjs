@@ -423,6 +423,7 @@
     warnings,
     white,
     wrapped,
+    wrapped_operand,
     writeFile
 */
 
@@ -6108,12 +6109,14 @@ function jslint_phase3_parse(state) {
 // }
 
         let left;
+        let the_operator;
         let the_symbol;
 
 // Statements will have already advanced, so advance now only if the token is
 // not the first of a statement.
 
         if (!initial) {
+            the_operator = token_now;
             advance();
         }
         the_symbol = syntax_dict[token_now.id];
@@ -6138,6 +6141,17 @@ function jslint_phase3_parse(state) {
 // ["let aa=`${}`", "parse_expression", "unexpected_a", "}", 11]
 
             return stop("unexpected_a", token_now);
+        }
+        if (rbp >= 20 && left.id === "=>" && left.wrapped) {
+
+// PR-xxx - Bugfix - An arrow function as an operand, as in
+// 'aa || ((bb) => cc)', needs its parens, so post_s_function does not warn
+// unexpected_parens on them.
+
+// test_cause:
+// ["aa||((aa)=>0)", "parse_expression", "(live)", "", 0]
+
+            left.wrapped_operand = true;
         }
 
 // Parse/loop through each symbol in expression.
@@ -6168,6 +6182,20 @@ function jslint_phase3_parse(state) {
 // ", "parse_expression", "(live)", "", 0]
 
                 break;
+            }
+            if (token_nxt.id === "=>" && rbp >= 20 && left.identifier) {
+
+// PR-xxx - Bugfix - An arrow function is an AssignmentExpression, so as the
+// operand of an operator tighter than '=', as in 'aa || bb => cc', it is a
+// SyntaxError. Warn on its parameter, which suppresses wrap_fart_parameter,
+// since '(bb) => cc' there is still invalid.
+
+// test_cause:
+// ["!aa=>0", "parse_expression", "wrap_subexpression_a_b", "!", 2]
+// ["aa||aa=>0", "parse_expression", "wrap_subexpression_a_b", "||", 5]
+// ["new aa=>0", "parse_expression", "wrap_subexpression_a_b", "new", 5]
+
+                warn("wrap_subexpression_a_b", left, "=>", the_operator.id);
             }
             advance();
             left = the_symbol.led_infix(left);
@@ -10065,7 +10093,7 @@ function jslint_phase4_walk(state) {
         delete scope_function.loop;
         delete scope_function.switch;
         delete scope_function.try;
-        if (thing.wrapped) {
+        if (thing.wrapped && !thing.wrapped_operand) {
 
 // test_cause:
 // ["aa=(function(){})", "post_s_function", "unexpected_parens", "function", 5]
