@@ -1755,6 +1755,15 @@ function jslint(
             mm = `Use double quotes, not single quotes.`;
             break;
 
+// PR-xxx - Name the one way to invoke a function immediately.
+
+        case "use_function_immediate":
+            mm = (
+                `Use '(function () {...}())', not an arrow function, for an` +
+                ` immediate invocation.`
+            );
+            break;
+
 // PR-386 - Fix issue #382 - Make fart-related warnings more readable.
 
         case "use_function_not_fart":
@@ -5028,33 +5037,53 @@ function jslint_phase3_parse(state) {
 
     function check_left(left, right) {
 
-// Warn if the left is not one of these:
-//      ?.
-//      ?:
+// Warn if the left of <right> is not one of these:
+//      (e ? f : g)
+//      (e + f).b, (e + f)[b]
+//      (e || f)(), (e || f)``
+//      e?.b
 //      e()
 //      e.b
 //      e[b]
 //      identifier
 
+// PR-xxx - Allow member-access on a parenthesized binary-expression, as in
+// '(aa + bb).padEnd(cc)', since the parens make it explicit, and a call or
+// tagged-template only on one that can yield a function, '||', '&&' or '??'.
+// A ternary is always parenthesized here. A parenthesized literal or
+// arrow-function still warns, a second way to write '"aa".bb'.
+
+// test_cause:
+// ["(aa+aa).aa", "check_left", "(live)", "", 0]
+
         const id = left.id;
         if (
             !left.identifier &&
-            (
-                left.arity !== "ternary" ||
-                (
-                    !check_left(left.expression[1]) &&
-                    !check_left(left.expression[2])
-                )
-            ) &&
+            left.arity !== "ternary" &&
             (
                 left.arity !== "binary" ||
-                (id !== "." && id !== "?." && id !== "(" && id !== "[")
+                (
+                    id !== "." &&
+                    id !== "?." &&
+                    id !== "(" &&
+                    id !== "[" &&
+                    (
+                        !left.wrapped ||
+                        id === "=>" ||
+                        (
+                            right.id !== "." &&
+                            right.id !== "?." &&
+                            right.id !== "[" &&
+                            id !== "&&" &&
+                            id !== "??" &&
+                            id !== "||"
+                        )
+                    )
+                )
             )
         ) {
-            warn("unexpected_a", right || token_nxt);
-            return false;
+            warn("unexpected_a", right);
         }
-        return true;
     }
 
     function check_mutation(the_thing) {
@@ -5615,7 +5644,6 @@ function jslint_phase3_parse(state) {
                     name.id !== "toSorted"
                 )
             ) &&
-            (left.id !== "+" || name.id !== "slice") &&
             (
                 left.id !== "(regexp)" ||
                 (name.id !== "exec" && name.id !== "test")
@@ -5623,7 +5651,9 @@ function jslint_phase3_parse(state) {
         ) {
 
 // test_cause:
+// ["((aa)=>0).aa", "check_left", "unexpected_a", ".", 10]
 // ["(/./)?.0", "check_left", "unexpected_a", "?.", 6]
+// ["(\"\").aa", "check_left", "unexpected_a", ".", 5]
 // ["\"\".aa", "check_left", "unexpected_a", ".", 3]
 // ["\"aa\"?.0", "check_left", "unexpected_a", "?.", 5]
 // ["aa=[]?.aa", "check_left", "unexpected_a", "?.", 6]
@@ -5723,10 +5753,22 @@ function jslint_phase3_parse(state) {
             }
         }
 
+// PR-xxx - Allow subscript of an array- or object-literal, '[aa, bb][cc]' and
+// '{aa: bb}[cc]'. Inline is the one way for a single-use lookup [owner]. A
+// constant key '[aa]["aa"]' still warns, as its dot notation would.
+
+// test_cause:
+// ["aa=[aa][0]", "infix_lbracket", "(live)", "", 0]
+// ["aa={aa:0}[aa]", "infix_lbracket", "(live)", "", 0]
+
+        if (name !== undefined || (left.id !== "{" && left.id !== "[")) {
+
 // test_cause:
 // ["0[0]", "check_left", "unexpected_a", "[", 2]
+// ["aa=[aa][\"aa\"]", "check_left", "unexpected_a", "[", 8]
 
-        check_left(left, the_token);
+            check_left(left, the_token);
+        }
         the_token.expression = [left, the_subscript];
         advance("]");
         return the_token;
@@ -5738,10 +5780,21 @@ function jslint_phase3_parse(state) {
         if (left.id !== "function" && left.id !== "=>") {
 
 // test_cause:
-// ["(0?0:0)()", "check_left", "unexpected_a", "(", 8]
+// ["(aa+aa)()", "check_left", "unexpected_a", "(", 8]
 // ["0()", "check_left", "unexpected_a", "(", 2]
 
             check_left(left, the_paren);
+        }
+        if (left.id === "=>") {
+
+// PR-xxx - An arrow-function invoked immediately needs its parens, so warning
+// unexpected_parens on them cannot be obeyed. Name the one way instead.
+
+// test_cause:
+// ["((aa)=>0)()", "infix_lparen", "use_function_immediate", "=>", 6]
+
+            warn("use_function_immediate", left);
+            left.wrapped_operand = true;
         }
         the_paren.expression = [left];
         if (token_nxt.id !== ")") {
@@ -7287,7 +7340,11 @@ function jslint_phase3_parse(state) {
             advance();
             if (
                 (name.id === "get" || name.id === "set") &&
-                (token_nxt.identifier || token_nxt.id === "[")
+                (
+                    token_nxt.identifier ||
+                    token_nxt.id === "(string)" ||
+                    token_nxt.id === "["
+                )
             ) {
                 if (!option_dict.getset) {
 
@@ -7297,7 +7354,6 @@ function jslint_phase3_parse(state) {
                     warn("unexpected_a", name);
                 }
                 extra = name.id;
-                full = extra + " " + token_nxt.id;
                 name.getset = true;
                 name = token_nxt;
                 advance();
@@ -7366,13 +7422,32 @@ function jslint_phase3_parse(state) {
                 return parse_expression(0);
             }
             if (typeof extra === "string") {
+
+// PR-xxx - Allow string-key accessor '{get "aa"() {}}', named 'get aa' like
+// '{get aa() {}}', so either form catches a duplicate of the other.
+
+// test_cause:
+// ["aa={get \"a-a\"(){}}", "property_parse", "(live)", "", 0]
+
                 id = survey(name);
+                full = extra + " " + id;
                 if (seen_getset[full] === true || seen[id] === true) {
 
 // test_cause:
+// ["aa={aa:0,get \"aa\"(){}}", "property_parse", "duplicate_a", "aa", 14]
 // ["aa={get aa(){},get aa(){}}", "property_parse", "duplicate_a", "aa", 20]
 
                     warn("duplicate_a", name);
+                }
+                if (name.id === "(string)" && jslint_rgx_identifier.test(id)) {
+
+// PR-xxx - One way to name an accessor: 'get aa', not 'get "aa"' [owner]. A
+// duplicate warns first, the worse of two on one token.
+
+// test_cause:
+// ["aa={get \"aa\"(){}}", "property_parse", "expected_a_b", "\"aa\"", 9]
+
+                    warn("expected_a_b", name, id, "\"" + id + "\"");
                 }
                 seen[id] = false;
                 seen_getset[full] = true;
@@ -7387,7 +7462,11 @@ function jslint_phase3_parse(state) {
                 }
                 seen[id] = true;
             }
-            if (!name.identifier && token_nxt.id !== "(") {
+            if (
+                !name.identifier &&
+                token_nxt.id !== "(" &&
+                typeof extra !== "string"
+            ) {
 
 // test_cause:
 // ["aa={\"aa\":0}", "property_parse", "(live)", "", 0]

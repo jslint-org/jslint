@@ -1481,9 +1481,9 @@ String.aa().getTime();
                     `),
                     (`
 /*jslint fart*/
-(({expr}) => {
+[0].map(({expr}) => {
     aa(bb, cc, dd, ee, ff, gg);
-}());
+});
                     `),
                     "const {expr}",
                     "let {expr}",
