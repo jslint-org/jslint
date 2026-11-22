@@ -7,19 +7,20 @@
 - jslint - Destructuring - Allow catch-variable 'catch ({aa})', valid ES2015 but a stop now.
 - jslint - Destructuring - Allow a default in object destructuring-assignment '({aa = bb} = cc)', and a member-target '[aa.cc = bb] = cc', valid but stops now, and then warn a const reassigned by '({aa} = {})'.
 - jslint - Add warning for 'aa.hasOwnProperty(bb)' and 'Object.prototype.hasOwnProperty.call(aa, bb)', suggesting 'Object.hasOwn(aa, bb)'.
-- jslint - Warn arrow-function 'aa || bb => cc' as a SyntaxError, not with warning wrap_fart_parameter, whose fix is still invalid.
 - jslint - Check the target of a for-of or for-in head without const or let, e.g. 'for (aa + bb of cc)'.
 - jslint - Relax warning use_open for ternary-operator inside template-literal substitution '${...}'.
 - jslint - Revisit autofix of top-level whitespace, e.g. warning expected_space_a_b on line break inside closed-form expression, and on line break between an accessor's 'get' and its name.
 - jslint-directive - Add new directive 'tab' to support tab-indent.
 - jslint-ecma - Add ES2015-feature generators 'function*'.
-- jslint-ecma - Add ES2015-feature computed property-name '{[aa]: bb}', a stop now, warning "Expected an identifier and instead saw '['"; seen in betadog, 2026-11-20.
-- jslint - Relax subscript of an array- or object-literal '[aa, bb][cc]', '{aa: bb}[cc]', a stop now, warning "Unexpected '['"; seen in betadog, 2026-11-20.
-- jslint - Relax method-call on a parenthesized expression '(aa + bb).padEnd(cc)', a stop now, warning "Unexpected '.'"; seen in betadog, 2026-11-20.
+- jslint - Destructuring - Allow computed property-name 'const {[aa]: bb} = cc', valid ES2015 but a stop now.
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Add html and css linting back into jslint.
 
 # v2026.10.30
+- jslint-ecma - Add ES2015-feature computed property-name '{[aa]: bb}', '{[aa]() {}}', '{get [aa]() {}}' in object-literal, and warn a constant key '{["aa"]: bb}'; not yet in destructuring.
+- jslint - Allow member-access on a parenthesized binary-expression '(aa + bb).padEnd(cc)' or any ternary, and a call or tagged-template on a parenthesized '||', '&&' or '??', not only '(aa + bb).slice()'.
+- jslint - Warn arrow-function 'aa || bb => cc' as a SyntaxError with wrap_subexpression_a_b, not wrap_fart_parameter, and accept the parens it needs, 'aa || ((bb) => cc)'.
+- ci - Automate pull-request open and post-merge cleanup with github-ci waits: 'shGithubPrCreate pr|release', 'npm_config_mode_pr_create=1', 'shGithubPrCleanup'.
 - jstest - Collect each describe's tests from its body's synchronous part, so a jstestIt after an await throws, then report every failed or unfinished test at exit, and exit 1 on any.
 - jstest - Fail any describe or jstestIt name not in ASCII order.
 - jstest - Add opt-in test filter 'npm_config_mode_test_filter=<regexp>' on '<describe> - <it>'.

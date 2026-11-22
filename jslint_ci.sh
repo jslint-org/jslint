@@ -1418,7 +1418,9 @@ shGithubPrCleanup() {(set -e
     fi
     SHA="$(git rev-parse upstream/beta)"
     shGithubTokenExport
-    # Find the merged pull-request, for its head-branch.
+    # Find the merged pull-request, for its head-branch. Never end this call
+    # with the usual hash-quote editor hint, since inside $(...) macOS bash 3.2
+    # reads a quote in a comment as a real one and fails to parse the file.
     PR_INFO="$(node --input-type=module --eval '
 (async function () {
     const merge_sha = process.argv[1];
@@ -1458,7 +1460,7 @@ shGithubPrCleanup() {(set -e
     );
     process.exitCode = 0;
 }());
-' "$SHA" "$(git config remote.origin.url)" "$(git config remote.upstream.url)" # '
+' "$SHA" "$(git config remote.origin.url)" "$(git config remote.upstream.url)"
     )"
     read -r PR_HEAD_REF PR_HEAD_SHA PR_HEAD_IS_ORIGIN <<EOF
 $PR_INFO
@@ -1822,12 +1824,19 @@ import moduleFs from "fs";
         };
     }
     function prTextPrint() {
+        // Set the block apart from the git log printed just before it.
+        process.stderr.write("\n\n\n\n");
         console.error(String(`
 shGithubPrCreate - title:
+
 ${prText.title}
+
 shGithubPrCreate - description:
+
 ${prText.description}
+
 shGithubPrCreate - body:
+
 ${prText.body}
         `).trim() + "\n");
     }
@@ -1870,16 +1879,19 @@ ${prText.body}
                 }
             );
         });
+        changelogNew = changelogNew.filter(function (item) {
+            return !changelogOld.includes(item.split("\n")[0]);
+        });
+        // Fail, rather than reuse a released item, when CHANGELOG.md names
+        // nothing new for this pull-request. Mode pr_create reads HEAD instead.
+        moduleAssert.ok(
+            changelogNew.length > 0 ||
+            process.env.npm_config_mode_pr_create === "1",
+            `shGithubPrCreate - CHANGELOG.md top section has no item` +
+            ` missing from ${branchMerge}:CHANGELOG.md`
+        );
         commitMessage = String(
-            `- ${process.env.PR_XXX} ` +
-            (
-                changelogNew
-                    .filter(function (item) {
-                        return !changelogOld.includes(item.split("\n")[0]);
-                    })
-                    .join("\n") ||
-                changelogNew[0]
-            )
+            `- ${process.env.PR_XXX} ${changelogNew.join("\n")}`
         ).replace("\n", "\n\n");
     }
     // A kept open pull-request takes the push on its own head-branch.

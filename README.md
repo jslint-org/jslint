@@ -1093,7 +1093,7 @@ if (false) {
 
         # commit pending changes onto alpha, push branch-p20yy.mm.dd,
         # print title, description, body
-        sh jslint_ci.sh shGithubPrCreate pr
+        sh jslint_ci.sh shGithubPrCreate pr # v20yy.mm.dd __pr_beta_pre
 
         # open pull-request against beta, needing $MY_GITHUB_TOKEN
         # npm_config_mode_pr_issue=xxx adds "Fixes #xxx." to description
@@ -1127,7 +1127,7 @@ if (false) {
 
         # commit pending changes onto alpha, push branch-v20yy.mm.dd,
         # print title, description, body
-        sh jslint_ci.sh shGithubPrCreate release
+        sh jslint_ci.sh shGithubPrCreate release # v20yy.mm.dd __pr_master_pre
 
         # open pull-request against beta, needing $MY_GITHUB_TOKEN
         npm_config_mode_pr_create=1 sh jslint_ci.sh shGithubPrCreate release
