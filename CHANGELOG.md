@@ -13,6 +13,9 @@
 - jslint - Revisit autofix of top-level whitespace, e.g. warning expected_space_a_b on line break inside closed-form expression, and on line break between an accessor's 'get' and its name.
 - jslint-directive - Add new directive 'tab' to support tab-indent.
 - jslint-ecma - Add ES2015-feature generators 'function*'.
+- jslint-ecma - Add ES2015-feature computed property-name '{[aa]: bb}', a stop now, warning "Expected an identifier and instead saw '['"; seen in betadog, 2026-11-20.
+- jslint - Relax subscript of an array- or object-literal '[aa, bb][cc]', '{aa: bb}[cc]', a stop now, warning "Unexpected '['"; seen in betadog, 2026-11-20.
+- jslint - Relax method-call on a parenthesized expression '(aa + bb).padEnd(cc)', a stop now, warning "Unexpected '.'"; seen in betadog, 2026-11-20.
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Add html and css linting back into jslint.
 

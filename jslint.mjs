@@ -263,6 +263,7 @@
     max,
     message,
     meta,
+    method,
     min,
     mkdir,
     modeCoverageIgnoreFile,
@@ -5512,6 +5513,38 @@ function jslint_phase3_parse(state) {
         return token_now;
     }
 
+    function constant_super() {
+
+// PR-xxx - Allow 'super.aa' and 'super[aa]' in object-method under option
+// 'this'. This function will warn 'super' unless option 'this', in an
+// object-method or its arrow-function, and before '.' or '['.
+
+        if (
+            !option_dict.this ||
+            !scope_function.method ||
+            (token_nxt.id !== "." && token_nxt.id !== "[")
+        ) {
+
+// test_cause:
+// ["
+// /*jslint this*/
+// aa={aa(){super()}}
+// ", "constant_super", "unexpected_a", "super", 10]
+// ["
+// /*jslint this*/
+// aa={aa:function(){super.aa}}
+// ", "constant_super", "unexpected_a", "super", 19]
+// ["
+// /*jslint this*/
+// super.aa
+// ", "constant_super", "unexpected_a", "super", 1]
+// ["aa={aa(){super.aa}}", "constant_super", "unexpected_a", "super", 10]
+
+            warn("unexpected_a", token_now);
+        }
+        return token_now;
+    }
+
     function constant_this() {
         if (!option_dict.this) {
 
@@ -6142,16 +6175,26 @@ function jslint_phase3_parse(state) {
 
             return stop("unexpected_a", token_now);
         }
-        if (rbp >= 20 && left.id === "=>" && left.wrapped) {
+        if (rbp >= 20 && left.id === "=>") {
 
 // PR-xxx - Bugfix - An arrow function as an operand, as in
 // 'aa || ((bb) => cc)', needs its parens, so post_s_function does not warn
-// unexpected_parens on them.
+// unexpected_parens on them. Without them, 'aa || (bb) => cc' is a
+// SyntaxError, like 'aa || bb => cc' below.
+
+            if (left.wrapped) {
 
 // test_cause:
 // ["aa||((aa)=>0)", "parse_expression", "(live)", "", 0]
 
-            left.wrapped_operand = true;
+                left.wrapped_operand = true;
+            } else {
+
+// test_cause:
+// ["aa||(aa)=>0", "parse_expression", "wrap_subexpression_a_b", "||", 9]
+
+                warn("wrap_subexpression_a_b", left, "=>", the_operator.id);
+            }
         }
 
 // Parse/loop through each symbol in expression.
@@ -6835,7 +6878,12 @@ function jslint_phase3_parse(state) {
             name_only: true
         };
         if (mode_fart) {
+
+// PR-xxx - An arrow-function sees the 'super' of its parent, so inherits
+// <method> for <constant_super>.
+
             the_function.arity = "binary";
+            the_function.method = scope_function.method;
         }
         if (the_function.arity === "statement") {
 
@@ -7192,10 +7240,29 @@ function jslint_phase3_parse(state) {
         const seen = empty();
         const seen_getset = empty();
         const the_brace = token_now;
+        function property_method(name, full) {
+
+// This function will parse the method or accessor named <full> at <name>.
+
+            return prefix_function(
+                {
+                    arity: "unary",
+                    from: name.from,
+                    id: "function",
+                    line: name.line,
+                    method: true,
+                    name: full,
+                    thru: name.from
+                },
+                false,
+                false
+            );
+        }
         function property_parse() {
             let extra;
             let full;
             let id;
+            let key;
             let name = token_nxt;
             let the_colon;
             let value;
@@ -7220,7 +7287,7 @@ function jslint_phase3_parse(state) {
             advance();
             if (
                 (name.id === "get" || name.id === "set") &&
-                token_nxt.identifier
+                (token_nxt.identifier || token_nxt.id === "[")
             ) {
                 if (!option_dict.getset) {
 
@@ -7234,6 +7301,71 @@ function jslint_phase3_parse(state) {
                 name.getset = true;
                 name = token_nxt;
                 advance();
+            }
+            if (name.id === "[") {
+
+// PR-xxx - Add ES2015-feature computed property-name '{[aa]: bb}'. Its key is
+// pushed before its value, for the walker. Neither gets <name_alias>, so
+// <check_ordered> skips them, like a spread. A key on one line names a method
+// in the report.
+
+// test_cause:
+// ["aa={[\naa]:0}", "property_parse", "(live)", "", 0]
+// ["aa={[aa]:0}", "property_parse", "(live)", "", 0]
+
+                value = parse_expression(0);
+                the_brace.expression.push(value);
+                advance("]");
+                id = (
+                    name.line === token_now.line
+                    ? line_list[name.line].line_source.slice(
+                        name.from,
+                        token_now.thru
+                    )
+                    : "[]"
+                );
+                if (
+                    value.id === "(number)" ||
+                    value.id === "(string)" ||
+                    value.id === "false" ||
+                    value.id === "null" ||
+                    value.id === "true"
+                ) {
+
+// PR-xxx - Warn constant-key computed property-name. One way to write a
+// constant key: '{"aa": bb}', not '{["aa"]: bb}'.
+
+                    key = (
+                        value.id === "(string)"
+                        ? "\"" + value.value + "\""
+                        : artifact(value)
+                    );
+
+// test_cause:
+// ["aa={[0]:0}", "property_parse", "expected_a_b", "[0]", 5]
+// ["aa={[\"aa\"\n]:0}", "property_parse", "expected_a_b", "[\"aa\"]", 5]
+// ["aa={[null]:0}", "property_parse", "expected_a_b", "[null]", 5]
+
+                    warn("expected_a_b", name, key, "[" + key + "]");
+                }
+                if (typeof extra === "string" || token_nxt.id === "(") {
+
+// test_cause:
+// ["aa={[aa](){}}", "property_parse", "(live)", "", 0]
+// ["aa={get [aa](){}}", "property_parse", "(live)", "", 0]
+
+                    value = property_method(name, (
+                        typeof extra === "string"
+                        ? extra + " " + id
+                        : id
+                    ));
+                    value.extra = extra;
+                    return value;
+                }
+                advance(":");
+                return parse_expression(0);
+            }
+            if (typeof extra === "string") {
                 id = survey(name);
                 if (seen_getset[full] === true || seen[id] === true) {
 
@@ -7255,7 +7387,7 @@ function jslint_phase3_parse(state) {
                 }
                 seen[id] = true;
             }
-            if (!name.identifier) {
+            if (!name.identifier && token_nxt.id !== "(") {
 
 // test_cause:
 // ["aa={\"aa\":0}", "property_parse", "(live)", "", 0]
@@ -7277,27 +7409,19 @@ function jslint_phase3_parse(state) {
             } else if (token_nxt.id === "(") {
 
 // test_cause:
+// ["aa={\"aa\"(){}}", "property_parse", "(live)", "", 0]
 // ["aa={aa()}", "property_parse", "(live)", "", 0]
 // ["aa={get aa(){}}", "property_parse", "(live)", "", 0]
 
 // PR-516 - Bugfix - Name an accessor 'get aa' in the report, not 'get'.
 
-                value = prefix_function(
-                    {
-                        arity: "unary",
-                        from: name.from,
-                        id: "function",
-                        line: name.line,
-                        name: (
-                            typeof extra === "string"
-                            ? full
-                            : id
-                        ),
-                        thru: name.from
-                    },
-                    false,
-                    false
-                );
+// PR-xxx - Allow string-key method '{"aa"() {}}'.
+
+                value = property_method(name, (
+                    typeof extra === "string"
+                    ? full
+                    : id
+                ));
             } else {
                 if (typeof extra === "string") {
 
@@ -9114,6 +9238,7 @@ function jslint_phase3_parse(state) {
     constant("isFinite", "function", constant_isInfinite);
     constant("isNaN", "function", constant_isNaN);
     constant("null", "null", null);
+    constant("super", "object", constant_super);
     constant("this", "object", constant_this);
     constant("true", "boolean", true);
     constant("undefined", "undefined");
@@ -9216,7 +9341,6 @@ function jslint_phase3_parse(state) {
     symbol("protected");
     symbol("public");
     symbol("static");
-    symbol("super");
     symbol("void");
     symbol("yield");
     symbol("}");

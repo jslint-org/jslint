@@ -2099,6 +2099,9 @@ String({
         [{test_internal_error: true}, ""],
         [{test_unknown_warning_code: true}, ""],
         [{this: true}, "String(this);"],
+        [{this: true}, (
+            "String({aa() {\n    return () => super.aa;\n}});"
+        )],
         [{trace: true}, ""],
         [{unordered: true}, (`
 function aa({bb, aa}) {

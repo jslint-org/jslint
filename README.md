@@ -1031,7 +1031,7 @@ if (false) {
 |  22. | ✅ | ES2016 | [`Array.prototype.includes`](https://github.com/tc39/proposal-Array.prototype.includes) |
 |  21. | ✅ | ES2015 | [`arrows`](https://github.com/lukehoban/es6features#arrows) |
 |  20. | ❌ | ES2015 | [`classes`](https://github.com/lukehoban/es6features#classes) |
-|  19. | ❌ | ES2015 | [`enhanced object literals`](https://github.com/lukehoban/es6features#enhanced-object-literals) |
+|  19. | ⚠️ | ES2015 | [`enhanced object literals`](https://github.com/lukehoban/es6features#enhanced-object-literals) |
 |  18. | ✅ | ES2015 | [`template strings`](https://github.com/lukehoban/es6features#template-strings) |
 |  17. | ✅ | ES2015 | [`destructuring`](https://github.com/lukehoban/es6features#destructuring) |
 |  16. | ✅ | ES2015 | [`default + rest + spread`](https://github.com/lukehoban/es6features#default--rest--spread) |
