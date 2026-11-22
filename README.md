@@ -1091,48 +1091,25 @@ if (false) {
         # re-run until version propagates
         npm run test2
 
-        # re-run until version propagates
-        sh jslint_ci.sh shGithubPrCreate alpha beta # v20yy.mm.dd __pr_beta_pre
+        # commit pending changes onto alpha, push branch-p20yy.mm.dd,
+        # print title, description, body
+        sh jslint_ci.sh shGithubPrCreate pr
 
-        git push upstream alpha -f
+        # open pull-request against beta, needing $MY_GITHUB_TOKEN
+        # npm_config_mode_pr_issue=xxx adds "Fixes #xxx." to description
+        npm_config_mode_pr_issue=xxx npm_config_mode_pr_create=1 \
+            sh jslint_ci.sh shGithubPrCreate pr
         ```
-        - verify ci-success @ https://github.com/kaizhu256/jslint/actions
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions
-
-1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-p20yy.mm.dd
-    - click `Create pull request`
-    - input `Add a title *` with: `<CHANGELOG.md entry #1>`
-    - input `Add a description` with:
-        ```
-        Fixes #xxx.
-
-        This PR will:
-        <CHANGELOG.md entry #1>
-
-        This PR will additionally:
-        <CHANGELOG.md entry extra>
-
-        <screenshot>
-        ```
-    - click `Preview` and review
-    - verify:
-        - base respository: `jslint-org/jslint`
-        - base: `beta`
-    - click `Create pull request`
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions/workflows/ci.yml
+    - add `<screenshot>` to pull-request description, if any
 
 1. wait awhile before continuing ...
-    - click `Squash and merge`
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions
+    - after pull-request ci-success, click `Squash and merge`
     - run
         ```shell
+        # wait for ci after each push, reset alpha to beta,
+        # push alpha and beta, then delete head-branch
         sh jslint_ci.sh shGithubPrCleanup
-
-        git push upstream alpha -f
         ```
-        - verify ci-success @ https://github.com/kaizhu256/jslint/actions
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions
-    - click `Delete branch`
 
 
 <br><br>
@@ -1141,55 +1118,29 @@ if (false) {
 1. update `.github/workflows/ci.yml` `.github/workflows/publish.yml` to:
     - latest nodejs-lts version @ https://nodejs.org/en/about/previous-releases
 1. update `CHANGELOG.md`
+    - set top heading to `# v20yy.mm.dd`
     - verify `<CHANGELOG.md entries>` ordered by impact
     - run
         ```shell
         # re-run until version propagates
         npm run test2
 
-        # re-run until version propagates
-        sh jslint_ci.sh shGithubPrCreate alpha master # v20yy.mm.dd __pr_master_pre
+        # commit pending changes onto alpha, push branch-v20yy.mm.dd,
+        # print title, description, body
+        sh jslint_ci.sh shGithubPrCreate release
 
-        git push upstream alpha -f
+        # open pull-request against beta, needing $MY_GITHUB_TOKEN
+        npm_config_mode_pr_create=1 sh jslint_ci.sh shGithubPrCreate release
         ```
-        - verify ci-success @ https://github.com/kaizhu256/jslint/actions
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions
-
-1. goto https://github.com/jslint-org/jslint/compare/beta...kaizhu256:jslint:branch-v20yy.mm.dd
-    - click `Create pull request`
-    - input `Add a title *` with: `# v20yy.mm.dd`
-    - input `Add a description` with:
-        ```
-        <CHANGELOG.md entry #1>
-        <CHANGELOG.md entry extra>
-        ```
-    - click `Preview` and review
-    - verify:
-        - base respository: `jslint-org/jslint`
-        - base: `beta`
-    - click `Create pull request`
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions/workflows/ci.yml
 
 1. wait awhile before continuing ...
-    - click `Squash and merge`
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions
+    - after pull-request ci-success, click `Squash and merge`
     - run
         ```shell
+        # wait for ci after each push, reset alpha to beta,
+        # push alpha and beta, push beta to master, then delete head-branch
         sh jslint_ci.sh shGithubPrCleanup
-
-        git push upstream alpha -f
         ```
-        - verify ci-success @ https://github.com/kaizhu256/jslint/actions
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions
-    - click `Delete branch`
-    - run
-        ```shell
-        git push origin beta:master
-
-        git push upstream beta:master
-        ```
-        - verify ci-success @ https://github.com/kaizhu256/jslint/actions
-        - verify ci-success @ https://github.com/jslint-org/jslint/actions
 
 
 <br><br>
