@@ -3,7 +3,7 @@ Douglas Crockford <douglas@crockford.com>
 
 
 # Status
-| Branch | [master<br>(v2026.11.1)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
+| Branch | [master<br>(v2026.11.2)](https://github.com/jslint-org/jslint/tree/master) | [beta<br>(Web Demo)](https://github.com/jslint-org/jslint/tree/beta) | [alpha<br>(Development)](https://github.com/jslint-org/jslint/tree/alpha) |
 |--:|:--:|:--:|:--:|
 | CI | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/jslint-org/jslint/actions?query=branch%3Amaster) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=beta)](https://github.com/jslint-org/jslint/actions?query=branch%3Abeta) | [![ci](https://github.com/jslint-org/jslint/actions/workflows/ci.yml/badge.svg?branch=alpha)](https://github.com/jslint-org/jslint/actions?query=branch%3Aalpha) |
 | Coverage | [![coverage](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-master/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-beta/.artifact/coverage/index.html) | [![coverage](https://jslint-org.github.io/jslint/branch-alpha/.artifact/coverage/coverage_badge.svg)](https://jslint-org.github.io/jslint/branch-alpha/.artifact/coverage/index.html) |
@@ -1094,22 +1094,28 @@ if (false) {
         # commit pending changes onto alpha, push branch-p20yy.mm.dd,
         # print title, description
         # (use origin in place of upstream to test the flow on the fork)
-        sh jslint_ci.sh shGithubPrCreate upstream pr # v20yy.mm.dd __pr_beta_pre
+        sh jslint_ci.sh shGithubPrFlow branch upstream pr # v20yy.mm.dd __pr_beta_pre
 
         # open pull-request against beta, needing $MY_GITHUB_TOKEN
-        # npm_config_mode_pr_issue=xxx adds "Fixes #xxx." to description
-        npm_config_mode_pr_issue=xxx npm_config_mode_pr_create=1 \
-            sh jslint_ci.sh shGithubPrCreate upstream pr
+        # optional issue list xxx,yyy adds "Fixes #xxx. Fixes #yyy." to description
+        sh jslint_ci.sh shGithubPrFlow create upstream pr # xxx,yyy
         ```
     - add `<screenshot>` to pull-request description, if any
 
 1. wait awhile before continuing ...
-    - after pull-request ci-success, click `Squash and merge`
     - run
         ```shell
+        # wait for pull-request ci-success, then merge it
+        sh jslint_ci.sh shGithubPrFlow merge upstream
+
         # wait for ci after each push, reset alpha to beta,
         # push alpha and beta, then delete head-branch
-        sh jslint_ci.sh shGithubPrCleanup upstream
+        sh jslint_ci.sh shGithubPrFlow cleanup upstream
+        ```
+    - or run every step above unattended, safe to re-run, resuming where it
+      stopped
+        ```shell
+        sh jslint_ci.sh shGithubPrFlow all upstream pr # v20yy.mm.dd __pr_beta_pre
         ```
 
 
@@ -1126,25 +1132,15 @@ if (false) {
         # re-run until version propagates
         npm run test2
 
+        # unattended, and safe to re-run, resuming where it stopped:
         # commit pending changes onto alpha, push branch-v20yy.mm.dd,
-        # print title, description
-        # (use origin in place of upstream to test the flow on the fork)
-        sh jslint_ci.sh shGithubPrCreate upstream release # v20yy.mm.dd __pr_master_pre
-
-        # open pull-request against beta, needing $MY_GITHUB_TOKEN
-        npm_config_mode_pr_create=1 \
-            sh jslint_ci.sh shGithubPrCreate upstream release
-        ```
-
-1. wait awhile before continuing ...
-    - after pull-request ci-success, click `Squash and merge`
-    - run
-        ```shell
-        # wait for ci after each push, reset alpha to beta,
-        # push alpha and beta, push beta to master, then delete head-branch,
-        # then save a draft-release v20yy.mm.dd of master,
+        # open pull-request against beta, wait for its ci-success,
+        # squash-and-merge it, wait for ci after each push,
+        # reset alpha to beta, push alpha, beta and master,
+        # delete head-branch, then save a draft-release v20yy.mm.dd of master,
         # with CHANGELOG.md entries and generated release notes
-        sh jslint_ci.sh shGithubPrCleanup upstream
+        # (use origin in place of upstream to test the flow on the fork)
+        sh jslint_ci.sh shGithubPrFlow all upstream release # v20yy.mm.dd
         ```
 
 
@@ -1157,11 +1153,12 @@ if (false) {
     - input `Repository*` with: `jslint`
     - input `Workflow filename*` with: `publish.yml`
     - click `Set up connection` or `Update Package Settings`
-1. goto the draft-release url printed by `shGithubPrCleanup`
-    - if none, re-run `sh jslint_ci.sh shGithubReleaseCreate upstream`
+1. goto the draft-release url printed by `shGithubPrFlow all`
+    - if none, re-run `sh jslint_ci.sh shGithubPrFlow release upstream`
     - click `Edit`, `Preview` and review
     - verify `Set as the latest release` is checked
-    - click `Publish release`
+    - run `sh jslint_ci.sh shGithubPrFlow publish upstream`,
+      or click `Publish release`
         - verify ci-success @ https://github.com/jslint-org/jslint/actions
         - verify email-notification `Successfully published @jslint-org/jslint@20yy.mm.dd`
 
