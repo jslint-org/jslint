@@ -467,7 +467,7 @@ const jslint_charset_ascii = (
     "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_" +
     "`abcdefghijklmnopqrstuvwxyz{|}~\u007f"
 );
-const jslint_edition = "v2026.10.30";
+const jslint_edition = "v2026.11.1";
 const jslint_fudge = 1;                 // Fudge starting line and starting
                                         // ... column to 1.
 const jslint_global_dict_all = {
@@ -7393,7 +7393,7 @@ function jslint_phase3_parse(state) {
 
                     key = (
                         value.id === "(string)"
-                        ? "\"" + value.value + "\""
+                        ? `"${value.value}"`
                         : artifact(value)
                     );
 
@@ -7402,7 +7402,7 @@ function jslint_phase3_parse(state) {
 // ["aa={[\"aa\"\n]:0}", "property_parse", "expected_a_b", "[\"aa\"]", 5]
 // ["aa={[null]:0}", "property_parse", "expected_a_b", "[null]", 5]
 
-                    warn("expected_a_b", name, key, "[" + key + "]");
+                    warn("expected_a_b", name, key, `[${key}]`);
                 }
                 if (typeof extra === "string" || token_nxt.id === "(") {
 
@@ -7412,7 +7412,7 @@ function jslint_phase3_parse(state) {
 
                     value = property_method(name, (
                         typeof extra === "string"
-                        ? extra + " " + id
+                        ? `${extra} ${id}`
                         : id
                     ));
                     value.extra = extra;
@@ -7430,7 +7430,7 @@ function jslint_phase3_parse(state) {
 // ["aa={get \"a-a\"(){}}", "property_parse", "(live)", "", 0]
 
                 id = survey(name);
-                full = extra + " " + id;
+                full = `${extra} ${id}`;
                 if (seen_getset[full] === true || seen[id] === true) {
 
 // test_cause:
@@ -7447,7 +7447,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["aa={get \"aa\"(){}}", "property_parse", "expected_a_b", "\"aa\"", 9]
 
-                    warn("expected_a_b", name, id, "\"" + id + "\"");
+                    warn("expected_a_b", name, id, `"${id}"`);
                 }
                 seen[id] = false;
                 seen_getset[full] = true;

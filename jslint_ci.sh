@@ -1106,6 +1106,9 @@ shGithubCiWait() {(set -e
         ? 30
         : 120
     );
+    // A push of a commit that ran before still starts new runs within seconds,
+    // so trust only old runs after this wait.
+    const ms_late = 15 * 1000;
     const ms_norun = 5 * 60 * 1000;
     const ms_settle = 60 * 1000;
     const ms_total = 30 * 60 * 1000;
@@ -1120,6 +1123,7 @@ shGithubCiWait() {(set -e
     let line;
     let line_prv = "";
     let ms_dispatch = 0;
+    let ms_now = 0;
     let ms_seen = 0;
     let result;
     let run_list;
@@ -1170,23 +1174,31 @@ shGithubCiWait() {(set -e
     function run_is_ok(run) {
         return ["neutral", "skipped", "success"].includes(run.conclusion);
     }
+    function run_is_old(run) {
+        // A run done a settle-time ago, by the clock of github, had its own
+        // settle-time for a late workflow, as on a re-run.
+        return ms_now - Date.parse(run.updated_at) >= ms_settle;
+    }
     function run_list_newest(run_list_all) {
 
 // This function will keep the newest push or dispatch run of each workflow,
 // as a later entry of the same workflow overwrites an earlier one.
 
-        return Array.from(new Map(
-            run_list_all.filter(function (run) {
-                return (
-                    ["push", "workflow_dispatch"].includes(run.event) &&
-                    Date.parse(run.created_at) >= ms_dispatch
-                );
-            }).sort(function (aa, bb) {
-                return aa.run_number - bb.run_number;
-            }).map(function (run) {
-                return [run.workflow_id, run];
-            })
-        ).values());
+        return Object.values(Object.fromEntries(
+            run_list_all
+                .filter(function (run) {
+                    return (
+                        ["push", "workflow_dispatch"].includes(run.event) &&
+                        Date.parse(run.created_at) >= ms_dispatch
+                    );
+                })
+                .sort(function (aa, bb) {
+                    return aa.run_number - bb.run_number;
+                })
+                .map(function (run) {
+                    return [run.workflow_id, run];
+                })
+        ));
     }
     function sleep(ms) {
         return new Promise(function (resolve) {
@@ -1238,18 +1250,24 @@ shGithubCiWait() {(set -e
                 fail(`too many runs - ${result.json.total_count}`);
                 return;
             }
+            ms_now = Date.parse(result.date);
             run_list = run_list_newest(result.json.workflow_runs);
             if (run_list.length === 0 && ms_elapsed() >= ms_norun) {
                 fail("no run found in 5 minutes");
                 return;
             }
             if (run_list.length > 0) {
-                line = run_list.map(function (run) {
-                    return `${run.name} ${run.status} ${run.conclusion}`;
-                }).join(", ");
-                workflow_key = run_list.map(function (run) {
-                    return run.workflow_id;
-                }).sort().join();
+                line = run_list
+                    .map(function (run) {
+                        return `${run.name} ${run.status} ${run.conclusion}`;
+                    })
+                    .join(", ");
+                workflow_key = run_list
+                    .map(function (run) {
+                        return run.workflow_id;
+                    })
+                    .sort()
+                    .join();
                 if (line !== line_prv) {
                     console.error(
                         `shGithubCiWait - ${repo} ${arg_branch} - ${line}`
@@ -1266,16 +1284,23 @@ shGithubCiWait() {(set -e
                     return run.status === "completed" && !run_is_ok(run);
                 })) {
                     fail(`failed - ${line}`);
-                    console.error(run_list.map(function (run) {
-                        return run.html_url;
-                    }).join("\n"));
+                    console.error(
+                        run_list
+                            .map(function (run) {
+                                return run.html_url;
+                            })
+                            .join("\n")
+                    );
                     return;
                 }
                 if (
                     run_list.every(function (run) {
                         return run.status === "completed";
                     }) &&
-                    ms_elapsed() - ms_seen >= ms_settle
+                    (
+                        ms_elapsed() - ms_seen >= ms_settle ||
+                        (ms_elapsed() >= ms_late && run_list.every(run_is_old))
+                    )
                 ) {
                     console.error(
                         `shGithubCiWait - ${repo} ${arg_branch} - ok`
@@ -1405,18 +1430,33 @@ shGithubFileUpload() {(set -e
 )}
 
 shGithubPrCleanup() {(set -e
-# This function will cleanup pull-request after merge, waiting for github-ci
-# after each push, and deleting the head-branch only after all ci passes.
+# This function will cleanup pull-request after merge into beta of remote
+# <origin|upstream>, waiting for github-ci after each push, and deleting the
+# head-branch only after all ci passes. After a release, it saves the draft
+# github-release.
+#
 # It writes nothing before its checks pass, so re-run it after a fix.
+#
+# example usage:
+# sh jslint_ci.sh shGithubPrCleanup upstream
+    REMOTE="$1"
+    case "$REMOTE" in
+    origin|upstream)
+        ;;
+    *)
+        printf "shGithubPrCleanup - usage: <origin|upstream>\n" >&2
+        exit 1
+        ;;
+    esac
     git checkout alpha
-    git fetch upstream beta
-    if ! git diff --quiet alpha upstream/beta
+    git fetch "$REMOTE" beta
+    if ! git diff --quiet alpha "$REMOTE/beta"
     then
-        git --no-pager diff --stat alpha upstream/beta
-        printf "shGithubPrCleanup - alpha differs from upstream/beta\n" >&2
+        git --no-pager diff --stat alpha "$REMOTE/beta"
+        printf "shGithubPrCleanup - alpha differs from %s/beta\n" "$REMOTE" >&2
         exit 1
     fi
-    SHA="$(git rev-parse upstream/beta)"
+    SHA="$(git rev-parse "$REMOTE/beta")"
     shGithubTokenExport
     # Find the merged pull-request, for its head-branch. Never end this call
     # with the usual hash-quote editor hint, since inside $(...) macOS bash 3.2
@@ -1460,7 +1500,7 @@ shGithubPrCleanup() {(set -e
     );
     process.exitCode = 0;
 }());
-' "$SHA" "$(git config remote.origin.url)" "$(git config remote.upstream.url)"
+' "$SHA" "$(git config remote.origin.url)" "$(git config "remote.$REMOTE.url")"
     )"
     read -r PR_HEAD_REF PR_HEAD_SHA PR_HEAD_IS_ORIGIN <<EOF
 $PR_INFO
@@ -1471,26 +1511,45 @@ EOF
         exit 1
     fi
     printf "shGithubPrCleanup - merged %s\n" "$PR_HEAD_REF"
-    shGithubCiWait upstream beta
+    case "$PR_HEAD_IS_ORIGIN $PR_HEAD_REF" in
+    "false branch-v"*)
+        printf "shGithubPrCleanup - head-branch not in origin, no release\n"
+        ;;
+    esac
+    shGithubCiWait "$REMOTE" beta
     # Keep the backup of the pre-merge alpha on a re-run.
     if [ "$(git rev-parse alpha)" != "$SHA" ]
     then
         git push . alpha:__pr_upstream_pre -f
     fi
-    git reset upstream/beta
+    git reset "$REMOTE/beta"
     git push . alpha:beta -f
     git push origin alpha beta -f
     shGithubCiWait origin alpha
     shGithubCiWait origin beta
-    git push upstream alpha -f
-    shGithubCiWait upstream alpha
-    case "$PR_HEAD_REF" in
-    branch-v*)
-        git push . beta:master
-        git push origin master
-        shGithubCiWait origin master
-        git push upstream master
-        shGithubCiWait upstream master
+    if [ "$REMOTE" = upstream ]
+    then
+        git push upstream alpha -f
+        shGithubCiWait upstream alpha
+    fi
+    # Release only a branch-v* head from origin, so a contributor branch of
+    # that name cannot push master.
+    case "$PR_HEAD_IS_ORIGIN $PR_HEAD_REF" in
+    "true branch-v"*)
+        # Local master mirrors <remote>/master, and so does origin/master for
+        # upstream, so only <remote>/master guards against a non-fast-forward,
+        # and a test on origin cannot block the real release after it.
+        git push . beta:master -f
+        if [ "$REMOTE" = upstream ]
+        then
+            git push origin master -f
+            shGithubCiWait origin master
+            git push upstream master
+            shGithubCiWait upstream master
+        else
+            git push origin master
+            shGithubCiWait origin master
+        fi
         ;;
     esac
     # Delete the head-branch only if it still holds the merged commit, since a
@@ -1513,18 +1572,37 @@ EOF
             ":refs/heads/$PR_HEAD_REF"
     fi
     git push . alpha:__pr_upstream -f
+    case "$PR_HEAD_IS_ORIGIN $PR_HEAD_REF" in
+    "true branch-v"*)
+        shGithubReleaseCreate "$REMOTE"
+        ;;
+    esac
 )}
 
 shGithubPrCreate() {(set -e
 # This function will commit pending changes onto alpha as a pull-commit built
 # from CHANGELOG.md, and push it to origin as branch-p<date> for mode 'pr', or
-# branch-v<version> for mode 'release'. With npm_config_mode_pr_create=1, it
-# instead opens the pull-request of that pushed branch against beta.
+# branch-v<version> for mode 'release'.
+#
+# With npm_config_mode_pr_create=1, it instead opens the pull-request of that
+# pushed branch against beta of remote <origin|upstream>, where origin tests
+# the flow on the fork.
 #
 # example usage:
-# sh jslint_ci.sh shGithubPrCreate pr
+# sh jslint_ci.sh shGithubPrCreate upstream pr
 # npm_config_mode_pr_issue=519 npm_config_mode_pr_create=1 \
-#     sh jslint_ci.sh shGithubPrCreate pr
+#     sh jslint_ci.sh shGithubPrCreate upstream pr
+    case "$1" in
+    origin|upstream)
+        ;;
+    *)
+        printf "shGithubPrCreate - usage: <origin|upstream> <pr|release>" >&2
+        printf " [version] [squash]\n" >&2
+        exit 1
+        ;;
+    esac
+    PR_REMOTE="$1"
+    shift
     case "$1" in
     pr)
         BRANCH_MERGE=beta
@@ -1533,7 +1611,8 @@ shGithubPrCreate() {(set -e
         BRANCH_MERGE=master
         ;;
     *)
-        printf "shGithubPrCreate - usage: <pr|release> [version] [squash]\n" >&2
+        printf "shGithubPrCreate - usage: <origin|upstream> <pr|release>" >&2
+        printf " [version] [squash]\n" >&2
         exit 1
         ;;
     esac
@@ -1552,10 +1631,24 @@ shGithubPrCreate() {(set -e
         printf "shGithubPrCreate - missing UPSTREAM_REPOSITORY\n" >&2
         exit 1
     fi
+    # The pull-request opens on <remote>, while its number always comes from
+    # upstream, so a test on origin leaves the number and its tags as they are.
+    export PR_REMOTE
+    export PR_REPOSITORY="$(git config "remote.$PR_REMOTE.url" |
+        sed -En -e 's|.*github\.com[/:]||p' |
+        sed -E -e 's|/$||' -e 's|\.git$||')"
+    if [ ! "$PR_REPOSITORY" ]
+    then
+        printf "shGithubPrCreate - cannot parse url of remote %s\n" \
+            "$PR_REMOTE" >&2
+        exit 1
+    fi
     if [ "${npm_config_mode_pr_create:-}" = 1 ]
     then
         shGithubTokenExport
     else
+        # Name only the CHANGELOG.md items missing from <remote>/beta.
+        git fetch "$PR_REMOTE" beta
         FILE_LIST="$(
 git grep -Ei -e '^ *?(//|#) pr-xxx - ' | sed -E -e 's/:.*//' | sort -u
         )"
@@ -1685,13 +1778,17 @@ import moduleFs from "fs";
 
 // This function will open the pull-request of the branch pushed for HEAD.
 
-        const branchList = (await gitOutput([
-            "for-each-ref",
-            "--points-at",
-            "HEAD",
-            "--format=%(refname:short)",
-            "refs/remotes/origin/branch-*"
-        ])).split("\n").filter(Boolean);
+        const branchList = (
+            await gitOutput([
+                "for-each-ref",
+                "--points-at",
+                "HEAD",
+                "--format=%(refname:short)",
+                "refs/remotes/origin/branch-*"
+            ])
+        )
+            .split("\n")
+            .filter(Boolean);
         const owner = (
             /github\.com[\/:]([^\/]+)\//
         ).exec(await gitOutput(["config", "remote.origin.url"]))?.[1];
@@ -1714,10 +1811,12 @@ import moduleFs from "fs";
             // No tracking-ref holds HEAD. Fail if one of that name exists,
             // since HEAD then moved after the push.
             moduleAssert.ok(
-                !(await gitOutput([
-                    "for-each-ref",
-                    `refs/remotes/origin/${branchPull}`
-                ])),
+                !(
+                    await gitOutput([
+                        "for-each-ref",
+                        `refs/remotes/origin/${branchPull}`
+                    ])
+                ),
                 `shGithubPrCreate - HEAD moved since push to ${branchPull}`
             );
             console.error(
@@ -1725,10 +1824,10 @@ import moduleFs from "fs";
                 ` trying ${branchPull}`
             );
         }
-        // A re-run after success finds its pull-request already open.
+        // Fail if its pull-request is already open, since it is created once.
         res = await githubRequest(
             "GET",
-            `/repos/${process.env.UPSTREAM_REPOSITORY}/pulls` +
+            `/repos/${process.env.PR_REPOSITORY}/pulls` +
             `?head=${owner}:${branchPull}&state=open`
         );
         moduleAssert.ok(
@@ -1742,7 +1841,8 @@ import moduleFs from "fs";
             );
             return;
         }
-        if (modePr === "pr") {
+        // A test on origin gets a number of the fork, so skip the check.
+        if (modePr === "pr" && process.env.PR_REMOTE === "upstream") {
             // Github numbers issues and pull-requests in one sequence, so
             // the newest must sit just below the number the tags carry.
             res = await githubRequest(
@@ -1758,7 +1858,7 @@ import moduleFs from "fs";
         }
         res = await githubRequest(
             "POST",
-            `/repos/${process.env.UPSTREAM_REPOSITORY}/pulls`,
+            `/repos/${process.env.PR_REPOSITORY}/pulls`,
             {
                 base: "beta",
                 body: prText.description,
@@ -1771,7 +1871,11 @@ import moduleFs from "fs";
             `shGithubPrCreate - ${res.status} ${res.text}`
         );
         moduleAssert.ok(
-            modePr === "release" || res.json.number === prNumber,
+            (
+                modePr === "release" ||
+                process.env.PR_REMOTE === "origin" ||
+                res.json.number === prNumber
+            ),
             `shGithubPrCreate - github numbered ${res.json.html_url}` +
             `, not PR-${prNumber}, so fix the tags and title`
         );
@@ -1808,14 +1912,16 @@ import moduleFs from "fs";
             `shGithubPrCreate - title over 256 chars - ${title}`
         );
         return {
-            body: message.trim(),
             description: (
                 modePr === "release"
                 ? rest
                 : [
-                    issue && issue.split(",").map(function (number) {
-                        return `Fixes #${number}.`;
-                    }).join(" "),
+                    issue && issue
+                        .split(",")
+                        .map(function (number) {
+                            return `Fixes #${number}.`;
+                        })
+                        .join(" "),
                     `This PR will:\n${title}`,
                     rest && `This PR will additionally:\n${rest}`
                 ].filter(Boolean).join("\n\n")
@@ -1834,15 +1940,14 @@ ${prText.title}
 shGithubPrCreate - description:
 
 ${prText.description}
-
-shGithubPrCreate - body:
-
-${prText.body}
         `).trim() + "\n");
     }
     // Fail closed, so only a finished push or open exits 0.
     process.exitCode = 1;
-    version = version.replace((/-0?/g), ".").replace((/^v/), "");
+    // Turn only a date 2026-01-05 into 2026.1.5, keeping a suffix -rc1.
+    version = version
+        .replace((/^(\d{4})-0?(\d+)-0?(\d+)$/), "$1.$2.$3")
+        .replace((/^v/), "");
     // security - sanitize version
     version = version.trim().replace((/[^\w.\-]/g), "_");
     data = await moduleFs.promises.readFile("CHANGELOG.md", "utf8");
@@ -1872,7 +1977,10 @@ ${prText.body}
         changelogOld = await new Promise(function (resolve) {
             moduleChildProcess.execFile(
                 "git",
-                ["show", `${branchMerge}:CHANGELOG.md`],
+                [
+                    "show",
+                    `refs/remotes/${process.env.PR_REMOTE}/beta:CHANGELOG.md`
+                ],
                 {encoding: "utf8"},
                 function (ignore, stdout) {
                     resolve(stdout?.split("\n") || []);
@@ -1888,7 +1996,7 @@ ${prText.body}
             changelogNew.length > 0 ||
             process.env.npm_config_mode_pr_create === "1",
             `shGithubPrCreate - CHANGELOG.md top section has no item` +
-            ` missing from ${branchMerge}:CHANGELOG.md`
+            ` missing from ${process.env.PR_REMOTE}/beta:CHANGELOG.md`
         );
         commitMessage = String(
             `- ${process.env.PR_XXX} ${changelogNew.join("\n")}`
@@ -1906,6 +2014,21 @@ ${prText.body}
         prTextPrint();
         await prOpen();
         return;
+    }
+    // A re-run on its own pull-commit, with no squash given, rebuilds it on the
+    // same base, rather than stack a duplicate and overwrite that backup.
+    if (
+        !process.argv[4] &&
+        await gitOutput(["rev-parse", "HEAD"]) === (
+            await gitOutput([
+                "for-each-ref",
+                "--format=%(objectname)",
+                `refs/heads/__pr_${branchMerge}`
+            ])
+        )
+    ) {
+        branchSquash = `__pr_${branchMerge}_pre`;
+        console.error(`shGithubPrCreate - re-run, squash ${branchSquash}`);
     }
     prText = prTextCreate(commitMessage);
     // security - sanitize commitMessage
@@ -1944,11 +2067,202 @@ ${prText.body}
 ' "$BRANCH_MERGE" "$@" # '
 )}
 
+shGithubReleaseCreate() {(set -e
+# This function will save a draft github-release of master of remote
+# <origin|upstream>, for the version atop its CHANGELOG.md, after its github-ci
+# passes. Publish the draft by hand, which triggers publish.yml.
+#
+# It writes nothing before its checks pass, and never a second draft, and a
+# re-run finds a draft or release of the same commit as done.
+#
+# example usage:
+# sh jslint_ci.sh shGithubReleaseCreate upstream
+    REMOTE="$1"
+    case "$REMOTE" in
+    origin|upstream)
+        ;;
+    *)
+        printf "shGithubReleaseCreate - usage: <origin|upstream>\n" >&2
+        exit 1
+        ;;
+    esac
+    git fetch "$REMOTE" master
+    if [ "$(git rev-parse master)" != "$(git rev-parse "$REMOTE/master")" ]
+    then
+        printf "shGithubReleaseCreate - master differs from %s/master\n" \
+            "$REMOTE" >&2
+        exit 1
+    fi
+    shGithubCiWait "$REMOTE" master
+    shGithubTokenExport
+    node --input-type=module --eval '
+import moduleChildProcess from "child_process";
+import {promisify} from "util";
+(async function () {
+    const [arg_sha, arg_url] = process.argv.slice(1);
+    const latest = changelog_parse(await git_show("CHANGELOG.md"));
+    const repo = (
+        /github\.com[\/:]([^\/]+\/[^\/]+?)(?:\.git)?\/?$/
+    ).exec(arg_url)?.[1];
+    const tag = `v${latest.version}`;
+    const version_package = JSON.parse(await git_show("package.json")).version;
+    // A pypi-package, as in sqlmath, publishes the version in pyproject.toml,
+    // less any "-" suffix.
+    const version_pypi = (
+        /^version = "([^"]*)"\r?$/m
+    ).exec(
+        await git_show("pyproject.toml").catch(function () {
+            return "";
+        })
+    )?.[1];
+    let release;
+    let result;
+    function changelog_parse(text) {
+
+// This function will take the first "# v" heading, skipping "# Todo", with its
+// entries up to the next heading, keeping indented sub-items.
+
+        const [
+            ,
+            version,
+            body = ""
+        ] = (
+            /^# v(\S+)\n([\s\S]*?)(?:^# |(?![\s\S]))/m
+        ).exec(text.replace((/\r/g), "")) || [];
+        return {
+            body: body.trim(),
+            // Title the release with the first item.
+            item_first: body.trim().split("\n").find(function (line) {
+                return line.startsWith("- ");
+            }),
+            version
+        };
+    }
+    function fail(message) {
+        console.error(`shGithubReleaseCreate - ${repo} - ${message}`);
+    }
+    async function git_show(file) {
+        const {stdout} = await promisify(moduleChildProcess.execFile)(
+            "git",
+            ["show", `${arg_sha}:${file}`],
+            {maxBuffer: 256 * 1024 * 1024}
+        );
+        return stdout;
+    }
+    async function github_request(method, path, body) {
+        const res = await fetch(`https://api.github.com/repos/${repo}${path}`, {
+            body: body && JSON.stringify(body),
+            headers: {
+                accept: "application/vnd.github+json",
+                authorization: `Bearer ${process.env.MY_GITHUB_TOKEN}`,
+                "x-github-api-version": "2022-11-28"
+            },
+            method
+        });
+        const text = await res.text();
+        return {
+            json: (res.ok && text) && JSON.parse(text),
+            status: res.status,
+            text
+        };
+    }
+    // Fail closed, so only a saved draft exits 0.
+    process.exitCode = 1;
+    if (!repo) {
+        fail(`cannot parse github repo from url "${arg_url}"`);
+        return;
+    }
+    if (!process.env.MY_GITHUB_TOKEN) {
+        fail("needs MY_GITHUB_TOKEN");
+        return;
+    }
+    if (!latest.version || !latest.item_first) {
+        fail("no \"# v<version>\" with entries in CHANGELOG.md");
+        return;
+    }
+    if (latest.version !== version_package) {
+        fail(
+            `CHANGELOG.md version ${latest.version}` +
+            ` differs from package.json version ${version_package}`
+        );
+        return;
+    }
+    if (version_pypi && version_pypi !== latest.version.split("-")[0]) {
+        fail(
+            `CHANGELOG.md version ${latest.version}` +
+            ` differs from pyproject.toml version ${version_pypi}`
+        );
+        return;
+    }
+    // A draft has no tag yet, and only a listing of releases shows drafts.
+    result = await github_request("GET", "/releases?per_page=100");
+    if (result.status !== 200) {
+        fail(`list releases - ${result.status} ${result.text}`);
+        return;
+    }
+    release = result.json.find(function (elem) {
+        return elem.tag_name === tag;
+    });
+    // A re-run, as of shGithubPrCleanup, finds its own draft or release done.
+    if (release?.target_commitish === arg_sha) {
+        console.error(
+            `shGithubReleaseCreate - ${tag} already saved` +
+            ` - ${release.html_url}`
+        );
+        process.exitCode = 0;
+        return;
+    }
+    if (release) {
+        fail(
+            `${tag} already exists as a ` + (
+                release.draft
+                ? "draft"
+                : "release"
+            ) + ` - ${release.html_url}`
+        );
+        return;
+    }
+    result = await github_request("GET", `/git/matching-refs/tags/${tag}`);
+    if (result.status !== 200) {
+        fail(`list tags - ${result.status} ${result.text}`);
+        return;
+    }
+    if (result.json.some(function (elem) {
+        return elem.ref === `refs/tags/${tag}`;
+    })) {
+        fail(`tag ${tag} already exists, with no release`);
+        return;
+    }
+    // Never retry, since a lost reply could mean a saved draft, which a
+    // re-run then finds above.
+    result = await github_request("POST", "/releases", {
+        body: latest.body,
+        draft: true,
+        generate_release_notes: true,
+        name: `${tag} - ${latest.item_first.slice(2)}`,
+        tag_name: tag,
+        target_commitish: arg_sha
+    });
+    if (result.status !== 201) {
+        fail(`create draft - ${result.status} ${result.text}`);
+        return;
+    }
+    console.error(
+        `shGithubReleaseCreate - saved draft ${tag} - ${result.json.html_url}`
+    );
+    process.exitCode = 0;
+}());
+' "$(git rev-parse "$REMOTE/master")" "$(git config "remote.$REMOTE.url")" # '
+)}
+
 shGithubTokenExport() {
 # This function will export $MY_GITHUB_TOKEN from file.
     if [ ! "$MY_GITHUB_TOKEN" ]
     then
-        export MY_GITHUB_TOKEN="$(cat ~/.mysecret2/.my_github_token)"
+        # Drop any CR or LF, which an editor on windows may leave in the file.
+        export MY_GITHUB_TOKEN="$(
+            tr -d '\r\n' < ~/.mysecret2/.my_github_token
+        )"
     fi
 }
 

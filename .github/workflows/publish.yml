@@ -5,7 +5,7 @@
 name: publish
 on:
   release:
-    types: [created]
+    types: [published]
   workflow_dispatch:
 jobs:
 
@@ -33,6 +33,8 @@ jobs:
 
   publish_npmjs:
     name: Publish Package to npmjs
+    # npm trusts only the upstream repo, so skip a fork.
+    if: ${{ !github.event.repository.fork }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
