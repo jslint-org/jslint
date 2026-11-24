@@ -16,11 +16,11 @@
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Add html and css linting back into jslint.
 
-# v2026.11.2
+# v2026.11.3
 - jslint-ecma - Add ES2015-feature computed property-name '{[aa]: bb}', '{[aa]() {}}', '{get [aa]() {}}' in object-literal, and warn a constant key '{["aa"]: bb}'; not yet in destructuring.
 - jslint - Allow member-access on a parenthesized binary-expression '(aa + bb).padEnd(cc)' or any ternary, and a call or tagged-template on a parenthesized '||', '&&' or '??', not only '(aa + bb).slice()'.
 - jslint - Warn arrow-function 'aa || bb => cc' as a SyntaxError with wrap_subexpression_a_b, not wrap_fart_parameter, and accept the parens it needs, 'aa || ((bb) => cc)'.
-- ci - Automate pull-request open, post-merge cleanup with github-ci waits, and draft-release, on remote origin to test or upstream: 'shGithubPrCreate <origin|upstream> pr|release', 'npm_config_mode_pr_create=1', 'shGithubPrCleanup <origin|upstream>', 'shGithubReleaseCreate <origin|upstream>'.
+- ci - Automate the pull-request and release flow with github-ci waits, each step safe to re-run, on remote origin to test or upstream: 'shGithubPrFlow <branch|create|merge|merge_rebase|merge_squash|cleanup|release|publish> <origin|upstream>', and 'shGithubPrFlow all <origin|upstream> <pr|release>' to resume the whole flow unattended.
 
 # v2026.10.30
 - jstest - Collect each describe's tests from its body's synchronous part, so a jstestIt after an await throws, then report every failed or unfinished test at exit, and exit 1 on any.
