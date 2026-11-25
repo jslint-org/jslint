@@ -332,6 +332,7 @@
     reduce,
     repeat,
     replace,
+    replaceAll,
     resolve,
     result,
     reverse,
@@ -424,7 +425,6 @@
     warnings,
     white,
     wrapped,
-    wrapped_operand,
     writeFile
 */
 
@@ -5056,31 +5056,24 @@ function jslint_phase3_parse(state) {
 // ["(aa+aa).aa", "check_left", "(live)", "", 0]
 
         const id = left.id;
-        if (
-            !left.identifier &&
-            left.arity !== "ternary" &&
+        if (!(
+            left.identifier ||
+            left.arity === "ternary" ||
             (
-                left.arity !== "binary" ||
+                left.arity === "binary" &&
                 (
-                    id !== "." &&
-                    id !== "?." &&
-                    id !== "(" &&
-                    id !== "[" &&
+                    [".", "?.", "(", "["].includes(id) ||
                     (
-                        !left.wrapped ||
-                        id === "=>" ||
+                        left.wrapped &&
+                        id !== "=>" &&
                         (
-                            right.id !== "." &&
-                            right.id !== "?." &&
-                            right.id !== "[" &&
-                            id !== "&&" &&
-                            id !== "??" &&
-                            id !== "||"
+                            [".", "?.", "["].includes(right.id) ||
+                            ["&&", "??", "||"].includes(id)
                         )
                     )
                 )
             )
-        ) {
+        )) {
             warn("unexpected_a", right);
         }
     }
@@ -5775,14 +5768,6 @@ function jslint_phase3_parse(state) {
     function infix_lparen(left) {
         const the_paren = token_now;
         let the_argument;
-        if (left.id !== "function" && left.id !== "=>") {
-
-// test_cause:
-// ["(aa+aa)()", "check_left", "unexpected_a", "(", 8]
-// ["0()", "check_left", "unexpected_a", "(", 2]
-
-            check_left(left, the_paren);
-        }
         if (left.id === "=>") {
 
 // PR-519 - An arrow-function invoked immediately needs its parens, so warning
@@ -5790,9 +5775,16 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["((aa)=>0)()", "infix_lparen", "use_function_immediate", "=>", 6]
+// ["aa=((aa)=>0)?.()", "infix_lparen", "use_function_immediate", "=>", 9]
 
             warn("use_function_immediate", left);
-            left.wrapped_operand = true;
+        } else if (left.id !== "function") {
+
+// test_cause:
+// ["(aa+aa)()", "check_left", "unexpected_a", "(", 8]
+// ["0()", "check_left", "unexpected_a", "(", 2]
+
+            check_left(left, the_paren);
         }
         the_paren.expression = [left];
         if (token_nxt.id !== ")") {
@@ -6124,7 +6116,7 @@ function jslint_phase3_parse(state) {
         }
     }
 
-    function parse_expression(rbp, initial) {
+    function parse_expression(rbp, initial, mode_paren) {
 
 // This is the heart of JSLINT, the Pratt parser. In addition to parsing, it
 // is looking for ad hoc lint patterns. We add .fud_stmt to Pratt's model, which
@@ -6229,22 +6221,34 @@ function jslint_phase3_parse(state) {
         if (rbp >= 20 && left.id === "=>") {
 
 // PR-519 - Bugfix - An arrow function as an operand, as in
-// 'aa || ((bb) => cc)', needs its parens, so post_s_function does not warn
-// unexpected_parens on them. Without them, 'aa || (bb) => cc' is a
-// SyntaxError, like 'aa || bb => cc' below.
+// 'aa || ((bb) => cc)', needs its parens. Without them,
+// 'aa || (bb) => cc' is a SyntaxError, like 'aa || bb => cc' below, warned at
+// the arrow, or at the operator for an async arrow without await, which already
+// warns at the arrow. 'new ((bb) => cc)()' throws.
 
-            if (left.wrapped) {
-
-// test_cause:
-// ["aa||((aa)=>0)", "parse_expression", "(live)", "", 0]
-
-                left.wrapped_operand = true;
-            } else {
+            if (the_operator.id === "new") {
 
 // test_cause:
+// ["new((aa)=>0)", "parse_expression", "unexpected_a", "new", 1]
+
+                warn("unexpected_a", the_operator);
+            } else if (!left.wrapped) {
+
+// test_cause:
+// ["aa??(aa)=>0", "parse_expression", "wrap_subexpression_a_b", "??", 9]
 // ["aa||(aa)=>0", "parse_expression", "wrap_subexpression_a_b", "||", 9]
+// ["aa||async(aa)=>0", "parse_expression", "wrap_subexpression_a_b", "||", 3]
 
-                warn("wrap_subexpression_a_b", left, "=>", the_operator.id);
+                warn(
+                    "wrap_subexpression_a_b",
+                    (
+                        left.async === 1
+                        ? the_operator
+                        : left
+                    ),
+                    "=>",
+                    the_operator.id
+                );
             }
         }
 
@@ -6291,8 +6295,40 @@ function jslint_phase3_parse(state) {
 
                 warn("wrap_subexpression_a_b", left, "=>", the_operator.id);
             }
+
+// PR-519 - So does an arrow function as a left operand, as in
+// '((aa) => bb) || cc' or '((aa) => bb)()'. Without them, as in
+// '(aa) => {...}()', it is a SyntaxError. An assignment or '++' to it warns
+// bad_assignment_a instead.
+
+            if (
+                left.id === "=>" &&
+                !left.wrapped &&
+                the_symbol.lbp > 20 &&
+                token_nxt.id !== "++" &&
+                token_nxt.id !== "--"
+            ) {
+
+// test_cause:
+// ["
+// /*jslint fart*/
+// aa=(aa)=>{}()
+// ", "parse_expression", "wrap_subexpression_a_b", "(", 8]
+
+                warn("wrap_subexpression_a_b", left, "=>", token_nxt.id);
+            }
             advance();
             left = the_symbol.led_infix(left);
+        }
+        if (rbp < 20 && left.id === "=>" && left.wrapped && !mode_paren) {
+
+// PR-519 - An arrow function that is no operand needs no parens. Inside more
+// parens, as in '(((aa) => bb))', <prefix_lparen> warns the extra pair instead.
+
+// test_cause:
+// ["aa=((aa)=>0)", "parse_expression", "unexpected_parens", "=>", 9]
+
+            warn("unexpected_parens", left);
         }
         return left;
     }
@@ -7397,10 +7433,23 @@ function jslint_phase3_parse(state) {
 
 // test_cause:
 // ["aa={[0]:0}", "property_parse", "expected_a_b", "[0]", 5]
+// ["aa={[0n]:0}", "property_parse", "expected_a_b", "[0n]", 5]
+// ["aa={[0x1_0]:0}", "property_parse", "expected_a_b", "[0x1_0]", 5]
 // ["aa={[\"aa\"\n]:0}", "property_parse", "expected_a_b", "[\"aa\"]", 5]
 // ["aa={[null]:0}", "property_parse", "expected_a_b", "[null]", 5]
 
-                    warn("expected_a_b", name, key, `[${key}]`);
+// PR-519 - A number key suggests its string, '{"16": bb}' for '{[0x1_0]: bb}',
+// since '{16: bb}' warns too.
+
+                    warn("expected_a_b", name, (
+                        value.id === "(number)"
+                        ? JSON.stringify(String(
+                            key.endsWith("n")
+                            ? BigInt(key.slice(0, -1).replaceAll("_", ""))
+                            : Number(key.replaceAll("_", ""))
+                        ))
+                        : key
+                    ), `[${key}]`);
                 }
                 if (typeof extra === "string" || token_nxt.id === "(") {
 
@@ -7437,16 +7486,6 @@ function jslint_phase3_parse(state) {
 
                     warn("duplicate_a", name);
                 }
-                if (name.id === "(string)" && jslint_rgx_identifier.test(id)) {
-
-// PR-519 - One way to name an accessor: 'get aa', not 'get "aa"' [owner]. A
-// duplicate warns first, the worse of two on one token.
-
-// test_cause:
-// ["aa={get \"aa\"(){}}", "property_parse", "expected_a_b", "\"aa\"", 9]
-
-                    warn("expected_a_b", name, id, `"${id}"`);
-                }
                 seen[id] = false;
                 seen_getset[full] = true;
             } else {
@@ -7459,6 +7498,25 @@ function jslint_phase3_parse(state) {
                     warn("duplicate_a", name);
                 }
                 seen[id] = true;
+            }
+            if (
+                name.id === "(string)" &&
+                (typeof extra === "string" || token_nxt.id === "(") &&
+                jslint_rgx_identifier.test(id) &&
+                id !== "function" &&
+                (option_dict.nomen || !jslint_rgx_weird_property.test(id))
+            ) {
+
+// PR-519 - One way to name an accessor or a method: 'get aa' and 'aa()', not
+// 'get "aa"' and '"aa"()' [owner]. A duplicate warns first, the worse of two on
+// one token. A name that would warn weird_property_a, as '"_aa"()', or read
+// as a function expression, '"function"()', keeps its quotes.
+
+// test_cause:
+// ["aa={\"aa\"(){}}", "property_parse", "expected_a_b", "\"aa\"", 5]
+// ["aa={get \"aa\"(){}}", "property_parse", "expected_a_b", "\"aa\"", 9]
+
+                warn("expected_a_b", name, id, `"${id}"`);
             }
             if (
                 !name.identifier &&
@@ -7486,7 +7544,7 @@ function jslint_phase3_parse(state) {
             } else if (token_nxt.id === "(") {
 
 // test_cause:
-// ["aa={\"aa\"(){}}", "property_parse", "(live)", "", 0]
+// ["aa={\"a-a\"(){}}", "property_parse", "(live)", "", 0]
 // ["aa={aa()}", "property_parse", "(live)", "", 0]
 // ["aa={get aa(){}}", "property_parse", "(live)", "", 0]
 
@@ -7644,7 +7702,7 @@ function jslint_phase3_parse(state) {
 // test_cause:
 // ["(0)", "prefix_lparen", "(live)", "", 0]
 
-        the_value = parse_expression(0);
+        the_value = parse_expression(0, false, true);
         if (the_value.wrapped === true) {
 
 // test_cause:
@@ -10294,7 +10352,7 @@ function jslint_phase4_walk(state) {
         delete scope_function.loop;
         delete scope_function.switch;
         delete scope_function.try;
-        if (thing.wrapped && !thing.wrapped_operand) {
+        if (thing.wrapped && thing.id === "function") {
 
 // test_cause:
 // ["aa=(function(){})", "post_s_function", "unexpected_parens", "function", 5]

@@ -1,5 +1,5 @@
-<svg height="1702" width="800" xmlns="http://www.w3.org/2000/svg">
-<rect height="1702" fill="#222" width="800"></rect>
+<svg height="1768" width="800" xmlns="http://www.w3.org/2000/svg">
+<rect height="1768" fill="#222" width="800"></rect>
 <text
     fill="#7f7"
     font-family="consolas, menlo, monospace"
@@ -53,139 +53,139 @@
     textLength="768"
     x="10"
     y="186"
->- jslint - Allow a quoted accessor-name 'get "aa"() {}', valid ES2015 but a stop now.            </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="208"
 >- jslint - Destructuring - Allow catch-variable 'catch ({aa})', valid ES2015 but a stop now.     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="230"
+    y="208"
 >- jslint - Destructuring - Allow a default in object destructuring-assignment '({aa = bb} = cc)'\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="252"
+    y="230"
 >  , and a member-target '[aa.cc = bb] = cc', valid but stops now, and then warn a const reassign\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="274"
+    y="252"
 >  ed by '({aa} = {})'.                                                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="296"
+    y="274"
 >- jslint - Add warning for 'aa.hasOwnProperty(bb)' and 'Object.prototype.hasOwnProperty.call(aa,\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="318"
+    y="296"
 >   bb)', suggesting 'Object.hasOwn(aa, bb)'.                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="340"
+    y="318"
 >- jslint - Check the target of a for-of or for-in head without const or let, e.g. 'for (aa + bb \</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="362"
+    y="340"
 >  of cc)'.                                                                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="384"
+    y="362"
 >- jslint - Relax warning use_open for ternary-operator inside template-literal substitution '${.\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="406"
+    y="384"
 >  ..}'.                                                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="428"
+    y="406"
 >- jslint - Revisit autofix of top-level whitespace, e.g. warning expected_space_a_b on line brea\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="450"
+    y="428"
 >  k inside closed-form expression, and on line break between an accessor's 'get' and its name.   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="472"
+    y="450"
 >- jslint-directive - Add new directive 'tab' to support tab-indent.                              </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="494"
+    y="472"
 >- jslint-ecma - Add ES2015-feature generators 'function*'.                                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="516"
+    y="494"
 >- jslint - Destructuring - Allow computed property-name 'const {[aa]: bb} = cc', valid ES2015 bu\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="538"
+    y="516"
 >  t a stop now.                                                                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="560"
+    y="538"
 >- jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="582"
+    y="560"
 >- jslint - Add html and css linting back into jslint.                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="604"
+    y="582"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="626"
+    y="604"
 ># v2026.11.29                                                                                    </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
-    y="648"
+    y="626"
 >- jslint-ecma - Add ES2015-feature computed property-name '{[aa]: bb}', '{[aa]() {}}', '{get [aa\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
+    y="648"
+>  ]() {}}', string-key method '{"a-b"() {}}' and accessor, and 'super.aa' under option this, and\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
     y="670"
->  ]() {}}' in object-literal, and warn a constant key '{["aa"]: bb}'; not yet in destructuring.  </tspan>
+>   warn a constant key '{["aa"]: bb}'; not yet in destructuring.                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -203,7 +203,7 @@
     textLength="768"
     x="10"
     y="736"
->  + bb).slice()'.                                                                                </tspan>
+>  + bb).slice()', and a subscript of an array- or object-literal '[aa, bb][cc]'.                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
@@ -215,253 +215,271 @@
     textLength="768"
     x="10"
     y="780"
->  t wrap_fart_parameter, and accept the parens it needs, 'aa || ((bb) =&gt; cc)'.                   </tspan>
+>  t wrap_fart_parameter, and accept the parens it needs, 'aa || ((bb) =&gt; cc)', and warn an arrow\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="802"
->- ci - Automate the pull-request and release flow with github-ci waits, each step safe to re-run\</tspan>
+>  -function invoked immediately '((aa) =&gt; bb)()', naming '(function () {...}())'.                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="824"
->  , on remote origin to test or upstream: 'shGithubPrFlow &lt;branch|create|merge|merge_rebase|merg\</tspan>
+>- ci - Automate the pull-request and release flow with github-ci waits, each step safe to re-run\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="846"
->  e_squash|cleanup|release|publish&gt; &lt;origin|upstream&gt;', and 'shGithubPrFlow all &lt;origin|upstream\</tspan>
+>   but create and branch, which appends a pull-commit, on remote origin to test or upstream: 'sh\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="868"
->  &gt; &lt;pr|release&gt;' to resume the whole flow unattended.                                           </tspan>
+>  GithubPrFlow &lt;branch|create|merge|merge_rebase|merge_squash|cleanup|release|publish&gt; &lt;origin|u\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="890"
->                                                                                                 </tspan>
+>  pstream&gt;', and 'shGithubPrFlow all &lt;origin|upstream&gt; &lt;pr|release&gt;' to resume the whole flow un\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="912"
-># v2026.10.30                                                                                    </tspan>
+>  attended.                                                                                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="934"
->- jstest - Collect each describe's tests from its body's synchronous part, so a jstestIt after a\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="956"
->  n await throws, then report every failed or unfinished test at exit, and exit 1 on any.        </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="978"
->- jstest - Fail any describe or jstestIt name not in ASCII order.                                </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1000"
->- jstest - Add opt-in test filter 'npm_config_mode_test_filter=&lt;regexp&gt;' on '&lt;describe&gt; - &lt;it&gt;'. </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1022"
->- jslint - Revamp cause-based testing on option trace and V8 block coverage, replacing the runti\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1044"
->  me hook and option test_cause.                                                                 </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1066"
->- jslint - Report: Functions - Copy each signature from its source text, keeping default values. </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1088"
->- jslint - Report: Functions - List block-scoped names, catch-variables and outer names, and mar\</tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1110"
->  k closure only across functions.                                                               </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1132"
->- ci - Bump to node_version 24 to 26.                                                            </tspan>
-<tspan
-    lengthAdjust="spacingAndGlyphs"
-    textLength="768"
-    x="10"
-    y="1154"
 >                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
+    y="956"
+># v2026.10.30                                                                                    </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="978"
+>- jstest - Collect each describe's tests from its body's synchronous part, so a jstestIt after a\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1000"
+>  n await throws, then report every failed or unfinished test at exit, and exit 1 on any.        </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1022"
+>- jstest - Fail any describe or jstestIt name not in ASCII order.                                </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1044"
+>- jstest - Add opt-in test filter 'npm_config_mode_test_filter=&lt;regexp&gt;' on '&lt;describe&gt; - &lt;it&gt;'. </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1066"
+>- jslint - Revamp cause-based testing on option trace and V8 block coverage, replacing the runti\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1088"
+>  me hook and option test_cause.                                                                 </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1110"
+>- jslint - Report: Functions - Copy each signature from its source text, keeping default values. </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1132"
+>- jslint - Report: Functions - List block-scoped names, catch-variables and outer names, and mar\</tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1154"
+>  k closure only across functions.                                                               </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
     y="1176"
-># v2026.9.29                                                                                     </tspan>
+>- ci - Bump to node_version 24 to 26.                                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1198"
->- jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add fu\</tspan>
+>                                                                                                 </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1220"
->  nction jslint_phase6_autofix().                                                                </tspan>
+># v2026.9.29                                                                                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1242"
->- jslint-website - Add button 'Autofix Whitespace' and section 'Report: Autofix'.                </tspan>
+>- jslint-cli - Add cli-option jslint_autofix=filename to autofix whitespace-warnings, and add fu\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1264"
->- jslint-vscode - Add command 'JSLint - Autofix Whitespace', CTRL+SHIFT+J A.                     </tspan>
+>  nction jslint_phase6_autofix().                                                                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1286"
->- jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-lin\</tspan>
+>- jslint-website - Add button 'Autofix Whitespace' and section 'Report: Autofix'.                </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1308"
->  e, except dot-operators '.', '?.' and tagged-template backtick, and update function jslint_pha\</tspan>
+>- jslint-vscode - Add command 'JSLint - Autofix Whitespace', CTRL+SHIFT+J A.                     </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1330"
->  se6_autofix() to autofix it.                                                                   </tspan>
+>- jslint - Add beta-warning to jslint_phase5_whitage(), requiring binary-operators at end-of-lin\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1352"
->- jslint - Check escapes in untagged megastrings via \&lt;char_after_escape&gt;.                       </tspan>
+>  e, except dot-operators '.', '?.' and tagged-template backtick, and update function jslint_pha\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1374"
->- jslint-autofix - Warning 'too_long' no longer blocks autofix.                                  </tspan>
+>  se6_autofix() to autofix it.                                                                   </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1396"
->- jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.                      </tspan>
+>- jslint - Check escapes in untagged megastrings via \&lt;char_after_escape&gt;.                       </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1418"
->- jslint-ecma - Add Exponentiation-assignment-operator '**=' support.                            </tspan>
+>- jslint-autofix - Warning 'too_long' no longer blocks autofix.                                  </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1440"
->- jslint - bugfix - Re-verify the block-scope and variable-lifecycle engine from v2026.7.30 agai\</tspan>
+>- jslint-ecma - Add ES2018-feature Asynchronous Iteration - for await...of.                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1462"
->  nst the spec, fixing labels, '??=' and '||=', redeclared 'var', and destructuring and for-of n\</tspan>
+>- jslint-ecma - Add Exponentiation-assignment-operator '**=' support.                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1484"
->  ames.                                                                                          </tspan>
+>- jslint - bugfix - Re-verify the block-scope and variable-lifecycle engine from v2026.7.30 agai\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1506"
->- jslint - Update operator binding-powers to match the spec, and merge warnings 'and', 'wrap_con\</tspan>
+>  nst the spec, fixing labels, '??=' and '||=', redeclared 'var', and destructuring and for-of n\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1528"
->  dition', 'wrap_unary' into 'wrap_subexpression_a_b'.                                           </tspan>
+>  ames.                                                                                          </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1550"
->- jslint - Move column-fudging into warn_at(); callers pass 0-based column.                      </tspan>
+>- jslint - Update operator binding-powers to match the spec, and merge warnings 'and', 'wrap_con\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1572"
->- jslint - Remove dead token-property 'free' from parser and whitage.                            </tspan>
+>  dition', 'wrap_unary' into 'wrap_subexpression_a_b'.                                           </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1594"
->- jslint - Improve parser to parse jquery.js without stopping - for-init comma, numeric object-k\</tspan>
+>- jslint - Move column-fudging into warn_at(); callers pass 0-based column.                      </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1616"
->  ey.                                                                                            </tspan>
+>- jslint - Remove dead token-property 'free' from parser and whitage.                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1638"
->- jslint-cli - Skip dotfiles when linting a directory.                                           </tspan>
+>- jslint - Improve parser to parse jquery.js without stopping - for-init comma, numeric object-k\</tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1660"
->- jslint-ci - Merge ci-shell-function shGithubPrUpdatePrxxx() into shGithubPrCreate().           </tspan>
+>  ey.                                                                                            </tspan>
 <tspan
     lengthAdjust="spacingAndGlyphs"
     textLength="768"
     x="10"
     y="1682"
+>- jslint-cli - Skip dotfiles when linting a directory.                                           </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1704"
+>- jslint-ci - Merge ci-shell-function shGithubPrUpdatePrxxx() into shGithubPrCreate().           </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1726"
 >- jslint - Reviewed probable-deadcode-sections and confirmed 7 of 8 were real-deadcode.          </tspan>
+<tspan
+    lengthAdjust="spacingAndGlyphs"
+    textLength="768"
+    x="10"
+    y="1748"
+>- jslint - inline-document each deadcode-guard with its proof and revive-note.                   </tspan>
 
 </text>
 </svg>

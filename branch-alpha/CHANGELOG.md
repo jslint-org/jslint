@@ -3,7 +3,6 @@
 # Todo
 - jslint-cli - Lint every file argument, as 'node jslint.mjs aa.mjs bb.mjs' now lints 'aa.mjs' and silently skips 'bb.mjs'.
 - jslint - Destructuring - Allow a default on a destructured parameter 'function aa({bb} = {})', valid ES2015 but a stop now.
-- jslint - Allow a quoted accessor-name 'get "aa"() {}', valid ES2015 but a stop now.
 - jslint - Destructuring - Allow catch-variable 'catch ({aa})', valid ES2015 but a stop now.
 - jslint - Destructuring - Allow a default in object destructuring-assignment '({aa = bb} = cc)', and a member-target '[aa.cc = bb] = cc', valid but stops now, and then warn a const reassigned by '({aa} = {})'.
 - jslint - Add warning for 'aa.hasOwnProperty(bb)' and 'Object.prototype.hasOwnProperty.call(aa, bb)', suggesting 'Object.hasOwn(aa, bb)'.
@@ -17,10 +16,10 @@
 - jslint - Add html and css linting back into jslint.
 
 # v2026.11.29
-- jslint-ecma - Add ES2015-feature computed property-name '{[aa]: bb}', '{[aa]() {}}', '{get [aa]() {}}' in object-literal, and warn a constant key '{["aa"]: bb}'; not yet in destructuring.
-- jslint - Allow member-access on a parenthesized binary-expression '(aa + bb).padEnd(cc)' or any ternary, and a call or tagged-template on a parenthesized '||', '&&' or '??', not only '(aa + bb).slice()'.
-- jslint - Warn arrow-function 'aa || bb => cc' as a SyntaxError with wrap_subexpression_a_b, not wrap_fart_parameter, and accept the parens it needs, 'aa || ((bb) => cc)'.
-- ci - Automate the pull-request and release flow with github-ci waits, each step safe to re-run, on remote origin to test or upstream: 'shGithubPrFlow <branch|create|merge|merge_rebase|merge_squash|cleanup|release|publish> <origin|upstream>', and 'shGithubPrFlow all <origin|upstream> <pr|release>' to resume the whole flow unattended.
+- jslint-ecma - Add ES2015-feature computed property-name '{[aa]: bb}', '{[aa]() {}}', '{get [aa]() {}}', string-key method '{"a-b"() {}}' and accessor, and 'super.aa' under option this, and warn a constant key '{["aa"]: bb}'; not yet in destructuring.
+- jslint - Allow member-access on a parenthesized binary-expression '(aa + bb).padEnd(cc)' or any ternary, and a call or tagged-template on a parenthesized '||', '&&' or '??', not only '(aa + bb).slice()', and a subscript of an array- or object-literal '[aa, bb][cc]'.
+- jslint - Warn arrow-function 'aa || bb => cc' as a SyntaxError with wrap_subexpression_a_b, not wrap_fart_parameter, and accept the parens it needs, 'aa || ((bb) => cc)', and warn an arrow-function invoked immediately '((aa) => bb)()', naming '(function () {...}())'.
+- ci - Automate the pull-request and release flow with github-ci waits, each step safe to re-run but create and branch, which appends a pull-commit, on remote origin to test or upstream: 'shGithubPrFlow <branch|create|merge|merge_rebase|merge_squash|cleanup|release|publish> <origin|upstream>', and 'shGithubPrFlow all <origin|upstream> <pr|release>' to resume the whole flow unattended.
 
 # v2026.10.30
 - jstest - Collect each describe's tests from its body's synchronous part, so a jstestIt after an await throws, then report every failed or unfinished test at exit, and exit 1 on any.

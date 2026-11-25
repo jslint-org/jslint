@@ -1077,15 +1077,6 @@ shGithubCheckoutRemote() {(set -e
     done
 )}
 
-shGithubCiWait() {(set -e
-# This function will run shGithubPrFlow ci_wait.
-#
-# example usage:
-# shGithubCiWait upstream/beta
-# shGithubCiWait upstream/beta dispatch
-    shGithubPrFlow ci_wait "$@"
-)}
-
 shGithubFileDownload() {(set -e
 # This function will download file $1 from github repo/branch.
 # https://docs.github.com/en/rest/reference/repos#create-or-update-file-contents
@@ -1207,7 +1198,7 @@ shGithubPrFlow() {(set -e
 # all <remote> <pr|release> [version] [squash-base]
 #     branch, create, merge (pr) or merge_squash (release), and cleanup,
 #     resuming by state, and never publish
-# ci_wait <remote>/<branch> [dispatch]
+# ci_wait <remote>/<branch>
 #     wait for the newest github-ci runs on the commit at <remote>/<branch>
 #
 # example usage:
@@ -1243,6 +1234,7 @@ import moduleFs from "fs";
         subcmd, ...argList
     ] = process.argv.slice(2);
     let modePr = "";
+    let ownerOrigin = "";
     let prText;
     let remote = "";
     async function all() {
@@ -1362,7 +1354,6 @@ import moduleFs from "fs";
                 "grep", "--untracked", "-Eil", "-e", "^ *?(//|#) pr-xxx - "
             ])
         ).split("\n").filter(Boolean);
-        const ownerOrigin = (await repoOf("origin")).split("/")[0];
         const repoRemote = await repoOf(remote);
         let branchPull = "";
         let branchSquash = "HEAD";
@@ -1376,6 +1367,7 @@ import moduleFs from "fs";
         let prXxx;
         let res;
         let tip;
+        let tipAlpha;
         let top;
         let version;
         await modeParse();
@@ -1463,13 +1455,7 @@ import moduleFs from "fs";
                 ` - ${res.status} ${res.text}`
             );
             prBranch = (
-                (
-                    res.json?.state === "open" &&
-                    // Github owners are case-insensitive.
-                    res.json.head?.label?.toLowerCase().startsWith(
-                        `${ownerOrigin.toLowerCase()}:`
-                    )
-                )
+                (res.json?.state === "open" && isOriginHead(res.json))
                 ? res.json.head.label.slice(ownerOrigin.length + 1)
                 : ""
             );
@@ -1527,21 +1513,15 @@ import moduleFs from "fs";
                 ` ${pr?.head.ref} - merge or close it first`
             );
         }
-        // A squash-base at HEAD, given or by default, even on a re-run, with
-        // nothing pending, appends an empty pull-commit carrying only the
-        // message.
-        if (
-            issueFile.length === 0 &&
-            await gitOutput(["rev-parse", branchSquash]) === head &&
-            !(await gitOutput(["status", "--porcelain"]))
-        ) {
-            log("nothing pending, append an empty pull-commit on HEAD");
-        }
         // The push goes to origin for either remote, so never over a commit
         // HEAD lacks, such as of a pull-request on the other remote, and the
         // lease on the push keeps it so through the slow test.
         tip = (
             await gitOutput(["ls-remote", "origin", `refs/heads/${branchPull}`])
+        ).split("\t")[0];
+        // The force-push of alpha takes a lease too.
+        tipAlpha = (
+            await gitOutput(["ls-remote", "origin", "refs/heads/alpha"])
         ).split("\t")[0];
         moduleAssert.ok(
             !tip || await gitTryCode([
@@ -1556,9 +1536,8 @@ import moduleFs from "fs";
         moduleAssert.ok(
             await shRun(`
 (set -e
-    . ./jslint_ci.sh
     npm run test2
-    shDirHttplinkValidate
+    sh jslint_ci.sh shDirHttplinkValidate
 )
             `) === 0,
             "shGithubPrFlow branch - test failed"
@@ -1577,19 +1556,18 @@ import moduleFs from "fs";
         commitMessage = commitMessage.trim().replace((/\u0027/g), "$&\"$&\"$&");
         if (await shRun(`
 (set -e
-    . ./jslint_ci.sh
-    # Its git output goes to the terminal, through tee, so force color.
     export GIT_CONFIG_COUNT=1
     export GIT_CONFIG_KEY_0=color.ui
     export GIT_CONFIG_VALUE_0=always
     git reset "${branchSquash}"
     git push . HEAD:__pr_"${branchMerge()}"_pre -f
-    shGitSquashPop alpha \u0027${commitMessage}\u0027
+    sh jslint_ci.sh shGitSquashPop alpha \u0027${commitMessage}\u0027
     [ "$(git rev-parse HEAD)" != \
         "$(git rev-parse __pr_"${branchMerge()}"_pre)" ]
     git push . HEAD:__pr_"${branchMerge()}" -f
     git --no-pager diff "${tip || "HEAD"}"
-    git push --atomic origin +alpha:alpha alpha:"${branchPull}" \
+    git push --atomic origin alpha:alpha alpha:"${branchPull}" \
+        --force-with-lease=refs/heads/alpha:"${tipAlpha}" \
         --force-with-lease=refs/heads/"${branchPull}":"${tip}"
     printf "\n\n\n\n"
     git --no-pager log --decorate -n 4
@@ -1764,42 +1742,17 @@ import moduleFs from "fs";
             });
         }
     }
-    async function ciWait(remoteName, branchName, mode) {
+    async function ciWait(remoteName, branchName) {
 
 // This function will wait for the newest github-ci runs on the commit at
-// <remoteName>/<branchName>. Mode dispatch first triggers workflow ci.yml on
-// <branchName>, then waits only for runs created after that.
+// <remoteName>/<branchName>.
 
         const repo = await repoOf(remoteName);
         const sha = await gitOutput([
             "rev-parse", `refs/remotes/${remoteName}/${branchName}`
         ]);
-        let msDispatch = 0;
-        let result;
-        moduleAssert.ok(
-            !mode || mode === "dispatch",
-            `shGithubPrFlow ci_wait - unknown mode "${mode}"`
-        );
-        if (mode === "dispatch") {
-            result = await githubRequest(
-                "POST",
-                `/repos/${repo}/actions/workflows/ci.yml/dispatches`,
-                {ref: branchName}
-            );
-            moduleAssert.ok(
-                result.status === 204,
-                `shGithubPrFlow ci_wait - dispatch - ${result.status}` +
-                ` ${result.text}`
-            );
-            // Use the clock of github, which stamps the run, minus 5s of skew.
-            msDispatch = Date.parse(result.date) - 5000;
-        }
         await ciPoll({
-            describe: function (runList) {
-                return runList.map(function (run) {
-                    return `${run.name} ${run.status} ${run.conclusion}`;
-                }).join(", ");
-            },
+            describe: runListDescribe,
             isOldOk: true,
             label: `${repo} ${branchName}`,
             name: "ci_wait",
@@ -1813,9 +1766,8 @@ import moduleFs from "fs";
                 // later entry of the same workflow overwrites an earlier one.
                 return Object.values(Object.fromEntries(
                     json.workflow_runs.filter(function (run) {
-                        return (
-                            ["push", "workflow_dispatch"].includes(run.event) &&
-                            Date.parse(run.created_at) >= msDispatch
+                        return ["push", "workflow_dispatch"].includes(
+                            run.event
                         );
                     }).sort(function (aa, bb) {
                         return aa.run_number - bb.run_number;
@@ -1868,10 +1820,8 @@ import moduleFs from "fs";
             ` merged as ${sha} - ${res.status}`
         );
         // Origin is the owner of the head label, as <prGet> finds it, so
-        // a renamed fork is still origin. Github owners are case-insensitive.
-        isOrigin = String(pr.head.label).toLowerCase().startsWith(
-            `${repoOrigin.split("/")[0].toLowerCase()}:`
-        );
+        // a renamed fork is still origin.
+        isOrigin = isOriginHead(pr);
         isRefV = pr.head.ref.startsWith("branch-v");
         // Release only a branch-v* head from origin, so a contributor branch of
         // that name cannot push master.
@@ -1917,17 +1867,28 @@ import moduleFs from "fs";
             }
         }
         await ciWait(remote, "beta");
+        // Each force-push below leases the ref fetched before it, so it never
+        // overwrites a push made since.
+        for (const name of new Set(["origin", remote])) {
+            await gitRun(["fetch", name, "alpha", "beta"]);
+        }
+        // Stop if beta moved during the wait, so cleanup never syncs a beta ci
+        // did not pass.
+        moduleAssert.ok(
+            await gitOutput(["rev-parse", `${remote}/beta`]) === sha,
+            `shGithubPrFlow cleanup - ${remote}/beta moved during its ci`
+        );
         // Keep the backup of the pre-merge alpha on a re-run.
         if (await gitOutput(["rev-parse", "alpha"]) !== sha) {
-            await gitRun(["push", ".", "alpha:__pr_upstream_pre", "-f"]);
+            await gitRun(["push", ".", `alpha:__pr_${remote}_pre`, "-f"]);
         }
         await gitRun(["reset", `${remote}/beta`]);
         await gitRun(["push", ".", "alpha:beta", "-f"]);
-        await gitRun(["push", "origin", "alpha", "beta", "-f"]);
+        await gitRun(["push", "origin", "alpha", "beta", "--force-with-lease"]);
         await ciWait("origin", "alpha");
         await ciWait("origin", "beta");
         if (remote === "upstream") {
-            await gitRun(["push", "upstream", "alpha", "-f"]);
+            await gitRun(["push", "upstream", "alpha", "--force-with-lease"]);
             await ciWait("upstream", "alpha");
         }
         if (isRelease) {
@@ -1937,7 +1898,10 @@ import moduleFs from "fs";
             // release after it.
             await gitRun(["push", ".", "beta:master", "-f"]);
             if (remote === "upstream") {
-                await gitRun(["push", "origin", "master", "-f"]);
+                await gitRun(["fetch", "origin", "master"]);
+                await gitRun([
+                    "push", "origin", "master", "--force-with-lease"
+                ]);
                 await ciWait("origin", "master");
             }
             await gitRun(["push", remote, "master"]);
@@ -1965,7 +1929,7 @@ import moduleFs from "fs";
                 `:refs/heads/${pr.head.ref}`
             ]);
         }
-        await gitRun(["push", ".", "alpha:__pr_upstream", "-f"]);
+        await gitRun(["push", ".", `alpha:__pr_${remote}`, "-f"]);
         if (isRelease) {
             await release();
         }
@@ -1980,7 +1944,6 @@ import moduleFs from "fs";
         // whose content HEAD has moved past since.
         const branchPull = await branchPushed();
         const commitMessage = await gitOutput(["log", "-1", "--format=%B"]);
-        const ownerOrigin = (await repoOf("origin")).split("/")[0];
         const prNumber = Number((/^- PR-(\d+) /).exec(commitMessage)?.[1]);
         const repoRemote = await repoOf(remote);
         let pr;
@@ -2075,10 +2038,7 @@ import moduleFs from "fs";
     }
     function gitTryCode(list) {
         return new Promise(function (resolve) {
-            // Its output goes to the terminal, through tee, so force color.
-            moduleChildProcess.spawn("git", [
-                "-c", "color.ui=always", ...list
-            ], {
+            moduleChildProcess.spawn("git", list, {
                 stdio: ["ignore", 1, 2]
             }).on("exit", resolve);
         });
@@ -2112,6 +2072,12 @@ import moduleFs from "fs";
             status: res.status,
             text
         };
+    }
+    function isOriginHead(pr) {
+        // Github owners are case-insensitive.
+        return String(pr?.head?.label).toLowerCase().startsWith(
+            `${ownerOrigin.toLowerCase()}:`
+        );
     }
     async function isSquashBase(sha) {
 
@@ -2231,7 +2197,6 @@ import moduleFs from "fs";
 // branch-v release, since github updates a head sha only after a push.
 
         const head = await gitOutput(["rev-parse", "HEAD"]);
-        const ownerOrigin = (await repoOf("origin")).split("/")[0];
         const res = await githubRequest(
             "GET",
             `/repos/${await repoOf(remote)}/pulls` +
@@ -2242,12 +2207,10 @@ import moduleFs from "fs";
             res.status === 200,
             `shGithubPrFlow ${subcmd} - ${res.status} ${res.text}`
         );
-        // Github owners are case-insensitive.
         list = res.json.filter(function (elem) {
             return (
-                String(elem.head.label).toLowerCase().startsWith(
-                    `${ownerOrigin.toLowerCase()}:branch-`
-                ) &&
+                isOriginHead(elem) &&
+                elem.head.ref.startsWith("branch-") &&
                 (elem.head.sha === head || (
                     // A pr branch is named by its day, so a merged one of
                     // that name may be an earlier pull-request.
@@ -2380,11 +2343,7 @@ ${prText.description}
         }
         // Wait for the newest publish.yml run the release started.
         await ciPoll({
-            describe: function (runList) {
-                return runList.map(function (run) {
-                    return `${run.name} ${run.status} ${run.conclusion}`;
-                }).join(", ");
-            },
+            describe: runListDescribe,
             isOldOk: true,
             label: `${repoRemote} publish.yml v${top.version}`,
             name: "publish",
@@ -2477,6 +2436,11 @@ ${prText.description}
             `shGithubPrFlow ${subcmd} - cannot parse url of remote ${name}`
         );
         return repo;
+    }
+    function runListDescribe(runList) {
+        return runList.map(function (run) {
+            return `${run.name} ${run.status} ${run.conclusion}`;
+        }).join(", ");
     }
     function shRun(script) {
         return new Promise(function (resolve) {
@@ -2577,16 +2541,16 @@ ${prText.description}
     // Fail closed, so only a finished step exits 0.
     process.exitCode = 1;
     remote = argList[0] || "";
+    ownerOrigin = (await repoOf("origin")).split("/")[0];
     if (subcmd === "ci_wait") {
         remote = remote.split("/")[0];
         moduleAssert.ok(
-            remote && argList[0].includes("/"),
-            "shGithubPrFlow ci_wait - usage: ci_wait <remote>/<branch>" +
-            " [dispatch]"
+            remote && argList[0].includes("/") && argList.length === 1,
+            "shGithubPrFlow ci_wait - usage: ci_wait <remote>/<branch>"
         );
         // Wait on the commit the remote holds now, not a stale tracking-ref.
         await gitRun(["fetch", remote, argList[0].slice(remote.length + 1)]);
-        await ciWait(remote, argList[0].slice(remote.length + 1), argList[1]);
+        await ciWait(remote, argList[0].slice(remote.length + 1));
     } else {
         const stepDict = {
             all,
