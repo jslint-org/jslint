@@ -1031,7 +1031,7 @@ shGitSquashPop() {(set -e
     # commit HEAD immediately after previous $COMMIT
     git commit --allow-empty -am "$MESSAGE" || true
     printf "\n\n\n\n"
-    git --no-pager log -n 4
+    git --no-pager log --decorate -n 4
 )}
 
 shGithubCheckoutRemote() {(set -e
@@ -1185,12 +1185,13 @@ shGithubFileUpload() {(set -e
 shGithubPrFlow() {(set -e
 # This function will run one step of the pull-request and release flow on
 # remote <origin|upstream>, where origin tests the flow on the fork. Every step
-# is safe to re-run except create, since a pull-request is created once.
+# is safe to re-run except create, since a pull-request is created once, and
+# branch, which appends another pull-commit.
 #
 # branch <remote> <pr|release> [version] [squash-base]
 #     commit pending changes onto alpha as a pull-commit built from
-#     CHANGELOG.md, and push it to origin as branch-p<date> or
-#     branch-v<version>
+#     CHANGELOG.md, squashed onto [squash-base], by default HEAD, and push it
+#     to origin as branch-p<date> or branch-v<version>
 # create <remote> <pr|release> [issue,issue]
 #     open its pull-request against beta
 # merge | merge_rebase | merge_squash <remote>
@@ -1373,7 +1374,6 @@ import moduleFs from "fs";
         let pr;
         let prBranch = "";
         let prXxx;
-        let preSha;
         let res;
         let tip;
         let top;
@@ -1527,32 +1527,16 @@ import moduleFs from "fs";
                 ` ${pr?.head.ref} - merge or close it first`
             );
         }
-        // A re-run, with no squash given, rebuilds everything since the last
-        // squash base, rather than stack a duplicate, an origin test merge or
-        // a hand fix on it.
-        preSha = await gitTry([
-            "rev-parse", "--verify", `refs/heads/__pr_${branchMerge()}_pre`
-        ]);
+        // A squash-base at HEAD, given or by default, even on a re-run, with
+        // nothing pending, appends an empty pull-commit carrying only the
+        // message.
         if (
-            !argList[3] &&
-            preSha &&
-            preSha !== head &&
-            await isSquashBase(preSha)
+            issueFile.length === 0 &&
+            await gitOutput(["rev-parse", branchSquash]) === head &&
+            !(await gitOutput(["status", "--porcelain"]))
         ) {
-            branchSquash = `__pr_${branchMerge()}_pre`;
-            log(`re-run, squash ${branchSquash}`);
+            log("nothing pending, append an empty pull-commit on HEAD");
         }
-        // A pull-commit with nothing in it would push the commits under it
-        // unsquashed, and still exit 0.
-        moduleAssert.ok(
-            (
-                modePr === "release" ||
-                issueFile.length > 0 ||
-                await gitOutput(["rev-parse", branchSquash]) !== head ||
-                await gitOutput(["status", "--porcelain"])
-            ),
-            "shGithubPrFlow branch - nothing to commit - pass a squash-base"
-        );
         // The push goes to origin for either remote, so never over a commit
         // HEAD lacks, such as of a pull-request on the other remote, and the
         // lease on the push keeps it so through the slow test.
@@ -1594,6 +1578,10 @@ import moduleFs from "fs";
         if (await shRun(`
 (set -e
     . ./jslint_ci.sh
+    # Its git output goes to the terminal, through tee, so force color.
+    export GIT_CONFIG_COUNT=1
+    export GIT_CONFIG_KEY_0=color.ui
+    export GIT_CONFIG_VALUE_0=always
     git reset "${branchSquash}"
     git push . HEAD:__pr_"${branchMerge()}"_pre -f
     shGitSquashPop alpha \u0027${commitMessage}\u0027
@@ -1604,7 +1592,7 @@ import moduleFs from "fs";
     git push --atomic origin +alpha:alpha alpha:"${branchPull}" \
         --force-with-lease=refs/heads/"${branchPull}":"${tip}"
     printf "\n\n\n\n"
-    git --no-pager log -n 4
+    git --no-pager log --decorate -n 4
 )
         `) !== 0) {
             await Promise.all(fileList.map(function ([file, data]) {
@@ -2087,7 +2075,10 @@ import moduleFs from "fs";
     }
     function gitTryCode(list) {
         return new Promise(function (resolve) {
-            moduleChildProcess.spawn("git", list, {
+            // Its output goes to the terminal, through tee, so force color.
+            moduleChildProcess.spawn("git", [
+                "-c", "color.ui=always", ...list
+            ], {
                 stdio: ["ignore", 1, 2]
             }).on("exit", resolve);
         });
@@ -2923,7 +2914,7 @@ import moduleRepl from "repl";
                 switch (match2.split(" ").slice(0, 2).join(" ")) {
                 // syntax-sugar - run git log
                 case "git log":
-                    match2 += " -n 10";
+                    match2 += " --decorate -n 10";
                     break;
                 // syntax-sugar - run ll
                 case "ll":

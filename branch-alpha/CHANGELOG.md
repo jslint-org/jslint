@@ -16,7 +16,7 @@
 - jslint-ecma - Expand ES2015-feature-support for es-module-export-statement.
 - jslint - Add html and css linting back into jslint.
 
-# v2026.11.3
+# v2026.11.29
 - jslint-ecma - Add ES2015-feature computed property-name '{[aa]: bb}', '{[aa]() {}}', '{get [aa]() {}}' in object-literal, and warn a constant key '{["aa"]: bb}'; not yet in destructuring.
 - jslint - Allow member-access on a parenthesized binary-expression '(aa + bb).padEnd(cc)' or any ternary, and a call or tagged-template on a parenthesized '||', '&&' or '??', not only '(aa + bb).slice()'.
 - jslint - Warn arrow-function 'aa || bb => cc' as a SyntaxError with wrap_subexpression_a_b, not wrap_fart_parameter, and accept the parens it needs, 'aa || ((bb) => cc)'.
