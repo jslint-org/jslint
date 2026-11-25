@@ -1180,9 +1180,9 @@ shGithubPrFlow() {(set -e
 # branch, which appends another pull-commit.
 #
 # branch <remote> <pr|release> [version] [squash-base]
-#     commit pending changes onto alpha as a pull-commit built from
-#     CHANGELOG.md, squashed onto [squash-base], by default HEAD, and push it
-#     to origin as branch-p<date> or branch-v<version>
+#     append a pull-commit onto alpha, holding any pending changes, built
+#     from CHANGELOG.md, squashed onto [squash-base], by default HEAD, and
+#     push it to origin as branch-p<date> or branch-v<version>
 # create <remote> <pr|release> [issue,issue]
 #     open its pull-request against beta
 # merge | merge_rebase | merge_squash <remote>
@@ -1345,9 +1345,9 @@ import moduleFs from "fs";
     }
     async function branch() {
 
-// This function will commit pending changes onto alpha as a pull-commit built
-// from CHANGELOG.md, and push it to origin as branch-p<date> for mode pr, or
-// branch-v<version> for mode release.
+// This function will append a pull-commit onto alpha, holding any pending
+// changes, built from CHANGELOG.md, and push it to origin as branch-p<date> for
+// mode pr, or branch-v<version> for mode release.
 
         const issueFile = (
             await gitTry([
